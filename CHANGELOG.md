@@ -2,6 +2,17 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI 1.3] - 2026-10-30: Posture meter goes live
+
+### Changed
+- **Posture meter** (bottom-left) now follows your real guard. It reads the server's existing posture value, which fills when you block hits and drains after 2.5 s.
+  - It shifts from candle-gold to blood-red as it fills, and the label turns red above 80%.
+  - When your guard breaks, the label flashes **BROKEN**.
+
+### Verified in a live playtest
+- **Server to HUD:** posture set on the server at 45 and 92 shows on the HUD at 45% and 92%, and the colour shifts.
+- **Break:** a 95 → 0 break flashes BROKEN, then the label returns to POSTURE.
+
 ## [UI 1.2] - 2026-10-30: Playtest pass
 
 ### Changed
