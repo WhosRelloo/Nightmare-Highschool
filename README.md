@@ -9,6 +9,7 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 | [`CHANGELOG.md`](CHANGELOG.md) | Full changelog, newest first |
 | [`updates/discord/`](updates/discord/) | Discord update posts, ready to paste (each under 2000 characters) |
 | [`docs/`](docs/) | Design and build docs: combat, school clock, attendance and discipline, classes, factions, quests, the UI kit |
+| [`art/dev-products/`](art/dev-products/) | Icons for the Spin Shop's Developer Products (512 px, upload them on the Creator Dashboard); generator in [`tools/dev-products/`](tools/dev-products/) |
 | [`tools/vfx/`](tools/vfx/) | Blender (Cycles) script that renders the main menu's VFX sprites (volumetric smoke flipbook, plasma, crystal shards, embers, mist), plus `make_soft_vfx.py`: soft-edged tendril, shard and film-grain textures |
 | [`tools/ui-textures/`](tools/ui-textures/) | Python scripts that generate the UI kit's original gothic textures, with PBR lighting baked in (`pip install pillow numpy`) |
 
