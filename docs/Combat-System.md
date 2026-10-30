@@ -60,6 +60,22 @@ On `Services.AI.AI`:
   - a 0.4 s rate limit per player
 - **Known gap:** a downed player keeps network ownership so they can crawl. An exploiter could crawl faster than 4, which is the usual Roblox movement trust problem. Server-side speed checks are a later anti-exploit task.
 
+## Crouch and slide (Left Ctrl)
+- **One key.** Left Ctrl slides while you're sprinting (Slide moved from C). Otherwise, **hold** it to crouch, and let go to stand. It's rebindable in Settings as "Slide / Crouch".
+- **Crouching** (`Services.Player.Crouch`, server authoritative):
+  - Sets the Humanoid attribute `Crouch` and walk speed **7**.
+  - Standing up restores the speed you had before (the game uses both 12 and 14.4 as normal speeds).
+  - Sprinting, jumping or falling, an action (attack, dodge, block, slide, feint), stun states, being downed, carried or gripped, and the main menu all stand you up.
+- **Animations:** `Crouch` (139672322709288) replaces the idle and `CrouchWalk` (112732055140240) replaces the walk.
+  - They sit in every movement pack (Default, Katana, the shared one).
+  - `Controllers.Character.AnimationController` swaps them in on the `Crouch` attribute and dips the camera 1.1 studs.
+- **Stealth:** crouching multiplies detection by `Config.Stealth.Detection.CrouchMultiplier = 0.5`. This stacks with standing still (0.6). Sprinting still multiplies by 1.7.
+- **Remote:** `UnPackets.Crouch` ("Activate" / "Release"). It's unreliable, so the client re-sends until the server's attribute matches.
+- **Verified (Studio):**
+  - Holding Ctrl crouched (speed 7, Crouch animation, camera dip). Walking played CrouchWalk at speed 7. Letting go stood up and restored speed 14.4.
+  - Sprint + Ctrl played the slide with no crouch. A jump while holding stood you up.
+- **Not yet:** a crouch button for phones and gamepads. After a jump you have to press Ctrl again to crouch.
+
 ## AI fairness (stunlock fix)
 
 **Before:** an NPC hit every ~0.6 s with a 0.8 s stun. The player was stunned **80%** of the time and couldn't act.

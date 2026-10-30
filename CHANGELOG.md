@@ -2,6 +2,57 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [Races 1.0] - 2026-10-30: Six bloodlines, race passives, the Bloodline tab, and crouching
+
+### Added
+- **Three new races:** **Werewolf, Ghoul and Wraith** join Human, Priest and Vampire.
+  - Still rolled by the server and never picked. Odds: Human 40%, Priest 25%, Vampire 15%, Werewolf 10%, Ghoul 6%, Wraith 4%.
+  - Each new race has three sub-races (Bloodmoon/Alpha, Ghast/Crypt Lord, Revenant/Hollow King) and three tier titles.
+- **Race passives, balanced:** every race has strengths that grow with its tier, plus one drawback.
+  - Rarer sub-races boost the strengths (x1.15 / x1.3), never the drawback.
+  - Night favours monsters and day favours mortals. Priests hit the undead harder, Human Slayers hit all monsters harder, and every 4th night is a full moon for werewolves.
+- **Bloodline tab** (creator: Look / Bloodline / Name & Clan / Spin Shop; in school, from the Student Record):
+  - the race crest and tier title, and the race and variant spins with odds
+  - the passive and its drawback, and what Tier II and III give
+  - your traits
+- **Skin palettes:** Vampires get pale or dark tones only, and Ghouls a ghoul-only palette (clamped by the UI-kit session, in both outfit modes).
+- **Crouching:** hold **Left Ctrl** to crouch and crouch-walk, with your two new animations and a small camera dip.
+  - Crouching halves how fast stealth watchers notice you.
+  - Ctrl while sprinting slides (Slide moved from C).
+
+### Changed
+- **No duplicate tabs:** the Wardrobe's Lineage tab is removed (Look / Face / Hair / Outfit). In the creator, the Register panel hides its own tab strip, since the menu buttons pick the tab.
+- **Fits the screen:** the docked Register panel now sits between the menu's letterbox bars instead of running under the bottom one.
+- **Student Record:** shows "Vampire · Tier I, Fledgling", the race passive and its drawback.
+- **Low-health regeneration** now reads "heal N HP/s when badly hurt".
+
+### Fixed
+- **Doubled hooks:** a leftover copy of the Progression module made every progression hook run twice (double EXP and double heals). It's removed.
+
+### Verified (Studio playtest)
+- **Damage multipliers (with Might 2):**
+
+  | Case | Multiplier |
+  |---|---|
+  | Vampire by day | 0.98 |
+  | Vampire at night | 1.09 |
+  | Alpha Werewolf on a normal night | 1.095 |
+  | Alpha Werewolf on a full-moon night | 1.1275 |
+  | Priest hitting a Vampire | x1.06 |
+
+  The Werewolf's max health was 115.
+- **Heals:** a Ghoul execution healed exactly 6%, and a Vampire kill 4%.
+- **Bloodline tab:** spins and renders in the creator and in school.
+- **Crouch:**
+  - Hold, walk and release work, and the speed is restored.
+  - Sprint + Ctrl slides, and a jump stands you up.
+- **Pure checks:** 87 pass.
+
+### Not yet
+- Race cosmetics modelled in Blender (Phase 2).
+- Hunger, rites, the tier-up cutscene and the turning bite (Phase 3).
+- Two-player checks, and crouch on phones and gamepads.
+
 ## [UI 1.8] - 2026-10-30: Readable on every screen (UI audit pass)
 
 ### Changed

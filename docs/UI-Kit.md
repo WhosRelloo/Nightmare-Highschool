@@ -353,6 +353,7 @@ The window opens by itself on a player's first live join, never in Studio. `Shar
 - **Look-style marks (cosmetic, NOT race):** Chapel gets a gold cross pin. Nightborn gets pale skin and crimson eyes. Only the `LookStyle` attribute is set.
 
 **`ReplicatedStorage.Lineage`: race, variant and traits, rolled on the server (players never choose)**
+> Since Races 1.0 the race roster, passives and the Bloodline tab are documented in [Races-and-Bloodlines.md](Races-and-Bloodlines.md). The Wardrobe no longer has a Lineage tab.
 - **Races** (from the concept doc; weights are configurable):
   - Human 50%: Human 90 / Superhuman 10
   - Priest 30%: Priest 85 / Grand Priest 12 / Pope 3

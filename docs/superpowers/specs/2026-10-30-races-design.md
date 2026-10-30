@@ -89,7 +89,13 @@ Values are for Tier **I / II / III**, before the sub-race multiplier. They are a
 - **Thresholds** use the doc's kill numbers: **25 hunger** unlocks the Tier II rite, **100** the Tier III rite. One ordinary kill = 1 hunger before bonuses.
 - **Rites** are short quests in the existing quest system: one objective chain, race-themed, at night where it fits.
   - Example: the vampire Tier II rite *"The Font Below"*: go to the chapel undercroft after midnight and drink at the font. The full rite list is written during Phase 3.
-  - Finishing a rite raises `Lineage.Tier`, plays an evolution moment (ember burst, tier title card) and unlocks that tier's cosmetics.
+  - Finishing a rite raises `Lineage.Tier` and unlocks that tier's cosmetics.
+- **Evolution cutscene (user request, 2026-10-30):** each tier-up plays a short cinematic cutscene (about 8–12 s) with authored camera angles and choreography, one per race and tier.
+  - Example: a Vampire's slow orbit and crane-up as the bat swarm folds in. A Werewolf's low dolly as they're forced to a knee under the moon, then a snap-zoom on the howl.
+  - Each cutscene has camera keyframes (cuts, orbits, push-ins, letterbox), a character animation, race VFX, a sound sting, and the tier title card at the end.
+  - It's client-side and local to the evolving player; nearby players see the VFX and animation from their own view.
+  - The player is frozen and invulnerable during it. It's skippable after the first time, and never plays in a duel or while in danger (it waits until safe).
+  - Designed and built in Phase 3, with the shot list agreed with the user first.
 - **Tier source changes** from "computed from kills on join" to "earned and saved".
   - Existing saves keep their current kill-based tier, so nobody drops.
   - `RaceTier` stays the public attribute.

@@ -16,4 +16,4 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**UI Audit (2026-10-30):** every screen checked for legibility, contrast, layering and scaling. The EXP strip no longer draws over panels, small and faint text was enlarged and brightened, and daylight colours were fixed. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-ui-audit.md) and [docs/UI-Audit.md](docs/UI-Audit.md).
+**Races & Bloodlines (2026-10-30):** Werewolves, Ghouls and Wraiths join the roll. Every race has a balanced passive. There is a new Bloodline tab, and you can crouch on Left Ctrl. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-bloodlines.md) and [docs/Races-and-Bloodlines.md](docs/Races-and-Bloodlines.md).
