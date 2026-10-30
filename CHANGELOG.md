@@ -2,6 +2,38 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [Progression 1.0] - 2026-10-30: Levels, stats, real perks and traits
+
+### Added
+- **EXP and levels (1 to 50).** EXP comes from:
+  - class: attending, passing lessons
+  - quests
+  - combat: duels, the Ring champion, executions
+  - factions: joining, new ranks
+  - introductions, and slipping away from hall monitors
+
+  Everything is **1.2× in school hours**, as the concept doc says. Level-ups give 3 stat points, a notification and an ember burst.
+- **Stats:** **Might** (+damage), **Grit** (+max health, slower guard strain) and **Wits** (+class and quest EXP, harder to spot). Spend points in the **Student Record** (**L**, or the new book button on the top bar).
+- **Clan perks and lineage traits now do things:**
+  - **Active:** damage dealt/taken, max health, guard strain, stealth, EXP by kind, school-hours and night EXP, night power, low-health healing, and Fated's daily get-back-up.
+  - **Planned:** walk speed, parry, prices, popularity and clue sense. These say "(planned)" until their systems exist.
+  - Clan perk texts are generated from the real effects.
+- **EXP strip:** a subtle hairline under the health bar.
+  - Clock ticks, gold warming to crimson with an ember tip, and the level as a Roman numeral.
+  - The knob glows when points are waiting. It rests faint and wakes when you earn EXP.
+- **Levels on show:** students you know show "Lv N" on their nameplate and in the Students list.
+
+### Fixed
+- **CONTINUE swallowing keys:** on a student who'd never saved a look, CONTINUE played the new-student reveal in the background, and its hidden name box then kept the keyboard in school. CONTINUE now skips the reveal, the register only takes focus while visible, and the menu waits longer for the signed flag on slow loads.
+- **L key:** the record key is read even though the game's keybind package marks every key as handled.
+
+### Verified (Studio playtest)
+- **Level-ups:** 500 quest EXP became 525 with the Harlow perk, Level 1 to 4, saved across a restart.
+- **Real EXP source:** a grip execution gave +20 EXP.
+- **Spending:** **+** by key raised Might (damage ×1.03, so a 10-damage hit dealt 10.30) and Grit (max health 102).
+- **UI:** the record opens with L and the top bar. The EXP strip wakes on gain.
+- **Not yet:** a live play-through of every EXP source, Fated, regeneration, and two players.
+
 ## [Social 1.0] - 2026-10-30: Strangers, Students list, compass, shift-lock cursor
 
 ### Added
