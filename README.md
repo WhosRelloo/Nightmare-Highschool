@@ -16,4 +16,4 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**Progression & Stats (2026-10-30):** EXP and 50 levels, three stats, clan perks and lineage traits that now really do things, a Student Record (L) and a subtle EXP strip. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-progression.md) and [docs/Progression-and-Stats.md](docs/Progression-and-Stats.md).
+**UI Audit (2026-10-30):** every screen checked for legibility, contrast, layering and scaling. The EXP strip no longer draws over panels, small and faint text was enlarged and brightened, and daylight colours were fixed. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-ui-audit.md) and [docs/UI-Audit.md](docs/UI-Audit.md).

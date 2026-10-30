@@ -2,6 +2,47 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI Audit 1.0] - 2026-10-30: Every screen checked for legibility, layering and scaling
+
+### Fixed
+- **EXP strip drawing over panels:** the strip sat on a layer above Factions, the Journal and Settings, so its line cut across them. It's now on the HUD's own layer, under every panel.
+- **Small text** on laptops (the UI scales to about two-thirds on a 720p screen):
+  - EXP level numeral and gain
+  - Student Record rows (and the Grit text running into its **+** button)
+  - Students list sub-lines
+  - compass intercardinals
+  - Name & Clan notes, odds, clan tag and pity line
+  - Spin Shop labels and badges
+  - the loading screen stamp
+- **Faint text (2.9:1 contrast):**
+  - Name & Clan and Spin Shop notes
+  - the main menu key hint, version line, "Drag to turn your student" and the SLOT I/II/III labels
+- **Daylight:** the compass and top bar read navy blue over a bright sky. Their backings are darker now.
+- **Students list:** a scrollbar appeared with a single student. The list height now counts its padding.
+
+### Reported to the UI kit (not changed here)
+- **Scaling:** the kit's linear scaling makes 15–17px text render at 10–11px on laptops. A gentler curve or a text floor was suggested.
+- **Small text:** Wardrobe, Settings, Journal, quest tracker, clock and hotbar labels.
+- **Edges:** shadows run past the right edge.
+- **Consistency:**
+  - Notifications aren't scaled.
+  - The Factions button is twice the size of its neighbours.
+  - The left button stack repeats the top bar.
+- **Phones:** panels overflow phones in landscape.
+
+See [docs/UI-Audit.md](docs/UI-Audit.md).
+
+### Verified (Studio playtest)
+- **Menu labels:** light and 18px.
+- **Clan tag:** reads "COMMON CLAN" with its space.
+- **Panels:** the EXP strip stays under the Factions panel.
+- **Compass:** dark in daylight.
+- **Students list:** no stray scrollbar.
+- **Record:** the Grit text wraps clear of its button.
+
+### Not tested
+- Real phones, gamepad navigation, dialogue, activities, the downed screen and the duel HUD.
+
 ## [Progression 1.0] - 2026-10-30: Levels, stats, real perks and traits
 
 ### Added
