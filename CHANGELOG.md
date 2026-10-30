@@ -2,6 +2,42 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [Races 1.2] - 2026-10-30: Evolve your bloodline: hunger, rites, tier-up cutscenes and the bite
+
+### Added
+- **Hunger:** every race fills its own meter (Vampire *Blood*, Werewolf *the Hunt*, Ghoul *Feeding*, Wraith *Souls*, Human *Resolve*, Priest *Faith*).
+  - It fills from kills and grip finishes, weighted by race: vampires and werewolves feed best at night (werewolves most of all under a full moon), ghouls from finishing, and priests also from attending class.
+  - The meter shows in the Bloodline tab.
+- **Rites:** 25 hunger opens the Tier II rite and 100 opens Tier III. There are 12 short night quests, one per race and tier:
+  - Vampire: *The Font Below*, *The Blood Ledger*
+  - Werewolf: *First Hunt* (full moon), *The Ring at Moonrise*
+  - Ghoul: *Grave-eater*, *Charnel Feast*
+  - Wraith: *Shroud*, *Dirge* (both stealth)
+  - Human: *The Hunter's Mark*, *Slayer's Oath*
+  - Priest: *Exorcism*, *Sainthood*
+  - 13 new rite objects (a stone font, a blood ledger, a cracked bell, votive candles and more) are placed in the Archive, Boiler Yard, Staff Room, Records Office and Duel Ring.
+- **Tier-up cutscenes:** finishing a rite plays about 10 s of choreography made just for that race.
+  - Authored camera shots, procedural body poses, race effects and colour grading, a letterbox, and a gold title card.
+  - It waits until you're safe; you're frozen and can't be hurt while it plays, and it's skippable after the first time.
+  - Players nearby see the pose and effects.
+- **The bite:** a Tier II+ monster gripping a downed Human or Priest can press **T** to offer the turn; the victim has 15 s to accept or fight it off.
+  - One turn per biter per in-game day; never in duels; werewolves only bite at night.
+- **Earned tiers:** tiers now come from rites, not kill counts. Existing saves keep the tier they already had.
+
+### Fixed
+- **Tail sway:** tails are now actually posed every frame. The pose used to be written after physics, so the next frame's animation overwrote it before it rendered.
+
+### Verified (Studio playtest)
+- Hunger rose to 30 and *The Font Below* opened by itself.
+- **The rite, played for real:** at night, walking into the Archive cleared step 1, and holding E at the font finished the quest. The student evolved to **Night Gentry**, the cutscene played, and they were unfrozen afterwards.
+- **Cutscenes:** Vampire, Werewolf, Ghoul and Priest were checked in frames. Measured on the Priest: the body knelt (dropping about 1 stud), then rose with arms raised and head back.
+- **Cutscene polish from testing:** the HUD hides during a cutscene, and the camera stays in front of walls in small rooms.
+- **Pure checks:** 160 pass, including that every rite's objects and areas exist in the map.
+
+### Not yet
+- **The bite:** two players are needed, so it's only code-reviewed.
+- **Not yet played through:** the other 11 rites, the Wraith and Human cutscenes, and the Tier III effects.
+
 ## [Races 1.1] - 2026-10-30: Race looks: ears, tails, grave wear and cold wisps
 
 ### Added

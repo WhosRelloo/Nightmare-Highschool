@@ -16,4 +16,4 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**Race looks (2026-10-30):** vampire ears, werewolf ears and animated tails, ghoul grave wear and uniform, and wraith cold wisps, all modelled for the game and unlocked by tier. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-race-looks.md) and [docs/Races-and-Bloodlines.md](docs/Races-and-Bloodlines.md).
+**Bloodline evolution (2026-10-30):** race hunger, 12 night rites, a tier-up cutscene for every race, and the bite that turns Humans and Priests. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-evolution.md) and [docs/Races-and-Bloodlines.md](docs/Races-and-Bloodlines.md).

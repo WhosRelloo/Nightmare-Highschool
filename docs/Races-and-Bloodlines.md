@@ -86,6 +86,42 @@ Race-only cosmetics, chosen in the Bloodline tab's **Looks** section. Grander ve
   - It writes each bone's `Transform` on Heartbeat, after the Animator's step, so the pose survives until the frame renders.
   - Tails more than 140 studs away stay still.
 
+## Evolution (Races 1.2)
+- **Hunger** (`PlayerData.Lineage.Hunger`, mirrored as the `RaceHunger` attribute) fills from game events in `Services.Player.Evolution`:
+
+  | Race | Kill | Grip finish | Other |
+  |---|---|---|---|
+  | Vampire | 1, at night 2 | +2 | |
+  | Werewolf | 1, night 2, full moon 4 | +1 | |
+  | Ghoul | 0.5 | +3 | |
+  | Wraith | 1 | +1 | |
+  | Human | 1, vs a monster player 2 | | |
+  | Priest | 1, vs an undead player 2 | | attending class +1 |
+
+- **Rites:** at `Lineage.HungerNeed` (25 for Tier II, 100 for Tier III) the rite quest `Rite<Race><Tier>` starts on its own (Config.Quests, category `Rite`, `Requires.Rite`).
+  - New objective type `Execute` (grip finishes) and objective flag `FullMoon`. Night rites use `Time = { Night }` and dawn rites `Time = { Morning }`.
+  - Rite objects are in `Workspace.School.NHRiteProps` (built by `Studio/rite_props.luau` in the session tools), plus the `RiteArchive` area.
+
+  | Race | Tier II | Tier III |
+  |---|---|---|
+  | Vampire | The Font Below: reach the Archive at night, drink at the font | The Blood Ledger: take the ledger from the Records Office unseen, get out, feed at night |
+  | Werewolf | First Hunt: 3 grip finishes on a full-moon night | The Ring at Moonrise: beat the ring champion at night, howl from the boiler stack |
+  | Ghoul | Grave-eater: dig the ash heap at night, then feed | Charnel Feast: feed 3 times at night, lie in the bone crate |
+  | Wraith | Shroud: touch the cold mirror in the staff room unseen, get out | Dirge: toll the cracked bell in the Records Office unseen, get out |
+  | Human | The Hunter's Mark: carve the Archive ward at night, be there at dawn | Slayer's Oath: beat the ring champion, swear on the boiler iron |
+  | Priest | Exorcism: light the three votive candles at night | Sainthood: reach the ring at dawn, keep vigil at the stone |
+
+- **Tier-up:** on rite completion the server waits until you're safe (not downed, duelling, gripped, or hit in the last 6 s), then `Lineage.Evolve`.
+  - It freezes you and sets `NH_Evolving`; `Downed.ApplyDamage` ignores damage while it's set.
+  - It fires `NHEvolve.Play` to every client; your client sends `NHEvolve.Done` when the cutscene ends or is skipped (16 s safety timeout).
+  - The cutscene is skippable once `Lineage.Seen` has that race and tier.
+- **Cutscenes** (`Controllers.Gui.Evolution`):
+  - Camera shots, procedural Motor6D poses written on PreSimulation, race effects, colour grading, a letterbox and a title card.
+  - The HUD is hidden for the evolving player, and the camera is kept in front of walls.
+- **The bite** (`Services.Player.Turning`): T while gripping (Tier II+ monster, Mortal victim) offers the turn (`NHTurn.Offer`). The grip stops and the victim gets `NHTurn.Ask` with 15 s to answer.
+  - **Accept:** `Lineage.Turn` (the biter's base race, Tier I, hunger 0, looks reset; spins and traits kept). The biter gets +5 hunger and uses their daily turn (`Lineage.TurnDay`).
+- **Test bridge:** `GiveHunger(name, n)`, `Evolve(name, tier)`.
+
 ## Code
 | Piece | Where |
 |---|---|
@@ -121,5 +157,4 @@ Saving is unchanged: `PlayerData.Lineage = { Race, SubRace, Tier, Traits, Spins 
 - **Bug found and fixed:** a leftover copy of the Progression module (from a timed-out check) made every Progression hook run twice. I removed it, and both heals and EXP then applied once.
 
 ## Not yet
-- **Phase 3:** race hunger, rites, earned tiers, the **tier-up cutscene** (cinematic camera and choreography, per race and tier), and the bite that turns Humans and Priests.
 - **Not playtested yet:** two players seeing each other's race effects, and Fated, Wraith and Werewolf effects in real fights.
