@@ -146,6 +146,8 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 ### Changed
 - The posture meter now sits beside the health bar. It used to collide with the menu buttons on wide screens.
+- Notifications sit at y = 72, below the top-centre compass (previously moved at runtime by the compass).
+- The Wardrobe preview says "Enrolled as <your student's name>" (Identity, private to you), or "a new student" before you sign. It used to show the Roblox display name.
 
 ### Fixed
 - **Save slots** (the main menu): Settings and the Wardrobe now re-read the profile when a slot loads, so saved settings come back after picking a slot. Shadows-off persisted across a rejoin in the live test.
