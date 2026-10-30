@@ -35,6 +35,7 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 - **Ring VFX:** new soft-filament tendril texture. It tiles along the beam and fades out at both sides. The tendrils also fade in from the core.
   - The crystal-shard sprites now fade out before their flipbook cell edges. **No more cut-off lines.**
 - The distant forest and hills are now night silhouettes.
+- Pressing ENTER SCHOOL without a first name now makes the register obvious: the field pulses, the placeholder reads "Write your first name here", and the cursor is in the box.
 
 ### Fixed
 - **The old tendril texture was mapped the wrong way round.** Roblox Beams run the image's vertical axis along the beam, which caused the hard edges.

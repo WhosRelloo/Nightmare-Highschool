@@ -24,7 +24,7 @@ Every student now has a full name: **`<first name> <clan>`**, for example *Mara 
   - **Rules:** 3 to 14 letters. A single space, ' or - may go between letters, so "Mary-Ann", "O'Neil" and "Rose Lee" all work. The server title-cases it ("mara" becomes "Mara").
   - **Filter:** the server checks the name with Roblox's text filter (`TextService:FilterStringAsync`, broadcast context) and refuses anything the filter changes.
   - **Renames:** free until you first **enter school** with that student. Entering locks the name, and after that each rename costs one **Name Change**.
-- **You must sign before you enter.** ENTER SCHOOL and CONTINUE send you to the register first. The server refuses `Enter` with "NeedName" too.
+- **You must sign before you enter.** ENTER SCHOOL and CONTINUE send you to the register first: the name field pulses crimson, the placeholder reads "Write your first name here", and the cursor is already in the box. The server refuses `Enter` with "NeedName" too.
 - **Your clan:** a slot-machine reel (kit `SpinReel`) with the clan's lore line and its **perk**. The reel always lands on the server's result, and rarer clans spin longer.
   - **Epic and better** land with a rarity burst, a ring flare in the clan's colour, and the camera leaning in.
 - **Pity meter:** "Epic or better guaranteed within N spins".
