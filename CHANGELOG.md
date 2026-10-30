@@ -2,6 +2,96 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [Social 1.0] - 2026-10-30: Strangers, Students list, compass, shift-lock cursor
+
+### Added
+- **Stranger system:** you only see a student's name once you've learned it.
+  - **Known students:** their full name shows over their head, with the clan in its rarity colour and their faction's seal.
+  - **Everyone else:** a faint *Stranger*, only up close.
+  - **Learning names:** walk up and press **G** to introduce yourself. They get a notification with your name. Members of the same faction also know each other.
+  - **Saving:** who you know is saved per student (`PlayerData.Known`).
+- **Students list** (replaces Roblox's player list):
+  - Grouped by faction: The Vigil, The Crimson Court, Unaffiliated.
+  - Closed by default. Open it with **Tab** or the top bar's Students button.
+  - Built from the UI kit's player rows. Strangers show as *Stranger*.
+- **Compass** across the top centre:
+  - Shows N, E, S, W, plus markers for classrooms, faction bases, the duel ring and quest NPCs.
+  - Your tracked quest objective is always shown, pinned to the edge when behind you, and whatever you face is named with its distance.
+  - Places come from map attributes, and the builder can tag more with `Compass = "Label"`.
+- **Shift-lock cursor:** a dark wrought-iron ring with gold hour ticks, spear-point finials and a crimson diamond (44 px).
+
+### Changed
+- **Names are private.** They're no longer on public player attributes or Roblox's name tag. The server sends each player only the names they know. The public `Signed` flag replaces `FirstName`, `RPName`, `Clan` and `ClanRarity`.
+- **E stays free for Equip** near other players: introductions use G, and Equip only gives way to prompts that use E.
+- **Duel messages** no longer show account names. After a duel, both fighters must step off the pads before a rematch countdown can start.
+- **Notifications** now appear just below the compass.
+
+### Fixed
+- Nameplates were missing when a character spawned, because its head arrives a moment later.
+- Tab didn't open the Students list, because Roblox marks Tab as already handled.
+- The Students list text was too dark: its background gradient was tinting the text.
+- Roblox's player list came back after leaving the main menu.
+- The compass overlapped the top bar on narrow windows.
+- Other players' characters overlapped yours on the main-menu editing stage. They're now hidden on your screen while you're in the menu.
+- **Changelog:** the Menu 1.0 and Menu 1.1 entries had been lost when the file was rewritten from an older copy. They're restored below.
+
+### Verified (two-player Studio test)
+- **Joining:** both players got their own loading screen and menu, and picked saves at the same time with separate data.
+- **Names and clans:** simultaneous clan spins and name signing worked, then both entered school.
+- **Privacy and introductions:** names stay private, and the introduction prompt works by key press, with a notification and a coloured nameplate.
+- **New UI:** the Students list, compass and shift-lock cursor work.
+- **Combat:** PvP hits landed. **V** carry, **B** grip with the kill saved, then a respawn.
+- **Duels and leaving:** a duel ran on the pads, and leaving worked without errors.
+- **Not yet:** the fixes from this run on fresh code, chat between players, rejoining, and discipline reports.
+
+## [Menu 1.1] - 2026-10-30: Names and clans, Spin Shop, loading screen, top bar
+
+### Added
+- **Full names:** every student is now `<first name> <clan>`, for example *Mara Ravenscar*.
+  - The first name is typed in the **register** (Name & Clan tab). It's checked by Roblox's text filter, and only letters are allowed: 3 to 14, with a space, ' or - between them.
+  - It's free to change until you enter school. After that you need a Name Change.
+  - It shows over your head, in the editing-screen header, and on the slot cards.
+- **Clans** (family names), **rolled by the server** and never chosen. There are 28 original clans in 6 rarities:
+  - Common 52%, Uncommon 26%, Rare 13%, Epic 6%, Legendary 2.5%, Cursed 0.5%.
+  - **Pity:** Epic or better is guaranteed after 40 spins in a row without one.
+  - **Spins:** a free first roll plus 3 clan spins.
+  - Each clan has a lore line and a perk (data only for now).
+  - **The reel:** it lands on the server's result, and rare clans flare the ring in their colour and lean the camera in.
+- **Spin Shop (Robux):** clan spins (1 / 5 / 15), race spins (3 / 10), variant spins (3), trait spins (5) and a Name Change.
+  - `Services.Player.Purchases` is the game's only receipt handler, and it never grants a receipt twice.
+  - **Not on sale yet:** the Developer Product ids have to be created on the Creator Dashboard and pasted into `Config.Shop`.
+- **Editing-screen sections:** **Look** (the Wardrobe), **Name & Clan** and **Spin Shop**, each with its own camera move. A new student meets their clan first.
+- **Loading screen** (ReplicatedFirst), styled as your admission file:
+  - A blackletter title card, with typewritten file details and notes.
+  - Behind it, the **real courtyard**, filmed by a slow camera glide.
+  - An **asset counter**: "RECORDS RECEIVED done / total", percent, and time left, on a hairline crimson progress rule.
+  - A crimson **ADMITTED** stamp when everything has arrived.
+- **Custom top bar:** Roblox's top bar is switched off. In its place, one slim ink-and-gold plate with **Menu** (Settings), **Chat** (with an unread pip) and **Students** (player list). It fades back when you're not using it.
+- **West grounds** for the menu scene (the side the cameras look across, which looked empty):
+  - A West Hall and four more dead oaks.
+  - The wall and iron fence carry on along that side.
+  - Two rows of forest silhouettes and 48 more lit town windows.
+  - A proper chapel spire.
+
+### Changed
+- **Ring VFX:** new soft-filament tendril texture. It tiles along the beam and fades out at both sides. The tendrils also fade in from the core.
+  - The crystal-shard sprites now fade out before their flipbook cell edges. **No more cut-off lines.**
+- The distant forest and hills are now night silhouettes.
+- Pressing ENTER SCHOOL without a first name now makes the register obvious: the field pulses, the placeholder reads "Write your first name here", and the cursor is in the box.
+
+### Fixed
+- **The old tendril texture was mapped the wrong way round.** Roblox Beams run the image's vertical axis along the beam, which caused the hard edges.
+- The identity update event was named `Changed`, which clashed with Roblox's built-in `.Changed`, so purchases errored after granting. It's now `Updated`.
+- The editing-screen header showed a new clan before the reel landed.
+- The loading counter reported meshes as failed, because they were preloaded as id strings. It now preloads through each asset's instance.
+
+### Verified (Studio)
+- **Name rules:** good names title-cased, bad names refused.
+- **Odds over 10,000 rolls:** matched the config. The longest run without Epic or better was 39, so pity works.
+- **Receipts:** a repeated receipt changed nothing. Clan, race and name-change grants land in the save.
+- **Real clicks and keys:** reveal, spin, Spin Shop and the top-bar buttons.
+- **Loading screen:** 385 to 418 assets per run, 1 failed (the place has no permission for one sound).
+
 ## [UI 1.7] - 2026-10-30: Wardrobe 2.0, painted eyes, lineage spins
 
 ### Added
@@ -73,6 +163,32 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 - Traits are data only until the stat system exists.
 - Spins aren't used up in Studio.
 - 420 face textures, all generated by `Tools/ui-textures`, with automatic no-overlap checks.
+
+## [Menu 1.0] - 2026-10-30: Cinematic main menu and save slots
+
+### Added
+- **Main menu:** a cinematic night courtyard in front of the academy. It has wet cobblestone, Victorian brick, gothic stone, a clock tower with working hands, an iron gate with gargoyles, and dead oaks hung with moss, a pair of sneakers and Crimson Court ribbons.
+  - Every surface uses PBR materials: colour, normal and roughness maps.
+  - Your student floats in a crimson clock seal while energy tears out of a stone ring behind them.
+  - Ambient life: lamps flicker, windows die, chimneys smoke, bats circle the tower and lightning flashes.
+- **Camera:** a skippable intro fly-in, then smooth spline moves between every screen, with handheld drift and mouse parallax.
+- **Menu items:** CONTINUE, PLAY, SETTINGS and CREDITS (keyboard, mouse and gamepad).
+- **Save slots:** three students, each with their own save (race roll, quests, factions, Yen and record). Slot 1 is your existing save, so nothing is lost.
+  - Each card shows race, title, faction rank, Yen, quests, takedowns and when you last played.
+  - Each slot's student stands on a lit plinth; empty slots are a crimson ghost.
+- **Edit your student:** after picking a slot, your real character steps into the seal and the Wardrobe docks beside them.
+  - The camera cuts for each tab: face close-up, hair three-quarter view, full body, low angle.
+  - Drag to orbit.
+  - ENTER SCHOOL pushes the camera to the doors and fades you into school.
+- **VFX textures rendered in Blender Cycles:** volumetric smoke (a 4x4 flipbook), tileable plasma for the tendrils, lit crystal shards (2x2), embers and mist. The render script is `tools/vfx/render_vfx.py`.
+
+### Changed
+- **Saves:** your profile now loads when you pick a slot, not on join. The server spawns and respawns characters (`CharacterAutoLoads` is off), and combat is blocked while you're in the menu.
+
+### Verified
+- Live playtest with real clicks and keys: intro, menu, slots, editing (the Face-tab camera cut), entering school with the HUD, camera and lighting restored, and Continue.
+- Camera speed measured during the intro: it ramps smoothly with no stops between shots.
+- **Not tested yet:** two players, and phones.
 
 ## [UI 1.6] - 2026-10-30: One save system; "Look" instead of race
 

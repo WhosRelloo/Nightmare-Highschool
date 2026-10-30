@@ -15,4 +15,4 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**Names, Clans, Spin Shop & Loading Screen (2026-10-30):** full names with server-rolled clans, a Robux Spin Shop, an admission-file loading screen with an asset counter, and a custom top bar. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-names-clans-loading.md), [docs/Names-Clans-and-Spin-Shop.md](docs/Names-Clans-and-Spin-Shop.md) and [docs/Main-Menu.md](docs/Main-Menu.md).
+**Strangers, Students List & Compass (2026-10-30):** names stay hidden until you're introduced (press G), a faction-grouped Students list that replaces Roblox's, a compass for places of interest, and a wrought-iron shift-lock cursor. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-strangers-compass.md) and [docs/Strangers-Students-Compass.md](docs/Strangers-Students-Compass.md).
