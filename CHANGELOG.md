@@ -2,6 +2,32 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [Menu 1.0] - 2026-10-30: Cinematic main menu and save slots
+
+### Added
+- **Main menu:** a cinematic night courtyard in front of the academy. It has wet cobblestone, Victorian brick, gothic stone, a clock tower with working hands, an iron gate with gargoyles, and dead oaks hung with moss, a pair of sneakers and Crimson Court ribbons.
+  - Every surface uses PBR materials: colour, normal and roughness maps.
+  - Your student floats in a crimson clock seal while energy tears out of a stone ring behind them.
+  - Ambient life: lamps flicker, windows die, chimneys smoke, bats circle the tower and lightning flashes.
+- **Camera:** a skippable intro fly-in, then smooth spline moves between every screen, with handheld drift and mouse parallax.
+- **Menu items:** CONTINUE, PLAY, SETTINGS and CREDITS (keyboard, mouse and gamepad).
+- **Save slots:** three students, each with their own save (race roll, quests, factions, Yen and record). Slot 1 is your existing save, so nothing is lost.
+  - Each card shows race, title, faction rank, Yen, quests, takedowns and when you last played.
+  - Each slot's student stands on a lit plinth; empty slots are a crimson ghost.
+- **Edit your student:** after picking a slot, your real character steps into the seal and the Wardrobe docks beside them.
+  - The camera cuts for each tab: face close-up, hair three-quarter view, full body, low angle.
+  - Drag to orbit.
+  - ENTER SCHOOL pushes the camera to the doors and fades you into school.
+- **VFX textures rendered in Blender Cycles:** volumetric smoke (a 4x4 flipbook), tileable plasma for the tendrils, lit crystal shards (2x2), embers and mist. The render script is `tools/vfx/render_vfx.py`.
+
+### Changed
+- **Saves:** your profile now loads when you pick a slot, not on join. The server spawns and respawns characters (`CharacterAutoLoads` is off), and combat is blocked while you're in the menu.
+
+### Verified
+- Live playtest with real clicks and keys: intro, menu, slots, editing (the Face-tab camera cut), entering school with the HUD, camera and lighting restored, and Continue.
+- Camera speed measured during the intro: it ramps smoothly with no stops between shots.
+- **Not tested yet:** two players, and phones.
+
 ## [UI 1.6] - 2026-10-30: One save system; "Look" instead of race
 
 ### Changed
