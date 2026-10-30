@@ -1,11 +1,18 @@
 # Main Menu and Save Slots: NH Combat Test
 
-**Status:** built and playtested in Studio (single player). The flow is: join → cinematic intro → main menu → slot picker → edit your student → enter school.
+**Status:** built and playtested in Studio (single player). The flow is: join → **loading screen** → cinematic intro → main menu → slot picker → edit your student (Look / Name & Clan / Spin Shop) → enter school, where a slim custom **top bar** replaces Roblox's.
 
 The inspiration was two references: a minimal RPG menu with save slots, and a posed hero with VFX. Everything here is an original Nightmare Highschool design.
 
 ## What you see
 
+0. **Loading screen** (`ReplicatedFirst.NHLoadingScreen`, the first thing that runs). It's styled as your **admission file** being processed.
+   - **Title card:** a blackletter title, "STUDENT FILE No. ####" and "OFFICE OF ADMISSIONS · NIGHT TERM" typed in typewriter type, and the time it was "FILED".
+   - **Live background:** behind it is **the real game**. Once the menu is ready, the black backdrop opens onto the courtyard, filmed by a slow 70-second camera glide (`PreRollA` → `PreRollB`), so players watch the academy appear while they wait.
+   - **Asset counter:** every content id the client can see (images, meshes, sounds, animations, particle and beam textures, PBR maps, clothing) is collected, de-duplicated and preloaded through the instance that uses it. The bottom of the letterbox shows "RECORDS RECEIVED 0214 / 0406 52% ~6s left", with a hairline crimson progress rule along its top edge. The time left is worked out from the measured load rate.
+   - **Details:** typed notes (tips), drifting embers and film grain.
+   - **Finish:** a crimson **ADMITTED** rubber stamp slams onto the title, the screen goes black, and the intro starts. A "[ continue ]" button appears after 12 s, and loading carries on in the background.
+   - **Hand-off:** sets `LocalPlayer` attribute `NHLoaded`. The menu sets `NHMenuReady` when its camera is in place, and `NHLoadHold = true` holds the stamp for screenshots.
 1. **Intro fly-in, about 12 s.** You can skip it with any key or a click.
    - The camera starts high above the academy at night.
    - It sweeps past the clock tower, whose hands show the real school time.
@@ -27,10 +34,16 @@ The inspiration was two references: a minimal RPG menu with save slots, and a po
    - Each card shows your name, race (or "not yet revealed"), title, faction rank, Yen, quests done, takedowns and when you last played.
    - The hovered card lifts, its spotlight brightens and its student turns toward you.
    - Use A/D or the arrows, Enter to play, and Backspace to go back.
-5. **Edit your student.** Your real character appears inside the seal, and the Wardrobe (UI session) docks on the right in stage mode.
-   - **The camera cuts per tab:** Look and Outfit get the full body, Face a close-up, Hair a high three-quarter view, and Lineage a low heroic angle.
+5. **Edit your student.** Your real character appears inside the seal, with your full name as the header. A switch on the left picks the panel docked on the right:
+   - **Look:** the Wardrobe (UI session), in stage mode.
+   - **Name & Clan:** sign the register and spin your clan.
+   - **Spin Shop:** Robux spins.
+
+   See [Names-Clans-and-Spin-Shop.md](Names-Clans-and-Spin-Shop.md). A new student starts on Name & Clan and watches the clan reel land first.
+   - **The camera cuts per tab:** Look and Outfit get the full body, Face a close-up, Hair a high three-quarter view, Lineage and Name & Clan a low heroic angle, and the Spin Shop the full body.
+   - **Rare clans:** an Epic-or-better roll flares the ring in the clan's colour and leans the camera in.
    - **Drag to orbit** around your student. The ring VFX calm down while you edit.
-6. **ENTER SCHOOL:** the camera pushes toward the school doors, fades through "The bell is ringing...", and you spawn at the school. The HUD, lighting, camera and controls are all handed back.
+6. **ENTER SCHOOL** (needs a first name: you're sent to the register if you haven't signed): the camera pushes toward the school doors, fades through "The bell is ringing...", and you spawn at the school. The HUD, lighting, camera and controls are all handed back.
 
 **Ambient life:**
 - lamps flicker and dust drifts in their light
@@ -39,6 +52,13 @@ The inspiration was two references: a minimal RPG menu with save slots, and a po
 - bats circle the tower and lightning flashes
 - moss, ribbons, a kite tail and sneakers sway in the wind
 - the night grade uses bloom, depth of field that follows the subject, and colour correction
+
+7. **Top bar** (`Controllers.Gui.TopBar`, in school). Roblox's top bar is switched off (`SetCore("TopbarEnabled", false)`). In its place is one small ink-black plate with a gold rim and a faint crimson underline:
+   - **Menu:** the game's Settings. Esc still opens Roblox's menu.
+   - **Chat:** shows or hides the chat window and input bar, with a crimson pip for messages that arrive while it's hidden. **/** opens chat.
+   - **Students:** shows or hides the player list.
+
+   It fades back after a few seconds without the mouse near the top, and wakes when you move there. It sits just right of anything Roblox still draws in the corner (`GuiService.TopbarInset`), and the main menu hides it with the rest of the HUD.
 
 ## Camera
 
@@ -71,6 +91,15 @@ The inspiration was two references: a minimal RPG menu with save slots, and a po
 | `NH_DeadGrass` | dead grass with leaves |
 | `NH_RuneStone` | rune stone |
 | `NH_DeadBark` | dead oak bark |
+
+**West grounds** (`MenuScene.WestGrounds`, temporary). This is the side the menu cameras look across on the right of the screen, which looked empty before.
+- **West Hall:** a 60% copy of the school front, angled toward the courtyard, with lit windows.
+- **Dead oaks:** four more procedural oaks.
+- **Boundary:** the stone and brick wall with iron fence continues to x = -160.
+- **Forest:** two rows of pine silhouettes.
+- **Chapel:** the distant chapel is now a dark silhouette with a proper spire and a lit belfry. Its old spire was four loose wedges that read as grey slabs.
+- **Town:** 48 more lit windows in the distant town.
+- **Distance colour:** the forest and hill shapes are near-black so they read as night silhouettes.
 
 **Built pieces:**
 
@@ -111,7 +140,15 @@ The inspiration was two references: a minimal RPG menu with save slots, and a po
 | `Sway` | wind |
 | `SlotLight = n` | slot spotlights |
 
-## VFX textures (rendered in Blender Cycles, physically based)
+## VFX textures
+
+**Soft-edge pass** (`tools/vfx/make_soft_vfx.py`, numpy):
+- **Tendrils:** the ring tendrils use `nh_wisp2_v`, nine twisting filaments that tile along the beam and fade to zero at both sides. Each tendril also fades in from the core and out at the tip, so none show straight cut-off lines.
+- **Orientation:** Roblox Beams run an image's **vertical** axis along the beam, so the texture is saved rotated. The old texture was the wrong way round, and that caused the hard edges.
+- **Shards:** the crystal-shard flipbook (`nh_shards2_2x2`) now fades every sprite out before its cell edge. The old sprites crossed the cell borders, so particles showed sliced edges.
+- **Tried and removed:** a wide "halo" layer under each tendril read as flat sheets.
+
+**Blender renders** (Cycles, physically based):
 
 `tools/vfx/render_vfx.py` renders white sprites with alpha that Roblox tints:
 - **volumetric smoke:** Principled Volume with 4D noise, lit by a warm key and a cool rim; 16 frames in a 4×4 flipbook
@@ -132,6 +169,9 @@ The asset ids are in `Config.MainMenu.Textures`. Re-run with:
 
 | Where | What |
 |---|---|
+| `ReplicatedFirst.NHLoadingScreen` | the loading screen (admission file, asset counter, stamp) |
+| `StarterPlayerScripts.Controllers.Gui.TopBar` | the custom top bar |
+| `StarterPlayerScripts.Controllers.Gui.Identity` | Name & Clan + Spin Shop panel ([details](Names-Clans-and-Spin-Shop.md)) |
 | `ReplicatedStorage.Config.MainMenu` | on/off, slot count, title, camera paths, credits, VFX texture ids |
 | `ServerScriptService.Services.Player.Slots` | slot list, choose, enter, spawn/respawn, menu avatar |
 | `ServerScriptService.Services.Player.Data` | `LoadSlot`, `ViewSlot`, `SlotKey`, `GetSlot` (profile loads per slot) |
@@ -151,6 +191,15 @@ The asset ids are in `Config.MainMenu.Textures`. Re-run with:
 
 **Screenshots checked:** the gate shot through the bars, the hero shot, the slot screen, editing, entering and after entering.
 
+**Menu 1.1 (loading, names, top bar, VFX, west grounds):**
+- **Loading screen:** counted 385 to 418 assets per run, with 1 failure (a sound the place has no permission for, already broken before). Each run took 11 to 20 s in Studio.
+  - The live scene opens behind the title card.
+  - The stamp lands, and the hand-off to the intro works.
+- **Editing screen:** Name & Clan and Spin Shop were tested with real clicks and keys. See the names doc.
+- **Top bar:** Chat, Students and Menu were tested through real key presses. Chat hides the chat window and input, Students hides the player list, and Menu opens Settings. Roblox reports `TopbarEnabled = false`.
+- **Tendrils:** checked on screen. Soft filaments, with no cut-off lines.
+- **West grounds:** checked under the night grade from the hero and pre-roll shots.
+
 **Bugs found and fixed:**
 - students faced away from the camera
 - slot order was mirrored against the cards
@@ -164,7 +213,7 @@ The asset ids are in `Config.MainMenu.Textures`. Re-run with:
 **Not tested:**
 - Two players. Each player has their own menu, but two people choosing slots at once was not tried.
 - Phones and touch: drag-to-orbit uses touch input, but no device test was done.
-- The newest camera and texture changes were made after the last full playtest.
+- Whether Roblox still shows its own Roblox-logo button with the top bar off. Studio screenshots don't include Roblox's own UI. The custom bar leaves room for it (164 px reported).
 - Live servers: slot views use ProfileService `ViewProfileAsync`, and Studio uses the Studio data store.
 
 **Leftover test data:** slot 1 of the Studio test profile was used.
