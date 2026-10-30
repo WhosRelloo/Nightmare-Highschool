@@ -12,6 +12,11 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 - **Tidier edges:** the clock panel moved in so its shadow stays on screen, and the yen counter sits clear of the EXP strip.
 - **Lineage tab:** each trait now shows its effect, for example "+10% EXP at night", and marks planned ones "(planned)", using Progression's descriptions.
 - **Race tier rises mid-session:** Lineage re-checks kills every 15 s, so a new tier no longer waits for the next load.
+- **Race skin palettes:** Vampire and Ghoul skin always lands on its bloodline's tones (Vampire: pale or deathly dark; Ghoul: grey-green and bruised).
+  - It applies in the uniform and in your own Roblox outfit, where the avatar's skin shifts to the nearest tone.
+  - The Wardrobe shows only those tones.
+  - Your saved choice is kept, so a race change (for example Vampire to Human) gives your own skin back.
+  - Roblox's avatar loader can no longer undo the uniform or palette skin after spawning.
 - **Transformations follow the race:** a transformed character wears its race's outfit (with matching eyes and mouth): Vampire, Werewolf, Ghoul, Wraith or Priest. Humans keep their clothes. `Transformation` can be a form name, a race or sub-race, or simply `true` (uses the rolled race). `Appearance.FormOf(character)` resolves it.
 - **No duplicate Settings button:** on keyboard devices the left-edge Settings button is hidden, since the top bar's Menu button opens Settings, and the Wardrobe button moves up into its place.
 
