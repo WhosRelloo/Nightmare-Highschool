@@ -69,6 +69,15 @@ The UI kit scales everything by `min(width / 1920, height / 1080)`. On common la
 5. **Phones:** the touch minimum scale (0.92) makes 740px panels overflow a 390px-tall landscape phone.
 6. **Input:** on Name & Clan the name box keeps keyboard focus, so Return on a creator button re-submits the name. Left for the gamepad pass.
 
+### Follow-up done by the UI kit session (same day)
+- **Scaling:** below 1× the kit now scales by `raw^0.6`, so 720p goes from 0.67 to **0.78** and 768p from 0.71 to **0.82**.
+  - `Kit.FitToScreen` keeps tall panels such as the Wardrobe and Settings on screen (and on phones) by shrinking the panel, not the text.
+- **Text:** the theme's sizes went up (small 15 to 18, body 18 to 20, tiny 13 to 15). This also lifts the Quest Journal and Quest Tracker.
+- **Hard-coded sizes:** raised in the Wardrobe, Settings, HUD, clock, dialogue and Factions.
+- **Clock:** moved in to x = −30. The **Quest Tracker** now matches at −30 (set from the quest side), so both shadows stay on screen. The tracker move hasn't been re-checked in a playtest; it's based on measuring the old 4px overshoot.
+- **Scaling consistency:** Notifications and the Factions panel scale with the rest, so the Factions button now matches its neighbours.
+- **Left-edge buttons:** on keyboard devices the Settings button is hidden, because the top bar's Menu covers it. Journal, Factions and Wardrobe stay until the top bar gets buttons for them.
+
 ### Checked and fine
 - No two HUD pieces overlap each other.
 - Nothing important is off screen at 1287×600. The "off-screen" Name & Clan notes were inside a scrolling list.

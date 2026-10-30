@@ -45,6 +45,8 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 See [docs/UI-Audit.md](docs/UI-Audit.md).
 
+- **Quest Tracker:** moved in to line up with the clock (x = −30), so its shadow stays on screen.
+
 ### Verified (Studio playtest)
 - **Menu labels:** light and 18px.
 - **Clan tag:** reads "COMMON CLAN" with its space.
