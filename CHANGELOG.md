@@ -2,6 +2,23 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI 1.2] - 2026-10-30: Playtest pass
+
+### Changed
+- The DOWNED alert's subtitle and countdown are larger.
+- The posture meter label is larger and readable.
+
+### Verified in a live playtest, with real key presses
+- **Hotbar:** 1 equips your tool (the slot glows gold); pressing 1 again unequips it.
+- **Dialogue:**
+  - E on Pip opens the compact box (464×149 px on a 600 px-tall window), and the bottom HUD hides.
+  - 2 picks a reply and closes it, and the HUD returns.
+  - Number keys don't fire the hotbar while you're talking.
+- **Yen** updates live (¥327 → ¥347 from a quest reward).
+- **Interaction prompt** renders as the engraved E key cap with "Pip Larkin / Talk".
+- **Clock** ends above the quest tracker.
+- **Console:** no UI errors.
+
 ## [UI 1.1] - 2026-10-30: Quest UI polish
 
 ### Changed
