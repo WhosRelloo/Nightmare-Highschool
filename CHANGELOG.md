@@ -2,6 +2,22 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI 1.1] - 2026-10-30: Quest UI polish
+
+### Changed
+- **Quest tracker:**
+  - The card and the stealth detection meter use the same ornate chip as the clock.
+  - The detection bar is an iron-framed meter.
+  - The objective marker is an engraved gold plate.
+- **Quest journal:** quest, clue and insight blocks are bracket-cornered kit cards. A picked clue gets a gold frame and a warm fill instead of a flat colour, and hovering a clue lights its frame.
+- **Clock HUD** now scales with the screen like the quest tracker, so the tracker card always sits below it.
+
+### Fixed
+- Auto-sized kit cards no longer have an empty band underneath. The clock panel now matches its text exactly.
+
+### Verified
+- **In a live playtest:** the new HUD (health, hotbar, Yen, posture meter, DOWNED alert), all 30 prompts switched to the custom style, the core health and backpack hidden, and the clock fitting its text.
+
 ## [UI 1.0] - 2026-10-30: "After Dark" UI overhaul
 
 ### Added
