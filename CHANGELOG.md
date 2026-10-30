@@ -2,6 +2,22 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI 1.6] - 2026-10-30: One save system; "Look" instead of race
+
+### Changed
+- **Settings, Wardrobe looks and "Last joined" now save in your main profile (ProfileService)**, like reputation and quests, instead of in separate DataStores. Saving, session locking and rejoining are all handled by the profile system.
+  - `PlayerData` gains `Settings`, `Appearance` and `LastJoined`.
+  - `UpdateState` gains the actions `SetSettings`, `SetAppearance` and `SetLastJoined`.
+  - The server validates and rate-limits every request before saving it.
+- **Wardrobe:** the race picker is now a cosmetic **Look**: Scholar, Chapel (gold cross pin) or Nightborn (pale skin, red glint). Race is a rolled gameplay system and is never chosen in the mirror. The wardrobe only sets the cosmetic `LookStyle` attribute.
+
+### Removed
+- The DataStores `NH_Settings_v1`, `NH_Appearance_v1` and `NH_LastJoined_v1`. No code references them anymore.
+
+### Verified
+- In edit mode: everything compiles, the new profile actions apply to a default profile, defaults fill in, and a `Race` key sent by a client is dropped.
+- **Still to do:** a live playtest. Studio's Play button is stuck and needs a manual Stop, then Play.
+
 ## [UI 1.5] - 2026-10-30: Wardrobe (character creator) and "Last joined"
 
 ### Added

@@ -9,6 +9,8 @@ A gothic UI kit for Nightmare Highschool: a cursed school after dark, built from
 | `ReplicatedStorage.UI.ServerDirectory` | Live server list: MemoryStore heartbeat, remotes and client polling |
 | `ReplicatedStorage.UI.Preview` | Sample layouts with NH data (`Build`, `BuildServerSelect`) |
 | `ServerScriptService.NHServerDirectory` | One-line Script that runs `ServerDirectory.StartServer()` |
+
+**Persistence rule:** all saved player data goes through ProfileService (`ServerScriptService.Services.Player.Data` → `Data.UpdateState`). Never create a separate DataStore.
 | `StarterGui.UIKitPreview` | Preview of every HUD/menu component. Saved **disabled**. |
 | `StarterGui.ServerSelectPreview` | Preview of the server selection screen. Saved **disabled**. |
 | `Tools/ui-textures/*.py` | Python scripts that generate all the texture art (re-run them to tweak it) |
@@ -260,7 +262,7 @@ Left as they are: the `FlashUI`, `RedScreen` and `Vingette` screen effects.
 ### Settings (menu: M)
 - `ReplicatedStorage.UI.Settings` holds the schema, defaults and ranges, server saving (`StartServer`, run by `ServerScriptService.NHSettings`), and client applying.
 - Client API: `Load()`, `Get(key)`, `Set(key, value)`, `SetKey(action, keyName) -> ok, message`, `Reset()`, and `Changed` (a BindableEvent).
-- Data lives in the DataStore `NH_Settings_v1` under the key `u<UserId>`. It's validated with `Settings.Sanitize`.
+- Data lives in the player's ProfileService data (`PlayerData.Settings`, action `SetSettings`). The server validates it with `Settings.Sanitize` and rate-limits saves.
 - `Controllers.Gui.SettingsMenu` draws the window with kit components.
 
 What each setting changes:
@@ -278,12 +280,12 @@ What each setting changes:
 
 ### Wardrobe: the character creator (key K)
 - `ReplicatedStorage.UI.Appearance` holds the palettes (6 skins, 4 hairstyles, 6 hair colours, 3 uniforms), `Sanitize`, `ApplyTo(character, data)`, the server side (`StartServer`, run by `ServerScriptService.NHAppearance`), and the client calls `Fetch()` and `Send(data)`.
-- **Data:** `{ Race, Skin, Hair, HairColor, Uniform, UseAvatar }`, saved in the DataStore `NH_Appearance_v1`. It's applied after the Roblox avatar loads, on every spawn, and again whenever it changes.
+- **Data:** `{ LookStyle, Skin, Hair, HairColor, Uniform, UseAvatar, Created }`, saved in ProfileService data (`PlayerData.Appearance`, action `SetAppearance`). It's applied after the Roblox avatar loads, on every spawn, and again whenever it changes.
 - **UseAvatar = true** (the default): only the race mark is added.
 - **UseAvatar = false:** the avatar's Accessory, Shirt, Pants and ShirtGraphic move to `ServerStorage.NHAppearanceStash`, and the original BodyColors are recorded. Then the skin and uniform BodyColors, collar, tie, crest, hands and hair are built in `character.NHLook` (welded parts). Switching back restores everything exactly.
-- **Race marks:** Priest gets a gold cross pin. Vampire gets pale skin and red neon eye glints. Race sets a `Race` attribute on the player and character, but has no gameplay effect yet.
+- **Look-style marks (cosmetic, NOT race):** Chapel gets a gold cross pin. Nightborn gets pale skin and red neon eye glints. Only the `LookStyle` attribute is set. Race is a rolled gameplay system and is never chosen here.
 - `Controllers.Gui.Wardrobe` draws the window: a live `CharacterPreview:BindPlayer` on the left (with a turn-around button) and the choices on the right. It opens by itself on a player's first live join, never in Studio.
-- `ServerDirectory.LastJoined()` / `FormatLastJoined(rec)` provide the server-select footer. On join, the previous campus is read before this one is written to `NH_LastJoined_v1`.
+- `ServerDirectory.LastJoined()` / `FormatLastJoined(rec)` provide the server-select footer. On join, the previous campus is read from `PlayerData.LastJoined`, then this one is written with `SetLastJoined`.
 
 Reserved keys (in `Settings.ReservedKeys`) can't be rebound. **M** opens the menu; O is avoided because Roblox's camera uses I and O for zoom and swallows them.
 
