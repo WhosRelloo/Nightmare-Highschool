@@ -2,54 +2,6 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
-## [Menu 1.1] - 2026-10-30: Names and clans, Spin Shop, loading screen, top bar
-
-### Added
-- **Full names:** every student is now `<first name> <clan>`, for example *Mara Ravenscar*.
-  - The first name is typed in the **register** (Name & Clan tab). It's checked by Roblox's text filter, and only letters are allowed: 3 to 14, with a space, ' or - between them.
-  - It's free to change until you enter school. After that you need a Name Change.
-  - It shows over your head, in the editing-screen header, and on the slot cards.
-- **Clans** (family names), **rolled by the server** and never chosen. There are 28 original clans in 6 rarities:
-  - Common 52%, Uncommon 26%, Rare 13%, Epic 6%, Legendary 2.5%, Cursed 0.5%.
-  - **Pity:** Epic or better is guaranteed after 40 spins in a row without one.
-  - **Spins:** a free first roll plus 3 clan spins.
-  - Each clan has a lore line and a perk (data only for now).
-  - **The reel:** it lands on the server's result, and rare clans flare the ring in their colour and lean the camera in.
-- **Spin Shop (Robux):** clan spins (1 / 5 / 15), race spins (3 / 10), variant spins (3), trait spins (5) and a Name Change.
-  - `Services.Player.Purchases` is the game's only receipt handler, and it never grants a receipt twice.
-  - **Not on sale yet:** the Developer Product ids have to be created on the Creator Dashboard and pasted into `Config.Shop`.
-- **Editing-screen sections:** **Look** (the Wardrobe), **Name & Clan** and **Spin Shop**, each with its own camera move. A new student meets their clan first.
-- **Loading screen** (ReplicatedFirst), styled as your admission file:
-  - A blackletter title card, with typewritten file details and notes.
-  - Behind it, the **real courtyard**, filmed by a slow camera glide.
-  - An **asset counter**: "RECORDS RECEIVED done / total", percent, and time left, on a hairline crimson progress rule.
-  - A crimson **ADMITTED** stamp when everything has arrived.
-- **Custom top bar:** Roblox's top bar is switched off. In its place, one slim ink-and-gold plate with **Menu** (Settings), **Chat** (with an unread pip) and **Students** (player list). It fades back when you're not using it.
-- **West grounds** for the menu scene (the side the cameras look across, which looked empty):
-  - A West Hall and four more dead oaks.
-  - The wall and iron fence carry on along that side.
-  - Two rows of forest silhouettes and 48 more lit town windows.
-  - A proper chapel spire.
-
-### Changed
-- **Ring VFX:** new soft-filament tendril texture. It tiles along the beam and fades out at both sides. The tendrils also fade in from the core.
-  - The crystal-shard sprites now fade out before their flipbook cell edges. **No more cut-off lines.**
-- The distant forest and hills are now night silhouettes.
-- Pressing ENTER SCHOOL without a first name now makes the register obvious: the field pulses, the placeholder reads "Write your first name here", and the cursor is in the box.
-
-### Fixed
-- **The old tendril texture was mapped the wrong way round.** Roblox Beams run the image's vertical axis along the beam, which caused the hard edges.
-- The identity update event was named `Changed`, which clashed with Roblox's built-in `.Changed`, so purchases errored after granting. It's now `Updated`.
-- The editing-screen header showed a new clan before the reel landed.
-- The loading counter reported meshes as failed, because they were preloaded as id strings. It now preloads through each asset's instance.
-
-### Verified (Studio)
-- **Name rules:** good names title-cased, bad names refused.
-- **Odds over 10,000 rolls:** matched the config. The longest run without Epic or better was 39, so pity works.
-- **Receipts:** a repeated receipt changed nothing. Clan, race and name-change grants land in the save.
-- **Real clicks and keys:** reveal, spin, Spin Shop and the top-bar buttons.
-- **Loading screen:** 385 to 418 assets per run, 1 failed (the place has no permission for one sound).
-
 ## [UI 1.7] - 2026-10-30: Wardrobe 2.0, painted eyes, lineage spins
 
 ### Added
@@ -98,6 +50,7 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 ### Fixed
 - **Save slots** (the main menu): Settings and the Wardrobe now re-read the profile when a slot loads, so saved settings come back after picking a slot. Shadows-off persisted across a rejoin in the live test.
+- **Avatar clothes drawing over the uniform** after a save-slot spawn: Roblox could finish loading the avatar after the look was applied. The look is now re-applied on `CharacterAppearanceLoaded`, and late avatar clothing, accessories, BodyColors and face are tucked away while the uniform or painted face is on. Switching back to your own outfit still restores everything. Found by the quest session.
 - **Lineage, "Last joined" and the look** now run when a profile loads (`Data.ProfileLoaded`), not on join, so they work when the profile loads later from the main menu.
 
 ### Verified (live playtest)
