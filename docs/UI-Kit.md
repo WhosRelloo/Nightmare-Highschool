@@ -202,6 +202,61 @@ local _, char = Components.CharacterPreview({ player = game.Players.LocalPlayer,
 
 **In Studio**, MemoryStore only works in a published place with Studio API access, and teleports never run. The list then shows just the current server, the status reads "Local only", and Join explains why it can't teleport.
 
+### Helpers for reskinning existing UI
+
+**Decorate(frame, opts)**
+- Dresses an existing frame as a kit panel without changing its layout or size. Works with scale sizes and AutomaticSize.
+- The art goes in a ZIndex-0 child, `NHDecor`. The frame's own children draw on top.
+- opts: `title?, accent?, frameColor?, bgColor?, ornament? ("ornate"|"thin"|"slot"|"none"), ornamentScale?, shadow?, bgTransparency?`
+- **Rule:** if the frame has a UIListLayout or UIPadding, move the content into an inner frame. Layouts would also move `NHDecor`.
+- **Auto-size:** on an AutomaticSize frame, the art layer is sized in offsets that track the content. A scale-sized child would measure against the frame's *parent* (the whole screen), and the drop shadow is kept from overhanging an auto-sized edge.
+- api: `:SetTitle`, `:SetFrameColor`.
+
+**Other helpers**
+
+| Helper | What it does |
+|---|---|
+| `Plate{text?, autoWidth?, color?, font?, textSize?}` | Engraved plate (HUD chips, counters) |
+| `Bar{fraction, color?, caption?, height?}` | Labelled iron progress bar. api: `:Set(f, caption?)`, `:SetColor` |
+| `ChoiceRow{index?, text, color?, onClick(index), height?}` | Numbered reply row (dialogue choices, menus) |
+| `Toast{title, text?, kind?, color?}` | Notification row. `kind` is Info, Good, Warning or Bad (`Components.ToastColors`). |
+| `FadeOut(root, duration?)` | Fades every text, image, frame and stroke in a subtree. Returns the root tween. |
+
+## Reskinned game UI and in-play HUD
+
+Every reskin swaps visuals only. Packets, attributes, instance names and public functions are unchanged.
+
+| Script (`StarterPlayerScripts.Controllers.Gui`) | Now |
+|---|---|
+| `Dialogue` | A compact ornate box, low on screen, tinted in the speaker's faction colour, with `ChoiceRow` replies and an AutoScale floor of 0.8 |
+| `Notifications` | `Toast` rows that fade with `FadeOut` |
+| `ClockHud` | An ornate auto-height chip, plus an engraved class-waypoint plate |
+| `DownedHud` | An engraved prompt plate above the health bar. It turns red when you're downed or gripped. |
+| `FactionsPanel` | An ornate panel with a plaque, bracket-cornered cards, `Bar`s and kit buttons |
+| `Activities` | The lesson chalkboard framed in iron ornament over slate-green. The renderers are untouched. Leaving a lesson keeps the core backpack off while KitHud is active. |
+| **`KitHud`** (new) | Covered in its own section below. |
+| **`PromptUi`** (new) | Covered in its own section below. |
+
+### KitHud
+The in-play HUD:
+- **Health bar** (Humanoid health) with a % orb. Recent damage shows as a delayed "ghost" segment.
+- **Hotbar** from your Backpack tools. Click, tap or press 1-9 to equip. Tools can set `Rarity` and `Count` attributes.
+- **Yen** from the profile.
+- **Posture meter**, reading a `Posture` attribute on the character or Humanoid, out of `Config.Combat.PostureMax`.
+- **DOWNED alert**, driven by `Downed` + `DownedUntil`.
+
+It replaces the core health bar and backpack. The bottom HUD hides during dialogue (`InDialogue`) and lessons, and number keys are ignored then.
+
+### PromptUi
+Draws every ProximityPrompt in the NH style:
+- Prompts switch to `Style = Custom` on the local client only, so the server's prompts are untouched.
+- Each prompt shows an engraved key cap that fills with candle-gold over `HoldDuration`, plus the object and action text.
+- Touch and mouse players hold the key cap.
+- Opt a prompt out with the `KeepDefaultStyle` attribute.
+- The Equip controller's E-to-interact check still works, because PromptShown and PromptHidden still fire.
+
+Left as they are: the `FlashUI`, `RedScreen` and `Vingette` screen effects.
+
 ## Verified
 
 - All modules and scripts compile (checked with `loadstring`).
