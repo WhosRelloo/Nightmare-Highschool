@@ -2,7 +2,13 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
-## [UI 1.9] - 2026-10-30: Wardrobe preview never cuts your character off, and faces sit flush
+## [UI 1.9] - 2026-10-30: Wardrobe preview never cuts your character off, faces sit flush, ghoul uniforms
+
+### Added
+- **Ghoul school uniforms:** Ghouls in school uniform now wear torn, grave-stained versions of it, drawn by the clothing session. Skin shows through the tears.
+  - Red Vest, Red Shirt, Black Vest and Black Shirt each swap for their ghoul version.
+  - The standard uniform trousers swap for ghoul jeans. If you picked other bottoms, you keep them.
+  - Other tops, avatar mode, and the full-transformation outfit are unchanged. A race change re-dresses you straight away.
 
 ### Fixed
 - **Wardrobe preview camera:** your character is now framed head to feet, centred, with a margin, at every window size.
@@ -18,6 +24,11 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 ### Verified (Studio playtest)
 - School Wardrobe (K) at 1287x600 and 1571x600: centred head to feet, steady through the turn-around spin.
+- Ghoul uniforms, on a test copy of a character:
+  - All 4 uniform tops, plus the trousers, switch to the ghoul versions.
+  - Jeans are kept, and the Navy Vest is unchanged.
+  - A Human gets the normal uniform, and avatar mode is unchanged.
+  - The ghoul Black Vest renders correctly in game.
 - **Not yet checked live:** the creator layout. It mirrors the Register panel's fit, which was already verified.
 
 ## [Races 1.0] - 2026-10-30: Six bloodlines, race passives, the Bloodline tab, and crouching
