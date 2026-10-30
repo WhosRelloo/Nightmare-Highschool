@@ -78,6 +78,16 @@ The UI kit scales everything by `min(width / 1920, height / 1080)`. On common la
 - **Scaling consistency:** Notifications and the Factions panel scale with the rest, so the Factions button now matches its neighbours.
 - **Left-edge buttons:** on keyboard devices the Settings button is hidden, because the top bar's Menu covers it. Journal, Factions and Wardrobe stay until the top bar gets buttons for them.
 
+### Bigger kit text vs. fixed-height rows (Quest Journal and Tracker)
+- **Quest Tracker:**
+  - **Before:** the footer overflowed its 16px row by about 1px at 0.70 scale and sat on the card's bottom border. The 52px objective box fit only two lines of 20px text.
+  - **Fix:** card 380×140, objective 64, footer and timer 20.
+  - **Verified in Play:** the objective ends at y 156 and the footer starts at 157. The right edges line up with the clock.
+- **Quest Journal:**
+  - Text rows size themselves, so nothing clipped on the Quests or Case Files tabs.
+  - Deduction buttons are 230px wide, and the longest answer is 19 characters, so they fit.
+  - The evidence board itself wasn't reached, because this student has no case yet.
+
 ### Checked and fine
 - No two HUD pieces overlap each other.
 - Nothing important is off screen at 1287×600. The "off-screen" Name & Clan notes were inside a scrolling list.

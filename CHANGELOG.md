@@ -48,6 +48,8 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 See [docs/UI-Audit.md](docs/UI-Audit.md).
 
 - **Quest Tracker:** moved in to line up with the clock (x = −30), so its shadow stays on screen.
+- **Quest Tracker and bigger kit text:** with the kit's new sizes (small 18, body 20), the "[J] Journal" footer overflowed its 16px row onto the card border, and the objective box only fit two lines. The card is now 140 tall (was 112), the objective box 64 (was 52, room for three lines) and the footer/timer 20. Checked in Play: no overlap, and a long objective needs 40 of 64.
+- **Quest Journal:** checked against the bigger text. Text rows size themselves, tab and quest rows fit, and the longest deduction answer (19 characters) fits its 230px button. Nothing to change.
 
 ### Verified (Studio playtest)
 - **Menu labels:** light and 18px.
