@@ -257,6 +257,27 @@ Draws every ProximityPrompt in the NH style:
 
 Left as they are: the `FlashUI`, `RedScreen` and `Vingette` screen effects.
 
+### Settings (menu: M)
+- `ReplicatedStorage.UI.Settings` holds the schema, defaults and ranges, server saving (`StartServer`, run by `ServerScriptService.NHSettings`), and client applying.
+- Client API: `Load()`, `Get(key)`, `Set(key, value)`, `SetKey(action, keyName) -> ok, message`, `Reset()`, and `Changed` (a BindableEvent).
+- Data lives in the DataStore `NH_Settings_v1` under the key `u<UserId>`. It's validated with `Settings.Sanitize`.
+- `Controllers.Gui.SettingsMenu` draws the window with kit components.
+
+What each setting changes:
+
+| Setting | Effect |
+|---|---|
+| Volumes | The client SoundGroups `NH_Master` > `NH_Effects` / `NH_Music`. Ungrouped sounds are routed automatically: looped ones go to Music, the rest to Effects. |
+| FieldOfView | `Camera.FieldOfView` |
+| CameraShake | The player attribute `NHShakeScale`, which `EmitManager.ShakeCamera` multiplies into its intensity |
+| UIScale | `Components.SetUserScale`, which multiplies every kit AutoScale |
+| ShowHud / ShowClock | Enables or disables `KitHud` / `ClockHud` |
+| Shadows | `Lighting.GlobalShadows`, on the client only |
+| Vignette | Enables or disables `Vingette` |
+| Keys | `InputController.Rebind(action, key)` |
+
+Reserved keys (in `Settings.ReservedKeys`) can't be rebound. **M** opens the menu; O is avoided because Roblox's camera uses I and O for zoom and swallows them.
+
 ## Verified
 
 - All modules and scripts compile (checked with `loadstring`).

@@ -2,6 +2,28 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI 1.4] - 2026-10-30: Settings menu
+
+### Added
+- **Settings menu** (press **M**, or the Settings button on the left). Every option really works and saves to your profile.
+  - **Controls:** rebind Block, Dodge, Sprint, Slide, Heavy Attack, Feint, Carry and Grip. Keys owned by other systems (E, P, J, M, Space, LMB, 1-9, I/O) can't be taken, and duplicates are refused.
+  - **Audio:** Master, Combat Effects, and Music & Ambience volume.
+  - **Camera:** Field of View (60-100°) and Camera Shake strength (0% turns it off).
+  - **Interface:** UI Scale (80-120%, scales every NH panel), Show HUD, Show Clock.
+  - **Graphics:** Shadows, Screen Vignette.
+  - **Reset to defaults.**
+- Settings save to their own DataStore (`NH_Settings_v1`), separate from game progress. They're validated on the server (ranges clamped, bad keys refused) and written when you leave.
+
+### Changed
+- The input controller can now rebind actions at runtime. Camera shake now respects the player's Camera Shake setting.
+
+### Verified in a live playtest, with real input
+- M opens the menu. O can't be used, because Roblox's camera reserves I and O for zoom.
+- Rebinding Dodge Q → G: afterwards Q did nothing, and G dodged 8.9 studs.
+- Shadows off turned off the game's shadows. Clicking the FOV slider set the camera to 80°.
+- After leaving the game, the saved record held Dodge = G, Shadows off and FOV 80. The test record was then cleared.
+- On join, the defaults loaded and applied (volumes, FOV 70, shake 100%), and game sounds were routed into the volume groups.
+
 ## [UI 1.3] - 2026-10-30: Posture meter goes live
 
 ### Changed
