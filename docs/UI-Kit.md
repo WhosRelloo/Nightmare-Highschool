@@ -276,6 +276,15 @@ What each setting changes:
 | Vignette | Enables or disables `Vingette` |
 | Keys | `InputController.Rebind(action, key)` |
 
+### Wardrobe: the character creator (key K)
+- `ReplicatedStorage.UI.Appearance` holds the palettes (6 skins, 4 hairstyles, 6 hair colours, 3 uniforms), `Sanitize`, `ApplyTo(character, data)`, the server side (`StartServer`, run by `ServerScriptService.NHAppearance`), and the client calls `Fetch()` and `Send(data)`.
+- **Data:** `{ Race, Skin, Hair, HairColor, Uniform, UseAvatar }`, saved in the DataStore `NH_Appearance_v1`. It's applied after the Roblox avatar loads, on every spawn, and again whenever it changes.
+- **UseAvatar = true** (the default): only the race mark is added.
+- **UseAvatar = false:** the avatar's Accessory, Shirt, Pants and ShirtGraphic move to `ServerStorage.NHAppearanceStash`, and the original BodyColors are recorded. Then the skin and uniform BodyColors, collar, tie, crest, hands and hair are built in `character.NHLook` (welded parts). Switching back restores everything exactly.
+- **Race marks:** Priest gets a gold cross pin. Vampire gets pale skin and red neon eye glints. Race sets a `Race` attribute on the player and character, but has no gameplay effect yet.
+- `Controllers.Gui.Wardrobe` draws the window: a live `CharacterPreview:BindPlayer` on the left (with a turn-around button) and the choices on the right. It opens by itself on a player's first live join, never in Studio.
+- `ServerDirectory.LastJoined()` / `FormatLastJoined(rec)` provide the server-select footer. On join, the previous campus is read before this one is written to `NH_LastJoined_v1`.
+
 Reserved keys (in `Settings.ReservedKeys`) can't be rebound. **M** opens the menu; O is avoided because Roblox's camera uses I and O for zoom and swallows them.
 
 ## Verified
