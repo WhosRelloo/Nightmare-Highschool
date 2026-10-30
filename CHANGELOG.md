@@ -2,6 +2,19 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI 1.9] - 2026-10-30: Wardrobe preview never cuts your character off
+
+### Fixed
+- **Wardrobe preview camera:** your character is now framed head to feet, centred, with a margin, at every window size.
+  - Before, the shot was taken once, often while your character was still loading, and then kept. The head ended up jammed under the TURN AROUND bar with empty space below.
+  - The camera is now worked out from your character's real height, its turn-around width, the preview's shape and the camera's field of view. It's redone on every outfit change and every resize.
+  - Sheathed weapons (the katana on your back) and held tools no longer count toward the shot, so they don't shrink your character. Hair, accessories and future ears and tails still count.
+- **Creator layout:** in the main-menu creator, the Wardrobe panel now sits between the menu's letterbox bars, so its Done button can't hide under the bottom bar. This matches the Register panel.
+
+### Verified (Studio playtest)
+- School Wardrobe (K) at 1287x600 and 1571x600: centred head to feet, steady through the turn-around spin.
+- **Not yet checked live:** the creator layout. It mirrors the Register panel's fit, which was already verified.
+
 ## [Races 1.0] - 2026-10-30: Six bloodlines, race passives, the Bloodline tab, and crouching
 
 ### Added
