@@ -42,7 +42,8 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 - **New UI:** the Students list, compass and shift-lock cursor work.
 - **Combat:** PvP hits landed. **V** carry, **B** grip with the kill saved, then a respawn.
 - **Duels and leaving:** a duel ran on the pads, and leaving worked without errors.
-- **Not yet:** the fixes from this run on fresh code, chat between players, rejoining, and discipline reports.
+- **Second run:** every fix was re-checked on fresh code in a new session: E equips and G introduces next to a stranger, there's no duel rematch while standing on the pads, and known names persisted across sessions, per student.
+- **Not yet:** chat between players and discipline reports.
 
 ## [Menu 1.1] - 2026-10-30: Names and clans, Spin Shop, loading screen, top bar
 

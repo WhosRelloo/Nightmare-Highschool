@@ -1,6 +1,6 @@
 # Strangers, the Students List, the Compass and the Shift-Lock Cursor: NH Combat Test
 
-**Status:** built and tested with **two real players** (a Studio local server with 2 clients). Some fixes from that run still need one more two-player pass; see "Verified".
+**Status:** built and tested with **two real players** (Studio local server with 2 clients), across two sessions. Every fix from the first run was re-checked on fresh code in a second run.
 
 ## Stranger system
 You only see a student's name once you've learned it.
@@ -80,8 +80,16 @@ Each step was run on the two clients and checked on the server, using real keys 
 - E being taken by the introduce prompt: moved to G.
 - Two duel problems: account names in messages, and instant rematches.
 
-**Still to check (next two-player run):**
-- Those fixes, on fresh code.
+**Second run (fresh code, a new session):**
+- **Nameplate on spawn:** fixed. A freshly spawned stranger's *Stranger* plate appeared, visible within 18 studs.
+- **Roblox's player list:** stays off after the menu.
+- **Shift-lock cursor:** the new 44 px cursor is set.
+- **Tab:** opens the list, and it's readable: STUDENTS, "2 enrolled", the group, your gold row with its rarity line, and *Stranger*. The compass stayed clear of the top bar.
+- **Equip vs. introduce:** next to a stranger, **E equipped** the weapon (the hand grip appeared, and no introduction was sent). **G introduced**: the other player then saw "Ada Lowell", visible from 60 studs.
+- **Duel:** it ran on the pads. Afterwards, with both still standing on the pads, **no new countdown started**. The running server's messages read "Your opponent went down." / "You went down." / "You left the ring.", with no account names.
+- **Known names persist across sessions:** Player1's student still knew `-2:1` from the last session.
+- **Per student:** Player2's new slot-II student (signed by typing "juno", which became "Juno Kestrel") was a stranger to Player1. It learned only Ada's name, through the G introduction.
+
+**Not tested:**
 - Chat between players. Typing in chat wasn't run, at your request.
-- Rejoining after leaving, and that known names persist.
 - A discipline report on a witnessed fight.
