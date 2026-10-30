@@ -156,6 +156,16 @@ local root, api = Components.Toggle({ label = "Subtitles", value = true,
 **CreditsPanel{title?, entries = {{role, name}}, columns?}**
 - A two-column grid of roles and names.
 
+**ColorPicker{value?, onChanged(c), onReleased(c), presets?}**
+- A hue/saturation wheel (`Theme.Images.ColorWheel`), a brightness bar, a live swatch, a **HEX** box (`#RRGGBB`, invalid input reverts) and optional preset chips.
+- Mouse and touch drag. `onChanged` fires while dragging, `onReleased` on let-go, preset or HEX.
+- api: `:Set(color, silent?)`, `:Get()`. The root's `Value` attribute holds the colour.
+
+**SpinReel{entry?, height?, textSize?}**
+- A slot-machine window. `api:Spin(entries, final, duration?, onDone?)` rolls through random entries and lands on `final` (Quint ease-out), then flashes in its colour.
+- An entry is `{ text, sub?, color? }`. `api:Show(entry)` sets it without animation.
+- The result always comes from the server; the reel only animates it.
+
 **ServerRow{name, players, maxPlayers, region?, period?, ping?, faction?, isCurrent?, jobId?, onJoin(server, api)}**
 - Shows the campus name, a faction crest, "Students 18 / 30" with a population gauge, the in-game period, the region, the ping and a Join button.
 - The button reads **Join**, **Full**, **Here** or **Joining...** to match the server's state.
@@ -279,12 +289,79 @@ What each setting changes:
 | Keys | `InputController.Rebind(action, key)` |
 
 ### Wardrobe: the character creator (key K)
-- `ReplicatedStorage.UI.Appearance` holds the palettes (6 skins, 4 hairstyles, 6 hair colours, 3 uniforms), `Sanitize`, `ApplyTo(character, data)`, the server side (`StartServer`, run by `ServerScriptService.NHAppearance`), and the client calls `Fetch()` and `Send(data)`.
-- **Data:** `{ LookStyle, Skin, Hair, HairColor, Uniform, UseAvatar, Created }`, saved in ProfileService data (`PlayerData.Appearance`, action `SetAppearance`). It's applied after the Roblox avatar loads, on every spawn, and again whenever it changes.
-- **UseAvatar = true** (the default): only the race mark is added.
-- **UseAvatar = false:** the avatar's Accessory, Shirt, Pants and ShirtGraphic move to `ServerStorage.NHAppearanceStash`, and the original BodyColors are recorded. Then the skin and uniform BodyColors, collar, tie, crest, hands and hair are built in `character.NHLook` (welded parts). Switching back restores everything exactly.
-- **Look-style marks (cosmetic, NOT race):** Chapel gets a gold cross pin. Nightborn gets pale skin and red neon eye glints. Only the `LookStyle` attribute is set. Race is a rolled gameplay system and is never chosen here.
-- `Controllers.Gui.Wardrobe` draws the window: a live `CharacterPreview:BindPlayer` on the left (with a turn-around button) and the choices on the right. It opens by itself on a player's first live join, never in Studio.
+`Controllers.Gui.Wardrobe` draws the window. On the left is a live `CharacterPreview:BindPlayer` with a turn-around button. On the right are five tabs:
+
+| Tab | What you set |
+|---|---|
+| Look | Look style (Scholar / Chapel / Nightborn) and skin: 6 presets plus a colour wheel / HEX |
+| Face | Eye shape (Roblox face, Sharp, Hooded, Fierce, Doe, Sleepless, Cat, Gentle, Calm), eye set (Male / Female), eye colour (7 presets plus wheel / HEX; Nightborn is always crimson), brows (None plus 11 styles, including the thick Bold, Heavy and Bushy; "Match hair" or a custom colour) and mouth (None plus 20 anime mouths, frowns included, "Fuller lips") |
+| Hair | Built hairstyle (Neat Crop / Fringe / Long / Bun / None), catalog hair by ID, "Recolour catalog hair", and hair colour (presets plus wheel / HEX) |
+| Outfit | "Use my Roblox outfit", plus the official uniform: Red Vest, Red Shirt, Black Vest, Black Shirt (group clothing) and the school trousers |
+| Lineage | The server-rolled race and variant (spin reel), race and variant odds, 2 trait slots with rerolls |
+
+The window opens by itself on a player's first live join, never in Studio. `Shared.OpenTab(name)` opens it on a given tab.
+
+**`ReplicatedStorage.UI.Appearance` (cosmetic only)**
+- **Data:** `{ LookStyle, Skin, SkinHex, Hair, HairColor, HairHex, HairId, TintHair, Eyes, EyeSet, EyeColor, EyeHex, Brows, BrowHex, Mouth, Lips, Uniform, UseAvatar, Created }`.
+  - It's saved in ProfileService data (`PlayerData.Appearance`, action `SetAppearance`).
+  - A `*Hex` value (`"RRGGBB"`) overrides its preset index. `""` means use the preset.
+  - The look is applied after the Roblox avatar loads, on every spawn, and again whenever it changes.
+- **UseAvatar = false:** the avatar's Accessory, Shirt, Pants and ShirtGraphic move to `ServerStorage.NHAppearanceStash`. You then wear `NHUniformShirt` and `NHUniformPants`, with skin BodyColors and the built hair. Switching back restores everything exactly.
+- **Catalog hair:**
+  - `HairId` is any Roblox hair accessory (AssetType HairAccessory). The server checks it with `GetProductInfo`, loads it through `Players:CreateHumanoidModelFromDescription`, caches it, and attaches it as `NHHair`. An ID that doesn't load is never saved.
+  - While it's worn, the avatar's own hair is held in `ServerStorage.NHHairStash`.
+  - With `TintHair` on, it's recoloured: `SpecialMesh.VertexColor`, or for a MeshPart the texture is cleared and the colour set.
+  - The remote `NHAppearance.CheckHair(id) -> ok, name|reason` lets the window validate an ID first.
+- **Painted face:** drawn on the skin at full resolution.
+  - **How it's drawn:** on a classic (cylinder) head, the face is `head.NHFacePlate`, a Folder of 12 thin invisible strips.
+    - Each strip is welded to the head, sits 0.006 studs off the skin and is angled to follow the curve.
+    - Each strip has a SurfaceGui showing its 1/12 slice of the 1024 px art (`ImageRectOffset` / `ImageRectSize`).
+    - This wraps the head exactly like a decal, but GUI images render at full resolution on every graphics setting. Decals get down-sampled on lower settings, which made the faces look crunchy. This was verified live: every strip measured 0.006 studs above the skin, with no floating.
+  - **Other heads:** MeshPart and dynamic heads fall back to plain Decals.
+  - **First person:** you don't see your own face, because the Wardrobe disables your own face's SurfaceGuis while Roblox hides your head (`LocalTransparencyModifier`).
+  - **Previews:** `CharacterPreview` turns the strips back into Decals inside its ViewportFrame, since ViewportFrames don't draw SurfaceGuis.
+  - **Avatar face:** the avatar's own front face decals are hidden, and restored when you go back to "Roblox face".
+
+  | Layer | Content | Order | Tint |
+  |---|---|---|---|
+  | `NHEyesVeins` | greyscale skin veins (vampire / ghoul forms only) | 1 | the head's real colour, mixed 50/50 with the form's vein colour, so it suits any skin |
+  | `NHEyesIris` | greyscale iris | 2 | eye colour (or the form's colour) |
+  | `NHEyesMain` | sclera, lids, lashes, pupil, highlights | 3 | none |
+  | `NHBrows` | brow hair strokes, fitted to the eye shape | 4 | `BrowHex`, or the hair colour 18% darker |
+  | `NHMouth` | mouth (the transformation mouth while transformed) | 4 | none |
+
+  - Brows and mouth show only with painted eyes.
+  - All art IDs are in `ReplicatedStorage.UI.EyeArt` (420 textures): 8 shapes × Male/Female × 7 forms of eyes, 11 brow styles × 8 shapes, and 20 mouths × (plain / fuller lips) plus 4 transformation mouths. It's generated by `Tools/ui-textures/gen_eyes.py`, `gen_face.py` and `build_eyeart.py`.
+  - **Mouths:** cel-shaded anime, modelled on an open × width mouth grid:
+    - a thin wine-coloured outline
+    - a two-tone maroon / rose interior
+    - a thin tooth crescent, plus a lower tooth sliver when wide open
+    - a soft lower-lip shadow
+    - "Fuller lips" adds a glossy pink tint
+  - **The 20 mouths:**
+    - Neutral, Smile, Flat, Smirk, Hint, Grin, Small, Ooh, Open, Talk, Laugh, Shout, Pout
+    - frowns: Frown, Scowl, Sulk, Grimace
+    - anime extras: Cat, Fang, Shark
+  - **No overlaps:** each eye render checks its line groups against each other, and every brow and mouth is checked against every eye variant. A brow is lifted until its lower edge clears the highest lash, wing or crease of every variant of that eye shape by 14 px.
+- **Transformation eyes:** when gameplay sets the character attribute `Transformation` to `Vampire`, `Wolf`, `Ghoul` or `Wraith`, the eyes and mouth switch to that form's art and tint, and switch back when it's cleared. Appearance only reads this attribute.
+  - Vampire: crimson; a blade-shaped slit pupil with a glowing rim and a dark sigil ring; bloodshot whites; veins.
+  - Wolf: a huge amber iris; a ragged feral pupil with a gold rim and starburst; a yellowed sclera.
+  - Ghoul: a milky iris; a pinprick pupil; a sunken socket; bloodshot whites; many branching skin veins.
+  - Wraith: blank glowing eyes. *Proposed:* vampire is established in the concept doc; wolf and ghoul were requested by the developer; wraith is an extra suggestion.
+  - **`TransformationStage = 2`** gives Vampire and Ghoul their second stage: jet-black sclera (art keys `vampire2`, `ghoul2`).
+- **Look-style marks (cosmetic, NOT race):** Chapel gets a gold cross pin. Nightborn gets pale skin and crimson eyes. Only the `LookStyle` attribute is set.
+
+**`ReplicatedStorage.Lineage`: race, variant and traits, rolled on the server (players never choose)**
+- **Races** (from the concept doc; weights are configurable):
+  - Human 50%: Human 90 / Superhuman 10
+  - Priest 30%: Priest 85 / Grand Priest 12 / Pope 3
+  - Vampire 20%: Vampire 85 / Nobleblood 12 / Royal Vamp 3
+- **Traits:** 13 proposals from Common to Legendary, in 2 slots. They're data only (each has an `Effects` table) until the stat system exists.
+- **Saving:** in ProfileService data, `PlayerData.Lineage = { Race, SubRace, Tier, Traits, Spins = { Race, Variant, Trait } }`, through the action `SetLineage`. Only `ServerScriptService.NHLineage` writes it.
+- **Tier** (concept doc: 3 race tiers by kill count) is worked out on join from `Kills + NPCKills`. The thresholds `Lineage.TierKills = { 0, 25, 100 }` are a proposal. The tier is mirrored as the Player attribute `RaceTier`, so class and tier systems won't need a data migration.
+- **New players:** a new profile gets a free first roll and 3 / 3 / 5 rerolls. Spins aren't used up in Studio.
+- **Remote:** `NHLineage.Spin(kind, slot?) -> ok, lineage|reason` (RemoteFunction, rate-limited to 1 per second).
+- **Attributes:** the server mirrors the read-only Player attributes `Race`, `SubRace`, `RaceTier` and `Traits` (a comma list) for other systems to read.
 - `ServerDirectory.LastJoined()` / `FormatLastJoined(rec)` provide the server-select footer. On join, the previous campus is read from `PlayerData.LastJoined`, then this one is written with `SetLastJoined`.
 
 Reserved keys (in `Settings.ReservedKeys`) can't be rebound. **M** opens the menu; O is avoided because Roblox's camera uses I and O for zoom and swallows them.

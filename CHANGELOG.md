@@ -2,31 +2,64 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
-## [Menu 1.0] - 2026-10-30: Cinematic main menu and save slots
+## [UI 1.7] - 2026-10-30: Wardrobe 2.0, painted eyes, lineage spins
 
 ### Added
-- **Main menu:** a cinematic night courtyard in front of the academy. It has wet cobblestone, Victorian brick, gothic stone, a clock tower with working hands, an iron gate with gargoyles, and dead oaks hung with moss, a pair of sneakers and Crimson Court ribbons.
-  - Every surface uses PBR materials: colour, normal and roughness maps.
-  - Your student floats in a crimson clock seal while energy tears out of a stone ring behind them.
-  - Ambient life: lamps flicker, windows die, chimneys smoke, bats circle the tower and lightning flashes.
-- **Camera:** a skippable intro fly-in, then smooth spline moves between every screen, with handheld drift and mouse parallax.
-- **Menu items:** CONTINUE, PLAY, SETTINGS and CREDITS (keyboard, mouse and gamepad).
-- **Save slots:** three students, each with their own save (race roll, quests, factions, Yen and record). Slot 1 is your existing save, so nothing is lost.
-  - Each card shows race, title, faction rank, Yen, quests, takedowns and when you last played.
-  - Each slot's student stands on a lit plinth; empty slots are a crimson ghost.
-- **Edit your student:** after picking a slot, your real character steps into the seal and the Wardrobe docks beside them.
-  - The camera cuts for each tab: face close-up, hair three-quarter view, full body, low angle.
-  - Drag to orbit.
-  - ENTER SCHOOL pushes the camera to the doors and fades you into school.
-- **VFX textures rendered in Blender Cycles:** volumetric smoke (a 4x4 flipbook), tileable plasma for the tendrils, lit crystal shards (2x2), embers and mist. The render script is `tools/vfx/render_vfx.py`.
+- **Wardrobe tabs:** Look, Face, Hair, Outfit and Lineage.
+- **Painted eyes:** original, high-res art for classic heads.
+  - 8 shapes: Sharp, Hooded, Fierce, Doe, Sleepless, Cat (slit pupil), Gentle and Calm.
+  - Each shape has a **Male** and a **Female** eye set. The female set has fuller lashes, a longer wing and lower lashes.
+  - The iris is a separate tinted layer, so eye colour can be anything: 7 presets plus a colour wheel or HEX.
+  - "Roblox face" keeps your own face.
+- **Brows** are a separate layer, so you can pick them on their own. There are 11 styles plus None: Straight, Arched, Angled, Soft, Thick, Thin, Furrowed, Raised, and the extra-thick Bold, Heavy and Bushy.
+  - They're drawn with fine hair strokes and match your hair colour, or a colour you pick.
+  - Every style is fitted to every eye shape, so a brow never touches the lashes on any variant.
+- **Mouths** are a separate layer too, drawn cel-shaded anime-style (modelled on an open × width mouth grid): a thin wine-coloured outline, a maroon / rose interior, a tooth crescent and a soft lower-lip shadow.
+  - There are 20 styles plus None: Neutral, Smile, Flat, Smirk, Hint, Grin, Small, Ooh, Open, Talk, Laugh, Shout and Pout.
+  - **Frowns:** Frown, Scowl, Sulk and Grimace.
+  - **Anime extras:** Cat (":3"), Fang and Shark.
+  - Each has a "Fuller lips" option with glossy pink lips.
+- **Sharp faces that sit on the skin:** faces are drawn as SurfaceGuis on 12 strips that wrap the head 0.006 studs above the skin, so they stay full-resolution on every graphics setting (decals got down-sampled and looked crunchy). Previews convert them to decals automatically, and your own face hides in first person.
+- **Nothing overlaps:** the art generator checks every face piece against every other and refuses to ship any overlap, for example brow on lashes, under-eye lines on lower lashes, or veins on line work.
+- **Transformation eyes:** every shape, in both sets, has transformation versions. Gameplay switches them by setting the character attribute `Transformation`; players can't pick them.
+  - Vampire: a crimson iris with a blade-shaped slit pupil, a glowing rim and a dark sigil ring, plus bloodshot whites, veins and an under-eye shadow.
+  - Wolf: a huge amber iris, a ragged feral pupil with a gold rim and starburst, and a yellowed sclera.
+  - Ghoul: a milky iris, a pinprick pupil, sunken sockets, bloodshot whites, and many branching veins spreading over the skin.
+  - Wraith: blank glowing eyes with a halo. *Proposed:* it isn't in the concept doc.
+  - **Second stage** (`TransformationStage = 2`): vampires and ghouls get **jet-black sclera**.
+  - Transformations also swap the mouth: vampire fangs with a single crimson bead, a wolf snarl with gums and canines, a ghoul's jagged grin with split, stitched corners, and a hollow wraith mouth trailing smoke.
+  - **Veins** are a separate layer, tinted from the character's own skin colour, so they look natural on any skin tone. They're shaded with a raised, lit edge and a bruised halo.
+- **Colour picker** (a new kit component, `ColorPicker`): a hue wheel, a brightness bar, a HEX box and presets. It's used for skin, hair, eye and brow colour.
+- **Catalog hair:** paste any Roblox hair accessory ID. The server checks it, loads it and saves it. Optional recolouring. Your avatar's own hair is hidden while it's worn.
+- **"None"** hairstyle.
+- **Lineage** (from the concept doc), rolled on the server and never chosen:
+  - Races: Human 50% / Priest 30% / Vampire 20%.
+  - Variants: Superhuman; Grand Priest and Pope; Nobleblood and Royal Vamp.
+  - 2 trait slots, drawn from 13 proposed traits (Common to Legendary).
+  - New students get a free first roll, then 3 race, 3 variant and 5 trait rerolls. There's a slot-machine reel (a new kit component, `SpinReel`) and an odds readout.
+  - It's saved in `PlayerData.Lineage` (action `SetLineage`), and the server mirrors the `Race`, `SubRace`, `RaceTier` and `Traits` attributes.
+  - A `Tier` (1 to 3) is stored for the concept doc's kill-count race tiers, worked out from grip executions. The thresholds (0 / 25 / 100) are a proposal.
+- **Official uniforms:** Red Vest, Red Shirt, Black Vest and Black Shirt, with the school trousers. These are the Nightmare Highschool group's clothing, replacing the built blazer.
 
 ### Changed
-- **Saves:** your profile now loads when you pick a slot, not on join. The server spawns and respawns characters (`CharacterAutoLoads` is off), and combat is blocked while you're in the menu.
+- The posture meter now sits beside the health bar. It used to collide with the menu buttons on wide screens.
 
-### Verified
-- Live playtest with real clicks and keys: intro, menu, slots, editing (the Face-tab camera cut), entering school with the HUD, camera and lighting restored, and Continue.
-- Camera speed measured during the intro: it ramps smoothly with no stops between shots.
-- **Not tested yet:** two players, and phones.
+### Fixed
+- **Save slots** (the main menu): Settings and the Wardrobe now re-read the profile when a slot loads, so saved settings come back after picking a slot. Shadows-off persisted across a rejoin in the live test.
+- **Lineage, "Last joined" and the look** now run when a profile loads (`Data.ProfileLoaded`), not on join, so they work when the profile loads later from the main menu.
+
+### Verified (live playtest)
+- The official uniform (Black Shirt) and the Nightborn look came back after a rejoin.
+- The face renders on the live character. All 12 strips measured 0.006 studs above the skin, welded.
+- The free first lineage roll happened on profile load: Priest, with Early Riser and Light Sleeper.
+- A race spin landed on Human, with the reel animation and odds updating.
+- The posture meter no longer overlaps the menu buttons.
+- The Wardrobe's main-menu stage mode works in the quest session's creator.
+
+### Notes
+- Traits are data only until the stat system exists.
+- Spins aren't used up in Studio.
+- 420 face textures, all generated by `Tools/ui-textures`, with automatic no-overlap checks.
 
 ## [UI 1.6] - 2026-10-30: One save system; "Look" instead of race
 
