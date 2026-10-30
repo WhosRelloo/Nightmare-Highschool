@@ -2,7 +2,7 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
-## [UI 1.9] - 2026-10-30: Wardrobe preview never cuts your character off
+## [UI 1.9] - 2026-10-30: Wardrobe preview never cuts your character off, and faces sit flush
 
 ### Fixed
 - **Wardrobe preview camera:** your character is now framed head to feet, centred, with a margin, at every window size.
@@ -10,6 +10,11 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
   - The camera is now worked out from your character's real height, its turn-around width, the preview's shape and the camera's field of view. It's redone on every outfit change and every resize.
   - Sheathed weapons (the katana on your back) and held tools no longer count toward the shot, so they don't shrink your character. Hair, accessories and future ears and tails still count.
 - **Creator layout:** in the main-menu creator, the Wardrobe panel now sits between the menu's letterbox bars, so its Done button can't hide under the bottom bar. This matches the Register panel.
+- **Faces sit on the head:** the painted face (eyes, brows, mouth, veins) floated about 0.02 studs off the cheeks.
+  - The cause was the face shell using half the head's width as its radius. The classic head's visible curve is 0.48 of its width (0.54 studs on this game's 0.9-scale heads).
+  - The strips now sit on that curve, and the art is sized to the head's visible width, so it wraps the same angle as before.
+  - Each flat strip is placed so its edges, not its centre, touch the curve, so no strip edge pokes out. Old faces rebuild automatically.
+  - In a grazing close-up along the cheek, only the 0.006-stud anti-flicker gap now shows past the head outline. That's well under a pixel at normal camera distances, and nothing flickers.
 
 ### Verified (Studio playtest)
 - School Wardrobe (K) at 1287x600 and 1571x600: centred head to feet, steady through the turn-around spin.
