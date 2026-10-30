@@ -2,6 +2,32 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [Races 1.1] - 2026-10-30: Race looks: ears, tails, grave wear and cold wisps
+
+### Added
+- **Race cosmetics modelled in Blender** on the game's R6 proportions, with PBR textures (colour, normal, roughness, and metalness on the silver Moon pieces):
+  - **Vampire ears:** Pointed and Swept (Tier I), Long Swept (II), Elder (III). They take the player's skin tone.
+  - **Werewolf ears:** Upright and Tufted (I), Torn (II), Moon-marked (III).
+  - **Werewolf tails:** Brush, Bushy and Bobbed (I), Shaggy (II), Moon-marked (III). Six fur colours tint the ears and tail; the Moon pieces are charcoal and silver.
+  - **Ghoul:** stitched jaw wrap and chest strap (II), and a tattered grave shroud (III).
+  - **Wraith:** a faint cold breath every few seconds and thin cold wisps from the shoulders and hands, half as visible by day. Wisp colours at Tier II, frost-tipped fingers at Tier III.
+- **Animated tails:** each tail has a 7-bone rig. Tails sway gently at rest, swing out when you turn or strafe, lift when you run and bounce when you land. This runs on each player's own screen only.
+- **Looks picker** in the Bloodline tab. The server checks every choice against your race and tier; locked options show the tier they unlock at. Saved per student.
+- **Ghoul school uniform:** a Ghoul wearing the school uniform gets a torn, re-stitched, grave-stained version of the same uniform (clothing and UI-kit sessions).
+
+### Fixed
+- **Floating ears and faces:** this game's bodies are scaled to 0.9, so every piece now scales with the real body. The vampire ears press against the head, and the painted face wraps the head's true curve (UI-kit session). Nothing clips into the body.
+
+### Verified (Studio playtest)
+- Vampire, Werewolf, Ghoul and Wraith looks attached and seated, checked from several angles.
+- Picking looks saves and re-dresses the character; a locked choice falls back to a Tier I look.
+- A tail swayed at rest (tip up to about 5 degrees) and lifted while sprinting (the lift direction was also checked on the rig).
+- Wraith wisps showed at night.
+
+### Not yet
+- The darker ghoul shroud and strap colours haven't been seen in a playtest yet (uploaded after the last test).
+- Two-player checks; how the looks behave during transformations.
+
 ## [UI 1.9] - 2026-10-30: Wardrobe preview never cuts your character off, faces sit flush, ghoul uniforms
 
 ### Added

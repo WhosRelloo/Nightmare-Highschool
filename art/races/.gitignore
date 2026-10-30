@@ -1,0 +1,11 @@
+# working files: derived mesh dumps, Blender backups, debug renders
+meshdata/
+*.blend1
+previews/*
+!previews/race_cosmetics_showcase.png
+!previews/v_ears_all.png
+!previews/w_ears_all.png
+!previews/t_all.png
+textures/_*
+textures/vamp_maps.png
+fbx/_*

@@ -59,6 +59,33 @@ Race is always **rolled by the server**; players never pick it.
 
 ![Record with race rows](img/record-race.jpg)
 
+## Looks (Races 1.1)
+Race-only cosmetics, chosen in the Bloodline tab's **Looks** section. Grander versions unlock at Tier II and III.
+
+| Race | Slot | Tier I | Tier II | Tier III |
+|---|---|---|---|---|
+| Vampire | Ears | Pointed, Swept | Long Swept | Elder |
+| Werewolf | Ears | Upright, Tufted | Torn | Moon-marked |
+| Werewolf | Tail | Brush, Bushy, Bobbed | Shaggy | Moon-marked |
+| Werewolf | Fur colour | Ash, Charcoal, Umber, Russet, Wheat, Snow | | |
+| Ghoul | Grave wear | None (the ghoul uniform shows in school uniform) | Stitch straps | Grave shroud, or both |
+| Wraith | Cold wisps | Pale | Grave green, Violet | |
+| Wraith | Frost | None | | Frost-tipped fingers |
+
+![Race cosmetics](../art/races/previews/race_cosmetics_showcase.png)
+
+- **Art:** modelled in Blender on the R6 rig (`art/races/NH_RaceCosmetics.blend`), exported as FBX (`art/races/fbx/`), PBR textures in `art/races/textures/` (ids in `art/races/fbx/textures.json`). Imported once into `ServerStorage.NHRaceCosmetics` (see [Race-Cosmetics-Import.md](Race-Cosmetics-Import.md)).
+- **Each MeshPart** carries `NH_Part` (Head or Torso), `NH_Offset` (from that part's centre, at standard R6 size), `NH_Tint` (skin, fur or none) and optionally `NH_Squeeze`.
+- **Server:** `Services.Player.RaceCosmetics` builds the character's `NHRaceLooks` folder.
+  - It scales each piece to the real body (torso height / 2).
+  - It tints vampire ears to the head colour and werewolf pieces to the fur colour.
+  - It adds the Wraith particles.
+  - It rebuilds whenever `Race`, `RaceTier` or `RaceLooks` changes, and on respawn.
+- **Saving:** `PlayerData.Lineage.Looks = { [slot] = optionId }`, set through `NHLineage.SetLook` (server-validated, rate-limited). `Lineage.ResolveLooks` falls back to a Tier I option when a saved look is above your tier. The resolved looks are mirrored as the player attribute `RaceLooks`.
+- **Tail animation:** `Controllers.Character.TailSway` (client).
+  - It writes each bone's `Transform` on Heartbeat, after the Animator's step, so the pose survives until the frame renders.
+  - Tails more than 140 studs away stay still.
+
 ## Code
 | Piece | Where |
 |---|---|
@@ -94,6 +121,5 @@ Saving is unchanged: `PlayerData.Lineage = { Race, SubRace, Tier, Traits, Spins 
 - **Bug found and fixed:** a leftover copy of the Progression module (from a timed-out check) made every Progression hook run twice. I removed it, and both heals and EXP then applied once.
 
 ## Not yet
-- **Phase 2:** race cosmetics modelled in Blender (vampire ears, wolf ears and tails, ghoul extras, wraith breath and wisps) and the ghoul uniform.
 - **Phase 3:** race hunger, rites, earned tiers, the **tier-up cutscene** (cinematic camera and choreography, per race and tier), and the bite that turns Humans and Priests.
 - **Not playtested yet:** two players seeing each other's race effects, and Fated, Wraith and Werewolf effects in real fights.

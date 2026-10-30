@@ -1,0 +1,294 @@
+{
+ "V_Ears_Pointed": {
+  "part": "Head",
+  "textures": "VampEars",
+  "tint": "skin",
+  "rigged": false,
+  "blender_offset_from_part_centre": [
+   0.0,
+   0.1993,
+   0.0559
+  ],
+  "size": [
+   1.7083,
+   0.4576,
+   0.7688
+  ],
+  "tris": 8388,
+  "metal": false
+ },
+ "V_Ears_Swept": {
+  "part": "Head",
+  "textures": "VampEars",
+  "tint": "skin",
+  "rigged": false,
+  "blender_offset_from_part_centre": [
+   0.0,
+   0.2052,
+   -0.0218
+  ],
+  "size": [
+   1.6487,
+   0.4401,
+   0.4009
+  ],
+  "tris": 7200,
+  "metal": false
+ },
+ "V_Ears_LongSwept": {
+  "part": "Head",
+  "textures": "VampEars",
+  "tint": "skin",
+  "rigged": false,
+  "blender_offset_from_part_centre": [
+   0.0,
+   0.2283,
+   0.0504
+  ],
+  "size": [
+   1.973,
+   0.4758,
+   0.5196
+  ],
+  "tris": 7200,
+  "metal": false
+ },
+ "V_Ears_Elder": {
+  "part": "Head",
+  "textures": "VampEars",
+  "tint": "skin",
+  "rigged": false,
+  "blender_offset_from_part_centre": [
+   0.0,
+   0.1672,
+   0.1574
+  ],
+  "size": [
+   1.9937,
+   0.3634,
+   0.7548
+  ],
+  "tris": 7200,
+  "metal": false
+ },
+ "W_Ears_Upright": {
+  "part": "Head",
+  "textures": "WolfEars",
+  "tint": "fur",
+  "rigged": false,
+  "blender_offset_from_part_centre": [
+   0.0,
+   0.0842,
+   0.8243
+  ],
+  "size": [
+   1.1698,
+   0.3047,
+   0.6414
+  ],
+  "tris": 5888,
+  "metal": true,
+  "note": "seated 0.14 lower in Studio (NH_Offset) so the base meets the in-game head top"
+ },
+ "W_Ears_Tufted": {
+  "part": "Head",
+  "textures": "WolfEars",
+  "tint": "fur",
+  "rigged": false,
+  "blender_offset_from_part_centre": [
+   0.0,
+   0.0842,
+   0.8243
+  ],
+  "size": [
+   1.1698,
+   0.3047,
+   0.6414
+  ],
+  "tris": 7868,
+  "metal": true,
+  "note": "seated 0.14 lower in Studio (NH_Offset) so the base meets the in-game head top"
+ },
+ "W_Ears_Torn": {
+  "part": "Head",
+  "textures": "WolfEars",
+  "tint": "fur",
+  "rigged": false,
+  "blender_offset_from_part_centre": [
+   0.0,
+   0.0832,
+   0.8246
+  ],
+  "size": [
+   1.2157,
+   0.3037,
+   0.641
+  ],
+  "tris": 5888,
+  "metal": true,
+  "note": "seated 0.14 lower in Studio (NH_Offset) so the base meets the in-game head top"
+ },
+ "W_Ears_Moon": {
+  "part": "Head",
+  "textures": "WolfEars",
+  "tint": null,
+  "rigged": false,
+  "blender_offset_from_part_centre": [
+   0.0,
+   0.087,
+   0.8397
+  ],
+  "size": [
+   1.209,
+   0.3301,
+   0.6949
+  ],
+  "tris": 7868,
+  "metal": true,
+  "note": "seated 0.14 lower in Studio (NH_Offset) so the base meets the in-game head top"
+ },
+ "W_Tail_Brush": {
+  "part": "Torso",
+  "textures": "TailBrush",
+  "tint": "fur",
+  "rigged": true,
+  "blender_offset_from_part_centre": [
+   -0.009,
+   0.9793,
+   -1.6361
+  ],
+  "size": [
+   0.4534,
+   1.0888,
+   1.9522
+  ],
+  "tris": 9742,
+  "metal": false
+ },
+ "W_Tail_Bushy": {
+  "part": "Torso",
+  "textures": "TailBushy",
+  "tint": "fur",
+  "rigged": true,
+  "blender_offset_from_part_centre": [
+   -0.0103,
+   1.0661,
+   -1.5054
+  ],
+  "size": [
+   0.6736,
+   1.276,
+   1.8027
+  ],
+  "tris": 11782,
+  "metal": false
+ },
+ "W_Tail_Bobbed": {
+  "part": "Torso",
+  "textures": "TailBobbed",
+  "tint": "fur",
+  "rigged": true,
+  "blender_offset_from_part_centre": [
+   -0.0131,
+   0.8482,
+   -0.5576
+  ],
+  "size": [
+   0.4822,
+   0.841,
+   0.6055
+  ],
+  "tris": 4914,
+  "metal": false
+ },
+ "W_Tail_Shaggy": {
+  "part": "Torso",
+  "textures": "TailShaggy",
+  "tint": "fur",
+  "rigged": true,
+  "blender_offset_from_part_centre": [
+   0.0043,
+   1.1,
+   -1.8542
+  ],
+  "size": [
+   0.7061,
+   1.3281,
+   2.4008
+  ],
+  "tris": 12802,
+  "metal": false
+ },
+ "W_Tail_Moon": {
+  "part": "Torso",
+  "textures": "TailMoon",
+  "tint": null,
+  "rigged": true,
+  "blender_offset_from_part_centre": [
+   0.0047,
+   1.3318,
+   -1.3654
+  ],
+  "size": [
+   0.6114,
+   1.7911,
+   1.6354
+  ],
+  "tris": 12938,
+  "metal": true
+ },
+ "G_Stitch_Jaw": {
+  "part": "Head",
+  "textures": "GhoulStraps",
+  "tint": null,
+  "rigged": false,
+  "blender_offset_from_part_centre": [
+   0.0001,
+   -0.0449,
+   0.1895
+  ],
+  "size": [
+   1.3164,
+   0.3562,
+   0.9959
+  ],
+  "tris": 1524,
+  "metal": false
+ },
+ "G_Stitch_Shoulder": {
+  "part": "Torso",
+  "textures": "GhoulStraps",
+  "tint": null,
+  "rigged": false,
+  "blender_offset_from_part_centre": [
+   0.0,
+   -0.0001,
+   0.0012
+  ],
+  "size": [
+   2.6773,
+   1.1175,
+   2.0976
+  ],
+  "tris": 2360,
+  "metal": false
+ },
+ "G_Shroud": {
+  "part": "Torso",
+  "textures": "GhoulShroud",
+  "tint": null,
+  "rigged": false,
+  "blender_offset_from_part_centre": [
+   0.0072,
+   -0.0073,
+   0.5489
+  ],
+  "size": [
+   2.6582,
+   1.39,
+   1.1889
+  ],
+  "tris": 7200,
+  "metal": false
+ }
+}

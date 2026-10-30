@@ -16,4 +16,4 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**Races & Bloodlines (2026-10-30):** Werewolves, Ghouls and Wraiths join the roll. Every race has a balanced passive. There is a new Bloodline tab, and you can crouch on Left Ctrl. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-bloodlines.md) and [docs/Races-and-Bloodlines.md](docs/Races-and-Bloodlines.md).
+**Race looks (2026-10-30):** vampire ears, werewolf ears and animated tails, ghoul grave wear and uniform, and wraith cold wisps, all modelled for the game and unlocked by tier. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-race-looks.md) and [docs/Races-and-Bloodlines.md](docs/Races-and-Bloodlines.md).

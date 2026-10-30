@@ -1,0 +1,49 @@
+{
+ "VampEars": {
+  "color": "rbxassetid://76321911857542",
+  "normal": "rbxassetid://100864839300982",
+  "roughness": "rbxassetid://117187684068821"
+ },
+ "WolfEars": {
+  "color": "rbxassetid://95098259594527",
+  "normal": "rbxassetid://90568699399631",
+  "roughness": "rbxassetid://134861618445844",
+  "metalness": "rbxassetid://89808732454589"
+ },
+ "TailBrush": {
+  "color": "rbxassetid://98280657135781",
+  "normal": "rbxassetid://73940816752094",
+  "roughness": "rbxassetid://89093086618568"
+ },
+ "TailBushy": {
+  "color": "rbxassetid://71809930835562",
+  "normal": "rbxassetid://76862522323396",
+  "roughness": "rbxassetid://121129251690128"
+ },
+ "TailBobbed": {
+  "color": "rbxassetid://103280022539645",
+  "normal": "rbxassetid://90068580465988",
+  "roughness": "rbxassetid://74641747722539"
+ },
+ "TailShaggy": {
+  "color": "rbxassetid://125777278993825",
+  "normal": "rbxassetid://112895755119347",
+  "roughness": "rbxassetid://76521860104872"
+ },
+ "TailMoon": {
+  "color": "rbxassetid://128136652607026",
+  "normal": "rbxassetid://119234769262447",
+  "roughness": "rbxassetid://101219385723103",
+  "metalness": "rbxassetid://113031111874694"
+ },
+ "GhoulStraps": {
+  "color": "rbxassetid://93061227832589",
+  "normal": "rbxassetid://98199724332902",
+  "roughness": "rbxassetid://138873465371489"
+ },
+ "GhoulShroud": {
+  "color": "rbxassetid://73494585397261",
+  "normal": "rbxassetid://88648387882761",
+  "roughness": "rbxassetid://84944488786398"
+ }
+}
