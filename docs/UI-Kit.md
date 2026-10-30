@@ -296,13 +296,13 @@ What each setting changes:
 | Look | Look style (Scholar / Chapel / Nightborn) and skin: 6 presets plus a colour wheel / HEX |
 | Face | Eye shape (Roblox face, Sharp, Hooded, Fierce, Doe, Sleepless, Cat, Gentle, Calm), eye set (Male / Female), eye colour (7 presets plus wheel / HEX; Nightborn is always crimson), brows (None plus 11 styles, including the thick Bold, Heavy and Bushy; "Match hair" or a custom colour) and mouth (None plus 20 anime mouths, frowns included, "Fuller lips") |
 | Hair | Built hairstyle (Neat Crop / Fringe / Long / Bun / None), catalog hair by ID, "Recolour catalog hair", and hair colour (presets plus wheel / HEX) |
-| Outfit | "Use my Roblox outfit", plus the official uniform: Red Vest, Red Shirt, Black Vest, Black Shirt (group clothing) and the school trousers |
+| Outfit | "Use my Roblox outfit"; Top: 18 options (the 4 official group shirts plus 14 variants: vests, polos, blazer, cardigan, varsity jacket, PE shirt); Bottoms: 8 options (uniform trousers, jeans, slacks, khakis, shorts, tartan skirt) |
 | Lineage | The server-rolled race and variant (spin reel), race and variant odds, 2 trait slots with rerolls |
 
 The window opens by itself on a player's first live join, never in Studio. `Shared.OpenTab(name)` opens it on a given tab.
 
 **`ReplicatedStorage.UI.Appearance` (cosmetic only)**
-- **Data:** `{ LookStyle, Skin, SkinHex, Hair, HairColor, HairHex, HairId, TintHair, Eyes, EyeSet, EyeColor, EyeHex, Brows, BrowHex, Mouth, Lips, Uniform, UseAvatar, Created }`.
+- **Data:** `{ LookStyle, Skin, SkinHex, Hair, HairColor, HairHex, HairId, TintHair, Eyes, EyeSet, EyeColor, EyeHex, Brows, BrowHex, Mouth, Lips, Uniform, Bottoms, UseAvatar, Created }`.
   - It's saved in ProfileService data (`PlayerData.Appearance`, action `SetAppearance`).
   - A `*Hex` value (`"RRGGBB"`) overrides its preset index. `""` means use the preset.
   - The look is applied after the Roblox avatar loads, on every spawn, and again whenever it changes.
