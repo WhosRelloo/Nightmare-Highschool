@@ -2,6 +2,51 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [VFX 1.4] - 2026-10-31: The bell rings, the monitor spots you, and the big moments get their own banner
+
+VFX Batch 2 ("core feedback"). Big moments now show as one gold-framed banner, low on screen and clear of the toast stack, and only one plays at a time. Each banner **replaces** that beat's old toast, so nothing shows twice. Everything follows Camera Shake, Reduce Motion and Reduce Flashing, and waits while you're in the main menu or mid tier-up.
+
+### Added
+- **School bell and period card (P0-8):** when the period changes, a brass hand bell rings and a card names the period, subject, room and end time (e.g. "Period 2 · Chemistry · Room 103 · until 9:45 AM").
+  - The clock panel's rim flashes gold, and the red class marker pulses twice when a class starts.
+  - It rings at class start and end, passing time, break, lunch and the end of classes. "Before School" gets a quiet card with no bell. Morning, evening and night stay silent.
+  - It never rings when you join or while you're in the menu.
+- **"Spotted!" (P0-9):** when a hall monitor starts chasing you, and only you, the monitor gets an orange outline and a "!" over its head, a whistle blows and the screen edges darken.
+  - **Caught:** the screen drains of colour for a moment and a red "! CAUGHT" stamp lands.
+  - **Escaped:** the "!" turns into a "?" and the alert fades.
+  - It clears on every exit: going to class, getting downed, the monitor going off duty, respawning.
+- **Quest beats (P1-4):** banners for a new quest, a new objective, quest complete and quest failed.
+  - Main quests are gold, side quests are chalk, rites use your race colour, and failures are red. Each also has a word and a mark (! » ✓ ✗), so colour is never the only cue.
+  - A quest's ending text plays as its own "Epilogue" banner. Long text wraps and the banner grows to fit, so story text is never cut off.
+- **Clue discovered (P1-5):** gold-and-ink sparkles rise from the object and it flashes gold, then a "+ CLUE" slip with the clue's name flies into the Journal button.
+- **Level-up "Bell Toll" (P1-6):** a gold banner with your new level stamped on the seal, a bell and a small camera nudge. Players within 80 studs see an ember column, a gold ring at your feet and a warm light. A multi-level jump plays once.
+- **Purchase confirmed (P1-8):** after a Spin Shop grant really goes through, a banner says what you got (e.g. "+5 Clan spins").
+- **Roll call (P1-9):** respawning fades in from black while the colour comes back. Other players nearby see a violet smoke puff and a chalk ring where you appear. It never plays on the menu spawn or when entering school.
+
+### Changed
+- **Server:** quests (start, objective, complete, fail), clue found, level-up and purchase-granted now fire `NHFx` events instead of toasts. Smaller updates, such as objective counts, optional objectives and "already in your case file", are still toasts.
+- **Level-up:** the server no longer parents its own ember emitter, which clients might never have seen (P0-10).
+- **Quest complete:** its banner now plays before any level-up the rewards cause.
+
+### Verified (Studio, Play)
+- **Bell:** jumping the clock to 8:19 and then 8:20 played the Homeroom card, then the Period 1 card (screenshot).
+- **Quest chain through the real server path, on spare slot II:**
+  - Attend gave a "New objective" banner (screenshot).
+  - Reading the locker note showed the clue slip (screenshot), then completed New Kid. The reward EXP gave a level-up banner (screenshot), and The Empty Desk started.
+- **Banner order (client log):** a purchase banner (real receipt path), then "New quest", then "Quest failed" (deadline), in that order.
+- **Spotted (real HallMonitor):**
+  - Caught: the "! CAUGHT" stamp showed (screenshot).
+  - Escape: the "!" changed to "?" 3.7 s into the chase, and the outline and mark were gone 1.75 s later (client log).
+- **Roll call:** after dying, the veil and the desaturated colour started on the new character (client log).
+- **Re-check after the fixes:** a long objective wraps fully, and the clue slip fits its text (screenshots).
+- **Console:** no errors from the new code, and the two new sound ids load with no access errors.
+
+### Not yet
+- **Not seen yet:** the Epilogue banner (New Kid has no ending text), the clock-rim flash, the marker pulse, and the clue slip's flight into the Journal.
+- **Order fix:** the "complete before level-up" fix is only checked by reading the code.
+- **Other players' view:** the level-up column and the respawn puff haven't been watched from a second player.
+- **Settings:** Reduce Motion and Reduce Flashing haven't been tried with these effects, and phone layout hasn't been checked.
+
 ## [VFX 1.3] - 2026-10-31: Chairs, a staff lounge, a living Archive and a vending machine you can thump
 
 ### Added

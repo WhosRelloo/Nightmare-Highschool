@@ -159,9 +159,9 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 | P0-5 | **Tested**: Locker prompt shared and stuck on "Leave · Occupied" after a respawn | World F2 | Q (Stealth) |
 | P0-6 | **Implemented** (module tested; trash path code-reviewed): Detention trash visible and pressable for everyone | World F1 | Q (Detention + QuestTracker) |
 | P0-7 | **Tested**: EXP bar drains backwards on level-up | UI F1 | — (Progress) |
-| P0-8 | **School Bell & Period Card**: there is no bell at all | World A / F3 | Q (new module) |
-| P0-9 | **"Spotted!"**: the chase target is never told | World B / F4 | Q (HallMonitor + new client) |
-| P0-10 | Level-up burst may never reach clients (server Emit) | UI F2 | Q |
+| P0-8 | **Tested (VFX 1.4)**: School Bell & Period Card: there is no bell at all | World A / F3 | Q (new module) |
+| P0-9 | **Tested (VFX 1.4)**: "Spotted!": the chase target is never told | World B / F4 | Q (HallMonitor + new client) |
+| P0-10 | **Implemented (VFX 1.4)**: Level-up burst may never reach clients (server Emit). The server emitter was removed and clients draw it (P1-6) | UI F2 | Q |
 | P0-11 | **Tested** (measured, not seen on screen): Goal flare rings lie flat | UI F3 | — / Q |
 | P0-12 | **Tested**: Enter school can reset FOV to 70 | UI F4 | — (MainMenu) |
 | P0-13 | **Implemented (UI kit, code-checked)**: Lesson cancelled during the 3-2-1 still flashes its board | World F8 | UI (Activities) |
@@ -172,12 +172,12 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 | P1-1 | **Implemented** (installed; routed shakes code-reviewed): `Controllers.Fx` helper + `NHFx` remote; every noncombat shake via `NHShakeScale` | UI #1 | Q (new) |
 | P1-2 | **Tested (UI kit, UI 1.10)**: Reduced flashing / Reduced motion / Effects quality settings | UI P3 | UI (Settings) |
 | P1-3 | **Tested**: DayCycle grade + LightingStack (fixes the menu restore) | World C / F5 | Q (new) + MainMenu |
-| P1-4 | Quest Beat banner + Story Card; tracker line flash | Quests C1 | Q (new) + UI (Notify flag) |
-| P1-5 | Clue Discovered (ink shimmer, "+CLUE" slip into the journal) | Quests C3 | Q |
-| P1-6 | Level-up "Bell Toll" (strip wrap, numeral stamp, ember column) | UI #2 | Q + — |
+| P1-4 | **Tested (VFX 1.4)**: Quest Beat banner + Story Card (the "Epilogue" banner, not yet seen live); tracker line flash not done | Quests C1 | Q (new) + UI (Notify flag) |
+| P1-5 | **Tested (VFX 1.4)**: Clue Discovered (ink shimmer, "+CLUE" slip into the journal) | Quests C3 | Q |
+| P1-6 | **Tested (VFX 1.4)**: Level-up "Bell Toll" (numeral stamp, ember column; the strip wrap was already P0-7). Observers not checked | UI #2 | Q + — |
 | P1-7 | **Tested (UI kit, UI 1.12)**: Milestone toast tier (seal stamp, shimmer). Use `Kind = "Milestone"` | UI #4 | UI |
-| P1-8 | Purchase-granted confirmation | UI #7 | Q |
-| P1-9 | "Roll call" respawn | UI #9 | Q |
+| P1-8 | **Tested (VFX 1.4)**: Purchase-granted confirmation | UI #7 | Q |
+| P1-9 | **Tested (VFX 1.4)**: "Roll call" respawn (owner side; the observer puff isn't checked) | UI #9 | Q |
 | P1-10 | Watcher awareness ("?" / "!") + watcher flashlight cone | Quests C5 / World H | Q |
 | P1-11 | Thrown Out (fade on caught) | Quests C7 | Q |
 | P1-12 | RiteFX: votive ignition, bell, font, mirror frost, and so on | Quests C9 / World K | Q |
@@ -267,4 +267,9 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 - 2026-10-30: **Batch 0 (VFX 1.0)** Play-tested: P0-2, P0-5, P0-7, P0-11, P0-12 Tested; P0-4/P0-6 Implemented via `Controllers.World.OwnedObjects` (tested with tagged test boxes; real paths code-reviewed). The UI kit shipped P0-1, P0-13 and P1-2 (UI 1.10). Next: Batch 1 (Fx toolbox, DayCycle).
 - 2026-10-31: **VFX 1.1.** P1-1 toolbox Implemented, P1-3 DayCycle Tested (night brightened after the first look). Added outside the catalog at the user's request: PBR school surfaces, Blender props batch 1 (desks, teacher desks, chalkboards, lockers) with locker door animation (Tested). See [[School-Props]]. Batch 2 (chairs, lounge, vending machine with rattle, altar, bookshelf with book fall) is modelled and waiting for import.
 - 2026-10-31: **VFX 1.2.** The weathered prop bake is live on batch 1. Batch-2 designs were upgraded (wrought-iron student chair, full candelabrum, solid pointed gables, finer leather) and textured. The clan and race reels pass rarity to the kit reveal (P2-14, code-reviewed). The hall locker row is fixed.
-- 2026-10-31: **VFX 1.3.** Batch-2 props are placed and Play-tested: chairs, the Staff Room lounge, the vending machine with its rattle, 9 Archive bookcases with the book fall, and the altar. The candelabra is waiting for its import.
+- 2026-10-31: **VFX 1.3.** Batch-2 props are placed and Play-tested: chairs, the Staff Room lounge, the vending machine with its rattle, 9 Archive bookcases with the book fall, and the altar. The candelabra was placed later the same day.
+- 2026-10-31: **VFX 1.4 (Batch 2: core feedback).** P0-8, P0-9, P1-4, P1-5, P1-6, P1-8 and P1-9 are Tested, and P0-10 is Implemented.
+  - **Where:** client `Controllers.Gui.Moments` (one Moment queue and banner) and `Controllers.World.Spotted`. On the server, `NHFx` kinds QuestBeat, Clue, LevelUp, Purchase, Spotted and SpottedEnd, plus the `MonitorTarget` attribute on monitors.
+  - **Placement:** banners sit low-centre (anchored at 0.745 of the screen height), because the toast stack occupies the space under the compass.
+  - **Sounds (D4 inventory, Pro Sound Effects):** Bell `9113584435` (Brass Hand Bell 7) and Whistle `9117261163` (Pealess Whistle Fox 40). The kit's Stamp `9119907907`, Confirm `9114058995` and Tick `9120300134` are reused.
+  - **Next:** Batch 3 (stealth and the supernatural).

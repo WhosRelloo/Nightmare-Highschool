@@ -16,4 +16,4 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**Chairs, lounge, Archive (2026-10-31):** chairs in every classroom, a Staff Room lounge, a vending machine you can thump, and an Archive with bookcases that spill their books and a stone altar. See [`CHANGELOG.md`](CHANGELOG.md), [`docs/School-Props.md`](docs/School-Props.md) and [the Discord post](updates/discord/2026-10-31-archive-and-lounge.md).
+**The bell rings (2026-10-31):** a school bell and period card, a "Spotted!" alert when a hall monitor chases you, and banners for quests, clues, level-ups, purchases and respawns. See [`CHANGELOG.md`](CHANGELOG.md), [`docs/VFX-Design-Bible.md`](docs/VFX-Design-Bible.md) and [the Discord post](updates/discord/2026-10-31-the-bell-rings.md).
