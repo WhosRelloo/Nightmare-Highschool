@@ -169,9 +169,9 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 ### P1: high-impact and reusable
 | ID | Effect | Source | Owner |
 |---|---|---|---|
-| P1-1 | `Controllers.Fx` helper + `NHFx` remote; every noncombat shake via `NHShakeScale` | UI #1 | Q (new) |
+| P1-1 | **Implemented** (installed; routed shakes code-reviewed): `Controllers.Fx` helper + `NHFx` remote; every noncombat shake via `NHShakeScale` | UI #1 | Q (new) |
 | P1-2 | **Tested (UI kit, UI 1.10)**: Reduced flashing / Reduced motion / Effects quality settings | UI P3 | UI (Settings) |
-| P1-3 | DayCycle grade + LightingStack (fixes the menu restore) | World C / F5 | Q (new) + MainMenu |
+| P1-3 | **Tested**: DayCycle grade + LightingStack (fixes the menu restore) | World C / F5 | Q (new) + MainMenu |
 | P1-4 | Quest Beat banner + Story Card; tracker line flash | Quests C1 | Q (new) + UI (Notify flag) |
 | P1-5 | Clue Discovered (ink shimmer, "+CLUE" slip into the journal) | Quests C3 | Q |
 | P1-6 | Level-up "Bell Toll" (strip wrap, numeral stamp, ember column) | UI #2 | Q + — |
@@ -265,3 +265,4 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 ## Status log
 - 2026-10-30: Phase 1 audit done (code review of 177 dumped noncombat scripts, world inventory, screenshots of the greybox). Style guide, catalog and roadmap drafted. **Nothing implemented yet.**
 - 2026-10-30: **Batch 0 (VFX 1.0)** Play-tested: P0-2, P0-5, P0-7, P0-11, P0-12 Tested; P0-4/P0-6 Implemented via `Controllers.World.OwnedObjects` (tested with tagged test boxes; real paths code-reviewed). The UI kit shipped P0-1, P0-13 and P1-2 (UI 1.10). Next: Batch 1 (Fx toolbox, DayCycle).
+- 2026-10-31: **VFX 1.1.** P1-1 toolbox Implemented, P1-3 DayCycle Tested (night brightened after the first look). Added outside the catalog at the user's request: PBR school surfaces, Blender props batch 1 (desks, teacher desks, chalkboards, lockers) with locker door animation (Tested). See [[School-Props]]. Batch 2 (chairs, lounge, vending machine with rattle, altar, bookshelf with book fall) is modelled and waiting for import.

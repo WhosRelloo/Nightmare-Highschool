@@ -16,4 +16,4 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**VFX revamp started (2026-10-30):** the noncombat VFX audit and design bible, plus the first fixes: the Wraith tier-up flicker, the EXP bar, owner-only drops and trash, lockers, the goal rings and the entry FOV. See [`docs/VFX-Design-Bible.md`](docs/VFX-Design-Bible.md), [`CHANGELOG.md`](CHANGELOG.md) and [the Discord post](updates/discord/2026-10-30-vfx-revamp.md).
+**Nights, surfaces and props (2026-10-31):** blue-violet nights, PBR school surfaces, Blender-modelled desks, chalkboards and lockers that open and close. See [`CHANGELOG.md`](CHANGELOG.md), [`docs/School-Props.md`](docs/School-Props.md) and [the Discord post](updates/discord/2026-10-31-nights-and-props.md).

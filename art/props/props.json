@@ -1,0 +1,29 @@
+{
+  "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right).",
+  "StudentDesk": {
+    "dims": [3.0, 2.0, 2.5], "pieces": ["StudentDesk"], "replaces": "Desk",
+    "ColorMap": "rbxassetid://81364537313727", "NormalMap": "rbxassetid://130943619179803",
+    "RoughnessMap": "rbxassetid://101245451808677", "MetalnessMap": "rbxassetid://116080966801557"
+  },
+  "TeacherDesk": {
+    "dims": [7.0, 3.0, 3.0], "pieces": ["TeacherDesk"], "replaces": "TeacherDesk",
+    "ColorMap": "rbxassetid://112978670543356", "NormalMap": "rbxassetid://80580765659497",
+    "RoughnessMap": "rbxassetid://102970589812372", "MetalnessMap": "rbxassetid://116167342772661"
+  },
+  "Chalkboard": {
+    "dims": [9.2, 0.6, 5.15], "pieces": ["Chalkboard"], "replaces": null,
+    "ColorMap": "rbxassetid://110275924309735", "NormalMap": "rbxassetid://122900074150431",
+    "RoughnessMap": "rbxassetid://89445357287041", "MetalnessMap": "rbxassetid://115490936512926"
+  },
+  "Locker": {
+    "dims": [2.06, 1.54, 7.14], "pieces": ["Locker_Body", "Locker_Door0"], "swing": {"Locker_Door0": -1}, "replaces": "Locker",
+    "ColorMap": "rbxassetid://119243076772316", "NormalMap": "rbxassetid://136592251029739",
+    "RoughnessMap": "rbxassetid://118204342697611", "MetalnessMap": "rbxassetid://122698530609420"
+  },
+  "HidingLocker": {
+    "dims": [3.16, 3.14, 7.14], "pieces": ["HidingLocker_Body", "HidingLocker_Door0", "HidingLocker_Door1"],
+    "swing": {"HidingLocker_Door0": -1, "HidingLocker_Door1": 1}, "replaces": "HidingLocker",
+    "ColorMap": "rbxassetid://134920300893844", "NormalMap": "rbxassetid://116215226171998",
+    "RoughnessMap": "rbxassetid://82379051094174", "MetalnessMap": "rbxassetid://96614228702112"
+  }
+}

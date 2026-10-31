@@ -2,6 +2,54 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [VFX 1.1] - 2026-10-31: Real nights, PBR school surfaces, the first modelled props
+
+### Added
+- **Blue-violet nights.** The school now has a day-night grade:
+  - **Times:** pink-gold dawn (6:00–8:00), amber dusk (16:30–18:30), and a moody blue-violet night from 20:00, still as bright overall as before.
+  - **How it works:** `Controllers.World.DayCycle` blends keyframes from `Config.DayCycle` by the school clock. It steps aside while the main menu owns the lighting.
+  - **Menu hand-off fixed:** coming back from the menu, it puts back the real time of day and your Shadows setting (the menu used to restore a stale snapshot).
+  - Crimson **Nightmare Nights** come later as a school event.
+- **One shared effects toolbox** (`Controllers.Fx`, with a server `NHFx` event):
+  - bursts, rings, light pulses, flashes, shakes, veils and UI pops
+  - all of them follow the Camera Shake, Reduce Motion, Reduce Flashing and Effects Quality settings
+  - Soccer, the tier-up cutscene and the main menu's shake, FOV kick, Surge flash and lightning now go through it, so Camera Shake 0% means no shake anywhere and Reduce Flashing calms the menu lightning
+- **PBR school surfaces:**
+  - new seamless 1024² materials: worn linoleum tiles, floorboards, varnished desk wood, chipped painted metal, layered slate
+  - classroom floors, desks and metal now catch the light, and walls use Roblox's plaster
+  - the change is fully reversible
+- **Modelled school props** (Blender, baked PBR, in the gothic school style):
+  - gothic iron-frame **student desks** (48)
+  - oak **teacher desks** with crimson leather tops (6)
+  - a carved **chalkboard** in every classroom (6)
+  - crimson enamel **lockers** with arched panels, a quatrefoil vent, strap hinges, a padlock and a real interior (8 hallway, 2 hiding)
+  - Each old block stays underneath, invisible, so gameplay, prompts and hiding spots are unchanged.
+- **Lockers open and close:**
+  - Hiding lockers swing open and shut when someone hides or leaves.
+  - Locker 113 opens when you search it, and its quest note swings with the door.
+  - The other hallway lockers have an Open/Close prompt.
+  - Every player sees the same doors.
+
+### Fixed
+- **EXP bar position:** it sat one top-bar height too high, over the health bar's top rail. It's now just under the bar.
+
+### Verified (Studio playtest)
+- **Night:**
+  - **Hand-off:** at 23:17 the grade took over after the menu, the sun matched the school time and Shadows stayed on.
+  - **Brightness:** the first night grade was too dark (dark outfits became silhouettes), so it was brightened and checked again.
+- **Surfaces:**
+  - **Floor tiles:** a close-up shows the tiles, grout and speckle.
+  - **Desks and archive:** varnished desks and the candlelit archive render correctly.
+- **Props:** a classroom with desks, teacher desk and chalkboard renders correctly.
+- **Lockers:**
+  - **Hiding locker:** a hide-and-leave opened the door to 105° in 0.45 s and closed it again, both times. Measured on the client.
+- **EXP strip:** it measures at y 535–548, under the bar and above the hotbar.
+
+### Not yet
+- **Not verified live:** the toolbox's own effects aren't used by a new effect yet, and the routed shakes were checked by code review.
+- **Prop textures:** being re-baked with edge wear, crevice dirt and new leather, brass, stone, iron and paper materials.
+- **Batch 2 is modelled and waiting to be imported:** chairs (student, teacher, armchair, sofa), trash can, candelabra, a rattling vending machine, a carved altar with its reredos, and a bookshelf whose books fall.
+
 ## [UI 1.13] - 2026-10-30: Lesson juice, rarity reveals, a dialogue box that slides in
 
 ### Added
