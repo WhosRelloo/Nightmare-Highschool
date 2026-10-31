@@ -2,6 +2,30 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI 1.11] - 2026-10-30: A proper Yen purse on the HUD
+
+### Changed
+- **The Yen display is redesigned.** It used to be a tiny bare box floating above the health bar's right end, partly covered by the bar's end ornament. It's now a framed plate just past the bar's right end ornament, centred on the bar, mirroring the posture meter on the left.
+  - It shows a gold coin, made from the HUD's orb art with a ¥ stamp, and the amount in the gold title font.
+  - It stays clear of the hotbar (at any slot count), the bar's end ornament and the EXP strip under the bar.
+
+### Added
+- **Yen changes you can see** (VFX bible P2-15): when you earn or spend Yen, the amount counts up or down to the new total, the coin gives a small pulse, and a "+¥N" (green) or "−¥N" (red) chip floats up off the plate and fades.
+  - Loading your profile or swapping save slots just sets the number, with no chip.
+  - Reduce Motion keeps the chip but drops the rise and the pulse.
+
+### Fixed
+- Swapping save slots now updates the Yen shown. A full profile load used to leave the old slot's amount up until the next Yen change.
+
+### Verified (Studio playtest, 1400×683 and 1684×683)
+- The plate sits beside the bar, centred on it, with nothing overlapping.
+- These Yen changes were fed in through a temporary Studio-only test hook, since removed:
+  - First load shows 407 with no chip.
+  - A real change counts 407 → 532 with a "+¥125" chip.
+  - A profile load jumps silently to 9,000.
+  - A silent update in the middle of a count wins and settles on 407.
+  - With Reduce Motion, "−¥50" shows without the rise or the coin pulse.
+
 ## [VFX 1.0] - 2026-10-30: Noncombat VFX revamp begins (audit, design bible, first fixes)
 
 ### Added
