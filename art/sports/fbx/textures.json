@@ -1,0 +1,22 @@
+{
+ "NH_Basketball": {
+  "color": "rbxassetid://119722298644593",
+  "normal": "rbxassetid://81928244432390",
+  "roughness": "rbxassetid://103760123655924"
+ },
+ "NH_SoccerBall": {
+  "color": "rbxassetid://88694975984910",
+  "normal": "rbxassetid://106835228307190",
+  "roughness": "rbxassetid://130725851128027"
+ },
+ "NH_Football": {
+  "color": "rbxassetid://137617443458630",
+  "normal": "rbxassetid://113973678002861",
+  "roughness": "rbxassetid://108373569727037"
+ },
+ "NH_Cone": {
+  "color": "rbxassetid://135907550062419",
+  "normal": "rbxassetid://136801500626232",
+  "roughness": "rbxassetid://134128476063932"
+ }
+}

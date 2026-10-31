@@ -2,6 +2,73 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [Sports 1.0] - 2026-10-30: Sports clubs and basketball
+
+### Added
+- **Clubs:** Night Ravens (basketball, Coach Varga), Grave Rovers (soccer, Coach Mallory) and Iron Wardens (football, Coach Dunmore).
+  - Join, switch or quit through the coach. Ranks run Rookie → Starter → Varsity → Captain, and Captain earns a title.
+  - Members keep a win/loss record from ranked club games (12:00–20:00 in-game).
+  - Club tags show in the Students list.
+- **Venues:** a gothic stone gymnasium south of the school, with:
+  - a full court, bleachers, hanging lamps and a scoreboard
+  - a practice end with a hoop, Shootaround spots and a cone course
+  - Next to it: a walled soccer pitch and a floodlit football field, all with compass markers.
+- **Basketball, Highschool Hoops style:** games from 1v1 to 5v5, joined from the team pads.
+  - **E** hold/release shot with a kit meter and Perfect/Early/Late feedback.
+  - **Q R F C** dribble moves that chain and cancel, **Z** euro step, **G** post up.
+  - **Click** passes where you aim. On defence, click steals and jumping blocks.
+  - **Rules:**
+    - contested shots, layups and dunks, threes, and stamina
+    - a 24 s shot clock, check ball, half court with clearing for 1v1 and 2v2
+    - halftime, overtime and buzzer-beaters
+  - Race perks apply in games.
+  - Getting downed, leaving or walking off for 5 s takes you out.
+  - **Rewards:** Sport EXP, yen and popularity; club EXP and record for ranked games; a post-game card with MVP and your line.
+- **Drills:** Shootaround (10 spots, 60 s) and Cone Dribble (weave six cones with moves). Best scores are saved.
+- **Night Ravens Tryout:** a quest from Coach Varga: pass the Shootaround, then play a full game.
+- **Blender models:** a basketball, soccer ball, football and training cone with baked PBR maps (`art/sports`).
+  - They load as the ball look once you import the FBX files. Until then the balls are plain spheres.
+- **Phone and gamepad controls:** kit-art buttons for Shoot, Pass/Steal, Move and Euro.
+
+### Changed
+- While you carry a ball, the combat keys (click, Q, R, F, E, Dodge, Block) step aside, and you can't slide or crouch in a game.
+
+### Audit (end to end)
+- **How it was audited:**
+  - A code review of every sports module.
+  - Studio checks: installed code matches its source, and the venue setup and patches are complete.
+  - Live tests in Play.
+- **Fixed:**
+  - "Holding a ball" stuck after a game or drill ended (it blocked steals and blocks).
+  - A client-reported perfect shot timing (timing is now measured only on the server).
+  - Block spam.
+  - Offensive-rebound shot clock and clearing.
+  - Post-up without a defender.
+  - Bystanders blocking ball pickups, and a ball stuck in the bleachers.
+  - Four reward farms: check-ball touches, forfeits, drill repeats, cone teleporting.
+  - The venue HUD overwriting the drill HUD.
+  - A client dash that ignored the server and stamina.
+  - Made shots falling through the floor.
+  - Respawning mid-game.
+  - Empty games that never ended.
+  - Buzzer-beaters that didn't count.
+  - Several smaller edge cases.
+
+### Verified (Studio playtest)
+- **Real keys:** E shot with the meter, Q crossover and Z euro step (the dash comes after server approval).
+- **Through the test bridge:**
+  - joining through Coach Varga
+  - both drills: bests saved, club EXP, the 3-minute reward cooldown, the teleport run rejected
+  - a full solo-test game: 2s and 3s, check ball, shot clock, halftime, a buzzer-beater counted, a ranked record, MVP, rewards, tryout completed
+  - removal on a knockout and on walking off the court
+  - 205 junk and spammed remote calls with no errors
+  - 60 pure checks
+
+### Not yet
+- **Two-player tests:** steals, blocks, passing, contest and forfeits with a real opponent need two players.
+- **Soccer and football:** their rules are Sports 1.1 and 1.2.
+- **Imported models:** the Blender models are waiting on File → Import 3D.
+
 ## [Races 1.2] - 2026-10-30: Evolve your bloodline: hunger, rites, tier-up cutscenes and the bite
 
 ### Added

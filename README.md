@@ -16,4 +16,4 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**Bloodline evolution (2026-10-30):** race hunger, 12 night rites, a tier-up cutscene for every race, and the bite that turns Humans and Priests. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-evolution.md) and [docs/Races-and-Bloodlines.md](docs/Races-and-Bloodlines.md).
+**Sports clubs (2026-10-30):** three clubs and coaches, a gothic gymnasium, a pitch and a field, and Highschool Hoops-style basketball (E shot meter, dribble moves, euro step) with drills, ranked club games and a tryout, audited end to end. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-sports.md) and [docs/Sports.md](docs/Sports.md).

@@ -1,0 +1,4 @@
+# Blender FBX side folders (duplicate textures) and upload copies
+*.fbm/
+textures/up512/
+*.blend1
