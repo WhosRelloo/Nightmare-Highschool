@@ -164,4 +164,11 @@
 | Smaller fixes | stamina flag cleared, half court turns full court when teams grow, drill prompt reach matches the server, no drills while downed or duelling, pass range checked for named targets, coach join failures handled, buzzer-beaters count |
 | No phone or gamepad controls | Kit-art touch and gamepad buttons |
 
-**Still needs two players:** steals, blocks, passing, contest and forfeits with a real opponent (the planned two-player test).
+**Two-player test (local server, 2026-10-30):**
+- **Steals:** they work, and a reach during a dribble move gets crossed up.
+- **Half court:** the clear rule works, and check ball follows a score.
+- **Blocks:** 3 of 4 blocked with a jump at the release.
+- **Defender pressure:** shrinks the green window (same timing: green open, okay contested).
+- **Offensive rebounds:** the shot clock resets to 14.
+- **Rewards and forfeit:** a game to 21 paid both players, and a forfeit removed the walker after 5 s and ended the game.
+- **Still open:** a real pass needs a 2v2.

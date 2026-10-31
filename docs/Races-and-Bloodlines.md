@@ -122,6 +122,12 @@ Race-only cosmetics, chosen in the Bloodline tab's **Looks** section. Grander ve
   - **Accept:** `Lineage.Turn` (the biter's base race, Tier I, hunger 0, looks reset; spins and traits kept). The biter gets +5 hunger and uses their daily turn (`Lineage.TurnDay`).
 - **Test bridge:** `GiveHunger(name, n)`, `Evolve(name, tier)`.
 
+
+**The bite, two-player test (2026-10-30):**
+- **Accept:** a Tier II Vampire gripping a downed Human pressed T, the accept / fight-off card appeared, and Accept turned them into a Tier I Vampire (the grip ended and the biter's hunger rose).
+- **Daily limit:** a second bite the same day was refused with a reason.
+- **Fight it off:** the next night, the victim stayed Human.
+
 ## Code
 | Piece | Where |
 |---|---|

@@ -72,8 +72,25 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
   - 205 junk and spammed remote calls with no errors
   - 60 pure checks
 
+### Verified (two-player local server test, 2026-10-30)
+- **The queue:** both pads filled, a 10 s countdown ran, and a half-court 1v1 went live (Crimson ball).
+- **Steals:** a reach during a crossover failed and showed **"Crossed up!"** on the defender's screen. A steal on a standing ball handler worked; possession and the shot clock flipped.
+- **Half-court clear:** a shot inside the arc right after a steal was refused. After clearing past the arc it went up and scored 2, and check ball went to the other team.
+- **Blocks:** with a jump at the release, 3 of 4 shots were blocked (a 60% roll), and the fourth went in. Without a jump, perfect-timed shots stayed green.
+- **Defender pressure:** at the same release timing (about 0.67 s), 3/3 open shots were green and 3/3 shots with a defender a stud away were okay (1 made).
+- **Offensive rebounds:** the shot clock went from 11.4 back up to 14, with no clear needed.
+- **Passing:** a 1v1 pass with no teammate keeps the ball. A real pass needs a 2v2.
+- **Game to 21:** both players were paid: +12 yen for the win, +8 yen for playing.
+- **Forfeit:** the opponent walked off, was removed after 5 s, and the game ended "Forfeit" for Crimson. The 3-minute reward cooldown held.
+- **The bite (Races 1.2), with real T presses and real clicks:**
+  - A Tier II Vampire gripped a downed Human, and T opened the accept / fight-off card.
+  - **Accept** turned the Human into a Tier I Vampire; the grip ended and the biter's hunger rose.
+  - A second bite the same day was refused with a reason.
+  - The next night, **Fight it off** kept the victim Human.
+- **Console:** no sports or bite errors.
+
 ### Not yet
-- **Two-player tests:** steals, blocks, passing, contest and forfeits with a real opponent need two players.
+- **Passing in a real game:** needs a 2v2 (four players).
 - **Soccer and football:** their rules are Sports 1.1 and 1.2.
 - **Imported models:** the Blender models are waiting on File → Import 3D.
 
