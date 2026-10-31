@@ -2,6 +2,31 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI 1.10] - 2026-10-30: Comfort settings, readable story toasts, clean lesson cancels (VFX revamp, part 1)
+
+### Added
+- **Comfort and effects settings** (VFX bible P1-2):
+  - **Reduce Motion** and **Reduce Flashing**, in a new Camera > Comfort section.
+  - **High-quality Effects**, under Graphics.
+  - They're saved to your profile, and the game's effects read them from the player attributes `NHReducedMotion`, `NHReducedFlash` and `NHFxQuality` ("High" or "Low").
+  - **Starting values:** until you change them, Reduce Motion follows your device's reduced-motion setting where Roblox provides one, and High-quality Effects follows your Roblox graphics level (levels 1-3 start on Low).
+
+### Fixed
+- **Story text no longer cut off** (P0-1): notification bodies used to be one line ending in "…", hiding chapter endings, case insights, "Case breakthrough", "Your blood stirs", "Turned" and the stealth checkpoint text.
+  - Long text now wraps and the notification grows to fit, up to about 5 lines, then ends in "…".
+  - Short notifications look exactly as before.
+- **A cancelled lesson no longer flashes its board** (P0-13): if a lesson was cancelled during the 3-2-1 countdown, the board and timer still appeared over "Lesson cancelled" about 0.65 s later. The countdown now stops, and a board built at that moment is thrown away.
+- **The lesson board shake** now follows Settings > Camera Shake (0% turns it off), and Reduce Motion halves it.
+
+### Verified (Studio playtest)
+- The three new player attributes are set at load. Toggling Reduce Motion in the menu sets `NHReducedMotion` and saves it, and toggling it back works too.
+- The Comfort section and High-quality Effects show in the Settings menu.
+- Notifications:
+  - A 4-line story notification shows all its text.
+  - A very long one stops at about 5 lines with "…".
+  - A short one is still the 54 px single line, and a title-only one is unchanged.
+- **Checked by code review only:** the lesson-cancel fix. It needs a real lesson cancelled mid-countdown.
+
 ## [Races 1.3] - 2026-10-30: A race spin starts you over at Tier I
 
 ### Changed
