@@ -16,4 +16,4 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**Soccer (2026-10-30):** the Grave Rovers take the west pitch, with charged and curved shots, dribbles that break ankles, slide tackles, keepers, Bloodrush, two drills and a tryout. Our Blender balls are now in play. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-soccer.md) and [docs/Sports.md](docs/Sports.md).
+**Customization and main menu audit (2026-10-30):** the Wardrobe, main menu, save slots, names and Bloodline tab were audited end to end, with 10 menu and save fixes plus the Wardrobe fixes in UI 1.9.2. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-customization-audit.md) and [docs/Main-Menu.md](docs/Main-Menu.md).

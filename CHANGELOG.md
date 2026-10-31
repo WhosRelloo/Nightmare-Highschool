@@ -2,6 +2,49 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [Menu 1.2] - 2026-10-30: Character customization and main menu audit
+
+The whole customization path was audited end to end: the main menu, save slots, the Wardrobe, names and clans, and the Bloodline tab. The method was a code review of every module, then live tests in Play with real keys and clicks. The Wardrobe and appearance fixes are in [UI 1.9.2]; this entry covers the rest.
+
+### Fixed
+- **A slow name check could undo purchases and the enrolment lock.** Setting your first name waits on Roblox's text filter, then saved a copy of your record taken before the wait.
+  - A spin purchase that landed during the wait was wiped.
+  - Entering school during the wait unlocked your name again, so you could rename for free.
+  - Now the record is re-read after the filter, the lock is re-checked, and only the name changes. A save-slot switch during the wait is refused.
+- **Menu keys worked behind Settings.** With Settings open from the main menu, W/S moved the hidden menu and Enter could trigger CONTINUE and send you into school. Menu keys now do nothing while Settings is open.
+- **Posed students in the menu were bald.** Catalog hair on the menu's client-side copies kept a weld to the model it was built from, so it fell out of the world within about 2 seconds. Accessories on menu copies are now re-welded to the body.
+- **Posed students ignored race.** The menu copies had no race, so Vampire and Ghoul skin and uniforms showed wrong on the plinths. Each copy now carries its slot's race.
+- **The Bloodline tab used the wrong camera shot.** It asked for a shot named `Bloodline` but the config called it `Lineage`, so it fell back to the body shot. It now gets the low heroic angle.
+- **Dead buttons on a network error.** If picking a slot or entering school errored, every slot button stayed dead or the screen stayed black. Both calls are now protected, and the slot list retries up to 5 times instead of showing no cards.
+- **Repeated hooks:** each failed ENTER SCHOOL added another Wardrobe camera hook. Now there is one per menu visit.
+- **Bloodline tab showed old data** right after a spin or look change, because it redrew from the profile copy before that had updated. It keeps the server's answer for 3 seconds.
+- **"Last played" saved outside the save rules.** It was written straight into the profile. It now goes through `UpdateState` (new `SetLastPlayed` action) and is in the `PlayerData` schema.
+- **Gamepad:** the right stick turns your student in the creator, and the creator's Look button gets selection focus when you arrive on a gamepad.
+
+### Checked and fine
+- No client path can set race, tier, spins or name changes.
+- Slot numbers are validated on the server (whole numbers 1 to 3 only).
+- ENTER SCHOOL needs a loaded slot and a name, checked on the server.
+
+### Verified (Studio playtest)
+- **Wardrobe:** all four tabs open. A Face change updates the live head strips and the preview together and saves to the profile; the original look was put back afterwards. The preview skin colour matches the live character.
+- **Main menu, real keys and clicks:** loading screen → intro → menu.
+  - With Settings open, S, S, Enter left the menu untouched, and after closing Settings the menu keys worked again.
+  - PLAY → slot cards with real data → slot I → creator → Bloodline (new camera shot) → ENTER SCHOOL. The HUD came back and "last played" saved.
+- **Plinth students:** all four copies keep their accessories (the hero and slot I wear their catalog hair), each with its slot's race.
+- Every changed script compiles; the console showed no script errors.
+
+### Not yet
+- **Needs your call:** a race spin keeps your tier, hunger and race looks. A Tier III Vampire who spins into a Wraith stays Tier III without doing the Wraith rites. The bite resets these to Tier I, and the races spec says tiers are earned per race.
+- **Not tested live:**
+  - the name-filter race (code review only)
+  - the Bloodline refresh after a spin (spinning would have re-rolled the test character's Legendary bloodline)
+  - gamepad and phone
+- **Left as is:**
+  - The menu hints show keyboard keys on every device.
+  - The loading screen's "continue" is mouse/touch only; it is optional, since the screen finishes on its own.
+  - Hiding other players on the menu scans their characters 15 times a second.
+
 ## [UI 1.9.2] - 2026-10-30: Customization audit fixes (look, hair, Wardrobe saving)
 
 ### Fixed

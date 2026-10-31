@@ -110,3 +110,6 @@ All 28 clans are original names. Each has a lore line and a perk.
 - Two players at once.
 - Phones.
 - The text filter on live servers. In Studio it lets most text through.
+
+## Audit fix (Menu 1.2)
+`Identity.SetName` waits on the text filter. Before this fix it saved a copy taken before the wait, wiping spins bought or the enrolment lock set during it. Now the record is re-read after the filter, the lock is re-checked, and only `First` and `NameChanges` change. If the player switched save slots during the wait, the rename is refused.

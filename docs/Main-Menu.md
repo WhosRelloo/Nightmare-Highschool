@@ -217,3 +217,17 @@ The asset ids are in `Config.MainMenu.Textures`. Re-run with:
 - Live servers: slot views use ProfileService `ViewProfileAsync`, and Studio uses the Studio data store.
 
 **Leftover test data:** slot 1 of the Studio test profile was used.
+
+## Audit (Menu 1.2)
+Code review of the menu, slots, loading screen and save loader, then live tests. See the CHANGELOG entry for details.
+
+| Found | Fix |
+|---|---|
+| Menu keys (W/S/Enter) still worked behind Settings and could trigger CONTINUE | `Local.SettingsUp()`: input is ignored while the Settings panel is visible |
+| Posed students lost their catalog hair within about 2 s (the accessory's old weld pointed at a destroyed model, so the handle fell) | `Local.WeldAccessories` re-welds each accessory to the matching body attachment |
+| Posed students had no race, so race skin and uniforms didn't apply | `Local.Student(..., Race)` sets the `Race` attribute before `ApplyTo` |
+| The Bloodline tab's camera shot key didn't exist | `Config.MainMenu.Paths.Creator.Bloodline = CreatorLow` |
+| A remote error left slot buttons dead or the screen black; a failed slot list showed no cards | `Choose`/`Enter` are wrapped in pcall; `List` retries 5 times |
+| A failed ENTER SCHOOL added another Wardrobe hook each time | One hook per menu visit (`State.WardrobeHooked`) |
+| `LastPlayed` was written straight into the profile | `UpdateState` `SetLastPlayed` action, plus the field in `PlayerData` |
+| Gamepad couldn't turn the student | Right stick orbits; the Look button is selected on arrival |
