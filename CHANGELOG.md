@@ -2,6 +2,19 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [Races 1.3] - 2026-10-30: A race spin starts you over at Tier I
+
+### Changed
+- **A race spin now resets your tier, the same as the bite.** You start at Tier I with hunger 0 and your race looks cleared; your traits and spins are kept. Tiers are earned through each race's own rites, so a new race starts from the beginning. Before this, a Tier III Vampire who spun into a Wraith stayed Tier III without doing a single Wraith rite.
+- **A variant spin is unchanged:** it keeps your race, tier and hunger.
+- **The Bloodline tab says so** before you spin: "A race spin ... starts you over at Tier I (hunger and race looks reset); a variant spin keeps your race and tier."
+- **Old saves can't jump back up:** a spin also marks the record as already migrated, so the old kill-count tier can never lift a freshly reset tier.
+
+### Verified (Studio playtest, spare slot II)
+- **Race spin:** slot II was set to a Tier III Vampire with hunger 30 and Pointed ears, then spun through the real spin remote as the player. It became a Werewolf (Bloodmoon) at Tier I, with hunger 0, no looks and the same traits. The character's `Race` and `RaceTier` updated live.
+- **Variant spin:** at Tier II with hunger 12, it kept Tier II and hunger 12.
+- **Afterwards:** slot II was restored exactly to its earlier state, and the console showed no script errors.
+
 ## [UI 1.9.3] - 2026-10-30: Looks are saved by name, and catalog hair stays on in menus
 
 ### Changed
@@ -58,7 +71,7 @@ The whole customization path was audited end to end: the main menu, save slots, 
 - Every changed script compiles; the console showed no script errors.
 
 ### Not yet
-- **Needs your call:** a race spin keeps your tier, hunger and race looks. A Tier III Vampire who spins into a Wraith stays Tier III without doing the Wraith rites. The bite resets these to Tier I, and the races spec says tiers are earned per race.
+- **Decided:** a race spin now resets you to Tier I, like the bite. See [Races 1.3].
 - **Not tested live:**
   - the name-filter race (code review only)
   - the Bloodline refresh after a spin (spinning would have re-rolled the test character's Legendary bloodline)

@@ -164,3 +164,6 @@ Saving is unchanged: `PlayerData.Lineage = { Race, SubRace, Tier, Traits, Spins 
 
 ## Not yet
 - **Not playtested yet:** two players seeing each other's race effects, and Fated, Wraith and Werewolf effects in real fights.
+
+## A race spin starts over (Races 1.3)
+A **race** spin resets `Tier = 1`, `Hunger = 0` and `Looks = {}`, keeps traits and spins, and sets `Earned = true` so the old kill-count migration can't raise the tier again. This matches the bite (`Lineage.Turn`). A **variant** spin keeps race, tier and hunger. The rule lives in the `Spin` handler in `ReplicatedStorage.Lineage`; the Bloodline tab's spin note tells the player before they spin.
