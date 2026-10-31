@@ -2,6 +2,21 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [VFX 1.4.1] - 2026-10-31: Banners stay clear of conversations
+
+### Fixed
+- **Quest banners covered the dialogue replies.**
+  - **Why:** quests are accepted by choosing a reply, so the "New quest" banner fired while the dialogue box was still open, and the banner's low-centre spot sat over the replies.
+  - **Now:** Moment banners wait up to 6 s for a conversation to end. If it's still open, or one opens while a banner is up, the banner rises to sit just above the dialogue box, then drops back when the box closes. (`Controllers.Gui.Moments`, using the `InDialogue` attribute.)
+
+### Verified (Studio playtest)
+- **Setup:** a real conversation with Ezra (4 replies) at a 1680×683 viewport.
+- **Banner fired mid-conversation:** it was held, appeared at 6.3 s, and lifted 111 px, ending 10 px above the box.
+- **No conversation:** the banner shows at once in its usual spot.
+- **Conversation opened mid-banner:** the banner lifts to the same 10 px gap.
+- **Conversation closed mid-banner:** it drops back.
+- **Console:** no errors.
+
 ## [VFX 1.4] - 2026-10-31: The bell rings, the monitor spots you, and the big moments get their own banner
 
 VFX Batch 2 ("core feedback"). Big moments now show as one gold-framed banner, low on screen and clear of the toast stack, and only one plays at a time. Each banner **replaces** that beat's old toast, so nothing shows twice. Everything follows Camera Shake, Reduce Motion and Reduce Flashing, and waits while you're in the main menu or mid tier-up.

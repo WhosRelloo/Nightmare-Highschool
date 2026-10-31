@@ -273,3 +273,4 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
   - **Placement:** banners sit low-centre (anchored at 0.745 of the screen height), because the toast stack occupies the space under the compass.
   - **Sounds (D4 inventory, Pro Sound Effects):** Bell `9113584435` (Brass Hand Bell 7) and Whistle `9117261163` (Pealess Whistle Fox 40). The kit's Stamp `9119907907`, Confirm `9114058995` and Tick `9120300134` are reused.
   - **Next:** Batch 3 (stealth and the supernatural).
+- 2026-10-31: **VFX 1.4.1.** Moment banners hold up to 6 s for an open conversation, then lift above `Dialogue.Box` (Tested: held, then 10 px above the box; follows the box opening and closing mid-banner). Reported by the UI kit session.
