@@ -49,6 +49,13 @@ The greybox school is being dressed with modelled props and PBR surface material
 
 Door and flap origins sit on their hinge lines.
 
+**Batch 2 setup** (`Studio/props_setup2.luau`, run after importing the batch-2 FBX files):
+- Measures every template from its parts, so it doesn't depend on the dims above.
+- Glass pieces become Glass material; Glow pieces become Neon with a PointLight (amber on the vending machine and candelabra, crimson on the altar).
+- Tags the vending machine `NHVendingProp` and the bookcase `NHBookshelfProp`, and marks every book `Book = true`.
+- Props with no placeholder (chairs, sofa, altar, candelabra, bookcases) get an invisible anchor part named `NHPropSpot_<key>`, which `props_revert.luau` also removes.
+- The Staff Room furniture stays clear of the watcher's patrol loop (x 37–52, z 17–29).
+
 | Prop | Triangles | Replaces / goes to |
 |---|---|---|
 | StudentDesk | 4.8k | `Desk` ×48 (R101–R106) |
@@ -56,7 +63,14 @@ Door and flap origins sit on their hinge lines.
 | Chalkboard | 6.1k | new, on the wall behind each teacher desk (a `ChalkboardSpot` part) |
 | Locker | 10.1k (2 pieces) | the 8 hallway lockers, including Locker113, which carries the quest note |
 | HidingLocker | 15.2k (3 pieces) | the Records Office and Staff Room hiding lockers |
-| StudentChair, TeacherChair, Armchair, Sofa, TrashCan, Candelabra, VendingMachine, Altar, Bookshelf | 0.3k–26k | batch 2: modelled, waiting to be imported |
+| StudentChair | 3.5k (wrought iron to match the desk) | batch 2: behind every student desk (48) |
+| TeacherChair | 3.9k | batch 2: tucked into each teacher desk (6) and around the Staff Room table (4) |
+| Armchair, Sofa | ~3.4k each | batch 2: the Staff Room lounge on the south wall (2 armchairs, 1 sofa) |
+| VendingMachine | 13k (5 pieces) | batch 2: over the hallway `VendingMachine` (quest spot LostSpotC keeps its prompt) |
+| TrashCan | 2.3k | batch 2: over R106 `TrashBin` (the detention prompt stays), and one in the Staff Room |
+| Bookshelf | 11k (Case + 93 books) | batch 2: 9 bookcases replace the Archive's 13 narrow blocks (5 on the south wall, 2 per side wall) |
+| Altar | 26k (4 pieces) | batch 2: the Archive's north-west rite corner, facing the room |
+| Candelabra | 10.3k (2 pieces) | batch 2: either side of the altar |
 
 ## In Roblox
 **Import:**
@@ -108,7 +122,12 @@ Door and flap origins sit on their hinge lines.
 - **Records Office:** hid in the locker and left it. The door opened to −105° in 0.45 s, held and closed, on both hide and leave (client measurement).
 - **Hallway:** a hallway locker opened through `Open`.
 
+**Weathered textures (2026-10-31):** all 76 placed batch-1 props use the weathered bake (classroom and locker-row screenshots). The two end lockers of the hall row were turned sideways by the first placement; all eight now face the hall, and `props_setup.luau` faces the row across the hall.
+
+**Texture ids:**
+- All 14 props have their four maps in `art/props/props.json`.
+- `Studio/props_ids.py` keeps it current: `set` merges upload results, `luau` writes a re-texture script, and `setup2` fills `props_setup2.luau`.
+
 **Not verified yet:**
-- the new batch-1 textures with weathering
 - two-player locker sync
-- batch 2, which is not imported yet
+- batch 2, which is not imported yet (its placement, the vending rattle and the book fall)

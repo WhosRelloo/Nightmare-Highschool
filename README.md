@@ -16,4 +16,4 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**Nights, surfaces and props (2026-10-31):** blue-violet nights, PBR school surfaces, Blender-modelled desks, chalkboards and lockers that open and close. See [`CHANGELOG.md`](CHANGELOG.md), [`docs/School-Props.md`](docs/School-Props.md) and [the Discord post](updates/discord/2026-10-31-nights-and-props.md).
+**Worn-in props (2026-10-31):** weathered desks, chalkboards and lockers, upgraded chairs, candelabra and gables for the next batch, and lesson test fixes. See [`CHANGELOG.md`](CHANGELOG.md), [`docs/School-Props.md`](docs/School-Props.md) and [the Discord post](updates/discord/2026-10-31-worn-in-props.md).

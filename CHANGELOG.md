@@ -2,6 +2,42 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [VFX 1.2] - 2026-10-31: Weathered props, batch 2 ready, lesson test fixes
+
+### Changed
+- **School props look worn in.** Desks, teacher desks, chalkboards and lockers were re-baked with:
+  - chipped enamel and bare metal on edges
+  - dirt in the crevices
+  - softened edges
+  - new brass, iron, leather and paper materials
+- **Batch-2 designs upgraded before import:**
+  - **Student chair:** now matches the desk's wrought-iron work: raked back legs, a pointed-arch back with the desk's rose, brass finials (3.5k triangles, was 296).
+  - **Candelabrum:** now has scroll feet, a basket-twist iron column, a drip tray, four scroll arms and a tall centre candle, with wax drips.
+  - **Gables and crests:** the vending machine, bookcase and altar get solid pointed gables, and the teacher chair a pointed crest with pinnacles. These replace wavy curves.
+  - **Leather:** the grain is about 2.5× finer, so chairs and sofas read as leather, not stucco.
+  - **Bin:** the paper in it is properly crumpled.
+- **Rarity reveal on spins:** the clan reel and the race reel now land with the UI kit's rarity reveal: a glint, then glows and rings that grow with rarity, and the near-miss stop for Legendary and Cursed.
+
+### Fixed
+- **End lockers:** the two lockers at the ends of the hall row were turned sideways. All eight now face the hall.
+- **Test bridge:**
+  - `NightStudy` with an unknown player name returns false instead of erroring.
+  - New Lab Mix auto-player: `AutoLab(name, accuracy)`, or `StartLesson(name, room, accuracy)`. Lab Mix is a rhythm game judged on server time, so tool-driven tests could never hit a note, and the beaker blew after six misses (the real rule).
+
+### Verified (Studio)
+- **New textures:** screenshots of a classroom and the hall locker row show them on all 76 placed props: 48 desks, 6 teacher desks, 6 chalkboards, 10 lockers.
+- **End lockers:** they face the hall (screenshot).
+- **Lab Mix auto-player (Play):**
+  - It hit 20 of 22 notes, and the lesson ended normally.
+  - The UI kit then checked Lab Mix's new UI live with it.
+- **Night Study (Play):**
+  - An unknown name returns false.
+  - The real name, at 21:00 by the Archive table, starts a session.
+
+### Not yet
+- **Rarity reveal:** the UI kit checked it on a Legendary test spin, but not inside the Identity or Bloodline reels.
+- **Batch 2 import:** waiting for the FBX import in Studio. Then `props_setup2` places everything, and the vending rattle and book fall get tested.
+
 ## [UI 1.14] - 2026-10-31: Class lessons get the full UI-kit treatment
 
 The user asked to "make the actual minigame ui higher quality with the existing ui we have in game". Everything here uses existing UI-kit art only: plates, slot and thin frames, seals, the HUD orb, the candle icon and the divider.

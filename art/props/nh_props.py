@@ -14,6 +14,7 @@ Pipeline per prop:
 In Roblox each prop is one MeshPart with a SurfaceAppearance (asset ids in art/props/props.json).
 """
 import math
+import random
 import os
 import sys
 
@@ -192,15 +193,15 @@ def palette():
         "brass": material("Brass", "NH_Brass", tint=(1, 1, 1), scale=0.5, wear=0.35, dirt=0.8),
         "crimson": material("Crimson", "NH_PaintedMetal", tint=(0.24, 0.035, 0.05), scale=1.3, wear=0.7, wear_metal=True),
         "crimsonin": material("CrimsonIn", "NH_PaintedMetal", tint=(0.11, 0.02, 0.03), scale=0.65, rough_add=0.15, wear=0.3, wear_metal=True),
-        "leatherdark": material("LeatherDark", "NH_Leather", tint=(0.17, 0.026, 0.036), scale=0.7, wear=0.4),
+        "leatherdark": material("LeatherDark", "NH_Leather", tint=(0.17, 0.026, 0.036), scale=1.8, normal=0.5, wear=0.4),
         "stone": material("Stone", "NH_Limestone", tint=(0.95, 0.93, 0.88), scale=0.28, wear=0.3, dirt=0.9),
         "stonedark": material("StoneDark", "NH_Limestone", tint=(0.6, 0.58, 0.55), scale=0.28, wear=0.25, dirt=0.9),
-        "inkblue": material("InkBlue", "NH_Leather", tint=(0.12, 0.16, 0.36), scale=0.7, wear=0.4),
+        "inkblue": material("InkBlue", "NH_Leather", tint=(0.12, 0.16, 0.36), scale=1.8, normal=0.5, wear=0.4),
         "glassamber": material("GlassAmber", base=(0.55, 0.32, 0.08), rough=0.15, wear=0.0, dirt=0.3),
         "glassclear": material("GlassClear", base=(0.75, 0.8, 0.85), rough=0.05, wear=0.0, dirt=0.0),
         "paper": material("Paper", "NH_Paper", tint=(1, 1, 1), scale=0.5, wear=0.2, dirt=0.5),
         "brasssteel": material("Steel", base=(0.72, 0.72, 0.74), rough=0.22, metal=1.0, wear=0.3),
-        "leather": material("Leather", "NH_Leather", tint=(0.26, 0.035, 0.05), scale=0.7, wear=0.45),
+        "leather": material("Leather", "NH_Leather", tint=(0.26, 0.035, 0.05), scale=1.8, normal=0.5, wear=0.45),
         "chalk": material("Chalk", base=(0.92, 0.91, 0.86), rough=0.95, wear=0.0, dirt=0.3),
         "felt": material("Felt", base=(0.10, 0.10, 0.11), rough=0.98, wear=0.0),
         "glass": material("Ink", base=(0.02, 0.02, 0.04), rough=0.08, wear=0.0, dirt=0.0),
@@ -429,6 +430,36 @@ def teacher_desk(M):
     return (W, D, H)
 
 
+def _gable(name, cx, y, hw, zs, za, depth, mat, edge_mat=None, edge=0.05, n=8):
+    """Solid pointed gable panel (slightly convex sides meeting at a sharp apex, over a flat base) in the XZ plane, `depth` thick along Y,
+    with a square moulding along both sloped edges."""
+    pts = []
+    for i in range(n + 1):
+        t = i / n
+        pts.append((cx - hw + hw * t, zs + (za - zs) * (0.45 * t + 0.55 * math.sin(t * math.pi / 2))))
+    for i in range(n - 1, -1, -1):
+        t = i / n
+        pts.append((cx + hw - hw * t, zs + (za - zs) * (0.45 * t + 0.55 * math.sin(t * math.pi / 2))))
+    me = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    fr = [bm.verts.new((x, y - depth / 2, z)) for x, z in pts]
+    bk = [bm.verts.new((x, y + depth / 2, z)) for x, z in pts]
+    bm.faces.new(fr)
+    bm.faces.new(list(reversed(bk)))
+    for i in range(len(pts)):
+        j = (i + 1) % len(pts)
+        bm.faces.new((fr[i], fr[j], bk[j], bk[i]))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me)
+    bm.free()
+    ob = bpy.data.objects.new(name, me)
+    bpy.context.collection.objects.link(ob)
+    _finish(ob, mat, min(0.03, depth / 4))
+    if edge_mat is not None:
+        tube(name + "Edge", [(x, y - depth / 2 - edge * 0.4, z + edge * 0.3) for x, z in pts], edge, edge_mat, square=True, poly=True)
+    return ob
+
+
 def _quatrefoil(name, cx, y, cz, r, mat):
     ring(name, (cx, y, cz), r, "Y", mat, thick=0.022)
     for k, (dx, dz) in enumerate([(0, 1), (0, -1), (1, 0), (-1, 0)]):
@@ -582,21 +613,46 @@ def _legs4(prefix, w, d, h, r, mat, splay=0.0, square=True):
 
 
 def student_chair(M):
-    """1.6 W x 1.6 D x 3.2 H: wrought-iron frame, oak seat and back panel, a pointed-arch iron back."""
+    """1.5 W x 1.5 D x 3.3 H: the student desk's partner. Wrought-iron frame whose back legs rake up into the
+    back, a pointed-arch iron back with the desk's quatrefoil rose, a shaped oak seat on an iron seat frame,
+    an oak crest rail, brass finials and iron foot pads."""
     W, D, SH = 1.4, 1.3, 1.5
-    _legs4("Leg", W - 0.1, D - 0.1, SH - 0.05, 0.04, M["iron"], splay=0.05)
-    for sy in (-1, 1):
-        tube(f"SideRail{sy}", [(-(W - 0.1) / 2, sy * (D - 0.1) / 2, 0.45), ((W - 0.1) / 2, sy * (D - 0.1) / 2, 0.45)], 0.025, M["iron"], poly=True)
+    fx, fy = (W - 0.16) / 2, (D - 0.16) / 2
+    # front legs: slight outward kick at the foot
     for sx in (-1, 1):
-        tube(f"Stretch{sx}", [(sx * (W - 0.1) / 2, -(D - 0.1) / 2, 0.45), (sx * (W - 0.1) / 2, (D - 0.1) / 2, 0.45)], 0.025, M["iron"], poly=True)
-    box("Seat", (W, D, 0.09), (0, 0, SH), M["oak"], bevel=0.025, segments=1)
-    by = (D - 0.1) / 2
+        tube(f"LegF{sx}", [(sx * (fx + 0.03), -fy - 0.03, 0.04), (sx * fx, -fy + 0.01, 0.75), (sx * fx, -fy, SH - 0.06)], 0.04, M["iron"])
+    # back legs rake back and continue up as the back uprights
+    top = 3.15
     for sx in (-1, 1):
-        tube(f"Upright{sx}", [(sx * (W - 0.14) / 2, by, SH), (sx * (W - 0.14) / 2, by + 0.12, 3.1)], 0.035, M["iron"], square=True, poly=True)
-    box("BackPanel", (W - 0.1, 0.07, 0.5), (0, by + 0.1, 2.75), M["oak"], bevel=0.02, segments=1, rot=(math.radians(-8), 0, 0))
-    arch = [(-0.42, by + 0.05, SH + 0.1), (-0.42, by + 0.07, 2.2), (0, by + 0.08, 2.45), (0.42, by + 0.07, 2.2), (0.42, by + 0.05, SH + 0.1)]
-    tube("BackArch", arch, 0.022, M["iron"], poly=True)
-    return (W, D, 3.1)
+        tube(f"LegB{sx}", [(sx * (fx + 0.03), fy + 0.05, 0.04), (sx * fx, fy, SH - 0.06), (sx * fx, fy + 0.07, 2.3), (sx * (fx - 0.02), fy + 0.14, top)], 0.04, M["iron"])
+        cyl(f"Finial{sx}", 0.055, 0.1, (sx * (fx - 0.02), fy + 0.14, top + 0.05), M["brass"], verts=12, bevel=0.015)
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=6, radius=0.06, location=(sx * (fx - 0.02), fy + 0.14, top + 0.14))
+        _finish(bpy.context.active_object, M["brass"], 0)
+        bpy.context.active_object.name = f"FinialBall{sx}"
+    # foot pads
+    for sx in (-1, 1):
+        for sy, yy in ((-1, -fy - 0.03), (1, fy + 0.05)):
+            box(f"Foot{sx}{sy}", (0.13, 0.13, 0.04), (sx * (fx + 0.03), yy, 0.02), M["iron"], bevel=0.012)
+    # rails with the desk's slight dip, and a front footrest
+    for sx in (-1, 1):
+        tube(f"SideRail{sx}", [(sx * fx, -fy, 0.45), (sx * fx, 0, 0.42), (sx * fx, fy, 0.45)], 0.026, M["iron"])
+    tube("Footrest", [(-fx, -fy, 0.3), (0, -fy - 0.03, 0.28), (fx, -fy, 0.3)], 0.026, M["iron"])
+    tube("BackStretch", [(-fx, fy, 0.45), (fx, fy, 0.45)], 0.024, M["iron"], poly=True)
+    # iron seat frame and a shaped oak seat (rounded front, slight dish)
+    tube("SeatFrame", [(-fx, -fy, SH - 0.08), (fx, -fy, SH - 0.08), (fx, fy, SH - 0.08), (-fx, fy, SH - 0.08)], 0.022, M["iron"], closed=True, poly=True, square=True)
+    box("Seat", (W, D - 0.05, 0.09), (0, -0.02, SH), M["oak"], bevel=0.035, segments=3)
+    box("SeatNose", (W - 0.06, 0.12, 0.06), (0, -D / 2 + 0.06, SH - 0.06), M["oakdark"], bevel=0.025, segments=2)
+    # back: a pointed iron arch with the quatrefoil rose, under an oak crest rail
+    by = fy + 0.1
+    tube("BackArch", _arch_loop(0, by, fx - 0.08, SH + 0.12, 2.15, 2.62), 0.024, M["iron"], closed=True, poly=True)
+    rz = 1.98
+    ring("Rose", (0, by, rz), 0.2, "Y", M["iron"], thick=0.022)
+    for k, (dx, dz) in enumerate([(0, 0.2), (0, -0.2), (0.2, 0), (-0.2, 0)]):
+        ring(f"Foil{k}", (dx * 0.62, by, rz + dz * 0.62), 0.08, "Y", M["iron"], thick=0.016)
+    tube("ArchBar", [(0, by, SH + 0.12), (0, by, rz - 0.2)], 0.02, M["iron"], poly=True)
+    box("Crest", (W - 0.08, 0.08, 0.36), (0, by + 0.04, 2.85), M["oak"], bevel=0.03, segments=2, rot=(math.radians(-8), 0, 0))
+    box("CrestCap", (W - 0.02, 0.12, 0.05), (0, by + 0.07, 3.04), M["oakdark"], bevel=0.02, rot=(math.radians(-8), 0, 0))
+    return (W + 0.1, D + 0.1, top + 0.2)
 
 
 def teacher_chair(M):
@@ -615,9 +671,26 @@ def teacher_chair(M):
     box("BackLeather", (W - 0.36, 0.06, 1.5), (0, by - 0.02, SH + 1.35), M["leather"], bevel=0.04, segments=2)
     for k, x in enumerate((-0.45, 0, 0.45)):
         tube(f"Lancet{k}", [(x - 0.14, by - 0.06, SH + 2.15), (x - 0.14, by - 0.06, SH + 2.55), (x, by - 0.06, SH + 2.8), (x + 0.14, by - 0.06, SH + 2.55), (x + 0.14, by - 0.06, SH + 2.15)], 0.035, M["oak"], square=True, poly=True)
-    crest = [(-W / 2 + 0.1, by, SH + 2.9), (-0.5, by, SH + 3.0), (0, by, SH + 3.3), (0.5, by, SH + 3.0), (W / 2 - 0.1, by, SH + 2.9)]
-    tube("Crest", crest, 0.07, M["oak"], square=True)
-    cyl("Finial", 0.08, 0.25, (0, by, SH + 3.42), M["brass"], verts=10)
+    # pointed crest rail between the stiles, pinnacles on the stiles, a brass finial on the apex
+    hw, zs, za = W / 2 - 0.1, SH + 2.92, SH + 3.4
+    crest = [(-hw, by, zs)]
+    for tt in [i / 8 for i in range(1, 9)]:
+        crest.append((-hw + hw * math.sin(tt * math.pi / 2) ** 0.9, by, zs + (za - zs) * (1 - math.cos(tt * math.pi / 2))))
+    for tt in [i / 8 for i in range(7, -1, -1)]:
+        crest.append((hw - hw * math.sin(tt * math.pi / 2) ** 0.9, by, zs + (za - zs) * (1 - math.cos(tt * math.pi / 2))))
+    tube("Crest", crest, 0.065, M["oak"], square=True, poly=True)
+    tube("CrestInner", [(x, y, z - 0.16) for (x, y, z) in crest[2:-2]], 0.03, M["oakdark"], square=True, poly=True)
+    for sx in (-1, 1):
+        box(f"StileCap{sx}", (0.2, 0.22, 0.08), (sx * (W / 2 - 0.1), by, SH + 2.94), M["oakdark"], bevel=0.02)
+        bpy.ops.mesh.primitive_cone_add(vertices=4, radius1=0.11, radius2=0.0, depth=0.3, location=(sx * (W / 2 - 0.1), by, SH + 3.13), rotation=(0, 0, math.pi / 4))
+        pk = bpy.context.active_object
+        pk.name = f"Pinnacle{sx}"
+        _finish(pk, M["oak"], 0)
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=10, ring_count=5, radius=0.04, location=(sx * (W / 2 - 0.1), by, SH + 3.3))
+        _finish(bpy.context.active_object, M["brass"], 0)
+    cyl("FinialBase", 0.06, 0.08, (0, by, za + 0.07), M["brass"], verts=12, bevel=0.015)
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=6, radius=0.075, location=(0, by, za + 0.18))
+    _finish(bpy.context.active_object, M["brass"], 0)
     for sx in (-1, 1):
         box(f"Arm{sx}", (0.18, D - 0.2, 0.12), (sx * (W / 2 - 0.05), -0.05, SH + 0.85), M["oak"], bevel=0.04)
         cyl(f"ArmPost{sx}", 0.06, 0.8, (sx * (W / 2 - 0.08), -D / 2 + 0.2, SH + 0.45), M["oakdark"], verts=10)
@@ -721,8 +794,7 @@ def vending_machine(M):
     box("FlapTrim", (gw * 0.76, 0.03, 0.08), (gx, yfront - 0.05, 1.11), M["brass"], bevel=0.01)
     # crown: pointed arch, quatrefoil seal and pinnacles
     box("Crown", (W + 0.15, D + 0.15, 0.2), (0, 0.05, H), M["iron"], bevel=0.05, segments=2)
-    crest = [(-W / 2, yfront - 0.02, H + 0.1), (-0.8, yfront - 0.02, H + 0.45), (0, yfront - 0.02, H + 0.95), (0.8, yfront - 0.02, H + 0.45), (W / 2, yfront - 0.02, H + 0.1)]
-    tube("CrownArch", crest, 0.08, M["iron"], square=True)
+    _gable("CrownGable", 0, yfront + 0.06, W / 2 - 0.12, H + 0.1, H + 0.95, 0.12, M["iron"], M["brass"], edge=0.035)
     _quatrefoil("Seal", 0, yfront - 0.08, H + 0.45, 0.2, M["brass"])
     for sx in (-1, 1):
         cyl(f"Pinnacle{sx}", 0.09, 0.6, (sx * (W / 2 - 0.05), yfront + 0.05, H + 0.35), M["iron"], verts=8)
@@ -893,8 +965,7 @@ def altar(M):
         hood.name = f"Hood{k}"
         _finish(hood, M["stone"], 0)
     # gable with tracery and pinnacles
-    gable = [(-RW / 2, yb - 0.05, RH - 0.3), (-1.5, yb - 0.05, RH + 0.7), (0, yb - 0.05, RH + 1.5), (1.5, yb - 0.05, RH + 0.7), (RW / 2, yb - 0.05, RH - 0.3)]
-    tube("Gable", gable, 0.12, M["stone"], square=True)
+    _gable("Gable", 0, yb - 0.05, RW / 2 - 0.05, RH - 0.3, RH + 1.5, 0.3, M["stone"], M["stonedark"], edge=0.09)
     _quatrefoil("GableRose", 0, yb - 0.25, RH + 0.45, 0.32, M["stonedark"])
     for k, x in enumerate((-RW / 2, -1.0, 1.0, RW / 2)):
         _pinnacle(f"Pin{k}", x, yb - 0.1, RH - 0.4 if abs(x) > 2 else RH - 0.1, 1.6 if abs(x) > 2 else 1.1, M["stone"])
@@ -982,8 +1053,7 @@ def bookshelf(M):
     box("Back", (W - 0.2, 0.06, H - 0.2), (0, D / 2 - 0.04, H / 2), M["oakdark"], bevel=0.01)
     box("Kick", (W, D + 0.05, 0.35), (0, -0.02, 0.175), M["oakdark"], bevel=0.03)
     box("Top", (W + 0.25, D + 0.2, 0.2), (0, -0.05, H + 0.05), M["oak"], bevel=0.05, segments=2)
-    crest = [(-W / 2, -D / 2, H + 0.15), (-1.2, -D / 2, H + 0.45), (0, -D / 2, H + 0.9), (1.2, -D / 2, H + 0.45), (W / 2, -D / 2, H + 0.15)]
-    tube("Crest", crest, 0.08, M["oak"], square=True)
+    _gable("CrestGable", 0, -D / 2 + 0.1, W / 2 - 0.35, H + 0.15, H + 0.9, 0.12, M["oak"], M["oakdark"], edge=0.04)
     _quatrefoil("Seal", 0, -D / 2 - 0.03, H + 0.45, 0.17, M["brass"])
     shelf_z = [0.35 + j * (H - 0.5) / 4 for j in range(4)]
     for j, z0 in enumerate(shelf_z):
@@ -1033,48 +1103,94 @@ def trash_can(M):
         t = bpy.context.active_object
         t.name = f"Medallion{k}"
         _finish(t, M["brass"], 0)
-    for k, (x, y, z, r) in enumerate([(0.2, 0.1, H - 0.4, 0.3), (-0.25, -0.15, H - 0.45, 0.28), (0.05, -0.3, H - 0.3, 0.22)]):
-        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1, radius=r, location=(x, y, z))
+    rng = random.Random(7)
+    for k, (x, y, z, r) in enumerate([(0.2, 0.1, H - 0.42, 0.28), (-0.25, -0.15, H - 0.47, 0.26), (0.05, -0.3, H - 0.32, 0.2),
+                                       (-0.2, 0.28, H - 0.38, 0.22), (0.3, -0.12, H - 0.62, 0.24)]):
+        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, radius=r, location=(x, y, z))
         p = bpy.context.active_object
         p.name = f"Paper{k}"
+        for v in p.data.vertices:          # crumple: push each vertex in or out a little
+            v.co *= 1 + rng.uniform(-0.26, 0.12)
+        for f in p.data.polygons:          # faceted, like creased paper
+            f.use_smooth = False
         _finish(p, M["paper"], 0)
     return (2 * R + 0.1, 2 * R + 0.1, H + 0.05)
 
 
 def candelabra(M):
-    """1.6 W x 1.6 D x 6.4 H: standing iron candelabrum: tripod feet, knotted column, three arms with drip pans
-    and candles. Pieces: Candelabra; Glow (flames)."""
-    H = 5.2
+    """1.7 W x 1.7 D x 6.3 H: standing wrought-iron candelabrum: three S-scroll feet on ball toes, a
+    basket-twist column between brass collars, a drip tray, four scroll arms and a tall centre candle, each
+    on a brass bobeche, with wax drips. Pieces: Candelabra; Glow (flames)."""
+    H = 5.6
     set_group("Candelabra")
     for k in range(3):
         a = k / 3 * 2 * math.pi
-        tube(f"FootLeg{k}", [(0, 0, 0.5), (math.cos(a) * 0.45, math.sin(a) * 0.45, 0.2), (math.cos(a) * 0.65, math.sin(a) * 0.65, 0.03)], 0.04, M["iron"])
-    tube("Column", [(0, 0, 0.45), (0, 0, H - 0.3)], 0.05, M["iron"], poly=True)
-    for k, z in enumerate((1.4, 2.6, 3.8)):
-        bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=6, radius=0.11, location=(0, 0, z))
-        kn = bpy.context.active_object
-        kn.name = f"Knot{k}"
-        _finish(kn, M["iron"], 0)
+        c, s_ = math.cos(a), math.sin(a)
+        pts = [(0.05, 0.75), (0.28, 0.5), (0.5, 0.14), (0.7, 0.16), (0.72, 0.32), (0.62, 0.34)]
+        tube(f"Foot{k}", [(c * r, s_ * r, z) for r, z in pts], 0.035, M["iron"], square=True)
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=10, ring_count=5, radius=0.07, location=(c * 0.5, s_ * 0.5, 0.07))
+        _finish(bpy.context.active_object, M["iron"], 0)
+    cyl("BaseCollar", 0.11, 0.16, (0, 0, 0.8), M["brass"], verts=16, bevel=0.03)
+    tube("Core", [(0, 0, 0.7), (0, 0, H - 0.5)], 0.035, M["iron"], poly=True)
+    # basket twist: four strands spiralling round the core, swelling in the middle
+    z0, z1 = 1.0, 3.3
+    for k in range(4):
+        pts = []
+        for i in range(25):
+            t = i / 24
+            ang = k / 4 * 2 * math.pi + t * 2.5 * math.pi
+            rr = 0.035 + 0.1 * math.sin(t * math.pi)
+            pts.append((math.cos(ang) * rr, math.sin(ang) * rr, z0 + (z1 - z0) * t))
+        tube(f"Twist{k}", pts, 0.018, M["iron"], res=2)
+    for k, z in enumerate((z0 - 0.05, z1 + 0.05)):
+        cyl(f"Collar{k}", 0.075, 0.1, (0, 0, z), M["brass"], verts=14, bevel=0.02)
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=14, ring_count=7, radius=0.13, location=(0, 0, 3.75))
+    kn = bpy.context.active_object
+    kn.scale = (1, 1, 0.7)
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    kn.name = "Knop"
+    _finish(kn, M["iron"], 0)
+    cyl("DripTray", 0.28, 0.04, (0, 0, 4.15), M["brass"], verts=24, bevel=0.012)
+    ring("TrayRim", (0, 0, 4.18), 0.28, "Z", M["brass"], thick=0.018)
     tops = []
-    for k, a in enumerate((math.pi, 0)):
-        x = math.cos(a) * 0.6
-        tube(f"Arm{k}", [(0, 0, H - 0.6), (x * 0.5, 0, H - 0.75), (x, 0, H - 0.45)], 0.035, M["iron"])
-        tops.append((x, 0, H - 0.45))
-    tops.append((0, 0, H - 0.3))
+    zA = H - 0.85
+    for k in range(4):
+        a = k / 4 * 2 * math.pi + math.pi / 4
+        c, s_ = math.cos(a), math.sin(a)
+        pts = [(0.03, zA), (0.25, zA - 0.18), (0.5, zA - 0.08), (0.6, zA + 0.2), (0.6, zA + 0.32)]
+        tube(f"Arm{k}", [(c * r, s_ * r, z) for r, z in pts], 0.03, M["iron"])
+        curl = [(0.25, zA - 0.18), (0.22, zA - 0.32), (0.3, zA - 0.38), (0.34, zA - 0.3)]
+        tube(f"Curl{k}", [(c * r, s_ * r, z) for r, z in curl], 0.018, M["iron"])
+        tops.append((c * 0.6, s_ * 0.6, zA + 0.32))
+    tube("CentreStem", [(0, 0, H - 0.5), (0, 0, H - 0.2)], 0.035, M["iron"], poly=True)
+    tops.append((0, 0, H - 0.2))
     flames = []
+    rng = random.Random(3)
     for k, (x, y, z) in enumerate(tops):
-        cyl(f"Pan{k}", 0.14, 0.04, (x, y, z), M["brass"], verts=14)
-        h = 0.55 if k < 2 else 0.7
-        cyl(f"Candle{k}", 0.07, h, (x, y, z + 0.02 + h / 2), M["chalk"], verts=12)
-        flames.append((x, y, z + 0.02 + h))
+        cyl(f"Bobeche{k}", 0.15, 0.035, (x, y, z), M["brass"], verts=18, bevel=0.01)
+        ring(f"BobRim{k}", (x, y, z + 0.02), 0.15, "Z", M["brass"], thick=0.012)
+        cyl(f"Socket{k}", 0.08, 0.12, (x, y, z + 0.07), M["brass"], verts=14, bevel=0.012)
+        h = 0.75 if k == 4 else rng.uniform(0.42, 0.62)
+        cyl(f"Candle{k}", 0.065, h, (x, y, z + 0.1 + h / 2), M["chalk"], verts=14, bevel=0.01)
+        for d in range(2):
+            ang = rng.uniform(0, 2 * math.pi)
+            bpy.ops.mesh.primitive_uv_sphere_add(segments=8, ring_count=4, radius=0.025, location=(x + math.cos(ang) * 0.065, y + math.sin(ang) * 0.065, z + 0.1 + h - 0.06 - d * 0.12))
+            dr = bpy.context.active_object
+            dr.scale = (1, 1, 2.2)
+            bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+            _finish(dr, M["chalk"], 0)
+        tube(f"Wick{k}", [(x, y, z + 0.1 + h), (x, y, z + 0.14 + h)], 0.008, M["iron"], poly=True)
+        flames.append((x, y, z + 0.1 + h))
     set_group("Glow")
     for k, (x, y, z) in enumerate(flames):
-        bpy.ops.mesh.primitive_cone_add(vertices=8, radius1=0.045, radius2=0.0, depth=0.16, location=(x, y, z + 0.09))
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=8, ring_count=6, radius=0.045, location=(x, y, z + 0.12))
         f = bpy.context.active_object
+        f.scale = (1, 1, 2.3)
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
         f.name = f"Flame{k}"
         _finish(f, M["paper"], 0)
     set_group("Main")
-    return (1.4, 1.4, H + 0.6)
+    return (1.5, 1.5, H + 0.95)
 
 
 BUILD = {

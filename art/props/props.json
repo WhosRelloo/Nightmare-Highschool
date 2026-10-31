@@ -1,29 +1,142 @@
 {
   "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right).",
   "StudentDesk": {
-    "dims": [3.0, 2.0, 2.5], "pieces": ["StudentDesk"], "replaces": "Desk",
-    "ColorMap": "rbxassetid://81364537313727", "NormalMap": "rbxassetid://130943619179803",
-    "RoughnessMap": "rbxassetid://101245451808677", "MetalnessMap": "rbxassetid://116080966801557"
+    "dims": [
+      3.0,
+      2.0,
+      2.5
+    ],
+    "pieces": [
+      "StudentDesk"
+    ],
+    "replaces": "Desk",
+    "ColorMap": "rbxassetid://119199643257036",
+    "NormalMap": "rbxassetid://118197039345762",
+    "RoughnessMap": "rbxassetid://90078892240620",
+    "MetalnessMap": "rbxassetid://97876136669058"
   },
   "TeacherDesk": {
-    "dims": [7.0, 3.0, 3.0], "pieces": ["TeacherDesk"], "replaces": "TeacherDesk",
-    "ColorMap": "rbxassetid://112978670543356", "NormalMap": "rbxassetid://80580765659497",
-    "RoughnessMap": "rbxassetid://102970589812372", "MetalnessMap": "rbxassetid://116167342772661"
+    "dims": [
+      7.0,
+      3.0,
+      3.0
+    ],
+    "pieces": [
+      "TeacherDesk"
+    ],
+    "replaces": "TeacherDesk",
+    "ColorMap": "rbxassetid://122391392000842",
+    "NormalMap": "rbxassetid://111238009278438",
+    "RoughnessMap": "rbxassetid://128553520356572",
+    "MetalnessMap": "rbxassetid://129452035132704"
   },
   "Chalkboard": {
-    "dims": [9.2, 0.6, 5.15], "pieces": ["Chalkboard"], "replaces": null,
-    "ColorMap": "rbxassetid://110275924309735", "NormalMap": "rbxassetid://122900074150431",
-    "RoughnessMap": "rbxassetid://89445357287041", "MetalnessMap": "rbxassetid://115490936512926"
+    "dims": [
+      9.2,
+      0.6,
+      5.15
+    ],
+    "pieces": [
+      "Chalkboard"
+    ],
+    "replaces": null,
+    "ColorMap": "rbxassetid://110314165711802",
+    "NormalMap": "rbxassetid://111773915720933",
+    "RoughnessMap": "rbxassetid://75462476169250",
+    "MetalnessMap": "rbxassetid://127576927030727"
   },
   "Locker": {
-    "dims": [2.06, 1.54, 7.14], "pieces": ["Locker_Body", "Locker_Door0"], "swing": {"Locker_Door0": -1}, "replaces": "Locker",
-    "ColorMap": "rbxassetid://119243076772316", "NormalMap": "rbxassetid://136592251029739",
-    "RoughnessMap": "rbxassetid://118204342697611", "MetalnessMap": "rbxassetid://122698530609420"
+    "dims": [
+      2.06,
+      1.54,
+      7.14
+    ],
+    "pieces": [
+      "Locker_Body",
+      "Locker_Door0"
+    ],
+    "swing": {
+      "Locker_Door0": -1
+    },
+    "replaces": "Locker",
+    "ColorMap": "rbxassetid://125605367180671",
+    "NormalMap": "rbxassetid://134964045558160",
+    "RoughnessMap": "rbxassetid://112359419696781",
+    "MetalnessMap": "rbxassetid://105685323182554"
   },
   "HidingLocker": {
-    "dims": [3.16, 3.14, 7.14], "pieces": ["HidingLocker_Body", "HidingLocker_Door0", "HidingLocker_Door1"],
-    "swing": {"HidingLocker_Door0": -1, "HidingLocker_Door1": 1}, "replaces": "HidingLocker",
-    "ColorMap": "rbxassetid://134920300893844", "NormalMap": "rbxassetid://116215226171998",
-    "RoughnessMap": "rbxassetid://82379051094174", "MetalnessMap": "rbxassetid://96614228702112"
+    "dims": [
+      3.16,
+      3.14,
+      7.14
+    ],
+    "pieces": [
+      "HidingLocker_Body",
+      "HidingLocker_Door0",
+      "HidingLocker_Door1"
+    ],
+    "swing": {
+      "HidingLocker_Door0": -1,
+      "HidingLocker_Door1": 1
+    },
+    "replaces": "HidingLocker",
+    "ColorMap": "rbxassetid://116413063338016",
+    "NormalMap": "rbxassetid://118449033562807",
+    "RoughnessMap": "rbxassetid://102466735422130",
+    "MetalnessMap": "rbxassetid://90274331224708"
+  },
+  "StudentChair": {
+    "RoughnessMap": "rbxassetid://124425914857151",
+    "ColorMap": "rbxassetid://99773927010963",
+    "NormalMap": "rbxassetid://128189110996143",
+    "MetalnessMap": "rbxassetid://88269426254881"
+  },
+  "Armchair": {
+    "RoughnessMap": "rbxassetid://70635437683913",
+    "NormalMap": "rbxassetid://91125813254208",
+    "MetalnessMap": "rbxassetid://129252041337426",
+    "ColorMap": "rbxassetid://110776626479663"
+  },
+  "TeacherChair": {
+    "NormalMap": "rbxassetid://114874567074694",
+    "RoughnessMap": "rbxassetid://113721330437773",
+    "ColorMap": "rbxassetid://135881762011003",
+    "MetalnessMap": "rbxassetid://90869726345107"
+  },
+  "Sofa": {
+    "RoughnessMap": "rbxassetid://81358892133951",
+    "MetalnessMap": "rbxassetid://103839246941343",
+    "ColorMap": "rbxassetid://99555431114140",
+    "NormalMap": "rbxassetid://122210496011655"
+  },
+  "Candelabra": {
+    "ColorMap": "rbxassetid://125734275449169",
+    "RoughnessMap": "rbxassetid://108160554368108",
+    "MetalnessMap": "rbxassetid://72587148502578",
+    "NormalMap": "rbxassetid://133813537830889"
+  },
+  "Bookshelf": {
+    "RoughnessMap": "rbxassetid://89024092285150",
+    "ColorMap": "rbxassetid://128159318193009",
+    "MetalnessMap": "rbxassetid://82010368192284",
+    "NormalMap": "rbxassetid://97117786650136"
+  },
+  "VendingMachine": {
+    "MetalnessMap": "rbxassetid://91892421142621",
+    "NormalMap": "rbxassetid://102028755279339",
+    "ColorMap": "rbxassetid://138714013466175",
+    "RoughnessMap": "rbxassetid://138589164892980"
+  },
+  "TrashCan": {
+    "NormalMap": "rbxassetid://123167419278486",
+    "ColorMap": "rbxassetid://118452411438524",
+    "RoughnessMap": "rbxassetid://109613283863595",
+    "MetalnessMap": "rbxassetid://78665269185778"
+  },
+  "Altar": {
+    "ColorMap": "rbxassetid://104351765437765",
+    "RoughnessMap": "rbxassetid://139979198778574",
+    "NormalMap": "rbxassetid://121770734792967",
+    "MetalnessMap": "rbxassetid://100494834326003"
   }
 }
