@@ -1,6 +1,6 @@
 # Sports Clubs
 
-**Status:** Sports 1.0 is built in NH Combat Test. Basketball is fully playable: games from 1v1 to 5v5, two drills, the Night Ravens club and its tryout quest.
+**Status:** basketball (1.0) and soccer (1.1) are built and playable in NH Combat Test, each with two drills, a club and a tryout. Football comes in 1.2.
 - The soccer pitch and the football field are built, and both coaches take members, but their rules come in 1.1 (soccer) and 1.2 (football). Their pads read "coming soon".
 - Design: [superpowers/specs/2026-10-30-sports-design.md](superpowers/specs/2026-10-30-sports-design.md). Plan: [superpowers/plans/2026-10-30-sports-1.0.md](superpowers/plans/2026-10-30-sports-1.0.md).
 
@@ -90,6 +90,78 @@
   - Quitting (X) or leaving the practice court gives nothing.
   - A cone run faster than 4 s, or moving faster than possible between checks (a teleport), doesn't count.
 
+## Soccer (Sports 1.1, Grave Rovers)
+Built to play close to a Blue Lock-style Roblox soccer game the user supplied as a reference (`Huh.rbxl`).
+- Only the mechanics and feel were studied. No code, characters or assets were copied.
+
+**Controls** (soccer games and drills)
+
+| Key | With the ball | Without it |
+|---|---|---|
+| **Click** (hold, release) | Shoot. A 0.36 s charge gives full power, aimed with the camera; a tap kicks where you face. Hold **A / D** at full power to curve the ball late. | Volley or header: a 0.3 s kick window strikes the next ball that reaches you |
+| **R** | Pass to the teammate nearest your aim (into space if nobody is there) | Call for the ball (teammates see a marker) |
+| **Q** | Dribble burst. A tackle landing in it breaks the tackler's ankles (ragdoll 1.9 s). | Keeper in their box: dive |
+| **Right-click** | Feint: counters a tackle (the tackler is stunned) | |
+| **E** | | Tackle: a lunge with a 0.65 s steal window. A miss stuns you for 1.2 s. |
+| **T** | Bloodrush | Bloodrush |
+
+- **Phone and gamepad:** kit-art buttons for Kick (R2), Pass (X), Dribble/Dive (Y), Tackle (B), Feint (L2) and Bloodrush (L1).
+- **Combat keys:** while a character carries `SportKeys`, the E (equip), R (heavy) and Q (dodge) combat binds step aside.
+
+**Ball:**
+- **Holding and shooting:** the ball sits at your feet (a weld), and the server owns it.
+  - Shot velocity is aim × 120 × power, plus lift.
+  - Curve is a sideways push that eases out and pulls back late.
+  - Rolling friction applies on the ground.
+- **Pickup reach:** you trap a loose ball within 4.2 studs. A keeper in their box reaches 6.5, and a diving keeper or a lunging tackler reaches further.
+- **Ball-only walls:** invisible walls on the stone-wall line (collision group `SportBallWall`) keep the ball in play. Players walk through them, so there are no throw-ins, corners or goal kicks.
+- **Model:** our Blender soccer ball (`ServerStorage.NHSportModels.Soccer`) is the ball's look. Fast balls leave a trail, and high balls show a landing marker.
+
+**Rules:**
+- **Format:** 1v1 to 5v5 from the halfway-line pads. First to 10, a 5-goal lead, or the most goals after two 4-minute halves. A tie goes to golden-goal overtime.
+- **Goals:** a ball crossing into a goal mouth scores, checked along its whole path so fast shots can't slip through.
+  - After a goal there's a 3.5 s celebration: a goal-mouth flare, the scorer's close-up and a pose.
+  - Then the team that conceded kicks off from the centre spot.
+  - An own goal counts for the other team. An assist is a teammate's pass within 12 s.
+- **Keepers:** from 3v3, a player who queues on their side's **keeper pad** becomes the keeper.
+  - In their box, the keeper has the long reach and the dive, and clicking with the ball throws it.
+  - Holding the ball more than 6 s in the box throws it automatically.
+- **Stamina:** sprinting drains it; dribble 11, tackle 20, feint 8. Holding the ball regenerates stamina 35% slower.
+- **Bloodrush:** a meter that fills from steals (+10), ankle breaks (+10), goals (+20) and shots on target (+5).
+  - At 45 or more, **T** spends it on up to 18 s (scaled by the meter) of +10% shot power and 30% less sprint drain.
+  - It shows an aura in your race's colour.
+- **Race perks:** Wraith tackle reach, Ghoul strip resistance, Priest pass accuracy, Vampire night shot accuracy, Human stamina regen.
+
+**Drills** (practice ground south of the pitch; E on the green start pads)
+- **Target Practice:** 60 s. Shoot from behind the line at the lit corner target. Pass with 4.
+- **Wall Passes:** 45 s. Pass into the rebound wall from behind the line and control the return within 3 s. Pass with 8.
+- **Rewards:** as in basketball, one rewarded run per drill every 3 minutes.
+
+**Grave Rovers Tryout** (Coach Mallory): pass Target Practice, then play a full soccer game. Reward: 20 yen and +3 popularity.
+
+**Animations** (`Config.Sports.SoccerAnims`): clips from the group library (15981569), the closest fit per move.
+- **Rules (the user's call):** no combat clips, and no movement clips except the slide.
+- **Used:**
+  - **Tackle:** "SLIDING"
+  - **Keeper throw:** "Activate"
+  - **Goal celebration:** "Isagi Celebration", cut after the 3.5 s goal pause
+- **Procedural poses (no fitting clip exists):** kick, charge, pass, volley, header, dribble, feint, the ankle-break fall and the keeper dive.
+- **Playback:** every clip plays once, at Action2 priority, and stops with its move. Some movement clips are saved looping, so the loop is turned off.
+- **What the group's soccer uploads turned out to be** (each checked for length, rig and moving joints): camera and letterbox cutscene rigs, character ultimates, long character cutscenes and a dragon rig. None are gameplay moves.
+
+**Venue additions** (`Workspace.Sports.Pitch.Soccer`):
+- ball-only walls and ceiling
+- keeper zones (`SportKeeperZone` = the defending team) and keeper pads (`SportKeeperPad`)
+- the practice ground: a target goal with 4 targets and sensors, a rebound wall and sensor, drill pads, balls and bounds
+
+**Code:**
+- `Services.Sports.Soccer` (rules and drills) and `Controllers.Gui.Soccer` (controls, meters, poses, effects).
+- `Config.Sports.Soccer` and `RaceAura`.
+- **Shared changes:**
+  - **Ball:** `Kick`, `ReachFor`, friction, and the collision group for soccer balls.
+  - **Matches:** keeper pads queue, mercy rule.
+  - **Sports client:** gated to basketball input, with shared state and hints exported.
+
 ## Venues (Workspace.Sports)
 - **Gymnasium**
   - Gothic stone hall at x 30..190, z 112..192.
@@ -172,3 +244,22 @@
 - **Offensive rebounds:** the shot clock resets to 14.
 - **Rewards and forfeit:** a game to 21 paid both players, and a forfeit removed the walker after 5 s and ended the game.
 - **Still open:** a real pass needs a 2v2.
+
+### Soccer audit (Sports 1.1)
+**How it was run:** a code review of every soccer module (14 findings, all fixed), then live tests in Play, including real key presses.
+
+| Found | Fix |
+|---|---|
+| A "straight up" aim produced an invalid number that could fake a target hit or a goal | Every aim is made safe; invalid positions never count as inside a sensor; invalid ball speeds are refused |
+| Players move their own characters, so a teleporter could shoot from inside the goal or reach the ball from anywhere | Server speed check each tick (75 studs/s): a teleporter loses the ball and can't act or touch it for 1.5 s; shots from inside a goal mouth or off the pitch are refused; drills check too |
+| A tackler who won a loose ball still got the miss stun | Winning the ball ends the tackle window |
+| Tackle and dribble timers survived a goal or halftime; a tying goal at the buzzer triggered two kickoffs | Timers reset at kickoff and halftime; a goal's kickoff is cancelled by halftime or overtime; the buzzer wait covers the celebration |
+| Target Practice didn't feed the ball back after a hit | It feeds the ball back 2.5 s after any shot |
+| Volleys didn't reset the dead-ball timer | Every kick resets it |
+| A keeper's click volleyed instead of catching | The keeper catches on touch in their box |
+| The kick charge could be spammed | One charge per hold |
+| A stun restored sprint speed; a kick charge carried over between games | Stuns restore the default walk speed; the charge is cleared when you leave |
+| Curve was keyboard-only | Steering left or right while charging curves on gamepad and touch |
+| "Out of gas" showed to everyone; intercepted passes counted as assists | The message goes to the tired player only; interceptions clear the last pass |
+| Stamina did nothing in either sport | Running out stops sprinting |
+| Looping animation clips (the slide) kept playing | Every clip plays once and stops with its move |

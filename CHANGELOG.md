@@ -2,6 +2,66 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [Sports 1.1] - 2026-10-30: Soccer and the Grave Rovers
+
+### Added
+- **Soccer on the west pitch**, built to play close to the Blue Lock-style reference place you supplied (only the mechanics were studied; no code, characters or assets copied).
+  - **Shooting:** hold and release click. A 0.36 s charge gives full power, aimed with the camera; at full power, A or D curves the ball late.
+  - **On the ball:** **R** passes to the teammate you aim at, **Q** is a dribble burst that breaks a tackler's ankles, and **right-click** feints.
+  - **Without the ball:** **E** tackles (a miss leaves you stunned), and **click** volleys or heads the next ball.
+  - **Keepers:** from 3v3, keeper pads give a keeper with a long reach, a dive (Q) and a throw (click) in their box.
+  - **Bloodrush (T):** a meter fed by steals, ankle breaks and goals. It gives a burst of shot power and speed with an aura in your race's colour.
+  - **Match flow:** the ball stays in play (ball-only walls). First to 10, a 5-goal lead, or the most goals at time, with golden-goal overtime.
+  - **After a goal:** a goal flare, the scorer's close-up and a celebration, then kickoff to the team that conceded.
+- **Drills** on the new practice ground south of the pitch: **Target Practice** (lit corner targets) and **Wall Passes** (first-time passing off a rebound wall).
+- **Grave Rovers Tryout** from Coach Mallory, who now coaches for real.
+- **Our Blender balls in play:** the basketball, soccer ball and football models are imported with their PBR textures and used as the ball look.
+- **Animations from the group library** (no combat clips, no movement clips except the slide):
+  - "SLIDING" for tackles
+  - "Activate" for keeper throws
+  - "Isagi Celebration" after goals
+  - Procedural poses for everything else
+- **Phone and gamepad buttons** for soccer, in kit art.
+
+### Fixed
+- **The ball sat inside the player's body:** possession dropped the hold offset. Basketballs now sit in the hand and soccer balls at the feet.
+- **Models and seams far from the ball:** they were welded before the ball moved to its spawn point.
+- **Fast balls skipped sensors:** a fast ball could pass through a goal or target sensor between checks. Sensors now test the ball's whole path.
+- **Leftover feedback text:** "Perfect Release" and "Clean pass!" left a faint outline on screen after fading.
+- **Stamina did nothing:** running out now stops sprinting, in basketball and soccer.
+
+### Audit (end to end)
+- **How it was audited:** a code review of every soccer module, then live tests in Play.
+- **Fixed:**
+  - Invalid "straight up" aims that could fake a target hit or a goal.
+  - **Teleport cheating:** players move their own characters, so the server now checks movement speed; a teleporter loses the ball and can't act for 1.5 s, and shots from inside a goal mouth or off the pitch are refused.
+  - A tackler who won a loose ball still got the miss stun.
+  - Tackle and dribble timers carried over a goal or halftime.
+  - A tying goal at the buzzer triggered two kickoffs.
+  - Target Practice didn't feed the ball back after a hit.
+  - The dead-ball timer during volleys.
+  - The keeper volleyed instead of catching.
+  - The kick charge could be spammed.
+  - A stun restored sprint speed.
+  - A stale kick charge carried over between games.
+  - Curve for gamepad and touch.
+  - "Out of gas" showed to everyone.
+  - Intercepted passes counted as assists.
+  - Looping animation clips kept playing after the move.
+
+### Verified (Studio playtest)
+- **Shots and Bloodrush:** goals, curve (about 10 studs each way), kickoff after a goal, two goals filling Bloodrush to 50 and T spending it (crimson aura).
+- **Drills:** Target Practice 4/4 and Wall Passes 4/4.
+- **Real keys:** Q dribble and E tackle. The slide plays once, E doesn't equip a weapon in a game, and a missed tackle stuns.
+- **Goal celebration** clip.
+- **Ball model** at the feet.
+- **Tests:** 81 pure checks, including the path sensor and invalid aims.
+
+### Not yet
+- **Two players:** tackles, steals, feints and ankle breaks need at least two players; keepers need 3v3.
+- **Missing clips:** your group has no non-combat kick, pass, dribble, dive or header clips, so those stay procedural poses.
+- **The training cone model:** not imported, so the gym cones are still cylinders.
+
 ## [UI 1.9.1] - 2026-10-30: Class waypoint survives respawning
 
 ### Fixed

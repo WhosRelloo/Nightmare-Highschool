@@ -16,4 +16,4 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**Sports clubs (2026-10-30):** three clubs and coaches, a gothic gymnasium, a pitch and a field, and Highschool Hoops-style basketball (E shot meter, dribble moves, euro step) with drills, ranked club games and a tryout, audited end to end. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-sports.md) and [docs/Sports.md](docs/Sports.md).
+**Soccer (2026-10-30):** the Grave Rovers take the west pitch, with charged and curved shots, dribbles that break ankles, slide tackles, keepers, Bloodrush, two drills and a tryout. Our Blender balls are now in play. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-soccer.md) and [docs/Sports.md](docs/Sports.md).
