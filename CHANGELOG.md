@@ -33,7 +33,11 @@ The user asked to "make the actual minigame ui higher quality with the existing 
 - **Word Scramble (English):** framed letter slots and tiles, the kit-styled Shuffle / Clear / Skip buttons, and the word timer bar.
 - **Match the Past (History):** wax-seal card backs, and a flipped card reading "EVENT · First Moon landing".
 - **Fixed during testing:** the title plate's own layer hid its text, and the slot frames were inset by the button's text padding.
-- **Not seen live:** Lab Mix. Test-bridge Lab Mix lessons end the moment they start (reported to the quest session), so it shares the same pieces but hasn't been looked at.
+- **Lab Mix (Chemistry), seen live with the quest session's new test-bridge auto-player (85% accuracy):** framed lanes, kit D/F/J/K pads, the gold-framed beaker and "PERFECT ✓". The run ended on a gold "A" report card ("Score 96%", "• Practice round: no rewards.").
+
+### Fixed (UI 1.14.1)
+- **Lab Mix leftover note outlines:** a hit or missed ingredient faded its fill but left its chalk outline sitting at the bottom of the lane. The whole note now fades and hides. (Checked by reading the code; it was never caught on screen.)
+- **Rarity reveal rings drew over the result text:** on a Legendary spin, the gold ring burst covered the name. Rings now sit behind the reel's text and burst out past its edges. Verified on a "Hollow King · Legendary" test spin: the name reads cleanly, with the ring and glint behind and across.
 
 ## [VFX 1.1] - 2026-10-31: Real nights, PBR school surfaces, the first modelled props
 
