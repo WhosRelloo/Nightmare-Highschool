@@ -129,7 +129,7 @@ Door and flap origins sit on their hinge lines.
 - `Studio/props_ids.py` keeps it current: `set` merges upload results, `luau` writes a re-texture script, and `setup2` fills `props_setup2.luau`.
 
 **Batch 2 (2026-10-31):**
-- **Placed:** 48 student chairs, 10 teacher chairs, the Staff Room sofa and armchairs, 2 bins, the vending machine, 9 Archive bookcases and the altar.
+- **Placed:** 48 student chairs, 10 teacher chairs, the Staff Room sofa and armchairs, 2 bins, the vending machine, 9 Archive bookcases, the altar and 2 candelabra.
 - **Checked:** every prop sits on its floor (raycast), and the classroom, Staff Room, Archive and vending machine were checked in screenshots.
 - **Play:**
   - **Vending rattle:** a Thump set `RattleAt`, and the cabinet rocked up to 2.1° with the flap swinging 34°, then returned exactly to rest.
@@ -143,4 +143,3 @@ Door and flap origins sit on their hinge lines.
 
 **Not verified yet:**
 - two-player locker sync, and the rattle and book fall seen from a second player
-- Candelabra: its import didn't come through, so it isn't placed yet

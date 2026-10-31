@@ -6,8 +6,7 @@
 
 **The Archive came alive:**
 📚 nine tall oak bookcases, 93 books each. Pull one and the whole case spills onto the floor (it tidies itself up… eventually)
-⛪ a carved stone altar in the rite corner, lit by a crimson window
+⛪ a carved stone altar in the rite corner, lit by a crimson window and flanked by standing iron candelabra 🕯️
 
 **The hallway vending machine is real.** Give it a thump and watch it rattle. Searching it for that quest shakes it too.
 
-Coming soon: standing candelabra by the altar. 🕯️
