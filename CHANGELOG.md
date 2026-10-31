@@ -2,6 +2,14 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI 1.9.1] - 2026-10-30: Class waypoint survives respawning
+
+### Fixed
+- **Class / detention waypoint:** respawning (e.g. after a sports match or a death) made the clock HUD throw "Label is not a valid member of BillboardGui 'ClassWaypoint'" every half second, and the marker never came back.
+  - Respawning wipes reset-on-spawn GUIs, and the marker was one of them. The script kept using the wiped copy.
+  - The marker now survives respawns, and it's rebuilt if it ever goes missing anyway.
+  - Verified in Play: after a respawn, the "Detention · Room 106" marker stays up, its distance keeps updating, and the console stays clean.
+
 ## [Sports 1.0] - 2026-10-30: Sports clubs and basketball
 
 ### Added
