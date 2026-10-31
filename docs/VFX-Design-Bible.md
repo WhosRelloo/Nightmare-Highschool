@@ -152,25 +152,25 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 ### P0: broken or missing critical feedback
 | ID | Effect / fix | Source | Owner |
 |---|---|---|---|
-| P0-1 | Story text cut off: wrap long toast bodies, or move them to a Story Card | Quests C1 / F | UI (Kit.Toast) + Q |
-| P0-2 | Wraith tier-up flicker stuck (it writes `max(current,F)` and never resets) | Quests P0-2 | Q (Evolution) |
+| P0-1 | **Tested (UI kit, UI 1.10)**: Story text cut off: wrap long toast bodies, or move them to a Story Card | Quests C1 / F | UI (Kit.Toast) + Q |
+| P0-2 | **Tested**: Wraith tier-up flicker stuck (it writes `max(current,F)` and never resets) | Quests P0-2 | Q (Evolution) |
 | P0-3 | Votive candles already lit; "light the votive" changes nothing | Quests P0-3 | Q (rite props) |
-| P0-4 | Dropped quest items glow for everyone (the docs say owner-only) | Quests P0-4 / World F10 | Q |
-| P0-5 | Locker prompt shared and stuck on "Leave · Occupied" after a respawn | World F2 | Q (Stealth) |
-| P0-6 | Detention trash visible and pressable for everyone | World F1 | Q (Detention + QuestTracker) |
-| P0-7 | EXP bar drains backwards on level-up | UI F1 | — (Progress) |
+| P0-4 | **Implemented** (module tested; drop path code-reviewed): Dropped quest items glow for everyone (the docs say owner-only) | Quests P0-4 / World F10 | Q |
+| P0-5 | **Tested**: Locker prompt shared and stuck on "Leave · Occupied" after a respawn | World F2 | Q (Stealth) |
+| P0-6 | **Implemented** (module tested; trash path code-reviewed): Detention trash visible and pressable for everyone | World F1 | Q (Detention + QuestTracker) |
+| P0-7 | **Tested**: EXP bar drains backwards on level-up | UI F1 | — (Progress) |
 | P0-8 | **School Bell & Period Card**: there is no bell at all | World A / F3 | Q (new module) |
 | P0-9 | **"Spotted!"**: the chase target is never told | World B / F4 | Q (HallMonitor + new client) |
 | P0-10 | Level-up burst may never reach clients (server Emit) | UI F2 | Q |
-| P0-11 | Goal flare rings lie flat | UI F3 | — / Q |
-| P0-12 | Enter school can reset FOV to 70 | UI F4 | — (MainMenu) |
-| P0-13 | Lesson cancelled during the 3-2-1 still flashes its board | World F8 | UI (Activities) |
+| P0-11 | **Tested** (measured, not seen on screen): Goal flare rings lie flat | UI F3 | — / Q |
+| P0-12 | **Tested**: Enter school can reset FOV to 70 | UI F4 | — (MainMenu) |
+| P0-13 | **Implemented (UI kit, code-checked)**: Lesson cancelled during the 3-2-1 still flashes its board | World F8 | UI (Activities) |
 
 ### P1: high-impact and reusable
 | ID | Effect | Source | Owner |
 |---|---|---|---|
 | P1-1 | `Controllers.Fx` helper + `NHFx` remote; every noncombat shake via `NHShakeScale` | UI #1 | Q (new) |
-| P1-2 | Reduced flashing / Reduced motion / Effects quality settings | UI P3 | UI (Settings) |
+| P1-2 | **Tested (UI kit, UI 1.10)**: Reduced flashing / Reduced motion / Effects quality settings | UI P3 | UI (Settings) |
 | P1-3 | DayCycle grade + LightingStack (fixes the menu restore) | World C / F5 | Q (new) + MainMenu |
 | P1-4 | Quest Beat banner + Story Card; tracker line flash | Quests C1 | Q (new) + UI (Notify flag) |
 | P1-5 | Clue Discovered (ink shimmer, "+CLUE" slip into the journal) | Quests C3 | Q |
@@ -219,6 +219,11 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 - soft-edge soccer markers
 - basketball `nh_*` sparkles
 
+### P4: after everything else (user-scheduled)
+| ID | Effect / feature | Notes | Owner |
+|---|---|---|---|
+| P4-1 | **Nightmare Nights**: crimson nights run as a school event | The user approved the idea. It needs its own design pass: how the school schedule announces it, what changes in the school, and the trigger (full moon or the event calendar). Visuals: crimson grade, a large pale-crimson moon, a "Nightmare Night" banner when night falls. Builds on DayCycle (P1-3) and the full-moon work (P2-1). | Q |
+
 ### Optional (need your approval; no mechanic exists)
 - jumpscares and "nightmare events"
 - weather
@@ -246,13 +251,17 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 **Need the Fx helper first:** everything that bursts, shakes or flashes.
 **Need DayCycle first:** P2-1, P2-2, P2-3.
 
-## Decisions needed
-- **D1 Architecture.** `Controllers.Fx` + `NHFx` + DayCycle/LightingStack + shared `RaceFX`, as above.
-- **D2 Accessibility settings.** Add Reduced flashing, Reduced motion and Effects quality to Settings (UI-kit file).
-- **D3 Night look.** Proposed night grade: blue-violet, OutdoorAmbient about 35, slight desaturation. This changes how the game looks after 20:00.
-- **D4 Sounds.** There are no noncombat sounds in the place. The Bell, whistle, chimes, clank and crumple need audio: either the free Roblox-made library or your own uploads.
-- **D5 World effects on the greybox.** Build tagged ambient effects now (they carry over to the real map), or wait for the real map.
-- **D6 "Night" starts at 20:00 or 21:00.** Powers use 20:00, the timetable says 21:00.
+## Decisions
+- **D1 Architecture: Approved (2026-10-30).** `Controllers.Fx` + `NHFx` + DayCycle/LightingStack + shared `RaceFX`, as above.
+- **D2 Accessibility settings: Approved.** Add Reduced flashing, Reduced motion and Effects quality to Settings. The UI-kit session owns `UI.Settings`, so it is asked to add them.
+- **D3 Night look: Approved, with a change.**
+  - Normal nights (20:00–6:00) get a **moody blue-violet** grade.
+  - **Crimson nights are called "Nightmare Nights"** (user, 2026-10-30). They tie into the school system as a **school event**, and are scheduled **after everything else** in this roadmap (catalog P4-1).
+  - Until then, the planned link is to the existing full-moon rule (every 4th night, `Lineage.IsFullMoon`, which already boosts powers). The event design decides the final trigger.
+- **D4 Sounds: Approved.** Use Roblox's free Creator Store audio (Roblox-made). Every sound id is listed in the asset inventory so it can be swapped.
+- **D5 World effects on the greybox: assumption.** Build them tag-driven (rule W1) but schedule them late (P2-2/3). Reversible.
+- **D6 "Night" starts at 20:00: assumption.** This matches powers, EXP and the full moon. The timetable's "Evening" segment (20–21) is left alone, so night visuals start at 20:00. Reversible.
 
 ## Status log
 - 2026-10-30: Phase 1 audit done (code review of 177 dumped noncombat scripts, world inventory, screenshots of the greybox). Style guide, catalog and roadmap drafted. **Nothing implemented yet.**
+- 2026-10-30: **Batch 0 (VFX 1.0)** Play-tested: P0-2, P0-5, P0-7, P0-11, P0-12 Tested; P0-4/P0-6 Implemented via `Controllers.World.OwnedObjects` (tested with tagged test boxes; real paths code-reviewed). The UI kit shipped P0-1, P0-13 and P1-2 (UI 1.10). Next: Batch 1 (Fx toolbox, DayCycle).

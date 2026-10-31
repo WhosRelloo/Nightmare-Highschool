@@ -16,4 +16,4 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**Customization and main menu audit (2026-10-30):** the Wardrobe, main menu, save slots, names and Bloodline tab were audited end to end, with 10 menu and save fixes plus the Wardrobe fixes in UI 1.9.2. See [`CHANGELOG.md`](CHANGELOG.md), [the Discord post](updates/discord/2026-10-30-customization-audit.md) and [docs/Main-Menu.md](docs/Main-Menu.md).
+**VFX revamp started (2026-10-30):** the noncombat VFX audit and design bible, plus the first fixes: the Wraith tier-up flicker, the EXP bar, owner-only drops and trash, lockers, the goal rings and the entry FOV. See [`docs/VFX-Design-Bible.md`](docs/VFX-Design-Bible.md), [`CHANGELOG.md`](CHANGELOG.md) and [the Discord post](updates/discord/2026-10-30-vfx-revamp.md).

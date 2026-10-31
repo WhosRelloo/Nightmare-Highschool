@@ -2,6 +2,53 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [VFX 1.0] - 2026-10-30: Noncombat VFX revamp begins (audit, design bible, first fixes)
+
+### Added
+- **The VFX design bible and audit** (`docs/VFX-Design-Bible.md`, `docs/VFX-Audit.md`).
+  - The audit is a code review of 177 noncombat scripts plus the world inventory.
+  - The bible sets the style (the candlelit Institution vs the Blood), the palette and what each colour means, effect tiers and budgets, accessibility rules and the effect architecture.
+  - It also holds a P0–P4 catalog and roadmap.
+  - Running, movement and combat VFX are out of scope.
+- **Owner-only objects** (`Controllers.World.OwnedObjects`): the server tags an object for one player, and every other client hides it, including its lights and prompts. "Exclusive" prompts work for one player at a time.
+
+### Fixed
+- **Wraith tier-up flicker:** the body now flickers and comes back, instead of sticking about 60% see-through until the end.
+- **EXP bar on level-up:** it fills to the end, stamps the new level and refills from empty. It used to slide backwards.
+- **Entering school keeps your field of view:** the menu no longer forces 70.
+- **Dropped quest items and detention trash are visible only to their owner.** Other players used to see glowing boxes and "Pick up · Trash" prompts that did nothing for them.
+- **Lockers:**
+  - Respawning while hidden no longer leaves a locker stuck on "Leave · Occupied".
+  - Only the person hiding sees "Leave".
+- **Soccer goal rings** now burst upright out of the goal mouth, sized to the goal. They used to lie flat inside the goal box.
+- **From the UI-kit session (UI 1.10):**
+  - long story toasts wrap instead of being cut off
+  - a lesson cancelled during the countdown no longer flashes its board
+  - new **Reduce Motion**, **Reduce Flashing** and **High-quality Effects** settings
+
+### Verified (Studio playtest)
+- **FOV:** with FOV saved at 85, entering school through the real CONTINUE flow kept the camera at 85. The setting was put back to 70 afterwards.
+- **EXP bar:** a display-only level-up (IV→V) climbed to the end, switched numerals and refilled to 15%, never moving backwards.
+- **Wraith flicker:** in a display-only Wraith Tier III cutscene, transparency moved between 0.25 and 0.60 from 3 to 8.5 s, then returned to 0.
+- **Owner-only objects:** with two tagged test boxes, the other player's box, light and prompt were hidden on screen and my own stayed. An exclusive prompt turned off when held by someone else and on when held by me.
+- **Locker:** hid in the Records Office locker, respawned while hidden, and the prompt read "Hide · Locker" again.
+- **Goal rings:** a server goal effect drew three rings at the west goal mouth with a horizontal axis (upright).
+- No new script errors.
+
+### Not yet
+- **Not seen:**
+  - The goal rings' new look wasn't caught in a screenshot (verified by measurement only).
+  - The real dropped-item and detention paths were code-reviewed; the hiding module was tested with tagged test boxes.
+  - Two-player checks are still to do.
+- **Next batches:**
+  - the shared effects toolbox
+  - the day/night grade (blue-violet nights)
+  - the school bell
+  - the "Spotted!" hall-monitor alert
+  - quest and clue moments
+  - level-up, respawn and purchase feedback
+  - **Nightmare Nights** (crimson nights as a school event) comes last.
+
 ## [UI 1.10] - 2026-10-30: Comfort settings, readable story toasts, clean lesson cancels (VFX revamp, part 1)
 
 ### Added
