@@ -2,6 +2,39 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI 1.14] - 2026-10-31: Class lessons get the full UI-kit treatment
+
+The user asked to "make the actual minigame ui higher quality with the existing ui we have in game". Everything here uses existing UI-kit art only: plates, slot and thin frames, seals, the HUD orb, the candle icon and the divider.
+
+### Changed
+- **Kit typography:** lessons use the kit's Fantasy title face and Garamond book face instead of the cartoon fonts (LuckiestGuy, PermanentMarker, PatrickHand). The chalkboard stays as the classroom's identity.
+- **Board header:** the lesson's name ("POP QUIZ", "WORD SCRAMBLE", "MATCH THE PAST", ...) sits on a gold kit plate hanging from the frame, with the subject and level beneath.
+  - Score and the lesson clock each have their own framed plate; the clock has the kit's candle icon.
+  - A time bar under the header burns down, gold, turning crimson for the last 10 seconds.
+- **Buttons, letter tiles, lab pads and memory cards** are kit slots: a dark well with an iron-gold slot frame and a soft top light.
+  - On hover the frame turns gold and the button lifts slightly; on press it sinks.
+  - Right and wrong still tint green and red, now with the ✓/✗ glyph.
+- **Timers inside the games** (per question, per word) are kit progress bars.
+- **Framing:** the Lab Mix lanes and beaker get kit frames, and face-down memory cards show a gold wax seal behind the "?".
+- **Countdown:** the 3-2-1 is stamped into the HUD's gold orb, with a tick each second.
+- **Report card:** the result is now a kit panel instead of a paper sheet.
+  - It has a "Report Card" header and the course line.
+  - The grade sits in a wax seal coloured by the grade: gold A, blue B, silver C, amber D, crimson F. It still slams in, with wax drops; A shimmers and F gets crossed out.
+  - The score has a bar that fills.
+  - Result lines carry ✓ / ✗ / • marks.
+  - At the bottom: a divider, the teacher's remark in quotes, and a gold Close button.
+- Reduce Motion: no lifts, pops or slams, just fades.
+
+### Verified (Studio playtest, real lessons via the test bridge)
+- **Pop Quiz (Mathematics):**
+  - The countdown orb stamps each second, and the gold title plate, score and clock plates and the time bar all show.
+  - A right answer goes green with a ✓ and "Correct!"; a wrong one goes red with "Nope." and the right answer shown green.
+  - The report card shows a crimson F seal with the cross-out and wax drops, "Score 13%" with its bar, "✗ Failed", the remark and a gold Close.
+- **Word Scramble (English):** framed letter slots and tiles, the kit-styled Shuffle / Clear / Skip buttons, and the word timer bar.
+- **Match the Past (History):** wax-seal card backs, and a flipped card reading "EVENT · First Moon landing".
+- **Fixed during testing:** the title plate's own layer hid its text, and the slot frames were inset by the button's text padding.
+- **Not seen live:** Lab Mix. Test-bridge Lab Mix lessons end the moment they start (reported to the quest session), so it shares the same pieces but hasn't been looked at.
+
 ## [VFX 1.1] - 2026-10-31: Real nights, PBR school surfaces, the first modelled props
 
 ### Added
