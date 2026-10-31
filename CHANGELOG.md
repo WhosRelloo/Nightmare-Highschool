@@ -2,6 +2,34 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI 1.12] - 2026-10-30: Milestone toasts, prompt sounds and refusals, the near-miss reel
+
+### Added
+- **Milestone notifications** (VFX bible P1-7): a gold notification for the big moments: level-up, quest complete, faction join or rank, purchases.
+  - The wax seal stamps in (1.6× → 1×, with a stamp sound) and one gold shimmer runs across the title.
+  - It stays up 6 s.
+  - Server code sends it with `Kind = "Milestone"` on the existing notification packet.
+- **Every notification now has an entrance:** it fades in and settles into place. When a fifth one pushes the oldest out, the oldest fades instead of vanishing.
+- **Prompt sounds:**
+  - A typewriter-key click when you start holding a prompt.
+  - A small desk-bell ping when it goes through.
+  - All UI sounds follow the Effects volume.
+- **Refused prompts:** when the server turns an action down, the prompt says so. The key cap flashes red and the gold fill drains, the cap gives a small shake, the action line reads "✗ <reason>" (for example "✗ Locked until 3 PM") for a moment, and a knob-jiggle sound plays.
+  - Only the player who was refused sees it.
+  - Server code: set the prompt attribute `NHRejected` to `"<UserId>|<reason>|<anything unique>"`.
+  - Client code: call `PromptUi.Reject(prompt, reason)`.
+- **Near-miss spin** (VFX bible P2-14 / P3): when a spin reel lands on a Legendary or Cursed result, it slows as if it will stop one short, hangs a beat, then clicks over onto the result with a small overshoot.
+  - Callers mark the result entry with `rarity = "Legendary"` / `"Cursed"`, or `nearMiss = true`.
+- **Reduce Motion is respected throughout:** no stamp, shimmer, shake or near-miss, just fades.
+
+### Verified (Studio playtest)
+- All four new sounds load in the game.
+- Milestone notification: the stamp sound plays, the seal settles, and the shimmer runs. A normal notification fades in and settles.
+- Refused prompt: "✗ Locked until 3 PM" shows, then the prompt goes back to "Open locker" after 1.6 s.
+- Reel: a Legendary result stops one short, hangs about 0.6 s, overshoots and settles exactly on the result. A Common result lands normally.
+- **Fixed during testing:** the sound helper referenced a service before the kit declared it, which would have thrown an error from every prompt.
+- **Not shown in screenshots:** the prompt's billboard. This Studio screen capture doesn't draw billboards at all (a plain test billboard didn't show either), so the refusal was checked from the prompt's actual text, colours and sound.
+
 ## [UI 1.11] - 2026-10-30: A proper Yen purse on the HUD
 
 ### Changed
