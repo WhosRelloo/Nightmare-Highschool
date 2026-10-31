@@ -2,6 +2,41 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI 1.9.2] - 2026-10-30: Customization audit fixes (look, hair, Wardrobe saving)
+
+### Fixed
+- **Faces vanished on non-classic heads:** on mesh or avatar heads, the painted face is drawn with decals. The avatar-face guard hid those decals on the second apply at spawn, leaving those players faceless. The guard now skips our five face layers and still hides a late avatar face.
+- **Doubled hair and crosses at spawn:** the two applies at spawn could overlap while a catalog hair loaded, wearing two hairs and two look folders.
+  - The hair lookup now happens before anything on the character changes.
+  - A newer apply makes an older, still-waiting one give up.
+  - All old copies are cleared, not just the first.
+- **Bald after a hair-lookup hiccup:** a brief Roblox catalog error used to save Hair ID 0 and hide your other hair.
+  - Your other hair now stays unless the catalog hair actually goes on.
+  - A saved Hair ID is cleared only when the ID definitely isn't a hair.
+- **Hair-lookup spam:**
+  - Failed lookups are cached for 30 s.
+  - The hair cache is capped.
+  - Each player gets one new uncached lookup every 1.5 s.
+  - Re-sending an unchanged look no longer saves or rebuilds.
+- **Wardrobe could overwrite your saved look with defaults:**
+  - Edits are blocked ("Loading your look...") until your saved look has loaded.
+  - After a save-slot swap, the Wardrobe re-reads the new slot's look before any edit can save.
+  - A queued save is dropped when the profile changes.
+  - A save sends a copy of the look as it was when you clicked.
+- **Colour wheel:** after a drag, the swatch highlight and the "Custom colour #" note now update.
+- **Stashed avatar clothes and hair** are also cleaned up when a character is removed or a player leaves, not only when the character is destroyed.
+
+### Verified (Studio playtest, test copies of a character)
+- Mesh-part head: after two applies, the iris, main, brows and mouth all stay visible, and a late avatar face decal is still hidden.
+- Two overlapping applies with an uncached hair (Lavender Updo): the older one is dropped, leaving exactly 1 hair and 1 look folder.
+- A hair ID that fails to load keeps the built hair (5 parts) and isn't marked "not a hair".
+- Stash folders are removed on cleanup.
+- The Wardrobe opens with the saved look, and the console shows no script errors.
+- **Checked by code review only:** the save-slot swap gap in the Wardrobe, and the colour-wheel redraw.
+
+### Not yet
+- Looks are still saved as list positions (eyes, brows, mouth, uniform, bottoms), so reordering a list would change saved looks. Moving to stable ids needs a one-time migration.
+
 ## [Sports 1.1] - 2026-10-30: Soccer and the Grave Rovers
 
 ### Added
