@@ -2,6 +2,43 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI 1.13] - 2026-10-30: Lesson juice, rarity reveals, a dialogue box that slides in
+
+### Added
+- **Lesson juice** (VFX bible P2-11): class activities now sound and feel like something.
+  - **Sounds:**
+    - A chalk tap on every board button.
+    - A bell ping for a right answer, pitched higher with each step of a streak or combo.
+    - A dull thump for a wrong one.
+    - In Lab Mix: PERFECT, GOOD and SLIP each have their own sound.
+  - **✓ / ✗ glyphs:** a glyph pops off the answer you picked, with a puff of chalk dust, so right and wrong are never colour-only.
+  - **The grade stamp slams onto the result sheet** (1.6× → 1×) with a stamp sound and a spatter of red ink. A grades get a gold shimmer across the letter; an F gets crossed out with two red scribbles.
+  - **BOOM:** when the Lab Mix beaker goes off, there's a quick flash (softer with Reduce Flashing) and a cloud of green smoke.
+  - **Timer pulse:** in the last 10 seconds the lesson timer turns red and pulses each second, ticking for the last 5.
+- **Rarity reveal** (P2-14, the UI kit's part): a shared `RarityReveal` with one tier per rarity.
+  - **Common:** a glint.
+  - **Uncommon:** adds a soft flash.
+  - **Rare:** adds a ring burst in the rarity colour.
+  - **Epic:** two rings and a chime.
+  - **Legendary / Cursed:** a "Surge" with a double glow pulse, three rings and the stamp sound, after the near-miss spin.
+  - Spin reels play it when the result entry carries a `rarity`. The world burst for Legendary/Cursed is the quest session's part.
+- **Dialogue slides in:** the dialogue box rises into place and fades in when a conversation starts, and slides down and fades when it ends. A soft glow in the speaker's colour runs along its top edge and brightens when a new character speaks.
+- Everything here follows Reduce Motion (fades only) and Reduce Flashing.
+
+### Fixed
+- **Fading panels back in:** the kit's FadeIn now returns every element to how it was built, even after a FadeOut. Before, a panel faded out and then back in would have stayed invisible.
+
+### Verified (Studio playtest, using the test bridge)
+- A Chemistry Lab Mix lesson was started for real.
+- The F stamp slammed in with ink spatter and both scribbles.
+- The BOOM fired: a flash and 7 green smoke puffs.
+- No errors from the lesson, kit or dialogue code.
+- **Checked by code review only:**
+  - The ✓/✗ glyph bursts, because every Lab Mix run ended at once, before any note could be hit. That's the quest session's area.
+  - The timer pulse.
+  - The dialogue slide-in, because Play was stopped from outside before I reached it.
+  - The rarity tiers on a live reel; the reel's near-miss was tested in UI 1.12.
+
 ## [UI 1.12] - 2026-10-30: Milestone toasts, prompt sounds and refusals, the near-miss reel
 
 ### Added

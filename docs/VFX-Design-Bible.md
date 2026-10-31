@@ -175,7 +175,7 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 | P1-4 | Quest Beat banner + Story Card; tracker line flash | Quests C1 | Q (new) + UI (Notify flag) |
 | P1-5 | Clue Discovered (ink shimmer, "+CLUE" slip into the journal) | Quests C3 | Q |
 | P1-6 | Level-up "Bell Toll" (strip wrap, numeral stamp, ember column) | UI #2 | Q + — |
-| P1-7 | Milestone toast tier (seal stamp, shimmer) | UI #4 | UI |
+| P1-7 | **Tested (UI kit, UI 1.12)**: Milestone toast tier (seal stamp, shimmer). Use `Kind = "Milestone"` | UI #4 | UI |
 | P1-8 | Purchase-granted confirmation | UI #7 | Q |
 | P1-9 | "Roll call" respawn | UI #9 | Q |
 | P1-10 | Watcher awareness ("?" / "!") + watcher flashlight cone | Quests C5 / World H | Q |
@@ -200,22 +200,22 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 | P2-8 | "Second chance" get-up (Recover / Fated) | UI #10 | Q |
 | P2-9 | Sigil paint & scrub | World G | Q |
 | P2-10 | Locker POV / hide fade | World I / Quests C6 | Q |
-| P2-11 | Lesson juice (sounds, stamp slam, BOOM) | World J | UI |
+| P2-11 | **Tested (UI kit, UI 1.13)**: Lesson juice (sounds, stamp slam, BOOM). Glyph bursts code-checked | World J | UI |
 | P2-12 | Presence fade for NPCs and watchers | Quests C13 | Q |
 | P2-13 | Evidence string + SOLVED stamp | Quests C4 | Q |
-| P2-14 | Rarity reveal (clan / race / variant) | UI #6 | Q + UI (SpinReel) |
-| P2-15 | Yen chip | UI #5 | UI |
+| P2-14 | **UI part implemented (UI 1.12/1.13)**: Rarity reveal (clan / race / variant). `Kit.RarityReveal` tiers + SpinReel near-miss; callers pass `rarity` on the final entry. World burst still Q | UI #6 | Q + UI (SpinReel) |
+| P2-15 | **Tested (UI kit, UI 1.11)**: Yen chip | UI #5 | UI |
 
 ### P3: polish
 - EXP gain tick
 - result card reveal
-- dialogue slide-in
+- dialogue slide-in (**implemented, UI 1.13**, with speaker rim; code-checked)
 - Strangers write-on
 - seated chime
 - discipline record stamp
 - Night Study candle warmth
-- timer pulse
-- prompt sounds and rejected state (UI)
+- timer pulse (**implemented, UI 1.13**: lesson timer, last 10 s)
+- prompt sounds and rejected state (**tested, UI 1.12**)
 - soft-edge soccer markers
 - basketball `nh_*` sparkles
 
