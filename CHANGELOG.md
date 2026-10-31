@@ -2,6 +2,29 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [UI 1.9.3] - 2026-10-30: Looks are saved by name, and catalog hair stays on in menus
+
+### Changed
+- **Saved looks use fixed IDs, not list positions:** before, a look was saved as "eyes option 5" or "top 18". Adding, removing or reordering options would silently change everyone's saved look. Now each choice is saved by a fixed ID ("doe" eyes, "red-vest", skin "#D8B492").
+  - Every eye shape, brow, mouth, top, bottom, skin tone, hair style, hair colour and eye colour has an ID that never changes. New options get new IDs, and existing IDs are never changed or reused.
+  - **Existing saves convert automatically** the first time each save slot loads.
+  - A save slot that hasn't converted yet is read through a frozen copy of today's list order. It stays correct even after the lists change, and nobody has to log in first.
+
+### Fixed
+- **Catalog hair fell off on the client:** the main menu's student copies (and any other copy built on the client) lost their catalog hair within about 2 s; it dropped out of the world.
+  - The cached hair kept a dead weld from the temporary model Roblox builds to load it, and on the client `AddAccessory` doesn't build a new one.
+  - Now the old weld is stripped when the hair is cached, and the hair is welded to the matching head attachment whenever no weld was made.
+
+### Verified (Studio playtest)
+- Your slot 1 save was converted live, and is now stored by ID (leather-jacket, ripped-jeans, calm, arched, frown, ...). Slot 3, not loaded since, is still in the old format and reads correctly.
+- A look sent by ID from the client is applied by the server (the mouth changed), and the original look was restored exactly.
+- 12 of 12 checks in Edit pass:
+  - Old saves read as before.
+  - Converting a look to IDs and back gives the identical look.
+  - Bad values fall back to the defaults.
+  - After a simulated reorder (Gym shirt moved to the front), both an old-format save and a new-format save still show the Gym shirt.
+- Pal Hair on a copy built on the client stays welded to the head (0.19 studs up, steady for 3 s), with the painted face showing. Server-side hair still welds normally.
+
 ## [Menu 1.2] - 2026-10-30: Character customization and main menu audit
 
 The whole customization path was audited end to end: the main menu, save slots, the Wardrobe, names and clans, and the Bloodline tab. The method was a code review of every module, then live tests in Play with real keys and clicks. The Wardrobe and appearance fixes are in [UI 1.9.2]; this entry covers the rest.
