@@ -16,4 +16,4 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**Worn-in props (2026-10-31):** weathered desks, chalkboards and lockers, upgraded chairs, candelabra and gables for the next batch, and lesson test fixes. See [`CHANGELOG.md`](CHANGELOG.md), [`docs/School-Props.md`](docs/School-Props.md) and [the Discord post](updates/discord/2026-10-31-worn-in-props.md).
+**Chairs, lounge, Archive (2026-10-31):** chairs in every classroom, a Staff Room lounge, a vending machine you can thump, and an Archive with bookcases that spill their books and a stone altar. See [`CHANGELOG.md`](CHANGELOG.md), [`docs/School-Props.md`](docs/School-Props.md) and [the Discord post](updates/discord/2026-10-31-archive-and-lounge.md).

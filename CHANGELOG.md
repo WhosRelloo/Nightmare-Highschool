@@ -2,6 +2,52 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [VFX 1.3] - 2026-10-31: Chairs, a staff lounge, a living Archive and a vending machine you can thump
+
+### Added
+- **Seating everywhere:**
+  - a wrought-iron chair behind every student desk (48)
+  - a high-backed oak chair tucked into each teacher desk (6)
+- **Staff Room lounge:**
+  - a crimson chesterfield and two wingback armchairs along the back wall
+  - four teacher chairs round the staff table
+  - a wrought-iron bin
+  - All of it stays clear of the watcher's patrol route.
+- **Hallway vending machine:** a gothic iron vending machine over the vending-machine quest spot.
+  - **Thump** it and it rattles for everyone: the cabinet rocks, the wares jump, the flap clacks and the sign flickers.
+  - It also rattles when the vending-machine quest spot is searched, and its quest prompt still works.
+  - Reduce Motion and Reduce Flashing tone it down.
+- **The Archive:**
+  - **Bookcases:** nine oak bookcases with pointed crests replace the old shelf blocks, 93 books each.
+  - **Pull a book:** the whole case spills its books onto the floor with real physics, the same for everyone. After 12 seconds they drift back onto the shelves.
+  - **Altar:** a carved stone altar with its reredos now stands in the north-west rite corner, lit by a crimson window and candles.
+- **R106 bin:** the detention bin is now a wrought-iron basket. Its detention prompt is unchanged.
+
+### Fixed
+- **Prop pivots:** batch-2 props came in lying on their backs.
+  - **Cause:** the importer's rotated pivot, plus `Model.WorldPivot` being ignored once a model has a PrimaryPart.
+  - **Fix:** the setup now sets the PrimaryPart's PivotOffset directly.
+- **Prop prompts:** the vending and bookcase prompts didn't appear with streaming on, because the model arrived before its parts.
+  - The client now waits for the piece that hosts the prompt.
+  - Both models stream in whole (Atomic).
+
+### Verified (Studio)
+- **Placement (screenshots):**
+  - a classroom with its chairs
+  - the Staff Room
+  - the Archive's bookcases and the altar
+  - the vending machine
+  - Every prop sits on its floor (raycast check).
+- **Vending rattle (Play):** a Thump from the client set `RattleAt` on the server. On the client the cabinet rocked up to 2.1° and the flap swung 34°, then everything returned exactly to rest.
+- **Book fall (Play):**
+  - **Fall:** a Pull from the client unanchored all 93 books, and after 2.5 s 38 had left the case and most lay on the floor (screenshot).
+  - **Restore:** after 14.5 s all were back, anchored and in the case.
+- **Prompts (Play):** all 10 appear (9 bookcases and the vending machine), and Thump is enabled while the quest prompt is off.
+
+### Not yet
+- **Candelabra:** its import didn't come through. A second teacher-desk import was found floating over the school and moved to `ServerStorage.NHPropsImportLeftovers`. Once the candelabra is imported, a rerun of `props_setup2` places one either side of the altar.
+- **Two-player check:** the rattle and the book fall haven't been watched from a second player.
+
 ## [VFX 1.2] - 2026-10-31: Weathered props, batch 2 ready, lesson test fixes
 
 ### Changed

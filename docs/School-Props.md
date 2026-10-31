@@ -69,7 +69,7 @@ Door and flap origins sit on their hinge lines.
 | VendingMachine | 13k (5 pieces) | batch 2: over the hallway `VendingMachine` (quest spot LostSpotC keeps its prompt) |
 | TrashCan | 2.3k | batch 2: over R106 `TrashBin` (the detention prompt stays), and one in the Staff Room |
 | Bookshelf | 11k (Case + 93 books) | batch 2: 9 bookcases replace the Archive's 13 narrow blocks (5 on the south wall, 2 per side wall) |
-| Altar | 26k (4 pieces) | batch 2: the Archive's north-west rite corner, facing the room |
+| Altar | 26k (4 pieces) | batch 2: the Archive's north-west rite corner, facing the room (crimson glow) |
 | Candelabra | 10.3k (2 pieces) | batch 2: either side of the altar |
 
 ## In Roblox
@@ -128,6 +128,19 @@ Door and flap origins sit on their hinge lines.
 - All 14 props have their four maps in `art/props/props.json`.
 - `Studio/props_ids.py` keeps it current: `set` merges upload results, `luau` writes a re-texture script, and `setup2` fills `props_setup2.luau`.
 
+**Batch 2 (2026-10-31):**
+- **Placed:** 48 student chairs, 10 teacher chairs, the Staff Room sofa and armchairs, 2 bins, the vending machine, 9 Archive bookcases and the altar.
+- **Checked:** every prop sits on its floor (raycast), and the classroom, Staff Room, Archive and vending machine were checked in screenshots.
+- **Play:**
+  - **Vending rattle:** a Thump set `RattleAt`, and the cabinet rocked up to 2.1° with the flap swinging 34°, then returned exactly to rest.
+  - **Book fall:** a Pull unanchored all 93 books, and 38 left the case in 2.5 s. All were back, anchored, at 14.5 s.
+  - **Prompts:** all 10 appear.
+- **Importer quirks:** the importer's pivot is rotated, and `Model.WorldPivot` is ignored once a PrimaryPart is set. So `props_setup2` sets the PrimaryPart's PivotOffset to a world-axis bottom centre, and `Studio/props_fix_pivots2.luau` repairs copies placed with the old pivot.
+- **Streaming:** the vending machine and bookcases use `ModelStreamingMode = Atomic`, and the client waits for the prompt's host piece (`VendingMachine_Body`, `Bookshelf_Case`).
+- **Look tweaks in Studio:**
+  - vending glass is light and see-through, with a shelf light inside
+  - the altar's glow is crimson
+
 **Not verified yet:**
-- two-player locker sync
-- batch 2, which is not imported yet (its placement, the vending rattle and the book fall)
+- two-player locker sync, and the rattle and book fall seen from a second player
+- Candelabra: its import didn't come through, so it isn't placed yet
