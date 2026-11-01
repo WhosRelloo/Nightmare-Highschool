@@ -16,4 +16,5 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**Nightfall (2026-11-01):** watchers that notice you, all-new tier-up cutscenes with PBR set pieces, a combat tag (say "mb all" to make peace), capes in the Spin Shop, and Shift to sprint. See [`CHANGELOG.md`](CHANGELOG.md) and [the Discord post](updates/discord/2026-11-01-nightfall.md).
+**Fists and Enrollment (2026-11-01):** a Fist class with Z/X/C skills, race finishers on N (drain, eat, siphon, exorcise), enrol at the desk and pick your uniform, a School Store with try-on previews, wardrobes in the locker rooms, and capes that finally fit. See [`CHANGELOG.md`](CHANGELOG.md) and [the Discord post](updates/discord/2026-11-01-fists-and-enrollment.md).
+**Before that, Nightfall (2026-11-01):** watchers that notice you, all-new tier-up cutscenes with PBR set pieces, a combat tag (say "mb all" to make peace), capes in the Spin Shop, and Shift to sprint. See [`CHANGELOG.md`](CHANGELOG.md) and [the Discord post](updates/discord/2026-11-01-nightfall.md).

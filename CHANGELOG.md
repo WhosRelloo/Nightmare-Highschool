@@ -2,6 +2,41 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.6] - 2026-11-01: Fists, race actions, enrollment and the School Store
+
+A combat class, race-specific finishers, a new-student flow, and a batch of requested fixes.
+
+### Added
+- **Fist class (owner's animations):**
+  - Runs on the same combat code as the Katana (four-hit M1 combo, running attack, downslam, crit, aerial crit, block and parry, grip), with its own timings and a shorter reach.
+  - The Fist animations have no Hit/EndLag markers. Contact times were read off each clip's keyframes (fastest limb, checked against Katana's real markers) and stored in `Config.Weapons.Fist.Markers`. A marker that exists in a clip always wins (`ServerStorage.Packages.AnimMarkers`).
+  - Skills on **Z / X / C**: Question Mark Kick (launch), Body Slam and Bear Hug (startup lunge, then a paired grab and victim animation, then the finisher; grabs go through a guard).
+  - The skill slots sit bottom-right, built from the UI kit's item slots. A veil drains and the seconds count down while each one cools down.
+- **Race actions on N (finish a downed body):**
+  - Vampire: **Blood Drain**. Ghoul and Werewolf: **Eat Body**. Wraith: **Soul Siphon** (pale wisps spiral out of the body). Human and Priest: **Exorcise** (a gold light column; only works on the unholy).
+  - Each one heals you and feeds your race hunger. Feeding is no longer automatic after a grip.
+  - Exorcise and Soul Siphon use a placeholder kneel clip until dedicated animations exist.
+- **Enrollment:** new students start in their own clothes.
+  - They enrol at the **Enrollment desk** outside the Records Office by picking one of three uniforms (Black Blazer, Navy Vest or Charcoal Cardigan, with trousers or the tartan skirt by body type; race recolours apply).
+  - You can't start a class until you've enrolled.
+  - Existing students count as enrolled and keep what they wear.
+- **School Store** (the vending machine): every school top for ¥250, sorted into tabs (Official, Vests, Polos, Jackets & PE, Owned).
+- **Try-on preview** on the enrollment and store screens: your own character wears whatever you point at.
+- **Wardrobe stations:** the wardrobe now opens only from a locker-room wardrobe ("Change Outfit" prompt; tag a part `NHWardrobe` to add one) and closes when you walk away. The K key and HUD button are gone, and the server refuses look changes made anywhere else. One placeholder station sits by the hallway lockers.
+
+### Changed
+- **You're slower in combat:** walk and sprint speed drop by 20% while you're combat-tagged.
+- **Slide into a run:** if you're still holding Shift when a slide ends, you go straight back to a full-speed sprint.
+- **Capes fit like the owner's R6 rigs:** each cape stores its exact fit (`NH_TorsoFit`), scaled to your body, so it sits on your shoulders and back instead of hanging off one side. The sway now bends every cloth chain the same way (the side chains used to twist).
+
+### Fixed
+- **Fist animations were being overridden:** the Fist equip clip (the looped idle stance) never ended, so it covered every attack and the Fist idle, walk and run never loaded. The crit now plays at Action4 with a short ease in and plays to the end.
+- **Cape templates** no longer carry animation-editor data (about 5,000 instances each).
+
+### Notes
+- A Studio-only hitbox debug box can be left behind by an interrupted attack. Players never see it.
+- Recovered: `M1`'s two child modules (Running M1, Aerial M1) were restored from cloud version 237 after a module rebuild dropped them. A copy is in `ServerStorage.NH_Backup`.
+
 ## [VFX 1.5] - 2026-11-01: Stealth and the supernatural, all-new tier-ups, capes, combat tag
 
 VFX Batch 3, a full PBR rebuild of the tier-up cutscenes, and a set of requested fixes and features.
