@@ -154,7 +154,7 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 |---|---|---|---|
 | P0-1 | **Tested (UI kit, UI 1.10)**: Story text cut off: wrap long toast bodies, or move them to a Story Card | Quests C1 / F | UI (Kit.Toast) + Q |
 | P0-2 | **Tested**: Wraith tier-up flicker stuck (it writes `max(current,F)` and never resets) | Quests P0-2 | Q (Evolution) |
-| P0-3 | Votive candles already lit; "light the votive" changes nothing | Quests P0-3 | Q (rite props) |
+| P0-3 | **Tested (VFX 1.5)**: Votive candles already lit; "light the votive" changes nothing (now unlit per player until your rite counts them) | Quests P0-3 | Q (rite props) |
 | P0-4 | **Implemented** (module tested; drop path code-reviewed): Dropped quest items glow for everyone (the docs say owner-only) | Quests P0-4 / World F10 | Q |
 | P0-5 | **Tested**: Locker prompt shared and stuck on "Leave · Occupied" after a respawn | World F2 | Q (Stealth) |
 | P0-6 | **Implemented** (module tested; trash path code-reviewed): Detention trash visible and pressable for everyone | World F1 | Q (Detention + QuestTracker) |
@@ -178,14 +178,14 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 | P1-7 | **Tested (UI kit, UI 1.12)**: Milestone toast tier (seal stamp, shimmer). Use `Kind = "Milestone"` | UI #4 | UI |
 | P1-8 | **Tested (VFX 1.4)**: Purchase-granted confirmation | UI #7 | Q |
 | P1-9 | **Tested (VFX 1.4)**: "Roll call" respawn (owner side; the observer puff isn't checked) | UI #9 | Q |
-| P1-10 | Watcher awareness ("?" / "!") + watcher flashlight cone | Quests C5 / World H | Q |
-| P1-11 | Thrown Out (fade on caught) | Quests C7 | Q |
-| P1-12 | RiteFX: votive ignition, bell, font, mirror frost, and so on | Quests C9 / World K | Q |
-| P1-13 | The Blood Takes (turning transition) + shared `RaceFX` | Quests C10 | Q |
-| P1-14 | Quest-giver seals over NPCs | Quests C12 | Q |
-| P1-15 | Waypoint upgrade (edge arrow, near beacon, scan cache) | Quests C2 | Q |
-| P1-16 | Detention clean-up (owner-only trash, pickup burst, bin) | World F | Q |
-| P1-17 | Tier-up polish: `nh_*` textures, honour shake and flash, keep the toast | Quests C11 / UI | Q |
+| P1-10 | **Tested (VFX 1.5)**: Watcher awareness ("?" / "!") + watcher flashlight cone | Quests C5 / World H | Q |
+| P1-11 | **Tested (VFX 1.5)**: Thrown Out (fade on caught) | Quests C7 | Q |
+| P1-12 | **Tested (VFX 1.5)**: RiteFX: votive ignition, bell, font, mirror frost, and so on | Quests C9 / World K | Q |
+| P1-13 | **Tested (VFX 1.5)**: The Blood Takes (turning transition) + shared `RaceFX` | Quests C10 | Q |
+| P1-14 | **Tested (VFX 1.5)**: Quest-giver seals over NPCs | Quests C12 | Q |
+| P1-15 | **Tested (VFX 1.5)**: Waypoint upgrade (edge arrow, near beacon, scan cache) | Quests C2 | Q |
+| P1-16 | **Tested (VFX 1.5)**: Detention clean-up (owner-only trash, pickup burst, bin) | World F | Q |
+| P1-17 | **Tested (VFX 1.5)**: Tier-up polish: `nh_*` textures, honour shake and flash, keep the toast | Quests C11 / UI | Q |
 
 ### P2: signature experiences
 | ID | Effect | Source | Owner |
@@ -273,4 +273,8 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
   - **Placement:** banners sit low-centre (anchored at 0.745 of the screen height), because the toast stack occupies the space under the compass.
   - **Sounds (D4 inventory, Pro Sound Effects):** Bell `9113584435` (Brass Hand Bell 7) and Whistle `9117261163` (Pealess Whistle Fox 40). The kit's Stamp `9119907907`, Confirm `9114058995` and Tick `9120300134` are reused.
   - **Next:** Batch 3 (stealth and the supernatural).
+- 2026-11-01: **VFX 1.5 (Batch 3).** P0-3 and P1-10..P1-17 are Tested.
+  - **New modules:** `ReplicatedStorage.Functions.{RaceFX,EvolveFX}`, `Controllers.World.{QuestSeals,ObjectFx,Waypoint}` and `Services.Features.CombatTag`. Spotted gained watcher awareness, torches and Thrown Out.
+  - **Tier-ups rebuilt** with 15 PBR meshes (`art/vfx/evolve`, `ReplicatedStorage.NHEvolveFX`) and rendered sprites (`art/vfx/evolve/sprites.json`).
+  - **Rule kept:** supernatural looks fire only on supernatural events (rites, turning, tier-ups).
 - 2026-10-31: **VFX 1.4.1.** Moment banners hold up to 6 s for an open conversation, then lift above `Dialogue.Box` (Tested: held, then 10 px above the box; follows the box opening and closing mid-banner). Reported by the UI kit session.

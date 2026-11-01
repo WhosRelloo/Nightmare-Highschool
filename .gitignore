@@ -1,0 +1,4 @@
+
+# render scratch / caches
+art/vfx/evolve/sprites/_frames/
+__pycache__/

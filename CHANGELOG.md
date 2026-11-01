@@ -2,6 +2,82 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [VFX 1.5] - 2026-11-01: Stealth and the supernatural, all-new tier-ups, capes, combat tag
+
+VFX Batch 3, a full PBR rebuild of the tier-up cutscenes, and a set of requested fixes and features.
+
+### Added
+- **Watcher awareness (P1-10):**
+  - A "?" appears over a stealth-zone watcher once you're 25% noticed, and firms up as the meter rises. At 75% it becomes a crimson "!" and the screen edges darken (this follows the Vignette setting).
+  - After dark, the night custodian carries a flickering torch (a real light, seen by everyone).
+  - The watcher's speech bubble uses the UI kit look.
+- **Thrown out (P1-11):** when a watcher catches you, they grab you with the new caught animations (watcher 110064849600468, you 124875544038575). The screen then fades to a "THROWN OUT" stamp while you're walked to the door. The old "Caught!" toast is gone.
+- **Quest-giver seals (P1-14):** a wax seal over NPCs who have something for you. The server works these out and they update whenever your quests change.
+  - Gold "!": a quest to start.
+  - Gold "✓": talk to them.
+  - Gold "↺": retry a failed quest.
+  - Iron "…": a quest you're still doing for them.
+  - At most 8 show at once, and only within 80 studs.
+- **Rite props answer you (P1-12):** each rite prop reacts when your rite uses it. These effects are only visible to you.
+  - Blood ripples and red mist in the font.
+  - The cracked bell swings (about 11°) with a shock ring.
+  - Frost creeps over the mirror.
+  - Silver steam from the stack, embers from the ash.
+  - The ward's scratches glow, then cool.
+  - Sparks fly off the iron.
+  - Grave dust rises from the crate, and a dawn shaft lights the stone.
+- **Votives (P0-3):** the three votive candles now start **unlit**. They light, with a burst of embers, when your rite counts them, then flicker gently.
+- **Detention (P1-16):** a dust-and-glint puff for each piece of trash you pick up, and a gold flourish at the bin when you finish.
+- **The Blood Takes (P1-13):**
+  - When a bite turns someone, that player gets three heartbeat pulses at the screen edges in their new race's colour; the colour drains, then their race's tint washes in.
+  - Anyone within 140 studs sees blood-coloured smoke and rising embers.
+- **Tier-ups rebuilt with PBR set pieces (P1-17, owner request):**
+  - Every race gets a glowing ground sigil (a second, counter-turning ring at Tier III), a light column and a climax shockwave.
+  - Fifteen new Blender-modelled meshes carry baked colour, normal, roughness and metalness maps (`art/vfx/evolve`, templates in `ReplicatedStorage.NHEvolveFX`).
+  - **Vampire:** a wet blood pool spreads under them, a bat swarm circles, then veined blood crystals erupt.
+  - **Werewolf:** three claw slashes, then the howl cracks the floor and throws rock while a huge moon rises behind them.
+  - **Ghoul:** grave mounds heave up, one with an R6-style skull, and bone spurs claw out of the earth through drifting spores.
+  - **Wraith:** ice creeps across the floor, frost falls, and ice spikes burst up.
+  - **Human:** an iron hunter's sigil forges behind their back, and silver stakes slam down in a ring with sparks.
+  - **Priest:** a gilded cross rises behind them, a gilded halo settles over their head, and feathers fall.
+  - Erupting pieces stay out of the cutscene camera's view. The cutscene's own effects now use the nh_* sprites (no default Roblox smoke or sparkles), and Tier III leaves a 5-second afterglow.
+  - The "Evolved" message is now a banner that waits for the cutscene to end; before, the toast used to expire unseen behind it.
+- **Combat tag:** any combat hit tags both players for 30 seconds. A padlock emblem with a glowing skull keyhole, chains and barbed wire shows "DANGER" and a countdown; it stamps in, beats like a heart and flickers in the last 5 seconds.
+  - **"mb all"** (or "my bad all") in chat ends every fight you're in. Each person you traded hits with drops out of combat unless they're fighting someone else, and gets a small "X said mb" note.
+- **Capes in the Spin Shop:** the Vamp, Rogue and Fur Cape.
+  - Owned by the student you buy them on; the server stops anyone wearing a cape they haven't bought.
+  - Worn from Wardrobe → Outfit → Cape.
+  - They sway like cloth on every client: back when you run, against your turns, fluttering in the air, gently breathing at rest. Reduce Motion halves this.
+  - Product ids are still 0 ("not on sale yet").
+- **Body shape:** the Wardrobe's Look tab offers Standard or Female (your Female Body torso).
+- **Waypoint upgrade (P1-15):**
+  - An edge chevron with the distance points to off-screen targets, kept clear of the HUD.
+  - The marker shrinks with distance.
+  - Within 25 studs there's a ground ring and a light column, with one gold pulse when you arrive.
+
+### Changed
+- **Sprint is hold Left Shift** (it used to be double-tap W). Saved W bindings move over automatically. **Shift lock is Left Alt.**
+- **Colour wheel:** it no longer turns into a black disc on dark colours; the hues stay visible.
+- **Ghoul and Wraith looks:** the Ghoul's jaw stitches sat inside the head and now sit on the face. The Wraith's breath, wisps and frost were nearly invisible, especially by day, and are now clearly readable with the nh_* sprites.
+- **Quest tracker:** it no longer rescans the whole map every 0.25 s when a target is out of view.
+
+### Security
+- **The Female Body model contained a Studio-only phishing script.** It showed a fake "Roblox Studio" window with a command box and a copy button, built to trick a developer into running code. It was disabled and moved to `ServerStorage.NHQuarantine`; nothing else had been planted.
+
+### Verified (Studio, Play)
+- **Keys:** holding Shift sprints at speed 25, and mouse lock is bound to Left Alt.
+- **Stealth:** watcher "?" at 0.30 detection, "!" at 0.82, then the THROWN OUT stamp (client log, through the real stealth path). The custodian's torch is on at 21:30.
+- **Seals:** Dex shows "↺" for the failed Special Delivery (screenshot).
+- **Rite props:** votives start unlit and light at 0.43 brightness; the bell swings 10.8° and comes back exactly to rest; all 11 rite effects fire without errors.
+- **Tier-ups:** all six races played through the real Evolve path, with screenshots for every race. The "Evolved" banner arrived 0.2 s after the cutscene ended.
+- **Wardrobe:** the colour wheel, brightness bar and swatches all save; Female body saved and applied.
+- **Combat tag:** the tag and countdown showed after a real hit (screenshot), and "mb all" cleared it.
+- **Capes:** all three were measured on the body (the Fur Cape needed its own offset). While sprinting, the cape tip swings from 0.64 to 1.76 studs behind the torso.
+
+### Not yet
+- **Re-bake:** IceSpike, MoonDisc and BloodPool weren't re-baked with the latest finer veins and deeper moon craters; the PC ran out of memory.
+- **Two-player:** "mb all" between two real players, and other players' view of the tier-ups and capes.
+- **Owner's animation list:** idles, gym, emotes, fist moves and the rest still need their ids.
 ## [VFX 1.4.1] - 2026-10-31: Banners stay clear of conversations
 
 ### Fixed

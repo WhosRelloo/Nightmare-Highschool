@@ -1,0 +1,17 @@
+{
+  "_note": "Tier-up (evolution) sprites from make_evolve_sprites.py / nh_evolve_flipbooks.py, uploaded 2026-11-01. White art, tinted per race in Roblox.",
+  "evo_sigil_Vampire": "rbxassetid://71155214984713",
+  "evo_sigil_Werewolf": "rbxassetid://99971445815793",
+  "evo_sigil_Ghoul": "rbxassetid://79334903644638",
+  "evo_sigil_Wraith": "rbxassetid://98004675393234",
+  "evo_sigil_Human": "rbxassetid://85671257624535",
+  "evo_sigil_Priest": "rbxassetid://101056836189271",
+  "evo_bat_4x4": "rbxassetid://92253632642153",
+  "evo_feather_4x4": "rbxassetid://129780603815518",
+  "evo_claws": "rbxassetid://121739065632043",
+  "evo_streak": "rbxassetid://85345386625602",
+  "evo_spore": "rbxassetid://74644103733948",
+  "evo_frost_2x2": "rbxassetid://92233090974100",
+  "evo_godray": "rbxassetid://77357987513961",
+  "_pending": "evo_bat_4x4 was re-rendered with a stronger wingbeat AFTER this upload; re-upload it. Meshes (fbx/) need importing: BloodCrystal, IceSpike, BoneSpike, StoneChunk, HunterSigil, GoldHalo."
+}

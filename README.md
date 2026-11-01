@@ -16,4 +16,4 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**The bell rings (2026-10-31):** a school bell and period card, a "Spotted!" alert when a hall monitor chases you, and banners for quests, clues, level-ups, purchases and respawns. See [`CHANGELOG.md`](CHANGELOG.md), [`docs/VFX-Design-Bible.md`](docs/VFX-Design-Bible.md) and [the Discord post](updates/discord/2026-10-31-the-bell-rings.md).
+**Nightfall (2026-11-01):** watchers that notice you, all-new tier-up cutscenes with PBR set pieces, a combat tag (say "mb all" to make peace), capes in the Spin Shop, and Shift to sprint. See [`CHANGELOG.md`](CHANGELOG.md) and [the Discord post](updates/discord/2026-11-01-nightfall.md).
