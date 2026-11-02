@@ -207,17 +207,17 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 | P2-15 | **Tested (UI kit, UI 1.11)**: Yen chip | UI #5 | UI |
 
 ### P3: polish
-- EXP gain tick
-- result card reveal
+- EXP gain tick (**tested, 1.9.3**)
+- result card reveal (**tested, 1.9.3**)
 - dialogue slide-in (**implemented, UI 1.13**, with speaker rim; code-checked)
-- Strangers write-on
-- seated chime
-- discipline record stamp
-- Night Study candle warmth
+- Strangers write-on (**implemented, 1.9.3**; needs a two-player test)
+- seated chime (**tested, 1.9.3**)
+- discipline record stamp (**tested, 1.9.3**)
+- Night Study candle warmth (**tested, 1.9.3**)
 - timer pulse (**implemented, UI 1.13**: lesson timer, last 10 s)
 - prompt sounds and rejected state (**tested, UI 1.12**)
-- soft-edge soccer markers
-- basketball `nh_*` sparkles
+- soft-edge soccer markers (**implemented, 1.9.3**; the soft ring itself is tested)
+- basketball `nh_*` sparkles (**tested, 1.9.3**)
 
 ### P4: after everything else (user-scheduled)
 | ID | Effect / feature | Notes | Owner |
@@ -287,3 +287,8 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 - 2026-11-02: **Batch 4 complete (1.9.0).** P2-5, P2-6 and P2-13 are Tested.
   - **Found along the way:** the soccer client's `Local.Fx` name clash meant soccer never used the toolbox. It's fixed, so soccer now honours the shake and flash settings.
   - **Next:** Batch 5 (the P3 polish list). P2-2 and P2-3 still wait on D5.
+- 2026-11-02: **Batch 5 complete (1.9.3).** Every P3 item is in.
+  - **Tested:** EXP gain tick, result card reveal, seated chime, discipline stamp, Night Study warmth and basketball sparkles.
+  - **Implemented:** Strangers write-on (needs two players) and the soccer marker (built on the tested soft ring).
+  - **Toolbox:** `Fx.Ring` is now a soft decal ring, with a new `Fx.SoftDisc` helper. No effect in the game uses a hard Neon ring any more.
+  - **Left on the roadmap:** P2-2 and P2-3 (wait on D5) and P4-1 Nightmare Nights.

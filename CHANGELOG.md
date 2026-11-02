@@ -2,6 +2,45 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.9.3] - 2026-11-02: VFX Batch 5 (polish) and an anti-teleport check
+
+### Added
+- **Anti-teleport check (security #14 follow-up).**
+  - **What it does:** four times a second the server compares each player's position with the last one. A sideways jump faster than 100 studs a second (plus 25 studs of lag slack) or a climb faster than 60 studs a second (plus 20) counts as a teleport. The player is put back where they were and the attribute `NHTeleportFlags` counts up. Nobody is kicked. Falling is never limited.
+  - **What it lets through:** every move the game makes itself (entering school, admin bring and go-to, the veil, duels, sports set pieces, stealth thrown-out, the menu stage, respawn). Those are made by server scripts, and a server script setting a CFrame fires the root's changed signal on the server, which client physics never does. So none of those call sites needed changes.
+  - **Also skipped:** admins (level 1+; the attribute `NHAntiTeleportTest` turns that off for testing), players in the main menu, seated or dead players, anchored roots, and roots the server owns (downed or gripped).
+  - **Files:** `Services.Features.AntiTeleport` (new).
+- **School polish (VFX P3).** In `Controllers.World.SchoolFx` (new):
+  - **Seated chime:** when you take your seat in class, a soft desk bell plays and the clock HUD's "In class" line pops.
+  - **Discipline record stamp:** when your record gets worse, the new level (WARNING, DETENTION, PROBATION, SUSPENSION) slams in under the clock in red ink with the Stamp sound. When it gets better, a gold "Record improved" banner shows.
+  - **Night Study candle warmth:** while a Night Study lesson is up, the screen edges glow a flickering candle amber and the picture warms to sepia.
+  - Nothing fires on join, only on changes. All of it follows the Reduced motion setting.
+
+### Changed
+- **Soft rings everywhere (VFX P3).** `Fx.Ring` now draws the kit's soft ring art on a decal instead of a hard Neon cylinder. This covers every effect that uses it (goals, shocks, swishes, seals). A new `Fx.SoftDisc` helper lays any soft decal flat or facing a direction.
+- **Soccer landing marker:** a soft gold ring with a faint inner glow, instead of a flat Neon disc.
+- **Basketball:** a swish now uses the game's own ember sprites (plus gold shards for a three) and soft rings through the net, instead of default sparkles. The dunk shock is a soft ring.
+- **Sports result card reveal:** the card scales in. The winner's title takes their team colour. Rewards count up from zero. A drill personal best stamps in.
+- **EXP gain tick:** the "+N" pops, and three gold sparks run along the new part of the EXP bar.
+- **Strangers write-on:** when you learn someone's name, it writes itself on like ink (never on join).
+- **Files:** `Controllers.Fx`, `Gui.Soccer`, `Gui.Sports`, `Gui.Progress`, `Gui.Strangers`. Backups are in `ServerStorage.NH_Backup.Batch5_pre`.
+
+### Verified
+**[PT]** on save slot II:
+- **Anti-teleport:**
+  - a 150-stud client teleport and a 120-stud fly-up were both caught and put back;
+  - a server move of 80 studs, a 60 studs/s physics run for 1.5 s and a 120-stud fall were not flagged.
+- **SchoolFx:**
+  - the stamp shows PROBATION and cleans up, and the improved banner shows;
+  - the seated pop fires (it waits for the HUD's next tick);
+  - the Night Study tint and edges come on with a Night Study board and leave with it.
+- **Toolbox and sports:**
+  - flat and upright soft rings, which clean themselves up;
+  - swish: two rings, ember and shard emitters; dunk shock ring;
+  - the drill card scales from 0.82, counts the reward up to +40 and stamps PERSONAL BEST.
+- **EXP tick:** the "+60" popped to 1.3, with three sparks.
+- **Not tested live:** the Strangers write-on (it needs a second player) and the soccer marker during a real kick (it uses the same tested `SoftDisc`).
+
 ## [1.9.2] - 2026-11-02: Every NPC gets a real face and outfit
 
 ### Fixed

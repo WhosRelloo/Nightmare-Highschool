@@ -25,6 +25,7 @@ How each result was checked:
 | **Kills saved**: `Kills` (players) and `NPCKills` are added to player data, plus a Kills leaderboard column. Grip executions count. | `PlayerData`, `Functions.UpdateState`, `Player.Data`, `Features.KillTracker` | [PT-real] a B grip took NPCKills 0→1, and it survived a session restart |
 | **Main menu + save slots**: a cinematic PBR night-courtyard menu (spline camera, posed student in a crimson clock seal, Blender-rendered VFX), 3 save slots (each its own save; slot 1 = the old save), and character editing with camera cuts per Wardrobe tab, then ENTER SCHOOL | `Config.MainMenu`, `Services.Player.Slots`, `Services.Player.Data` (per-slot load), `Gui.MainMenu`, `workspace.MenuScene`, `Tools/vfx` | **[PT]** with real clicks and keys: intro → menu → slots → edit (Face-tab cut) → enter school; Continue. Camera smoothness measured (no stops between shots). 8 bugs found and fixed. **Menu 1.2 audit:** 10 more fixed (Settings input, plinth hair weld and race, Bloodline shot, remote errors, LastPlayed via UpdateState, name-filter race in Identity), all but the name race retested in Play. See Main-Menu.md. |
 | **UI Audit 1.0**:<br>• Every screen checked for small text, contrast, layering and edges<br>• Fixes in Progress, Compass, TopBar, Students, Identity, MainMenu, Loading<br>• Kit-owned findings sent to the UI kit session | `Gui.Progress` (`NHExpStrip`), `Gui.Compass`, `Gui.TopBar`, `Gui.Students`, `Gui.Identity`, `Gui.MainMenu`, `NHLoadingScreen` | **[PT-real]** audited in a 1287×600 playtest by day and night. Phones and gamepad not tested. See UI-Audit.md. |
+| **1.9.3**: VFX Batch 5 (P3 polish: soft rings and soccer marker, basketball sparkles, result card reveal, EXP gain tick, Strangers write-on, seated chime, discipline stamp, Night Study warmth); anti-teleport check (#14) | `Features.AntiTeleport` (new), `Controllers.World.SchoolFx` (new), `Controllers.Fx`, `Gui.{Soccer,Sports,Progress,Strangers}` | **[PT]** teleports caught; server moves, fast runs and falls pass; see CHANGELOG 1.9.3. Strangers write-on needs two players. |
 | **1.9.2**: every quest character, coach and staff NPC gets a full look (face art, outfit, skin, hair) instead of a hair on a recoloured rig | `Features.NpcLooks` (new), `Social.Npcs`, `School.HallMonitor`, `Quests.Stealth` | **[PT]** 27/27 NPCs have face art, a shirt and hair |
 | **1.9.1**: customization cameras frame the edited area in the free screen space (creator + wardrobe/barber stations, orbit around the student); barber's book split Male/Female (catalog `Group` from `RigSource`); delinquents/wolves moved to off-campus hangouts; barber moved to a nook; Fighter Crop and Fluffy Messy re-seated | `Functions.FrameCamera`, `Gui.MainMenu`, `Gui.Wardrobe`, `NHHairCatalog`, `Map.NHHangouts`, `Features.{Delinquents,WildWolves,AmbientNpcs}` | **[PT]** see CHANGELOG 1.9.1 |
 | **1.9.0**: VFX Batch 4 complete: evidence strings, link feedback and SOLVED stamp (P2-13), goal celebration and re-entrant GoalCam (P2-5), client Bloodrush aura (P2-6); soccer effects follow the player's settings again (`Local.Fx` name clash fixed) | `Gui.QuestJournal`, `Quests.Investigation`, `Gui.Soccer`, `Sports.Soccer` | **[PT]** strings, shake, stamp, aura, goal effects and light pulse. GoalCam checked by code reading (needs a live match). |
@@ -109,7 +110,7 @@ Nothing was changed in the production place.
 11. ~~The `UnPackets.Sprint` and `Block` handlers call `ActionManager[State]` with a string from the client.~~ **False positive.** `Packet.Actions` only encodes `Activate` or `Release`. The handlers now also check this explicitly.
 12. ~~`UnPackets.Action` lets a client activate any action module by name (free i-frames, the no-cooldown Template skill).~~ **Fixed** with an allow-list. Dodge also validates its direction now. [PT]
 13. ~~**Block and Sprint press/release travel over unreliable remotes.**~~ **Fixed (1.8.6).** Sprint, Block, Crouch and Equip use reliable `RemoteEvent`s. Attacks and dodges stay unreliable. [PT] Through the real client.
-14. ~~**No remote has rate limits or distance checks.**~~ **Fixed (1.8.6):** 15 events a second per input per player (`UnPackets`), and a 30-stud reach check on player hits (`DamageLogic.Processed`). [PT] **Still open:** an anti-teleport check (needs a design that allows entering school, admin bring and menus).
+14. ~~**No remote has rate limits or distance checks.**~~ **Fixed (1.8.6):** 15 events a second per input per player (`UnPackets`), and a 30-stud reach check on player hits (`DamageLogic.Processed`). [PT] **Anti-teleport added (1.9.3):** `Features.AntiTeleport` puts back jumps faster than 100 studs/s sideways or 60 up. Server-made moves fire the root's CFrame signal and are let through. [PT]
 
 **Tooling:**
 
@@ -133,11 +134,11 @@ Nothing was changed in the production place.
   - Claws still borrows the Fist attack clips.
   - Fist and Claws have no grip pair of their own (they use Katana's).
   - Exorcise and Soul Siphon use a placeholder kneel.
-- **Security follow-up:** an anti-teleport check (#14). It needs a design that allows entering school, admin bring and menus.
 - **Live-only checks:**
   - the Main Menu button's teleport;
   - two-player tests (combat movers, race effects, carry and grip on players);
-  - the GoalCam in a real match.
+  - the GoalCam in a real match;
+  - the Strangers name write-on (needs a second player).
 - **VFX:**
   - **Batch 5 (P3 polish):** EXP gain tick, result card reveal, Strangers write-on, seated chime, discipline record stamp, Night Study candle warmth, soft-edge soccer markers, basketball `nh_*` sparkles.
   - **P2-2 and P2-3:** wait on D5.
