@@ -2,6 +2,21 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.8.2] - 2026-11-02: NPCs get real hair and stand where they should
+
+### Added
+- **Every NPC wears one of the owner's catalog hairs:**
+  - The 12 ambient students get a random hair for their body type.
+  - Each quest character has a fixed hair: Vesper Crane long straight, Coach Mallory a low ponytail, Pip short, Ezra slicked back, Coach Varga, Dex spiky, Bruno a Baki cut, Coach Dunmore locs.
+  - The Hall Monitor, Mr. Hale and the Night Custodian have hair too. Delinquents already did.
+
+### Fixed
+- **Ambient students floated about 3 studs in the air.** The rig's pivot sits at its feet, not its root, so "pivot = floor + 3" put the feet 3 studs up. They're now placed by the root and their feet are snapped to the floor.
+- **Posed students** (lying, sit-ups, push-ups, kneeling in detention, leaning) are settled again once their animation is actually playing. The body rests on whatever is under each limb, so nobody hovers or sinks into the floor.
+- **Seated students** (sofa, armchair, desk chair) now sit on the cushion with their hips over the seat. They used to hang in mid-air in front of it or sink through it.
+- **Walls and props:** students are nudged out of walls and props after posing. The leaning kid was standing inside the lost-property bin, and another student was half inside a hallway wall.
+- **Floor checks** skip invisible colliders. The detention kid had been placed on top of an invisible trash-bin box.
+
 ## [1.8.1] - 2026-11-02: Wolves fight fair
 
 ### Changed
