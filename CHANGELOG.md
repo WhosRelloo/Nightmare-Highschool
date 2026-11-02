@@ -2,6 +2,46 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.8.6] - 2026-11-02: Known bugs cleared
+
+All seven open bugs from the Implementation-Status list are fixed and Play-tested.
+
+### Fixed
+- **#7 Animation tracks were never freed.**
+  - **The bug:** every `TrackService.Play` loaded a fresh track and kept it for the life of the character, so long-lived delinquents, wolves and dummies crept toward the animator's track limit, after which animations stop playing.
+  - **The fix:** each animator now keeps one loaded track per animation and reuses it. Older handles to the same animation are retired, and their stop listeners are disconnected. Everything is freed when the character goes away. Cleanup also remembers the Animator, so it works on destroyed characters.
+- **#8 The aerial heavy (Aerial M2) had no cooldown.**
+  - **The bug:** each weapon's aerial module set its cooldown under its own script name, at the `EndLag` marker (which raced the end of the move), while the gate checked `Aerial M2`.
+  - **The fix:** the cooldown is now set under `Aerial M2` when the move starts, for its end lag plus 2 s (the `ENDLAG_COOLDOWNS` every module declared but never used). A press during the cooldown does nothing instead of falling through to a ground M2 played mid-air.
+- **#13 Stuck sprint or block.** Sprint, Block, Crouch and Equip now travel over reliable remotes, so a dropped "Release" can't leave them on. Attacks and dodges stay unreliable, where a lost packet is just a missed press.
+- **#3 No health regeneration.** Once your combat tag runs out (30 s after your last exchange), you heal 2% of max health a second. There's no regen while tagged, downed or in the menu. It stacks with the low-health traits.
+- **#14 No rate limits or reach check:**
+  - **Rate limit:** each combat input is capped at 15 events a second per player; extras are dropped.
+  - **Reach check:** a player's hit can't land on a target more than 30 studs away.
+  - **Not yet covered:** a full anti-teleport check is a separate design job, because entering school, the admin "bring" and menus all teleport legitimately.
+- **#6 AI walked straight into walls.**
+  - **Line of sight:** NPCs check it to their goal every 0.25 s (rays at chest and knee height). With a clear line the chase is unchanged.
+  - **Pathing:** when blocked, they compute a path in the background (at most once a second, and only if the target moved), follow its waypoints, jump where the path says to, and face where they're walking.
+  - **Patrols and return home:** patrols use the same pathing, and an NPC with no patrol route walks back home when it loses its target.
+- **#9 Studio dummies:**
+  - Their loops ended only when health dropped *below* zero, so they never ended. They now stop at death or removal.
+  - A missing Humanoid skips that one dummy instead of aborting the rest.
+- **#10 Missed respawns.** `EntityLoader` now connects `CharacterAdded` for players who joined before it started.
+- **NPC setup:** every NPC made its own unprotected web call (`GetHumanoidDescriptionFromUserId`, always the same fallback id). It's now cached and wrapped in `pcall`, so NPC setup drops from 0.23 s to 0.015 s after the first.
+
+### Verified (Play)
+- **Track cache:**
+  - 16 M1 presses gave three full combos at unchanged timing.
+  - Each fighter keeps only 4 loaded tracks.
+  - The cache is freed on removal.
+- **Aerial M2:** fires, is refused straight after, and fires again after the cooldown, for Katana, Fist and Claws.
+- **Sprint and block:** on and off through the real client path, over `RemoteEvent`s.
+- **Regen:** +2.3 HP/s on a 117 HP student, and nothing while tagged.
+- **Rate limit:** 50 M1 packets in about 1.7 s, 30 reached the server.
+- **Reach:** a hit at 5 studs lands, and one at 40 studs is refused.
+- **Pathing:** an AI fighter went around a 40-stud wall and reached its target in 2.1 s.
+- **Respawn:** a respawned Claws student is set up in `Live` and re-equipped.
+
 ## [1.8.5] - 2026-11-02: Delinquents go down
 
 ### Changed
