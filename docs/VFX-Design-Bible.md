@@ -281,4 +281,4 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 - 2026-11-02: **1.7 to 1.8.4 (no new P-items).** These releases were content, admin and combat work. The only feedback additions:
   - **1.8.4:** a `Slash` entry in the hit and block effects and sounds (`Assets.Effects.{HitType,BlockHit}`, `Assets.Sounds.{Hit,SwingSFX,BlockHit}`) so Claws hits register. It reuses the Blood set until bespoke slash art exists.
   - **1.8.1:** the wolves' red attack tell (a Highlight plus a PointLight on the head).
-  - **Still pending:** Batch 4 (P1-18 onward).
+  - **Still pending:** Batch 4, the P2 signature experiences (P2-2 and P2-3 wait for decision D5).
