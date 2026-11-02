@@ -166,3 +166,10 @@ Everything is found by **attributes**, so the real map just needs parts with the
 - More cases using the same evidence board
 - Rivalry quests that use the duel ring ("Bruno's rival wants a rematch")
 - Teacher NPCs in classrooms as watchers for cheating quests
+
+## Evidence board effects (1.9.0)
+- **Strings:** each insight draws a crimson thread with pins between its two clue cards.
+- **New link:** a confirmed link animates its string in and types out the insight.
+- **Wrong pair:** both cards shake.
+- **Solving a case:** stamps SOLVED over the journal.
+- **Server events:** `Investigation` fires NHFx `LinkHit`, `LinkMiss` and `Solved`.

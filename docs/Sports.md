@@ -263,3 +263,11 @@ Built to play close to a Blue Lock-style Roblox soccer game the user supplied as
 | "Out of gas" showed to everyone; intercepted passes counted as assists | The message goes to the tired player only; interceptions clear the last pass |
 | Stamina did nothing in either sport | Running out stops sprinting |
 | Looping animation clips (the slide) kept playing | Every clip plays once and stops with its move |
+
+## Goal and Bloodrush effects (1.9.0)
+- **Goal:**
+  - an upright team-colour flare in the goal mouth, three net rings and shards off both posts;
+  - the pitch lights pulse once;
+  - spectators within 150 studs see it.
+  - **GoalCam:** re-entrant, and it eases back behind you.
+- **Bloodrush aura:** drawn on each client from the character attribute `SportRush`. It shows race-colour embers and two wisp ribbons on the torso, and flickers out over the last 1.5 s. Colours come from `Lineage`.

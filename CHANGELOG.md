@@ -2,6 +2,40 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.9.0] - 2026-11-02: VFX Batch 4 complete (case files, goals, Bloodrush)
+
+### Added
+- **Evidence string and SOLVED (P2-13)** in the Journal's Case Files.
+  - **Strings:** each insight is a crimson thread with pins, joining its two clue cards down the board's left edge.
+  - **New link:** a confirmed link draws its string in, and the insight text types out.
+  - **Wrong pair:** both cards shake and flash red.
+  - **Solving the case:** the journal darkens and a crimson SOLVED stamp slams in with the case name.
+  - **Files:** `Investigation` sends NHFx `LinkHit` / `LinkMiss` / `Solved`, drawn by `Controllers.Gui.QuestJournal`.
+- **Goal celebration (P2-5):**
+  - an upright team-colour flare and light in the goal mouth, three net rings and shards off both posts;
+  - the pitch lights pulse for a second;
+  - spectators within 150 studs see it.
+  - **GoalCam:** now re-entrant, and it eases back behind you instead of snapping.
+- **Bloodrush revamp (P2-6).** The aura is drawn on every client from the `SportRush` attribute, so late joiners see it.
+  - **Look:** race-colour embers and two wisp ribbons locked to the torso, with nothing trailing behind you. It flickers out over the last 1.5 s.
+  - **Colours** now come from `Lineage`. The old `Config.Sports.RaceAura` disagreed with it.
+  - **Server:** the default-texture sparkle emitter is no longer created.
+
+### Fixed
+- **Soccer effects ignored your settings.** The soccer client's effect handler was also called `Local.Fx`, which replaced the shared FX toolbox getter. Every soccer shake, flash and ring ignored your camera-shake and reduced-flashing settings and used a local fallback. The handler is now `Local.OnFx`.
+
+### Verified
+**[PT]**
+- **Case files (slot II, solved case):** 3 threads and 6 pins drawn. The wrong pair shook both cards. The stamp slammed from 1.8 with a slight overshoot, the journal darkened to 45%, it held about 2 s, then faded.
+- **Bloodrush:** the aura appeared, flickered in the last 1.5 s, then cleared.
+- **Goal by the west goal:** flare, light, 3 rings, both post shards, and the pitch lights went 2.2 → 3.96 → 2.2.
+- **Not tested in Play:** the GoalCam changes only run in a live match, so they were checked by code reading.
+
+### Batch 4 status
+- **Tested:** P2-1, P2-4, P2-5, P2-6, P2-7, P2-8, P2-9, P2-10, P2-12 and P2-13.
+- **Done earlier (UI kit):** P2-11, P2-14 and P2-15.
+- **Waiting on decision D5:** P2-2 and P2-3.
+
 ## [1.8.9] - 2026-11-02: Painted sigils, and no more prisoner idle
 
 ### Added
