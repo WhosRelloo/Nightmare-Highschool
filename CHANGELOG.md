@@ -2,6 +2,75 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.10.0] - 2026-11-02: The Locker, the concession stand, study groups, the Report Card, and a school that keeps its own timetable
+
+### Added
+- **NPC daily schedules.** 14 background students now live by the timetable (`Services.Features.Schedules`). They keep the same faces all day.
+  - **Night and early morning:** off campus.
+  - **Before school:** they walk in from the gate and mill about the hallway.
+  - **Class periods:** six of them take seats in that period's room, which leaves chairs free for players. The rest are "in the east wing".
+  - **Passing and break:** the hallway, walking, chatting and leaning on the wall.
+  - **Lunch:** the concession stand. Six queue at the counter and the rest eat in a loose arc in front of it.
+  - **After school:** each student has a club (gym, field, pitch or archive). A third go home from 14:00.
+  - **Evening:** they drift home, and everyone is gone by 19:00.
+  - **How they move:** PathfindingService, sized for the 8-stud doorways. If there's no path they stay put rather than walk through walls.
+  - **Players:** the students never collide with players (collision group `NHWalkers`).
+  - **Animations:** Roblox's default R6 walk and idle, and the owner's sitting, leaning and eating clips.
+- **The concession stand.** Mrs. Okada's snack kiosk sits just outside the west end of the main hallway (`Services.Features.Concession`, compass "Concession Stand").
+  - **Build:** a striped awning, a CONCESSIONS sign, a menu board, snacks on the counter and two lanterns.
+  - **Menu:** hold E at the counter to open it, then Buy 1 or Buy 5.
+  - **Snacks** (`Config.Items`):
+    - **Food heals over a few seconds**, half as much while you're combat-tagged, and shares a 12 s "full" cooldown: Onigiri ¥25, Melon Bread ¥40, Yakisoba Bun ¥80, Night Bento ¥200.
+    - **Drinks give one snack buff at a time:** Ramune (guard), Barley Tea (stealth), Canned Coffee (class and quest EXP), Red Lantern (damage and health).
+    - **Balance:** every buff stays under one Common gear piece's budget.
+- **The Locker (G, or the new top-bar button).** Your inventory, laid out like the owner's reference (`Controllers.Gui.Locker`).
+  - **Left:** your character, with equipment slots around it: Head, Face and Neck gear, your Weapon class and your Snack buff. Under it, the Gear Scale adds up what your worn gear gives.
+  - **Right:** the Backpack, with tabs All, Gear and Snacks. Each slot shows the item in 3D and has a hover tooltip.
+    - **Snacks:** Use, To pouch or Unpin, Drop (with a confirm).
+    - **Gear:** shows whether you're wearing it. You still change gear at a wardrobe.
+  - **Pouch:** your four hotbar snacks.
+  - **Hotbar:** pinned snacks are real Tools, so they sit on the existing hotbar. Equip one and click to eat or drink it.
+  - **Save data:** `PlayerData.Inventory` and the `SetInventory` action.
+- **Study groups (U, or the new top-bar button).** A party of up to four (`Services.Features.Party`, `Controllers.Gui.StudyGroup`).
+  - **Inviting:** invite anyone in the server. You only see names you've learned (Strangers). The invite card has Accept, Decline and a 20 s fuse.
+  - **The panel:** each member's race, level, live health and posture, a crown for the leader, and Remove for the leader.
+  - **Shared EXP:** +10% EXP while a member is within 150 studs, and members nearby get a quarter of your combat EXP.
+  - **Ending:** leaving, going back to the menu or leaving the server takes you out. A group of one breaks up.
+- **The Report Card (L, or the Record button).** A new stats panel that replaces the old record (`Controllers.Gui.StatsPanel`).
+  - **Report Card:** your name, race and tier, level and EXP, points to spend, and Might, Grit and Wits, each with what one point gives and a +1 button.
+  - **Abilities:** everything adds up to max health, damage, toughness, guard, night and full-moon power, healing, stealth, and every EXP bonus.
+  - **Record:** takedowns, attendance, discipline, and where every bonus comes from (clan, race passive and drawback, traits, gear, snack).
+- **Top bar:** two new buttons, Locker [G] and Study Group [U]. The Record tooltip now reads "Report Card [L]". G, U, L and H are reserved in the keybind settings.
+
+### Fixed
+- **Gear chests lay on their side.** The imported chest mesh was Z-up, so every chest spawned lying on its back. The template was turned upright and the lock now faces the room, with the back against the nearest wall. The model's pivot was reset so placement keeps it upright, and the lid still hinges open from its back edge.
+  - **Backup:** `ServerStorage.NH_Backup.Systems_pre.NHChestModel_preUpright`.
+
+### Changed
+- **Progression:** active snack buffs count as an effect source. Study group bonus and share are part of `Award`. The sheet carries `Record` (name, attendance, discipline, classes), plus `GearText` and `SnackText`.
+- **Backups** of every patched module are in `ServerStorage.NH_Backup.Systems_pre`.
+
+### Verified
+**[PT]** on save slot II:
+- **Inventory:**
+  - Granted snacks show up in the hotbar with counts.
+  - Ramune's buff appears on the sheet and in combat attributes, and a second sip is refused.
+  - Melon Bread heals, and the "full" cooldown holds.
+  - Buying from too far away is refused. Buying at the counter took ¥50 for two Onigiri.
+- **Schedules:**
+  - In a planned Period 1, 5 of 6 students were seated at R102's desks facing the chalkboard within 40 s; the sixth was still walking from a club.
+  - In a planned lunch, 13 or 14 students were within 22 studs of the stand.
+  - The evening plan sent the even-numbered students home.
+- **Panels:**
+  - The Locker, the stand menu, the Report Card and the Study Group panel render from kit pieces, with screenshots checked.
+  - The Study Group's solo paths work: inviting yourself or someone absent is refused, an expired invite is refused, and leaving with no group does nothing.
+- **Chests:** placed chests stand upright in Play, and the lid opens correctly.
+- **Restored:** slot II's discipline (back to Detention, 8 points; earlier playtests had run into class time and logged 3 absences), Yen (¥180) and inventory (empty).
+
+### Not tested yet
+- A real two-player study group: invites, shared EXP, the live health bars of another member.
+- A full in-game day of schedules on the live clock. Periods were planned through `Schedules.PlanForTests` so the clock didn't mark the test student absent.
+
 ## [1.9.3] - 2026-11-02: VFX Batch 5 (polish) and an anti-teleport check
 
 ### Added

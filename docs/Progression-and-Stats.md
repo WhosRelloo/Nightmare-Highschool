@@ -94,3 +94,8 @@ Effects from stats, your clan perk and your lineage traits are added together, t
 - Two players seeing each other's level.
 
 **Race tiers:** the tier is stored by Lineage (UI kit session) from total takedowns (0 / 25 / 100) when a save loads. Updating it mid-session as kills come in is left to Lineage.
+
+## The Report Card (1.10.0)
+The L panel is now `Controllers.Gui.StatsPanel`; see [Inventory and study groups](Inventory-and-Study-Groups.md#the-report-card-l).
+- **New effect sources:** the active snack buff (`Features.Inventory.Effects`).
+- **Study groups:** +10% EXP while a member is near, and a 25% share of your combat EXP to nearby members (`Features.Party`, called from `Award`).

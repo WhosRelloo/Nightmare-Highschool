@@ -72,3 +72,22 @@ A 40-minute class is about 3 minutes 20 seconds of real time, and a passing peri
 1. ~~Classrooms and attendance~~: **done**, see `Attendance-and-Discipline.md`. Subjects and rooms per period are in `Config.Classes`. The HUD shows your current or next class and marks the room door.
 2. **NPC schedules** driven by `PeriodChanged`.
 3. **Timetable UI** (a full schedule view) and waypoints to the next class.
+
+## NPC daily schedules (1.10.0)
+`Services.Features.Schedules`: 14 background students follow `Config.SchoolSchedule` segments and `Config.Classes` rooms.
+
+| Segment | What they do |
+|---|---|
+| Night, Morning | off campus |
+| Before School | walk in from the gate (near the spawn) and mill about the hallway |
+| Class | students 1 to 6 sit in that period's room (the 6 chairs nearest the door), the rest leave for "the east wing" |
+| Passing, Break | hallway: walk, chat, lean on the wall |
+| Lunch | the concession stand: 6 queue at the `NHLunchSpot` markers, the rest stand in an arc and eat |
+| After School | each student's club (gym, field, pitch, archive); a third go home from 14:00 |
+| Evening | the even-numbered students go home at once, everyone by 19:00 |
+
+- **Movement:** PathfindingService with agent radius 1, because the 8-stud doorways have props beside them. With no path, a student stays put.
+- **Collisions:** collision group `NHWalkers` doesn't collide with players, other walkers or sports balls.
+- **Each model:** `Role = "Ambient"`, `NHScheduled = index`, and `NHActivity` (what they're doing).
+- **API:** `Schedules.Pause(on)`; `Schedules.Debug()`; `Schedules.PlanForTests(kind, name?, hour?)` plans a period without moving the clock.
+- **Test note:** moving the clock into a class period marks Studio test players absent, so use `PlanForTests`.
