@@ -138,5 +138,17 @@
     "RoughnessMap": "rbxassetid://139979198778574",
     "NormalMap": "rbxassetid://121770734792967",
     "MetalnessMap": "rbxassetid://100494834326003"
+  },
+  "GearChest": {
+    "fbx": "art/props/fbx/GearChest.fbx",
+    "pieces": [
+      "GearChest_Main",
+      "GearChest_Lid (origin on the back hinge)"
+    ],
+    "color": "rbxassetid://106558472108974",
+    "normal": "rbxassetid://110464632301354",
+    "roughness": "rbxassetid://120954492253739",
+    "metalness": "rbxassetid://94177547932526",
+    "note": "Loot chest for 3D gear (Services.Features.GearChests). Import the FBX, then it becomes ServerStorage.NHChestModel."
   }
 }

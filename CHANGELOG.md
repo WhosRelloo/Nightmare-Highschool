@@ -2,6 +2,44 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.7] - 2026-11-01: Claws, wolves, gear chests, living hair and faces
+
+### Added
+- **Claws class:** the owner's claws idle and walk, a slashing M1 set with its own reach, and two skills:
+  - **Slash Barrage** (Z): five quick hits.
+  - **Ripper's Waltz** (X): a startup, a paired grab, a victim animation and the finisher.
+- **Wolves (the owner's rigged wolf, used both ways):**
+  - **Wild wolves** roam the Boiler Yard at night, three at a time. They bite, leap, howl to call the pack, stagger and guard-break. Each one is worth 40 EXP and ¥15.
+  - **Werewolf form:** at Tier 2 or higher, T turns a Werewolf into the wolf, with its own bite and leap.
+- **3D gear (40 pieces):** masks, scarves, hats, chains and more, each with a rarity and small, capped stat bonuses.
+  - Found in **gear chests** around the school, which respawn every 8 minutes. A duplicate pays out Yen instead.
+  - Also sold in the School Store's Accessories tab, with a try-on preview.
+- **Gear Chest model:** dark oak with iron straps and a velvet bed of loot (R6 skull, tomes, candle, dagger, coins, crucifix). It's built in Blender with PBR textures. The game uses a stand-in until it's imported.
+- **Living hair:** all 35 of the owner's catalog hairs are rigged with bone chains per lock.
+  - Roots and hair lying on the scalp never move; only the hanging strands sway, with movement, turns, falls and wind.
+  - Rigged with `tools/hair-rig/nh_hair_autorig.py` from the owner's OBJ exports. It's fitted to the R6 head through each hair's HairAttachment.
+- **Faces blink:** every 2.5 to 6 seconds (sometimes twice), using lids drawn per eye shape. Faces squint while you're combat-tagged.
+- **10 more brow styles:** Sleek, Flat Thick, High Arch, Sharp Arch, Worried, Angry, Feathered, Wisp, Tapered and Rounded, each fitted to every eye shape (21 styles in all).
+- **NPC life:** sitting, thinking, chilling, leaning and barbell idles for ambient students. A gym regular now lifts.
+- **Body Slam** has its victim animation.
+- **Class locker:** a locker in the hallway lets you switch class (60 second cooldown).
+
+### Changed
+- **The Wardrobe is outfit only.** Hair and hair colour moved to the **Barber** NPC, who has a book of every hair.
+- The "Use my Roblox outfit" toggle and the Roblox face option are gone. Old saves fall back to standard eyes.
+- **Fist touch-ups:** the aerial M1 hovers, then dives with a tall hitbox that lands reliably. The running attack lunges and sweeps twice, and hits harder.
+- Catalog hairs are sized down 12% to fit the head.
+
+### Fixed
+- Rigid hair no longer swings as one piece from the root.
+- Grabs always release both characters, even if the grab is interrupted.
+- The "NH dummy" no longer shows on the main menu.
+
+### Notes
+- The aerial dive's downward speed isn't visible yet. The tall hitbox covers it.
+- Exorcise and Soul Siphon still use the placeholder kneel clip.
+- The owner's raw hair exports (`Hair OBJ's/`) and the rigged FBX files (`Hair FBX/`) stay out of git.
+
 ## [1.6] - 2026-11-01: Fists, race actions, enrollment and the School Store
 
 A combat class, race-specific finishers, a new-student flow, and a batch of requested fixes.

@@ -7,7 +7,9 @@ SHAPES = [("sharp", "Sharp"), ("hooded", "Hooded"), ("fierce", "Fierce"), ("doe"
           ("sleepless", "Sleepless"), ("cat", "Cat"), ("gentle", "Gentle"), ("calm", "Calm")]
 FORMS = ["base", "vampire", "wolf", "ghoul", "wraith", "vampire2", "ghoul2"]
 BROWS = [("straight", "Straight"), ("arched", "Arched"), ("angled", "Angled"), ("soft", "Soft"), ("thick", "Thick"),
-         ("thin", "Thin"), ("furrowed", "Furrowed"), ("raised", "Raised"), ("bold", "Bold"), ("heavy", "Heavy"), ("bushy", "Bushy")]
+         ("thin", "Thin"), ("furrowed", "Furrowed"), ("raised", "Raised"), ("bold", "Bold"), ("heavy", "Heavy"), ("bushy", "Bushy"),
+         ("sleek", "Sleek"), ("flatthick", "Flat Thick"), ("higharch", "High Arch"), ("sharparch", "Sharp Arch"), ("worried", "Worried"),
+         ("angry", "Angry"), ("feathered", "Feathered"), ("wisp", "Wisp"), ("tapered", "Tapered"), ("rounded", "Rounded")]
 MOUTHS = [("neutral", "Neutral"), ("smile", "Smile"), ("flat", "Flat"), ("smirk", "Smirk"), ("hint", "Hint"), ("grin", "Grin"),
           ("small", "Small"), ("ooh", "Ooh"), ("open", "Open"), ("talk", "Talk"), ("laugh", "Laugh"), ("shout", "Shout"),
           ("pout", "Pout"), ("frown", "Frown"), ("scowl", "Scowl"), ("sulk", "Sulk"), ("grimace", "Grimace"),

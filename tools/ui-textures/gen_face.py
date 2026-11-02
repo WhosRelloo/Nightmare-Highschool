@@ -108,9 +108,22 @@ BROWS = {
     "bold":     dict(arch=13, peak=.58, sharp=False, tilt=2, thick=25, lift=2),
     "heavy":    dict(arch=4, peak=.5, sharp=False, tilt=5, thick=30, lift=0),
     "bushy":    dict(arch=8, peak=.5, sharp=False, tilt=0, thick=26, lift=4, bushy=True),
+    # 2026-11-01: more range in thickness and arch (owner request)
+    "sleek":    dict(arch=24, peak=.6, sharp=False, tilt=0, thick=7, lift=4),
+    "flatthick": dict(arch=2, peak=.5, sharp=False, tilt=2, thick=22, lift=1),
+    "higharch": dict(arch=28, peak=.58, sharp=False, tilt=0, thick=17, lift=1),
+    "sharparch": dict(arch=22, peak=.7, sharp=True, tilt=0, thick=9, lift=3),
+    "worried":  dict(arch=9, peak=.42, sharp=False, tilt=-12, thick=11, lift=5),
+    "angry":    dict(arch=3, peak=.62, sharp=True, tilt=22, thick=16, lift=0),
+    "feathered": dict(arch=12, peak=.52, sharp=False, tilt=0, thick=17, lift=3, softedge=True),
+    "wisp":     dict(arch=10, peak=.5, sharp=False, tilt=0, thick=4, lift=7),
+    "tapered":  dict(arch=15, peak=.62, sharp=False, tilt=1, thick=14, lift=3),
+    "rounded":  dict(arch=17, peak=.5, sharp=False, tilt=0, thick=13, lift=3),
 }
 BROW_LABEL = dict(straight="Straight", arched="Arched", angled="Angled", soft="Soft", thick="Thick", thin="Thin",
-                  furrowed="Furrowed", raised="Raised", bold="Bold", heavy="Heavy", bushy="Bushy")
+                  furrowed="Furrowed", raised="Raised", bold="Bold", heavy="Heavy", bushy="Bushy",
+                  sleek="Sleek", flatthick="Flat Thick", higharch="High Arch", sharparch="Sharp Arch", worried="Worried",
+                  angry="Angry", feathered="Feathered", wisp="Wisp", tapered="Tapered", rounded="Rounded")
 
 def brow_profile(t, soft):
     p = (0.72 + 0.28 * smooth(0.0, 0.22, t)) * (1 - 0.86 * smooth(0.5, 1.0, t))
@@ -434,11 +447,17 @@ if __name__ == "__main__":
         eyes_solid = np.max([eye_alpha(nm) for nm in eye_names[sh]], 0) > 0.8
         near = np.asarray(Image.fromarray((eyes_solid * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(5)), np.float32) > 0
         for j, style in enumerate(BROWS):
+            if os.environ.get("NEW_BROWS") and style not in os.environ["NEW_BROWS"].split(","):
+                continue
             out = render_brow(sh, style, xs, top, 100 + k * 13 + j)
             bad = int(((out[..., 3] > 0.08) & near).sum())
             if bad:
                 report.append(f"BROW OVERLAP {style}_{sh}: {bad}px")
         print("brows ok", sh, "variants", n, flush=True)
+    if os.environ.get("NEW_BROWS"):
+        print("\n".join(report) if report else "NO OVERLAPS")
+        print("done (new brows only)")
+        sys.exit(0)
     # (the per-mouth pixel check below is the real guarantee; this is just an early warning)
     if MCY - 20 * MOUTH_SCALE - MOUTH_GAP < lowest:
         report.append(f"MOUTH MAY BE TOO HIGH: lowest eye pixel {lowest:.0f}")
