@@ -2,6 +2,25 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.8] - 2026-11-02: The Headmaster's Desk (admin panel)
+
+### Added
+- **Admin panel, F3 for staff.** It's built only from the game's UI kit (Panel, TabBar, Buttons, Search, Toggles, Sliders, Section headers) with the school crest.
+  - **Who can open it:** the group's rank 254+, the `Config.Cmdr` admin and owner lists, and anyone in Studio. Everyone else gets nothing, not even a hint that it exists.
+  - **Server-side checks:** every action is checked on the server, rate-limited and logged. Staff can't target a higher rank.
+  - **Students list:** search, health, race, ping, and owner, staff, muted, frozen and god tags.
+  - **Moderation:** warn (with reason), mute and unmute (blocks chat on every channel), freeze, send to detention, spectate, kick, and ban (Roblox ban API, in days; permanent bans are owner-only), plus unban by UserId.
+  - **Student:**
+    - Heal, revive, god mode, transform, bring, go to, clear disciplinary record, kill, walk-speed slider.
+    - Give Yen (over ¥100k needs an owner), Combat EXP, lineage spins or a name change.
+    - Give any of the 40 gear pieces (listed by rarity colour).
+  - **World:** set the school clock (or Morning, Noon, Midnight), clock speed, a server-wide announcement, and shut down the server (owner-only).
+  - **Spawns:** a delinquent crew, a wolf pack (night only), a sparring partner, and clear all enemies.
+  - **Self:** fly (WASD, Space, Ctrl, Shift for speed), noclip, ESP (names and health through walls), Ctrl+click teleport, invisible, heal, stop spectating.
+  - **Server:** students, uptime, physics FPS, memory, school clock, enemy and wolf counts, and the staff log (last 200 actions).
+  - **Destructive buttons** (Kick, Ban, Kill, Shutdown, Clear enemies) need a second click within 3 seconds.
+- Other UI can open the desk by setting the player attribute `NHAdminOpen` (true, false, or a tab number). The server still decides who gets in.
+
 ## [1.7.1] - 2026-11-01: Delinquents and the real Gear Chest
 
 ### Added
