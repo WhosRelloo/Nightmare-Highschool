@@ -2,6 +2,22 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.7.1] - 2026-11-01: Delinquents and the real Gear Chest
+
+### Added
+- **Delinquents (PVE):** crews of street delinquents hang around the Field, the Pitch and the Boiler Yard, and pick fights with anyone who gets close.
+  - Roles:
+    - **Delinquent:** 100 HP, worth 30 EXP and ¥10.
+    - **Delinquent Brute:** 170 HP, slower, worth 45 EXP and ¥15.
+    - **Gang Leader** (rare): 220 HP, sharper, worth 85 EXP and ¥30.
+  - They use the Fist moveset through the regular combat AI, dress in street clothes (leather jackets, flannels, band tees, ripped jeans) and wear the rigged catalog hairs.
+  - Up to 6 at a time. Crews refill every 20 seconds, never within 45 studs of a student.
+  - Tag a part `NHDelinquentSpawn` to add a hangout.
+- **Combat AI skill (`Config.Skill`, 0 to 1):** scales how often an AI blocks, parries, dodges, feints and uppercuts. The sparring demon stays at 1. Delinquents are 0.12 to 0.45.
+
+### Changed
+- **Gear chests use the owner-imported model** (`ServerStorage.NHChestModel`, PBR). The lid now swings up and back on its rear hinge, showing the loot inside.
+
 ## [1.7] - 2026-11-01: Claws, wolves, gear chests, living hair and faces
 
 ### Added
