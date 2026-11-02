@@ -2,6 +2,31 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.8.5] - 2026-11-02: Delinquents go down
+
+### Changed
+- **Delinquents go down like students instead of dying outright.** A beaten delinquent drops to the ground for 15 s. In that time you can:
+  - **Carry** them (V).
+  - **Grip** them (B) to finish them.
+  - Use your **race finisher** (N): drain, eat, siphon or exorcise.
+  - Leave them, and they get back up at 25% health and pick the fight back up.
+- **Rewards:** a finish pays the finisher the delinquent's EXP and Yen and counts as an NPC kill.
+- **Interrupting:** like any grip, getting hit by the rest of the crew interrupts it. Clear the crew first, or carry the body away.
+
+### Fixed
+- **Downed AI enemies (delinquents, the sparring partner) kept crawling** toward wherever they were walking when they went down. They now stay where they fall.
+
+### Not changed
+- **Wild wolves still die outright.** The grip and finisher animations are made for people, not a four-legged wolf.
+
+### Verified
+**[PT]** On an isolated delinquent, using the spare save slot (restored afterwards):
+- Downed with no drift.
+- Carried on the shoulder with the "[V] Drop [B] Grip" hint, and dropped.
+- Grip finish at 3.0 s.
+- Werewolf race finisher at 4.2 s: +¥10 and +1 NPC kill.
+- A delinquent left alone got back up after 15.3 s.
+
 ## [1.8.4] - 2026-11-02: Fist and Claws combat audit, fluid movement, back to menu
 
 ### Fixed

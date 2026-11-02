@@ -53,7 +53,11 @@ Each attack's movement comes from one place, so nothing fights it:
 
 ### Enemies that use this code
 - **Delinquents** (`Features.Delinquents`) fight with the Fist moveset through the regular combat AI. `Config.Skill` (0 to 1) scales how often they block, parry, dodge, feint and uppercut.
-- **Wild wolves** (`Features.WildWolves`) run their own fixed pattern: Bite, Bite, hop back, Leap. A red tell comes 0.5 s before a bite and 0.85 s before a leap, a 1.4 s punish window follows the leap, and only one wolf attacks a student at a time.
+  - Since 1.8.5 they can be **downed** like students (`Config.Downed.NPCsCanBeDowned`), so they can be carried (V), gripped (B) or finished with a race action (N).
+  - A downed delinquent left alone gets back up after 15 s at 25% health.
+  - A finish, or any kill, pays the killer through `AI.NPCDefeated` → `Downed.GetKiller`.
+- **Downed AI enemies stop where they fall.** `NPCController` clears the last walk target once, then idles while `Downed`, `Carried` or `Gripped`.
+- **Wild wolves** (`Features.WildWolves`, `NoDowned`: they die outright, because the grip animations are for people) run their own fixed pattern: Bite, Bite, hop back, Leap. A red tell comes 0.5 s before a bite and 0.85 s before a leap, a 1.4 s punish window follows the leap, and only one wolf attacks a student at a time.
 
 ### Verified (1.8.4, dummy fighters, Play)
 - **M1 combo hit times:**
