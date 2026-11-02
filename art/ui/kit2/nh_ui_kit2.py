@@ -29,6 +29,10 @@ os.makedirs(OUT, exist_ok=True)
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 WHICH = argv[0] if argv and not argv[0].startswith("--") else "all"
 SAMPLES = int(argv[argv.index("--samples") + 1]) if "--samples" in argv else 48
+SCALE = float(argv[argv.index("--scale") + 1]) if "--scale" in argv else 1.0
+if SCALE != 1.0:
+    OUT = os.path.join(HERE, "out@%gx" % SCALE)
+    os.makedirs(OUT, exist_ok=True)
 
 
 def reset(rx, ry):
@@ -40,7 +44,7 @@ def reset(rx, ry):
     sc.cycles.samples = SAMPLES
     sc.cycles.use_denoising = True
     sc.render.film_transparent = True
-    sc.render.resolution_x, sc.render.resolution_y = rx, ry
+    sc.render.resolution_x, sc.render.resolution_y = int(rx * SCALE), int(ry * SCALE)
     sc.render.image_settings.file_format = "PNG"
     sc.render.image_settings.color_mode = "RGBA"
     sc.view_settings.view_transform = "AgX"
@@ -74,18 +78,76 @@ def lights(sc, s):
     area((0, s * 0.6, s * 0.3), 30 * s, (0.95, 0.25, 0.3), s)            # crimson rim
 
 
+def add_bump(mat, kind, strength, scale, distance=0.02):
+    """layer a procedural relief on top of a material's existing normal (hammered iron, tooled leather, scratches)."""
+    nt = mat.node_tree; N = nt.nodes; L = nt.links
+    bs = next(n for n in N if n.type == "BSDF_PRINCIPLED")
+    prev = bs.inputs["Normal"].links[0].from_socket if bs.inputs["Normal"].is_linked else None
+    tc = N.new("ShaderNodeTexCoord")
+    if kind == "hammered":
+        v = N.new("ShaderNodeTexVoronoi"); v.feature = "SMOOTH_F1"; v.inputs["Scale"].default_value = scale
+        L.new(tc.outputs["Object"], v.inputs["Vector"]); h = v.outputs["Distance"]
+    elif kind == "tooled":
+        # a damask-like tooling: voronoi cell borders (stamped lines) over a fine pebbled grain
+        v = N.new("ShaderNodeTexVoronoi"); v.feature = "DISTANCE_TO_EDGE"; v.inputs["Scale"].default_value = scale
+        L.new(tc.outputs["Object"], v.inputs["Vector"])
+        ramp = N.new("ShaderNodeMapRange"); ramp.inputs["From Min"].default_value = 0.0; ramp.inputs["From Max"].default_value = 0.06
+        L.new(v.outputs["Distance"], ramp.inputs["Value"])
+        g = N.new("ShaderNodeTexNoise"); g.inputs["Scale"].default_value = scale * 30; g.inputs["Detail"].default_value = 6
+        L.new(tc.outputs["Object"], g.inputs["Vector"])
+        mx = N.new("ShaderNodeMath"); mx.operation = "MULTIPLY_ADD"; mx.inputs[1].default_value = 0.15
+        L.new(g.outputs["Fac"], mx.inputs[0]); L.new(ramp.outputs["Result"], mx.inputs[2]); h = mx.outputs[0]
+    else:  # scratches: stretched noise
+        mp = N.new("ShaderNodeMapping"); mp.inputs["Scale"].default_value = (scale * 0.05, scale, scale)
+        L.new(tc.outputs["Object"], mp.inputs["Vector"])
+        w = N.new("ShaderNodeTexWave"); w.inputs["Scale"].default_value = 3; w.inputs["Distortion"].default_value = 12
+        w.inputs["Detail"].default_value = 4
+        L.new(mp.outputs["Vector"], w.inputs["Vector"]); h = w.outputs["Fac"]
+    bump = N.new("ShaderNodeBump"); bump.inputs["Strength"].default_value = strength; bump.inputs["Distance"].default_value = distance
+    L.new(h, bump.inputs["Height"])
+    if prev is not None:
+        L.new(prev, bump.inputs["Normal"])
+    L.new(bump.outputs["Normal"], bs.inputs["Normal"])
+    return mat
+
+
 def mats():
     m = P.material
-    return {
-        "iron": m("Iron", "NH_Iron", tint=(0.12, 0.11, 0.12), scale=1.2, rough_add=0.05, wear=0.65, wear_metal=True),
-        "brass": m("Brass", "NH_Brass", tint=(1.0, 0.8, 0.52), scale=1.5, wear=0.45, dirt=0.9),
-        "silver": m("Silver", base=(0.72, 0.72, 0.76), rough=0.28, metal=1.0, wear=0.45, dirt=0.8),
-        "leather": m("Leather", "NH_Leather", tint=(0.05, 0.035, 0.04), scale=2.2, normal=0.7, wear=0.25),
-        "crimson": m("Crimson", "NH_Leather", tint=(0.32, 0.03, 0.045), scale=2.2, normal=0.6, wear=0.4),
-        "glass": m("Glass", base=(0.03, 0.025, 0.035), rough=0.12, wear=0.0, dirt=0.3),
-        "bone": m("Bone", "NH_Limestone", tint=(0.9, 0.84, 0.7), scale=1.0, wear=0.35, dirt=1.0),
+    M = {
+        "iron": m("Iron", "NH_Iron", tint=(0.22, 0.21, 0.22), scale=1.6, rough_add=0.0, wear=0.8, wear_metal=True, normal=1.0),
+        "brass": m("Brass", "NH_Brass", tint=(1.0, 0.82, 0.55), scale=2.0, wear=0.55, dirt=1.0, normal=1.0),
+        "silver": m("Silver", base=(0.78, 0.78, 0.82), rough=0.24, metal=1.0, wear=0.5, dirt=0.9),
+        "leather": m("Leather", "NH_Leather", tint=(0.13, 0.065, 0.06), scale=2.6, normal=1.0, wear=0.35, dirt=0.9),
+        "crimson": m("Crimson", "NH_PaintedMetal", tint=(0.34, 0.035, 0.05), scale=2.4, wear=0.6, wear_metal=True),
+        "glass": m("Glass", base=(0.035, 0.03, 0.04), rough=0.1, wear=0.0, dirt=0.4),
+        "bone": m("Bone", "NH_Limestone", tint=(0.92, 0.86, 0.72), scale=1.2, wear=0.4, dirt=1.0),
         "wood": m("Wood", "NH_DeskWood", tint=(0.45, 0.3, 0.18), scale=1.0, wear=0.4),
+        "thread": m("Thread", base=(0.62, 0.5, 0.3), rough=0.7, wear=0.0, dirt=0.3),
     }
+    add_bump(M["iron"], "hammered", 0.7, 7, distance=0.03)          # hand-forged, hammer-dimpled iron
+    add_bump(M["brass"], "scratches", 0.12, 40)       # fine polishing scratches
+    add_bump(M["silver"], "scratches", 0.1, 50)
+    add_bump(M["leather"], "tooled", 0.3, 7, distance=0.02)       # tooled damask leather
+    add_bump(M["glass"], "scratches", 0.05, 30)
+    return M
+
+
+def stitches(w, h, inset, M, y=-0.06, step=0.22, size=0.12):
+    """a saddle-stitched seam running round a w x h rectangle, inset from its edge."""
+    hw, hh = w / 2 - inset, h / 2 - inset
+    def run(a, b):
+        n = max(2, int((b - a).length / step))
+        for k in range(n):
+            p = a.lerp(b, (k + 0.5) / n)
+            d = (b - a).normalized()
+            bpy.ops.mesh.primitive_cube_add(size=1, location=(p.x, y, p.z))
+            o = bpy.context.active_object
+            o.scale = (size if abs(d.x) > 0.5 else size * 0.28, 0.03, size * 0.28 if abs(d.x) > 0.5 else size)
+            o.rotation_euler = (0, 0.35, 0)
+            link(o, M["thread"])
+    V = Vector
+    run(V((-hw, 0, hh)), V((hw, 0, hh))); run(V((-hw, 0, -hh)), V((hw, 0, -hh)))
+    run(V((-hw, 0, -hh)), V((-hw, 0, hh))); run(V((hw, 0, -hh)), V((hw, 0, hh)))
 
 
 def link(ob, mat):
@@ -192,6 +254,7 @@ def panel():
     sc = reset(1600, 1100); M = mats(); cam(sc, 16.0); lights(sc, 14)
     slab("Back", 14.4, 9.4, 0.2, (0, 0.25, 0), M["leather"], bevel=0.05)
     frame(14.6, 9.6, M, band=0.34, corner=1.0)
+    stitches(14.4, 9.4, 0.34, M, y=0.12, step=0.24, size=0.12)   # seam hugs the trim, clear of content
     # padlock clasp, top centre
     slab("LockBody", 0.9, 0.8, 0.3, (0, -0.25, 4.8 - 0.1), M["iron"], bevel=0.12)
     pts = [(0.3 * math.cos(math.pi * i / 20), -0.25, 5.15 + 0.38 * math.sin(math.pi * i / 20)) for i in range(21)]
