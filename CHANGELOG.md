@@ -2,6 +2,25 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.8.9] - 2026-11-02: Painted sigils, and no more prisoner idle
+
+### Added
+- **Sigil paint and scrub (VFX P2-9).**
+  - **Paint:** a faction mark wipes onto the wall left to right over 1.2 s, and drips run down from it. The drips fade after a few seconds.
+  - **Scrub:** the mark fades through grey over 2 s with soap suds.
+  - **On join:** marks already up when you join just show.
+  - **Files:** `Controllers.World.SigilFx`. The server state (`Services.Social.Pranks`) is unchanged.
+  - **Still to add:** a spray-hiss sound, once a Creator Store sound is picked (D4).
+
+### Changed
+- **Players no longer play the prisoner idle in detention** (owner request). The loop that played it while you stood still in Room 106 is removed from `Controllers.Character.ContextAnims`. The ambient detention kid NPC keeps its pose.
+
+### Verified
+**[PT]**
+- **Sigils:** TheAlley's sigil painted with 5 drips. On reset it went grey, faded over about 1.3 s, then handed back to the server's hidden state with its colour restored.
+- **Detention:** standing still in Room 106 with a detention active, only the normal stance plays.
+- **Test cleanup:** my locker test had added a Trespassing violation to the spare save slot II. It was removed and the points restored to 12.
+
 ## [1.8.8] - 2026-11-02: Arrivals, veils, lockers and fades (VFX Batch 4)
 
 ### Added

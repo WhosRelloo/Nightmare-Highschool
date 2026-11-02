@@ -244,3 +244,6 @@ Verified with real presses:
 1. **Class activities** (Milestone 5): at least two real activities, such as a math timed quiz and a chemistry ingredient match. Results feed attendance and rewards.
 2. **Probation restrictions and suspension gameplay**, such as off-campus tasks to get reinstated. The current hooks are only the level and the `Suspended` attribute.
 3. **More witnesses:** teachers in classrooms reporting fights, using the same `ReportIncident`.
+
+## Detention animation (1.8.9)
+Players no longer play the prisoner idle while standing in detention (owner request, 2026-11-02). The ambient detention kid in Room 106 still uses it.

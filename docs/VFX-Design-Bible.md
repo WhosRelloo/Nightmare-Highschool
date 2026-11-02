@@ -198,7 +198,7 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 | P2-6 | Bloodrush aura revamp (client, ribbons, ends cleanly) | UI #13 | Q |
 | P2-7 | **Tested (1.8.8)**: Teleport veil (`Fx.VeilMove`: duel ring, admin bring/go-to) + server-hop TeleportGui; `Controllers.World.Veil` | UI #11 | Q |
 | P2-8 | **Tested (1.8.7)**: "Second chance" get-up (Recover / Fated); `Controllers.World.GetUp` | UI #10 | Q |
-| P2-9 | Sigil paint & scrub | World G | Q |
+| P2-9 | **Tested (1.8.9)**: Sigil paint & scrub (wipe + drips, grey fade + suds; spray-hiss sound still to pick); `Controllers.World.SigilFx` | World G | Q |
 | P2-10 | **Tested (1.8.8)**: Locker POV / hide fade; `Controllers.World.LockerPOV` | World I / Quests C6 | Q |
 | P2-11 | **Tested (UI kit, UI 1.13)**: Lesson juice (sounds, stamp slam, BOOM). Glyph bursts code-checked | World J | UI |
 | P2-12 | **Tested (1.8.8)**: Presence fade for NPCs and watchers; `Controllers.World.Presence` | Quests C13 | Q |
