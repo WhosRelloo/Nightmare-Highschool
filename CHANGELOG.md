@@ -2,6 +2,21 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.8.1] - 2026-11-02: Wolves fight fair
+
+### Changed
+- **Wild wolves follow a fixed, readable pattern** instead of random bites.
+  - **Cycle:** Bite → Bite → hop back → Leap, the same every time, with a short circling breather between steps. When a wolf spots you, it howls (calling the pack) and circles before its first bite.
+  - **Every attack has a tell:** the wolf stops, crouches, and its eyes and outline glow red, 0.5 s before a bite and 0.85 s before a leap. Hitting it during the wind-up interrupts the attack.
+  - **Bites** only land if you're still in front of its jaws. Back off or sidestep during the tell to dodge.
+  - **The leap** locks onto where you stood when the tell ended, so a sidestep makes it sail past. After landing, the wolf pants for **1.4 s**, your free window to punish.
+  - **One attacker at a time:** the rest of the pack circles wide and waits its turn. A wolf that gets stunned, stuck or posture-broken gives up its turn so it never stalls the fight.
+  - **Measured on a student standing still against three wolves:** one hit every 2.5 to 3 s (5 per bite, 8 per leap), and never two tells at once.
+
+### Fixed
+- Wolf leaps (and the bite lunge) never actually moved the wolf. The Humanoid cancelled the velocity. Both now use a short scripted arc or step-in.
+- A wolf could get stuck just outside bite range (its hips are far behind its jaws). Range is now measured from the head.
+
 ## [1.8] - 2026-11-02: The Headmaster's Desk (admin panel)
 
 ### Added
