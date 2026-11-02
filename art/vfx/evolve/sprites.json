@@ -13,5 +13,5 @@
   "evo_spore": "rbxassetid://74644103733948",
   "evo_frost_2x2": "rbxassetid://92233090974100",
   "evo_godray": "rbxassetid://77357987513961",
-  "_pending": "evo_bat_4x4 was re-rendered with a stronger wingbeat AFTER this upload; re-upload it. Meshes (fbx/) need importing: BloodCrystal, IceSpike, BoneSpike, StoneChunk, HunterSigil, GoldHalo."
+  "_pending": "Nothing pending (checked 2026-11-02): evo_bat_4x4 on disk is byte-identical to the uploaded asset, and all 13 meshes are imported into ReplicatedStorage.NHEvolveFX."
 }
