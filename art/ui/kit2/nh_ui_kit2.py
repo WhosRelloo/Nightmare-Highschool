@@ -9,7 +9,9 @@ Pieces (transparent PNGs in art/ui/kit2/out):
   button.png   520x150    a button plate: iron with a brass edge and rivets
   node.png     420x420    a skill-tree node: an iron diamond wrapped in chain (silver, tinted per branch later)
   card.png     760x480    a shop card frame: iron with brass filigree corners (neutral, tinted per rarity later)
-  crest.png    600x600    the school crest: a shield with a crimson field, a skull, crossed rulers and a padlock
+  crest.png    600x680    the school crest: gothic heater shield (iron rim, brass trim, crimson leather), silver
+                          crescent in a dark chief, R6 bone skull with ember eyes over crossed brass skeleton keys,
+                          padlock on the point, NOCTE DISCIMUS ribbon
 """
 import math
 import os
@@ -261,32 +263,132 @@ def card():
     render("card.png")
 
 
-def crest():
-    sc = reset(600, 600); M = mats(); cam(sc, 6.0); lights(sc, 6)
-    # shield: a rounded-bottom shape (curve outline) with a crimson field slab behind
-    pts = []
-    for i in range(41):
-        t = i / 40
-        a = math.pi * t
-        pts.append((1.9 * math.cos(a + math.pi), -0.02, -0.4 - 1.6 * math.sin(a)))
-    pts = [(-1.9, -0.02, 1.9)] + pts + [(1.9, -0.02, 1.9)]
-    curve("Rim", pts, 0.16, M["brass"], closed=True)
-    slab("Field", 3.7, 3.9, 0.15, (0, 0.2, 0.0), M["crimson"], bevel=0.05)
-    # crossed rulers (wood) behind a bone skull
-    for s in (-1, 1):
-        slab("Ruler", 0.4, 4.6, 0.08, (0, 0.05, -0.1), M["wood"], bevel=0.02).rotation_euler = (0, s * math.pi / 4, 0)
-    bpy.ops.mesh.primitive_cylinder_add(vertices=40, radius=0.75, depth=1.1, location=(0, -0.25, 0.25), rotation=(0, 0, 0))
-    sk = bpy.context.active_object
-    rb = sk.modifiers.new("R", "BEVEL"); rb.width = 0.3; rb.segments = 8; rb.limit_method = "ANGLE"
-    sk.scale = (1, 0.35, 1)
+def shield_outline(w, top, side, tip, n=24):
+    """a gothic heater shield in the XZ plane: flat top with a small central peak, straight sides, curved to a point."""
+    hw = w / 2
+    head = [(-hw, top), (-hw * 0.12, top), (0, top + 0.18), (hw * 0.12, top), (hw, top), (hw, side)]
+    right = []
+    for i in range(1, n):
+        t = i / n
+        x = (1 - t) ** 2 * hw + 2 * (1 - t) * t * hw
+        z = (1 - t) ** 2 * side + 2 * (1 - t) * t * (side + (tip - side) * 0.55) + t * t * tip
+        right.append((x, z))
+    left = [(-x, z) for (x, z) in reversed(right)]
+    return head + right + [(0, tip)] + left + [(-hw, side)]
+
+
+def filled(name, pts2d, depth, y, mat):
+    """an extruded, filled 2D outline facing the camera (-Y)."""
+    cu = bpy.data.curves.new(name, "CURVE"); cu.dimensions = "2D"; cu.fill_mode = "BOTH"
+    cu.extrude = depth; cu.bevel_depth = 0.02
+    sp = cu.splines.new("POLY"); sp.points.add(len(pts2d) - 1)
+    for i, (x, z) in enumerate(pts2d):
+        sp.points[i].co = (x, z, 0, 1)
+    sp.use_cyclic_u = True
+    ob = bpy.data.objects.new(name, cu); bpy.context.collection.objects.link(ob)
+    ob.rotation_euler = (math.pi / 2, 0, 0); ob.location = (0, y, 0)
+    ob.data.materials.append(mat)
+    return ob
+
+
+def text(body, size, loc, mat, extrude=0.03, font="georgiab.ttf", spacing=1.0):
+    cu = bpy.data.curves.new("T", "FONT"); cu.body = body; cu.size = size; cu.extrude = extrude
+    cu.bevel_depth = 0.006; cu.align_x = "CENTER"; cu.align_y = "CENTER"; cu.space_character = spacing
+    try:
+        cu.font = bpy.data.fonts.load("C:/Windows/Fonts/" + font, check_existing=True)
+    except Exception:
+        pass
+    ob = bpy.data.objects.new("T", cu); bpy.context.collection.objects.link(ob)
+    ob.rotation_euler = (math.pi / 2, 0, 0); ob.location = loc
+    ob.data.materials.append(mat)
+    return ob
+
+
+def skeleton_key(angle, M):
+    """a brass skeleton key lying diagonally behind the skull (bow up, bit down)."""
+    root = bpy.data.objects.new("Key", None); bpy.context.collection.objects.link(root)
+    parts = []
+    bpy.ops.mesh.primitive_torus_add(major_radius=0.32, minor_radius=0.08, major_segments=28, minor_segments=8,
+                                     location=(0, 0, 1.75), rotation=(math.pi / 2, 0, 0))
+    parts.append(bpy.context.active_object)
+    for z in (1.33, 1.2):
+        bpy.ops.mesh.primitive_torus_add(major_radius=0.12, minor_radius=0.045, major_segments=16, minor_segments=6, location=(0, 0, z))
+        parts.append(bpy.context.active_object)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.075, depth=3.0, location=(0, 0, -0.2))
+    parts.append(bpy.context.active_object)
+    for (w, h, z) in ((0.42, 0.14, -1.45), (0.3, 0.12, -1.2), (0.42, 0.1, -1.0)):
+        bpy.ops.mesh.primitive_cube_add(size=1, location=(w / 2, 0, z)); c = bpy.context.active_object; c.scale = (w, 0.1, h)
+        parts.append(c)
+    for o in parts:
+        link(o, M["brass"]); o.parent = root
+    root.rotation_euler = (0, angle, 0); root.location = (0, 0.02, -0.15)
+    return root
+
+
+def r6_skull(loc, M):
+    """an R6-style skull: a rounded block cranium, deep oval sockets with ember eyes, a nose notch, a squared jaw."""
+    x, y, z = loc
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(x, y, z + 0.18)); sk = bpy.context.active_object
+    sk.scale = (1.5, 0.9, 1.25)
+    bv = sk.modifiers.new("B", "BEVEL"); bv.width = 0.36; bv.segments = 10
     link(sk, M["bone"])
-    dark = P.material("Hole", base=(0.02, 0.01, 0.01), rough=0.9, wear=0.0, dirt=0.0)
-    for x in (-0.28, 0.28):
-        bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=8, radius=0.2, location=(x, -0.5, 0.3))
-        e = bpy.context.active_object; e.scale = (1, 0.3, 1.1); link(e, dark)
-    slab("Jaw", 0.9, 0.35, 0.2, (0, -0.35, -0.42), M["bone"], bevel=0.06)
-    # padlock at the bottom tip
-    slab("Lock", 0.7, 0.6, 0.25, (0, -0.3, -1.65), M["iron"], bevel=0.1)
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(x, y + 0.05, z - 0.62)); jaw = bpy.context.active_object
+    jaw.scale = (1.0, 0.75, 0.42)
+    bv = jaw.modifiers.new("B", "BEVEL"); bv.width = 0.12; bv.segments = 6
+    link(jaw, M["bone"])
+    dark = P.material("Socket", base=(0.015, 0.008, 0.01), rough=0.85, wear=0.0, dirt=0.0)
+    glow = P.material("Ember", base=(0.9, 0.08, 0.06), rough=0.4, wear=0.0, dirt=0.0)
+    try:
+        bsdf = glow.node_tree.nodes.get("Principled BSDF")
+        bsdf.inputs["Emission Color"].default_value = (1.0, 0.12, 0.08, 1)
+        bsdf.inputs["Emission Strength"].default_value = 3.0
+    except Exception:
+        pass
+    for sx in (-1, 1):
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=24, ring_count=12, radius=0.27, location=(x + sx * 0.36, y - 0.42, z + 0.12))
+        e = bpy.context.active_object; e.scale = (1.0, 0.45, 1.15); e.rotation_euler = (0, sx * 0.25, 0); link(e, dark)
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=12, ring_count=6, radius=0.06, location=(x + sx * 0.36, y - 0.5, z + 0.1))
+        link(bpy.context.active_object, glow)
+    bpy.ops.mesh.primitive_cone_add(vertices=3, radius1=0.13, depth=0.1, location=(x, y - 0.45, z - 0.2), rotation=(math.pi / 2, 0, math.pi))
+    link(bpy.context.active_object, dark)
+    for k in range(-2, 3):
+        slab("Gap", 0.025, 0.24, 0.05, (x + k * 0.17, y - 0.33, z - 0.6), dark, bevel=0.005)
+    slab("Bite", 0.9, 0.03, 0.05, (x, y - 0.33, z - 0.6), dark, bevel=0.005)
+
+
+def crest():
+    sc = reset(600, 680); M = mats(); cam(sc, 6.0); lights(sc, 6)
+    bpy.data.objects["C"].location = (0, -20, -0.25)
+    out = shield_outline(3.8, 2.0, 0.0, -2.35)
+    inner = shield_outline(3.36, 1.78, -0.05, -2.02)
+    filled("Back", out, 0.12, 0.32, M["iron"])
+    filled("Field", inner, 0.1, 0.18, M["crimson"])
+    curve("Trim", [(x, 0.05, z) for (x, z) in inner], 0.035, M["brass"], closed=True)
+    curve("Rim", [(x, 0.0, z) for (x, z) in out], 0.1, M["iron"], closed=True)
+    chief = [(-1.68, 1.78), (-0.2, 1.78), (0, 1.94), (0.2, 1.78), (1.68, 1.78), (1.68, 1.02), (-1.68, 1.02)]
+    filled("Chief", chief, 0.06, 0.1, M["leather"])
+    curve("ChiefLine", [(-1.68, 0.02, 1.02), (1.68, 0.02, 1.02)], 0.04, M["brass"])
+    moon_o = [(0.42 * math.cos(a), 0.42 * math.sin(a)) for a in [math.pi * (0.25 + 1.5 * i / 30) for i in range(31)]]
+    moon_i = [(0.14 + 0.33 * math.cos(a), 0.06 + 0.33 * math.sin(a)) for a in [math.pi * (1.75 - 1.5 * i / 30) for i in range(31)]]
+    mo = filled("Moon", moon_o + moon_i, 0.08, 0.02, M["silver"]); mo.location.z = 1.42; mo.location.x = -0.05
+    for sx in (-1, 1):
+        for k in range(3):
+            rivet((sx * (0.75 + k * 0.32), -0.06, 1.4), 0.05, M["brass"])
+    skeleton_key(math.pi / 4, M); skeleton_key(-math.pi / 4, M)
+    r6_skull((0, -0.15, -0.1), M)
+    for sx in (-1, 1):
+        finial(sx * 1.9, 2.0, 0.5, sx, 1, M)
+    bpy.ops.mesh.primitive_cone_add(vertices=4, radius1=0.12, depth=0.5, location=(0, -0.02, -2.55), rotation=(math.pi, 0, 0))
+    link(bpy.context.active_object, M["iron"])
+    slab("LockBody", 0.62, 0.52, 0.26, (0, -0.3, -1.6), M["iron"], bevel=0.1)
+    curve("Shackle", [(0.2 * math.cos(math.pi * i / 16), -0.3, -1.34 + 0.24 * math.sin(math.pi * i / 16)) for i in range(17)], 0.05, M["silver"])
+    rivet((0, -0.45, -1.62), 0.06, M["brass"])
+    slab("Ribbon", 3.5, 0.42, 0.08, (0, -0.55, -2.15), M["crimson"], bevel=0.03)
+    for sx in (-1, 1):
+        t = slab("Tail", 0.55, 0.42, 0.06, (sx * 1.95, -0.45, -2.25), M["crimson"], bevel=0.03); t.rotation_euler = (0, sx * 0.35, 0)
+    for z in (-1.95, -2.35):
+        curve("RibbonEdge", [(-1.75, -0.6, z), (1.75, -0.6, z)], 0.018, M["brass"])
+    text("NOCTE  DISCIMUS", 0.24, (0, -0.62, -2.16), M["brass"], spacing=1.15)
     render("crest.png")
 
 
