@@ -1,6 +1,6 @@
 # Implementation Status: NH Combat Test
 
-Last updated: 2026-10-29. Done: Milestone 0, a combat pass (`Combat-System.md`), clock and timetable (`School-Simulation.md`), attendance and discipline (`Attendance-and-Discipline.md`), class activities (`Class-Activities.md`), and factions and reputation (`Factions-and-Reputation.md`).
+Last updated: 2026-11-02 (through 1.8.4). Done: Milestone 0, combat and three weapon classes (`Combat-System.md`), clock and timetable (`School-Simulation.md`), attendance and discipline (`Attendance-and-Discipline.md`), class activities (`Class-Activities.md`), factions and reputation (`Factions-and-Reputation.md`), quests, races, sports, the main menu (`Main-Menu.md`) and the admin panel (`Admin-Panel.md`).
 
 How each result was checked:
 - **[PT]** Studio playtest
@@ -25,6 +25,13 @@ How each result was checked:
 | **Kills saved**: `Kills` (players) and `NPCKills` are added to player data, plus a Kills leaderboard column. Grip executions count. | `PlayerData`, `Functions.UpdateState`, `Player.Data`, `Features.KillTracker` | [PT-real] a B grip took NPCKills 0→1, and it survived a session restart |
 | **Main menu + save slots**: a cinematic PBR night-courtyard menu (spline camera, posed student in a crimson clock seal, Blender-rendered VFX), 3 save slots (each its own save; slot 1 = the old save), and character editing with camera cuts per Wardrobe tab, then ENTER SCHOOL | `Config.MainMenu`, `Services.Player.Slots`, `Services.Player.Data` (per-slot load), `Gui.MainMenu`, `workspace.MenuScene`, `Tools/vfx` | **[PT]** with real clicks and keys: intro → menu → slots → edit (Face-tab cut) → enter school; Continue. Camera smoothness measured (no stops between shots). 8 bugs found and fixed. **Menu 1.2 audit:** 10 more fixed (Settings input, plinth hair weld and race, Bloodline shot, remote errors, LastPlayed via UpdateState, name-filter race in Identity), all but the name race retested in Play. See Main-Menu.md. |
 | **UI Audit 1.0**:<br>• Every screen checked for small text, contrast, layering and edges<br>• Fixes in Progress, Compass, TopBar, Students, Identity, MainMenu, Loading<br>• Kit-owned findings sent to the UI kit session | `Gui.Progress` (`NHExpStrip`), `Gui.Compass`, `Gui.TopBar`, `Gui.Students`, `Gui.Identity`, `Gui.MainMenu`, `NHLoadingScreen` | **[PT-real]** audited in a 1287×600 playtest by day and night. Phones and gamepad not tested. See UI-Audit.md. |
+| **1.8.4**: Fist/Claws combat audit against Katana: running-attack `Hit` fallback (0.33 s); one shared mover per attack (a weapon-speed running lunge that stops at the target; a downslam that skips the glide, holds height, dives timed to the ground, soft-aims within 11 studs and sweeps twice); Slash hit/block effects and sounds; Claws spawn equipped (`Functions.ClawKit`); dash carries into sprint; cooldowns checked before the current action is cancelled; Settings **Main Menu** button (same-server rejoin) | `Combat.M1.{Running M1,Aerial M1}`, `EmitManager.Shared.M1.{Running M1,Aerial M1}`, `Config.Weapons` (Fist markers), `Assets.{Effects,Sounds}.*.Slash`, `Functions.ClawKit`, `Managers.EntityLoader.SetWeapon`, `General.Equip`, `Features.ClassLocker`, `Movement.Dodge`, `ActionManager.CanActivate`, `Features.BackToMenu`, `Controllers.Gui.BackToMenu` | **[PT]** Dummy runs for all three weapons: running hits at 6, 10 and 14 studs; downslams from 8 and 14 studs with targets below and 9 studs ahead; M2 for all three. Claws welded and Claws stance on spawn (slot II). Forward and side dash back to a 40.5 sprint; a dash on cooldown keeps the sprint. Main Menu two-click flow (Studio answers "live game only"). The teleport itself only runs live. |
+| **1.8.3**: full end-to-end audit; gear chests re-pivoted, backed to the nearest wall and facing the room; staff-room table moved off Mr. Hale's route; gear buy busy flag always cleared | `ServerStorage.NHChestModel`, `Features.GearChests`, `workspace.School.Quests.StaffRoom`, `Features.Gear` | **[PT]** 438 scripts compile; a full day and night with no errors; chest placement screenshots |
+| **1.8.2**: catalog hair on every NPC; ambient students placed by root (the rig pivot is at the feet); posed and seated students settled after their animation loads | `Features.AmbientNpcs`, `Social.Npcs`, `School.HallMonitor`, `Quests.Stealth` | **[PT]** floor raycasts and screenshots of every ambient NPC |
+| **1.8.1**: wolves fight a fixed telegraphed pattern (Bite, Bite, hop back, Leap, then a 1.4 s punish window), with a red tell, one attacker at a time through an expiring turn token, head-based bite range and a scripted leap arc | `Features.WildWolves` | **[PT]** three wolves vs a still student: one hit every 2.5 to 3 s, never two tells at once |
+| **1.8**: the Headmaster's Desk admin panel (F3): moderation, student, world, spawns, self and server tabs; server-checked, rate-limited and logged | `Features.Admin`, `Controllers.Gui.AdminPanel`, `ReplicatedStorage.NHAdmin` | **[PT]** every command in Studio on a spare slot (destructive ones confirm twice) |
+| **1.7.1**: delinquent crews (PVE EXP and Yen), AI `Config.Skill`, the owner's Gear Chest model with a hinged lid | `Features.Delinquents`, `AI.NPCBehaviors`, `ServerStorage.NHChestModel`, `Features.GearChests` | **[PT]** kill reward (+¥10, +30 EXP), lid swing |
+| **1.7**: Claws class with Slash Barrage and Ripper's Waltz; wild wolves and Werewolf form; 40 gear pieces and chests; 35 rigged catalog hairs; blinking faces; 21 brow styles; the Barber; the class locker | `Config.Weapons.Claws`, `Skills.*`, `Features.{WildWolves,Transformation,Gear,GearChests,ClassLocker}`, `ReplicatedStorage.NHHairCatalog`, `Controllers.Character.{HairSway,EyeBlink}`, `UI.{Appearance,EyeArt}` | **[PT]** skills, wolf fights, chest loot, hair sway, blink |
 | **1.6**: Fist class on the Katana combat code with keyframe-derived timings (`AnimMarkers` + `Config.Weapons.Fist.Markers`), Z/X/C skills (Question Mark Kick, Body Slam, Bear Hug) with a kit skill bar; N race actions (Blood Drain, Eat Body, Soul Siphon, Exorcise) through `Downed.StartGrip` overrides; Enrollment desk (3 starter uniforms per body type), School Store (Yen, tabs, try-on preview), civilian defaults and owned-uniform checks; wardrobe stations (`NHWardrobe`); combat slow; slide into sprint; owner-fitted capes (`NH_TorsoFit`) and axis-correct sway; Fist equip loop fix | `Combat.{M1,M1.Running M1,M1.Aerial M1,Uppercut}`, `Assets.M2.Fist`, `Skills.{GrabCore,BodySlam,BearHug,QuestionMarkKick}`, `Misc.RaceAction`, `Features.{Downed,RaceAction,CombatSpeed,WardrobeStations}`, `School.{Enrollment,Activities}`, `Player.Identity`, `Movement.{Slide,Sprint}`, `Controllers.{SkillController,Gui.Enrollment,Gui.Wardrobe,World.RaceActionFx,Character.CapeSway,StateController.Misc.Equip}`, `UI.{Appearance,Settings}`, `NHCapes` | **[PT]** Fist M1/M2/running/kick hits, Body Slam and Bear Hug grabs, crit priority (track weights), Fist movement pack, slide carry and combat slow (speeds), Eat Body (heal, hunger, finish), wardrobe gate (server near/far), enrollment pick and store purchase (data restored), store and preview (screenshot), cape fit (offsets). Two-player and Exorcise/Siphon visuals not yet seen. |
 | **VFX 1.5**: Batch 3 (watcher awareness and torch, Thrown Out with caught animations, quest-giver seals, rite prop effects and unlit votives, detention effects, The Blood Takes, waypoint upgrade); tier-ups rebuilt with 15 PBR set pieces and rendered sprites; combat tag with "mb all"; capes in the Spin Shop with cloth sway; Female body; Shift sprint and Alt shift lock; colour wheel, Ghoul and Wraith look fixes | `Functions.{RaceFX,EvolveFX}`, `Controllers.World.{Spotted,QuestSeals,ObjectFx,Waypoint}`, `Controllers.Character.{CapeSway,ShiftLockKey}`, `Controllers.Gui.{CombatTag,Evolution,Moments}`, `Services.Features.CombatTag`, `Services.Quests.{Stealth,Quests}`, `Services.Player.{Turning,Evolution,Identity,Purchases,RaceCosmetics}`, `UI.{Appearance,Settings,Components}`, `NHEvolveFX`, `NHCapes` | **[PT]** stealth (client log), seals, rite props (bell swing, votives), all six tier-ups (screenshots), Wardrobe controls, combat tag and mb all (solo), cape fit and sway. Two-player views and some re-bakes are pending. |
 | **VFX 1.4** (Batch 2, core feedback): school bell and period card, "Spotted!" monitor alert, quest-beat banners with epilogue, clue slip, level-up Bell Toll, purchase confirmation, roll-call respawn. One Moment queue; banners replace their toasts | `Controllers.Gui.Moments`, `Controllers.World.Spotted`, `Services.Features.Fx` (`NHFx`), `Services.Quests.{Quests,Investigation}`, `Services.Player.{Progression,Purchases}`, `Services.School.HallMonitor` | **[PT]** bell card on a period change, stage, clue, level-up, purchase, start and fail banners through real server paths (screenshots and client log), Spotted caught and escaped (real HallMonitor), own respawn veil. Epilogue, clock-rim flash, marker pulse and other players' view not checked. |
@@ -60,6 +67,9 @@ Nothing was changed in the production place.
 - **Player combat:**
   - Equip (E) **[PT-real]**
   - M1 4-hit combo **[PT-real]**
+  - Three weapon classes (Katana, Fist, Claws): the M1 combo, running attack, aerial attack and M2 all land on a dummy (1.8.4)
+  - Claws students spawn with their claws equipped (1.8.4)
+  - A dash or slide hands back to a full-speed sprint while sprint is held (1.6, 1.8.4)
   - Knockback and stun
   - Respawn re-initializes the character: it goes to Live, the weapon is on its back, collision group is `Entity`, and equipping works.
 - **Dummies:** Parry, Attacking, ParryTrade, Blocking, PostureBreak, and Inf Dummy all behave as designed.
@@ -95,12 +105,12 @@ Nothing was changed in the production place.
 
 **Tooling:**
 
-15. **Cmdr admin is unusable for the developer.** It is restricted to hard-coded IDs (4283953723, 1219061975, 3585755651), and the developer account (37484441) isn't one of them.
+15. ~~**Cmdr admin is unusable for the developer.**~~ **Superseded (1.8):** the Headmaster's Desk (F3) admits group rank 254+, `Config.Cmdr` admins and anyone in Studio. Old note: It is restricted to hard-coded IDs (4283953723, 1219061975, 3585755651), and the developer account (37484441) isn't one of them.
 
 ## Dead or incomplete content (kept, not deleted)
 
-- **Vows (Fists, Flames).** Activation is commented out, and both need a `Hands` weapon type that doesn't exist.
-- **M2 assets for Fist, LongSword, Trident.** No weapon config exists for them.
+- **Vows (Fists, Flames).** Activation is commented out. The `Hands` weapon type they need now exists (Fist, Claws).
+- **M2 assets for LongSword, Trident.** No weapon config exists for them. (Fist has had a config since 1.6, Claws since 1.7.)
 - **Missing mechanics.** Ragdoll never happens. Perfect-dodge gives no reward. `AirWeld` is unused.
 - **Empty or unused modules.** `GuiController` and `SkillController` are empty, and `Services.AI.Spawn` is commented out.
 
@@ -134,9 +144,15 @@ Nothing was changed in the production place.
 4. ~~Decision needed: the interaction key~~ **Decided: E**, with `Config.Interaction` as the shared setting. E is context-sensitive: it interacts while a prompt is showing and equips otherwise. [PT-real]
 4. **Shared foundation**, still to do: a NotificationService and toast UI, a unified InteractionService built on ProximityPrompts, and EXP and level data (the school-hours 1.2× hook is ready in `SchoolClock.GetExpMultiplier()`).
 
+**Open after the 1.8.4 combat audit:**
+
+- Claws still borrows the Fist attack animations until Claws clips exist.
+- The Main Menu button's teleport is untested live, because Studio can't teleport. Try it once in a live server.
+- The dummy tests used AI rigs. Two-player checks of the running attack and downslam (which use client-side movers) are still worth doing.
+
 ## Decisions needed from the developer
 
 - **Stunlock fix approach:** slower AI attacks, or a stun-immunity window after a stun ends.
 - **School-hours length:** 4 in-game hours, or 10% of the day as the doc says. The two numbers disagree.
-- **Admin access:** add the developer account (37484441) to `Config.Cmdr`?
-- **Whether the docs should live in the GitHub repo**, which is currently empty.
+- ~~**Admin access**~~ Answered by the admin panel (1.8).
+- ~~**Docs in the GitHub repo**~~ Done: this repo.

@@ -2,6 +2,68 @@
 
 This doc covers what was added on top of the existing combat framework. For the base framework (ActionManager, DamageLogic, HitBox, StateManager), see `Project-Audit.md` §3–5.
 
+## Weapons and movement (1.6 to 1.8.4)
+
+Three classes run on the same combat code (`ServerScriptService.Services.Player.ActionManager.Combat`). Each weapon is a table in `ReplicatedStorage.Config.Weapons`.
+
+| | Katana | Fist | Claws |
+|---|---|---|---|
+| Damage / damage type | 4, Blood | 3, Blunt | 3.5, Slash |
+| Animation speed | 1.3 | 1.15 | 1.2 |
+| Hitbox | 6×10×7, 3.5 studs ahead | 5×8×6, 2.8 ahead | 5.5×8×6.5, 3.1 ahead |
+| Timing markers | in the animations | `Config.Weapons.Fist.Markers` (by animation id) | shares the Fist clips and markers |
+| Running attack | shared lunge at 25 | lunge at 42, ×1.6 damage, heavy knockback | lunge at 46, ×1.5 damage |
+| Aerial attack | forward glide (30), then a drop | downslam: hang, dive at 0.56 s, impact at 0.66 s | same as Fist |
+| Equip | E draws the katana | E | starts equipped (Specter Claws) |
+
+### Timing markers
+`ServerStorage.Packages.AnimMarkers` reads an animation's `Hit` and `EndLag` keyframes. If a clip lacks them, or a freshly loaded track can't report them yet, it falls back to `Config.Weapons.<Name>.Markers[animationId]`. A real keyframe always wins.
+
+Fist's running straight has `Hit = 0.33, EndLag = 0.67` in the fallback. Without it the running attack errored and never hit (fixed in 1.8.4).
+
+### One mover per attack (1.8.4)
+Each attack's movement comes from one place, so nothing fights it:
+- **Running attack:**
+  - The shared lunge (`EmitManager.Shared.M1["Running M1"]`) runs on the attacker's client, or on the server for NPCs.
+  - It carries you at `Paramaters.Speed`: `Config.Weapons.X.RunningAttack.Lunge`, or 25 for Katana. It stops as soon as something is 3 studs in front of you.
+  - You keep moving through the wind-up and are planted only for the recovery after the hit.
+  - Weapons with a `RunningAttack` also sweep the hitbox a second time 0.07 s later.
+- **Aerial attack, Katana:** the shared glide (`Shared.M1["Aerial M1"]`) moves you forward at 30 and down at 10 until you're near the ground or something is ahead of you.
+- **Aerial attack, Fist and Claws (`Config.Weapons.X.AerialAttack`):**
+  - The server sends `NoGlide`, so the glide is skipped.
+  - A vertical-only hover holds your height through the wind-up and keeps your jump's sideways drift.
+  - At `DiveAt` the dive speed is set from a ground raycast, so you meet the floor on the impact frame from any height (clamped between `Dive` and 170).
+  - If a living target stands within 11 studs ahead, the dive curves to land 2 studs in front of them.
+  - The hitbox is tall and sits low (`Offset`, `Size`), and sweeps twice.
+- **M2:** each weapon has its own module in `ServerStorage.Assets.M2.<Weapon>`.
+
+### Hit feedback
+`DamageType` selects `ReplicatedStorage.Assets.Effects.HitType[...]`, `Effects.BlockHit[...]`, `Sounds.Hit[...]`, `Sounds.SwingSFX[...]` and `Sounds.BlockHit[...]`. Each needs an entry for every damage type. `Slash` was missing until 1.8.4, so Claws hits had no effect or sound.
+
+### Claws equip (1.8.4)
+`ReplicatedStorage.Assets.Weapons.Claws.Kit` holds the two Specter Claw parts. Each has a Motor6D `Weld` and a `WeldTo` StringValue (`Right Arm` / `Left Arm`).
+- `ReplicatedStorage.Functions.ClawKit.Attach(character)` clones the kit into `Accessory.Weapons` and welds each part to its arm. `Remove(character)` takes it off.
+- `EntityLoader.SetWeapon` attaches the kit for Claws students, sets `Equip`, and tells the client to play the Claws stance.
+- Equip (E) keeps the kit on for Claws. The class locker stows it when you switch class.
+
+### Sprint and dash (1.6, 1.8.4)
+- `UnPackets.Sprint` records `SprintHeld` on the character.
+- When a **slide** or **dash** ends with sprint still held, it sets `SprintCarry` and re-activates Sprint. Sprint then starts at the full 40.5 speed instead of walking up from 25.
+- `ActionManager.CanActivate` checks the requested action's cooldown **before** cancelling the current action. Before 1.8.4, any press on cooldown (a dash, an M1, a skill) silently ended your sprint or block.
+
+### Enemies that use this code
+- **Delinquents** (`Features.Delinquents`) fight with the Fist moveset through the regular combat AI. `Config.Skill` (0 to 1) scales how often they block, parry, dodge, feint and uppercut.
+- **Wild wolves** (`Features.WildWolves`) run their own fixed pattern: Bite, Bite, hop back, Leap. A red tell comes 0.5 s before a bite and 0.85 s before a leap, a 1.4 s punish window follows the leap, and only one wolf attacks a student at a time.
+
+### Verified (1.8.4, dummy fighters, Play)
+- **M1 combo hit times:**
+  - Katana 0.30 / 0.87 / 1.47 / 2.08 s.
+  - Fist 0.38 / 0.82 / 1.31 / 1.86 s.
+  - Claws 0.35 / 0.77 / 1.32 / 1.87 s.
+- **Running attack:** lands at 6, 10 and 14 studs for all three (Fist and Claws at 0.33 s, Katana at 0.50 s).
+- **Downslam (Fist and Claws):** lands from 8 and 14 studs up, with targets below and 6 to 9 studs ahead. Katana's glide lands at about 9 studs.
+- **M2:** lands for all three. Katana lands two hits.
+
 ## Downed / Carry / Grip
 
 **Rule:** combat damage never kills directly. At 0 HP a character is **downed**. Only a **grip** (execute) kills.

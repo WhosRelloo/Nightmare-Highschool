@@ -278,3 +278,7 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
   - **Tier-ups rebuilt** with 15 PBR meshes (`art/vfx/evolve`, `ReplicatedStorage.NHEvolveFX`) and rendered sprites (`art/vfx/evolve/sprites.json`).
   - **Rule kept:** supernatural looks fire only on supernatural events (rites, turning, tier-ups).
 - 2026-10-31: **VFX 1.4.1.** Moment banners hold up to 6 s for an open conversation, then lift above `Dialogue.Box` (Tested: held, then 10 px above the box; follows the box opening and closing mid-banner). Reported by the UI kit session.
+- 2026-11-02: **1.7 to 1.8.4 (no new P-items).** These releases were content, admin and combat work. The only feedback additions:
+  - **1.8.4:** a `Slash` entry in the hit and block effects and sounds (`Assets.Effects.{HitType,BlockHit}`, `Assets.Sounds.{Hit,SwingSFX,BlockHit}`) so Claws hits register. It reuses the Blood set until bespoke slash art exists.
+  - **1.8.1:** the wolves' red attack tell (a Highlight plus a PointLight on the head).
+  - **Still pending:** Batch 4 (P1-18 onward).

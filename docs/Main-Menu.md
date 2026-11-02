@@ -165,6 +165,18 @@ The asset ids are in `Config.MainMenu.Textures`. Re-run with:
 
 (Use a short output path: Blender can't open files past Windows' 260-character limit.)
 
+## Back to the main menu (1.8.4)
+
+Settings (top bar Menu, or M) has a crimson **Main Menu** button in its footer, next to "Reset to defaults". It's added by `Controllers.Gui.BackToMenu`; the menu itself is unchanged.
+- **Confirming:** the first click arms it ("Confirm?"). A second click within 4 s confirms. The status line explains each step.
+- **Server:** `Services.Features.BackToMenu` (remote `ReplicatedStorage.NHBackToMenu`) refuses while you're combat-tagged (`CombatTagUntil`), downed or carried, or already in the menu. It accepts at most one request per 6 s.
+- **Why a teleport:**
+  - A save slot can't be unloaded mid-session, because releasing the profile kicks the player.
+  - So the button teleports you back into the **same server** (`TeleportOptions.ServerInstanceId = game.JobId`), or into any server if that fails.
+  - Leaving saves and releases the profile, and you arrive on the normal loading screen and main menu, free to pick any slot.
+- **In Studio,** teleports can't run, so the button answers "Works in a live game only (not Studio)."
+- **Hidden** while you're in the main menu (Settings opens from there too).
+
 ## Files
 
 | Where | What |
