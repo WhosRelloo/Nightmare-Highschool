@@ -2,6 +2,41 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.9.1] - 2026-11-02: Customization cameras, Male/Female hair, enemies off campus, NPC hair fixed
+
+### Changed
+- **Customization cameras frame what you're editing, in the space the panels leave free.**
+  - **The problem:** in the main-menu creator, the camera centred your student while the edit panel covered the right of the screen. The feet fell under the letterbox, and dragging to turn the student swung them away, because the orbit pivoted on the scene's origin.
+  - **Creator shots:** each one is now built live from your student, keeping its angle and lens: the whole body for Look, Outfit, Bloodline, Name and Shop; the face for Face; the whole hairstyle for Hair.
+  - **Placement:** the shot is centred in the free area between the left menu, the panel and the letterbox. It's framed again 0.75 s later, once the panel has slid into place.
+  - **Orbit:** dragging turns the camera around your student.
+  - **Wardrobe stations and the barber:** the panel docks on the right like the creator's, and the world camera frames you in the space beside it (your whole outfit at a wardrobe, your hair at the barber). It picks an angle nothing blocks, or fades whatever is in the way, just for you. Closing the panel or walking away gives your camera back.
+  - **Files:** `ReplicatedStorage.Functions.FrameCamera` (new, shared), `Gui.MainMenu` (camera framing and orbit only; the menu's look is unchanged), `Gui.Wardrobe`.
+- **Hair styles split by Male and Female.**
+  - **Barber's book:** shows **Male** and **Female** sections, with your body type's first.
+  - **Catalog:** each hair's `Group` now follows the owner's export folders (`Males_*` / `Females_*`), giving 15 Male and 20 Female. Ten male cuts were tagged "Any", so ambient NPCs (which match `Group` exactly) never wore them. They do now.
+- **Delinquents and wolves moved away from the school.** Their spots are markers in `workspace.Map.NHHangouts`:
+  - **Delinquent crews** hang out in the empty south-east lot, "The Back Lot" on the compass, instead of the Field, the Pitch and the Boiler Yard.
+  - **Wolves** roam the west edge and the south-west corner at night instead of the Boiler Yard.
+- **The barber** works out of the nook between the Records Office and the Boiler Yard, facing the hallway, instead of standing in the corridor in front of the lockers (`Features.AmbientNpcs`).
+
+### Fixed
+- **NPC hair sat in the wrong place on two catalog cuts.**
+  - **Affected:** Fighter Crop and Fluffy Messy sat about 0.7 studs too low, hanging at the back of the neck or on the shoulders (Bruno Vance, Mr. Hale, some delinquents).
+  - **Found by:** measuring every catalog hair's surface on a test head with rays. The other 33 were already right.
+  - **Fix:** both are raised, and Fighter Crop is also brought forward, in the catalog itself, so players get the fix too. The originals are kept in `ServerStorage.NH_Backup.NHHairCatalog_preFit`.
+
+### Verified
+**[PT]**
+- **Creator Body:** hair top at y 246 and feet at y 662, inside the free 85–726 band, centred at x ≈ 700 between the menu (355) and the panel (1054). Before, the feet were cut off at 696.
+- **Creator Face and Hair:** each fills the free area. Name & Clan keeps its low angle.
+- **Barber:** opens docked, with the camera on your hair and the barber faded or avoided.
+- **Delinquents:** spawned at about (180, −175).
+- **Wolves:** appeared at (−240, −233), (−224, −47) and (−215, −6).
+- **Bruno's hair:** now at (0.00, 0.17, 0.11) on his head.
+- **Barber:** at (158.6, 28), facing the hallway, with the prompt working.
+- **Still open:** Bruno Vance still shows the default Roblox face (not the Nightmare High face art). That's a separate Social NPC appearance issue.
+
 ## [1.9.0] - 2026-11-02: VFX Batch 4 complete (case files, goals, Bloodrush)
 
 ### Added

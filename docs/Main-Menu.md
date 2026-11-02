@@ -165,6 +165,15 @@ The asset ids are in `Config.MainMenu.Textures`. Re-run with:
 
 (Use a short output path: Blender can't open files past Windows' 260-character limit.)
 
+## Creator camera framing (1.9.1)
+- **Framing:** each creator tab frames the part of your student it edits, in the screen space left free by the left menu, the docked panel and the letterbox (`ReplicatedStorage.Functions.FrameCamera`).
+  - Look, Outfit, Bloodline, Name and Shop show the whole body.
+  - Face shows the face.
+  - Hair shows the whole hairstyle.
+- **Angle and lens:** these still come from the MenuShot parts.
+- **Timing:** the shot is framed one frame after a tab change, and again 0.75 s later once the panel has slid into place.
+- **Orbit:** dragging turns the camera around your student.
+
 ## Back to the main menu (1.8.4)
 
 Settings (top bar Menu, or M) has a crimson **Main Menu** button in its footer, next to "Reset to defaults". It's added by `Controllers.Gui.BackToMenu`; the menu itself is unchanged.
