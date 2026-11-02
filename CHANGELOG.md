@@ -2,6 +2,35 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.8.7] - 2026-11-02: Night sight, the full moon and second chances
+
+### Added
+- **Night sight (H) for night races.** Vampires, Werewolves, Ghouls and Wraiths press **H** to see in the dark.
+  - **You:** a personal light lifts the dark around you, under a sharp, desaturated hunter's grade with a hint of your race colour.
+  - **Everyone:** your eyes glow in your race colour. Vampire is crimson, Werewolf amber, Ghoul acid green and Wraith ice blue.
+  - **How the glow works:** each face strip gets an unlit copy of the iris behind the face, and the normal iris is hidden. The glow shows through the eye opening, blinks still cover it, and a small light at the eyes tints the face.
+  - **Server-owned:** the state is the character attribute `NightSight`, so everyone sees it. Humans and Priests can't turn it on.
+  - **Turns off** when you die, respawn, go back to the menu, or stop being a night race.
+  - **Files:** `Services.Features.NightSight` (remote `ReplicatedStorage.NHNightSight`) and `Controllers.Character.NightSight`.
+- **Full-moon night (VFX P2-1).** From 20:00 on a full-moon night (every 4th night, the same rule that boosts night powers):
+  - the moon swells from 11 to 18 over 20 s;
+  - a cool, pale-crimson moonlight grade fades in, stronger for Werewolves and Vampires;
+  - a "The moon is full" banner shows once a night;
+  - Werewolves get a 3 s silver edge around the screen.
+  - It all eases back at dawn, and stays out of the main menu.
+  - **Files:** `Controllers.World.FullMoon`, which has its own `NHMoonGrade` layer and never touches DayCycle's properties. `Controllers.Gui.Moments` gained a public `Banner(Opts)`.
+- **"Second chance" get-up (VFX P2-8).** When a student gets back up from downed, players within 120 studs see:
+  - a candle-gold wisp, a gold ring at the feet and a warm light pulse;
+  - for **Fated** (the once-a-day revive): a clock-face sigil turns under them, its hand sweeping once, with crimson-gold embers.
+  - It plays for the get-up only, never the downed, carry or grip visuals, and not for NPCs.
+  - **Files:** `Controllers.World.GetUp`, NHFx `GetUp` from `Downed.Recover`. Progression marks a Fated revive with `NHFated`.
+
+### Verified
+**[PT]** on the spare save slot II (a Werewolf):
+- **Night sight:** on through the real remote, with all 12 face strips glowing amber, the normal iris hidden, and the eye light, personal light and grade on. Off removes everything and restores the iris. A Human is refused.
+- **Full moon (night 8, 21:00):** the moon reached 18, the strong grade applied, the banner showed at 2.5 s and the silver edge at 3.1 s. At dawn the moon went back to 11 and the grade to neutral.
+- **Get-up:** the wisp, embers and ring drew, and the Fated sigil appeared. The sigil now finds the ground with a raycast, because a downed body sits low.
+
 ## [1.8.6] - 2026-11-02: Known bugs cleared
 
 All seven open bugs from the Implementation-Status list are fixed and Play-tested.

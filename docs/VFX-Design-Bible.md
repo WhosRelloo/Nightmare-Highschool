@@ -190,14 +190,14 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 ### P2: signature experiences
 | ID | Effect | Source | Owner |
 |---|---|---|---|
-| P2-1 | Full-moon night (moon size and tint, banner) | World D / Quests C14 | Q |
+| P2-1 | **Tested (1.8.7)**: Full-moon night (moon size and tint, banner); `Controllers.World.FullMoon` | World D / Quests C14 | Q |
 | P2-2 | Tagged lamps and ambient emitters (archive dust, boiler steam and embers, candle flicker at night) | World inventory | Q (W1) |
 | P2-3 | Ambient zone soundscape | World inventory | Q |
 | P2-4 | Enter-school "Bell" iris transition + location card | UI #8 | — |
 | P2-5 | Goal celebration (upright flare, net rings, light pulse, spectators) | UI #12 | — / Q |
 | P2-6 | Bloodrush aura revamp (client, ribbons, ends cleanly) | UI #13 | Q |
 | P2-7 | Teleport veil | UI #11 | Q |
-| P2-8 | "Second chance" get-up (Recover / Fated) | UI #10 | Q |
+| P2-8 | **Tested (1.8.7)**: "Second chance" get-up (Recover / Fated); `Controllers.World.GetUp` | UI #10 | Q |
 | P2-9 | Sigil paint & scrub | World G | Q |
 | P2-10 | Locker POV / hide fade | World I / Quests C6 | Q |
 | P2-11 | **Tested (UI kit, UI 1.13)**: Lesson juice (sounds, stamp slam, BOOM). Glyph bursts code-checked | World J | UI |
@@ -282,3 +282,4 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
   - **1.8.4:** a `Slash` entry in the hit and block effects and sounds (`Assets.Effects.{HitType,BlockHit}`, `Assets.Sounds.{Hit,SwingSFX,BlockHit}`) so Claws hits register. It reuses the Blood set until bespoke slash art exists.
   - **1.8.1:** the wolves' red attack tell (a Highlight plus a PointLight on the head).
   - **Still pending:** Batch 4, the P2 signature experiences (P2-2 and P2-3 wait for decision D5).
+- 2026-11-02: **Batch 4 started (1.8.7).** P2-1 (full-moon night) and P2-8 ("Second chance" get-up) are Tested. Outside the catalogue, the owner asked for **night sight** for night races (H: glowing race-colour eyes and a personal light). It's a supernatural look, so it fires only on a supernatural action, which fits the style rule.

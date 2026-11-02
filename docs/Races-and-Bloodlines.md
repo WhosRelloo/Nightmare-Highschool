@@ -162,6 +162,13 @@ Saving is unchanged: `PlayerData.Lineage = { Race, SubRace, Tier, Traits, Spins 
   - The UI audit check found no small or faint text in the tab.
 - **Bug found and fixed:** a leftover copy of the Progression module (from a timed-out check) made every Progression hook run twice. I removed it, and both heals and EXP then applied once.
 
+## Night sight (1.8.7)
+Night races (Vampire, Werewolf, Ghoul, Wraith) press **H** to see in the dark.
+- **Eye glow:** everyone sees their eyes glow in the race colour. Vampire is crimson, Werewolf amber, Ghoul acid green and Wraith ice blue.
+- **What they see:** a personal light and a hunter's grade.
+- **State:** held on the server as the character attribute `NightSight` (`Services.Features.NightSight`), and drawn by `Controllers.Character.NightSight`.
+- **Not available to** Humans and Priests.
+
 ## Not yet
 - **Not playtested yet:** two players seeing each other's race effects, and Fated, Wraith and Werewolf effects in real fights.
 
