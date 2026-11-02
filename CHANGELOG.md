@@ -2,6 +2,33 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.8.4] - 2026-11-02: Fist and Claws combat audit, fluid movement, back to menu
+
+### Fixed
+- **Fist and Claws running attacks never dealt damage.** The running-straight clip has no readable `Hit` marker when the swing starts, so the server's timing code errored out. It now has a fallback `Hit` of 0.33 s (the clip's own "Hit" keyframe), and both classes land the running attack at 6, 10 and 14 studs.
+- **Fist and Claws overshot their targets.** Two movers fought each other: a server lunge stacked on the shared running lunge, and a server hover and dive stacked on Katana's forward glide. Now:
+  - The running attack uses one shared lunge at the weapon's own speed. It stops when someone is 3 studs in front of you, like Katana's does.
+  - The downslam skips the glide. It holds your height but keeps your jump's drift, and the dive is timed to the ground so you land on the impact frame from any jump height.
+  - If someone is within 11 studs ahead, the dive curves to land in front of them.
+  - A second hit sweep 0.07 s later catches a target the dive reaches a frame late.
+- **Claws hits had no effect or sound.** The Claws damage type (Slash) had no hit effect, block effect, hit sound, swing sound or block sound. Each now has one.
+- **Pressing an action on cooldown cancelled what you were doing.** For example, a dash pressed during its cooldown ended your sprint. Cooldowns are now checked before the current action is cancelled.
+
+### Added
+- **The Claws class starts with claws on.** Spawning as a Claws student attaches the Specter Claws to both arms, already equipped with the Claws stance. Switching class in the locker stows them.
+- **Dashing hands back to the run.** If sprint is still held when a dash ends (forward, back or side), you go straight into a full-speed run (40.5) instead of walking.
+- **"Main Menu" button** in the Settings panel footer (top bar Menu, or M). It's a UI kit crimson button: click once to arm it, then again within 4 s to confirm. You go back to the normal loading screen and main menu with your progress saved, and you can choose any slot. It's refused while you're combat-tagged or downed, and it's hidden in the menu itself. It rejoins the same server through a teleport, so in Studio it only shows a "live game only" note.
+
+### Measured (dummy tests, all three weapons)
+- **M1 combo rhythm** already matched Katana's:
+  - Hits at 0.30 / 0.87 / 1.47 / 2.08 s (Katana), 0.38 / 0.82 / 1.31 / 1.86 s (Fist) and 0.35 / 0.77 / 1.32 / 1.87 s (Claws).
+  - All three restart after about 1.1 s.
+- **Hits now landing:**
+  - **Running attack:** Fist and Claws at 0.33 s, Katana at 0.50 s.
+  - **Downslam (Fist and Claws):** from 8 and 14 studs up, with targets below or up to 9 studs ahead.
+  - **M2:** all three. Katana lands two hits.
+- **Still open:** Claws borrows the Fist attack animations until Claws clips exist.
+
 ## [1.8.3] - 2026-11-02: Full audit, chest rotations
 
 ### Fixed
