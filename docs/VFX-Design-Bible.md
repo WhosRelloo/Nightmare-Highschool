@@ -193,15 +193,15 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 | P2-1 | **Tested (1.8.7)**: Full-moon night (moon size and tint, banner); `Controllers.World.FullMoon` | World D / Quests C14 | Q |
 | P2-2 | Tagged lamps and ambient emitters (archive dust, boiler steam and embers, candle flicker at night) | World inventory | Q (W1) |
 | P2-3 | Ambient zone soundscape | World inventory | Q |
-| P2-4 | Enter-school "Bell" iris transition + location card | UI #8 | — |
+| P2-4 | **Tested (1.8.8)**: Enter-school "Bell" arrival (seal opening + location card), built after the menu hands over so the menu is untouched; `Controllers.World.Arrival` | UI #8 | — |
 | P2-5 | Goal celebration (upright flare, net rings, light pulse, spectators) | UI #12 | — / Q |
 | P2-6 | Bloodrush aura revamp (client, ribbons, ends cleanly) | UI #13 | Q |
-| P2-7 | Teleport veil | UI #11 | Q |
+| P2-7 | **Tested (1.8.8)**: Teleport veil (`Fx.VeilMove`: duel ring, admin bring/go-to) + server-hop TeleportGui; `Controllers.World.Veil` | UI #11 | Q |
 | P2-8 | **Tested (1.8.7)**: "Second chance" get-up (Recover / Fated); `Controllers.World.GetUp` | UI #10 | Q |
 | P2-9 | Sigil paint & scrub | World G | Q |
-| P2-10 | Locker POV / hide fade | World I / Quests C6 | Q |
+| P2-10 | **Tested (1.8.8)**: Locker POV / hide fade; `Controllers.World.LockerPOV` | World I / Quests C6 | Q |
 | P2-11 | **Tested (UI kit, UI 1.13)**: Lesson juice (sounds, stamp slam, BOOM). Glyph bursts code-checked | World J | UI |
-| P2-12 | Presence fade for NPCs and watchers | Quests C13 | Q |
+| P2-12 | **Tested (1.8.8)**: Presence fade for NPCs and watchers; `Controllers.World.Presence` | Quests C13 | Q |
 | P2-13 | Evidence string + SOLVED stamp | Quests C4 | Q |
 | P2-14 | **UI part implemented (UI 1.12/1.13)**: Rarity reveal (clan / race / variant). `Kit.RarityReveal` tiers + SpinReel near-miss; callers pass `rarity` on the final entry. World burst still Q | UI #6 | Q + UI (SpinReel) |
 | P2-15 | **Tested (UI kit, UI 1.11)**: Yen chip | UI #5 | UI |
@@ -283,3 +283,4 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
   - **1.8.1:** the wolves' red attack tell (a Highlight plus a PointLight on the head).
   - **Still pending:** Batch 4, the P2 signature experiences (P2-2 and P2-3 wait for decision D5).
 - 2026-11-02: **Batch 4 started (1.8.7).** P2-1 (full-moon night) and P2-8 ("Second chance" get-up) are Tested. Outside the catalogue, the owner asked for **night sight** for night races (H: glowing race-colour eyes and a personal light). It's a supernatural look, so it fires only on a supernatural action, which fits the style rule.
+- 2026-11-02: **Batch 4 continued (1.8.8).** P2-4, P2-7, P2-10 and P2-12 are Tested. Still to do: P2-5, P2-6, P2-9 and P2-13 (P2-2 and P2-3 wait on D5).

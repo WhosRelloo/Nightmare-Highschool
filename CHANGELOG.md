@@ -2,6 +2,30 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.8.8] - 2026-11-02: Arrivals, veils, lockers and fades (VFX Batch 4)
+
+### Added
+- **Enter-school arrival (P2-4).** When you leave the main menu for school, once the menu's own fade has cleared:
+  - a gold clock seal stamps in at the centre of the screen and opens outward, with a soft bell;
+  - a card names where you are (the nearest named place, classroom or faction base, else "School grounds") with the day and time.
+  - The main menu itself is unchanged. `Controllers.World.Arrival`.
+- **Teleport veil (P2-7).** Moving into the duel ring, and the admin panel's bring and go-to, now fade your screen to ink, puff violet smoke where you stood, move you under the veil, then puff smoke where you land.
+  - **Server hops** (the Main Menu button, the server browser) show a crest card that says "Leaving school..." instead of Roblox's default screen.
+  - **Files:** `Services.Features.Fx.VeilMove`, `Controllers.World.Veil`.
+- **Locker hide (P2-10).**
+  - **Hiding:** your camera moves to the locker door and looks out through vent slats, desaturated, with a slightly narrower FOV. Your race-look emitters pause.
+  - **Others:** they see you fade out with a muffled clank, and fade back when you step out.
+  - **Respawn:** a reset or death while hidden leaves nothing behind.
+  - **Files:** `Controllers.World.LockerPOV`.
+- **Presence fade (P2-12).** Stealth watchers coming on or off duty and talkable NPCs respawning fade in and out over 0.7 s, with a soft smoke puff, instead of popping. The server flags them with `Presence`, and on removal sets `Departing` and waits 0.8 s. `Controllers.World.Presence`.
+
+### Verified
+**[PT]**
+- **Arrival:** the seal showed 2.2 s after entering, then the card ("Archive", "Monday · 12:01 PM").
+- **Veil:** the screen was fully covered in 0.2 s, the move happened under the cover, it faded back over 0.4 s, and smoke puffed at both ends. The hold was then raised to 0.2 s to allow for network latency.
+- **Locker:** camera at the door, FOV 64, saturation -0.3, slats and the HIDDEN eye. Stepping out restored everything, and so did a respawn while hidden.
+- **Presence:** fade in over 0.6 s, fade out over 0.5 s, then removed.
+
 ## [1.8.7] - 2026-11-02: Night sight, the full moon and second chances
 
 ### Added
