@@ -332,10 +332,6 @@ def r6_skull(loc, M):
     sk.scale = (1.5, 0.9, 1.25)
     bv = sk.modifiers.new("B", "BEVEL"); bv.width = 0.36; bv.segments = 10
     link(sk, M["bone"])
-    bpy.ops.mesh.primitive_cube_add(size=1, location=(x, y + 0.05, z - 0.62)); jaw = bpy.context.active_object
-    jaw.scale = (1.0, 0.75, 0.42)
-    bv = jaw.modifiers.new("B", "BEVEL"); bv.width = 0.12; bv.segments = 6
-    link(jaw, M["bone"])
     dark = P.material("Socket", base=(0.015, 0.008, 0.01), rough=0.85, wear=0.0, dirt=0.0)
     glow = P.material("Ember", base=(0.9, 0.08, 0.06), rough=0.4, wear=0.0, dirt=0.0)
     try:
@@ -351,9 +347,27 @@ def r6_skull(loc, M):
         link(bpy.context.active_object, glow)
     bpy.ops.mesh.primitive_cone_add(vertices=3, radius1=0.13, depth=0.1, location=(x, y - 0.45, z - 0.2), rotation=(math.pi / 2, 0, math.pi))
     link(bpy.context.active_object, dark)
-    for k in range(-2, 3):
-        slab("Gap", 0.025, 0.24, 0.05, (x + k * 0.17, y - 0.33, z - 0.6), dark, bevel=0.005)
-    slab("Bite", 0.9, 0.03, 0.05, (x, y - 0.33, z - 0.6), dark, bevel=0.005)
+    # mouth: cheekbones, upper jaw with a row of teeth, a dark gap, a hinged lower jaw with its own teeth
+    for sx in (-1, 1):
+        cb = slab("Cheek", 0.42, 0.16, 0.36, (x + sx * 0.52, y - 0.2, z - 0.27), M["bone"], bevel=0.07)
+        cb.rotation_euler = (0, sx * 0.3, 0)
+    slab("Maxilla", 0.98, 0.16, 0.5, (x, y - 0.12, z - 0.44), M["bone"], bevel=0.06)
+    slab("MouthGap", 0.92, 0.26, 0.3, (x, y - 0.12, z - 0.68), dark, bevel=0.03)
+    widths = (0.13, 0.15, 0.16, 0.16, 0.15, 0.13)
+    xs, acc = [], -sum(widths) / 2 - 0.01 * 2.5
+    for w in widths:
+        xs.append(acc + w / 2); acc += w + 0.01
+    for i, (tx, w) in enumerate(zip(xs, widths)):
+        long = 0.03 if i in (1, 4) else 0.0        # canines a touch longer
+        slab("ToothU", w, 0.17 + long, 0.16, (x + tx, y - 0.36, z - 0.585 - long / 2), M["bone"], bevel=0.035)
+        slab("ToothL", w * 0.95, 0.15, 0.16, (x + tx, y - 0.34, z - 0.8), M["bone"], bevel=0.035)
+    jaw = slab("Mandible", 1.1, 0.28, 0.62, (x, y - 0.05, z - 0.98), M["bone"], bevel=0.11)
+    slab("Chin", 0.5, 0.12, 0.2, (x, y - 0.33, z - 1.06), M["bone"], bevel=0.06)
+    for sx in (-1, 1):
+        slab("Hinge", 0.1, 0.34, 0.2, (x + sx * 0.6, y - 0.22, z - 0.72), dark, bevel=0.03)   # jaw joints
+        rivet((x + sx * 0.6, y - 0.32, z - 0.72), 0.045, M["brass"])                       # brass pins
+    # a hairline crack across the brow
+    curve("Crack", [(x + 0.18, y - 0.69, z + 0.75), (x + 0.26, y - 0.69, z + 0.58), (x + 0.21, y - 0.69, z + 0.47), (x + 0.3, y - 0.69, z + 0.36)], 0.012, dark)
 
 
 def crest():
@@ -380,9 +394,9 @@ def crest():
         finial(sx * 1.9, 2.0, 0.5, sx, 1, M)
     bpy.ops.mesh.primitive_cone_add(vertices=4, radius1=0.12, depth=0.5, location=(0, -0.02, -2.55), rotation=(math.pi, 0, 0))
     link(bpy.context.active_object, M["iron"])
-    slab("LockBody", 0.62, 0.52, 0.26, (0, -0.3, -1.6), M["iron"], bevel=0.1)
-    curve("Shackle", [(0.2 * math.cos(math.pi * i / 16), -0.3, -1.34 + 0.24 * math.sin(math.pi * i / 16)) for i in range(17)], 0.05, M["silver"])
-    rivet((0, -0.45, -1.62), 0.06, M["brass"])
+    slab("LockBody", 0.62, 0.5, 0.26, (0, -0.3, -1.72), M["iron"], bevel=0.1)
+    curve("Shackle", [(0.2 * math.cos(math.pi * i / 16), -0.36, -1.47 + 0.2 * math.sin(math.pi * i / 16)) for i in range(17)], 0.05, M["silver"])
+    rivet((0, -0.45, -1.74), 0.06, M["brass"])
     slab("Ribbon", 3.5, 0.42, 0.08, (0, -0.55, -2.15), M["crimson"], bevel=0.03)
     for sx in (-1, 1):
         t = slab("Tail", 0.55, 0.42, 0.06, (sx * 1.95, -0.45, -2.25), M["crimson"], bevel=0.03); t.rotation_euler = (0, sx * 0.35, 0)
