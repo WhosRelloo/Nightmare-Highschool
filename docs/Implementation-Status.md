@@ -1,6 +1,6 @@
 # Implementation Status: NH Combat Test
 
-Last updated: 2026-11-02 (through 1.9.1). Done: Milestone 0, combat and three weapon classes (`Combat-System.md`), clock and timetable (`School-Simulation.md`), attendance and discipline (`Attendance-and-Discipline.md`), class activities (`Class-Activities.md`), factions and reputation (`Factions-and-Reputation.md`), quests, races, sports, the main menu (`Main-Menu.md`) and the admin panel (`Admin-Panel.md`).
+Last updated: 2026-11-02 (through 1.9.2). Done: Milestone 0, combat and three weapon classes (`Combat-System.md`), clock and timetable (`School-Simulation.md`), attendance and discipline (`Attendance-and-Discipline.md`), class activities (`Class-Activities.md`), factions and reputation (`Factions-and-Reputation.md`), quests, races, sports, the main menu (`Main-Menu.md`) and the admin panel (`Admin-Panel.md`).
 
 How each result was checked:
 - **[PT]** Studio playtest
@@ -25,6 +25,7 @@ How each result was checked:
 | **Kills saved**: `Kills` (players) and `NPCKills` are added to player data, plus a Kills leaderboard column. Grip executions count. | `PlayerData`, `Functions.UpdateState`, `Player.Data`, `Features.KillTracker` | [PT-real] a B grip took NPCKills 0→1, and it survived a session restart |
 | **Main menu + save slots**: a cinematic PBR night-courtyard menu (spline camera, posed student in a crimson clock seal, Blender-rendered VFX), 3 save slots (each its own save; slot 1 = the old save), and character editing with camera cuts per Wardrobe tab, then ENTER SCHOOL | `Config.MainMenu`, `Services.Player.Slots`, `Services.Player.Data` (per-slot load), `Gui.MainMenu`, `workspace.MenuScene`, `Tools/vfx` | **[PT]** with real clicks and keys: intro → menu → slots → edit (Face-tab cut) → enter school; Continue. Camera smoothness measured (no stops between shots). 8 bugs found and fixed. **Menu 1.2 audit:** 10 more fixed (Settings input, plinth hair weld and race, Bloodline shot, remote errors, LastPlayed via UpdateState, name-filter race in Identity), all but the name race retested in Play. See Main-Menu.md. |
 | **UI Audit 1.0**:<br>• Every screen checked for small text, contrast, layering and edges<br>• Fixes in Progress, Compass, TopBar, Students, Identity, MainMenu, Loading<br>• Kit-owned findings sent to the UI kit session | `Gui.Progress` (`NHExpStrip`), `Gui.Compass`, `Gui.TopBar`, `Gui.Students`, `Gui.Identity`, `Gui.MainMenu`, `NHLoadingScreen` | **[PT-real]** audited in a 1287×600 playtest by day and night. Phones and gamepad not tested. See UI-Audit.md. |
+| **1.9.2**: every quest character, coach and staff NPC gets a full look (face art, outfit, skin, hair) instead of a hair on a recoloured rig | `Features.NpcLooks` (new), `Social.Npcs`, `School.HallMonitor`, `Quests.Stealth` | **[PT]** 27/27 NPCs have face art, a shirt and hair |
 | **1.9.1**: customization cameras frame the edited area in the free screen space (creator + wardrobe/barber stations, orbit around the student); barber's book split Male/Female (catalog `Group` from `RigSource`); delinquents/wolves moved to off-campus hangouts; barber moved to a nook; Fighter Crop and Fluffy Messy re-seated | `Functions.FrameCamera`, `Gui.MainMenu`, `Gui.Wardrobe`, `NHHairCatalog`, `Map.NHHangouts`, `Features.{Delinquents,WildWolves,AmbientNpcs}` | **[PT]** see CHANGELOG 1.9.1 |
 | **1.9.0**: VFX Batch 4 complete: evidence strings, link feedback and SOLVED stamp (P2-13), goal celebration and re-entrant GoalCam (P2-5), client Bloodrush aura (P2-6); soccer effects follow the player's settings again (`Local.Fx` name clash fixed) | `Gui.QuestJournal`, `Quests.Investigation`, `Gui.Soccer`, `Sports.Soccer` | **[PT]** strings, shake, stamp, aura, goal effects and light pulse. GoalCam checked by code reading (needs a live match). |
 | **1.8.9**: VFX P2-9 sigil paint and scrub; the prisoner idle removed from players in detention | `Controllers.World.SigilFx`, `Controllers.Character.ContextAnims` | **[PT]** paint with drips, scrub fade, detention stance |
@@ -121,15 +122,27 @@ Nothing was changed in the production place.
 - **Missing mechanics.** Ragdoll never happens. Perfect-dodge gives no reward. `AirWeld` is unused.
 - **Empty or unused modules.** `GuiController` and `SkillController` are empty, and `Services.AI.Spawn` is commented out.
 
-## Not started (from the master prompt and the concept doc)
+## Not started or still open (refreshed 2026-11-02)
 
-- ~~School simulation~~ **Done** (clock, timetable, classes, attendance, discipline, detention, hall monitors). Still to do: NPC schedules and a timetable UI.
-- ~~Social systems~~ **Done** for two factions. Still to do: The Ordinary and The Hollow (rumoured only), and relationships with ordinary students.
-- **Content systems:** inventory, personal lockers, clubs, jobs, events. *Done:* dialogue, quests, investigation, stealth, duels.
-- **Progression from the concept doc:** races, classes, EXP and levels
-- **UI:** HUD, timetable UI, quest journal, notifications, settings
-- **Input:** mobile and gamepad controls
-- **World:** school map. The place is currently a flat baseplate.
+- **World:** the real school map. The campus is still a greybox on a 512-stud baseplate. Places are found by attributes and tags (`Compass`, `RoomId`, `NpcPost`, `NHDelinquentSpawn`, `NHWolfSpawn`, `NHWardrobe`...), so a built map lights up on its own.
+- **Input:** phone and gamepad controls for combat (V carry, B grip, crouch, H night sight). Soccer and menus already have pads.
+- **School life:** NPC daily schedules and a timetable screen.
+- **Factions:** The Ordinary and The Hollow (rumoured only), and relationships with ordinary students.
+- **Content systems:** inventory, personal lockers, jobs, events. *Done:* dialogue, quests, investigation, stealth, duels, clubs and sports, gear and chests, progression (EXP, levels, stats), races and bloodlines, the HUD, journal, notifications and settings.
+- **Animation gaps:**
+  - Claws still borrows the Fist attack clips.
+  - Fist and Claws have no grip pair of their own (they use Katana's).
+  - Exorcise and Soul Siphon use a placeholder kneel.
+- **Security follow-up:** an anti-teleport check (#14). It needs a design that allows entering school, admin bring and menus.
+- **Live-only checks:**
+  - the Main Menu button's teleport;
+  - two-player tests (combat movers, race effects, carry and grip on players);
+  - the GoalCam in a real match.
+- **VFX:**
+  - **Batch 5 (P3 polish):** EXP gain tick, result card reveal, Strangers write-on, seated chime, discipline record stamp, Night Study candle warmth, soft-edge soccer markers, basketball `nh_*` sparkles.
+  - **P2-2 and P2-3:** wait on D5.
+  - **P4-1 Nightmare Nights:** needs its own design pass.
+  - **Sigil spray-hiss:** needs a sound picked (D4).
 
 ## Downed / Carry / Grip: open items
 

@@ -2,6 +2,27 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.9.2] - 2026-11-02: Every NPC gets a real face and outfit
+
+### Fixed
+- **Quest characters and staff showed Roblox's default smile on a recoloured rig.**
+  - **Who:** Bruno, Pip, Ezra, Vesper, Dex, Coaches Varga, Mallory and Dunmore, the Hall Monitor and the stealth watchers (Mr. Hale).
+  - **Why:** they were only ever given a hair.
+  - **Fix:** they now get a full look through the same appearance system as the students: face art (eyes, brows, mouth), skin, outfit and their catalog hair.
+  - **Outfits:**
+    - the Vigil and Crimson Court leaders wear their faction vests;
+    - the coaches wear P.E. shirts or a varsity jacket;
+    - Bruno, keeper of the ring, wears a leather jacket;
+    - Dex, the courier, wears a flannel;
+    - staff wear a blazer or cardigan.
+  - **Kept:** the faction light.
+  - **Files:** `Services.Features.NpcLooks` (new: `Apply` and `Specs`), used by `Social.Npcs`, `School.HallMonitor` and `Quests.Stealth`.
+
+### Verified
+**[PT]**
+- **Coverage:** all 27 non-dummy NPCs have the face art, a shirt and hair.
+- **Bruno up close:** game eyes, angry brows, a scowl, a leather jacket and his re-seated Fighter Crop.
+
 ## [1.9.1] - 2026-11-02: Customization cameras, Male/Female hair, enemies off campus, NPC hair fixed
 
 ### Changed
