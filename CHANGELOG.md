@@ -2,6 +2,25 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.8.3] - 2026-11-02: Full audit, chest rotations
+
+### Fixed
+- **Gear chests stand upright and face the room.** The imported chest kept its FBX pivot about 100 studs from the mesh, so chests swung around it, landed away from their spots and faced random ways. The pivot is now the chest's centre. Each chest sits with its back a hand's width off the nearest wall and the lock facing open space. In the open it faces the spot's direction. It re-checks the floor after moving, so it never ends up hanging off a ledge.
+- **Mr. Hale walked through the staff-room table** on every patrol lap (his route ran along its edge, beside the coffee counter). The table moved 1.5 studs to open a clear path.
+- **Gear store:** a failed save during a purchase could leave the player stuck on "One moment..." until they rejoined. The busy flag is now always cleared.
+
+### Audit (no change needed)
+- **Scripts:** all 438 compile, with no empty sources. A full in-game day and night across nine areas showed no server errors and no client errors.
+- **World:** no parts fall out of the world or slide loose.
+- **Data:** all 40 gear items have templates, all 35 hairs are rigged and grouped, every NPC hair ID is valid, every quest giver exists, and both stealth routes are present.
+- **Purchases:** the store, gear and enrollment handlers all check distance, ownership, price and IDs on the server.
+- **Delinquent kill reward** checked live: +¥10 and +30 Combat EXP for a Grunt.
+- **School day:** "After School" from 12:00 is by design. The timetable runs four in-game school hours.
+- **Left as is:**
+  - Debug `warn(true)` lines in combat state code (Block, DownSlam, VowFlame, Posture Break, the skill template), because combat is off-limits here.
+  - A raw table print on the client.
+  - The HUD Yen label is exactly as wide as its text, which is fine.
+
 ## [1.8.2] - 2026-11-02: NPCs get real hair and stand where they should
 
 ### Added
