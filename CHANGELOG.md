@@ -2,6 +2,49 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.14.1] - 2026-11-03: Football: power levels, tighter catching, landing rings
+
+### Changed
+- **Throw power levels (Football Fusion style).** The QB sets a power from 10 to 100 in steps of 5 with **Z / C** (d-pad on a gamepad), even while lined up before the snap, then **clicks** to throw at it. The hold-to-charge throw is gone.
+  - The power shows on a kit bar above the controls hint, with its style: LOB (40 and under), SPIRAL, BULLET (80 and up).
+  - Low power floats a high lofted ball; high power fires a flat, fast bullet.
+  - Thrown balls spiral: nose along the flight, spinning about the long axis, faster on a bullet.
+  - The gold ring still shows the QB where a throw at the current power would come down.
+  - Kicks still use the hold-and-release kick meter.
+- **Catching takes more skill.** All of these still need a click:
+
+  | Setting | Before | Now |
+  |---|---|---|
+  | Reach from the shoulders | 5.5 studs | 3.75 studs |
+  | Interception reach | 4.5 studs | 3.25 studs |
+  | Click window | 0.4 s | 0.25 s |
+  | Lockout after a whiffed click | 0.6 s | 0.8 s |
+  | Extra reach from a dive | +2 | +1.5 |
+
+  The look-back for network delay stays at 0.3 s.
+
+### Added
+- **A faint landing ring** under every football in the air (passes and kicks), for everyone. It follows the ball's real arc.
+
+### Fixed
+- **Dive catches:** a click anywhere in a dive now counts. The landing stun used to block clicks in the second half of the dive. A dive still never catches by itself.
+- **Kickoffs can be caught.** Catches were only accepted in normal plays.
+- **Kick returns:** jukes, spins, dives and kneels now work, as on any carry.
+
+### Testing (Play, solo on slot II, after school hours)
+- **Power level:** real Z presses took it from 60 to 40 (LOB); the HUD bar shows "POWER 60 · SPIRAL".
+- **Three throws at the same target:**
+
+  | Power | Launch angle | Peak | Spin |
+  |---|---|---|---|
+  | 25 | 31 degrees | 10.9 | 25 rad/s |
+  | 60 | 10 degrees | 6.9 | 34 rad/s |
+  | 100 | 4 degrees | 6.2 | 45 rad/s |
+
+  The spin was 100% along the flight line, and the landing ring appeared at the target each time.
+- **Route Runner, tighter reach:** 3 of 4 caught; the miss passed 4.9 studs away. Dive and click: 3 of 3 caught.
+- **Not tested:** a kickoff catch and return, which need a second player to kick.
+
 ## [1.14.0] - 2026-11-03: Football (Sports 1.2, Iron Wardens)
 
 ### Added

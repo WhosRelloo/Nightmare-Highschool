@@ -1,7 +1,7 @@
 """Nightmare Highschool school props (Blender 5.x, run headless).
 
 usage:
-  "E:/Blender/blender.exe" --background --factory-startup --python art/props/nh_props.py -- <Prop> [--size 1024] [--samples 64]
+  "E:/Blender/blender.exe" --background --factory-startup --python art/props/nh_props.py -- <Prop> [--size 1024] [--samples 64] [--gpu]
   Props: StudentDesk, TeacherDesk, Chalkboard, Locker, HidingLocker   (or "all")
 
 Each prop is modelled in studs (1 Blender unit = 1 stud), facing -Y (its front), base on the ground at the origin.
@@ -34,6 +34,8 @@ argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 PROP = argv[0] if argv else "StudentDesk"
 SIZE = int(argv[argv.index("--size") + 1]) if "--size" in argv else 1024
 SAMPLES = int(argv[argv.index("--samples") + 1]) if "--samples" in argv else 64
+GPU = "--gpu" in argv          # bake and render on the GPU (Cycles HIP / CUDA / OptiX, whichever is present)
+BAKE_SAMPLES = max(16, SAMPLES // 2)   # colour, roughness, normal and metal bakes (AO uses SAMPLES)
 
 
 # ------------------------------------------------------------------ scene
@@ -44,6 +46,20 @@ def reset():
     sc.unit_settings.system = "NONE"
     sc.render.engine = "CYCLES"
     sc.cycles.device = "CPU"
+    if GPU:
+        prefs = bpy.context.preferences.addons["cycles"].preferences
+        for kind in ("OPTIX", "CUDA", "HIP", "ONEAPI"):
+            try:
+                prefs.compute_device_type = kind
+            except TypeError:
+                continue
+            prefs.get_devices()
+            gpus = [d for d in prefs.devices if d.type == kind]
+            if gpus:
+                for d in prefs.devices:
+                    d.use = d.type == kind
+                sc.cycles.device = "GPU"
+                break
     sc.cycles.samples = SAMPLES
     return sc
 
@@ -1193,6 +1209,8 @@ def candelabra(M):
     return (1.5, 1.5, H + 0.95)
 
 
+PREVIEW_PAD = {}   # name -> camera distance factor for a prop that would be cropped
+
 BUILD = {
     "StudentDesk": student_desk,
     "TeacherDesk": teacher_desk,
@@ -1294,13 +1312,13 @@ def bake_all(objs, name):
         o.select_set(True)
     bpy.context.view_layer.objects.active = objs[0]
     bk = sc.render.bake
-    bk.margin = 8
+    bk.margin = max(8, SIZE // 128)   # 8 px at 1024, 16 at 2048, so mip levels don't bleed seams
     bk.use_selected_to_active = False
 
     def bake_input(socket_name, kind):
         """Bake one Principled input as-is by routing it through an emission shader (EMIT bake).
         Used for Base Color (a DIFFUSE colour bake returns black for metals) and Metallic."""
-        sc.cycles.samples = 16
+        sc.cycles.samples = BAKE_SAMPLES
         saved = []
         for m in mats:
             nt = m.node_tree
@@ -1323,7 +1341,7 @@ def bake_all(objs, name):
             nt.nodes.remove(em)
 
     bake_input("Base Color", "color")
-    sc.cycles.samples = 16
+    sc.cycles.samples = BAKE_SAMPLES
     set_target("rough")
     bpy.ops.object.bake(type="ROUGHNESS")
     set_target("normal")
@@ -1391,7 +1409,7 @@ def preview(objs, name, dims, suffix=""):
     w.use_nodes = True
     w.node_tree.nodes["Background"].inputs["Color"].default_value = (0.03, 0.028, 0.045, 1)
     w.node_tree.nodes["Background"].inputs["Strength"].default_value = 1.0
-    size = max(dims)
+    size = max(dims) * PREVIEW_PAD.get(name, 1.0)
     def light(kind, loc, energy, color, rot=None, s=2.0):
         L = bpy.data.lights.new(kind, kind)
         L.energy = energy
@@ -1445,11 +1463,12 @@ def run(name):
     print(f"[props] {name}: {tris} tris, pieces {[o.name for o in objs]}, dims {dims}")
 
 
-# batch 3 lives in its own file and registers into BUILD; it must share THIS module (run as a script,
+# batches 3 and 4 live in their own files and registers into BUILD; it must share THIS module (run as a script,
 # nh_props is __main__, and a second import would get its own PARTS list)
 sys.modules.setdefault("nh_props", sys.modules[__name__])
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import nh_props_batch3  # noqa: E402,F401
+import nh_props_batch4  # noqa: E402,F401
 
 
 if __name__ == "__main__":

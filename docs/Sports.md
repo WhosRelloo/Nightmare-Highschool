@@ -182,10 +182,10 @@ Plays like *Football Fusion 2* (the owner's pick), with an optional quick play c
 
 | Who | Key | Action |
 |---|---|---|
-| QB | aim with the mouse, hold click and release | Throw. Power 0-100 over 1.2 s sets speed and range (a short hold falls short). A gold ring shows the landing spot. Might adds range. One forward pass a play, from behind the line. |
+| QB | Z / C, then click (aim with the mouse) | Set the power level (10-100 in steps of 5, also before the snap), then click to throw at it. Low power is a high lob, high power a flat bullet (the HUD bar says LOB / SPIRAL / BULLET). A gold ring shows where it would land. Might adds range. One forward pass a play, from behind the line. |
 | QB | F / G | Pump fake / hand off to the closest teammate within 6 studs |
 | Anyone | click | Reach for the ball in the air (catch or interception) |
-| Anyone | Space / Q | Jump catch / dive (10-stud lunge, +2 studs of reach, 20 stamina) |
+| Anyone | Space / Q | Jump catch / dive (10-stud lunge, +1.5 studs of reach while you click, 20 stamina) |
 | Carrier | E / R, F, K | Juke left / right, spin (both break a tackle in their window), kneel |
 | Defence | touch, R, C | Tackle, hit stick (25% fumble; a miss stumbles you for 1 s), swat |
 | Kicker | hold click and release, O | Kick (aim with the camera), onside (kickoff) |
@@ -196,9 +196,11 @@ Plays like *Football Fusion 2* (the owner's pick), with an optional quick play c
 
 **Catching (Football Fusion style)**
 - Click to reach. Your arms follow the ball while you reach (up to a second while you hold). Every client draws this for every character, from the server's `F_Reach`.
-- The ball snaps into the hands of whoever's reach it touches first along its flight. Reach is 5.5 studs from the shoulders (4.5 for an interception), plus Wraith's +8% and a dive's +2.
+- The ball snaps into the hands of whoever's reach it touches first along its flight. Reach is 3.75 studs from the shoulders (3.25 for an interception), plus Wraith's +8% and a dive's +1.5: be under the ball.
+- Every catch needs a click, a dive catch too (a click anywhere in the dive counts). The click window is 0.25 s, and a whiffed click locks the next one for 0.8 s.
+- A faint ring on the grass shows everyone where a ball in the air will come down.
+- Thrown balls spiral (nose along the flight, spinning faster on a bullet).
 - A click is judged against where the ball was over the last 0.3 s, and a landed ball waits 0.3 s before it's ruled incomplete. This covers network delay.
-- A whiffed click locks the next one for 0.6 s.
 - Once caught, the ball sits in the right palm, long side forward, and the right arm holds it tucked while you run.
 
 **Kicks:** kickoffs from your own 20, onside kicks (live after 5 yards), punts and field goals all use the kick meter. A ball in the end zone is a touchback at the 12. A field goal must pass between the uprights above the crossbar.
