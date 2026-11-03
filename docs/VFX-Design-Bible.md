@@ -191,8 +191,8 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 | ID | Effect | Source | Owner |
 |---|---|---|---|
 | P2-1 | **Tested (1.8.7)**: Full-moon night (moon size and tint, banner); `Controllers.World.FullMoon` | World D / Quests C14 | Q |
-| P2-2 | Tagged lamps and ambient emitters (archive dust, boiler steam and embers, candle flicker at night) | World inventory | Q (W1) |
-| P2-3 | Ambient zone soundscape | World inventory | Q |
+| P2-2 | **Tested (1.13.0)**: Tagged lamps and ambient emitters (archive dust, boiler steam and embers, candle flicker); `Controllers.World.Ambient`, `Config.Ambience`, tags `NHLamp`, `NHCandle`, `NHAmbient:<Kind>`, `NHSwing` | World inventory | Q (W1) |
+| P2-3 | **Tested (1.13.0)**: Ambient zone soundscape (outdoor / hall / classroom / Archive / Boiler Yard beds, day and night, 2.5 s crossfade, Music & Ambience volume); `Controllers.World.Soundscape` | World inventory | Q |
 | P2-4 | **Tested (1.8.8)**: Enter-school "Bell" arrival (seal opening + location card), built after the menu hands over so the menu is untouched; `Controllers.World.Arrival` | UI #8 | — |
 | P2-5 | **Tested (1.9.0)**: Goal celebration (upright flare, net rings, post shards, light pulse, spectators within 150); GoalCam re-entrant + eases back (code-checked) | UI #12 | — / Q |
 | P2-6 | **Tested (1.9.0)**: Bloodrush aura revamp (client, from `SportRush`; embers + 2 wisp ribbons; flicker-out; Lineage colours) | UI #13 | Q |
@@ -259,7 +259,7 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
   - **Crimson nights are called "Nightmare Nights"** (user, 2026-10-30). They tie into the school system as a **school event**, and are scheduled **after everything else** in this roadmap (catalog P4-1).
   - Until then, the planned link is to the existing full-moon rule (every 4th night, `Lineage.IsFullMoon`, which already boosts powers). The event design decides the final trigger.
 - **D4 Sounds: Approved.** Use Roblox's free Creator Store audio (Roblox-made). Every sound id is listed in the asset inventory so it can be swapped.
-- **D5 World effects on the greybox: assumption.** Build them tag-driven (rule W1) but schedule them late (P2-2/3). Reversible.
+- **D5 World effects on the greybox: settled (1.13.0).** Built tag-driven (rule W1), so a new building only needs its parts tagged. The halls have no roofs yet, so the soundscape treats the hall floors (`Config.Ambience.IndoorFloors`) as indoors.
 - **D6 "Night" starts at 20:00: assumption.** This matches powers, EXP and the full moon. The timetable's "Evening" segment (20–21) is left alone, so night visuals start at 20:00. Reversible.
 
 ## Status log
@@ -292,3 +292,9 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
   - **Implemented:** Strangers write-on (needs two players) and the soccer marker (built on the tested soft ring).
   - **Toolbox:** `Fx.Ring` is now a soft decal ring, with a new `Fx.SoftDisc` helper. No effect in the game uses a hard Neon ring any more.
   - **Left on the roadmap:** P2-2 and P2-3 (wait on D5) and P4-1 Nightmare Nights.
+- 2026-11-03: **P2-2 and P2-3 done (1.13.0).** Both Tested.
+  - **Lamps:** `NHLamp` on the 4 pitch floodlight heads: on at 18:30, off at 6:30, staggered, neon heads go plain by day. Lamps come on before the 20:00 night grade (D6) on purpose, like street lights at dusk.
+  - **Candles:** `NHCandle` on the Archive flames, candelabra and altar (and the batch-3 sconces once placed). The votives stay with `ObjectFx`.
+  - **Emitters:** Archive dust, boiler pipe steam, boiler embers; fog is defined but unplaced. Budgets per the style guide (120 studs, 3 at once, 10/s, Low halves).
+  - **Sounds (D4 inventory, Pro Sound Effects):** outdoor `9112777914` / `9112764573`, hall `9116260218` / `9118747853`, Archive night `9125602882`, boiler `9112839511`.
+  - **Left on the roadmap:** P4-1 Nightmare Nights (needs its design pass with the owner).

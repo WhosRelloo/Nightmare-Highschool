@@ -2,6 +2,70 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.13.0] - 2026-11-03: Living halls, an animated cursor, new outfits and a slimmer health bar
+
+### Added
+- **Lamps, candles and ambient effects (VFX P2-2).** Client only (`Controllers.World.Ambient`, data in `Config.Ambience`, both new). Everything follows tags (rule W1), so new world parts only need a tag:
+
+  | Tag | What it does | Tagged now |
+  |---|---|---|
+  | `NHLamp` | lights fade on at dusk (18:30 on the school clock) and off at dawn (6:30), each lamp up to 3 s apart; a neon lamp head turns to plain plastic while it's off | the 4 pitch floodlight heads |
+  | `NHCandle` | the flame's light flickers softly (two layers of noise, ±16%; Reduce Flashing: ±4%), only within 80 studs | the 3 Archive study-table flames, the 2 candelabra, the altar |
+  | `NHAmbient:Dust` | warm motes drifting through the part's box | the Archive zone |
+  | `NHAmbient:Steam` | soft steam rising off the part | the Boiler Yard pipe |
+  | `NHAmbient:Embers` | embers rising from the part | the boiler's firebox glow |
+  | `NHAmbient:Fog` | low fog (night only, High effects quality only) | nothing yet |
+  | `NHSwing` | a piece rocking about a hinge (attributes `SwingHinge`, `SwingAxis`, `SwingAngle`, `SwingPeriod`; Reduce Motion halves it) | the grandfather clock's pendulum (batch-3 props) |
+
+  - **Budgets:** emitters run only within 120 studs, at most 3 at once (the nearest on screen), at most 10 particles a second each; Low effects quality halves every rate. Nothing runs in the main menu.
+  - **Owned elsewhere, left alone:** the votive wicks (`ObjectFx` lights them per quest) and the main-menu scene's lamps (the menu has its own grade).
+- **Zone soundscape (VFX P2-3).** `Controllers.World.Soundscape` (new) plays one ambience bed at a time, crossfading over 2.5 s, through the **Music & Ambience** volume (`NH_Master.NH_Music`). Silent in the main menu.
+
+  | Where | Day | Night |
+  |---|---|---|
+  | Outdoors | evening breeze and light insects | crickets |
+  | The halls | distant students and paper | a low interior wind |
+  | Classrooms R101-R106 | the hall bed, quieter | the hall bed, quieter |
+  | The Archive | a low interior wind | faint eerie choral tones |
+  | The Boiler Yard | machine hum | machine hum |
+
+  - **Sounds:** Roblox's Pro Sound Effects loops (decision D4): `9112777914`, `9112764573`, `9116260218`, `9118747853`, `9125602882`, `9112839511`.
+  - **How it knows where you are:** inside a `RoomId` zone part first; then over a `Hallway` / `HallwayExtension` floor (the greybox halls have no roofs); then anything with a roof overhead counts as indoors; otherwise outdoors. Zones are tracked as they stream in.
+- **Animated cursor.** `Controllers.Gui.Cursor` (new) draws the gothic ink cursor from a 64 px sprite sheet (`art/ui/cursor/make_animated_cursor.py`, `rbxassetid://102099082521411`):
+  - **Clips:** a slow idle shimmer of the gem, a brighter hover (over buttons, text boxes and click detectors), a click ripple, and a busy spin.
+  - **Where it hides:** over the Roblox menu, with the mouse locked (shift lock, first person), and on touch or gamepad, where the system cursor takes over again.
+  - **Fallback:** until the sheet has loaded it shows the static NH cursor, so you never see a blank cursor.
+  - **Options → Interface:** **Cursor Size** (24-48 px, default 32) and **Animated Cursor** (on by default). Reduce Motion also holds it still.
+  - **API:** `SetBusy(on, key)`, `SetEnabled(on)`, `IsShowing()`.
+- **Seven female outfits** (top + skirt pairs, all school tops and sold in the School Store and Wardrobe): sailor uniform, chapel corset, bolero pinafore, cheer uniform, lolita dress, cable-knit with a plaid mini, and a gala gown with sheer lace sleeves. The lolita dress, cable-knit and gala gown are civilian picks too. The wardrobe now has 31 tops, 20 bottoms and 22 school tops.
+- **Transformation outfits with and without the uniform.** `Appearance.FormOutfit(form, data)` picks the outfit:
+  - **In a school top** (and not using your Roblox avatar): the uniform version of the form, worn over your own bottoms. New for Vampire (a torn blazer with the crest), Wolf and Werewolf (a clawed vest), Ghoul (a stained vest) and Wraith (a frayed cardigan).
+  - **Female body:** Vampire becomes the Countess (corset gown) and Wraith the Banshee (tattered shroud dress).
+  - **Otherwise:** the form's full outfit, as before. Priest has no uniform version.
+- **Props batch 3** (`art/props/nh_props_batch3.py`, hooked into `nh_props.py`): a grandfather clock with a swinging pendulum, a wall sconce, a hall bench, a notice board, a celestial globe, an alchemy table, a school bell and a trophy cabinet. All eight are baked at 1024 with full PBR maps; the maps are uploaded and listed in `art/props/props.json`. They wait for the owner to import the FBX files (see School-Props.md).
+- **Clothing tools in the repo.** The clothing generators, source templates, every variant and `asset_ids.json` now live in `art/clothing/`.
+
+### Changed
+- **Health bar: smaller and re-made in PBR.** 600 x 50 (about 72% of the old width) in a new baked-PBR iron frame with an engraved groove, a greyscale fill the game tints, and a new clock-ring orb with crimson glass (`art/ui/hud/make_health_pbr.py`; `KitHud` `Local.SkinHealth`). The Yen and posture plates moved in to match.
+- **Timetable card** (finishing the other account's fix): it hangs just below the clock panel at any UI scale instead of stretching down the screen. The card is 540 x 640, the footer is centred and trimmed, a class row shows its subject, and the room line is dimmer.
+
+### Verified
+**[PT]** on save slot II:
+- **Ambient:** at night the floodlights were on; at 1 PM they were off with plain lamp heads. The 6 candle lights varied smoothly around their base brightness. In the Archive the dust ran; in the Boiler Yard the steam and embers ran (3 emitters, the cap), and steam was visible over the pipe in a screenshot.
+- **Soundscape:** silent in the menu; outdoors at night and by day, the hall by day, a classroom (eased down to 0.14), the Archive at night (eerie bed) and the Boiler Yard each played the right loop, loaded and in the Music group. Moving outside crossfaded.
+- **Cursor:** follows the mouse, animates, hovers, and the two Options rows render (screenshot).
+- **Health bar:** screenshot.
+- **Transformation outfits:** setting `Transformation` live in a school uniform gave the new uniform shirts for Vampire, Wolf, Werewolf, Ghoul and Wraith with your own bottoms kept; Priest kept its full outfit; clearing it put the uniform back.
+- **Female outfits:** rendered on mannequins; `FormOutfit` unit-tested for every case.
+- **Props batch 3:** the placement script was dry-run with boxes of each prop's real size: no clashes with walls, signs, quest props or rite props. The pendulum stand-in swung ±5° about its top in Play.
+- **Record:** slot II's discipline was checked before and after every clock change and is unchanged.
+
+### Not tested yet
+- The batch-3 props in place (they need importing first).
+- The female transformation outfits on a live character, and buying and wearing the new outfits through the wardrobe.
+- The cursor's busy clip from another system.
+- Two-player tests (as before).
+
 ## [1.12.0] - 2026-11-02: The phone, the timetable, and two bug fixes
 
 ### Added

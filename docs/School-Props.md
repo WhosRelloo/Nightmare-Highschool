@@ -56,6 +56,13 @@ Door and flap origins sit on their hinge lines.
 - Props with no placeholder (chairs, sofa, altar, candelabra, bookcases) get an invisible anchor part named `NHPropSpot_<key>`, which `props_revert.luau` also removes.
 - The Staff Room furniture stays clear of the watcher's patrol loop (x 37–52, z 17–29).
 
+**Batch 3 setup** (`Studio/props_setup3.luau`, run after importing the batch-3 FBX files from `art/props/fbx/`):
+- Same template steps as batch 2 (scale, SurfaceAppearance, Glass and Neon pieces, bottom-centre pivot, Atomic streaming). The bench, clock, cabinet and alchemy table collide; the rest don't.
+- The sconce's Glow gets a warm PointLight and the `NHCandle` tag; the alchemy table's Glow a soft green light.
+- The pendulum gets `NHSwing` with its hinge at the top-centre of its own box (±5°, 2 s), animated by `Controllers.World.Ambient`.
+- Placed copies are named `<Prop>_<key>` and tagged `NHPropBatch3`; `Studio/props_revert3.luau` removes them. Every placement reports anything solid it overlaps.
+- **Hall layout:** the classroom walls face the hall at z 58.5 with 8-stud doors at the room centres (x 62, 92, 122, 152, 182, 212); the door headers carry the room signs, so nothing hangs on them.
+
 | Prop | Triangles | Replaces / goes to |
 |---|---|---|
 | StudentDesk | 4.8k | `Desk` ×48 (R101–R106) |
@@ -71,6 +78,14 @@ Door and flap origins sit on their hinge lines.
 | Bookshelf | 11k (Case + 93 books) | batch 2: 9 bookcases replace the Archive's 13 narrow blocks (5 on the south wall, 2 per side wall) |
 | Altar | 26k (4 pieces) | batch 2: the Archive's north-west rite corner, facing the room (crimson glow) |
 | Candelabra | 10.3k (2 pieces) | batch 2: either side of the altar |
+| GrandfatherClock | 14.9k (Case, Pendulum, Glass) | batch 3: the hall, on R103's wall east of the door; the pendulum swings (`NHSwing`) |
+| WallSconce | 3k (Sconce, Glow, Glass) | batch 3: the hall, west of each classroom door (6); the flame flickers (`NHCandle`) |
+| HallBench | 5.2k | batch 3: the hall, on the R101, R104 and R106 walls (3) |
+| NoticeBoard | 3.2k | batch 3: the hall, on the R102 and R104 walls (2) |
+| CelestialGlobe | 4.8k | batch 3: the Archive, in front of the east shelves |
+| AlchemyTable | 5.8k (Main, Glass, Glow) | batch 3: the Archive's north-east corner (green potion glow) |
+| SchoolBell | 3.7k (Bracket, Bell) | batch 3: high on R104's wall, west of its door |
+| TrophyCabinet | 10.8k (Main, Glass) | batch 3: the hall, on R105's wall west of the door |
 
 ## In Roblox
 **Import:**
@@ -143,3 +158,8 @@ Door and flap origins sit on their hinge lines.
 
 **Not verified yet:**
 - two-player locker sync, and the rattle and book fall seen from a second player
+
+**Batch 3 (2026-11-03):**
+- **Baked:** all 8 at 1024 with 32 samples (previews in `art/props/previews/`, sheet `_batch3_final_sheet.png`), maps uploaded, ids in `props.json`.
+- **Dry run:** `props_setup3` placed boxes of each prop's real size: no clashes (the first pass hit R103's sign and the rite bone crate, and both props were moved). The stand-ins were removed afterwards.
+- **Not imported yet:** waiting for the owner's File → Import 3D of the 8 FBX files.

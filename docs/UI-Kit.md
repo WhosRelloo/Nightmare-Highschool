@@ -35,6 +35,7 @@ The textures are greyscale, so `ImageColor3` tints them. That's how the faction 
 - **Ornate panel frame:** 4 corner pieces plus 4 edge strips tiled with `ScaleType.Tile`. The edges repeat a gothic iron-gate arcade instead of stretching.
 - **9-slice frames:** `FrameThin` for rows, buttons and plates, and `FrameSlot` (bracket corners) for item slots and server rows.
 - **Health bar:** PBR end caps, arcade rails (the panel edge tiles) and a veined fill that tiles horizontally.
+  - **1.13.0 HUD bar:** `art/ui/hud/make_health_pbr.py` bakes a one-piece iron frame (2400 x 200, engraved groove), a greyscale fill (768 x 144) and a new orb ring and glass. `KitHud` uses them at 600 x 50 (`Local.SkinHealth`).
 - **Other art:**
   - a clock-face orb ring and a glass orb
   - wax-seal rarity gems
@@ -251,13 +252,21 @@ Every reskin swaps visuals only. Packets, attributes, instance names and public 
 
 ### KitHud
 The in-play HUD:
-- **Health bar** (Humanoid health) with a % orb. Recent damage shows as a delayed "ghost" segment.
+- **Health bar** (Humanoid health) with a % orb. Recent damage shows as a delayed "ghost" segment. Since 1.13.0 it's 600 x 50 at the top of the bottom HUD (`BAR_W`, `BAR_H`, `BAR_Y`), in the PBR iron frame.
 - **Hotbar** from your Backpack tools. Click, tap or press 1-9 to equip. Tools can set `Rarity` and `Count` attributes.
 - **Yen** from the profile.
 - **Posture meter**, reading a `Posture` attribute on the character or Humanoid, out of `Config.Combat.PostureMax`.
 - **DOWNED alert**, driven by `Downed` + `DownedUntil`.
 
 It replaces the core health bar and backpack. The bottom HUD hides during dialogue (`InDialogue`) and lessons, and number keys are ignored then.
+
+### Cursor
+`Controllers.Gui.Cursor` (1.13.0) replaces the mouse cursor with an animated one:
+- **Art:** `art/ui/cursor/make_animated_cursor.py` writes `NHCursorAnim.png`, a 512 x 512 sheet of 64 px frames: idle (rows 0-1), hover (2-3), click (4), busy (5-6). The tip sits at pixel (14, 12).
+- **Drawing:** an ImageLabel in the `NHCursor` ScreenGui (DisplayOrder 1000000) follows the mouse, and the system cursor is hidden only while it shows. The ScreenGui's `HiddenBecause` attribute says why it's hidden (menu, locked, touch, gamepad, disabled).
+- **Fallback:** the static `MouseIcon` until `PreloadAsync` confirms the sheet.
+- **Settings:** `CursorSize` (24-48, player attribute `NHCursorSize`) and `AnimatedCursor` (`NHCursorAnimated`); Reduce Motion holds frame 0.
+- **API:** `SetBusy(on, key)` (busy while any key is set), `SetEnabled(on)`, `IsShowing()`.
 
 ### PromptUi
 Draws every ProximityPrompt in the NH style:
@@ -349,7 +358,7 @@ The window opens by itself on a player's first live join, never in Studio. `Shar
   - Ghoul: a milky iris; a pinprick pupil; a sunken socket; bloodshot whites; many branching skin veins.
   - Wraith: blank glowing eyes. *Proposed:* vampire is established in the concept doc; wolf and ghoul were requested by the developer; wraith is an extra suggestion.
   - **`TransformationStage = 2`** gives Vampire and Ghoul their second stage: jet-black sclera (art keys `vampire2`, `ghoul2`).
-  - **Transformation outfits** (`Appearance.Forms[x].Outfit`): while transformed, the character wears the form's shirt + pants. `Priest` is a clothing-only form. In "Use my Roblox outfit" mode only the clothes swap; accessories stay (the stash runs in clothes-only mode). Changing the attribute re-runs `ApplyTo`.
+  - **Transformation outfits** (`Appearance.FormOutfit(form, data)`, 1.13.0): in a school top (and not avatar mode) the form's `UniformOutfit` (a shirt only, so your own bottoms stay); on the female body its `FemaleOutfit`; otherwise `Outfit`. Uniform versions exist for Vampire, Wolf/Werewolf, Ghoul and Wraith; female versions for Vampire and Wraith. While transformed, the character wears the chosen shirt + pants. `Priest` is a clothing-only form. In "Use my Roblox outfit" mode only the clothes swap; accessories stay (the stash runs in clothes-only mode). Changing the attribute re-runs `ApplyTo`.
 - **Look-style marks (cosmetic, NOT race):** Chapel gets a gold cross pin. Nightborn gets pale skin and crimson eyes. Only the `LookStyle` attribute is set.
 
 **`ReplicatedStorage.Lineage`: race, variant and traits, rolled on the server (players never choose)**

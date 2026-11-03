@@ -1445,6 +1445,13 @@ def run(name):
     print(f"[props] {name}: {tris} tris, pieces {[o.name for o in objs]}, dims {dims}")
 
 
+# batch 3 lives in its own file and registers into BUILD; it must share THIS module (run as a script,
+# nh_props is __main__, and a second import would get its own PARTS list)
+sys.modules.setdefault("nh_props", sys.modules[__name__])
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import nh_props_batch3  # noqa: E402,F401
+
+
 if __name__ == "__main__":
     names = list(BUILD) if PROP == "all" else [PROP]
     for n in names:
