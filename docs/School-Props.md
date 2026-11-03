@@ -85,7 +85,7 @@ Door and flap origins sit on their hinge lines.
 | CelestialGlobe | 4.8k | batch 3: the Archive, in front of the east shelves |
 | AlchemyTable | 5.8k (Main, Glass, Glow) | batch 3: the Archive's north-east corner (green potion glow) |
 | SchoolBell | 3.7k (Bracket, Bell) | batch 3: high on R104's wall, west of its door |
-| TrophyCabinet | 10.8k (Main, Glass) | batch 3: the hall, on R105's wall west of the door |
+| TrophyCabinet | 10.8k (Main, Glass) | batch 3: the hall, on R105's wall west of the door (x 172.5) |
 
 ## In Roblox
 **Import:**
@@ -162,4 +162,7 @@ Door and flap origins sit on their hinge lines.
 **Batch 3 (2026-11-03):**
 - **Baked:** all 8 at 1024 with 32 samples (previews in `art/props/previews/`, sheet `_batch3_final_sheet.png`), maps uploaded, ids in `props.json`.
 - **Dry run:** `props_setup3` placed boxes of each prop's real size: no clashes (the first pass hit R103's sign and the rite bone crate, and both props were moved). The stand-ins were removed afterwards.
-- **Not imported yet:** waiting for the owner's File → Import 3D of the 8 FBX files.
+- **Imported and placed (1.13.1):** all 16 copies, with no clashes and no imports left in the workspace. The trophy cabinet moved to x 172.5, so it no longer crowds the R105 sconce.
+- **Tested:** screenshots of the hall and the Archive. In Play at night the clock's textures show, the pendulum swings and the sconces glow.
+- **Clock colour map:** uploaded again as `132406564544469` (same image as before). In the Edit view the clock can look plain grey, because Studio caches a failed download; Play shows it correctly.
+- **Not verified yet:** the props seen by a second player.

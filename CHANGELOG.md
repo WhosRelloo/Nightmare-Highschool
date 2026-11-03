@@ -2,6 +2,34 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.13.1] - 2026-11-03: Hall furniture (props batch 3)
+
+### Added
+- **16 new props from batch 3 placed** (`ServerStorage.NHProps` templates, copies in `workspace.School.NHProps`, tagged `NHPropBatch3`):
+
+  | Prop | Where | Count |
+  |---|---|---|
+  | Grandfather clock (the pendulum swings, `NHSwing`) | the hall, on R103's wall east of the door | 1 |
+  | Wall sconce (the flame flickers, `NHCandle`) | the hall, west of every classroom door | 6 |
+  | Hall bench | the hall, on the R101, R104 and R106 walls | 3 |
+  | Notice board | the hall, on the R102 and R104 walls | 2 |
+  | Trophy cabinet | the hall, on R105's wall west of the door | 1 |
+  | School bell | high on R104's wall, west of its door | 1 |
+  | Alchemy table (green glow) | the Archive's north-east corner | 1 |
+  | Celestial globe | the Archive, in front of the east shelves | 1 |
+
+### Changed
+- The trophy cabinet sits at x 172.5 (was 173.5 in the dry run), so it no longer crowds the R105 sconce.
+- The clock's colour map was uploaded again (now `132406564544469`). The old id works too: it holds the same image.
+
+### Testing
+- **Placement:** the script placed all 16 with no clashes, and no imports were left in the workspace (Edit).
+- **Looks:** screenshots of the hall (clock, sconces, notice boards, bench, cabinet) and the Archive (globe, alchemy table).
+- **Play, solo on slot II at night:** the clock shows its wood and white face, the pendulum swings (6.6° in half a second), and the sconces glow.
+- **Known Studio quirk:** in the Edit view the clock can render plain grey, because Studio caches a failed download of its colour map. Play loads it correctly.
+- **Side effect:** jumping the school clock to 9 PM with `SetTime` logged one "Skipped class" on test slot II (+3 points). This is test data and was left alone.
+- **Not tested:** the props seen by a second player.
+
 ## [1.13.0] - 2026-11-03: Living halls, an animated cursor, new outfits and a slimmer health bar
 
 ### Added
