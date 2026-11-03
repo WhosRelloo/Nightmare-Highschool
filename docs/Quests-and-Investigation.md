@@ -86,7 +86,7 @@ Everything is found by **attributes**, so the real map just needs parts with the
 | `QuestObject` | `LockerNote`, `DeskCarving`, `AttendanceSheet`, `ArchiveCard`, `MiraFile`, `AnswerKey`, `LostSpotA`, `LostSpotB`, `LostSpotC` | things you use (E prompt and gold outline are added automatically) |
 | `QuestArea` | `RecordsOffice`, `RecordsExit`, `StaffRoom`, `StaffExit`, `DuelRing` | invisible box volumes. Make them `CanQuery = false` so they don't block line of sight. Tag `DuelRing` with `CombatAllowed`. |
 | `WatcherRoute` + `Order` | `RecordsRoute` / `StaffRoute`, then 1, 2, 3… | the patrol points for each watcher |
-| `HidingSpot` | `true` | lockers you can hide in. The part's front face (−Z / LookVector) is where you step out. |
+| `HidingSpot` | `true` | lockers you can hide in. The part's front face (−Z / LookVector) is where you step out. The Hide / Leave prompt hangs on an attachment `HidePoint` 3.5 studs out of the door at eye height (1.18.4). At the locker's centre it sat behind the hiding view's camera, and Roblox only shows prompts that are on screen, so you couldn't get out. |
 | `DuelPad` | `1`, `2` | the two ring pads |
 
 **Line of sight:** any part with `CanQuery` on blocks a watcher's view, so real walls and cabinets give cover automatically. Glass is the exception: it blocks the view unless you turn its `CanQuery` off.

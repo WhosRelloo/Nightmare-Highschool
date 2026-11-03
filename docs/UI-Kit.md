@@ -327,7 +327,7 @@ What each setting changes:
 |---|---|
 | Look | Look style (Scholar / Chapel / Nightborn) and skin: 6 presets plus a colour wheel / HEX |
 | Face | Eye shape (Roblox face, Sharp, Hooded, Fierce, Doe, Sleepless, Cat, Gentle, Calm), eye set (Male / Female), eye colour (7 presets plus wheel / HEX; Nightborn is always crimson), brows (None plus 11 styles, including the thick Bold, Heavy and Bushy; "Match hair" or a custom colour) and mouth (None plus 20 anime mouths, frowns included, "Fuller lips") |
-| Hair | Built hairstyle (Neat Crop / Fringe / Long / Bun / None), catalog hair by ID, "Recolour catalog hair", and hair colour (presets plus wheel / HEX) |
+| Hair | Built hairstyle (Neat Crop / Fringe / Long / Bun / None), catalog hair by ID, "Recolour catalog hair", and hair colour (presets plus wheel / HEX). Hair is fitted for the player's 0.9-scale head (1.8 × 0.9 × 0.9) and scaled by the head it goes on (`Appearance.HeadScale`, 1.18.4). The NPC rig's head is full size, so NPC hair used to sit too small: the head showed through and fringes sat on the face. Players are unchanged (×1). |
 | Outfit | "Use my Roblox outfit"; Top: 24 options (the 4 official group shirts, 14 uniform variants, 6 civilian); Bottoms: 13 options (uniform trousers, jeans, slacks, khakis, shorts, skirts, civilian) |
 | Lineage | The server-rolled race and variant (spin reel), race and variant odds, 2 trait slots with rerolls |
 

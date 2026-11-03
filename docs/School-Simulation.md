@@ -81,7 +81,7 @@ A 40-minute class is about 3 minutes 20 seconds of real time, and a passing peri
 | Night, Morning | off campus |
 | Before School | walk in from the gate (near the spawn) and mill about the hallway |
 | Class | students 1 to 6 sit in that period's room (the 6 chairs nearest the door), the rest leave for "the east wing" |
-| Passing, Break | hallway: walk, chat, lean on the wall |
+| Passing, Break | hallway: walk, chat, lean on the wall, or sit on a free place on a hall bench (two per bench, 1.18.4) |
 | Lunch | the concession stand: 6 queue at the `NHLunchSpot` markers, the rest stand in an arc and eat |
 | After School | each student's club (gym, field, pitch, archive); a third go home from 14:00 |
 | Evening | the even-numbered students go home at once, everyone by 19:00 |
@@ -90,6 +90,20 @@ A 40-minute class is about 3 minutes 20 seconds of real time, and a passing peri
 - **Collisions:** collision group `NHWalkers` doesn't collide with players, other walkers or sports balls.
 - **Each model:** `Role = "Ambient"`, `NHScheduled = index`, and `NHActivity` (what they're doing).
 - **API:** `Schedules.Pause(on)`; `Schedules.Debug()`; `Schedules.PlanForTests(kind, name?, hour?)` plans a period without moving the clock.
+- **Sitting (1.18.4):** `Services.Features.Seats` says where hips go on each seat prop, for the class students here and for the ambient sitters (the sofa, armchair and chair students).
+  - **The seat heights:** the seat props are single meshes with CanQuery off, so raycasts can't find their seats. Seats holds each prop's real seat-top height above its base, taken from the model source.
+
+    | Prop | Seat-top height (studs) |
+    |---|---|
+    | StudentChair | 1.545 |
+    | TeacherChair | 1.72 |
+    | Armchair | 1.575 |
+    | Sofa | 1.525 |
+    | HallBench | 1.465 |
+
+    A prop's `SeatHeight` attribute overrides its height. Other seats fall back to a raycast.
+  - **The fix:** once the sitting pose plays, the hips are settled onto that height, a little toward the backrest. Before this, every seated NPC sank 1.2 to 1.9 studs into the seat, and the chair sitter's legs went through the floor.
+  - **Standing up:** students stand up behind a chair (the desk is in front) and in front of a bench.
 - **Test note:** moving the clock into a class period marks Studio test players absent, so use `PlanForTests`.
 
 ## The timetable (1.12.0)

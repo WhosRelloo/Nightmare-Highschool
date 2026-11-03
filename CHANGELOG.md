@@ -2,6 +2,30 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.18.4] - 2026-11-03: Out of the lockers, NPCs in their seats, hair that fits
+
+### Fixed
+- **You can get out of a hiding locker again.**
+  - **The problem:** the Leave prompt sat at the locker's centre. Inside, the hiding view puts the camera just in front of that point, so the prompt was behind the camera. Roblox only shows prompts that are on screen, so E did nothing.
+  - **The fix:** the Hide / Leave prompt now hangs just outside the door at eye height, and E gets you out.
+- **NPCs sit in their seats.**
+  - **The problem:** the class students and the sofa, armchair and chair sitters sank 1.2 to 1.9 studs into their seats, and one student's legs went through the floor. The seat props don't take raycasts, so the old "find the seat" ray always missed.
+  - **The fix:** a new `Services.Features.Seats` knows each seat prop's real height from the model source and rests the hips on it once the pose plays.
+- **NPC hair fits their heads.**
+  - **The problem:** hair is fitted for the player's 0.9-scale head, but NPC heads are full size, so every NPC's hair sat too small. The head showed through and fringes sat on the face.
+  - **The fix:** catalog and built hair now scale to the head they go on. Players don't change.
+
+### Added
+- **Students sit on the hall benches** now and then between classes (two places per bench).
+
+### Testing
+- **Studio Play, slot II, after school and in the evening; class seating checked with no slot loaded:**
+  - **Lockers:** hid in the Staff Room locker. The Leave prompt came on screen and E got out (out 3 studs, unanchored, normal camera). Hiding from outside still works with E.
+  - **Sitting:** the six class students and the three ambient sitters all had their hips on the seat (gap 0.00, was −1.2 to −1.9). A side view showed a student on the chair at the desk.
+  - **Hair:** close-ups of three NPCs (short, long, fringe) showed no clipping or overlap.
+- **Slot II:** the first locker try got caught by the Staff Room watcher (Trespassing, +3). It was removed straight away, and the record matched before and after.
+- **Not tested:** the hall-bench sitting. Studio's Play start got stuck before that check.
+
 ## [1.18.3] - 2026-11-03: The real football machine and gothic scoreboards
 
 ### Changed
