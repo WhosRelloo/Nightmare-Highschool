@@ -200,6 +200,31 @@ Door, flap and tap origins sit on their hinge lines.
 | PillarIron | 9.6k | batch 9: cast-iron column with traceried brackets |
 | Pilaster | 3.6k (Main, Glow) | batch 9: wall pilaster with a blind arch, a crest and a lantern |
 
+**Placed on the map** (`Studio/props_map.luau`; `Studio/props_map_revert.luau` removes them). 91 copies of the batch 4 to 9 templates, in `workspace.NHPropsMap/<Area>`, tagged `NHPropMap`, named `<Prop>_<Area>_<n>`, with a `MapArea` attribute. Each row of the script gives a prop, an area, x and z, and the way its front faces. Rays find the floor or table top under it, or the wall behind it for wall pieces.
+
+| Area | Copies | Props |
+|---|---|---|
+| Hall | 24 | PillarMarble ×2 at the west entrance; PillarNiche ×4 along the open south edge; Pilaster ×7 framing the gaps between classrooms; GothicMirror over the west bench; PictureFrame ×3; BannerCrimson and BannerVigil; CeramicVase ×2; PottedPlant ×3 |
+| Forecourt | 4 | PillarTwisted ×2 and PillarOctagon ×2: an avenue from spawn to the hall's west end |
+| Staff Room | 11 | LunchTray, LunchTrayEmpty, CandleCluster and FlowerVase on the staff table; WallClock over the door; CoatRack, UmbrellaStand, Pigeonholes, TeaTrolley, Gramophone, PictureFrame |
+| Archive | 5 | Typewriter, BookStack and OilLamp on the study table; Telescope; BannerVigil outside, on the archive's hall wall by the door |
+| Records Office | 4 | FilingCabinet ×2 by the door, OilLamp on the tall cabinet, WallClock |
+| Boiler Yard | 8 | Boiler, PipeRun on the west fence, ValveWheel and Workbench on the east fence, CoalPile, CoalCart, PillarIron ×2 at the open north side |
+| Quad (between the classrooms and the gym) | 19 | CloisterArchNoLamp ×2 and CloisterArch: an arcade at the quad's west entrance; Fountain on the gym door; Topiary ×2 flanking the door; StonePlanter ×5 against the classroom backs; PillarFanVault, Sundial, Memorial, ArtEasel, ChessTable, Well, Balustrade ×2 |
+| Gym | 8 | BannerRavens, BannerRovers and BannerWardens on the entrance wall between the windows; Chandelier ×2 from the roof (no collision); BallRack, GymMatStack, WaterKeg |
+| Pitch | 2 | Bleachers ×2 behind the north wall, facing the pitch |
+| Football practice | 6 | Hurdle ×3, TackleDummy ×2 and WaterKeg on the north sideline |
+
+- **Kept clear:**
+  - **Rite props:** copies stay 1.5 studs from `School.NHRiteProps`. The Archive is a rite room (altar and bookshelves), so it gets only table props and the telescope. In the Boiler Yard the copies sit away from the anvil, ash heap and crate stack, and the boiler's door doesn't swing toward the anvil.
+  - **Other no-go spots:** the `MarkWall`s (there is no pilaster at the R105/R106 gap, and the planter behind R103 moved along), the `NHPropSpot_*` placeholders (the Staff Room's south end is kept for the sofa and armchairs), the watcher's patrol round the staff table, and the room exits.
+  - **Sports play zones:** the gym's `Court.Bounds` and `Practice.DrillBounds`, and the drill's `TargetBounds` and `RouteBounds`, which cover the whole practice turf.
+  - **The classroom gaps:** the 3-stud gaps between classrooms stay open. They are an alley from the hall to the quad.
+- **Left out:**
+  - **The washroom set** (BathroomMirror, Sink, ToiletStall, TowelRail): the school has no washroom yet.
+  - **FootballMachine and Scoreboard:** the drill's `ThrowingMachine` and the gym and pitch scoreboards are Sports greybox pieces. Swapping them is for the Sports build.
+- **Checks in the script:** each copy reports any visible part it digs into (pieces shrunk 0.25 so resting contact passes) and any rite prop within 1.5 studs.
+
 ## In Roblox
 **Import:**
 1. Use File → Import 3D. FBX comes in at 100× scale with a rotated pivot.
@@ -309,3 +334,27 @@ Door, flap and tap origins sit on their hinge lines.
   - **Textures:** every batch 6–9 map loaded on the client, including five that showed a failed fetch in Edit (Studio's caching quirk).
 - **Not verified yet:** a player pressing the prompts and the auto-close timers, the steam and ember emitters up close, and a second player's view.
 
+**Placed on the map (2026-11-03, 1.18.2):**
+- **Edit:**
+  - 91 copies with no clashes and none within 1.5 studs of a rite prop.
+  - A box check against every invisible zone left only the whole-room zones and the gym chandeliers, which hang inside `Court.Bounds` and don't collide.
+  - Screenshots of every area.
+- **Play (solo):**
+  - **Prompts:** all 91 copies reached the client, and the five rigged ones were ready with their prompts on the server: "Furnace / Open", "Valve / Turn", "Cabinet / Open" ×2, "Gramophone / Play".
+  - **Opened** (Open set from the server):
+    - the furnace door turned −100° and moved toward the front (out)
+    - the valve wheel turned 540°
+    - both drawers slid 1.1 studs out
+    - the record spun
+  - **Closed:** all went back to rest and the record stopped.
+  - **Always on:**
+    - the hall's Crimson banner swayed through 3.2°
+    - a gym chandelier swayed 1.6°
+    - the boiler's embers and a steam vent ran
+    - the second vent waits behind the three-nearest-emitters cap, as designed; emitters are off while a player is in the main menu
+  - No script errors.
+- **Not verified yet:**
+  - a player walking the map
+  - a player pressing the prompts, and the auto-close timers
+  - a second player's view
+  - performance with all the copies' lights on a low-end device

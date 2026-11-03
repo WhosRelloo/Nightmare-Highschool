@@ -2,6 +2,50 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.18.2] - 2026-11-03: The new props placed around the map
+
+### Added
+- **91 copies of the batch 4 to 9 props placed on the map** (`Studio/props_map.luau`, `workspace.NHPropsMap`, tag `NHPropMap`; `Studio/props_map_revert.luau` removes them). The templates and the baseplate showcase are unchanged.
+  - **Hall:** marble pillars at the west entrance, candle-niche pillars along the open south edge, pilasters framing the classroom gaps, the gothic mirror, picture frames, the Crimson and Vigil banners, vases and plants.
+  - **Approach from spawn:** an avenue of twisted and octagonal pillars.
+  - **Staff Room:** lunch trays, candles and a vase on the table, a wall clock, coat rack, umbrella stand, pigeonholes, tea trolley, gramophone and a picture.
+  - **Archive:** typewriter, books, oil lamp and telescope; the Vigil banner outside on its hall wall.
+  - **Records Office:** two filing cabinets, an oil lamp and a wall clock.
+  - **Boiler Yard:** the boiler, pipe run, valve wheel, workbench, coal pile, coal cart and two iron pillars.
+  - **Quad** (between the classrooms and the gym): a cloister arcade at its west entrance, the fountain on the gym door, topiaries, planters, the fan-vault pillar, sundial, memorial, easel, chess table, well and parapets.
+  - **Gym:** the three club banners, two chandeliers (no collision) and a ball rack, mats and keg.
+  - **Pitch:** two bleachers behind the north wall.
+  - **Football practice:** hurdles, tackle dummies and a keg on the sideline.
+- **Left out:**
+  - the washroom set (there is no washroom yet)
+  - the football machine and the scoreboard: the drill's throwing machine and the gym and pitch scoreboards are Sports greybox pieces
+
+### Changed
+- Nothing existing was moved or edited. The copies keep clear of the rite props, the mark walls, the prop placeholders, the watcher's patrol, the room exits and the Sports play zones. The gaps between classrooms stay open (an alley to the quad).
+
+### Testing
+- **Edit:**
+  - 91 placed with no clashes and nothing within 1.5 studs of a rite prop
+  - only whole-room zones overlap, plus the no-collide chandeliers in the court zone
+  - screenshots of every area
+- **Play (solo):**
+  - **Prompts:** the five rigged copies read "Furnace / Open", "Valve / Turn", "Cabinet / Open" ×2 and "Gramophone / Play".
+  - **Opened:**
+    - the furnace door swung out −100°
+    - the valve turned 540°
+    - the drawers slid 1.1 studs
+    - the record spun
+  - **Closed:** everything went back to rest and the record stopped.
+  - **Always on:**
+    - a banner and a chandelier swayed
+    - the embers and steam ran (paused in the main menu, by design)
+  - No script errors.
+- **Not verified yet:**
+  - a player walking the map
+  - players pressing the prompts, and the auto-close timers
+  - a second player's view
+  - low-end performance with the copies' lights
+
 ## [1.18.1] - 2026-11-03: Props batches 6 to 9 placed on the baseplate, rigs tested
 
 ### Added
