@@ -2,6 +2,23 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.15.1] - 2026-11-03: Props batches 4 and 5 placed on the baseplate
+
+### Added
+- **All 20 new props are in the test place** (the owner imported the FBX files). `props_setup4` filed the templates in `ServerStorage.NHProps` and stood one of each on the baseplate for the builder (`workspace.NHPropsShowcase`, two rows facing the spawn: batch 4 at z 58, batch 5 at z 70, from x −100), tagged `NHPropBatch4` / `NHPropBatch5`. No clashes, and no imports left in the workspace.
+
+### Changed
+- **Mirror glass** is a dark reflective finish (SmoothPlastic, reflectance 0.35). Roblox's Glass material read as a pale blank panel.
+
+### Testing
+- **Play (solo):**
+  - **Prompts:** the stall reads "Stall / Open" and switches to "Close" when open; the sink reads "Sink / Turn on".
+  - **Opening:** the stall door swings 95° **out** (its centre ends 0.9 studs in front of the stall), the taps turn a quarter each way, and the water shows.
+  - **Closing:** everything returns to rest and the water hides.
+  - **Textures:** all 25 SurfaceAppearances loaded in Play.
+- **Edit view:** screenshots of both rows. A few maps show white until Studio finishes fetching them, the known caching quirk.
+- **Not verified yet:** a player triggering the prompts and the auto-close timers (Open was set directly), and a second player's view.
+
 ## [1.15.0] - 2026-11-03: Furnishing the school (props batches 4 and 5)
 
 ### Added
