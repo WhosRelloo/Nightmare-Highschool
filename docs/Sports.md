@@ -185,7 +185,7 @@ Plays like *Football Fusion 2* (the owner's pick), with an optional quick play c
 | QB | Z / C, then click (aim with the mouse) | Set the power level (10-100 in steps of 5, also before the snap), then click to throw at it. Low power is a high lob, high power a flat bullet (the HUD bar says LOB / SPIRAL / BULLET). A gold ring shows where it would land. Might adds range. One forward pass a play, from behind the line. |
 | QB | F / G | Pump fake / hand off to the closest teammate within 6 studs |
 | Anyone | click | Reach for the ball in the air (catch or interception) |
-| Anyone | Space / Q | Jump catch / dive (10-stud lunge, +1.5 studs of reach while you click, 20 stamina) |
+| Anyone | Space / Q | Jump catch / dive: a free leap (about 15 studs, low and flat) that carries your momentum, goes the way you move, works mid-jump and steers a little. +1.5 studs of reach while you click, 0.4 s on the turf after, 1 s cooldown, 15 stamina. |
 | Carrier | E / R, F, K | Juke left / right, spin (both break a tackle in their window), kneel |
 | Defence | touch, R, C | Tackle, hit stick (25% fumble; a miss stumbles you for 1 s), swat |
 | Kicker | hold click and release, O | Kick (aim with the camera), onside (kickoff) |

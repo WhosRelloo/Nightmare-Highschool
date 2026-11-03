@@ -2,6 +2,24 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.14.2] - 2026-11-03: Football: a free dive
+
+### Changed
+- **The dive (Q) is a free leap, Football Fusion style.** It used to be a stiff 10-stud dash along the ground with 0.8 s of lying down.
+  - It carries your run's momentum: 36 studs/s, or 1.25 times your speed, up to 52.
+  - It adds a lift and a partial float in the air, so you lay out low and flat.
+  - It goes the way you're moving (or facing), and works from the ground or mid-jump for high balls.
+  - You can steer it a little in the air.
+  - Recovery is quicker: 0.4 s on the turf (was 0.8), a 1 s cooldown (was 1.6), and 15 stamina (was 20).
+  - Catching in a dive still needs a click. The extra reach (+1.5) lasts the whole flight.
+  - The tuning is in `Config.Sports.Football.Dive`: Speed, Carry, MaxSpeed, Lift, Float, Air and Down.
+
+### Testing (Play, solo on slot II, in a live play)
+- **Before the lift fix:** real Q presses (standing, and running at 16 studs/s) went 13.8 and 15.6 studs but never left the turf. The place's gravity is 210, so the lift was raised and a float added.
+- **After:** dives went 15.2-16 studs, rose 3.7 studs and spent 0.42-0.44 s in the air. A dive from mid-air also worked: 15.2 studs, 0.49 s in the air.
+- A carrier's dive into the end zone scored a touchdown.
+- **Not tested:** how other players see the dive (it plays on your own client, as other moves do).
+
 ## [1.14.1] - 2026-11-03: Football: power levels, tighter catching, landing rings
 
 ### Changed
