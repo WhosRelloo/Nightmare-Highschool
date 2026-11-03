@@ -2,6 +2,52 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.17.0] - 2026-11-03: Clubs, sports, boiler room, courtyard and pillars (props batches 6 to 9)
+
+### Added
+- **42 new props, baked at 2048** (`art/props/nh_props_batch6.py` to `nh_props_batch9.py`; FBX, maps and previews in `art/props/`, ids in `props.json`, sheet `_batch6_9_final_sheet.png`). As with batches 4 and 5 they go on the baseplate for the builder (`Studio/props_setup6.luau`, `workspace.NHPropsShowcase`).
+
+  | Batch | Props |
+  |---|---|
+  | 6, clubs and faculty | BannerRavens, BannerRovers, BannerWardens, BannerVigil, BannerCrimson, ChessTable, ArtEasel, Gramophone, Telescope, FilingCabinet, Typewriter, TeaTrolley, Pigeonholes |
+  | 7, sports and the boiler room | BallRack, Hurdle, TackleDummy, GymMatStack, WaterKeg, Scoreboard, Boiler, PipeRun, ValveWheel, CoalPile, CoalCart, Workbench |
+  | 8, the courtyard | Fountain, CloisterArch, CloisterArchNoLamp, StonePlanter, Topiary, Sundial, Well, Balustrade, Memorial |
+  | 9, building pillars | PillarCluster, PillarOctagon, PillarTwisted, PillarFanVault, PillarNiche, PillarMarble, PillarIron, Pilaster |
+
+- **Rigged and animated:**
+  - **Used with a prompt** (the locker system):
+    - the boiler's firebox door swings out ("Furnace / Open")
+    - the valve wheel turns one and a half turns ("Valve / Turn")
+    - the filing cabinet's top drawer slides out ("Cabinet / Open")
+    - the gramophone's record spins ("Gramophone / Play")
+  - **Always on:**
+    - the banner cloths sway
+    - steam rises from the boiler's flue and the pipe vent, and embers from the firebox
+    - the candles flicker
+    - the football machine's wheels spin and the chandelier sways (retrofitted on batches 4 and 5)
+- **CastleStone**, a seamless 2048 PBR set made from the cloister arch's own wall stone (`tools/vfx/make_castle_stone.py`).
+  - On the arch's wall piece (`CloisterArch_Wall`, `CloisterArchNoLamp_Wall`), which is not baked and uses UVs at 8 studs a tile.
+  - In the texture library as the MaterialVariant `NHCastleStone` (Limestone, 8 studs a tile; `art/textures/CastleStone`, `textures.json`, `docs/Textures.md`), so the builder can blend a wall into the arch.
+- **Code:**
+  - `Controllers.World.Ambient` gains `NHSpin` (spins about a hinge and axis, optionally only while the model is open) and an optional `SwingPhase` for `NHSwing`.
+  - `Controllers.World.LockerDoors` gains `SwingAxis` (turn about any axis), `SlideBy` (slide instead of turn) and `SwingTime`.
+  - Patch: `Studio/patch_rig2.luau`.
+- **Pipeline (`nh_props.py`):** `TILED` pieces skip the atlas and take a seamless set with world-scaled UVs.
+
+### Changed
+- **The owner's notes:**
+  - The courtyard set and the pillars got a second pass, more detailed and on theme: dark mossy castle stone, gothic tracery, crockets and grotesques, brass, iron and crimson, lanterns, ivy and crows.
+  - The arch's wall stays its original stone, not ashlar blocks.
+  - A second arch has no lantern.
+- **No duplicates:** the menu set's lamppost, bench, statue, urn, gargoyle and gate, and the sports balls and cones, were not remade.
+
+### Testing
+- **Bakes:** all 42 at 2048 with 64 samples; every piece is under 16k triangles. Previews and the contact sheet were reviewed, and the courtyard and pillars were redone after the owner's note.
+- **Uploads:** 176 maps uploaded to NH Combat Test (42 props, plus CastleStone at 2048 and 1024); the ids are in `props.json`, `textures.json` and `props_setup6.luau`.
+- **Code (Play):** `NHSpin` turned a test part 91° in 0.5 s at 180°/s; no script errors from the patched `Ambient` or `LockerDoors`.
+- **CastleStone:** tiles with no seams (2 × 2 check); the arch's wall piece shows it at 8 studs a tile in the bake preview.
+- **Not verified yet:** the import and the showcase placement (the owner imports the FBX files; props_setup6 then reports any clash and checks the furnace door opens outward), the four prompts and the sways, spins and steam on the real models in Play, and a second player's view.
+
 ## [1.16.1] - 2026-11-03: Region cards on every visit, a little lower
 
 ### Changed

@@ -92,6 +92,32 @@ Door, flap and tap origins sit on their hinge lines.
 - **Placement:** on the owner's call these go on the baseplate for the builder, not into the school. One copy of each sits in `workspace.NHPropsShowcase`, facing the spawn. Batch 4 is in the front row (z 58, from x −100); the table props sit on low slate plinths. Batch 5 is behind (z 70), with the chandelier hanging 6 studs up. Copies are tagged `NHPropBatch4` / `NHPropBatch5`, and `Studio/props_revert4.luau` removes them.
 - **Look:** on theme with the Institution (candlelit gothic: ink, bone, wax, paper, brass, crimson `#600E1A`). Wood is kept to the books, crates and small accents. The stall is black marble with brass-inlaid arches, cast-iron pilasters and a crimson enamel door. The clock, coat rack and hall mirror are cast iron, and the picture frame is black lacquer and gilt.
 
+**Batches 6 to 9 setup** (`Studio/props_setup6.luau`, run after importing their FBX files from `art/props/fbx/`):
+- Same template steps as batch 4. `*_Pool` is water that always shows (the fountain). `*_Wall` gets the seamless castle stone (the cloister arches). Glow pieces get a warm light and `NHCandle`, except the boiler's fire, which gets `NHAmbient:Embers`.
+- **Used with a prompt** (the locker system, as the stall and sink):
+  - **Boiler:** "Furnace / Open". The firebox door swings out 100°, and the setup checks it opens outward.
+  - **Valve wheel:** "Valve / Turn". The wheel turns 540° about its own axle and goes back after 4 s.
+  - **Filing cabinet:** "Cabinet / Open". The top drawer slides out 1.1 studs.
+  - **Gramophone:** "Gramophone / Play". The record spins while it plays, for up to 45 s.
+- **Always on** (`Controllers.World.Ambient`, only within 60 studs, halved for Reduce Motion):
+  - the banner cloths sway (`NHSwing`)
+  - the boiler's flue and the pipe vent give off steam (`NHAmbient:Steam` spots)
+  - the candles flicker
+  - retrofitted on batches 4 and 5: the football machine's wheels spin (`NHSpin`), and the chandelier sways
+- **New code:**
+  - `Ambient` gains `NHSpin` (`SpinHinge`, `SpinAxis`, `SpinSpeed`, `SpinWhenOpen`) and an optional `SwingPhase` for `NHSwing`.
+  - `LockerDoors` gains `SwingAxis` (turn about any axis), `SlideBy` (slide instead of turn) and `SwingTime`.
+  - Patch: `Studio/patch_rig2.luau`.
+- **Tiled pieces:** `nh_props.TILED` lists pieces that skip the baked atlas and get world-scaled UVs (8 studs a tile) with a seamless set instead: `CloisterArch_Wall` and `CloisterArchNoLamp_Wall` use `NH_CastleStone`.
+  - The same stone is the texture-library set **CastleStone** (MaterialVariant `NHCastleStone`, Limestone, 8 studs a tile; see [[Textures]]). A builder can run it across a wall and blend it into the arch.
+  - Made by `tools/vfx/make_castle_stone.py`.
+- **Placement** on the baseplate for the builder (`workspace.NHPropsShowcase`, tags `NHPropBatch6` to `NHPropBatch9`):
+  - batch 6 behind the first rows (z 84)
+  - batches 7 and 8 in front (z 44, z 30)
+  - the pillars to the west (x −232, z 70)
+  - `Studio/props_revert6.luau` removes them.
+- **Look:** on theme with the Institution: dark weathered castle stone, moss and ivy, brass, iron and crimson, candlelight, gothic carving. On the owner's notes the courtyard and pillars got a second, more detailed pass. Duplicates of existing models were skipped: the menu set's lamppost, bench, statue, urn, gargoyle and gate, the sports balls and cones.
+
 | Prop | Triangles | Replaces / goes to |
 |---|---|---|
 | StudentDesk | 4.8k | `Desk` ×48 (R101–R106) |
@@ -134,6 +160,45 @@ Door, flap and tap origins sit on their hinge lines.
 | Sink | 7.3k (Main, TapHot, TapCold, Water) | batch 5: a marble washstand with brass pillar taps (turn on: the taps turn, the water runs) |
 | ToiletStall | 17.9k (Body, Door0) | batch 5: black marble and iron with a crimson door that swings out; a toilet with a pull-chain cistern inside |
 | TowelRail | 1.6k | batch 5: brass, with a crimson towel |
+| BannerRavens, BannerRovers, BannerWardens | 10.7k (Cloth, Main) | batch 6: club banners: Night Ravens purple with a raven, Grave Rovers green with a grave cross and ball, Iron Wardens iron grey and rust with a shield; the cloth sways |
+| BannerVigil, BannerCrimson | 9.5k (Cloth, Main) | batch 6: faction banners: The Vigil ink and gold with a candle, The Crimson Court crimson with a thorned rose; the cloth sways |
+| ChessTable | 15.3k | batch 6: marble and iron, a full carved set in bone and ink |
+| ArtEasel | 5.0k (Main, Glass) | batch 6: iron easel, a moonlit canvas in progress, palette and brushes |
+| Gramophone | 7.4k (Main, Record) | batch 6: brass horn, crimson cabinet; "Gramophone / Play" spins the record |
+| Telescope | 3.6k (Main, Glass) | batch 6: brass refractor on an iron tripod |
+| FilingCabinet | 8.8k (Main, Drawer0) | batch 6: cast iron with brass label frames; "Cabinet / Open" slides the top drawer out |
+| Typewriter | 13.6k | batch 6: black enamel and brass, a typed sheet |
+| TeaTrolley | 14.9k | batch 6: iron and brass, teapot, cups, cake stand |
+| Pigeonholes | 12.8k | batch 6: staff mail cubbies with letters and parcels |
+| BallRack | 14.6k | batch 7: basketballs, soccer balls and footballs on an iron rack |
+| Hurdle | 2.0k | batch 7: iron frame, crimson enamel bar |
+| TackleDummy | 6.4k | batch 7: padded leather dummy on an iron sled |
+| GymMatStack | 6.8k | batch 7: crimson and ink leather mats |
+| WaterKeg | 7.4k | batch 7: iron-banded keg with a brass tap and tin cups |
+| Scoreboard | 7.1k | batch 7: gothic wall scoreboard with club lamps; to replace the greybox scoreboards at the pitch |
+| Boiler | 12.7k (Main, Glow, Door0) | batch 7: riveted boiler; "Furnace / Open" swings the firebox door out on the fire; steam from the flue, embers from the fire |
+| PipeRun | 6.6k | batch 7: wall pipes with valves and a gauge; steam from the vent |
+| ValveWheel | 3.4k (Main, Wheel) | batch 7: "Valve / Turn" turns the hand wheel one and a half turns |
+| CoalPile | 4.1k | batch 7: coal heap with a shovel |
+| CoalCart | 7.9k | batch 7: iron coal cart, full |
+| Workbench | 7.9k | batch 7: iron bench, vice, tools |
+| Fountain | 15.0k (Main, Pool) | batch 8: octagonal gothic fountain, grotesque spouts, a brass raven; the water (Pool) always shows |
+| CloisterArch | 15.8k (Main, Wall, Glass, Glow) | batch 8: a cloister bay with a hanging lantern; its wall face (Wall) carries the seamless NHCastleStone |
+| CloisterArchNoLamp | 14.7k (Main, Wall) | batch 8: the same arch without the lantern |
+| StonePlanter | 15.1k | batch 8: buttressed bed with crimson roses, ferns and ivy |
+| Topiary | 14.1k | batch 8: clipped yew in a carved tub |
+| Sundial | 5.0k | batch 8: clustered pedestal, brass dial, a crow |
+| Well | 12.3k (Main, Glass, Glow) | batch 8: wellhead under an iron canopy and slate roof, lantern |
+| Balustrade | 10.0k (Main, Glass, Glow) | batch 8: pierced gothic parapet, tiles every 8 studs, a lantern |
+| Memorial | 11.6k (Main, Glow) | batch 8: the founders' memorial spire, votives, iron railing |
+| PillarCluster | 14.6k | batch 9: clustered pier, stiff-leaf capital, grotesques |
+| PillarOctagon | 15.3k (Main, Glow) | batch 9: octagonal pier, blind tracery, stone ravens, a candle bracket |
+| PillarTwisted | 15.8k | batch 9: twisted wine-marble column on crouching grotesques |
+| PillarFanVault | 14.9k | batch 9: column springing a fan vault with carved bosses |
+| PillarNiche | 7.5k (Main, Glow) | batch 9: square pier with a canopied candle niche |
+| PillarMarble | 11.4k | batch 9: black marble with gilt bands and capital |
+| PillarIron | 9.6k | batch 9: cast-iron column with traceried brackets |
+| Pilaster | 3.6k (Main, Glow) | batch 9: wall pilaster with a blind arch, a crest and a lantern |
 
 ## In Roblox
 **Import:**
@@ -227,4 +292,10 @@ Door, flap and tap origins sit on their hinge lines.
   - **Closing:** everything went back to 0° and the water hid.
   - **Textures:** all 25 SurfaceAppearances loaded in Play. In the Edit view a few show plain white until Studio finishes fetching them.
 - **Not verified yet:** the prompts triggered by a player and the auto-close timers (Open was set directly), the props seen by a second player. Nothing spins the football machine's wheels yet.
+
+**Batches 6 to 9 (2026-11-03):**
+- **Baked:** all 42 at 2048 with 64 samples on the GPU, and every piece is under 16k triangles. Maps uploaded, ids in `props.json`. The castle stone was uploaded at 2048 (the arch walls) and at 1024 (the library set).
+- **Code, in Play:** `NHSpin` turned a test part 91° in 0.5 s at 180°/s, with no script errors from the patched `Ambient` or `LockerDoors`.
+- **Placement check:** done on the real import rather than stand-in boxes. `props_setup6` reports clashes and the furnace door's direction itself.
+- **Not verified yet:** the import and the showcase placement (the owner imports the FBX files; props_setup6 then reports any clash and checks the furnace door opens outward), the four prompts and the sways, spins and steam on the real models in Play, and a second player's view.
 

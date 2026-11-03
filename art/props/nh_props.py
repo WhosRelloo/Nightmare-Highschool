@@ -1217,6 +1217,7 @@ def candelabra(M):
 
 PREVIEW_PAD = {}   # name -> camera distance factor for a prop that would be cropped
 OPEN_DEG = {}      # piece -> how far it opens in the _open preview (default 105)
+TILED = {}         # piece -> (seamless set in art/props/textures, studs per tile): not baked; world-scaled UVs instead
 
 BUILD = {
     "StudentDesk": student_desk,
@@ -1469,6 +1470,51 @@ def preview(objs, name, dims, suffix=""):
     bpy.ops.render.render(write_still=True)
 
 
+def tile_uv(ob, tile):
+    """World-scaled UVs for a tiled piece: each face projected along its main axis, `tile` studs to one repeat, so a
+    seamless set lines up in scale with the same set used as a MaterialVariant on a builder's walls."""
+    me = ob.data
+    for uv in list(me.uv_layers):
+        me.uv_layers.remove(uv)
+    uv = me.uv_layers.new(name="Bake")
+    me.uv_layers.active = uv
+    mw = ob.matrix_world
+    rot = mw.to_3x3()
+    for poly in me.polygons:
+        n = rot @ poly.normal
+        a = max(range(3), key=lambda k: abs(n[k]))
+        for li in poly.loop_indices:
+            co = mw @ me.vertices[me.loops[li].vertex_index].co
+            if a == 0:
+                u, v = co.y * (1 if n[0] > 0 else -1), co.z
+            elif a == 1:
+                u, v = co.x * (-1 if n[1] > 0 else 1), co.z
+            else:
+                u, v = co.x, co.y
+            uv.data[li].uv = (u / tile, v / tile)
+
+
+def tile_material(ob, set_name):
+    m = bpy.data.materials.new(f"NH_{set_name}")
+    m.use_nodes = True
+    nt = m.node_tree
+    bs = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+    def tex(kind, color=False):
+        t = nt.nodes.new("ShaderNodeTexImage")
+        t.image = bpy.data.images.load(os.path.join(OUT_TEX, f"{set_name}_{kind}.png"))
+        if not color:
+            t.image.colorspace_settings.name = "Non-Color"
+        return t
+    nt.links.new(tex("color", True).outputs["Color"], bs.inputs["Base Color"])
+    nm = nt.nodes.new("ShaderNodeNormalMap")
+    nt.links.new(tex("normal").outputs["Color"], nm.inputs["Color"])
+    nt.links.new(nm.outputs["Normal"], bs.inputs["Normal"])
+    nt.links.new(tex("rough").outputs["Color"], bs.inputs["Roughness"])
+    nt.links.new(tex("metal").outputs["Color"], bs.inputs["Metallic"])
+    ob.data.materials.clear()
+    ob.data.materials.append(m)
+
+
 def run(name):
     global PARTS, GROUP, HINGES
     PARTS, GROUP, HINGES = [], "Main", {}
@@ -1476,9 +1522,14 @@ def run(name):
     M = palette()
     dims = BUILD[name](M)
     objs = join_parts(name)
-    bake_uv(objs)
-    imgs = bake_all(objs, name)
-    final_material(objs, name, imgs)
+    tiled = [o for o in objs if o.name in TILED]
+    baked = [o for o in objs if o not in tiled]
+    bake_uv(baked)
+    imgs = bake_all(baked, name)
+    final_material(baked, name, imgs)
+    for o in tiled:
+        tile_uv(o, TILED[o.name][1])
+        tile_material(o, TILED[o.name][0])
     tris = sum(len(p.vertices) - 2 for o in objs for p in o.data.polygons)
     export(objs, name)
     preview(objs, name, dims)
@@ -1493,13 +1544,17 @@ def run(name):
     print(f"[props] {name}: {tris} tris, pieces {per}, dims {dims}")
 
 
-# batches 3, 4 and 5 live in their own files and registers into BUILD; it must share THIS module (run as a script,
+# batches 3 to 9 live in their own files and registers into BUILD; it must share THIS module (run as a script,
 # nh_props is __main__, and a second import would get its own PARTS list)
 sys.modules.setdefault("nh_props", sys.modules[__name__])
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import nh_props_batch3  # noqa: E402,F401
 import nh_props_batch4  # noqa: E402,F401
 import nh_props_batch5  # noqa: E402,F401
+import nh_props_batch6  # noqa: E402,F401
+import nh_props_batch7  # noqa: E402,F401
+import nh_props_batch8  # noqa: E402,F401
+import nh_props_batch9  # noqa: E402,F401
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 {
- "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs.",
+ "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y).",
  "StudentDesk": {
   "dims": [
    3.0,
@@ -722,5 +722,844 @@
   "ColorMap": "rbxassetid://81786486130011",
   "RoughnessMap": "rbxassetid://81763998034455",
   "NormalMap": "rbxassetid://89961824816069"
+ },
+ "BannerRavens": {
+  "dims": [
+   3.99,
+   0.48,
+   6.0
+  ],
+  "pieces": [
+   "BannerRavens_Cloth",
+   "BannerRavens_Main"
+  ],
+  "tris": {
+   "BannerRavens_Cloth": 9244,
+   "BannerRavens_Main": 1472
+  },
+  "batch": 6,
+  "MetalnessMap": "rbxassetid://83952238905141",
+  "NormalMap": "rbxassetid://106953334121233",
+  "RoughnessMap": "rbxassetid://103081028586526",
+  "ColorMap": "rbxassetid://93081630366812"
+ },
+ "BannerRovers": {
+  "dims": [
+   3.99,
+   0.47,
+   6.0
+  ],
+  "pieces": [
+   "BannerRovers_Cloth",
+   "BannerRovers_Main"
+  ],
+  "tris": {
+   "BannerRovers_Cloth": 8888,
+   "BannerRovers_Main": 1472
+  },
+  "batch": 6,
+  "RoughnessMap": "rbxassetid://94628748252346",
+  "ColorMap": "rbxassetid://74931171416146",
+  "NormalMap": "rbxassetid://108989366599234",
+  "MetalnessMap": "rbxassetid://86036905800151"
+ },
+ "BannerWardens": {
+  "dims": [
+   3.99,
+   0.49,
+   6.0
+  ],
+  "pieces": [
+   "BannerWardens_Cloth",
+   "BannerWardens_Main"
+  ],
+  "tris": {
+   "BannerWardens_Cloth": 8888,
+   "BannerWardens_Main": 1472
+  },
+  "batch": 6,
+  "ColorMap": "rbxassetid://102185734813559",
+  "RoughnessMap": "rbxassetid://71932736392812",
+  "NormalMap": "rbxassetid://124657475564687",
+  "MetalnessMap": "rbxassetid://117086657503683"
+ },
+ "BannerVigil": {
+  "dims": [
+   3.99,
+   0.47,
+   6.0
+  ],
+  "pieces": [
+   "BannerVigil_Cloth",
+   "BannerVigil_Main"
+  ],
+  "tris": {
+   "BannerVigil_Cloth": 8032,
+   "BannerVigil_Main": 1472
+  },
+  "batch": 6,
+  "NormalMap": "rbxassetid://104188733078167",
+  "MetalnessMap": "rbxassetid://73661140383094",
+  "ColorMap": "rbxassetid://88164939689867",
+  "RoughnessMap": "rbxassetid://122833652001986"
+ },
+ "BannerCrimson": {
+  "dims": [
+   3.99,
+   0.49,
+   6.0
+  ],
+  "pieces": [
+   "BannerCrimson_Cloth",
+   "BannerCrimson_Main"
+  ],
+  "tris": {
+   "BannerCrimson_Cloth": 12624,
+   "BannerCrimson_Main": 1472
+  },
+  "batch": 6,
+  "RoughnessMap": "rbxassetid://140637860350603",
+  "NormalMap": "rbxassetid://127356683372809",
+  "MetalnessMap": "rbxassetid://82913385883199",
+  "ColorMap": "rbxassetid://73063363341827"
+ },
+ "ChessTable": {
+  "dims": [
+   2.46,
+   2.46,
+   2.83
+  ],
+  "pieces": [
+   "ChessTable"
+  ],
+  "tris": {
+   "ChessTable": 15336
+  },
+  "batch": 6,
+  "ColorMap": "rbxassetid://128754383292831",
+  "NormalMap": "rbxassetid://86914887430540",
+  "MetalnessMap": "rbxassetid://137673381254119",
+  "RoughnessMap": "rbxassetid://99199494452520"
+ },
+ "ArtEasel": {
+  "dims": [
+   2.73,
+   1.95,
+   5.28
+  ],
+  "pieces": [
+   "ArtEasel_Main",
+   "ArtEasel_Glass"
+  ],
+  "tris": {
+   "ArtEasel_Main": 4696,
+   "ArtEasel_Glass": 280
+  },
+  "batch": 6,
+  "ColorMap": "rbxassetid://78530778751287",
+  "RoughnessMap": "rbxassetid://86651858460465",
+  "MetalnessMap": "rbxassetid://79533911171091",
+  "NormalMap": "rbxassetid://128009735220894"
+ },
+ "Gramophone": {
+  "dims": [
+   1.93,
+   2.12,
+   3.09
+  ],
+  "pieces": [
+   "Gramophone_Main",
+   "Gramophone_Record"
+  ],
+  "tris": {
+   "Gramophone_Main": 4790,
+   "Gramophone_Record": 2632
+  },
+  "batch": 6,
+  "rig": "NHLockerProp: Gramophone / Play, the record spins (NHSpin), stops after 45 s",
+  "ColorMap": "rbxassetid://98648456747251",
+  "NormalMap": "rbxassetid://120742241045549",
+  "MetalnessMap": "rbxassetid://110298132141806",
+  "RoughnessMap": "rbxassetid://123219011469227"
+ },
+ "Telescope": {
+  "dims": [
+   1.96,
+   3.05,
+   4.22
+  ],
+  "pieces": [
+   "Telescope_Main",
+   "Telescope_Glass"
+  ],
+  "tris": {
+   "Telescope_Main": 3488,
+   "Telescope_Glass": 124
+  },
+  "batch": 6,
+  "ColorMap": "rbxassetid://75581791839421",
+  "NormalMap": "rbxassetid://114675842152342",
+  "MetalnessMap": "rbxassetid://139940620745794",
+  "RoughnessMap": "rbxassetid://78815416740397"
+ },
+ "FilingCabinet": {
+  "dims": [
+   1.86,
+   2.27,
+   4.91
+  ],
+  "pieces": [
+   "FilingCabinet_Main",
+   "FilingCabinet_Drawer0"
+  ],
+  "tris": {
+   "FilingCabinet_Main": 6848,
+   "FilingCabinet_Drawer0": 1908
+  },
+  "batch": 6,
+  "swing": {
+   "FilingCabinet_Drawer0": "slides out 1.1"
+  },
+  "rig": "NHLockerProp: Cabinet / Open, shuts after 8 s",
+  "RoughnessMap": "rbxassetid://135009734471217",
+  "NormalMap": "rbxassetid://76152841808477",
+  "ColorMap": "rbxassetid://117133875855851",
+  "MetalnessMap": "rbxassetid://127933197494509"
+ },
+ "Typewriter": {
+  "dims": [
+   1.61,
+   1.14,
+   1.49
+  ],
+  "pieces": [
+   "Typewriter"
+  ],
+  "tris": {
+   "Typewriter": 13648
+  },
+  "batch": 6,
+  "NormalMap": "rbxassetid://133495436583776",
+  "RoughnessMap": "rbxassetid://96402039824378",
+  "ColorMap": "rbxassetid://88277027376275",
+  "MetalnessMap": "rbxassetid://109621648174267"
+ },
+ "TeaTrolley": {
+  "dims": [
+   2.42,
+   1.3,
+   2.82
+  ],
+  "pieces": [
+   "TeaTrolley"
+  ],
+  "tris": {
+   "TeaTrolley": 14852
+  },
+  "batch": 6,
+  "RoughnessMap": "rbxassetid://90115215022535",
+  "NormalMap": "rbxassetid://135918649643411",
+  "MetalnessMap": "rbxassetid://136026822896531",
+  "ColorMap": "rbxassetid://126846435922899"
+ },
+ "Pigeonholes": {
+  "dims": [
+   3.82,
+   1.04,
+   3.75
+  ],
+  "pieces": [
+   "Pigeonholes"
+  ],
+  "tris": {
+   "Pigeonholes": 12796
+  },
+  "batch": 6,
+  "RoughnessMap": "rbxassetid://108597054511878",
+  "MetalnessMap": "rbxassetid://138827499547237",
+  "ColorMap": "rbxassetid://129939024621273",
+  "NormalMap": "rbxassetid://130616908974011"
+ },
+ "BallRack": {
+  "dims": [
+   4.03,
+   1.45,
+   2.9
+  ],
+  "pieces": [
+   "BallRack"
+  ],
+  "tris": {
+   "BallRack": 14576
+  },
+  "batch": 7,
+  "ColorMap": "rbxassetid://127205644144955",
+  "MetalnessMap": "rbxassetid://117973628434455",
+  "NormalMap": "rbxassetid://133267431755307",
+  "RoughnessMap": "rbxassetid://112973060044952"
+ },
+ "Hurdle": {
+  "dims": [
+   3.62,
+   1.32,
+   2.68
+  ],
+  "pieces": [
+   "Hurdle"
+  ],
+  "tris": {
+   "Hurdle": 2040
+  },
+  "batch": 7,
+  "MetalnessMap": "rbxassetid://106450133536986",
+  "RoughnessMap": "rbxassetid://100261850662182",
+  "NormalMap": "rbxassetid://134185523024887",
+  "ColorMap": "rbxassetid://75557197946565"
+ },
+ "TackleDummy": {
+  "dims": [
+   1.72,
+   3.06,
+   4.16
+  ],
+  "pieces": [
+   "TackleDummy"
+  ],
+  "tris": {
+   "TackleDummy": 6360
+  },
+  "batch": 7,
+  "NormalMap": "rbxassetid://81386028211436",
+  "RoughnessMap": "rbxassetid://80380297789058",
+  "ColorMap": "rbxassetid://102418448066064",
+  "MetalnessMap": "rbxassetid://135769421246602"
+ },
+ "GymMatStack": {
+  "dims": [
+   4.53,
+   2.8,
+   1.31
+  ],
+  "pieces": [
+   "GymMatStack"
+  ],
+  "tris": {
+   "GymMatStack": 6784
+  },
+  "batch": 7,
+  "MetalnessMap": "rbxassetid://103106085998327",
+  "RoughnessMap": "rbxassetid://98735201591748",
+  "NormalMap": "rbxassetid://96401465474979",
+  "ColorMap": "rbxassetid://106122539486615"
+ },
+ "WaterKeg": {
+  "dims": [
+   1.86,
+   2.76,
+   2.68
+  ],
+  "pieces": [
+   "WaterKeg"
+  ],
+  "tris": {
+   "WaterKeg": 7384
+  },
+  "batch": 7,
+  "MetalnessMap": "rbxassetid://104794130538108",
+  "NormalMap": "rbxassetid://118995579355221",
+  "RoughnessMap": "rbxassetid://84952889858531",
+  "ColorMap": "rbxassetid://105500888955034"
+ },
+ "Scoreboard": {
+  "dims": [
+   7.76,
+   0.66,
+   6.0
+  ],
+  "pieces": [
+   "Scoreboard"
+  ],
+  "tris": {
+   "Scoreboard": 7064
+  },
+  "batch": 7,
+  "NormalMap": "rbxassetid://97854871617041",
+  "ColorMap": "rbxassetid://70626481485636",
+  "MetalnessMap": "rbxassetid://74694925285157",
+  "RoughnessMap": "rbxassetid://81860130684766"
+ },
+ "Boiler": {
+  "dims": [
+   3.74,
+   3.68,
+   8.5
+  ],
+  "pieces": [
+   "Boiler_Main",
+   "Boiler_Glow",
+   "Boiler_Door0"
+  ],
+  "tris": {
+   "Boiler_Main": 10148,
+   "Boiler_Glow": 600,
+   "Boiler_Door0": 1996
+  },
+  "batch": 7,
+  "pivot": {
+   "Boiler_Door0": [
+    -0.64,
+    -1.68,
+    0.0
+   ]
+  },
+  "swing": {
+   "Boiler_Door0": "out 100"
+  },
+  "rig": "NHLockerProp: Furnace / Open, shuts after 8 s",
+  "ColorMap": "rbxassetid://73121200298892",
+  "RoughnessMap": "rbxassetid://101327034129222",
+  "MetalnessMap": "rbxassetid://86149882471179",
+  "NormalMap": "rbxassetid://136320771368973"
+ },
+ "PipeRun": {
+  "dims": [
+   8.6,
+   1.21,
+   4.28
+  ],
+  "pieces": [
+   "PipeRun"
+  ],
+  "tris": {
+   "PipeRun": 6592
+  },
+  "batch": 7,
+  "MetalnessMap": "rbxassetid://120135315941918",
+  "NormalMap": "rbxassetid://131387564083803",
+  "ColorMap": "rbxassetid://133758672099810",
+  "RoughnessMap": "rbxassetid://97536924562689"
+ },
+ "ValveWheel": {
+  "dims": [
+   1.34,
+   1.09,
+   2.4
+  ],
+  "pieces": [
+   "ValveWheel_Main",
+   "ValveWheel_Wheel"
+  ],
+  "tris": {
+   "ValveWheel_Main": 1592,
+   "ValveWheel_Wheel": 1804
+  },
+  "batch": 7,
+  "pivot": {
+   "ValveWheel_Wheel": [
+    0.0,
+    -0.62,
+    1.2
+   ]
+  },
+  "swing": {
+   "ValveWheel_Wheel": "540 about the axle"
+  },
+  "rig": "NHLockerProp: Valve / Turn, back after 4 s",
+  "RoughnessMap": "rbxassetid://97507741714153",
+  "MetalnessMap": "rbxassetid://107559282663711",
+  "ColorMap": "rbxassetid://100449055306949",
+  "NormalMap": "rbxassetid://74631880428263"
+ },
+ "CoalPile": {
+  "dims": [
+   3.23,
+   3.07,
+   2.72
+  ],
+  "pieces": [
+   "CoalPile"
+  ],
+  "tris": {
+   "CoalPile": 4072
+  },
+  "batch": 7,
+  "MetalnessMap": "rbxassetid://128105023398721",
+  "RoughnessMap": "rbxassetid://87061526209055",
+  "ColorMap": "rbxassetid://99729164372623",
+  "NormalMap": "rbxassetid://94801745488466"
+ },
+ "CoalCart": {
+  "dims": [
+   2.16,
+   3.72,
+   2.5
+  ],
+  "pieces": [
+   "CoalCart"
+  ],
+  "tris": {
+   "CoalCart": 7940
+  },
+  "batch": 7,
+  "RoughnessMap": "rbxassetid://109043981074709",
+  "ColorMap": "rbxassetid://119297793047848",
+  "MetalnessMap": "rbxassetid://107654397259567",
+  "NormalMap": "rbxassetid://123221750772219"
+ },
+ "Workbench": {
+  "dims": [
+   5.05,
+   2.53,
+   4.75
+  ],
+  "pieces": [
+   "Workbench"
+  ],
+  "tris": {
+   "Workbench": 7944
+  },
+  "batch": 7,
+  "NormalMap": "rbxassetid://95884616387935",
+  "RoughnessMap": "rbxassetid://89995487648348",
+  "MetalnessMap": "rbxassetid://89075715908759",
+  "ColorMap": "rbxassetid://78744040437149"
+ },
+ "Fountain": {
+  "dims": [
+   9.6,
+   9.6,
+   5.93
+  ],
+  "pieces": [
+   "Fountain_Main",
+   "Fountain_Pool"
+  ],
+  "tris": {
+   "Fountain_Main": 13584,
+   "Fountain_Pool": 1440
+  },
+  "batch": 8,
+  "NormalMap": "rbxassetid://118531837639762",
+  "ColorMap": "rbxassetid://95810723433687",
+  "RoughnessMap": "rbxassetid://118490691567366",
+  "MetalnessMap": "rbxassetid://111391146726134"
+ },
+ "CloisterArch": {
+  "dims": [
+   9.55,
+   1.92,
+   12.02
+  ],
+  "pieces": [
+   "CloisterArch_Main",
+   "CloisterArch_Wall",
+   "CloisterArch_Glass",
+   "CloisterArch_Glow"
+  ],
+  "tris": {
+   "CloisterArch_Main": 15254,
+   "CloisterArch_Wall": 384,
+   "CloisterArch_Glass": 48,
+   "CloisterArch_Glow": 80
+  },
+  "batch": 8,
+  "NormalMap": "rbxassetid://82908583856315",
+  "ColorMap": "rbxassetid://113187889505424",
+  "MetalnessMap": "rbxassetid://120930654942596",
+  "RoughnessMap": "rbxassetid://74468667265846",
+  "tiled": {
+   "CloisterArch_Wall": "NH_CastleStone at 8 studs a tile (seamless set; the same stone as MaterialVariant NHCastleStone)"
+  }
+ },
+ "CloisterArchNoLamp": {
+  "dims": [
+   9.55,
+   1.92,
+   12.02
+  ],
+  "pieces": [
+   "CloisterArchNoLamp_Main",
+   "CloisterArchNoLamp_Wall"
+  ],
+  "tris": {
+   "CloisterArchNoLamp_Main": 14272,
+   "CloisterArchNoLamp_Wall": 384
+  },
+  "batch": 8,
+  "RoughnessMap": "rbxassetid://111838876340158",
+  "ColorMap": "rbxassetid://111496790177279",
+  "NormalMap": "rbxassetid://91003112830343",
+  "MetalnessMap": "rbxassetid://88551890064403",
+  "tiled": {
+   "CloisterArchNoLamp_Wall": "NH_CastleStone at 8 studs a tile (seamless set; the same stone as MaterialVariant NHCastleStone)"
+  }
+ },
+ "StonePlanter": {
+  "dims": [
+   6.5,
+   3.21,
+   2.31
+  ],
+  "pieces": [
+   "StonePlanter"
+  ],
+  "tris": {
+   "StonePlanter": 15140
+  },
+  "batch": 8,
+  "RoughnessMap": "rbxassetid://138875702459325",
+  "MetalnessMap": "rbxassetid://88551890064403",
+  "NormalMap": "rbxassetid://109441070655034",
+  "ColorMap": "rbxassetid://72585559534549"
+ },
+ "Topiary": {
+  "dims": [
+   2.53,
+   2.37,
+   6.04
+  ],
+  "pieces": [
+   "Topiary"
+  ],
+  "tris": {
+   "Topiary": 14076
+  },
+  "batch": 8,
+  "NormalMap": "rbxassetid://122254306916984",
+  "RoughnessMap": "rbxassetid://130694761745127",
+  "ColorMap": "rbxassetid://100557242753078",
+  "MetalnessMap": "rbxassetid://88551890064403"
+ },
+ "Sundial": {
+  "dims": [
+   2.3,
+   2.3,
+   3.55
+  ],
+  "pieces": [
+   "Sundial"
+  ],
+  "tris": {
+   "Sundial": 4978
+  },
+  "batch": 8,
+  "ColorMap": "rbxassetid://77487654580301",
+  "MetalnessMap": "rbxassetid://78397000032365",
+  "NormalMap": "rbxassetid://107150491124892",
+  "RoughnessMap": "rbxassetid://94906703662676"
+ },
+ "Well": {
+  "dims": [
+   3.98,
+   3.69,
+   5.94
+  ],
+  "pieces": [
+   "Well_Main",
+   "Well_Glass",
+   "Well_Glow"
+  ],
+  "tris": {
+   "Well_Main": 12200,
+   "Well_Glass": 48,
+   "Well_Glow": 80
+  },
+  "batch": 8,
+  "NormalMap": "rbxassetid://70480558828941",
+  "ColorMap": "rbxassetid://129832448738672",
+  "RoughnessMap": "rbxassetid://135801761433856",
+  "MetalnessMap": "rbxassetid://100525507460514"
+ },
+ "Balustrade": {
+  "dims": [
+   8.22,
+   1.83,
+   4.29
+  ],
+  "pieces": [
+   "Balustrade_Main",
+   "Balustrade_Glass",
+   "Balustrade_Glow"
+  ],
+  "tris": {
+   "Balustrade_Main": 9882,
+   "Balustrade_Glass": 48,
+   "Balustrade_Glow": 80
+  },
+  "batch": 8,
+  "RoughnessMap": "rbxassetid://125903259963665",
+  "ColorMap": "rbxassetid://76127542166735",
+  "MetalnessMap": "rbxassetid://71409414265152",
+  "NormalMap": "rbxassetid://132377011148538"
+ },
+ "Memorial": {
+  "dims": [
+   4.02,
+   4.02,
+   9.04
+  ],
+  "pieces": [
+   "Memorial_Main",
+   "Memorial_Glow"
+  ],
+  "tris": {
+   "Memorial_Main": 11352,
+   "Memorial_Glow": 240
+  },
+  "batch": 8,
+  "RoughnessMap": "rbxassetid://72052435230003",
+  "ColorMap": "rbxassetid://71502003014754",
+  "MetalnessMap": "rbxassetid://98135866061631",
+  "NormalMap": "rbxassetid://83189197198513"
+ },
+ "PillarCluster": {
+  "dims": [
+   3.1,
+   2.86,
+   12.0
+  ],
+  "pieces": [
+   "PillarCluster"
+  ],
+  "tris": {
+   "PillarCluster": 14604
+  },
+  "batch": 9,
+  "NormalMap": "rbxassetid://90441093748848",
+  "RoughnessMap": "rbxassetid://110380117269586",
+  "MetalnessMap": "rbxassetid://88551890064403",
+  "ColorMap": "rbxassetid://112496086608706"
+ },
+ "PillarOctagon": {
+  "dims": [
+   2.5,
+   2.5,
+   12.0
+  ],
+  "pieces": [
+   "PillarOctagon_Main",
+   "PillarOctagon_Glow"
+  ],
+  "tris": {
+   "PillarOctagon_Main": 15264,
+   "PillarOctagon_Glow": 80
+  },
+  "batch": 9,
+  "MetalnessMap": "rbxassetid://82371230254580",
+  "NormalMap": "rbxassetid://134143021466933",
+  "RoughnessMap": "rbxassetid://138332089647253",
+  "ColorMap": "rbxassetid://77531092112667"
+ },
+ "PillarTwisted": {
+  "dims": [
+   2.69,
+   2.69,
+   12.0
+  ],
+  "pieces": [
+   "PillarTwisted"
+  ],
+  "tris": {
+   "PillarTwisted": 15788
+  },
+  "batch": 9,
+  "MetalnessMap": "rbxassetid://134094060116085",
+  "ColorMap": "rbxassetid://131423622751211",
+  "RoughnessMap": "rbxassetid://119569565228997",
+  "NormalMap": "rbxassetid://122891233914540"
+ },
+ "PillarFanVault": {
+  "dims": [
+   6.13,
+   6.13,
+   12.02
+  ],
+  "pieces": [
+   "PillarFanVault"
+  ],
+  "tris": {
+   "PillarFanVault": 14884
+  },
+  "batch": 9,
+  "MetalnessMap": "rbxassetid://88551890064403",
+  "ColorMap": "rbxassetid://119011091419073",
+  "NormalMap": "rbxassetid://103343384453044",
+  "RoughnessMap": "rbxassetid://134217978310548"
+ },
+ "PillarNiche": {
+  "dims": [
+   2.6,
+   2.6,
+   11.98
+  ],
+  "pieces": [
+   "PillarNiche_Main",
+   "PillarNiche_Glow"
+  ],
+  "tris": {
+   "PillarNiche_Main": 7466,
+   "PillarNiche_Glow": 80
+  },
+  "batch": 9,
+  "ColorMap": "rbxassetid://112302588429376",
+  "NormalMap": "rbxassetid://133712443772437",
+  "MetalnessMap": "rbxassetid://77015326341319",
+  "RoughnessMap": "rbxassetid://114565560498550"
+ },
+ "PillarMarble": {
+  "dims": [
+   2.34,
+   2.34,
+   12.0
+  ],
+  "pieces": [
+   "PillarMarble"
+  ],
+  "tris": {
+   "PillarMarble": 11372
+  },
+  "batch": 9,
+  "NormalMap": "rbxassetid://130711244374245",
+  "ColorMap": "rbxassetid://93177443290365",
+  "MetalnessMap": "rbxassetid://104492090281982",
+  "RoughnessMap": "rbxassetid://119118191647684"
+ },
+ "PillarIron": {
+  "dims": [
+   2.8,
+   2.8,
+   12.0
+  ],
+  "pieces": [
+   "PillarIron"
+  ],
+  "tris": {
+   "PillarIron": 9564
+  },
+  "batch": 9,
+  "NormalMap": "rbxassetid://71464843455174",
+  "RoughnessMap": "rbxassetid://89255507465826",
+  "ColorMap": "rbxassetid://102599642160614",
+  "MetalnessMap": "rbxassetid://138975876874427"
+ },
+ "Pilaster": {
+  "dims": [
+   2.3,
+   1.42,
+   12.0
+  ],
+  "pieces": [
+   "Pilaster_Main",
+   "Pilaster_Glow"
+  ],
+  "tris": {
+   "Pilaster_Main": 3480,
+   "Pilaster_Glow": 80
+  },
+  "batch": 9,
+  "ColorMap": "rbxassetid://101290261785101",
+  "MetalnessMap": "rbxassetid://108682938072509",
+  "NormalMap": "rbxassetid://76781498116090",
+  "RoughnessMap": "rbxassetid://73781657840428"
  }
 }

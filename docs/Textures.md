@@ -1,8 +1,9 @@
 # Textures (builder sets)
 
-24 tileable PBR texture sets for building NH Combat Test, made 2026-11-03.
+25 tileable PBR texture sets for building NH Combat Test, made 2026-11-03.
 - **Where they're from:** 14 match the gritty night-town style of the owner's reference screenshots; 10 are Nightmare High's own gothic sets.
 - **Original work:** everything is generated from scratch by `art/textures/nh_textures.py`. Nothing is copied from another game.
+- **CastleStone** came later, with props batch 8: the cloister arch's own wall stone, made by `tools/vfx/make_castle_stone.py` from the 2048 limestone set the props use. The arch's wall piece uses the same stone at the same scale (8 studs a tile), so a wall built in `NHCastleStone` blends into the arch.
 
 ## Using them in Studio
 Every set is a **MaterialVariant** in `MaterialService`, named `NH<Name>`. Pick one in either of two ways:
@@ -37,6 +38,7 @@ A ready-made sample wall, one 12 × 12 block per set, is in `ServerStorage.NHTex
 | RuneSlate | NHRuneSlate | Slate | 12 | slate slabs carved with crimson-lit runes |
 | MossyFlagstone | NHMossyFlagstone | Slate | 12 | irregular flagstones, moss in the joints |
 | QuatrefoilTile | NHQuatrefoilTile | Marble | 6 | cathedral floor with black quatrefoils |
+| CastleStone | NHCastleStone | Limestone | 8 | the courtyard cloister arch's weathered grey castle stone (no joints), so a wall blends into the arch; made by `tools/vfx/make_castle_stone.py` |
 
 Asset ids for every map are in `art/textures/textures.json`.
 
