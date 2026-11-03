@@ -23,7 +23,7 @@ import bmesh
 from mathutils import Vector
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.join(HERE, "source")
+SRC = os.path.join(HERE, "source")       # 1024 seamless sets; 2048 bakes use source_2k (see below)
 OUT_TEX = os.path.join(HERE, "textures")
 OUT_FBX = os.path.join(HERE, "fbx")
 OUT_PRE = os.path.join(HERE, "previews")
@@ -36,6 +36,12 @@ SIZE = int(argv[argv.index("--size") + 1]) if "--size" in argv else 1024
 SAMPLES = int(argv[argv.index("--samples") + 1]) if "--samples" in argv else 64
 GPU = "--gpu" in argv          # bake and render on the GPU (Cycles HIP / CUDA / OptiX, whichever is present)
 BAKE_SAMPLES = max(16, SAMPLES // 2)   # colour, roughness, normal and metal bakes (AO uses SAMPLES)
+# 2048 bakes (batch 4 on): the same seamless sets made at 2048, so small props are not baked from upscaled
+# 1024 sources, and a tighter, even-density UV pack. Make them with:
+#   python tools/vfx/make_pbr_materials.py art/props/source_2k 2048
+HQ = SIZE >= 2048
+if HQ and os.path.isdir(os.path.join(HERE, "source_2k")):
+    SRC = os.path.join(HERE, "source_2k")
 
 
 # ------------------------------------------------------------------ scene
@@ -1210,6 +1216,7 @@ def candelabra(M):
 
 
 PREVIEW_PAD = {}   # name -> camera distance factor for a prop that would be cropped
+OPEN_DEG = {}      # piece -> how far it opens in the _open preview (default 105)
 
 BUILD = {
     "StudentDesk": student_desk,
@@ -1274,7 +1281,12 @@ def bake_uv(objs):
     bpy.ops.object.mode_set(mode="EDIT")
     bpy.ops.mesh.select_all(action="SELECT")
     bpy.ops.uv.smart_project(angle_limit=math.radians(60), island_margin=0.006, area_weight=0.6)
-    bpy.ops.uv.pack_islands(margin=0.004)
+    if HQ:
+        # one texel density for every island, packed by shape with rotation and an 8-pixel gap
+        bpy.ops.uv.average_islands_scale()
+        bpy.ops.uv.pack_islands(rotate=True, margin_method="FRACTION", margin=8 / SIZE, shape_method="CONCAVE")
+    else:
+        bpy.ops.uv.pack_islands(margin=0.004)
     bpy.ops.object.mode_set(mode="OBJECT")
 
 
@@ -1402,6 +1414,23 @@ def export(objs, name):
 
 def preview(objs, name, dims, suffix=""):
     sc = bpy.context.scene
+    # show *_Glass and *_Glow pieces as they look in Roblox (Glass / Neon); the bake and FBX are already written
+    for ob in objs:
+        kind = "Glass" if ob.name.endswith("_Glass") else "Glow" if ob.name.endswith("_Glow") else None
+        if not kind:
+            continue
+        m = bpy.data.materials.new(f"Preview{kind}")
+        m.use_nodes = True
+        bs = next(n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+        if kind == "Glass":
+            bs.inputs["Base Color"].default_value = (0.85, 0.9, 0.95, 1)
+            bs.inputs["Roughness"].default_value = 0.04
+            bs.inputs["Transmission Weight"].default_value = 1.0
+        else:
+            bs.inputs["Emission Color"].default_value = (1.0, 0.62, 0.3, 1)
+            bs.inputs["Emission Strength"].default_value = 6.0
+        ob.data.materials.clear()
+        ob.data.materials.append(m)
     sc.cycles.samples = 48
     sc.render.resolution_x, sc.render.resolution_y = 900, 700
     sc.render.film_transparent = False
@@ -1456,19 +1485,21 @@ def run(name):
     doors = [o for o in objs if "nh_swing" in o.keys()]
     if doors:
         for o in doors:
-            o.rotation_euler[2] = math.radians(105) * o["nh_swing"]
+            o.rotation_euler[2] = math.radians(OPEN_DEG.get(o.name, 105)) * o["nh_swing"]
         sc = bpy.context.scene
         sc.render.filepath = os.path.join(OUT_PRE, f"{name}_open.png")
         bpy.ops.render.render(write_still=True)
-    print(f"[props] {name}: {tris} tris, pieces {[o.name for o in objs]}, dims {dims}")
+    per = {o.name: sum(len(p.vertices) - 2 for p in o.data.polygons) for o in objs}
+    print(f"[props] {name}: {tris} tris, pieces {per}, dims {dims}")
 
 
-# batches 3 and 4 live in their own files and registers into BUILD; it must share THIS module (run as a script,
+# batches 3, 4 and 5 live in their own files and registers into BUILD; it must share THIS module (run as a script,
 # nh_props is __main__, and a second import would get its own PARTS list)
 sys.modules.setdefault("nh_props", sys.modules[__name__])
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import nh_props_batch3  # noqa: E402,F401
 import nh_props_batch4  # noqa: E402,F401
+import nh_props_batch5  # noqa: E402,F401
 
 
 if __name__ == "__main__":

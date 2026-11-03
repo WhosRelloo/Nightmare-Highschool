@@ -6,3 +6,6 @@ __pycache__/
 # owner's raw hair exports and the rigged FBX built from them (large, re-creatable)
 Hair OBJ's/
 Hair FBX/
+
+# 2048 prop source sets (re-creatable: python tools/vfx/make_pbr_materials.py art/props/source_2k 2048)
+art/props/source_2k/

@@ -17,6 +17,10 @@
   CandleCluster   seven pillar candles of different heights on an iron tray, melted and dripping (Glow)
   UmbrellaStand   a fluted cast-iron stand with brass bands and quatrefoils, two furled umbrellas and a cane
   CoatRack        a turned oak hall stand on scrolled iron feet with eight hooks, a crimson scarf and a satchel
+  FootballMachine the Iron Wardens' steam throwing machine for the football drills: a riveted iron head on a
+                  tripod and brass turntable, two crimson-tyred launch wheels (WheelL / WheelR: own pieces, origin
+                  on the axle, they spin about Z), a feed chute and a crate of footballs, a brass boiler with a
+                  pressure gauge (Glass: the gauge glass), a throttle lever and an Iron Wardens shield
 
 Front faces -Y, Z is up, the origin is at the bottom centre (wall pieces: the back sits at +Y).
 Registered into nh_props.BUILD on import (nh_props imports this module at the end).
@@ -29,8 +33,8 @@ import bmesh
 from mathutils import Matrix, Vector
 
 import nh_props as P
-from nh_props import box, cyl, tube, ring, set_group, _finish, _gable, _quatrefoil, material
-from nh_props_batch3 import sphere, cone, flame
+from nh_props import box, cyl, tube, ring, set_group, _finish, _gable, _quatrefoil, _arch_loop, _arch_loop_x, material
+from nh_props_batch3 import sphere, cone, flame, circle_pts
 
 
 # ------------------------------------------------------------------ helpers
@@ -75,6 +79,13 @@ def lathe(name, prof, mat, seg=32, loc=(0, 0, 0), flute=None, jitter=None, scale
     ob = bpy.data.objects.new(name, me)
     bpy.context.collection.objects.link(ob)
     return _finish(ob, mat, 0)
+
+
+def hoop(name, center, radius, axis, mat, thick=0.03):
+    """A smooth closed hoop (ring() is a 16-sided bezier; this keeps big bands round): axis is the normal."""
+    n = max(16, min(64, int(radius * 80)))
+    pts = circle_pts(center[0], center[1], center[2], radius, axis, n)
+    return tube(name, pts, thick, mat, closed=True, poly=True)
 
 
 def _solid(ob, thick):
@@ -213,11 +224,11 @@ def ceramic_vase(M):
                    (0.44, 2.28), (0.31, 2.48), (0, 2.5)], ox, seg=40)
     lathe("Neck", [(0, 2.44), (0.3, 2.44), (0.27, 2.62), (0.27, 2.78), (0.33, 2.94), (0.42, 3.07), (0.47, 3.14), (0.46, 3.19),
                    (0.41, 3.19), (0.36, 3.1), (0.25, 2.92), (0.22, 2.7), (0, 2.6)], blk, seg=40)
-    ring("FootBand", (0, 0, 0.3), 0.335, "Z", M["brass"], thick=0.025)
-    ring("NeckBand", (0, 0, 2.47), 0.315, "Z", M["brass"], thick=0.025)
-    ring("Shoulder", (0, 0, 1.92), 0.655, "Z", M["brass"], thick=0.02)
-    ring("Belly", (0, 0, 1.0), 0.72, "Z", M["brass"], thick=0.018)
-    ring("LipBand", (0, 0, 3.12), 0.455, "Z", M["brass"], thick=0.02)
+    hoop("FootBand", (0, 0, 0.3), 0.335, "Z", M["brass"], thick=0.025)
+    hoop("NeckBand", (0, 0, 2.47), 0.315, "Z", M["brass"], thick=0.025)
+    hoop("Shoulder", (0, 0, 1.92), 0.655, "Z", M["brass"], thick=0.02)
+    hoop("Belly", (0, 0, 1.0), 0.72, "Z", M["brass"], thick=0.018)
+    hoop("LipBand", (0, 0, 3.12), 0.455, "Z", M["brass"], thick=0.02)
     for sx in (-1, 1):
         tube(f"Handle{sx}", [(sx * 0.62, 0, 1.98), (sx * 0.86, 0, 2.12), (sx * 0.9, 0, 2.42), (sx * 0.62, 0, 2.7), (sx * 0.32, 0, 2.72)],
              0.045, M["brass"])
@@ -280,8 +291,8 @@ def flower_vase(M):
     breath = flat("Breath", (0.92, 0.9, 0.86), 0.8, wear=0.0)
     set_group("Main")
     lathe("Foot", [(0, 0), (0.36, 0), (0.38, 0.03), (0.35, 0.08), (0.3, 0.11), (0.29, 0.14), (0, 0.14)], M["brass"], seg=36)
-    ring("FootBead", (0, 0, 0.11), 0.31, "Z", M["brass"], thick=0.02)
-    ring("Collar", (0, 0, 1.08), 0.205, "Z", M["brass"], thick=0.022)
+    hoop("FootBead", (0, 0, 0.11), 0.31, "Z", M["brass"], thick=0.02)
+    hoop("Collar", (0, 0, 1.08), 0.205, "Z", M["brass"], thick=0.022)
     # stems run from the bottom of the vase, out through the neck, to each head
     heads = [("rose", (0.0, -0.04, 2.15), (0, -0.25, 1)), ("rose", (0.32, -0.16, 1.88), (0.6, -0.5, 1)),
              ("rose", (-0.3, 0.12, 1.95), (-0.6, 0.2, 1)), ("lily", (-0.36, -0.24, 1.72), (-0.7, -0.6, 1)),
@@ -327,7 +338,7 @@ def potted_plant(M):
     lathe("Bowl", [(0, 0.7), (0.36, 0.7), (0.52, 0.82), (0.68, 0.98), (0.79, 1.2), (0.84, 1.42), (0, 1.42)], M["stone"], seg=64, flute=(16, 0.07))
     lathe("Rim", [(0, 1.36), (0.85, 1.36), (0.9, 1.44), (0.95, 1.52), (0.96, 1.62), (0.9, 1.66), (0.84, 1.64), (0.8, 1.56),
                   (0.76, 1.45), (0, 1.45)], M["stone"], seg=48)
-    ring("RimBead", (0, 0, 1.44), 0.91, "Z", M["stonedark"], thick=0.025)
+    hoop("RimBead", (0, 0, 1.44), 0.91, "Z", M["stonedark"], thick=0.025)
     cyl("Soil", 0.79, 0.06, (0, 0, 1.55), soil, verts=40, bevel=0.01)
     rnd = random.Random(23)
     for k in range(7):
@@ -528,7 +539,7 @@ def book_stack(M):
     # inkwell and quill on top
     lathe("Inkwell", [(0, top), (0.12, top), (0.13, top + 0.02), (0.13, top + 0.12), (0.09, top + 0.16), (0.05, top + 0.17), (0.05, top + 0.2),
                       (0.04, top + 0.2), (0.035, top + 0.17), (0, top + 0.17)], M["glass"], seg=20, loc=(-0.12, 0.05, 0))
-    ring("InkCollar", (-0.12, 0.05, top + 0.18), 0.052, "Z", M["brass"], thick=0.012)
+    hoop("InkCollar", (-0.12, 0.05, top + 0.18), 0.052, "Z", M["brass"], thick=0.012)
     quill = flat("Quill", (0.88, 0.86, 0.8), 0.7, wear=0.1)
     tube("QuillShaft", [(-0.12, 0.05, top + 0.08), (-0.02, 0.1, top + 0.4), (0.12, 0.18, top + 0.78)], 0.009, quill)
     s = _mark()
@@ -542,11 +553,11 @@ def oil_lamp(M):
     set_group("Main")
     lathe("Base", [(0, 0), (0.34, 0), (0.35, 0.03), (0.32, 0.07), (0.2, 0.12), (0.12, 0.18), (0.09, 0.28), (0.09, 0.34), (0.13, 0.38),
                    (0.14, 0.42), (0, 0.42)], M["brass"], seg=32)
-    ring("BaseBead", (0, 0, 0.065), 0.325, "Z", M["brass"], thick=0.016)
+    hoop("BaseBead", (0, 0, 0.065), 0.325, "Z", M["brass"], thick=0.016)
     sphere("Knop", 0.13, (0, 0, 0.27), M["brass"], seg=16, rings=8, scale=(1, 1, 0.6))
     lathe("Font", [(0, 0.4), (0.13, 0.4), (0.24, 0.47), (0.31, 0.58), (0.32, 0.65), (0.28, 0.75), (0.19, 0.82), (0.12, 0.85), (0, 0.85)],
           M["crimson"], seg=32)
-    ring("FontBand", (0, 0, 0.63), 0.322, "Z", M["brass"], thick=0.022)
+    hoop("FontBand", (0, 0, 0.63), 0.322, "Z", M["brass"], thick=0.022)
     for k in range(6):
         a = k / 6 * 2 * math.pi
         sphere(f"Stud{k}", 0.025, (math.cos(a) * 0.31, math.sin(a) * 0.31, 0.63), M["brass"], seg=8, rings=4)
@@ -558,7 +569,7 @@ def oil_lamp(M):
     cyl("WickKnob", 0.05, 0.03, (0.25, 0, 0.9), M["brass"], rot=(0, math.pi / 2, 0), verts=14, bevel=0.005)
     box("Wick", (0.06, 0.012, 0.04), (0, 0, 1.02), M["iron"], bevel=0.004)
     # a finger loop on the base
-    ring("Loop", (-0.42, 0, 0.22), 0.1, "Y", M["brass"], thick=0.022)
+    hoop("Loop", (-0.42, 0, 0.22), 0.1, "Y", M["brass"], thick=0.022)
     tube("LoopArm", [(-0.3, 0, 0.08), (-0.38, 0, 0.12)], 0.02, M["brass"], poly=True)
     tube("LoopArm2", [(-0.12, 0, 0.3), (-0.33, 0, 0.27)], 0.018, M["brass"], poly=True)
     set_group("Glow")
@@ -575,12 +586,12 @@ def oil_lamp(M):
 def wall_clock(M):
     zc = 1.45
     set_group("Main")
-    cyl("Case", 1.0, 0.3, (0, 0.05, zc), M["oak"], rot=(math.pi / 2, 0, 0), verts=48, bevel=0.04)
-    ring("CaseRim", (0, -0.1, zc), 0.96, "Y", M["oakdark"], thick=0.045)
-    ring("Bezel", (0, -0.14, zc), 0.86, "Y", M["brass"], thick=0.05)
+    cyl("Case", 1.0, 0.3, (0, 0.05, zc), M["iron"], rot=(math.pi / 2, 0, 0), verts=48, bevel=0.04)
+    hoop("CaseRim", (0, -0.1, zc), 0.96, "Y", M["crimson"], thick=0.045)
+    hoop("Bezel", (0, -0.14, zc), 0.86, "Y", M["brass"], thick=0.05)
     cyl("Dial", 0.83, 0.02, (0, -0.105, zc), M["paper"], rot=(math.pi / 2, 0, 0), verts=48, bevel=0.002)
-    ring("Chapter", (0, -0.118, zc), 0.6, "Y", M["oakdark"], thick=0.007)
-    ring("ChapterOut", (0, -0.118, zc), 0.76, "Y", M["oakdark"], thick=0.006)
+    hoop("Chapter", (0, -0.118, zc), 0.6, "Y", M["glass"], thick=0.007)
+    hoop("ChapterOut", (0, -0.118, zc), 0.76, "Y", M["glass"], thick=0.006)
     for k in range(60):
         a = k / 60 * 2 * math.pi
         hour = k % 5 == 0
@@ -596,12 +607,12 @@ def wall_clock(M):
         box(f"{nm}Tail", (w * 1.4, 0.012, 0.14), (-c * 0.07, y, zc - s_ * 0.07), M["iron"], bevel=0.004, rot=(0, ang, 0))
     cyl("HandCap", 0.045, 0.03, (0, -0.15, zc), M["brass"], rot=(math.pi / 2, 0, 0), verts=14)
     # pointed crest with a quatrefoil, side finials and a drop below
-    _gable("Crest", 0, 0.08, 0.62, zc + 0.6, zc + 1.42, 0.18, M["oak"], M["oakdark"], edge=0.045)
+    _gable("Crest", 0, 0.08, 0.62, zc + 0.6, zc + 1.42, 0.18, M["crimson"], M["brass"], edge=0.045)
     _quatrefoil("CrestSeal", 0, -0.03, zc + 1.16, 0.12, M["brass"])
     for sx in (-1, 1):
         a = math.radians(55)
         sphere(f"Finial{sx}", 0.09, (sx * math.sin(a) * 1.04, 0.05, zc + math.cos(a) * 1.04), M["brass"], seg=12, rings=6)
-    cone("Drop", 0.16, 0.0, 0.42, (0, 0.05, zc - 1.0 - 0.17), M["oakdark"], verts=8, rot=(math.pi, 0, 0))
+    cone("Drop", 0.16, 0.0, 0.42, (0, 0.05, zc - 1.0 - 0.17), M["iron"], verts=8, rot=(math.pi, 0, 0))
     sphere("DropBead", 0.07, (0, 0.05, zc - 0.98), M["brass"], seg=10, rings=5)
     box("Hanger", (0.3, 0.04, 0.2), (0, 0.22, zc + 0.75), M["iron"], bevel=0.01)
     set_group("Glass")
@@ -715,7 +726,7 @@ def picture_frame(M):
     W, H = 3.6, 2.6               # canvas
     FW = 0.34                     # frame rail width
     zc = FW + H / 2
-    ebony = material("Ebony", "NH_DeskWood", tint=(0.12, 0.08, 0.06), scale=0.22, rough_add=0.0, wear=0.5)
+    ebony = flat("BlackLacquer", (0.022, 0.02, 0.025), 0.2, wear=0.12, dirt=0.6)
     sil = flat("Silhouette", (0.012, 0.01, 0.016), 0.85, wear=0.0, dirt=0.3)
     hill = flat("FarHill", (0.04, 0.03, 0.065), 0.85, wear=0.0, dirt=0.3)
     lit = flat("LitWindow", (1.0, 0.62, 0.22), 0.5, wear=0.0, dirt=0.0)
@@ -777,8 +788,8 @@ def candle_cluster(M):
     red = flat("WaxCrimson", (0.3, 0.02, 0.03), 0.45, wear=0.05, dirt=0.55)
     set_group("Main")
     cyl("Tray", 0.64, 0.06, (0, 0, 0.12), M["iron"], verts=40, bevel=0.02)
-    ring("TrayRim", (0, 0, 0.16), 0.63, "Z", M["iron"], thick=0.03)
-    ring("TrayInlay", (0, 0, 0.152), 0.5, "Z", M["brass"], thick=0.012)
+    hoop("TrayRim", (0, 0, 0.16), 0.63, "Z", M["iron"], thick=0.03)
+    hoop("TrayInlay", (0, 0, 0.152), 0.5, "Z", M["brass"], thick=0.012)
     for k in range(3):
         a = k / 3 * 2 * math.pi + 0.3
         sphere(f"Foot{k}", 0.07, (math.cos(a) * 0.45, math.sin(a) * 0.45, 0.07), M["iron"], seg=10, rings=5)
@@ -814,16 +825,16 @@ def _umbrella(prefix, canopy, handle, M, cane=False):
         tube(f"{prefix}Shaft", [(0, 0, 0.28), (0, 0, 2.7)], 0.03, handle, poly=True)
         cyl(f"{prefix}Ferrule", 0.034, 0.12, (0, 0, 0.32), M["brass"], verts=10)
         sphere(f"{prefix}Knob", 0.09, (0, 0, 2.76), M["brass"], seg=14, rings=7, scale=(1, 1, 1.15))
-        ring(f"{prefix}Collar", (0, 0, 2.66), 0.04, "Z", M["brass"], thick=0.015)
+        hoop(f"{prefix}Collar", (0, 0, 2.66), 0.04, "Z", M["brass"], thick=0.015)
         return
     tube(f"{prefix}Tip", [(0, 0, 0.27), (0, 0, 0.5)], 0.016, M["brasssteel"], poly=True)
     lathe(f"{prefix}Canopy", [(0, 0.44), (0.03, 0.5), (0.08, 0.75), (0.12, 1.1), (0.13, 1.4), (0.12, 1.75), (0.08, 2.05), (0.04, 2.25),
                               (0.02, 2.3), (0, 2.31)], canopy, seg=32, flute=(8, 0.38))
-    ring(f"{prefix}Tie", (0, 0, 1.72), 0.105, "Z", canopy, thick=0.016)
+    hoop(f"{prefix}Tie", (0, 0, 1.72), 0.105, "Z", canopy, thick=0.016)
     sphere(f"{prefix}Button", 0.02, (0.11, 0, 1.72), M["brass"], seg=6, rings=3)
     tube(f"{prefix}Shaft", [(0, 0, 2.28), (0, 0, 2.62)], 0.022, M["iron"], poly=True)
     tube(f"{prefix}Crook", [(0, 0, 2.58), (0, 0, 2.82), (0.04, 0, 2.96), (0.16, 0, 2.99), (0.23, 0, 2.87), (0.21, 0, 2.74)], 0.035, handle)
-    ring(f"{prefix}Ferrule", (0, 0, 2.6), 0.03, "Z", M["brass"], thick=0.012)
+    hoop(f"{prefix}Ferrule", (0, 0, 2.6), 0.03, "Z", M["brass"], thick=0.012)
 
 
 def umbrella_stand(M):
@@ -834,7 +845,7 @@ def umbrella_stand(M):
     lathe("Mouth", [(0, 1.8), (0.48, 1.8), (0.5, 1.9), (0.55, 2.0), (0.57, 2.06), (0.53, 2.1), (0.47, 2.06), (0.44, 1.98), (0.43, 1.9),
                     (0.42, 0.26), (0, 0.26)], M["iron"], seg=48)
     for z, r in ((0.3, 0.495), (1.0, 0.48), (1.78, 0.48)):
-        ring(f"Band{z}", (0, 0, z), r, "Z", M["brass"], thick=0.025)
+        hoop(f"Band{z}", (0, 0, z), r, "Z", M["brass"], thick=0.025)
     for k in range(4):
         s = _mark()
         _quatrefoil(f"Foil{k}", 0, -0.475, 1.39, 0.15, M["brass"])
@@ -842,7 +853,7 @@ def umbrella_stand(M):
         _xform(s, Matrix.Rotation(k * math.pi / 2, 4, "Z"))
     # two furled umbrellas and a cane, leaning a little apart
     for k, (yaw, canopy, handle, cane) in enumerate(((0.5, black, M["oakdark"], False), (2.6, gamp_red, M["leatherdark"], False),
-                                                     (4.4, None, M["oakdark"], True))):
+                                                     (4.4, None, M["glass"], True))):
         s = _mark()
         _umbrella(f"Umbrella{k}", canopy, handle, M, cane=cane)
         d = Vector((math.cos(yaw), math.sin(yaw), 0)) * 0.19
@@ -862,13 +873,13 @@ def coat_rack(M):
         sphere(f"Toe{k}", 0.07, (c * 0.6, s_ * 0.6, 0.07), M["iron"], seg=10, rings=5)
     lathe("Post", [(0, 0.3), (0.2, 0.3), (0.22, 0.36), (0.2, 0.42), (0.14, 0.5), (0.14, 0.62), (0.18, 0.7), (0.18, 0.78), (0.12, 0.86),
                    (0.1, 1.2), (0.09, 2.8), (0.13, 2.9), (0.13, 3.0), (0.09, 3.1), (0.085, 4.6), (0.12, 4.68), (0.12, 4.76), (0.09, 4.82),
-                   (0.09, 5.2), (0.13, 5.28), (0.13, 5.36), (0.1, 5.44), (0.11, 5.6), (0.15, 5.7), (0.1, 5.8), (0, 5.82)], M["oak"], seg=24)
-    sphere("FinialBall", 0.13, (0, 0, 5.9), M["oakdark"], seg=16, rings=8)
-    cone("FinialSpire", 0.08, 0.0, 0.32, (0, 0, 6.15), M["oakdark"], verts=8)
+                   (0.09, 5.2), (0.13, 5.28), (0.13, 5.36), (0.1, 5.44), (0.11, 5.6), (0.15, 5.7), (0.1, 5.8), (0, 5.82)], M["iron"], seg=24)
+    sphere("FinialBall", 0.13, (0, 0, 5.9), M["brass"], seg=16, rings=8)
+    cone("FinialSpire", 0.08, 0.0, 0.32, (0, 0, 6.15), M["iron"], verts=8)
     sphere("FinialTip", 0.035, (0, 0, 6.32), M["brass"], seg=8, rings=4)
-    ring("CollarHi", (0, 0, 5.32), 0.135, "Z", M["brass"], thick=0.02)
-    ring("CollarLo", (0, 0, 4.72), 0.125, "Z", M["brass"], thick=0.02)
-    ring("CollarMid", (0, 0, 2.95), 0.135, "Z", M["brass"], thick=0.02)
+    hoop("CollarHi", (0, 0, 5.32), 0.135, "Z", M["brass"], thick=0.02)
+    hoop("CollarLo", (0, 0, 4.72), 0.125, "Z", M["brass"], thick=0.02)
+    hoop("CollarMid", (0, 0, 2.95), 0.135, "Z", M["brass"], thick=0.02)
     for tier, (z, off, sc) in enumerate(((5.32, 0.0, 1.0), (4.72, math.pi / 4, 0.8))):
         for k in range(4):
             a = k / 4 * 2 * math.pi + off
@@ -896,6 +907,155 @@ def coat_rack(M):
     return _dims()
 
 
+# ================================================================== football throwing machine
+def _football(prefix, mtx, hide, lace, L=0.62, R=0.18):
+    """A leather football along local Z, laces on +X."""
+    s = _mark()
+    prof = [(0, -L / 2)]
+    for i in range(1, 14):
+        t = i / 14
+        prof.append((R * math.sin(math.pi * t) ** 0.8, -L / 2 + L * t))
+    prof.append((0, L / 2))
+    lathe(f"{prefix}Ball", prof, hide, seg=16)
+    for z in (-0.27 * L, 0.27 * L):
+        r = R * math.sin(math.pi * (z / L + 0.5)) ** 0.8
+        hoop(f"{prefix}Stripe{z:.2f}", (0, 0, z), r + 0.004, "Z", lace, thick=0.012)
+    box(f"{prefix}Seam", (0.02, 0.022, L * 0.36), (R - 0.004, 0, 0), lace, bevel=0.006)
+    for k in range(6):
+        box(f"{prefix}Lace{k}", (0.016, 0.06, 0.014), (R + 0.004, 0, -L * 0.15 + k * L * 0.06), lace, bevel=0.004, segments=1)
+    _xform(s, mtx)
+
+
+def football_machine(M):
+    rubber = flat("LaunchTyre", (0.07, 0.008, 0.012), 0.78, dirt=0.7)
+    hide = material("FootballHide", "NH_Leather", tint=(0.32, 0.13, 0.06), scale=2.4, normal=0.6, wear=0.15, dirt=0.75)
+    lace = flat("Lace", (0.86, 0.84, 0.78), 0.7)
+    ZC = 1.68              # the ball leaves between the wheels at this height (the drill placeholder's 1.6 above the turf)
+    set_group("Main")
+    # tripod stand, brass turntable and a yoke up to the trunnions
+    feet = [(sx * 0.9, sy * 0.8) for sx in (-1, 1) for sy in (-1, 1)]
+    braces = []
+    for k, (fx, fy) in enumerate(feet):
+        top = (math.copysign(0.15, fx), math.copysign(0.15, fy), 0.95)
+        tube(f"Leg{k}", [top, (fx, fy, 0.06)], 0.045, M["iron"], square=True, poly=True)
+        box(f"Pad{k}", (0.2, 0.2, 0.05), (fx, fy, 0.025), M["iron"], bevel=0.012)
+        t = (0.95 - 0.4) / 0.89
+        braces.append((top[0] + (fx - top[0]) * t, top[1] + (fy - top[1]) * t, 0.4))
+    tube("Brace", [braces[0], braces[1], braces[3], braces[2]], 0.025, M["iron"], closed=True, square=True, poly=True)
+    cyl("Column", 0.17, 0.25, (0, 0, 0.95), M["iron"], verts=16, bevel=0.02)
+    cyl("Turntable", 0.42, 0.08, (0, 0, 1.1), M["brass"], verts=32, bevel=0.015)
+    hoop("TurnBead", (0, 0, 1.1), 0.42, "Z", M["brass"], thick=0.016)
+    for sx in (-1, 1):
+        tube(f"Yoke{sx}", [(sx * 0.3, 0, 1.17), (sx * 1.2, 0, 1.19), (sx * 1.2, 0, ZC)], 0.04, M["iron"], square=True, poly=True)
+        cyl(f"Trunnion{sx}", 0.13, 0.1, (sx * 1.22, 0, ZC), M["brass"], rot=(0, math.pi / 2, 0), verts=16, bevel=0.015)
+        sphere(f"TrunnionBoss{sx}", 0.05, (sx * 1.28, 0, ZC), M["brass"], seg=8, rings=4)
+    # the head: riveted decks, cheek plates with pointed-arch brass tracery
+    box("DeckLow", (2.28, 1.4, 0.1), (0, 0, 1.38), M["iron"], bevel=0.02)
+    box("DeckLowTrim", (2.28, 0.04, 0.05), (0, -0.71, 1.42), M["brass"], bevel=0.01)
+    for sx in (-1, 1):
+        box(f"DeckHigh{sx}", (0.84, 1.4, 0.1), (sx * 0.72, 0, 1.92), M["iron"], bevel=0.02)
+        box(f"Cheek{sx}", (0.08, 1.4, 0.64), (sx * 1.1, 0, ZC), M["iron"], bevel=0.015)
+        tube(f"CheekArch{sx}", _arch_loop_x(sx * 1.145, 0, 0.42, 1.44, 1.64, 1.9), 0.022, M["brass"], square=True, closed=True, poly=True)
+        sphere(f"CheekBoss{sx}", 0.06, (sx * 1.15, 0, 1.66), M["brass"], seg=10, rings=5)
+    for k in range(12):
+        x = -1.05 + k * 2.1 / 11
+        sphere(f"RivetLo{k}", 0.025, (x, -0.7, 1.35), M["iron"], seg=6, rings=3)
+        if abs(x) > 0.36:
+            sphere(f"RivetHi{k}", 0.025, (x, -0.7, 1.92), M["iron"], seg=6, rings=3)
+    # the Iron Wardens shield over the mouth
+    _gable("Crest", 0, -0.64, 0.42, 1.97, 2.42, 0.08, M["iron"], M["brass"], edge=0.03)
+    tube("Shield", _arch_loop(0, -0.7, 0.16, 2.0, 2.2, 2.34), 0.018, M["brass"], square=True, closed=True, poly=True)
+    _quatrefoil("ShieldSeal", 0, -0.71, 2.16, 0.07, M["crimson"])
+    # wheel axles with brass caps
+    for sx in (-1, 1):
+        tube(f"Axle{sx}", [(sx * 0.6, -0.35, 1.43), (sx * 0.6, -0.35, 1.99)], 0.03, M["iron"], poly=True)
+        cyl(f"AxleCap{sx}", 0.07, 0.05, (sx * 0.6, -0.35, 1.99), M["brass"], verts=14, bevel=0.01)
+    # feed chute from the crate down into the wheels
+    a0, a1 = Vector((0, 0.05, ZC + 0.04)), Vector((0, 1.1, ZC + 0.57))
+    d = (a1 - a0).normalized()
+    nrm = Vector((0, -d.z, d.y))
+    ang = math.atan2(d.z, d.y)
+    mid = (a0 + a1) / 2
+    box("Chute", (0.5, (a1 - a0).length, 0.035), tuple(mid), M["iron"], bevel=0.01, rot=(ang, 0, 0))
+    for sx in (-1, 1):
+        tube(f"ChuteRail{sx}", [tuple(a0 + Vector((sx * 0.26, 0, 0)) + nrm * 0.1), tuple(a1 + Vector((sx * 0.26, 0, 0)) + nrm * 0.1)],
+             0.022, M["brass"], poly=True)
+        tube(f"ChuteStay{sx}", [tuple(a1 + Vector((sx * 0.24, 0, 0))), (sx * 0.24, 0.7, 1.43)], 0.025, M["iron"], poly=True)
+    # the crate of footballs
+    cz, cy = ZC + 0.55, 1.28
+    box("CrateFloor", (1.04, 0.66, 0.04), (0, cy, cz + 0.02), M["iron"], bevel=0.01)
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            box(f"CratePost{sx}{sy}", (0.07, 0.07, 0.52), (sx * 0.5, cy + sy * 0.3, cz + 0.26), M["iron"], bevel=0.012)
+    for k, z in enumerate((0.1, 0.26, 0.42)):
+        box(f"CrateBack{k}", (1.0, 0.04, 0.12), (0, cy + 0.31, cz + z), M["crimson"], bevel=0.012)
+        for sx in (-1, 1):
+            box(f"CrateSide{sx}{k}", (0.04, 0.6, 0.12), (sx * 0.51, cy, cz + z), M["crimson"], bevel=0.012)
+    box("CrateFront", (1.0, 0.04, 0.12), (0, cy - 0.31, cz + 0.1), M["crimson"], bevel=0.012)
+    for sx in (-1, 1):
+        tube(f"CrateStay{sx}", [(sx * 0.46, cy + 0.28, cz), (sx * 0.46, 0.72, 1.43)], 0.03, M["iron"], square=True, poly=True)
+    for k, x in enumerate((-0.22, 0.22)):
+        _football(f"Crate{k}", Matrix.Translation((x, cy, cz + 0.23)) @ Matrix.Rotation(-math.pi / 2, 4, "X") @ Matrix.Rotation(k * 1.3, 4, "Z"),
+                  hide, lace)
+    _football("CrateTop", Matrix.Translation((0.02, cy - 0.02, cz + 0.5)) @ Matrix.Rotation(math.pi / 2, 4, "Y") @ Matrix.Rotation(0.6, 4, "Z"),
+              hide, lace)
+    # balls waiting in the chute, and one loaded between the wheels
+    for k, sdist in enumerate((0.42, 0.95)):
+        c = a0 + d * sdist + nrm * 0.2
+        _football(f"Chute{k}", Matrix.Translation(tuple(c)) @ _aim(d) @ Matrix.Rotation(k * 0.9, 4, "Z"), hide, lace)
+    _football("Loaded", Matrix.Translation((0, -0.42, ZC)) @ Matrix.Rotation(math.pi / 2, 4, "X") @ Matrix.Rotation(math.pi / 2, 4, "Z"),
+              hide, lace)
+    # the brass boiler with its gauge and chimney, a throttle lever
+    bx, by, bz = 0.68, 0.35, 1.97
+    lathe("Boiler", [(0, bz), (0.22, bz), (0.235, bz + 0.03), (0.225, bz + 0.07), (0.225, bz + 0.42), (0.2, bz + 0.5), (0.13, bz + 0.55),
+                     (0.06, bz + 0.57), (0, bz + 0.575)], M["brass"], seg=28, loc=(bx, by, 0))
+    for z in (bz + 0.12, bz + 0.36):
+        hoop(f"BoilerBand{z:.2f}", (bx, by, z), 0.23, "Z", M["iron"], thick=0.018)
+    tube("Chimney", [(bx, by, bz + 0.55), (bx, by, bz + 0.92)], 0.05, M["iron"], poly=True)
+    lathe("ChimneyCap", [(0.04, bz + 0.9), (0.1, bz + 0.96), (0.11, bz + 1.0), (0.04, bz + 0.99)], M["iron"], seg=16, loc=(bx, by, 0))
+    tube("Whistle", [(bx - 0.12, by, bz + 0.5), (bx - 0.12, by, bz + 0.66)], 0.025, M["brass"], poly=True)
+    sphere("WhistleBell", 0.04, (bx - 0.12, by, bz + 0.68), M["brass"], seg=8, rings=4, scale=(1, 1, 1.4))
+    tube("SteamPipe", [(bx - 0.22, by, bz + 0.18), (0.34, by - 0.1, bz + 0.14), (0.34, by - 0.25, bz + 0.03)], 0.03, M["brass"])
+    gy, gz = by - 0.235, bz + 0.3
+    cyl("GaugeCase", 0.14, 0.06, (bx, gy, gz), M["brass"], rot=(math.pi / 2, 0, 0), verts=24, bevel=0.012)
+    cyl("GaugeDial", 0.115, 0.01, (bx, gy - 0.032, gz), M["paper"], rot=(math.pi / 2, 0, 0), verts=24, bevel=0)
+    for k in range(9):
+        a = math.radians(-120 + k * 30)
+        box(f"GaugeTick{k}", (0.008, 0.006, 0.03), (bx + math.sin(a) * 0.09, gy - 0.038, gz + math.cos(a) * 0.09), M["glass"],
+            bevel=0.0, segments=1, rot=(0, a, 0))
+    box("GaugeRed", (0.05, 0.006, 0.012), (bx + 0.075, gy - 0.038, gz - 0.035), M["crimson"], bevel=0.0, segments=1, rot=(0, math.radians(120), 0))
+    box("GaugeNeedle", (0.01, 0.006, 0.09), (bx + math.sin(0.7) * 0.04, gy - 0.042, gz + math.cos(0.7) * 0.04), M["iron"], bevel=0.0,
+        segments=1, rot=(0, 0.7, 0))
+    lx, ly = -0.68, -0.15
+    tube("Quadrant", [(lx - 0.04, ly + math.cos(a) * 0.26, 1.97 + math.sin(a) * 0.26) for a in [math.radians(v) for v in range(30, 151, 20)]],
+         0.016, M["brass"], poly=True)
+    cyl("LeverHub", 0.06, 0.08, (lx, ly, 1.99), M["brass"], rot=(0, math.pi / 2, 0), verts=14, bevel=0.01)
+    tube("Lever", [(lx, ly, 1.99), (lx, ly - 0.16, 2.4)], 0.022, M["iron"], poly=True)
+    sphere("LeverKnob", 0.06, (lx, ly - 0.17, 2.43), M["crimson"], seg=12, rings=6)
+    # the launch wheels: crimson tyres on spoked iron rims, each its own piece spinning on its axle
+    for g, sx, sw in (("WheelL", -1, 1), ("WheelR", 1, -1)):
+        cx, cy2 = sx * 0.6, -0.35
+        set_group(g, hinge=(cx, cy2, ZC), swing=sw)
+        bpy.ops.mesh.primitive_torus_add(major_segments=40, minor_segments=12, major_radius=0.32, minor_radius=0.1, location=(cx, cy2, ZC))
+        ty = bpy.context.active_object
+        ty.name = f"{g}Tyre"
+        ty.scale = (1, 1, 1.25)
+        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+        _finish(ty, rubber, 0)
+        for z in (-0.07, 0.07):
+            hoop(f"{g}Tread{z}", (cx, cy2, ZC + z), 0.418, "Z", rubber, thick=0.012)
+        tube(f"{g}Rim", circle_pts(cx, cy2, ZC, 0.23, "Z", 32), 0.03, M["iron"], closed=True, square=True, poly=True)
+        for k in range(6):
+            a = k / 6 * 2 * math.pi
+            tube(f"{g}Spoke{k}", [(cx + math.cos(a) * 0.07, cy2 + math.sin(a) * 0.07, ZC), (cx + math.cos(a) * 0.22, cy2 + math.sin(a) * 0.22, ZC)],
+                 0.022, M["iron"], square=True, poly=True)
+        cyl(f"{g}Hub", 0.08, 0.3, (cx, cy2, ZC), M["brass"], verts=16, bevel=0.015)
+    set_group("Glass")
+    cyl("GaugeGlass", 0.12, 0.006, (bx, gy - 0.05, gz), M["glassclear"], rot=(math.pi / 2, 0, 0), verts=24, bevel=0)
+    set_group("Main")
+    return _dims()
+
+
 # tall, narrow props need the preview camera further back
 P.PREVIEW_PAD.update({"CeramicVase": 1.25, "CoatRack": 1.15, "UmbrellaStand": 1.2, "FlowerVase": 1.1, "OilLamp": 1.15, "CandleCluster": 1.1})
 
@@ -912,4 +1072,5 @@ P.BUILD.update({
     "CandleCluster": candle_cluster,
     "UmbrellaStand": umbrella_stand,
     "CoatRack": coat_rack,
+    "FootballMachine": football_machine,
 })

@@ -1,5 +1,5 @@
 {
- "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass.",
+ "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs.",
  "StudentDesk": {
   "dims": [
    3.0,
@@ -292,5 +292,435 @@
   "NormalMap": "rbxassetid://91220789444093",
   "RoughnessMap": "rbxassetid://92611596266568",
   "MetalnessMap": "rbxassetid://88657937000997"
+ },
+ "CeramicVase": {
+  "dims": [
+   2.07,
+   1.56,
+   3.19
+  ],
+  "pieces": [
+   "CeramicVase"
+  ],
+  "tris": {
+   "CeramicVase": 6416
+  },
+  "batch": 4,
+  "ColorMap": "rbxassetid://74931098534478",
+  "RoughnessMap": "rbxassetid://122850900129380",
+  "NormalMap": "rbxassetid://127889469940127",
+  "MetalnessMap": "rbxassetid://118836936304576"
+ },
+ "FlowerVase": {
+  "dims": [
+   1.1,
+   1.04,
+   2.33
+  ],
+  "pieces": [
+   "FlowerVase_Main",
+   "FlowerVase_Glass"
+  ],
+  "tris": {
+   "FlowerVase_Main": 13764,
+   "FlowerVase_Glass": 1152
+  },
+  "batch": 4,
+  "NormalMap": "rbxassetid://106585462358651",
+  "RoughnessMap": "rbxassetid://117752855934739",
+  "MetalnessMap": "rbxassetid://132372821482186",
+  "ColorMap": "rbxassetid://122828787873006"
+ },
+ "PottedPlant": {
+  "dims": [
+   2.83,
+   2.85,
+   2.91
+  ],
+  "pieces": [
+   "PottedPlant"
+  ],
+  "tris": {
+   "PottedPlant": 7908
+  },
+  "batch": 4,
+  "NormalMap": "rbxassetid://70986189727036",
+  "RoughnessMap": "rbxassetid://80542325167082",
+  "ColorMap": "rbxassetid://97447239759491",
+  "MetalnessMap": "rbxassetid://88551890064403"
+ },
+ "LunchTray": {
+  "dims": [
+   1.91,
+   1.36,
+   0.54
+  ],
+  "pieces": [
+   "LunchTray"
+  ],
+  "tris": {
+   "LunchTray": 5524
+  },
+  "batch": 4,
+  "ColorMap": "rbxassetid://99222279957429",
+  "NormalMap": "rbxassetid://120304012884977",
+  "MetalnessMap": "rbxassetid://102255890470461",
+  "RoughnessMap": "rbxassetid://83314760014558"
+ },
+ "LunchTrayEmpty": {
+  "dims": [
+   1.91,
+   1.36,
+   0.3
+  ],
+  "pieces": [
+   "LunchTrayEmpty"
+  ],
+  "tris": {
+   "LunchTrayEmpty": 2644
+  },
+  "batch": 4,
+  "MetalnessMap": "rbxassetid://138925912841564",
+  "ColorMap": "rbxassetid://88706012825497",
+  "NormalMap": "rbxassetid://101198571810415",
+  "RoughnessMap": "rbxassetid://115104298079712"
+ },
+ "BookStack": {
+  "dims": [
+   1.34,
+   1.08,
+   1.91
+  ],
+  "pieces": [
+   "BookStack"
+  ],
+  "tris": {
+   "BookStack": 9744
+  },
+  "batch": 4,
+  "ColorMap": "rbxassetid://111365081956435",
+  "RoughnessMap": "rbxassetid://88386655448801",
+  "NormalMap": "rbxassetid://78827670885110",
+  "MetalnessMap": "rbxassetid://109612455986954"
+ },
+ "OilLamp": {
+  "dims": [
+   0.89,
+   0.7,
+   1.74
+  ],
+  "pieces": [
+   "OilLamp_Main",
+   "OilLamp_Glow",
+   "OilLamp_Glass"
+  ],
+  "tris": {
+   "OilLamp_Main": 3000,
+   "OilLamp_Glow": 80,
+   "OilLamp_Glass": 840
+  },
+  "batch": 4,
+  "RoughnessMap": "rbxassetid://119749166297288",
+  "NormalMap": "rbxassetid://135848169663997",
+  "ColorMap": "rbxassetid://81492594350425",
+  "MetalnessMap": "rbxassetid://137633282714268"
+ },
+ "WallClock": {
+  "dims": [
+   2.0,
+   0.43,
+   2.93
+  ],
+  "pieces": [
+   "WallClock_Main",
+   "WallClock_Glass"
+  ],
+  "tris": {
+   "WallClock_Main": 9338,
+   "WallClock_Glass": 188
+  },
+  "batch": 4,
+  "RoughnessMap": "rbxassetid://129054952025413",
+  "ColorMap": "rbxassetid://129003764987917",
+  "MetalnessMap": "rbxassetid://87714425228563",
+  "NormalMap": "rbxassetid://73410753490479"
+ },
+ "PictureFrame": {
+  "dims": [
+   4.28,
+   0.22,
+   3.83
+  ],
+  "pieces": [
+   "PictureFrame"
+  ],
+  "tris": {
+   "PictureFrame": 7036
+  },
+  "batch": 4,
+  "RoughnessMap": "rbxassetid://124182549445676",
+  "NormalMap": "rbxassetid://77954114903713",
+  "MetalnessMap": "rbxassetid://124076198220518",
+  "ColorMap": "rbxassetid://101876852736602"
+ },
+ "CandleCluster": {
+  "dims": [
+   1.32,
+   1.32,
+   1.38
+  ],
+  "pieces": [
+   "CandleCluster_Main",
+   "CandleCluster_Glow"
+  ],
+  "tris": {
+   "CandleCluster_Main": 5740,
+   "CandleCluster_Glow": 560
+  },
+  "batch": 4,
+  "RoughnessMap": "rbxassetid://127287465483984",
+  "MetalnessMap": "rbxassetid://70911376295467",
+  "ColorMap": "rbxassetid://132496828763962",
+  "NormalMap": "rbxassetid://103565413127228"
+ },
+ "UmbrellaStand": {
+  "dims": [
+   1.16,
+   1.16,
+   3.03
+  ],
+  "pieces": [
+   "UmbrellaStand"
+  ],
+  "tris": {
+   "UmbrellaStand": 10252
+  },
+  "batch": 4,
+  "ColorMap": "rbxassetid://121112768857898",
+  "NormalMap": "rbxassetid://81958635110914",
+  "MetalnessMap": "rbxassetid://127710183963237",
+  "RoughnessMap": "rbxassetid://105242565942012"
+ },
+ "CoatRack": {
+  "dims": [
+   1.25,
+   1.25,
+   6.36
+  ],
+  "pieces": [
+   "CoatRack"
+  ],
+  "tris": {
+   "CoatRack": 6850
+  },
+  "batch": 4,
+  "ColorMap": "rbxassetid://114057151296197",
+  "NormalMap": "rbxassetid://80627595205151",
+  "MetalnessMap": "rbxassetid://76295063966787",
+  "RoughnessMap": "rbxassetid://114711147799738"
+ },
+ "FootballMachine": {
+  "dims": [
+   2.66,
+   2.52,
+   2.98
+  ],
+  "pieces": [
+   "FootballMachine_Main",
+   "FootballMachine_WheelL",
+   "FootballMachine_WheelR",
+   "FootballMachine_Glass"
+  ],
+  "tris": {
+   "FootballMachine_Main": 16212,
+   "FootballMachine_WheelL": 2268,
+   "FootballMachine_WheelR": 2268,
+   "FootballMachine_Glass": 92
+  },
+  "batch": 4,
+  "pivot": {
+   "FootballMachine_WheelL": [
+    -0.6,
+    -0.35,
+    1.68
+   ],
+   "FootballMachine_WheelR": [
+    0.6,
+    -0.35,
+    1.68
+   ]
+  },
+  "RoughnessMap": "rbxassetid://72041099106194",
+  "NormalMap": "rbxassetid://111388442195583",
+  "MetalnessMap": "rbxassetid://84285836685670",
+  "ColorMap": "rbxassetid://121804830578604"
+ },
+ "Bleachers": {
+  "dims": [
+   16.2,
+   5.41,
+   5.11
+  ],
+  "pieces": [
+   "Bleachers"
+  ],
+  "tris": {
+   "Bleachers": 13328
+  },
+  "batch": 5,
+  "MetalnessMap": "rbxassetid://99154541611802",
+  "NormalMap": "rbxassetid://105519586957351",
+  "ColorMap": "rbxassetid://96262129723948",
+  "RoughnessMap": "rbxassetid://135294227331289"
+ },
+ "Chandelier": {
+  "dims": [
+   3.78,
+   3.78,
+   5.2
+  ],
+  "pieces": [
+   "Chandelier_Main",
+   "Chandelier_Glow"
+  ],
+  "tris": {
+   "Chandelier_Main": 15774,
+   "Chandelier_Glow": 960
+  },
+  "batch": 5,
+  "RoughnessMap": "rbxassetid://87907906609158",
+  "ColorMap": "rbxassetid://73266742058105",
+  "MetalnessMap": "rbxassetid://92674117145943",
+  "NormalMap": "rbxassetid://71412880531757"
+ },
+ "GothicMirror": {
+  "dims": [
+   3.61,
+   0.69,
+   6.62
+  ],
+  "pieces": [
+   "GothicMirror_Main",
+   "GothicMirror_Mirror"
+  ],
+  "tris": {
+   "GothicMirror_Main": 6726,
+   "GothicMirror_Mirror": 56
+  },
+  "batch": 5,
+  "NormalMap": "rbxassetid://103626592210613",
+  "RoughnessMap": "rbxassetid://106614780585199",
+  "ColorMap": "rbxassetid://140223608712516",
+  "MetalnessMap": "rbxassetid://127942398133001"
+ },
+ "BathroomMirror": {
+  "dims": [
+   1.94,
+   0.46,
+   2.84
+  ],
+  "pieces": [
+   "BathroomMirror_Main",
+   "BathroomMirror_Mirror"
+  ],
+  "tris": {
+   "BathroomMirror_Main": 1956,
+   "BathroomMirror_Mirror": 56
+  },
+  "batch": 5,
+  "NormalMap": "rbxassetid://107626273663102",
+  "ColorMap": "rbxassetid://133601299986521",
+  "RoughnessMap": "rbxassetid://140327500685147",
+  "MetalnessMap": "rbxassetid://108152439214034"
+ },
+ "Sink": {
+  "dims": [
+   2.46,
+   1.78,
+   4.33
+  ],
+  "pieces": [
+   "Sink_Main",
+   "Sink_TapHot",
+   "Sink_TapCold",
+   "Sink_Water"
+  ],
+  "tris": {
+   "Sink_Main": 5448,
+   "Sink_TapHot": 756,
+   "Sink_TapCold": 756,
+   "Sink_Water": 304
+  },
+  "batch": 5,
+  "pivot": {
+   "Sink_TapHot": [
+    -0.5,
+    0.56,
+    3.12
+   ],
+   "Sink_TapCold": [
+    0.5,
+    0.56,
+    3.12
+   ]
+  },
+  "swing": {
+   "Sink_TapHot": 90,
+   "Sink_TapCold": 90
+  },
+  "rig": "NHLockerProp: Sink / Turn on, off after 6 s; Water shows while on",
+  "MetalnessMap": "rbxassetid://73064115100687",
+  "ColorMap": "rbxassetid://138683893032800",
+  "RoughnessMap": "rbxassetid://139740202882883",
+  "NormalMap": "rbxassetid://121176342581938"
+ },
+ "ToiletStall": {
+  "dims": [
+   4.15,
+   5.86,
+   7.22
+  ],
+  "pieces": [
+   "ToiletStall_Body",
+   "ToiletStall_Door0"
+  ],
+  "tris": {
+   "ToiletStall_Body": 14484,
+   "ToiletStall_Door0": 3396
+  },
+  "batch": 5,
+  "pivot": {
+   "ToiletStall_Door0": [
+    -1.6,
+    -2.7,
+    0.0
+   ]
+  },
+  "swing": {
+   "ToiletStall_Door0": "out 95"
+  },
+  "rig": "NHLockerProp: Stall / Open, shuts after 8 s",
+  "MetalnessMap": "rbxassetid://114970850899323",
+  "RoughnessMap": "rbxassetid://101243445199406",
+  "ColorMap": "rbxassetid://108034035804766",
+  "NormalMap": "rbxassetid://129592680270787"
+ },
+ "TowelRail": {
+  "dims": [
+   2.4,
+   0.44,
+   0.7
+  ],
+  "pieces": [
+   "TowelRail"
+  ],
+  "tris": {
+   "TowelRail": 1648
+  },
+  "batch": 5,
+  "MetalnessMap": "rbxassetid://82029221168071",
+  "ColorMap": "rbxassetid://81786486130011",
+  "RoughnessMap": "rbxassetid://81763998034455",
+  "NormalMap": "rbxassetid://89961824816069"
  }
 }

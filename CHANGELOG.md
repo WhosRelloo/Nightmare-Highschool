@@ -2,6 +2,44 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.15.0] - 2026-11-03: Furnishing the school (props batches 4 and 5)
+
+### Added
+- **20 new props, baked at 2048** (`art/props/nh_props_batch4.py`, `nh_props_batch5.py`; FBX, maps and previews in `art/props/`, ids in `props.json`). On the owner's call they go **on the baseplate for the builder**, not into the school yet: `Studio/props_setup4.luau` (session tools) files the templates in `ServerStorage.NHProps` and stands one of each in `workspace.NHPropsShowcase`.
+
+  | Batch | Props |
+  |---|---|
+  | 4 | CeramicVase, FlowerVase, PottedPlant, LunchTray, LunchTrayEmpty, BookStack, OilLamp, WallClock, PictureFrame, CandleCluster, UmbrellaStand, CoatRack, FootballMachine |
+  | 5 | Bleachers, Chandelier, GothicMirror, BathroomMirror, Sink, ToiletStall, TowelRail |
+
+- **Rigged washroom props** on the locker system (tag `NHLockerProp`):
+  - the stall's crimson door swings **out** 95° ("Stall / Open", shuts after 8 s)
+  - the sink's tap heads turn and its water runs ("Sink / Turn on", off after 6 s)
+- **The football drill's throwing machine:** a brass-and-iron steam machine. Its launch wheels are separate pieces with `SpinHinge` / `SpinAxis` attributes so they can spin. The drill's placeholder in `workspace.Sports` is untouched.
+
+### Changed
+- **Sharper textures:**
+  - bakes at 2048 with 64 samples
+  - 2048 source sets (`art/props/source_2k/`, made by `tools/vfx/make_pbr_materials.py`, not committed)
+  - even-density UV packing and margins that scale with size; Roblox takes maps up to 4096
+- **Pipeline (`nh_props.py`):**
+  - `--gpu` bakes on the GPU, about 1–2 minutes a prop
+  - the log lists each piece's triangles
+  - previews show glass and glow as they look in Roblox; `PREVIEW_PAD` and `OPEN_DEG` tune them
+  - 1024 bakes of batches 1–3 are unchanged
+- **`Services.Features.LockerProps`:** reads the prompt text and auto-close time from the model attributes `PromptObject`, `PromptOpen`, `PromptClose` and `AutoClose`, and skips models outside the workspace.
+- **`Controllers.World.LockerDoors`:** shows parts with a `ShowWhenOpen` transparency while open (the sink's water). Patch: `Studio/patch_lockers_rig.luau`.
+- **The owner's notes:**
+  - on theme with the game (ink, bone, wax, brass, crimson)
+  - less wooden: the stall is black marble, cast iron and crimson enamel; the clock, coat rack and hall mirror are cast iron; the picture frame is black lacquer and gilt; the bleachers are crimson enamel steel
+
+### Testing
+- **Bakes:** all 20 at 2048 with 64 samples; every piece is under Roblox's 20k-triangle cap (largest: the football machine's main piece, 16.2k). At 100% the maps are sharp. Contact sheet: `art/props/previews/_batch4_final_sheet.png`.
+- **Uploads:** all 80 maps uploaded to NH Combat Test; ids are in `props.json` and `props_setup4.luau`.
+- **Dry run (Edit):** `props_setup4` placed boxes of each prop's real size, with door, tap, water, mirror, glass and glow stand-ins, on the baseplate. Result: 20 placed in two rows with no clashes, and the stall door opens out. The stand-ins and their templates were removed afterwards.
+- **Locker patch (Play, read-only check):** all 11 lockers set up; the 8 hallway prompts still read "Locker / Open"; the ServerStorage templates are skipped; no errors from either script.
+- **Not verified yet:** the real import and showcase placement (the owner imports the FBX files); the stall door, taps and water in Play on the imported models; the textures seen in Studio; the props seen by a second player. Nothing spins the football machine's wheels yet.
+
 ## [1.14.3] - 2026-11-03: Shift lock: a crest reticle and a smooth camera
 
 ### Changed
