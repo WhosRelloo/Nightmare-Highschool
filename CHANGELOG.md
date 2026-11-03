@@ -2,6 +2,36 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.18.1] - 2026-11-03: Props batches 6 to 9 placed on the baseplate, rigs tested
+
+### Added
+- **All 42 props from 1.17.0 are in the test place** (the owner imported the FBX files).
+  - `props_setup6` filed the templates in `ServerStorage.NHProps` and stood one of each on the baseplate for the builder, in `workspace.NHPropsShowcase`:
+    - batch 6 at z 84
+    - batch 7 at z 44
+    - batch 8 at z 30
+    - the pillars at x −232, z 70
+  - No clashes, and no imports left in the workspace.
+- **Retrofit:** the football machine's wheels now spin and the chandelier sways, on both the templates and the placed copies.
+- **NHCastleStone:** the MaterialVariant, plus its block on the swatch wall (`ServerStorage.NHTextureSwatches`, 25 blocks).
+
+### Testing
+- **Placement (Edit):** all 42 placed with no clashes; the furnace door's sign came out −100° on the real geometry, and the check confirms it opens outward. Screenshots of the rows.
+- **Play (solo):**
+  - **Prompts:** "Furnace / Open", "Valve / Turn", "Cabinet / Open" and "Gramophone / Play".
+  - **Opened:**
+    - the furnace door swung −100° with its centre in front of the boiler (out)
+    - the valve wheel turned 540° (it ended half a turn round)
+    - the drawer slid toward the front
+    - the record spun 100° in 0.5 s
+  - **Closed:** everything went back to rest, and the record stopped.
+  - **Always on:**
+    - the football machine's wheels spin (139° in 0.2 s)
+    - a banner cloth swayed through 0.26° to 1.6° over 3 s
+    - both only within 60 studs of the camera, as designed
+  - **Textures:** every batch 6–9 map loaded on the Play client. That includes the five that showed a failed fetch in the Edit view, which is Studio's caching quirk.
+- **Not verified yet:** a player pressing the prompts and the auto-close timers (Open was set directly), the steam and ember emitters seen up close, and a second player's view.
+
 ## [1.18.0] - 2026-11-03: The Headmaster's Desk grows, and games on the phone
 
 ### Added

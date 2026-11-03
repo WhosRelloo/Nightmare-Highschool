@@ -296,6 +296,16 @@ Door, flap and tap origins sit on their hinge lines.
 **Batches 6 to 9 (2026-11-03):**
 - **Baked:** all 42 at 2048 with 64 samples on the GPU, and every piece is under 16k triangles. Maps uploaded, ids in `props.json`. The castle stone was uploaded at 2048 (the arch walls) and at 1024 (the library set).
 - **Code, in Play:** `NHSpin` turned a test part 91° in 0.5 s at 180°/s, with no script errors from the patched `Ambient` or `LockerDoors`.
-- **Placement check:** done on the real import rather than stand-in boxes. `props_setup6` reports clashes and the furnace door's direction itself.
-- **Not verified yet:** the import and the showcase placement (the owner imports the FBX files; props_setup6 then reports any clash and checks the furnace door opens outward), the four prompts and the sways, spins and steam on the real models in Play, and a second player's view.
+- **Dry run (Edit):** boxes of each prop's real size: 42 placed in four rows, no clashes; removed afterwards.
+- **Imported and placed (1.18.1):**
+  - all 42 with no clashes and no imports left in the workspace
+  - the furnace door opens out (−100° on the real geometry)
+  - the football machine's wheels and the chandelier were retrofitted
+- **Tested in Play (solo):**
+  - **Prompts:** all four read correctly.
+  - **Opened:** the furnace door swung out −100°, the valve wheel turned 540°, the drawer slid out, and the record spun at 200°/s.
+  - **Closed:** everything went back to rest.
+  - **Always on:** the football wheels spin and a banner sways about ±1.6°, both within 60 studs of the camera.
+  - **Textures:** every batch 6–9 map loaded on the client, including five that showed a failed fetch in Edit (Studio's caching quirk).
+- **Not verified yet:** a player pressing the prompts and the auto-close timers, the steam and ember emitters up close, and a second player's view.
 
