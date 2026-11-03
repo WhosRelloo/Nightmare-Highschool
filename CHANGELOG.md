@@ -2,6 +2,66 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.11.0] - 2026-11-02: New menu keys, the study group dock, a cinematic view, and a camera audit
+
+### Changed
+- **Menu keys remapped.** Every menu key now sits on the right side of the keyboard, away from combat and movement.
+
+  | Key | Opens | Notes |
+  |---|---|---|
+  | ` | Locker | was G, which clashed with "Introduce yourself" and the sports Post key |
+  | P | Options | was M |
+  | M | Report Card | was L |
+  | L | Factions | was P |
+  | J | Journal | unchanged |
+  | U | Study Group | unchanged |
+  | Tab | Students | unchanged |
+  | \\ | Cinematic view | new |
+
+  - **Reserved keys:** all of them, plus G (Introduce yourself), are reserved, so no combat rebind can take them.
+  - **Labels:** the settings key list, top-bar tooltips and panel buttons ("Factions [L]", "Options [P]") are updated.
+  - **Files:** `UI.Settings` (ReservedKeys, FixedKeys), `Gui.{SettingsMenu,FactionsPanel,Progress,Locker,StatsPanel,TopBar}`.
+- **The study group moved to a dock in the bottom-left corner** (`Gui.StudyGroup` rebuilt).
+  - **Rows:** one slim row per groupmate: a race-coloured edge, name and level, a hairline health bar (the kit's veined fill) with a gold posture thread, and distance.
+  - **States:** rows dim when a member is too far for the shared EXP, show DOWN when they're downed, and flash when they're hit. A gold "+10% EXP" chip lights when anyone is near.
+  - **Resting:** the dock rests faint and wakes on hover or a hit. Alone, it's one faint "Study Group U" chip.
+  - **Drawer (U or the chip):** invite, remove (leader) and leave. Invites slide in above the dock.
+
+### Added
+- **Cinematic view (\\, or the top bar's film button)** (`Gui.Cinematic`, new).
+  - **Hides:** every ScreenGui, every world name tag, Roblox's chat, player list and emote menu, and the mouse.
+  - **Adds:** black letterbox bars that slide in, each with a gold rule and the kit's diamond knob; an ink vignette; a light filmic grade (contrast up, colour down, a gentle far blur); and a title card ("C I N E M A T I C" with the crest) with a "\\ return" hint that fades away.
+  - **Restoring:** anything that tries to show itself while the view is on is held back, then restored when you leave.
+  - **Limits:** not available in the main menu.
+- **`Functions.CameraLease`** (new): one owner for the scripted camera.
+  - **How it works:** the barber and wardrobe stations, the locker hide, tier-up cutscenes and the goal cam take a lease instead of setting CameraType and FieldOfView themselves.
+  - **Handing back:** when the last lease ends, the normal camera returns at your Settings field of view. A lease whose owner stopped caring ends by itself. Respawning ends all leases. When a newer lease ends, the older one gets its shot back.
+
+### Fixed (camera audit)
+- **Hiding in a locker showed a black screen.** The camera was placed inside the locker door, because the head's ray can't hit the door's parts. It now finds the locker prop and sits just outside the door, looking out through the slats (`World.LockerPOV`). It also can't run in the main menu, where it used to take over the menu's camera.
+- **The barber camera.** It framed you from the front, but the barber stands there, so it ended up inside him (a faded dark blob) with you badly framed.
+  - **Now:** a three-quarter profile from the more open side, with the barber faded just for you while his book is open.
+  - **Light:** a soft warm key light on you (only you see it) at the barber and wardrobes, so hair and clothes read at night (`Gui.Wardrobe`).
+- **Cameras could get stuck or keep a station's zoom** when two camera moments overlapped. Fixed by the lease in `Gui.Wardrobe`, `Gui.Evolution`, `Gui.Soccer` (goal cam) and `World.LockerPOV`.
+- **The follow camera made a new Tween every frame** to track the torso. It now eases there directly (`Gui.Camera`).
+- **The Locker inventory's character preview** left an empty strip and cut off your feet. It now frames you head to toe.
+- **The pouch showed snacks you'd run out of.**
+- **Cinematic view:** leaving it now restores every interface. Roblox delivers property signals late, so the view now counts its own switch-offs instead of mistaking them for requests.
+- **Backups:** `ServerStorage.NH_Backup.{Keys_pre,Cameras_pre}`.
+
+### Docs
+- Discord posts are split by channel: `updates/discord/game-updates/` (every release) and `updates/discord/announcements/` (big waves only), with an index in `updates/discord/README.md`. The first announcement is **The Living School** (1.10 to 1.11).
+
+### Verified
+**[PT]** on save slot II:
+- **Locker hide:** the camera sits outside the door (inside nothing), with the room visible through the slats. Leaving gives back a Custom camera at your FOV.
+- **Barber:** a lit three-quarter hair shot with the barber faded. Hiding in a locker while the barber panel was still open stacked and unstacked the leases cleanly.
+- **Cinematic:** nothing visible while it's on (20 world name tags hidden too). After leaving, every interface is back exactly as it was, and the mouse is back.
+- **Study group dock:** shown with a group state sent from the server: live health, distance, "away" rows and the +10% chip.
+- **Locker preview:** head to toe.
+- **Keys:** checked in code and the settings list. Studio's test tools can't press keys in the game.
+- **Restored:** slot II's discipline went back to Detention, 8 points, 1 owed. Moving the test clock had run a day's decay.
+
 ## [1.10.0] - 2026-11-02: The Locker, the concession stand, study groups, the Report Card, and a school that keeps its own timetable
 
 ### Added

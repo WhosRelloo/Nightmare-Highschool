@@ -19,11 +19,13 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
-**The Locker, snacks, study groups and a living timetable (1.10.0, 2026-11-02):** students now go to class, crowd the new concession stand at lunch and head to clubs after school. Press G for your Locker (inventory, gear, a snack pouch on your hotbar), U for a study group of up to four with shared EXP, and L for the new Report Card. Gear chests stand up properly now. See [the Discord post](updates/discord/2026-11-02-locker-and-study-groups.md).
+**New keys, a cinematic view and fixed cameras (1.11.0, 2026-11-02):** menu keys moved clear of combat (` Locker, P Options, M Report Card, L Factions), study groups live in a quiet bottom-left dock, \\ hides all UI for a letterboxed cinematic view, and every scripted camera was audited (locker hide, barber, wardrobes, no more stuck cameras). Big-wave announcement: [The Living School](updates/discord/announcements/2026-11-02-the-living-school.md). Patch notes: [game update](updates/discord/game-updates/2026-11-02-keys-cinematic-cameras.md). All posts: [updates/discord](updates/discord/README.md).
 
-**Polish and an anti-teleport check (1.9.3, 2026-11-02):** soft glowing rings instead of hard neon, sports result cards that count up your rewards, EXP sparks, a desk bell when you sit in class, a red-ink stamp when your record gets worse, candle-lit Night Study, and a server check that puts teleport cheaters back where they were. See [the Discord post](updates/discord/2026-11-02-polish-and-anti-teleport.md).
+**The Locker, snacks, study groups and a living timetable (1.10.0, 2026-11-02):** students now go to class, crowd the new concession stand at lunch and head to clubs after school. Press G for your Locker (inventory, gear, a snack pouch on your hotbar), U for a study group of up to four with shared EXP, and L for the new Report Card. Gear chests stand up properly now. See [the Discord post](updates/discord/game-updates/2026-11-02-locker-and-study-groups.md).
 
-**VFX Batch 4 complete (1.9.0, 2026-11-02):** red string on the evidence board and a SOLVED stamp, goals that light up the pitch, a new Bloodrush aura, painted sigils, a teleport veil, a locker-eye view, NPCs that fade in and out, and an arrival card when you enter school. See [the Discord post](updates/discord/2026-11-02-night-sight-and-batch-4.md).
+**Polish and an anti-teleport check (1.9.3, 2026-11-02):** soft glowing rings instead of hard neon, sports result cards that count up your rewards, EXP sparks, a desk bell when you sit in class, a red-ink stamp when your record gets worse, candle-lit Night Study, and a server check that puts teleport cheaters back where they were. See [the Discord post](updates/discord/game-updates/2026-11-02-polish-and-anti-teleport.md).
+
+**VFX Batch 4 complete (1.9.0, 2026-11-02):** red string on the evidence board and a SOLVED stamp, goals that light up the pitch, a new Bloodrush aura, painted sigils, a teleport veil, a locker-eye view, NPCs that fade in and out, and an arrival card when you enter school. See [the Discord post](updates/discord/game-updates/2026-11-02-night-sight-and-batch-4.md).
 
 **Night sight and the full moon (1.8.7, 2026-11-02):** night races press **H** to see in the dark, their eyes glowing in their race colour. Full-moon nights now look the part, and getting back up from downed has its own moment.
 
@@ -31,12 +33,12 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 
 **Delinquents go down (1.8.5, 2026-11-02):** beaten delinquents drop instead of dying. Carry them, grip them, or finish them with your race action for the reward, before they get back up.
 
-**Fluid fights (1.8.4, 2026-11-02):** Fist and Claws running attacks and downslams now land every time and flow like Katana's, the Claws class spawns with its claws on, dashing hands straight back to your sprint, and Settings has a **Main Menu** button. See [`CHANGELOG.md`](CHANGELOG.md) and [the Discord post](updates/discord/2026-11-02-fluid-fights.md).
+**Fluid fights (1.8.4, 2026-11-02):** Fist and Claws running attacks and downslams now land every time and flow like Katana's, the Claws class spawns with its claws on, dashing hands straight back to your sprint, and Settings has a **Main Menu** button. See [`CHANGELOG.md`](CHANGELOG.md) and [the Discord post](updates/discord/game-updates/2026-11-02-fluid-fights.md).
 
 **Earlier on 2026-11-02:**
 - **1.8.2 to 1.8.3:** real hair on every NPC, no more floating or sinking students, chests that face the room, and a full end-to-end audit.
-- **1.8 to 1.8.1:** the Headmaster's Desk admin panel (F3), and wolves that fight a fair, telegraphed pattern. See [the Discord post](updates/discord/2026-11-02-headmasters-desk.md).
+- **1.8 to 1.8.1:** the Headmaster's Desk admin panel (F3), and wolves that fight a fair, telegraphed pattern. See [the Discord post](updates/discord/game-updates/2026-11-02-headmasters-desk.md).
 
 **2026-11-01:**
-- **1.7 to 1.7.1:** the Claws class, wolves, 40 gear pieces in chests, living hair, blinking faces and delinquent crews to fight. See [the Discord post](updates/discord/2026-11-01-claws-wolves-gear.md).
-- **1.6:** Fists and Enrollment. See [the Discord post](updates/discord/2026-11-01-fists-and-enrollment.md).
+- **1.7 to 1.7.1:** the Claws class, wolves, 40 gear pieces in chests, living hair, blinking faces and delinquent crews to fight. See [the Discord post](updates/discord/game-updates/2026-11-01-claws-wolves-gear.md).
+- **1.6:** Fists and Enrollment. See [the Discord post](updates/discord/game-updates/2026-11-01-fists-and-enrollment.md).

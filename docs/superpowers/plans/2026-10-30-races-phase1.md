@@ -759,7 +759,7 @@ local TAB_KEYS = { `Bloodline`, `Name`, `Shop` }
 **Files:**
 - Create: `docs/Races-and-Bloodlines.md`.
 - Modify: `CHANGELOG.md` (new top entry, edited in place after `git pull`), `docs/Implementation-Status.md`, `README.md` (Latest update), `docs/UI-Kit.md` (the Lineage section now points to Races-and-Bloodlines).
-- Create: `updates/discord/2026-10-30-bloodlines.md`.
+- Create: `updates/discord/game-updates/2026-10-30-bloodlines.md`.
 
 - [ ] **Step 1: Message the UI kit session** (`local_49983083-1634-4eea-8a8b-37dd1f973d04`):
   - The palettes exist: `Lineage.Palette(raceId)` is 9 colours for Vampire and 6 for Ghoul, and nil means normal tones.
@@ -778,7 +778,7 @@ local TAB_KEYS = { `Bloodline`, `Name`, `Shop` }
 
 - [ ] **Step 4: Scan and commit.**
   - Run: `git -C E:\Nightmare-Highschool diff --cached | grep -iE "api[_-]?key|token|secret|cookie|password"`. Expected: no output.
-  - Run: `git add docs CHANGELOG.md README.md updates/discord/2026-10-30-bloodlines.md && git commit -m "Races 1.0: six bloodlines, passives, Bloodline tab" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" && git pull --rebase && git push`.
+  - Run: `git add docs CHANGELOG.md README.md updates/discord/game-updates/2026-10-30-bloodlines.md && git commit -m "Races 1.0: six bloodlines, passives, Bloodline tab" -m "Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>" && git pull --rebase && git push`.
 
 - [ ] **Step 5: Mirror** the new and changed docs and changelog to `E:\Download\Obsidian (VAULT)\Rello Memory\Nightmare Highschool` (Docs/, Changelog/, and the home note's link list). Remind the user to save the place in Studio.
 
