@@ -2,6 +2,77 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.14.0] - 2026-11-03: Football (Sports 1.2, Iron Wardens)
+
+### Added
+- **Football on the Field, for the Iron Wardens.** Plays like *Football Fusion 2* (the owner's pick), with an optional quick play call borrowed from *NFL Universe Football*. Original code and art. Design: `docs/superpowers/specs/2026-10-30-sports-design.md` section 5. Plan: `docs/superpowers/plans/2026-11-03-football-1.2.md`.
+  - **Files:**
+    - `Services.Sports.Football`: the rules and both drills, plugged into the shared match core.
+    - `Controllers.Gui.Football`: controls, HUD, lines, routes, arms and poses.
+    - `Config.Sports.Football`: every number.
+    - `workspace.Sports.FootballPractice`: the practice lanes west of the Field.
+  - **A down:**
+    1. An optional 6-second huddle. The QB can press 1-6 to call Slants, Verticals, Posts, Curls, Outs or Screen, and the routes draw for the offence only. The defence can press 1 (man) or 2 (zone) for coverage hints. On 4th down the huddle adds P (punt) and, inside 30 yards, K (field goal).
+    2. The line-up: the QB is whoever stands closest to the ball. The QB snaps with Space within a 20-second play clock; late is delay of game (-5 yards).
+    3. The rush count: "1, 2, 3 Mississippi". Defenders can't cross the line until it ends. Each defender's own client holds a wall there, and the server pushes back anyone who crosses early.
+    4. The play.
+  - **Throwing:** aim with the mouse, then hold and release click (power 0-100 over 1.2 s). Power sets speed and range, so an under-charged deep ball falls short. A gold ring shows where it will land. Passes float: a lift force cancels part of the gravity. Might adds range, and accuracy perks shrink the small miss.
+    - Only one forward pass a play, from behind the line.
+    - **F** pump fake, **G** handoff.
+  - **Catching (Football Fusion style):**
+    - Click to reach. Your arms follow the ball while you reach, and everyone sees it.
+    - The ball snaps into the hands of whoever's reach it touches first along its flight.
+    - The ball then sits in the catcher's right hand, long side forward, and the arm holds it tucked while they run.
+    - Clicks are judged against where the ball was a moment ago, plus a 0.3-second grace after it lands, so network delay doesn't eat catches.
+    - Spamming locks you out for 0.6 s.
+    - **Q** dives, **Space** jump-catches, and a defender's catch is an interception.
+  - **Carrying:** **E / R** juke, **F** spin (both break a tackle in their window), **K** kneel.
+  - **Defence:** touch the carrier to tackle, **R** hit stick (25% fumble, a miss stumbles you), **C** swat.
+  - **Kicks:** kickoffs, onside kicks (**O**), punts and field goals all use a kick meter (hold and release, aim with the camera). **V** calls a fair catch. Touchbacks go to the 12.
+  - **Scoring:** touchdown 6, then **1** for the extra point or **2** for a 2-point try from the 5. Field goal 3, safety 2.
+  - **Rules:** 4 downs to gain 10, turnovers on downs, fumbles and interceptions. Two 4-minute halves, and the clock runs only while the ball is live. Overtime is next score wins. A 35-point lead ends it.
+  - **Race perks:** Vampire and Priest throw accuracy, Wraith catch and swat reach, Ghoul shrugs off a touch tackle 15% of the time, Human stamina regen.
+  - **Rewards and stats:** the shared rewards and club EXP. A football MVP score (points, catches, tackles, interceptions, swats, yards) and a football line on the post-game card.
+- **Drills on the practice lanes west of the Field:**
+  - *Route Runner:* a throwing machine calls a route, you run it and catch its throw. 10 throws; 6 catches pass.
+  - *QB Targets:* throw through three moving rings at 10, 20 and 30 yards for 1, 2 or 3 points. 10 points in 60 s passes.
+  - Best scores are saved through the club sheet.
+- **Iron Wardens Tryout** from Coach Dunmore: pass Route Runner, then play a football game.
+- **Coach Dunmore's new lines** explain throwing, catching, plays and tackling.
+- **The Gazette's club notice** now mentions football.
+
+### Changed
+- **Shared match core** (`Matches`, `Gui.Sports`), with soccer and basketball unchanged:
+  - a per-sport start word and lead word ("kickoff", "35-point lead")
+  - a `MvpScore` plug-in hook
+  - a per-sport post-game card line (`Gui.Sports.CardLines`)
+  - a labelled play clock (PLAY / HUDDLE / KICK / PAT)
+  - the down and distance on the scoreboard's phase line
+- **Ball:** a football is held in the palm, long side forward (it hung below the hand before).
+
+### Testing (solo on slot II, a Studio-only test mode and test defender)
+- **Plays:** kickoff (including the automatic kick) and touchback; huddle, line-up and snap with the count and both lines.
+- **Passing and downs:** a real mouse throw with the landing ring; incompletions, delay of game and turnover on downs.
+- **Defence:** a test defender waiting out the count, then tackling 4 yards back.
+- **Scoring:**
+  - a touchdown run (6)
+  - the automatic extra point
+  - a 2-point try (3-0 → 11-0 with a field goal)
+  - a 20-yard field goal is good, and a 34-yard try is refused (out of range)
+  - a punt for a touchback
+- **The post-game card:** football line, MVP and +72 EXP.
+- **Route Runner:** 8 of 9 caught after the lead and lag fixes. The drill passed (best 8 saved) and the tryout moved on to "play a game". Reaching arms measured at 16-38 degrees toward the ball; the caught ball sits in the palm with the arm in the carry.
+- **QB Targets:** ring hits score +1 and +2; carry pose screenshot.
+- **Bugs found and fixed in testing:**
+  - kickoff placement was flagged as a teleport
+  - the role label sat under the quest tracker
+  - touchdown runs counted no yards
+  - the machine's throws under-led and over-led receivers
+  - catches were lost to network delay
+  - the Route Runner spot sent Out routes off the lane
+- **Not tested:** anything between two players: catches against a QB's pass, contested catches, interceptions, jukes, hit sticks, swats, fumbles, fair catches, onside recoveries and returns. One "Incomplete" appeared once without a throw from the test (likely a stray click) and didn't repeat.
+- **Test data:** slot II has the Wardens tryout at stage 2, and the daytime drill tests logged "Absent" entries and 1 detention owed.
+
 ## [1.13.2] - 2026-11-03: A steady phone hand
 
 ### Fixed

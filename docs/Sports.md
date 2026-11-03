@@ -1,7 +1,6 @@
 # Sports Clubs
 
-**Status:** basketball (1.0) and soccer (1.1) are built and playable in NH Combat Test, each with two drills, a club and a tryout. Football comes in 1.2.
-- The soccer pitch and the football field are built, and both coaches take members, but their rules come in 1.1 (soccer) and 1.2 (football). Their pads read "coming soon".
+**Status:** basketball (1.0), soccer (1.1) and football (1.2) are built and playable in NH Combat Test, each with two drills, a club and a tryout. Football has been tested solo only.
 - Design: [superpowers/specs/2026-10-30-sports-design.md](superpowers/specs/2026-10-30-sports-design.md). Plan: [superpowers/plans/2026-10-30-sports-1.0.md](superpowers/plans/2026-10-30-sports-1.0.md).
 
 ## Clubs and coaches
@@ -161,6 +160,78 @@ Built to play close to a Blue Lock-style Roblox soccer game the user supplied as
   - **Ball:** `Kick`, `ReachFor`, friction, and the collision group for soccer balls.
   - **Matches:** keeper pads queue, mercy rule.
   - **Sports client:** gated to basketball input, with shared state and hints exported.
+
+## Football (Sports 1.2, Iron Wardens)
+Plays like *Football Fusion 2* (the owner's pick), with an optional quick play call from *NFL Universe Football*. Only the feel was studied; the code and art are original.
+
+**The field:** 60 yards between the goal lines (x -154 west, -34 east), 2 studs a yard, 8-yard end zones, 32 yards wide. Team A (Crimson) scores in the west end zone; B (Ash) in the east.
+
+**A down**
+1. **Huddle (6 s, optional):**
+   - The QB can call a play with **1-6**: Slants, Verticals, Posts, Curls, Outs or Screen. The routes draw for the offence only.
+   - The defence can press **1** (man: your receiver gets a mark) or **2** (zone: a circle) for coverage hints.
+   - On 4th down the huddle adds **P** (punt) and, inside 30 yards, **K** (field goal).
+2. **Line-up:** the QB is the offence player closest to the ball as the huddle ends. Receivers spread across the field; defenders line up 5 yards off, with one rusher.
+3. **Snap:** the QB presses **Space** within 20 s. Late is delay of game (-5 yards).
+4. **Rush count:** "1, 2, 3 Mississippi". Defenders can't cross the line until it ends (a throw, handoff or QB crossing the line ends it early).
+   - Each defender's own client holds a wall there, which only blocks them, and the server pushes back anyone over the line.
+   - Before the snap nobody may cross.
+5. **The play ends** on a tackle, out of bounds, a kneel, an incomplete pass, a touchdown or a safety. The ball is spotted there.
+
+**Controls**
+
+| Who | Key | Action |
+|---|---|---|
+| QB | aim with the mouse, hold click and release | Throw. Power 0-100 over 1.2 s sets speed and range (a short hold falls short). A gold ring shows the landing spot. Might adds range. One forward pass a play, from behind the line. |
+| QB | F / G | Pump fake / hand off to the closest teammate within 6 studs |
+| Anyone | click | Reach for the ball in the air (catch or interception) |
+| Anyone | Space / Q | Jump catch / dive (10-stud lunge, +2 studs of reach, 20 stamina) |
+| Carrier | E / R, F, K | Juke left / right, spin (both break a tackle in their window), kneel |
+| Defence | touch, R, C | Tackle, hit stick (25% fumble; a miss stumbles you for 1 s), swat |
+| Kicker | hold click and release, O | Kick (aim with the camera), onside (kickoff) |
+| Returner | V | Fair catch |
+| After a TD | 1 / 2 | Extra point (automatic) / 2-point try from the 5 |
+
+- Touch and gamepad: Action (R2: throw, kick or catch), Dive (B), Juke (Y), Hit / Swat (X), Snap / Fair catch (L1).
+
+**Catching (Football Fusion style)**
+- Click to reach. Your arms follow the ball while you reach (up to a second while you hold). Every client draws this for every character, from the server's `F_Reach`.
+- The ball snaps into the hands of whoever's reach it touches first along its flight. Reach is 5.5 studs from the shoulders (4.5 for an interception), plus Wraith's +8% and a dive's +2.
+- A click is judged against where the ball was over the last 0.3 s, and a landed ball waits 0.3 s before it's ruled incomplete. This covers network delay.
+- A whiffed click locks the next one for 0.6 s.
+- Once caught, the ball sits in the right palm, long side forward, and the right arm holds it tucked while you run.
+
+**Kicks:** kickoffs from your own 20, onside kicks (live after 5 yards), punts and field goals all use the kick meter. A ball in the end zone is a touchback at the 12. A field goal must pass between the uprights above the crossbar.
+
+**Scoring and rules**
+- Touchdown 6, extra point 1, 2-point try 2, field goal 3, safety 2.
+- 4 downs to gain 10, or the ball turns over. A fumble is loose: whoever recovers it has the ball.
+- Two 4-minute halves; the clock runs only while the ball is live. Overtime is next score wins. A 35-point lead ends the game.
+
+**Race perks:** Vampire (at night) and Priest throw accuracy, Wraith catch and swat reach, Ghoul a 15% chance to shrug off a touch tackle, Human stamina regen.
+
+**Drills (the practice lanes west of the Field, x -250..-184)**
+
+| Drill | How | Pass |
+|---|---|---|
+| Route Runner | Stand on the gold spot. The machine calls a route and draws it, then throws to you once you're on the last leg (it leads you along the route). Click to catch. | 6 of 10 |
+| QB Targets | Throw from the gold spot through three moving rings at 10, 20 and 30 yards: 1, 2 or 3 points. | 10 points in 60 s |
+
+- Bests are saved on the club sheet (`Drills.RouteRunner`, `Drills.QBTargets`).
+- **Iron Wardens Tryout** (Coach Dunmore): pass Route Runner, then play a football game. Reward: 20 yen and +3 popularity.
+
+**Testing tools (Studio only):** TestBridge has these commands:
+- `FootballState` (the mode, down, spot, holder, ball and score)
+- `FootballDummy(team)` (a test defender that chases the carrier after the count)
+- `FootballSpot(down, yardsToGoal)` (put the ball on a down and spot, then huddle)
+- `SportForce("Field", name, "", true)` starts a one-player test game
+
+**Not tested yet:** anything between two players, namely:
+- a real QB-to-receiver catch and contested catches
+- interceptions
+- jukes and spins against a tackler
+- hit sticks, swats and fumbles
+- fair catches, onside recoveries and returns
 
 ## Venues (Workspace.Sports)
 - **Gymnasium**
