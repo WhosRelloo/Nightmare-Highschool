@@ -2,6 +2,40 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.18.0] - 2026-11-03: The Headmaster's Desk grows, and games on the phone
+
+### Added
+- **Phone games: three of our own, in the school's style.** Each has its own grid icon, a title card with your best and the building's top 5, and a game-over card. See `docs/Phone.md`.
+  - **Wisp Flight** (flappy): tap a candle wisp through the gaps in wrought-iron spires under the moon.
+  - **Hex Slash** (slicing): swipe through cursed relics tossed up from below. Don't slash the holy cross. 3 lives.
+  - **Crypt Crush** (match-3): swap runes on a crypt slab. Lines of 4 make sigils and lines of 5 make seals. 30 moves.
+  - **Bests:** each save slot keeps its own bests (`PlayerData.Arcade`, `SetArcade`). The server checks every score against the length of the run.
+- **Admin panel (F3), new tabs** for everything added since it shipped. See `docs/Admin-Panel.md`.
+  - **School:**
+    - discipline: set points, excuse today (gives back the points), lift a suspension, clear or add a detention owed
+    - start a lesson in any classroom
+    - skip to any period (always forward), ring the bell
+  - **Progress:** set level (keeps EXP) or stat points, give EXP by kind, grant or remove titles, all places found or reset, and a read-only inspector of a student's slot.
+  - **Activities:** start or end a match at each venue, set a club, start, drop or reset quests (race rites are owner-only).
+  - **World:** full moon tonight, and go to (or send a student to) any of the 19 places.
+  - **Everyone:** bring all, freeze all, thaw all, and a server lock that keeps out everyone but staff.
+- **Admin quality of life:**
+  - Find a command searches every tab and jumps to the button.
+  - Right-click a button to pin it as a favourite.
+  - The last five students you picked float to the top.
+  - The selected student's UserId is in a box you can copy, and the student search also matches UserIds.
+  - Staff can leave notes on a student.
+- **TestBridge cleanup commands** for restoring test data exactly: `SetAttendance`, `RegionSet` and `SetProgressFields`.
+
+### Testing
+- **Admin panel, in Studio Play on slot II (after school, and from the main menu for the clock jumps):**
+  - Every new command ran.
+  - Tested on screen: the tabs, the search jump, favourites, recent students and the inspector.
+  - The test run found four problems, all fixed: skipping to a period could go backwards, ending a finished match claimed success, quest refusals had no reason, and set level wiped EXP.
+  - Slot II was restored exactly afterwards.
+  - Not run in Play: start a lesson, and the Field and Pitch matches.
+- **Phone games, in Studio Play on slot II (evening):** all three played to the end, the best saved and showed on the board, and there were no console errors. Not tested: two players, or Reduce Motion.
+
 ## [1.17.0] - 2026-11-03: Clubs, sports, boiler room, courtyard and pillars (props batches 6 to 9)
 
 ### Added

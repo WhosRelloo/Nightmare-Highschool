@@ -34,6 +34,47 @@ A modern smartphone layout (the owner's reference) in the school's style:
 
 Per the owner, there's no Report Card, Locker or Journal in the phone.
 
+## Games (1.18)
+Three of our own takes on classic phone-game genres, drawn only with the UI kit's art (Glow, Pip, Seal, the kit icons, Frames and gradients). Each has its own grid icon. Every game opens on a title card with a how-to line, **your best**, and **Best in the building** (the top 5 in this server). The game-over card shows your score, "New best!" if it is one, Play again and Back.
+
+| Game | Genre | How it plays |
+|---|---|---|
+| **Wisp Flight** | flappy | Tap to lift a candle wisp through gaps in wrought-iron spires under the moon; touching iron, the ground or the sky ends it ("The flame gutters"). One point per spire pair; gaps tighten and speed rises slowly. |
+| **Hex Slash** | slicing | Drag fast across the stage to slash cursed relics tossed up from below: candles, blood drops, wax seals, quills, bells. Each one splits into halves. 3 or more in one swipe is a combo. A missed relic costs a candle (3 lives). Slash the pale **holy cross** and the run ends. |
+| **Crypt Crush** | match-3 | Swap neighbouring runes on an 8 × 8 slab (six runes, each with its own colour and shape) to line up 3 or more. Only swaps that make a match are allowed. Matching 4 makes a **sigil** that clears its row and column; matching 5 makes a **seal** that clears one colour when swapped. Cascades multiply. 30 moves a run, and a board with no moves reshuffles. |
+
+- **Input:** taps and drags on the game only. The stage's input pad is a UI button, so the clicks never reach combat or movement.
+- **Stopping:** going Back or putting the phone away stops the game.
+- **Reduce Motion:** fewer particles and no flash.
+- **Files:**
+  - Client: `Controllers.Gui.PhoneGames` (the shell), with `PhoneGames.Wisp`, `PhoneGames.Hex`, `PhoneGames.Crypt` and `PhoneGames.CryptBoard` (the match-3 rules as pure functions, self-tested 39/39).
+  - Server: `Services.Features.PhoneGames`.
+- **Saved:** `PlayerData.Arcade = { Best = { Wisp, Hex, Crypt } }`, through the UpdateState action `SetArcade`, cleaned on every read. Each slot keeps its own bests.
+- **Remotes:** `ReplicatedStorage.NHArcade` has three calls:
+  - `Get` returns `{ Best, Board }`. Board rows are `{ Name, Score, Me }`. Names follow the stranger rule (a student you don't know shows as "a stranger"), and you show as "You".
+  - `Begin(game)` stamps the start of a run on the server clock.
+  - `Submit(game, score, seconds)` saves a new best.
+- **Anti-cheat on Submit:**
+  - The score must be at most Grace + Rate × the run's length.
+  - The run's length is the shorter of what the client says and the server's own time since `Begin` plus 2 s.
+  - One submit per 2 s per player.
+  - The caps:
+
+    | Game | Cap | Rate (points per second) | Grace |
+    |---|---|---|---|
+    | Wisp Flight | 5,000 | 1.2 | 3 |
+    | Hex Slash | 99,999 | 16 | 20 |
+    | Crypt Crush | 300,000 | 4,000 | 2,000 |
+
+- **Tested (Studio Play, slot II, evening):** all three open from the grid, start, play and end.
+  - Wisp Flight showed its moon, spires and fence, and the game-over card.
+  - Hex Slash slashed 3 relics with the crimson trail and split halves, and its 3 lives ran out.
+  - Crypt Crush made a 3-match (30 points), moves dropped to 29, and the board refilled.
+  - The best saved (Hex 3) and showed on the board as "You".
+  - The pad's pointer coordinates match the stage (no inset offset).
+  - No console errors.
+  - Not tested: two players on one board, Reduce Motion, sigils and seals in live play (covered by the logic self-test), and the anti-cheat caps against a forged submit.
+
 ## Data and remotes
 - **Saved:** `PlayerData.Phone = { History, Recent, Wallpaper = { Preset, Image? } }`, written with `SetPhone` and checked by `Phone.Sanitize`.
 - **Remotes:** `ReplicatedStorage.NHPhone` has Get, Send, Gazette, Contacts, SaveRecent and SaveWallpaper (RF), plus Changed (RE).
