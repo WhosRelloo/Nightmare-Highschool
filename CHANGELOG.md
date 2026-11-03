@@ -2,6 +2,32 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.16.0] - 2026-11-03: Regions: place names, discovery and Explorer
+
+### Added
+- **Region title cards.** Walk into a named place and a card names it just under the compass, then fades after about 3 seconds. See `docs/Regions.md`.
+  - a small spaced kicker ("ROOM 101", "STAFF ONLY")
+  - the name burning in left to right with a bright edge
+  - the kit divider drawing out from a pip, and a dim italic line
+  - all over a smoky band, with a glow breathing behind the name
+- **Danger places are crimson** and their names flicker like a candle: forbidden rooms, faction turf, and restricted places after dark (which also get their own night text).
+- **Discovery.** Your first visit to each of the 19 places saves on that slot and gives 15 EXP (`RegionFound`). The card adds a row: the wax seal stamps down, then "DISCOVERED N / 19", then a pip for every place, the new one lighting up, with a soft bell. Finding all 19 earns the title **Explorer**.
+- **The compass** names the place you're in when you face nothing (◇ The Main Hall).
+- **The arrival card** now names your region.
+- **Cinematic view keeps the cards**, just under the top letterbox bar. Any ScreenGui with `ShowInCinematic = true` now stays on in cinematic view.
+- **Region boxes** in `workspace.Regions` (Persistent), built from the existing zones, floors and courts. The builder can move or resize them.
+- **Server-checked.** The server checks you're really in the box before it saves, and saves only through PlayerData (`SetRegions`).
+
+### Changed
+- **The wax seal** (`Theme.Images.Seal`) is new PBR art: a 512 hand-pressed seal with a dripping edge, clock ticks and the diamond-cross emblem, baked by `art/ui/hud/make_seal_pbr.py`. It is greyscale, so every tint in the kit still works.
+- **Toasts** step down while a card is showing.
+
+### Testing
+- **Discovery, in Studio Play on slot II at night:** found places one at a time, then all 19. Each place saved once, the count reached 19 / 19, and Explorer was awarded.
+- **Cards and compass:** the gold card, the crimson card and the cinematic-view card all rendered, and the compass label worked. No console errors.
+- **Cleanup:** the test slot's places were reset afterwards.
+- **Not tested:** two players, Reduce Motion, or the arrival card's region name.
+
 ## [1.15.2] - 2026-11-03: Builder textures (24 PBR sets)
 
 ### Added

@@ -45,6 +45,7 @@ A slim strip across the top centre, in the top bar's style with faded ends. It s
 
 - **Your tracked quest objective** is always shown in gold, and pinned to the edge when it's behind you.
 - **Readout:** whatever you're facing is named under the strip, with its distance in studs.
+- **Region (1.16.0):** when you face nothing, the readout names the place you're in, faintly (◇ The Main Hall), from `Controllers.World.Regions` through `Compass.SetRegion`. Region title cards show just under it; see `docs/Regions.md`.
 - **Notifications:** the game's toasts now drop in just under the compass.
 
 ## Shift-lock cursor (`Controllers.Gui.ShiftLockCursor`)
