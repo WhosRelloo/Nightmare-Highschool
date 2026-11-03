@@ -2,6 +2,27 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.13.2] - 2026-11-03: A steady phone hand
+
+### Fixed
+- **The phone hand stays put while you move.** The server raises the right arm for the phone through the shoulder's `C0`, but the walk, run and idle animations kept swinging that joint on top, so the phone bobbed away from the face. A new client module, `Controllers.Character.PhoneHold`, clears the right shoulder's animation offset (`Motor6D.Transform`) every frame after the animations run, for every character holding the phone within 150 studs. The left arm, legs and torso still animate.
+
+### Changed
+- **Nightmare Nights (VFX P4-1) is shelved** by the owner for now. It stays on the roadmap with its design notes.
+
+### Testing
+- **Play, solo on slot II,** with real W and Shift key presses and the phone out, measuring each hand's movement relative to the torso:
+
+  | State | Top speed | Right hand (phone) | Left hand |
+  |---|---|---|---|
+  | Standing | 0.2 | 0.000 studs | 0.60 studs |
+  | Walking | 15.8 | 0.000 studs | 1.84 studs |
+  | Sprinting | 32.4 | 0.000 studs | 2.39 studs |
+
+- A screenshot mid-sprint shows the phone held at the face while the left arm swings.
+- No discipline entries were added during the test.
+- **Not tested:** how other players see it (each client runs the same lock for every character, but this needs two players to confirm).
+
 ## [1.13.1] - 2026-11-03: Hall furniture (props batch 3)
 
 ### Added

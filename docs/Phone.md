@@ -6,6 +6,7 @@ Added in 1.12.0. Server: `Services.Features.Phone`. Client: `Controllers.Gui.Pho
 - **Spawning:** every character spawns with a **Phone** Tool, attribute `NHPhone`. Its model is welded to an invisible handle, and the screen shows the crest.
 - **Equipping (hotbar, or Y):** opens the UI. Unequipping closes it. Closing from inside the phone (Camera, Timetable...) also puts it away.
 - **The pose:** the game's animations don't raise the arm for tools, so on equip the server sets the right shoulder's `C0` to `Base * Angles(0, 45°, 105°)`, which replicates to everyone. Unequipping restores it.
+- **Steady while moving (1.13.2):** `Controllers.Character.PhoneHold` (client) clears the right shoulder's `Transform` every frame (`PreSimulation`, after the animations), for every character holding the phone within 150 studs. Without it, the walk and run arm swing moved the phone away from the face. The left arm keeps swinging.
 - **The grip:** solved in Play against the R6 `RightGrip` weld. It stands the phone upright with the screen toward the face.
 
 ## The screen

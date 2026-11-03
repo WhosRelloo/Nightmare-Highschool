@@ -222,7 +222,7 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 ### P4: after everything else (user-scheduled)
 | ID | Effect / feature | Notes | Owner |
 |---|---|---|---|
-| P4-1 | **Nightmare Nights**: crimson nights run as a school event | The user approved the idea. It needs its own design pass: how the school schedule announces it, what changes in the school, and the trigger (full moon or the event calendar). Visuals: crimson grade, a large pale-crimson moon, a "Nightmare Night" banner when night falls. Builds on DayCycle (P1-3) and the full-moon work (P2-1). | Q |
+| P4-1 | **Nightmare Nights**: crimson nights run as a school event | **Shelved by the owner (2026-11-03).** The user approved the idea. It needs its own design pass: how the school schedule announces it, what changes in the school, and the trigger (full moon or the event calendar). Visuals: crimson grade, a large pale-crimson moon, a "Nightmare Night" banner when night falls. Builds on DayCycle (P1-3) and the full-moon work (P2-1). | Q |
 
 ### Optional (need your approval; no mechanic exists)
 - jumpscares and "nightmare events"
@@ -297,4 +297,4 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
   - **Candles:** `NHCandle` on the Archive flames, candelabra and altar (and the batch-3 sconces once placed). The votives stay with `ObjectFx`.
   - **Emitters:** Archive dust, boiler pipe steam, boiler embers; fog is defined but unplaced. Budgets per the style guide (120 studs, 3 at once, 10/s, Low halves).
   - **Sounds (D4 inventory, Pro Sound Effects):** outdoor `9112777914` / `9112764573`, hall `9116260218` / `9118747853`, Archive night `9125602882`, boiler `9112839511`.
-  - **Left on the roadmap:** P4-1 Nightmare Nights (needs its design pass with the owner).
+  - **Left on the roadmap:** P4-1 Nightmare Nights (needs its design pass with the owner; shelved on 2026-11-03).
