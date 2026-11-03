@@ -95,12 +95,16 @@ The total count updates on its own. The build script is a scratch Edit script, `
 - **1.16.1:** walked back into Room 101 after finding it: its card showed again, without the discovery row. The arrival card named the region ("Room 102 · Mathematics").
 - **Not tested:** two players, Reduce Motion, toasts arriving during a card, and the lowered card outside cinematic view (only seen in cinematic view, which has its own placement).
 
-## Test note: slot II's school record (2026-11-03)
-The 1.16.0 and 1.16.1 Play tests added entries to slot II's discipline and attendance record on in-game day 12454:
-- **Walked out of detention (5:09 AM):** the walk through all 19 places passed through Room 106 while a detention was owed.
-- **Caught by a hall monitor (10:22 AM):** a Play session dropped the player straight into school during class.
-- **Absent from Period 3 and Period 4:** the same session; one of the two Absent entries is stamped 3:30 PM because the clock was jumped to after school.
+## Test note: slot II's school record (2026-11-03, cleaned)
+The 1.16.0 and 1.16.1 Play tests (and one session where the owner entered school during class) added entries to slot II's record on in-game day 12454:
+- **Discipline:** walked out of detention at 5:09 AM (the all-19 walk passed through Room 106 while a detention was owed), a hall-monitor truancy at 10:22 AM, and absences at 11:06 AM and 3:30 PM. These came to 12 points and tipped the slot into a one-day suspension.
+- **Attendance:** absent from Period 3 (English) and Period 4 (History).
 
-They are test data and haven't been removed yet.
+**Cleaned the same day**, at the owner's request:
+- **Discipline:** the four entries are gone. Points are back to 6, the suspension is lifted, the existing probation (ending day 12455) stays, and the one owed detention stays.
+- **Attendance:** the two records are gone and Absent is back to 22.
+- **Checked:** after a fresh load, there are no day-12454 entries in either list.
+- **How:** TestBridge `SetDiscipline` and a new `SetAttendance(name, fields)` command, with the slot loaded from the main menu and never entered.
+- **What couldn't be restored:** both lists keep only their 20 latest entries, so the test entries pushed off the 4 oldest discipline entries and the 2 oldest attendance entries, all from earlier test days.
 
 **Lesson:** test regions at night or after school, avoid Room 106 while a detention is owed, and check the clock before starting Play.
