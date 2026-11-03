@@ -91,3 +91,12 @@ A 40-minute class is about 3 minutes 20 seconds of real time, and a passing peri
 - **Each model:** `Role = "Ambient"`, `NHScheduled = index`, and `NHActivity` (what they're doing).
 - **API:** `Schedules.Pause(on)`; `Schedules.Debug()`; `Schedules.PlanForTests(kind, name?, hour?)` plans a period without moving the clock.
 - **Test note:** moving the clock into a class period marks Studio test players absent, so use `PlanForTests`.
+
+## The timetable (1.12.0)
+Click the clock at the top-right (`Controllers.Gui.Timetable`). It shows the whole day:
+- **Each segment:** its time, name, and for classes the subject and room.
+- **Now:** the current segment is gold with a progress bar, and a line at the top shows "Now" and the next class.
+- **Your attendance:** today's status on each class you've had, from `Attendance.Recent`, with the lesson grade.
+- **Detention:** any detention you owe.
+
+It ticks every half second while open, and re-reads your attendance when a new segment starts.

@@ -2,6 +2,62 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.12.0] - 2026-11-02: The phone, the timetable, and two bug fixes
+
+### Added
+- **The phone.** Every student spawns with a **Phone** in their hotbar, built from the owner's model (`ServerStorage.NHPhoneModel`) with the crest glowing on its screen.
+  - **Opening it:** equip it, or press **Y**, and you raise it in front of your face; everyone sees the pose. The server turns the right shoulder and a solved grip stands the phone upright, screen to the face, back and lenses out.
+  - **The screen:** slides up at the bottom-right, laid out like a modern smartphone (owner's reference) but dressed for the school:
+    - a rounded iron body with a polished-gold edge and side buttons, and the kit's PBR slate grain;
+    - a notch with a lens and a status bar with the school clock;
+    - a 4-wide grid of rounded enamel app icons (the kit's glyph art pressed into a slot well);
+    - page dots, a frosted dock, and red badges (money received, a new paper each day).
+  - **Labels:** outlined and shadowed so they read on every wallpaper.
+  - **Input:** it never captures input, so combat and movement keep working with it up.
+  - **Apps:**
+
+    | App | Where | What it does |
+    |---|---|---|
+    | **Wallet** | dock | Send Yen to a classmate (pick, type, confirm): 1 to 5,000 at a time, 5 s apart, never from the menu or while downed. Both sides get a toast and a history line. |
+    | **Night FM** | dock | Play any public Roblox audio ID, only you hear it: title lookup, play/pause, stop, loop, volume, progress and recent IDs. It keeps playing with the phone away, and the hotbar slot shows a note. |
+    | **Classmates** | dock | Everyone in the building, with names only if you know them. Send Yen or invite them to your study group. |
+    | **Camera** | dock | The cinematic view. |
+    | **The Midnight Bell** | grid | The school paper, written live: the moon tonight, the top students in the building (names only if you know them), the discipline report, the stand's special, club notices and a rumour column. |
+    | **Timetable** | grid | Opens the timetable. |
+    | **Study Group** | grid | Opens the study group drawer. |
+    | **Factions** | grid | Opens the factions panel. |
+    | **Style** | grid | Eight preset wallpapers (Crimson Ink, Violet Night, Blood Moon, Vigil Candle, Court Velvet, Grave Fog, Midnight Blue, Ash), or your own image or decal ID. Saved, and only you see it. |
+    | **Options** | grid | Opens Options. |
+
+    Per the owner, there's no Report Card, Locker or Journal in the phone.
+  - **Saved:** `PlayerData.Phone` (history, recent IDs, wallpaper), with the `SetPhone` action. Y is reserved in the key settings.
+  - **Files:** `Services.Features.Phone`, `Controllers.Gui.Phone` (new).
+- **The timetable.** Click the clock at the top-right (`Controllers.Gui.Timetable`, new).
+  - **The day:** every segment from Before School to Night, with times, subjects and rooms.
+  - **Now:** the current segment lit gold with a progress bar, a "Now / Next class" line, and earlier segments dimmed.
+  - **Your attendance:** today's result on each class you've had, with the lesson grade.
+  - **Detention:** any detention you owe.
+
+### Fixed
+- **Top bar never faded back.** Since 1.10 the Study Group button overwrote the bar's fade container (`Ui.Group`), so every fade and wake tween errored ("Unable to cast value to Object", found with a startup error probe). The button now has its own field (`Gui.TopBar`).
+- **Combat movers errored on clients** that hadn't loaded a character yet (streamed out or mid-respawn): "LinearVelocity:31 attempt to index nil with 'LinearStore'". The client replay now skips characters it can't register (`Functions.LinearVelocity`, a two-line guard; combat behaviour unchanged).
+- **Phone text boxes** (Night FM ID, Wallet amount, Style image) passed gsub's match count into `tonumber` as a base and errored. They now read digits through one helper.
+- **Backups:** `ServerStorage.NH_Backup.Keys_pre` (`Phone_original`, `LinearVelocity`, `Settings`).
+
+### Verified
+**[PT]** on save slot II:
+- **The tool:** the phone arrives in the backpack on spawn. Equipping it opens the screen, and the pose and grip were checked from the front.
+- **Layout check:** every screen (home, Wallet, Night FM, Midnight Bell, Classmates, Style) passed an automated check for cut-off text (`TextFits`), elements outside the screen, and overlaps.
+- **Night FM:** played an ID and showed its real title.
+- **Style:** applied and saved Violet Night.
+- **Midnight Bell:** rendered live data.
+- **Wallet:** refuses sending to yourself or to anyone absent.
+- **Top bar:** no startup errors left after the fix.
+- **Restored:** slot II's phone data was reset after testing.
+
+### Not tested yet
+- A real two-player Wallet transfer, and Classmates with other students in it.
+
 ## [1.11.0] - 2026-11-02: New menu keys, the study group dock, a cinematic view, and a camera audit
 
 ### Changed

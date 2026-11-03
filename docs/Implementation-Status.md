@@ -1,6 +1,6 @@
 # Implementation Status: NH Combat Test
 
-Last updated: 2026-11-02 (through 1.11.0). Done: Milestone 0, combat and three weapon classes (`Combat-System.md`), clock and timetable (`School-Simulation.md`), attendance and discipline (`Attendance-and-Discipline.md`), class activities (`Class-Activities.md`), factions and reputation (`Factions-and-Reputation.md`), quests, races, sports, the main menu (`Main-Menu.md`) and the admin panel (`Admin-Panel.md`).
+Last updated: 2026-11-02 (through 1.12.0). Done: Milestone 0, combat and three weapon classes (`Combat-System.md`), clock and timetable (`School-Simulation.md`), attendance and discipline (`Attendance-and-Discipline.md`), class activities (`Class-Activities.md`), factions and reputation (`Factions-and-Reputation.md`), quests, races, sports, the main menu (`Main-Menu.md`) and the admin panel (`Admin-Panel.md`).
 
 How each result was checked:
 - **[PT]** Studio playtest
@@ -25,6 +25,7 @@ How each result was checked:
 | **Kills saved**: `Kills` (players) and `NPCKills` are added to player data, plus a Kills leaderboard column. Grip executions count. | `PlayerData`, `Functions.UpdateState`, `Player.Data`, `Features.KillTracker` | [PT-real] a B grip took NPCKills 0→1, and it survived a session restart |
 | **Main menu + save slots**: a cinematic PBR night-courtyard menu (spline camera, posed student in a crimson clock seal, Blender-rendered VFX), 3 save slots (each its own save; slot 1 = the old save), and character editing with camera cuts per Wardrobe tab, then ENTER SCHOOL | `Config.MainMenu`, `Services.Player.Slots`, `Services.Player.Data` (per-slot load), `Gui.MainMenu`, `workspace.MenuScene`, `Tools/vfx` | **[PT]** with real clicks and keys: intro → menu → slots → edit (Face-tab cut) → enter school; Continue. Camera smoothness measured (no stops between shots). 8 bugs found and fixed. **Menu 1.2 audit:** 10 more fixed (Settings input, plinth hair weld and race, Bloodline shot, remote errors, LastPlayed via UpdateState, name-filter race in Identity), all but the name race retested in Play. See Main-Menu.md. |
 | **UI Audit 1.0**:<br>• Every screen checked for small text, contrast, layering and edges<br>• Fixes in Progress, Compass, TopBar, Students, Identity, MainMenu, Loading<br>• Kit-owned findings sent to the UI kit session | `Gui.Progress` (`NHExpStrip`), `Gui.Compass`, `Gui.TopBar`, `Gui.Students`, `Gui.Identity`, `Gui.MainMenu`, `NHLoadingScreen` | **[PT-real]** audited in a 1287×600 playtest by day and night. Phones and gamepad not tested. See UI-Audit.md. |
+| **1.12.0**: the phone (a hotbar tool from the owner's model; smartphone-style gothic UI with PBR finish; Wallet, Night FM, Midnight Bell, Classmates, Camera, Style wallpapers and shortcuts); the timetable (click the clock); top-bar fade fix; LinearVelocity replay guard | `Features.Phone`, `Gui.Phone`, `Gui.Timetable` (new), `ServerStorage.NHPhoneModel`, `Gui.TopBar`, `Functions.LinearVelocity`, `PlayerData`, `UpdateState`, `UI.Settings` | **[PT]** automated layout check clean on every phone screen; see CHANGELOG 1.12.0 |
 | **1.11.0**: menu keys remapped (` Locker, P Options, M Report Card, L Factions, \\ Cinematic); study group dock (bottom-left); cinematic view; camera audit (CameraLease; locker hide, barber and wardrobe cameras, stuck-camera fix, follow-offset tween) | `Functions.CameraLease` (new), `Gui.Cinematic` (new), `Gui.StudyGroup` (rebuilt), `Gui.{Wardrobe,Evolution,Soccer,Camera,Locker,StatsPanel,SettingsMenu,FactionsPanel,Progress,TopBar}`, `World.LockerPOV`, `UI.Settings` | **[PT]** see CHANGELOG 1.11.0 |
 | **1.10.0**: NPC daily schedules (14 students follow the timetable); concession stand and snacks; the Locker inventory (G); study groups (U); the Report Card stats panel (L); gear chests stand upright | `Features.{Schedules,Concession,Inventory,Party}` (new), `Config.Items` (new), `Gui.{Locker,StudyGroup,StatsPanel}` (new), `Gui.TopBar`, `Gui.Progress`, `Player.Progression`, `PlayerData`, `UpdateState`, `UI.Settings` (keys), `ServerStorage.NHChestModel` | **[PT]** see CHANGELOG 1.10.0. Two-player group test and a full live-clock day still to do. |
 | **1.9.3**: VFX Batch 5 (P3 polish: soft rings and soccer marker, basketball sparkles, result card reveal, EXP gain tick, Strangers write-on, seated chime, discipline stamp, Night Study warmth); anti-teleport check (#14) | `Features.AntiTeleport` (new), `Controllers.World.SchoolFx` (new), `Controllers.Fx`, `Gui.{Soccer,Sports,Progress,Strangers}` | **[PT]** teleports caught; server moves, fast runs and falls pass; see CHANGELOG 1.9.3. Strangers write-on needs two players. |
@@ -129,7 +130,7 @@ Nothing was changed in the production place.
 
 - **World:** the real school map. The campus is still a greybox on a 512-stud baseplate. Places are found by attributes and tags (`Compass`, `RoomId`, `NpcPost`, `NHDelinquentSpawn`, `NHWolfSpawn`, `NHWardrobe`...), so a built map lights up on its own.
 - **Input:** phone and gamepad controls for combat (V carry, B grip, crouch, H night sight). Soccer and menus already have pads.
-- **School life:** a timetable screen. *Done (1.10.0):* NPC daily schedules.
+- **School life:** *done:* NPC daily schedules (1.10.0), the timetable (1.12.0).
 - **Factions:** The Ordinary and The Hollow (rumoured only), and relationships with ordinary students.
 - **Content systems:** jobs, events. *Done:* inventory, the Locker panel, consumables and the concession stand, study groups, the Report Card (1.10.0), dialogue, quests, investigation, stealth, duels, clubs and sports, gear and chests, progression (EXP, levels, stats), races and bloodlines, the HUD, journal, notifications and settings.
 - **Animation gaps:**
@@ -142,7 +143,8 @@ Nothing was changed in the production place.
   - the GoalCam in a real match;
   - the Strangers name write-on (needs a second player);
   - study groups with two players (invite, shared EXP, member health bars);
-  - a full in-game day of NPC schedules on the live clock.
+  - a full in-game day of NPC schedules on the live clock;
+  - a two-player Wallet transfer and Classmates with other students.
 - **VFX:**
   - **Batch 5 (P3 polish):** EXP gain tick, result card reveal, Strangers write-on, seated chime, discipline record stamp, Night Study candle warmth, soft-edge soccer markers, basketball `nh_*` sparkles.
   - **P2-2 and P2-3:** wait on D5.
