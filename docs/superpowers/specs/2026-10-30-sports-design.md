@@ -89,15 +89,54 @@
 - **Drills:** *Target Practice* (hit corner targets, power and curve); *Wall Passes* (one-touch timing).
 
 ## 5. Football (Field; 2v2 to 5v5)
-- **Roles each play:** QB (offence picks), receivers, defenders, one pass rusher (defence picks).
-- **Huddle (8 s):** the offence chooses a play from a playbook card (6 plays: slant, go, post, curl, out, screen per receiver). The routes draw on the field for the offence only; the defence picks man or zone.
-- **Snap:** the QB snaps with **Space**. The rusher waits for a 3 s count ("Mississippi") before rushing.
-  - **Throwing:** the QB aims with the mouse and holds click for power; a lead marker shows on the target; Might adds range.
-- **Receiving:** the catch window opens when the ball is within 6 studs. Click to catch (timing and contest decide); a dive (**Q**) extends reach and costs stamina; jukes (**E/R**) and spin (**F**) after the catch.
-- **Defence:** tackle (**click**, contact range; ends the play); interception = defender catch; swat (a timed click deflection).
-- **Rules:** a 60-yard field; 4 downs to gain 10 yards; touchdowns 6, with a simple extra point (1 automatic, or a 2-point try from the 5); turnover on downs; a field goal option on 4th down from inside 30 (a kick meter); two 4-minute halves.
-- **Expanded over the reference:** playbook and route preview, defensive schemes, the rush count, field goals, and 2-point tries.
-- **Drills:** *Route Runner* (catch from a throwing machine on chosen routes); *QB Targets* (moving rings).
+**Style (owner, 2026-11-03):** play like *Football Fusion 2*: freeform pickup football with manual throwing, catching and tackling and a full kicking game, plus an optional quick play call borrowed from *NFL Universe Football*. Original code, names and art; every number below is a tuning proposal kept in `Config.Sports.Football`.
+
+**The field:** 60 yards between the goal lines at 2 studs per yard (x −154 to −34), 8-yard end zones, 32 yards wide (z −190 to −126), goalposts at both ends.
+
+**A play, start to finish**
+1. **Huddle (6 s, optional):** the offence's QB can press **1–6** to call a play (Slants, Verticals, Posts, Curls, Outs, Screen). The routes draw on the field for the offence only. The defence can press **1** (man) or **2** (zone) to show each defender a coverage hint. Nobody has to call anything: when the huddle ends, the play is freeform.
+   - On 4th down the huddle also offers **P** (punt) and, inside 30 yards of the goal line, **K** (field goal).
+2. **Line up:** both sides are placed at the line of scrimmage: the QB 4 yards behind the ball, receivers spread across the field, defenders 5 yards off. Players can move before the snap, but nobody may cross the line.
+3. **The snap:** the QB presses **Space** within a 20 s play clock (late: delay of game, −5 yards). The QB is whoever stands closest to the ball when the huddle ends.
+4. **The rush count:** after the snap, a "1 Mississippi, 2 Mississippi, 3 Mississippi" count shows. Until it ends, defenders can't cross the line (a wall only defenders collide with). A throw, a handoff or the QB crossing the line ends the count early.
+5. **The play ends** on a tackle, a carrier leaving the field, a touchdown, a kneel, a safety, or an incomplete pass (the ball touches the ground uncaught). The ball is spotted where the play ended.
+
+**Controls**
+| Who | Key | Action |
+|---|---|---|
+| QB | **aim with the mouse, hold click, release** | Throw toward the aim point. Holding charges power (0–100 over 1.2 s); power sets speed and range, so an under-charged deep throw falls short. Might adds range. A lead marker shows where the ball will land. |
+| QB | **F** | Pump fake (the arm motion, no ball) |
+| QB | **G** | Hand off to the teammate closest to you within 6 studs (behind the line only) |
+| QB | — | Can run. Past the line, the QB can't throw forward any more. |
+| Anyone | **click** (ball in the air) | Catch: works within the catch radius (5 studs from your hands; Wits widens it). If several players try, the closest with the best timing wins. Spamming adds a 0.6 s cooldown. A defender's catch is an interception. |
+| Anyone | **Space** | Jump: a jump catch reaches higher |
+| Anyone | **Q** | Dive: a 10-stud lunge, +2 studs of catch radius in the air, then 0.8 s on the ground. Costs 20 stamina. |
+| Carrier | **E / R** | Juke left / right (a 6-stud side step with a 0.25 s tackle-break window, 1.2 s cooldown, stamina) |
+| Carrier | **F** | Spin (same break window, 1.5 s cooldown) |
+| Carrier | **K** | Kneel: down where you stand |
+| Defender | **touch** | Tackle: touching the carrier downs them |
+| Defender | **R** | Hit stick: a 6-stud lunge. A hit tackles with a 25% fumble chance; a miss stumbles you for 1 s. |
+| Defender | **C** | Swat: knocks a ball within 6 studs to the ground (always incomplete) |
+| Returner | **V** | Fair catch on a kick (no return; the ball is spotted where it's caught) |
+
+**Kicks**
+- **Kickoff** at the start of each half and after every score: the kicker (the kicking side's player closest to the tee) holds and releases click on a **kick meter** (power, plus accuracy from the release timing). A kick into the end zone that isn't returned is a touchback at the 12.
+  - **Onside:** the kicker presses **O** first for a short kick. Either side can recover it once it's travelled 5 yards.
+- **Punt:** on 4th down, from the huddle. Same kick meter.
+- **Field goal:** on 4th down inside 30 yards of the goal line. The kick meter, and it's good if the ball passes between the uprights above the crossbar: 3 points.
+
+**Scoring and rules**
+- Touchdown 6. Then the scorer's side picks: **1** for the extra point (automatic, 1 point) or **2** for a 2-point try from the 5.
+- Safety (the carrier is downed in their own end zone): 2 points, and the other side gets the ball.
+- 4 downs to gain 10 yards, or the ball turns over on downs. A fumble is loose: anyone can recover it.
+- Two 4-minute halves. The clock runs only while the ball is live. A tie goes to the shared overtime (next score wins, 2-minute cap).
+- Penalties: false start and delay of game (−5 yards, replay the down).
+
+**Race perks** (the shared table): Vampire throw accuracy at night, Werewolf sprint stamina on full-moon nights, Ghoul 15% chance to shrug off a touch tackle, Wraith +8% catch and swat reach, Human stamina regen, Priest +6% throw accuracy.
+
+**Drills:** *Route Runner* (a throwing machine throws to you on a chosen route; score catches) and *QB Targets* (throw through moving rings downfield; score points).
+**Tryout:** *Iron Wardens Tryout* from Coach Dunmore: pass a drill, then play one match.
+**Testing solo:** a Studio-only test mode lowers the minimum to one player and can add a test defender (a dummy that chases the carrier), so tackles, kicks and drills can be tested without a second player. Real games are players only.
 
 ## 6. Venues (built in Studio)
 - **Gymnasium:** gothic stone and dark-wood hall, a full court with lines, two hoops (backboard, rim, net), bleachers, hanging lights and a scoreboard.
