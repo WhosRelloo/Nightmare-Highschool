@@ -2,6 +2,17 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.16.1] - 2026-11-03: Region cards on every visit, a little lower
+
+### Changed
+- **Region cards show on every visit**, not only the first. The same place now waits just 6 s before it can show again (it was 45 s), so a doorway shuffle doesn't repeat it. First visits still add the discovery row.
+- **The card sits 12 px lower**, with more room under the compass. Toasts step down to match.
+
+### Testing
+- **Re-entry:** in Studio Play on slot II, walking back into Room 101 after finding it showed its card again, without the discovery row. The arrival card named the region ("Room 102 · Mathematics").
+- **The lowered card:** only seen in cinematic view, which has its own placement under the letterbox. Not checked under the compass.
+- **Slot II's record:** these tests added entries during class hours. See the note in `docs/Regions.md`.
+
 ## [1.16.0] - 2026-11-03: Regions: place names, discovery and Explorer
 
 ### Added

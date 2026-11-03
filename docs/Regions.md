@@ -3,7 +3,7 @@
 Walk into a named place and a quiet title card names it, just under the compass. Your first visit to each place counts as a discovery. It saves per slot, gives EXP, and finding every place earns the title **Explorer**. Added in 1.16.0, 2026-11-03.
 
 ## What you see
-- **The card** sits under the compass for about 3 seconds (4.4 for a discovery) and fades:
+- **The card** sits under the compass, 14 px below its readout (1.16.1), for about 3 seconds (4.4 for a discovery) and fades:
   - a smoky band behind it
   - a small spaced **kicker** ("ROOM 101", "NIGHTMARE HIGH", "STAFF ONLY", "DELINQUENT TURF")
   - the **name** in the title font, burning in left to right with a bright edge
@@ -15,7 +15,7 @@ Walk into a named place and a quiet title card names it, just under the compass.
 - **The arrival card** (leaving the main menu) now names your region too.
 
 ### When it doesn't show
-- **Steadiness:** you must stay 0.5 s in a place before its card shows, and the same place won't show again within 45 s unless it's a first visit.
+- **Steadiness:** you must stay 0.5 s in a place before its card shows. Every visit gets its card, found or not; the only limit is that the same place won't show again within 6 s, so shuffling in a doorway stays quiet (1.16.1, was 45 s).
 - **School Grounds** is the catch-all, so it never shows a card.
 - **After the main menu:** no card for 7 s, because the arrival card names the place. That first place only gets a card if it's a new discovery.
 - **No compass, no card:** none while the compass is switched off.
@@ -92,4 +92,15 @@ The total count updates on its own. The build script is a scratch Edit script, `
 - **Compass label:** named the region when facing nothing.
 - **Console:** no errors.
 - **Cleanup:** the test slot's places were reset afterwards. The test EXP and the Explorer title stay on that slot.
-- **Not tested:** two players, Reduce Motion, the arrival card's new region name, and toasts arriving during a card.
+- **1.16.1:** walked back into Room 101 after finding it: its card showed again, without the discovery row. The arrival card named the region ("Room 102 · Mathematics").
+- **Not tested:** two players, Reduce Motion, toasts arriving during a card, and the lowered card outside cinematic view (only seen in cinematic view, which has its own placement).
+
+## Test note: slot II's school record (2026-11-03)
+The 1.16.0 and 1.16.1 Play tests added entries to slot II's discipline and attendance record on in-game day 12454:
+- **Walked out of detention (5:09 AM):** the walk through all 19 places passed through Room 106 while a detention was owed.
+- **Caught by a hall monitor (10:22 AM):** a Play session dropped the player straight into school during class.
+- **Absent from Period 3 and Period 4:** the same session; one of the two Absent entries is stamped 3:30 PM because the clock was jumped to after school.
+
+They are test data and haven't been removed yet.
+
+**Lesson:** test regions at night or after school, avoid Room 106 while a detention is owed, and check the clock before starting Play.
