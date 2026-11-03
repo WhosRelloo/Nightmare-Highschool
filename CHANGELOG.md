@@ -2,6 +2,23 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.18.3] - 2026-11-03: The real football machine and gothic scoreboards
+
+### Changed
+- **The football drill's throwing machine** is now the riveted FootballMachine prop, with its wheels spinning, standing where the greybox machine was.
+- **The pitch and field scoreboards** are now the gothic scoreboard, scaled up to frame the live score panel. The club lamps show above it, and the crest and finials top it off.
+- **How:** `Studio/props_swap.luau` (undo with `Studio/props_swap_revert.luau`) hides the greybox machine, stand, wheels and wooden frames and keeps their collision. The props have no collision of their own. The drill still throws from its machine part and the matches still write to their panels, and the Sports code is unchanged.
+- **The gym's scoreboard is unchanged:** at that size the board's crest would go through the gym roof.
+
+### Testing
+- **Edit:** placed with no stray overlaps, and every ray from the front reaches the live panels.
+- **Play (solo):**
+  - **Drill:** the Route Runner drill started, with its ball resting on the new machine.
+  - **Machine:** the wheels spin.
+  - **Boards:** both panels show the live status in their gothic frames.
+  - No script errors.
+- **Not verified yet:** a throw seen leaving the machine (the test runner tripped the drill's teleport and bounds checks) and a full match with the score changing.
+
 ## [1.18.2] - 2026-11-03: The new props placed around the map
 
 ### Added

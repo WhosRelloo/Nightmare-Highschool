@@ -222,8 +222,20 @@ Door, flap and tap origins sit on their hinge lines.
   - **The classroom gaps:** the 3-stud gaps between classrooms stay open. They are an alley from the hall to the quad.
 - **Left out:**
   - **The washroom set** (BathroomMirror, Sink, ToiletStall, TowelRail): the school has no washroom yet.
-  - **FootballMachine and Scoreboard:** the drill's `ThrowingMachine` and the gym and pitch scoreboards are Sports greybox pieces. Swapping them is for the Sports build.
+  - **FootballMachine and Scoreboard:** these went in as swaps for Sports greybox pieces in 1.18.3 (below), except the gym's scoreboard.
 - **Checks in the script:** each copy reports any visible part it digs into (pieces shrunk 0.25 so resting contact passes) and any rite prop within 1.5 studs.
+
+**Swapped for the Sports greybox** (`Studio/props_swap.luau`; `Studio/props_swap_revert.luau` shows the greybox again). The Sports code and the greybox parts' positions are unchanged. The greybox parts are hidden (Transparency 1, the old value kept in `NHSwapHidden`) and keep their collision. The copies (tags `NHPropMap` and `NHPropSwap`) have no collision, touch or queries.
+
+- **The drill's throwing machine:**
+  - `Football` throws from 1.5 studs above the part with `SportDrillMachine` and rests the ball 2 studs above it, so that part stays where it is.
+  - `FootballMachine_Practice_1` stands over it on the turf, facing the routes (−X). Its top is 0.13 below the throw point.
+  - The greybox machine, its stand and its two wheels are hidden.
+- **The pitch and field scoreboards:**
+  - `Matches` writes into the SurfaceGui `Board` on the part with `SportScoreboard`, so that live panel stays.
+  - `Scoreboard_Pitch_1` and `Scoreboard_Field_1` are the gothic board scaled 3.29× (24.7 × 19.7) to frame it. The board's face recess (5.6 × 3.1 studs at the prop's own size) sits 0.05 behind the panel, which covers the board's painted digits. The club lamps show above the panel and the crest and finials top it off.
+  - The wooden greybox frames are hidden, and the board legs stay as its posts.
+- **Not the gym's board:** at that size the crest would go through the gym roof, so the gym keeps its greybox board.
 
 ## In Roblox
 **Import:**
@@ -358,3 +370,18 @@ Door, flap and tap origins sit on their hinge lines.
   - a player pressing the prompts, and the auto-close timers
   - a second player's view
   - performance with all the copies' lights on a low-end device
+
+**Greybox swaps (2026-11-03, 1.18.3):**
+- **Edit:**
+  - The three copies are placed; the only overlap is the board legs, which run behind the boards as designed.
+  - 91 of 91 rays from the front reach each live panel.
+  - Screenshots of both boards and the machine.
+- **Play (solo):**
+  - **Drill:** "Start Route Runner" started the drill, and the drill ball rested on the new machine, 0.6 above its top.
+  - **Machine:** its wheels spin.
+  - **Boards:** both panels showed the live status "Stand on a pad to play (0 v 0)" in their gothic frames.
+  - No script errors.
+- **Not verified yet:**
+  - a throw seen leaving the machine: the test runner tripped the drill's own teleport and bounds checks before a route was called
+  - a full match on the pitch or field with the score changing
+
