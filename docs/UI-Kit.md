@@ -266,7 +266,30 @@ It replaces the core health bar and backpack. The bottom HUD hides during dialog
 - **Drawing:** an ImageLabel in the `NHCursor` ScreenGui (DisplayOrder 1000000) follows the mouse, and the system cursor is hidden only while it shows. The ScreenGui's `HiddenBecause` attribute says why it's hidden (menu, locked, touch, gamepad, disabled).
 - **Fallback:** the static `MouseIcon` until `PreloadAsync` confirms the sheet.
 - **Settings:** `CursorSize` (24-48, player attribute `NHCursorSize`) and `AnimatedCursor` (`NHCursorAnimated`); Reduce Motion holds frame 0.
-- **API:** `SetBusy(on, key)` (busy while any key is set), `SetEnabled(on)`, `IsShowing()`.
+- **API:** `SetBusy(on, key)` (busy while any key is set), `SetEnabled(on)`, `IsShowing()`, `SetLockReticle(on)` (keeps the system icon hidden while the shift-lock reticle is drawn).
+
+### Shift-lock reticle
+`Controllers.Gui.ShiftLockCursor` (1.14.3) draws the shift-lock (Left Alt) reticle and eases the shoulder camera.
+- **Art (kit only, nothing uploaded):**
+  - `Theme.Images.Knob` tinted `Gold`, holding a `Pip` tinted `Crimson` (the gem);
+  - four `Pip`s in `Gold` circling at 22 degrees a second;
+  - a `Glow` in `Crimson` behind.
+- **Layout:** the `NHShiftLock` ScreenGui (DisplayOrder 999999, IgnoreGuiInset) holds a `Reticle` frame that sits on the locked mouse position. Its size is `NHCursorSize` × 1.5 (48 px at the default 32).
+- **Motion:**
+  - **On:** it grows 0.6 → 1 with an overshoot over 0.24 s, the pips sweep in, and one Knob pulse rings out over 0.45 s.
+  - **Held:** it breathes on a 2.6 s cycle.
+  - **Off:** it fades over 0.2 s, easing at both ends so it never pops.
+- **Settings:**
+  - `NHCursorAnimated` false or `NHReducedMotion`: no circling, breathing or pulse.
+  - Reduce Motion also drops the grow and sweep, so it only fades.
+  - `NHReducedFlash`: no glow flash.
+- **System icon:** while the reticle shows, `Cursor.SetLockReticle(true)` keeps the system icon hidden. The decision is made just after the camera locks the mouse, so the system icon never flashes.
+- **Fallback:** if the art hasn't loaded, the old static icon (`CursorImage` = `rbxassetid://77010980240373`) is the shift-lock cursor.
+- **Camera ease:** Roblox's PlayerModule snaps its 1.75-stud offset, and its CameraModule returns `{}`, so it can't be reached from outside. A render step at `Camera + 1` slides the camera by (eased offset minus Roblox's offset): 0.32 s on, 0.26 s off, a sine S-curve.
+  - It only touches the Custom camera with a Humanoid subject, outside vehicle seats and first person.
+  - A raycast keeps the slide 0.3 studs off walls.
+  - "Locked" is read from `Mouse.Icon` (the PlayerModule applies `CursorImage` while locked).
+- **API:** `Shoulder()` (the current offset in studs), `IsLocked()`.
 
 ### PromptUi
 Draws every ProximityPrompt in the NH style:

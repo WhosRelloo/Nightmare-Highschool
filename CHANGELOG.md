@@ -2,6 +2,49 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.14.3] - 2026-11-03: Shift lock: a crest reticle and a smooth camera
+
+### Changed
+- **New shift-lock reticle (Left Alt).** It replaces the static iron-ring icon. It's built only from existing UI-kit art (`UI.Theme.Images`), as the owner asked, with nothing new uploaded:
+  - a gold **Knob** (the pierced diamond) holding a crimson **Pip** gem;
+  - four small gold **Pips** that slowly circle it;
+  - a faint crimson **Glow** behind.
+- **It's animated:**
+  - **On:** it grows in with a small overshoot, the pips sweep in from outside, and one gold Knob pulse rings outward.
+  - **Held:** the knob and gem breathe, and the pips keep circling.
+  - **Off:** it shrinks and fades, and the pips drift back out.
+- **It follows your settings:**
+  - Its size follows Options > Interface > **Cursor Size**.
+  - **Animated Cursor off** or **Reduce Motion:** no circling, breathing or pulse. Reduce Motion also drops the grow and sweep, so it only fades.
+  - **Reduce Flashing:** no glow flash on the pulse.
+- **The camera eases on and off.** Before, Roblox snapped the 1.75-stud over-the-shoulder offset on and off in one frame. Now it slides across in 0.32 s turning on and 0.26 s turning off, on a smooth S-curve. Toggling mid-slide reverses it with no jump.
+
+### Technical
+- **`Controllers.Gui.ShiftLockCursor`** (rewritten) draws the reticle in a new `NHShiftLock` ScreenGui (DisplayOrder 999999, just under the NH cursor).
+- **Why the camera works this way:** Roblox's CameraModule returns an empty table, so nothing outside the PlayerModule can change its offset. So, just after the camera updates (`RenderPriority.Camera + 1`), the module slides the camera sideways by (the eased offset minus the offset Roblox just used). When the slide finishes, the camera is exactly Roblox's.
+  - It only touches the normal follow camera: Custom, a Humanoid subject, not a vehicle seat, not first person. CameraLease cutscenes, the menu and LockerPOV are left alone.
+  - A short raycast stops the slide at walls.
+- **How it knows shift lock is on:** from the mouse icon. The PlayerModule applies our `CursorImage` hook while it's locked and takes it off when it unlocks.
+- **No system-icon flash:** `Controllers.Gui.Cursor` gains `SetLockReticle(on)`, which keeps the system icon hidden while the reticle is drawn. The reticle decides to show right after the camera locks the mouse, so the old icon never shows for a frame.
+- **Fallback:** the old static icon (`rbxassetid://77010980240373`) stays as the `CursorImage`. It shows if the kit art hasn't loaded or fails to load.
+- **Unchanged:** `Gui.Camera`, the PlayerModule and `ShiftLockKey` (Left Alt).
+- **Backups:** the originals are in `ServerStorage.NH_Backup.ShiftLock_pre`.
+
+### Testing (Play, solo, real Left Alt presses, a recorder logging every frame)
+- **Camera on:** the sideways offset went 0 → 1.75 studs over 0.32 s. The per-frame steps rose and fell smoothly (0.01 → 0.15 → 0.01 studs at 60 fps).
+- **Camera off:** 1.75 → 0 over 0.26-0.30 s.
+- **Rapid toggles** reversed mid-slide with no jump.
+- **Reticle:** it faded in over about 0.23 s and scaled 0.71 → 1.03 → 1.0. The pulse rang out (transparency 0.99 → 0.58 → 1), and the pips circled.
+- **System icon:** `MouseIconEnabled` stayed off through the whole toggle, so the old icon never flashed.
+- **Position:** the reticle's centre sat exactly on the viewport centre, where the mouse locks.
+- **Reduce Motion:** the pips held still, there was no grow or pulse, it only faded, and the camera still eased.
+- **Screenshots** of the reticle on and off were taken, and the owner tried it in the same playtest.
+- **Not tested:**
+  - two-player;
+  - the wall stop while sliding next to a wall;
+  - first person with shift lock on.
+- **Seen while testing (not from this change):** in Studio the camera sometimes went Scriptable for a moment with no game script setting it. It was likely Studio plugins or input during the shared playtest. For a clean measurement, a test-only script held the camera on Custom.
+
 ## [1.14.2] - 2026-11-03: Football: a free dive
 
 ### Changed

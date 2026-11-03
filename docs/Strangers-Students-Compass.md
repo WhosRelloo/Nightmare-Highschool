@@ -48,6 +48,8 @@ A slim strip across the top centre, in the top bar's style with faded ends. It s
 - **Notifications:** the game's toasts now drop in just under the compass.
 
 ## Shift-lock cursor (`Controllers.Gui.ShiftLockCursor`)
+> **Replaced in 1.14.3** by an animated reticle built from kit art (a gold Knob with a crimson gem and circling Pips), and the camera now eases on and off. See UI-Kit.md, "Shift-lock reticle". The iron-ring icon below is now only the fallback, used while the kit art loads.
+
 - **Design:** a dark wrought-iron ring with gold hour ticks, gold-tipped spear-point finials at the quarters and a crimson diamond, with a dark halo so it reads on bright scenes. It's 44 × 44 pixels.
 - **Hook:** it uses Roblox's official one, a `CursorImage` StringValue under the PlayerModule's `MouseLockController`.
 - **Art:** `tools/vfx/make_cursor.py`.
