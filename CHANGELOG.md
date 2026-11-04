@@ -2,6 +2,27 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.22.0] - 2026-11-04: The cafeteria and the spire (props batches 15 to 17)
+
+### Added
+- **16 new props, baked at 2048** (`art/props/nh_props_batch15.py` to `nh_props_batch17.py`; ids in `props.json`, sheet `_batch15_17_final_sheet.png`). They go on the baseplate north of the gym for the builder (`Studio/props_setup15.luau`).
+
+  | Batch | Props |
+  |---|---|
+  | 15, the cafeteria's serving side | ServingCounter, TrayRack, DrinksDispenser, BakeryCase, CoffeeMachine, KitchenShelf, DishStack |
+  | 16, the cafeteria's dining side | CafeteriaTable, CafeChair, CafeBooth, ChalkMenuStand, CondimentCaddy, CakeStand, PendantLamp |
+  | 17, building pieces | Spire, SpireCross (the memorial's spire at building scale, for the builder's towers) |
+
+- **Animated:** steam over the serving counter's pans and from the coffee machine; the caddy's candle flickers.
+
+### Fixed
+- **The concession stand's sign and menu** were drawn just behind the faces of the new stand's boards. The setup now measures the boards with rays, and the live template is corrected.
+
+### Testing
+- Batches 10 to 14 are imported and set up: the templates are made, the showcase is placed east of the gym with no clashes, and every door opens the right way on its real hinge. In Play the new concession stand replaces the plank one, with Mrs. Okada, the prompt and the CONCESSIONS sign on its board.
+- Batches 15 to 17: baked, uploaded and dry-run with stand-in boxes.
+- **Not verified yet:** the textures on a client in Play, buying at the new stand, and the batch 15 to 17 import.
+
 ## [1.21.0] - 2026-11-04: Cliques (Phase 1)
 
 ### Added

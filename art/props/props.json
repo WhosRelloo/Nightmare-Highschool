@@ -1,5 +1,5 @@
 {
- "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y). Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway.",
+ "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y). Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 15-17: the cafeteria and the spire; PendantLamp_Glass is crimson glass (set in props_setup15).",
  "StudentDesk": {
   "dims": [
    3.0,
@@ -2447,5 +2447,317 @@
   "NormalMap": "rbxassetid://140442470629591",
   "RoughnessMap": "rbxassetid://79616657764426",
   "MetalnessMap": "rbxassetid://109248421334383"
+ },
+ "ServingCounter": {
+  "dims": [
+   10.0,
+   2.9,
+   4.33
+  ],
+  "pieces": [
+   "ServingCounter_Main",
+   "ServingCounter_Food",
+   "ServingCounter_Glass",
+   "ServingCounter_Glow"
+  ],
+  "tris": {
+   "ServingCounter_Main": 11172,
+   "ServingCounter_Food": 7536,
+   "ServingCounter_Glass": 12,
+   "ServingCounter_Glow": 240
+  },
+  "batch": 15,
+  "rig": "steam over the pans (NHAmbient:Steam)",
+  "ColorMap": "rbxassetid://114096343306881",
+  "NormalMap": "rbxassetid://113027512827669",
+  "RoughnessMap": "rbxassetid://101307668817983",
+  "MetalnessMap": "rbxassetid://132171060867251"
+ },
+ "TrayRack": {
+  "dims": [
+   2.34,
+   2.2,
+   5.6
+  ],
+  "pieces": [
+   "TrayRack"
+  ],
+  "tris": {
+   "TrayRack": 9524
+  },
+  "batch": 15,
+  "ColorMap": "rbxassetid://115588736487325",
+  "NormalMap": "rbxassetid://109836599143303",
+  "RoughnessMap": "rbxassetid://129118460174286",
+  "MetalnessMap": "rbxassetid://130698293584676"
+ },
+ "DrinksDispenser": {
+  "dims": [
+   2.88,
+   1.18,
+   2.0
+  ],
+  "pieces": [
+   "DrinksDispenser_Main",
+   "DrinksDispenser_Glass"
+  ],
+  "tris": {
+   "DrinksDispenser_Main": 6910,
+   "DrinksDispenser_Glass": 480
+  },
+  "batch": 15,
+  "ColorMap": "rbxassetid://109881126350804",
+  "NormalMap": "rbxassetid://103636949687726",
+  "RoughnessMap": "rbxassetid://117904222681960",
+  "MetalnessMap": "rbxassetid://98356231169370"
+ },
+ "BakeryCase": {
+  "dims": [
+   4.3,
+   2.07,
+   4.92
+  ],
+  "pieces": [
+   "BakeryCase_Main",
+   "BakeryCase_Glass",
+   "BakeryCase_Glow"
+  ],
+  "tris": {
+   "BakeryCase_Main": 14306,
+   "BakeryCase_Glass": 36,
+   "BakeryCase_Glow": 80
+  },
+  "batch": 15,
+  "ColorMap": "rbxassetid://73338799692824",
+  "NormalMap": "rbxassetid://75028652097559",
+  "RoughnessMap": "rbxassetid://90260569712103",
+  "MetalnessMap": "rbxassetid://79037429594850"
+ },
+ "CoffeeMachine": {
+  "dims": [
+   2.2,
+   1.49,
+   3.5
+  ],
+  "pieces": [
+   "CoffeeMachine"
+  ],
+  "tris": {
+   "CoffeeMachine": 8342
+  },
+  "batch": 15,
+  "rig": "steam from the dome vent (NHAmbient:Steam)",
+  "ColorMap": "rbxassetid://109221524549817",
+  "NormalMap": "rbxassetid://119584140845580",
+  "RoughnessMap": "rbxassetid://78140767048000",
+  "MetalnessMap": "rbxassetid://80655788635361"
+ },
+ "KitchenShelf": {
+  "dims": [
+   5.0,
+   1.0,
+   4.77
+  ],
+  "pieces": [
+   "KitchenShelf"
+  ],
+  "tris": {
+   "KitchenShelf": 8928
+  },
+  "batch": 15,
+  "ColorMap": "rbxassetid://115880335417145",
+  "NormalMap": "rbxassetid://112637994506181",
+  "RoughnessMap": "rbxassetid://71988811757101",
+  "MetalnessMap": "rbxassetid://94883386406038"
+ },
+ "DishStack": {
+  "dims": [
+   2.5,
+   1.59,
+   1.43
+  ],
+  "pieces": [
+   "DishStack"
+  ],
+  "tris": {
+   "DishStack": 11284
+  },
+  "batch": 15,
+  "ColorMap": "rbxassetid://110247188452144",
+  "NormalMap": "rbxassetid://139249123999766",
+  "RoughnessMap": "rbxassetid://101020874775022",
+  "MetalnessMap": "rbxassetid://125807906438203"
+ },
+ "CafeteriaTable": {
+  "dims": [
+   10.06,
+   6.0,
+   3.01
+  ],
+  "pieces": [
+   "CafeteriaTable"
+  ],
+  "tris": {
+   "CafeteriaTable": 15952
+  },
+  "batch": 16,
+  "ColorMap": "rbxassetid://90786419770763",
+  "NormalMap": "rbxassetid://74412419250010",
+  "RoughnessMap": "rbxassetid://76004011006762",
+  "MetalnessMap": "rbxassetid://111258662939080"
+ },
+ "CafeChair": {
+  "dims": [
+   1.47,
+   1.47,
+   3.72
+  ],
+  "pieces": [
+   "CafeChair"
+  ],
+  "tris": {
+   "CafeChair": 6676
+  },
+  "batch": 16,
+  "ColorMap": "rbxassetid://128723087491320",
+  "NormalMap": "rbxassetid://72930336466303",
+  "RoughnessMap": "rbxassetid://126488870718081",
+  "MetalnessMap": "rbxassetid://88378681388574"
+ },
+ "CafeBooth": {
+  "dims": [
+   6.12,
+   5.01,
+   5.98
+  ],
+  "pieces": [
+   "CafeBooth_Main",
+   "CafeBooth_Table"
+  ],
+  "tris": {
+   "CafeBooth_Main": 14496,
+   "CafeBooth_Table": 2332
+  },
+  "batch": 16,
+  "ColorMap": "rbxassetid://120501187293609",
+  "NormalMap": "rbxassetid://120360146224876",
+  "RoughnessMap": "rbxassetid://92662360330014",
+  "MetalnessMap": "rbxassetid://73833769222527"
+ },
+ "ChalkMenuStand": {
+  "dims": [
+   2.56,
+   1.85,
+   4.33
+  ],
+  "pieces": [
+   "ChalkMenuStand"
+  ],
+  "tris": {
+   "ChalkMenuStand": 6628
+  },
+  "batch": 16,
+  "ColorMap": "rbxassetid://113956556109132",
+  "NormalMap": "rbxassetid://108701350785142",
+  "RoughnessMap": "rbxassetid://111993709203513",
+  "MetalnessMap": "rbxassetid://76466470049150"
+ },
+ "CondimentCaddy": {
+  "dims": [
+   0.9,
+   0.44,
+   0.71
+  ],
+  "pieces": [
+   "CondimentCaddy_Main",
+   "CondimentCaddy_Glow"
+  ],
+  "tris": {
+   "CondimentCaddy_Main": 3310,
+   "CondimentCaddy_Glow": 80
+  },
+  "batch": 16,
+  "ColorMap": "rbxassetid://118387037634311",
+  "NormalMap": "rbxassetid://132004877631896",
+  "RoughnessMap": "rbxassetid://138052239230621",
+  "MetalnessMap": "rbxassetid://113567572243642"
+ },
+ "CakeStand": {
+  "dims": [
+   1.18,
+   1.18,
+   1.73
+  ],
+  "pieces": [
+   "CakeStand_Main",
+   "CakeStand_Glass"
+  ],
+  "tris": {
+   "CakeStand_Main": 8794,
+   "CakeStand_Glass": 288
+  },
+  "batch": 16,
+  "ColorMap": "rbxassetid://100380569120080",
+  "NormalMap": "rbxassetid://87259925208294",
+  "RoughnessMap": "rbxassetid://100766903618974",
+  "MetalnessMap": "rbxassetid://113878696493783"
+ },
+ "PendantLamp": {
+  "dims": [
+   1.19,
+   1.19,
+   4.0
+  ],
+  "pieces": [
+   "PendantLamp_Main",
+   "PendantLamp_Glow",
+   "PendantLamp_Glass"
+  ],
+  "tris": {
+   "PendantLamp_Main": 7184,
+   "PendantLamp_Glow": 196,
+   "PendantLamp_Glass": 880
+  },
+  "batch": 16,
+  "ColorMap": "rbxassetid://75117090156082",
+  "NormalMap": "rbxassetid://117077266498022",
+  "RoughnessMap": "rbxassetid://80817119268215",
+  "MetalnessMap": "rbxassetid://109061845346880"
+ },
+ "Spire": {
+  "dims": [
+   3.91,
+   3.91,
+   11.9
+  ],
+  "pieces": [
+   "Spire"
+  ],
+  "tris": {
+   "Spire": 4894
+  },
+  "batch": 17,
+  "ColorMap": "rbxassetid://135075315863556",
+  "NormalMap": "rbxassetid://109896934944195",
+  "RoughnessMap": "rbxassetid://90521938208911",
+  "MetalnessMap": "rbxassetid://88551890064403"
+ },
+ "SpireCross": {
+  "dims": [
+   3.91,
+   3.91,
+   13.52
+  ],
+  "pieces": [
+   "SpireCross"
+  ],
+  "tris": {
+   "SpireCross": 5382
+  },
+  "batch": 17,
+  "ColorMap": "rbxassetid://131782355499259",
+  "NormalMap": "rbxassetid://119608850103613",
+  "RoughnessMap": "rbxassetid://108548547727038",
+  "MetalnessMap": "rbxassetid://102864337133413"
  }
 }
