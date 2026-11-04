@@ -2,6 +2,35 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.32.0] - 2026-11-04: Controller gaps, PlayStation names
+
+### Added
+- **PlayStation button names** (`Components.PadStyle`, `KeyName`, `PadText`, `PadControls`): hints, the quick menu's list and Settings say Cross, Circle, Square, Triangle, L1 / R1, L2 / R2 and Touchpad on a PlayStation pad, and A, B, X, Y, LB / RB, LT / RT and View on Xbox. Auto reads the connected pad (Roblox names ButtonA "ButtonCross" on a PlayStation pad).
+- **Settings > Controls > Controller:** a Button names choice (Auto / Xbox / PlayStation, saved with your settings as `ControllerButtons`) and the full list of controller buttons. It comes first on a controller.
+- **Sliders on a controller:** D-pad Left / Right or the stick step a selected slider, repeating while held.
+- **Settings tabs:** LB / RB (L1 / R1) change tab.
+- **Lessons on a controller** (docs/Console-Controls.md):
+  - Pop Quiz and Match the Past: D-pad and A.
+  - Lab Mix: LT LB RB RT (L2 L1 R1 R2) play the four lanes.
+  - Word Scramble: A places a letter and moves to the next, B undo, X clear, Y shuffle.
+  - B closes the report card.
+- **Kit selection attributes:** `NHPadFirst` (picked first), `NHPadSkip` (never picked first), `NHNotPanel` (not the menu panel).
+- **Studio:** `PlayerGui.NHActivityTest` (Studio only) opens a lesson screen with made-up content; `NHPadStyleTest` forces a pad's names.
+
+### Fixed
+- **A controller could leave a lesson by accident:** during the 3-2-1, "Leave lesson" was the only button, so it was selected first, and one press of A would have quit. It's never picked first now.
+- **Strikes and feints from menus:** with a menu open on a controller, RT, LB, X and the other pad buttons no longer start combat actions (`Bind.Keybinds` checks the Player attribute `NHPadMenu`).
+- **A keyboard key could be rebound to a controller button** (pressing a pad button while a key row listened bound it). Pad buttons now cancel, and saved settings refuse them.
+
+### Verified (Studio, no slot, evening; simulated pad buttons, a PlayStation pad plugged in)
+- **Names:** Auto picked PlayStation from the plugged-in pad. The main menu hint read "Cross to select", "A to select" with Xbox chosen, and Cross again on Auto. Settings listed every button (Strike R2 ... Quick menu Touchpad), and the Button names choice stepped Auto (PlayStation) > Xbox (list showed RT) > PlayStation > Auto.
+- **Settings:** R1 / L1 changed tab and moved the selection to the first control. D-pad Right stepped Master volume 80 > 85. Holding D-pad Left repeated from 80 down to 20 for the whole 1.5 s and stopped on release. Volume put back to 80.
+- **Menu block:** RT, X and RB in Settings ran no action; RB outside a menu ran the heavy attack.
+- **Rebind:** a pad button bound itself to Block before the fix (it was put back to F); the fix is in, and was not exercised again.
+- **Lessons:** nothing was selected during the countdown and Leave lesson is marked skip. Then Pop Quiz selected the first answer (no "1)" prefix), Match the Past the first card, and Word Scramble the first letter, with its hint in PlayStation names. Placing a letter moved the selection to the next one; Circle undid it. Lab Mix's pads read L2 L1 R1 R2, couldn't be selected, and L2, R1, R2, L1 and D lit lanes 1, 3, 4, 2 and 1. The report card selected Close, and Circle closed it.
+- **Keyboard:** the Controls tab put the keys first, nothing was selected, hints stayed keyboard, and there were no script errors.
+- **Not tested:** pressing A, D-pad or stick navigation between buttons, and trigger thresholds on a real pad or console.
+
 ## [1.31.0] - 2026-11-04: Console controls
 
 ### Added

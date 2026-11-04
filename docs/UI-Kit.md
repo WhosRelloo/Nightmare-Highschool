@@ -69,7 +69,10 @@ local root, api = Components.Toggle({ label = "Subtitles", value = true,
 | `Slice(key, color, props)` | 9-slice image |
 | `Image(key, props)` | Image by `Theme.Images` key |
 | `new(class, props, children)` | Instance helper |
-| `KeyName(key)` | Short display name for a key |
+| `KeyName(key)` | Short display name for a key; controller buttons by the pad in use (Xbox / PlayStation, `PadStyle()`) |
+| `PadStyle()` | `"Xbox"` or `"PlayStation"`: the Settings choice, else the connected pad (see Console-Controls.md) |
+| `PadText(s)` | Fills `{A}`, `{B}`, `{L1}`... with this pad's names (use a plain `"..."` string, not a backtick one) |
+| `PadControls` | The list of controller buttons and what each does |
 | `Divider{color?, height?}` | Ornamental horizontal rule |
 | `SectionHeader{text, color?, height?}` | Gold embossed caps with a divider underneath |
 
@@ -92,10 +95,11 @@ local root, api = Components.Toggle({ label = "Subtitles", value = true,
 
 **Slider{label, min?, max?, step?, value?, suffix?, format?(v), onChanged(v), onReleased(v), color?, labelWidth?}**
 - Drag with mouse or touch anywhere on the 44 px track area. Snaps to `step`.
+- Controller (1.32.0): while selected, D-pad Left / Right or the left stick step it, repeating while held; `onReleased` runs when you let go.
 - api: `:Set`, `:Get`.
 
 **KeybindRow{label, key, onChanged(newKey)}**
-- Click the key plate, then press a key (Esc cancels). Accepts the keyboard, mouse buttons 2 and 3, and gamepad.
+- Click the key plate, then press a key (Esc cancels). Accepts the keyboard and mouse buttons 2 and 3. A controller button cancels (1.32.0), unless `allowGamepad` is set.
 - api: `:Set`, `:Get`.
 
 **ItemSlot{item?, size?, key?, selected?, onClick(item, api)}**
