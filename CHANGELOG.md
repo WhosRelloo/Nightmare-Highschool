@@ -20,8 +20,8 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 ### Testing
 - Batches 10 to 14 are imported and set up: the templates are made, the showcase is placed east of the gym with no clashes, and every door opens the right way on its real hinge. In Play the new concession stand replaces the plank one, with Mrs. Okada, the prompt and the CONCESSIONS sign on its board.
-- Batches 15 to 17: baked, uploaded and dry-run with stand-in boxes.
-- **Not verified yet:** the textures on a client in Play, buying at the new stand, and the batch 15 to 17 import.
+- Batches 15 to 17: baked, uploaded, imported and set up north of the gym with no clashes.
+- **Not verified yet:** every map seen on a client in Play (a check got 60 maps loaded and none failed before a save slot auto-loaded and it was stopped), buying at the new stand, and the steam in Play.
 
 ## [1.21.0] - 2026-11-04: Cliques (Phase 1)
 

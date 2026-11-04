@@ -476,5 +476,6 @@ Door, flap and tap origins sit on their hinge lines.
 **Batches 15 to 17 (2026-11-04):**
 - **Baked:** all 16 at 2048 with 64 samples on the GPU, every piece under 16k triangles. Maps uploaded, ids in `props.json`. Sheet `art/props/_batch15_17_final_sheet.png`.
 - **Dry run in Studio:** with stand-in boxes, `props_setup15` made all 16 templates and placed the three rows north of the gym with no clashes.
-- **Not verified yet:** the real import and the steam and lights in Play.
+- **Imported and set up (2026-11-04):** the owner imported the 16 FBX files; `props_setup15` made the templates and placed the three rows north of the gym with no clashes and no stray imports. The maps load in Studio (a few fill in a little later in the Edit view).
+- **Not verified yet:** the steam and lights in Play.
 
