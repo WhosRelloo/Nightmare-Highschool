@@ -276,6 +276,52 @@ It refreshes every 5 s while open.
 
 `Prank(by, victim)`, `PrankHit(name, down?)` (as if you hit or downed the prankster), `PrankMine(name, victim, useKit?)`, `Messes()`, `CleanAll()`, `Rumble(a, b, now?)` (now: start it; else plan it for tomorrow), `RumbleState()`, `Dares(name)` (send today's texts again), `Today(name)`, `DareFor(leader)`. Standing only changes with a loaded slot.
 
+## Phase 5 (1.34): leader showdowns
+
+`Services.Social.CliqueShowdowns` (new); settings in `Config.Cliques.Showdown`; lines `Challenge`, `Call`, `Beaten`, `Gloat` and `Crown` on each clique; quests `Showdown<Clique>` in `Config.Quests` (Category `Clique`, `Showdown = <clique>`, a `Defeat` objective with Target `Showdown<Clique>`, +50 Yen).
+
+**Two ways in (owner's pick: friend or foe).**
+- **As a friend:** Friendly (20) with the clique and its leader's quest 2 done. Ask the leader: "I want to test myself." (`QuestChoices`), and the quest starts.
+- **As a foe:** Hostile with the clique. Once an event day the leader texts you a challenge (their `Challenge` line, in Texts), and the quest starts by itself.
+  - You answer it After School or in the Evening (`FoeKinds`).
+  - Not answered by night: the quest fails, and that clique's crews confront you twice as often the next day (`NHGrudge_<clique>`, read by CliqueFights' turf confrontations).
+- **Gates:** `Quests.CanStart` asks `CliqueShowdowns.CanChallenge`. A won showdown is done for good. After a loss or a forfeit, not again the same event day.
+
+**The fight.**
+- **Start:** walk into the clique's hangout with the quest active, outside class.
+- **The leader:**
+  - The real leader (`Social.Npcs`) steps aside.
+  - A fighter in their look (`NpcLooks.Specs`) takes their place at `LeaderTier` with `LeaderHealth`: Normal 130, Hard 160, Nightmare 190. The Court's and the Pack's leaders are the toughest.
+  - Fists, and they target only you.
+- **The ring:** `RingSize` (5) members stand round you, `RingRadius` (14) studs out, shouting every `ShoutEvery` (6) s.
+- **Half health:** the leader shouts their `Call` and `Backup` (2) of the ring join in.
+- **Endings:**
+  - Down the leader: you win.
+  - Go down: you lose.
+  - Get `ForfeitDistance` (30) studs past the hangout: a forfeit.
+  - At most 5 minutes.
+- **The hall monitor:** while it lasts, the hangout is covered by a `CombatAllowed` part, so the monitor leaves it alone, as in Bruno's ring.
+- **Afterwards:** the ring walks off, the fighter goes and the real leader comes back.
+
+**Win / lose.**
+- **Win:**
+  - Their `Beaten` line, and the clique goes up to Respected (60) if it was lower. Downing the leader's −8 is part of that.
+  - The quest's Defeat objective completes (+50 Yen).
+  - `PlayerData.Social.Showdowns.Won[<clique>]` is set.
+- **Lose:** their `Gloat` line, and try again on a later day. If the leader was Hostile, `FoeLoss` (−5) more.
+
+**King (or Queen) of the School.** Beat all eight (either way):
+- the title (`KingTitle`), with Queen for a female body;
+- the Player attribute `NHKing`:
+  - `KingOff` (10%) off at every shop (`Config.Cliques.PriceFactor`, the best discount wins);
+  - backup at every clique's hangout (CliqueFights' backup);
+- a text from every leader (their `Crown` line);
+- the Midnight Bell's front page ("... runs this school").
+
+**The bulletin.** The Today tab has a **Showdowns** line: leaders beaten out of 8, open challenges and waiting leaders, and the King line.
+
+**Test hooks.** `Showdown(name, clique, path?)` (start a fight now), `ShowdownState()`, `ShowdownHurt(clique, amount)`, `ShowdownWin(name, clique)` (record a win: needs a slot), `CanShowdown(name, clique)`.
+
 ## Test hooks (Studio only, `ServerStorage.NHTestBridge`)
 - `SchedulePlan(kind, name?, hour?)`: put every student on a plan now, for example `("Break", "Break", 9)`
 - `ScheduleDebug()`: each student's index, clique, activity and seat
@@ -289,5 +335,5 @@ It refreshes every 5 s while open.
 - ~~**Phase 2:** reactions, turf, scuffles and the hall monitor.~~ Done in 1.27.0 (above).
 - ~~**Phase 3:** turf, leader quests and rank rewards for every clique.~~ Done in 1.28.0 (above).
 - ~~**Phase 4:** events: pranks, rumble days, the bulletin and dares.~~ Done in 1.33.0 (above).
-- **Phase 5:** leader showdowns, friend or foe (owner's pick): as a friend (Friendly and quest 2 done) a test of strength that makes the clique Respected; as an enemy (Hostile) the leader comes for you, and winning forces their respect. Beat all eight for King of the School.
+- ~~**Phase 5:** leader showdowns, friend or foe, and King of the School.~~ Done in 1.34.0 (above).
 - **Phase 6:** joining a clique.

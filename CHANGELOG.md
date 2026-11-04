@@ -2,6 +2,40 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.34.0] - 2026-11-04: Leader showdowns (Cliques Phase 5)
+
+### Added
+- **Showdowns** (`Services.Social.CliqueShowdowns`, new; docs/Cliques.md): a one-on-one with a clique's leader at their hangout, Bully-style.
+  - **As a friend** (Friendly and their quest 2 done): ask them, "I want to test myself."
+  - **As a foe** (Hostile): they text you a challenge once a day. Answer it after school or in the evening. Skip it, and their crews come for you twice as often the next day.
+- **The fight:**
+  - The leader steps out in their own look, one tier above their clique.
+  - Five members ring you and shout. At half health the leader calls two of them in.
+  - Down the leader to win. Go down and you lose; run 30 studs out and you forfeit.
+  - The hall monitor leaves it alone.
+- **Win / lose:**
+  - **Win:** the clique respects you (60+) and you get 50 Yen.
+  - **Lose:** try again tomorrow. Losing to a Hostile leader costs 5 more.
+- **King (or Queen) of the School** for beating all eight: the title, a text from every leader, the Midnight Bell's front page, 10% off at every shop, and backup at every hangout.
+- **Content:** 8 showdown quests (`Showdown<Clique>`), and challenge, call-in, win, lose and crown lines for every leader.
+- **The Today tab:** leaders beaten, open challenges, and the King line.
+- **Test hooks:** `Showdown`, `ShowdownState`, `ShowdownHurt`, `ShowdownWin`, `CanShowdown`.
+
+### Verified (Studio Play, no slot, evening)
+- **Bruno at the Back Lot:**
+  - The real Bruno stepped aside, and a fighter Bruno in his look (with his hair) at 160 health stood in, with 5 Delinquents in a ring. The hangout was a CombatAllowed zone.
+  - The idle test player went down in 25 s: a loss. The real Bruno came back, and the fighter, the ring and the zone were gone.
+- **Wren at the Ink Studio** (as a foe): at 60 of 130 health Wren called 2 of the ring in (3 left watching). Downing Wren won it.
+- **Lucien at the Chapel:** running far away forfeited it, and the real Lucien came back.
+- **The Today tab** showed "Showdowns · 0/8 leaders beaten" with its hint.
+- **Console:** no script errors.
+- **Not tested yet (needs a loaded slot):**
+  - asking a leader, and a challenge text starting the quest;
+  - the fight starting by walking into the hangout;
+  - a no-show and its grudge;
+  - the standing reward, the quest completing, and King of the School (title, texts, discount, backup, front page);
+  - a real fight played by hand.
+
 ## [1.33.1] - 2026-11-04: Controller uppercut, menu cursor
 
 ### Changed
