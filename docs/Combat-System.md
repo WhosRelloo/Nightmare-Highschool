@@ -157,7 +157,7 @@ Admins spawn a sparring partner of any tier from the admin panel (Spawns).
 
 **Name tag (1.25).** Each combat NPC wears the kit's tag (`NHDifficulty` on its head) instead of the Roblox name:
 - the name, in the title font (it follows `DisplayName`)
-- its pips, large, on a dark plaque whose crimson outline gets stronger with the tier
+- its pips, large, in a small version of the HUD's ornate bar (1.25.1): a grained dark rail with a `FrameThin` edge, between the wrought-iron `BarCapL` / `BarCapR`. The metal steps up by tier (dull iron, iron, dark gold, gold), with a crimson ember under each pip from Hard up
 - the tier in spaced capitals
 
 `Local.Tag` builds it. The look per tier is in `TIER_LOOK`.

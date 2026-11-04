@@ -2,6 +2,20 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.25.1] - 2026-11-04: Pips in a wrought-iron bar
+
+### Changed
+- **The pip backing on enemy name tags is redesigned** (owner: the rounded box "looks AI generated"). The pips now sit in a small version of the HUD's ornate bar, built from the kit's own pieces (`AI.NPCController` `Local.Tag`):
+  - a grained dark rail (`PanelBg`) with a thin framed edge (`FrameThin`, 9-sliced from `Theme.Slices`) and a metal hairline on top
+  - the health bar's wrought-iron end caps (`BarCapL` / `BarCapR`)
+  - the metal steps up by tier: dull iron (Easy), iron (Normal), dark gold (Hard), gold (Nightmare). The tier word takes the same metal.
+  - from Hard up, a crimson ember (`Glow`) burns under each pip.
+- The rounded box and its crimson outline are gone.
+
+### Testing
+- In Play, all four tiers were photographed at night and in daylight. Every piece loaded, and the caps and edge showed on each tier.
+- Not checked: phones.
+
 ## [1.25.0] - 2026-11-04: Enemy name tags that show the difficulty
 
 ### Changed
