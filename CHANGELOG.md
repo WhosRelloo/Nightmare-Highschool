@@ -2,6 +2,28 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.36.0] - 2026-11-04: The lamp and light kit, seven grass sets
+
+### Added
+- **The lamp and light kit: 12 fixtures, baked at 2048** (`art/props/nh_props_batch19.py`; ids in `props.json`, sheet `_batch19_final_sheet.png`). It fills the gaps round the school's existing lights and goes on the baseplate south of the Commons for the builder (`Studio/props_setup19.luau`, docs/School-Props.md):
+  - **Gas lamps:** GasLampPost, GasLampTwin (two lanterns and a raven), WallLantern
+  - **Candles:** HangingLantern, PricketStand, VotiveStand (18 tea lights in crimson glass)
+  - **Chandeliers:** ChandelierCorona (a gothic iron crown, 16 candles), ChandelierCrystal (gilt, crystal swags)
+  - **Rooms and stage:** FloorLamp (crimson silk shade), StageSpotlight (a real SpotLight), Footlights (an 8-stud run that tiles), TorchSconce (fire and embers)
+- **Real lights on every fixture**, warm against the blue-violet night, through the tags `Controllers.World.Ambient` already reads (no new script):
+  - candles, gas and fire flicker softly (`NHCandle`, still with Reduce Flashing)
+  - the outdoor gas lamps light at dusk and go out at dawn (`NHLamp`)
+  - the torch gives off embers (`NHAmbient:Embers`)
+- **Seven grass texture sets** (MaterialVariants, docs/Textures.md), 2048 and seamless: MoonlitGrass, SchoolLawn, OvergrownGrass, DeadGrass, MossyTurf, TroddenGrass, FrostGrass. A sample patch of each lies beside the lamp kit.
+- **Published under the Nightmare Highschool group:** all 70 new maps (owner's bulk import) and the lamp meshes.
+
+### Verified (Studio, Edit)
+- All 12 lamps placed with no clashes; their lights and tags checked by script.
+- Day and night screenshots (`docs/img/lamp-kit-day.jpg`, `lamp-kit-night.jpg`, `lamp-kit-hanging.jpg`).
+- All 70 group ids read back by name and swapped in; every lamp map and all seven grass sets show (`docs/img/grass-sets.jpg`).
+- Three grass sets showed blank white while three of them shared one base material. They now sit at most two to a base (Grass, LeafyGrass, Ground, Mud).
+- **Not tested in Play** (another session was testing in the same Studio): the flicker, the dusk switch and the embers.
+
 ## [1.35.1] - 2026-11-04: Talk cinematic, a softer menu clock
 
 ### Added

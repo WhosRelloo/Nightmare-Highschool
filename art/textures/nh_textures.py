@@ -231,7 +231,8 @@ def finish(color, height, rough, rng, cavity=0.6, micro=0.035, grunge=1.0):
 ALBEDO = 0.88    # every colour map a touch darker, to sit at the props' brightness under the same lights
 GRUNGE = {"BloodMarble": 0.35, "StainedGlass": 0.45, "CrimsonVelvet": 0.4, "SnowGround": 0.25, "DamaskWallpaper": 0.75,
           "CheckerMarble": 0.8, "QuatrefoilTile": 0.85, "DirtyTile": 1.4, "Concrete": 1.3, "DarkPlaster": 1.2,
-          "PaintedMetal": 1.2, "OldBoards": 1.3, "Cobblestone": 1.2, "GothicStone": 1.2, "MossyFlagstone": 1.1}
+          "PaintedMetal": 1.2, "OldBoards": 1.3, "Cobblestone": 1.2, "GothicStone": 1.2, "MossyFlagstone": 1.1, "MoonlitGrass": 0.3,
+          "SchoolLawn": 0.25, "OvergrownGrass": 0.3, "DeadGrass": 0.4, "MossyTurf": 0.35, "TroddenGrass": 0.6, "FrostGrass": 0.2}
 
 
 def write(name, color, height, rough, metal, strength, rng=None, cavity=0.6):
@@ -741,10 +742,247 @@ def QuatrefoilTile(rng):
     return write("QuatrefoilTile", col, h, rough, np.zeros_like(h), 3, rng, cavity=0.4)
 
 
+
+# ---------- ground ----------
+
+def _stamp(zbuf, layers, xs, ys, vs, vals):
+    """Depth-buffered stamping: write each point (pixel xs, ys, wrapped) where its height vs beats what is there.
+    layers is a list of (N, N[, 3]) arrays and vals the matching per-point values."""
+    idx = (ys.astype(np.int64) % N) * N + (xs.astype(np.int64) % N)
+    o = np.argsort(vs, kind="stable")
+    idx, vs = idx[o], vs[o]
+    keep = vs > zbuf.ravel()[idx]
+    idx, vs = idx[keep], vs[keep]
+    zbuf.ravel()[idx] = vs
+    for arr, val in zip(layers, vals):
+        flat = arr.reshape(N * N, -1) if arr.ndim == 3 else arr.ravel()
+        flat[idx] = val[o][keep]
+
+
+def _grid(R):
+    return np.meshgrid(np.arange(-R, R + 1, dtype=np.float32), np.arange(-R, R + 1, dtype=np.float32))
+
+
+def grass(rng, name, greens, straw, dead=0.05, dead_patch=0.75, layers=((26000, 0.12), (22000, 0.3), (16000, 0.48)),
+          length=(38, 52), width=(1.6, 1.6), lean=2.2, bend=0.9, soil=(0.075, 0.058, 0.042), bare=0.0, moss=0.0,
+          stones=0, leaves=0, leaf_pal=None, flowers=0, flower_pal=None, clover=0, seeds=0.0, frost=0.0, bright=1.0,
+          tip=0.75, strength=5):
+    """A grass set: layered blades stamped with a depth buffer (each blade has a real height, so the normals read as
+    blades), lit toward the tips, over soil; optional bare trodden patches, a moss cushion, pebbles, fallen leaves,
+    flowers, clover, seed heads and frost. Every position wraps, so the tile is seamless."""
+    zbuf = np.full((N, N), -1.0, np.float32)
+    col = np.zeros((N, N, 3), np.float32)
+    rough = np.zeros((N, N), np.float32)
+    soil_n = fbm(rng, 16, 16, 6)
+    col[:] = tint(rgb(*soil), (soil_n - 0.5) * 0.7)
+    rough[:] = 0.95
+    zbuf[:] = soil_n * 0.08
+    bare_m = smooth(0.45, 0.6, warped(rng, 4, 0.9, 5)) * bare if bare else np.zeros((N, N), np.float32)
+    if bare:
+        # trodden earth: lighter, smoother mud with grit where the grass is worn away
+        mud = fbm(rng, 40, 40, 4)
+        col[:] = mix(col, tint(rgb(0.22, 0.165, 0.11), (mud - 0.5) * 0.6), bare_m * 0.95)
+        rough[:] = 0.95 - bare_m * 0.15
+    if moss:
+        # a cushion of moss under the blades: bumpy, yellow-green to deep green
+        mn = warped(rng, 24, 0.5, 6)
+        cush = fbm(rng, 90, 90, 4)
+        mcol = mix(tint(rgb(0.13, 0.2, 0.06), (cush - 0.5) * 0.8), rgb(0.24, 0.3, 0.09), smooth(0.5, 0.8, mn))
+        mm = smooth(0.35, 0.55, mn) * moss
+        col[:] = mix(col, mcol, mm)
+        zbuf[:] = zbuf + mm * (0.06 + cush * 0.1)
+        rough[:] = rough * (1 - mm) + mm * 0.85
+    dead_mask = smooth(0.6, 0.75, warped(rng, 5, 0.7, 5))
+    tone_mask = fbm(rng, 6, 6, 4)
+    flow = fbm(rng, 3, 3, 3)
+    G = np.array(greens, np.float32) * bright
+    S = np.array(straw, np.float32) * bright
+    K = int((length[0] + length[1]) / 1.2) + 2      # a sample at least every 1.2 px, so thin tips don't break into dots
+    t = np.linspace(0, 1, K, dtype=np.float32)
+    offs = [(dx, dy) for dy in (-2, -1, 0, 1, 2) for dx in (-2, -1, 0, 1, 2)]
+    tips = []
+    for count, base in layers:
+        for chunk in range(0, count, 4000):
+            n = min(4000, count - chunk)
+            bx, by = rng.random(n) * N, rng.random(n) * N
+            ix, iy = bx.astype(np.int64) % N, by.astype(np.int64) % N
+            ok = rng.random(n) > bare_m[iy, ix] * 0.97
+            bx, by, ix, iy = bx[ok], by[ok], ix[ok], iy[ok]
+            n = len(bx)
+            if n == 0:
+                continue
+            ang = flow[iy, ix] * 6.2832 * 1.5 + (rng.random(n) - 0.5) * lean
+            L = length[0] + rng.random(n) * length[1]
+            W = width[0] + rng.random(n) * width[1]
+            bd = (rng.random(n) - 0.5) * bend
+            dd = rng.random(n) < (dead_mask[iy, ix] * dead_patch + dead)
+            g = G[rng.integers(0, len(G), n)] * (0.8 + 0.4 * tone_mask[iy, ix])[:, None]
+            c0 = np.where(dd[:, None], S[rng.integers(0, len(S), n)], g)
+            c0 *= (0.85 + rng.random(n) * 0.3)[:, None]
+            r0 = np.where(dd, 0.82, 0.58 + rng.random(n) * 0.12)
+            dx, dy = np.cos(ang), np.sin(ang)
+            px, py = -dy, dx
+            T = t[None, :]
+            cx = bx[:, None] + dx[:, None] * L[:, None] * T + px[:, None] * bd[:, None] * L[:, None] * T * T
+            cy = by[:, None] + dy[:, None] * L[:, None] * T + py[:, None] * bd[:, None] * L[:, None] * T * T
+            w = W[:, None] * (1 - T * 0.85)
+            v = base + 0.35 * T + rng.random(n)[:, None] * 0.05
+            shade = (1 - tip) + (tip + 0.3) * T
+            cblade = c0[:, None, :] * shade[..., None]
+            if frost:
+                fr = (T ** 1.5 * frost)[..., None]
+                cblade = cblade * (1 - fr) + rgb(0.7, 0.76, 0.86) * fr
+            rr = r0[:, None] - T * frost * 0.3
+            XS, YS, VS, CS, RS = [], [], [], [], []
+            for ox, oy in offs:
+                m = (ox * ox + oy * oy) <= (w * w)
+                XS.append((cx + ox)[m]); YS.append((cy + oy)[m])
+                ridge = 1 - math.sqrt(ox * ox + oy * oy) / 3.0
+                VS.append((v + ridge * 0.03)[m])
+                CS.append((cblade * (0.9 + 0.2 * ridge))[m])
+                RS.append(np.broadcast_to(rr, m.shape)[m])
+            _stamp(zbuf, [col, rough], np.concatenate(XS), np.concatenate(YS), np.concatenate(VS),
+                   [np.concatenate(CS), np.concatenate(RS)])
+            if seeds:
+                k = rng.random(n) < seeds
+                tips.append((cx[k, -1], cy[k, -1], ang[k], v[k, -1]))
+    # seed heads on the tallest blades: little tan grains along the tip
+    gx, gy = _grid(9)
+    for x, y, a, v in tips:
+        for j in range(len(x)):
+            u = gx * math.cos(a[j]) + gy * math.sin(a[j])
+            q = -gx * math.sin(a[j]) + gy * math.cos(a[j])
+            m = (u / 8.5) ** 2 + (q / (2.2 + 0.8 * np.cos(u * 1.6) ** 2)) ** 2 <= 1
+            c = rgb(0.42, 0.36, 0.22) * (0.8 + 0.3 * (np.cos(u * 1.6) ** 2))[..., None]
+            _stamp(zbuf, [col, rough], (x[j] + gx)[m], (y[j] + gy)[m], np.full(int(m.sum()), v[j] + 0.04, np.float32),
+                   [c[m].astype(np.float32), np.full(int(m.sum()), 0.8, np.float32)])
+
+    def scatter(count, mask):
+        pts = []
+        while len(pts) < count:
+            x, y = rng.random() * N, rng.random() * N
+            if rng.random() < mask[int(y) % N, int(x) % N] * 0.5 + 0.1:
+                pts.append((x, y))
+        return pts
+    # pebbles: grey domes half sunk in the turf
+    for x, y in scatter(stones, np.clip(bare_m + smooth(0.5, 0.7, tone_mask), 0, 1)):
+        a = rng.random() * math.pi
+        rx, ry = 7 + rng.random() * 14, 5 + rng.random() * 9
+        gx, gy = _grid(int(rx) + 2)
+        u = gx * math.cos(a) + gy * math.sin(a)
+        q = -gx * math.sin(a) + gy * math.cos(a)
+        d = (u / rx) ** 2 + (q / ry) ** 2
+        m = d <= 1
+        dome = np.sqrt(np.clip(1 - d, 0, 1))
+        c = rgb(0.3, 0.3, 0.31) * (0.7 + rng.random() * 0.5) * (0.6 + 0.5 * dome[..., None])
+        _stamp(zbuf, [col, rough], (x + gx)[m], (y + gy)[m], (0.2 + dome * 0.45)[m].astype(np.float32),
+               [c[m].astype(np.float32), np.full(int(m.sum()), 0.8, np.float32)])
+    # clover: three round leaflets with a pale chevron
+    for x, y in scatter(clover, tone_mask):
+        a0 = rng.random() * 6.28
+        s_ = 0.8 + rng.random() * 0.5
+        for k in range(3):
+            a = a0 + k * 2.094
+            ox, oy = math.cos(a) * 5 * s_, math.sin(a) * 5 * s_
+            gx, gy = _grid(int(6 * s_) + 1)
+            d = np.hypot(gx, gy) / (5.2 * s_)
+            m = d <= 1
+            c = rgb(0.1, 0.22, 0.08) * bright * (0.75 + 0.35 * (1 - d))[..., None]
+            c = np.where((np.abs(d - 0.55) < 0.08)[..., None], c * 1.35, c)
+            _stamp(zbuf, [col, rough], (x + ox + gx)[m], (y + oy + gy)[m], (0.86 + (1 - d) * 0.03)[m].astype(np.float32),
+                   [c[m].astype(np.float32), np.full(int(m.sum()), 0.55, np.float32)])
+    # fallen leaves
+    drift = smooth(0.55, 0.72, warped(rng, 4, 0.8, 4))
+    LP = np.array(leaf_pal or [(0.33, 0.035, 0.04)], np.float32)
+    for x, y in scatter(leaves, drift):
+        a = rng.random() * math.pi * 2
+        ln, wd = 18 + rng.random() * 16, 9 + rng.random() * 6
+        gx, gy = _grid(int(ln) + 2)
+        u = gx * math.cos(a) + gy * math.sin(a)
+        q = -gx * math.sin(a) + gy * math.cos(a)
+        shape = (u / ln) ** 2 + (q / (wd * (1 - 0.5 * np.clip(u / ln, -1, 1) ** 2 + 0.3))) ** 2
+        m = shape <= 1
+        c = LP[rng.integers(0, len(LP))] * (0.75 + rng.random() * 0.4)
+        vein = np.exp(-(q / 1.2) ** 2) * (np.abs(u) < ln)
+        edge = np.clip(1 - shape, 0, 1)
+        hv = 0.94 + rng.random() * 0.06 + edge * 0.04 - vein * 0.01 + (u / ln) * 0.02
+        cc = c[None, None, :] * (0.75 + 0.35 * edge[..., None]) * (1 - vein[..., None] * 0.25)
+        _stamp(zbuf, [col, rough], (x + gx)[m], (y + gy)[m], hv[m].astype(np.float32),
+               [cc[m].astype(np.float32), np.full(int(m.sum()), 0.62, np.float32)])
+    # flowers: five petals round a pale eye
+    FP = np.array(flower_pal or [(0.36, 0.26, 0.55)], np.float32)
+    gx, gy = _grid(7)
+    rr0 = np.hypot(gx, gy)
+    for _ in range(flowers):
+        x, y = rng.random() * N, rng.random() * N
+        th = np.arctan2(gy, gx) + rng.random() * 6.28
+        m = (rr0 <= 3.2 + 2.6 * np.abs(np.cos(th * 2.5))) & (rr0 <= 6.2)
+        pc = FP[rng.integers(0, len(FP))] * (0.8 + rng.random() * 0.4)
+        c = np.where((rr0 < 1.6)[..., None], rgb(0.78, 0.74, 0.5)[None, None, :], pc[None, None, :])
+        hv = 1.02 + (1 - rr0 / 7) * 0.03
+        _stamp(zbuf, [col, rough], (x + gx)[m], (y + gy)[m], hv[m].astype(np.float32),
+               [c[m].astype(np.float32), np.full(int(m.sum()), 0.5, np.float32)])
+    h = np.clip(zbuf, 0, 1.2)
+    return write(name, col, h, rough, np.zeros_like(h), strength, rng, cavity=0.75)
+
+
+NIGHT_GREENS = [(0.11, 0.21, 0.1), (0.156, 0.27, 0.117), (0.1, 0.195, 0.143), (0.195, 0.3, 0.13), (0.13, 0.247, 0.156)]
+STRAW = [(0.33, 0.28, 0.15), (0.27, 0.23, 0.12), (0.4, 0.34, 0.2)]
+CRIMSON_LEAVES = [(0.33, 0.035, 0.04), (0.36, 0.12, 0.05), (0.25, 0.03, 0.05), (0.2, 0.08, 0.16), (0.3, 0.05, 0.045)]
+
+
+def MoonlitGrass(rng):
+    """Night lawn for the school grounds: dense cold-green blades, patches of straw, crimson and rust fallen leaves and
+    a scatter of tiny violet nightshade flowers. Grass, 8 studs a tile."""
+    return grass(rng, "MoonlitGrass", NIGHT_GREENS, STRAW, leaves=150, leaf_pal=CRIMSON_LEAVES, flowers=300)
+
+
+def SchoolLawn(rng):
+    """The kept lawn of the quad: short, dense, even clipped grass, a little clover, hardly any straw. Grass, 8 a tile."""
+    return grass(rng, "SchoolLawn", [(0.12, 0.25, 0.09), (0.16, 0.3, 0.1), (0.1, 0.22, 0.1), (0.18, 0.31, 0.11)], STRAW,
+                 dead=0.01, dead_patch=0.12, layers=((30000, 0.12), (28000, 0.3), (22000, 0.48)), length=(18, 20),
+                 width=(1.6, 1.2), lean=3.0, bend=0.4, clover=220, tip=0.6, strength=4)
+
+
+def OvergrownGrass(rng):
+    """Churchyard grass gone wild: long leaning blades in sweeps, seed heads, more straw, a few white and violet weeds.
+    Grass, 10 a tile."""
+    return grass(rng, "OvergrownGrass", [(0.09, 0.17, 0.07), (0.13, 0.22, 0.08), (0.1, 0.18, 0.1), (0.16, 0.22, 0.09)], STRAW,
+                 dead=0.12, dead_patch=0.8, layers=((18000, 0.1), (16000, 0.28), (14000, 0.46), (9000, 0.62)),
+                 length=(70, 90), width=(1.8, 1.8), lean=1.2, bend=1.4, seeds=0.05, flowers=140,
+                 flower_pal=[(0.8, 0.78, 0.72), (0.36, 0.26, 0.55)], leaves=60, leaf_pal=CRIMSON_LEAVES, strength=6)
+
+
+def DeadGrass(rng):
+    """Autumn dead grass: matted tan and grey straw with a few green survivors and drifts of fallen leaves. Grass, 8 a tile."""
+    return grass(rng, "DeadGrass", [(0.14, 0.18, 0.08), (0.12, 0.16, 0.09)],
+                 [(0.36, 0.3, 0.17), (0.3, 0.25, 0.14), (0.42, 0.36, 0.22), (0.27, 0.24, 0.19), (0.33, 0.29, 0.21)],
+                 dead=0.8, dead_patch=0.15, length=(40, 50), lean=2.8, bend=1.2, leaves=260,
+                 leaf_pal=CRIMSON_LEAVES + [(0.42, 0.24, 0.08), (0.3, 0.2, 0.1)], soil=(0.09, 0.07, 0.05), strength=5)
+
+
+def MossyTurf(rng):
+    """Damp old turf by the walls: a cushion of moss under short sparse grass, pebbles, a little clover. Grass, 8 a tile."""
+    return grass(rng, "MossyTurf", NIGHT_GREENS, STRAW, dead=0.03, dead_patch=0.3, layers=((11000, 0.16), (9000, 0.34)),
+                 length=(22, 30), moss=1.0, stones=90, clover=60, strength=5)
+
+
+def TroddenGrass(rng):
+    """Worn grass where students cut across: bare trodden mud in winding patches, grit and pebbles. Grass, 10 a tile."""
+    return grass(rng, "TroddenGrass", NIGHT_GREENS, STRAW, dead=0.08, dead_patch=0.6, bare=1.0, length=(30, 40), lean=2.4,
+                 stones=160, leaves=40, leaf_pal=CRIMSON_LEAVES, soil=(0.1, 0.075, 0.055), strength=5)
+
+
+def FrostGrass(rng):
+    """A frost-bitten night lawn: blades rimed silver-blue toward the tips, glinting, the soil dark. Grass, 8 a tile."""
+    return grass(rng, "FrostGrass", [(0.08, 0.15, 0.1), (0.1, 0.17, 0.12), (0.12, 0.18, 0.11)], STRAW, dead=0.06,
+                 dead_patch=0.5, frost=0.85, leaves=40, leaf_pal=[(0.25, 0.03, 0.05), (0.2, 0.08, 0.16)], strength=5)
+
 SETS = [ParquetWood, FloorPlanks, RedBrick, StoneBlock, Cobblestone, HexTile, Pavers, Concrete,
         PaintedMetal, DirtyTile, DarkPlaster, CheckerMarble, OldBoards, SnowGround,
         DamaskWallpaper, CrimsonVelvet, GothicStone, WroughtIron, StainedGlass, BloodMarble, GothicOakPanel,
-        RuneSlate, MossyFlagstone, QuatrefoilTile]
+        RuneSlate, MossyFlagstone, QuatrefoilTile, MoonlitGrass, SchoolLawn, OvergrownGrass, DeadGrass, MossyTurf,
+        TroddenGrass, FrostGrass]
 
 
 def sheet(colors):

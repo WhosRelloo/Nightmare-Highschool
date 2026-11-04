@@ -199,5 +199,68 @@
   "Normal": "104210270918726",
   "Rough": "72309490674629",
   "Metal": "132104507237736"
+ },
+ "MoonlitGrass": {
+  "Base": "LeafyGrass",
+  "StudsPerTile": 8,
+  "Color": "102983683538714",
+  "Normal": "107450597982994",
+  "Rough": "119216089129735",
+  "Metal": "118881099203550",
+  "Note": "2048 px, published under the Nightmare Highschool group. Spread over Grass, LeafyGrass, Ground and Mud: with three on one base material Studio left one blank (white)"
+ },
+ "SchoolLawn": {
+  "Base": "Grass",
+  "StudsPerTile": 8,
+  "Color": "86957679467220",
+  "Normal": "86277034217109",
+  "Rough": "117817418306659",
+  "Metal": "118881099203550",
+  "Note": "2048 px, published under the Nightmare Highschool group. Spread over Grass, LeafyGrass, Ground and Mud: with three on one base material Studio left one blank (white)"
+ },
+ "OvergrownGrass": {
+  "Base": "Ground",
+  "StudsPerTile": 10,
+  "Color": "80987646470244",
+  "Normal": "90833964594067",
+  "Rough": "79247927590621",
+  "Metal": "118881099203550",
+  "Note": "2048 px, published under the Nightmare Highschool group. Spread over Grass, LeafyGrass, Ground and Mud: with three on one base material Studio left one blank (white)"
+ },
+ "DeadGrass": {
+  "Base": "LeafyGrass",
+  "StudsPerTile": 8,
+  "Color": "74597505812149",
+  "Normal": "75260276415666",
+  "Rough": "87165659450594",
+  "Metal": "118881099203550",
+  "Note": "2048 px, published under the Nightmare Highschool group. Spread over Grass, LeafyGrass, Ground and Mud: with three on one base material Studio left one blank (white)"
+ },
+ "MossyTurf": {
+  "Base": "Mud",
+  "StudsPerTile": 8,
+  "Color": "80355397260904",
+  "Normal": "78682945442676",
+  "Rough": "106328113681728",
+  "Metal": "118881099203550",
+  "Note": "2048 px, published under the Nightmare Highschool group. Spread over Grass, LeafyGrass, Ground and Mud: with three on one base material Studio left one blank (white)"
+ },
+ "TroddenGrass": {
+  "Base": "Ground",
+  "StudsPerTile": 10,
+  "Color": "78502340993435",
+  "Normal": "127472241785200",
+  "Rough": "130936160205522",
+  "Metal": "118881099203550",
+  "Note": "2048 px, published under the Nightmare Highschool group. Spread over Grass, LeafyGrass, Ground and Mud: with three on one base material Studio left one blank (white)"
+ },
+ "FrostGrass": {
+  "Base": "Grass",
+  "StudsPerTile": 8,
+  "Color": "89910581978293",
+  "Normal": "122695450420071",
+  "Rough": "80308530532421",
+  "Metal": "118881099203550",
+  "Note": "2048 px, published under the Nightmare Highschool group. Spread over Grass, LeafyGrass, Ground and Mud: with three on one base material Studio left one blank (white)"
  }
 }

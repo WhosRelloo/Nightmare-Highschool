@@ -1,6 +1,6 @@
 # Textures (builder sets)
 
-25 tileable PBR texture sets for building NH Combat Test, made 2026-11-03.
+32 tileable PBR texture sets for building NH Combat Test, made 2026-11-03.
 - **Where they're from:** 14 match the gritty night-town style of the owner's reference screenshots; 10 are Nightmare High's own gothic sets.
 - **Original work:** everything is generated from scratch by `art/textures/nh_textures.py`. Nothing is copied from another game.
 - **CastleStone** came later, with props batch 8: the cloister arch's own wall stone, made by `tools/vfx/make_castle_stone.py` from the 2048 limestone set the props use. The arch's wall piece uses the same stone at the same scale (8 studs a tile), so a wall built in `NHCastleStone` blends into the arch.
@@ -39,8 +39,26 @@ A ready-made sample wall, one 12 × 12 block per set, is in `ServerStorage.NHTex
 | MossyFlagstone | NHMossyFlagstone | Slate | 12 | irregular flagstones, moss in the joints |
 | QuatrefoilTile | NHQuatrefoilTile | Marble | 6 | cathedral floor with black quatrefoils |
 | CastleStone | NHCastleStone | Limestone | 8 | the courtyard cloister arch's weathered grey castle stone (no joints), so a wall blends into the arch; made by `tools/vfx/make_castle_stone.py` |
+| MoonlitGrass | NHMoonlitGrass | LeafyGrass | 8 | the night lawn: cold-green blades, straw patches, crimson and rust fallen leaves, tiny violet nightshade flowers |
+| SchoolLawn | NHSchoolLawn | Grass | 8 | the quad's kept lawn: short, dense, even, a little clover |
+| OvergrownGrass | NHOvergrownGrass | Ground | 10 | churchyard grass gone wild: long leaning blades, seed heads, white and violet weeds |
+| DeadGrass | NHDeadGrass | LeafyGrass | 8 | autumn dead grass: matted tan and grey straw, a few green survivors, drifts of leaves |
+| MossyTurf | NHMossyTurf | Mud | 8 | damp old turf by the walls: a moss cushion under short sparse grass, pebbles, clover |
+| TroddenGrass | NHTroddenGrass | Ground | 10 | worn grass where students cut across: winding bare mud paths, grit and pebbles |
+| FrostGrass | NHFrostGrass | Grass | 8 | a frost-bitten night lawn: blades rimed silver-blue toward the tips |
 
 Asset ids for every map are in `art/textures/textures.json`.
+
+## Grass sets (1.36.0)
+Seven grass sets, made by `grass()` in `art/textures/nh_textures.py`:
+- **How they're drawn:** layered blades are stamped with a depth buffer, so each blade has a real height and the normals read as blades. The blades are dark at the root and lit toward the tip, over soil.
+- **Extras per set:** trodden mud, a moss cushion, pebbles, clover, seed heads, frost, fallen leaves and flowers.
+- **Seamless:** every blade and leaf wraps, so the tiles have no seams.
+- **Sharp:** they're uploaded at 2048 (the 2048 masters, not the 1024 game copies).
+- **Group-owned:** they're published under the Nightmare Highschool group. The metalness map is one shared black image (`NHGrass_metal`).
+- **Base materials:** the sets are spread over Grass, LeafyGrass, Ground and Mud, at most two on one base. With three of them on one base material, Studio showed one of the three blank white. The images were fine (they showed on decals), and moving a set to another base fixed it each time.
+- **Samples:** one 8 × 8 patch of each lies beside the lamp kit (`workspace.NHPropsShowcase.GrassSwatch_<Name>`, tag `NHTextureSwatch`).
+- **Scripts:** `Studio/swap19_grass.luau` makes the variants, and `Studio/grass_bases.luau` sets the base materials.
 
 ## How they're made
 Run:

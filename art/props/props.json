@@ -1,5 +1,5 @@
 {
- "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y). Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 15-17: the cafeteria and the spire; PendantLamp_Glass is crimson glass (set in props_setup15). Batch 18: the nine skateboards; each piece's origin is its pivot (trucks lean about the long axis, wheels spin about the axle).",
+ "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y). Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 15-17: the cafeteria and the spire; PendantLamp_Glass is crimson glass (set in props_setup15). Batch 18: the nine skateboards; each piece's origin is its pivot (trucks lean about the long axis, wheels spin about the axle). Batch 19: the lamp and light kit; maps published under the Nightmare Highschool group (Asset Manager bulk import), lights and tags set in props_setup19.",
  "StudentDesk": {
   "dims": [
    3.0,
@@ -3038,5 +3038,271 @@
   "NormalMap": "rbxassetid://82986756657463",
   "RoughnessMap": "rbxassetid://70788956534806",
   "MetalnessMap": "rbxassetid://129925492807119"
+ },
+ "GasLampPost": {
+  "dims": [
+   2.2,
+   2.2,
+   11.25
+  ],
+  "pieces": [
+   "GasLampPost_Main",
+   "GasLampPost_Glow",
+   "GasLampPost_Glass"
+  ],
+  "tris": {
+   "GasLampPost_Main": 11858,
+   "GasLampPost_Glow": 120,
+   "GasLampPost_Glass": 72
+  },
+  "batch": 19,
+  "light": "PointLight 26 / 1.4 gas, flickers, lit at dusk (NHCandle, NHLamp)",
+  "ColorMap": "rbxassetid://118947207244816",
+  "NormalMap": "rbxassetid://78000112380266",
+  "RoughnessMap": "rbxassetid://88507222420477",
+  "MetalnessMap": "rbxassetid://114053656677374"
+ },
+ "GasLampTwin": {
+  "dims": [
+   3.83,
+   2.2,
+   11.33
+  ],
+  "pieces": [
+   "GasLampTwin_Main",
+   "GasLampTwin_Glow",
+   "GasLampTwin_Glass"
+  ],
+  "tris": {
+   "GasLampTwin_Main": 16950,
+   "GasLampTwin_Glow": 240,
+   "GasLampTwin_Glass": 144
+  },
+  "batch": 19,
+  "light": "a PointLight 22 / 1.2 in each lantern (NHLightSpot parts), flickers, lit at dusk",
+  "ColorMap": "rbxassetid://81113883251358",
+  "NormalMap": "rbxassetid://117250132340075",
+  "RoughnessMap": "rbxassetid://122364625938139",
+  "MetalnessMap": "rbxassetid://100770091618806"
+ },
+ "WallLantern": {
+  "dims": [
+   0.75,
+   1.5,
+   3.39
+  ],
+  "pieces": [
+   "WallLantern_Main",
+   "WallLantern_Glow",
+   "WallLantern_Glass"
+  ],
+  "tris": {
+   "WallLantern_Main": 3698,
+   "WallLantern_Glow": 120,
+   "WallLantern_Glass": 72
+  },
+  "batch": 19,
+  "light": "PointLight 18 / 1.2 gas, flickers, lit at dusk",
+  "ColorMap": "rbxassetid://79338029112166",
+  "NormalMap": "rbxassetid://96702754020028",
+  "RoughnessMap": "rbxassetid://85502923553098",
+  "MetalnessMap": "rbxassetid://134065820332972"
+ },
+ "HangingLantern": {
+  "dims": [
+   1.11,
+   0.97,
+   5.36
+  ],
+  "pieces": [
+   "HangingLantern_Main",
+   "HangingLantern_Glow",
+   "HangingLantern_Glass"
+  ],
+  "tris": {
+   "HangingLantern_Main": 5430,
+   "HangingLantern_Glow": 240,
+   "HangingLantern_Glass": 72
+  },
+  "batch": 19,
+  "light": "PointLight 16 / 1.1 candle, flickers",
+  "ColorMap": "rbxassetid://80193137857794",
+  "NormalMap": "rbxassetid://98787591997949",
+  "RoughnessMap": "rbxassetid://104013830111327",
+  "MetalnessMap": "rbxassetid://132799076484270"
+ },
+ "FloorLamp": {
+  "dims": [
+   1.48,
+   1.49,
+   5.72
+  ],
+  "pieces": [
+   "FloorLamp_Main",
+   "FloorLamp_Glow"
+  ],
+  "tris": {
+   "FloorLamp_Main": 9004,
+   "FloorLamp_Glow": 196
+  },
+  "batch": 19,
+  "light": "PointLight 16 / 1.0 through the crimson shade, steady",
+  "ColorMap": "rbxassetid://107836199126360",
+  "NormalMap": "rbxassetid://134319217899992",
+  "RoughnessMap": "rbxassetid://105648839327760",
+  "MetalnessMap": "rbxassetid://72828066433372"
+ },
+ "ChandelierCorona": {
+  "dims": [
+   4.36,
+   4.33,
+   5.55
+  ],
+  "pieces": [
+   "ChandelierCorona_Main",
+   "ChandelierCorona_Glow"
+  ],
+  "tris": {
+   "ChandelierCorona_Main": 18116,
+   "ChandelierCorona_Glow": 1280
+  },
+  "batch": 19,
+  "light": "PointLight 26 / 1.5 candle, flickers",
+  "ColorMap": "rbxassetid://84758977717477",
+  "NormalMap": "rbxassetid://73167799691182",
+  "RoughnessMap": "rbxassetid://97963838200848",
+  "MetalnessMap": "rbxassetid://132378730757136"
+ },
+ "ChandelierCrystal": {
+  "dims": [
+   3.44,
+   3.44,
+   4.75
+  ],
+  "pieces": [
+   "ChandelierCrystal_Main",
+   "ChandelierCrystal_Glass",
+   "ChandelierCrystal_Glow"
+  ],
+  "tris": {
+   "ChandelierCrystal_Main": 13144,
+   "ChandelierCrystal_Glass": 3824,
+   "ChandelierCrystal_Glow": 960
+  },
+  "batch": 19,
+  "light": "PointLight 24 / 1.5 candle, flickers",
+  "ColorMap": "rbxassetid://101801637893998",
+  "NormalMap": "rbxassetid://102060860123378",
+  "RoughnessMap": "rbxassetid://133014918833035",
+  "MetalnessMap": "rbxassetid://133719942272165"
+ },
+ "PricketStand": {
+  "dims": [
+   1.31,
+   1.22,
+   5.43
+  ],
+  "pieces": [
+   "PricketStand_Main",
+   "PricketStand_Glow"
+  ],
+  "tris": {
+   "PricketStand_Main": 7628,
+   "PricketStand_Glow": 80
+  },
+  "batch": 19,
+  "light": "PointLight 12 / 1.0 candle, flickers",
+  "ColorMap": "rbxassetid://132859501247463",
+  "NormalMap": "rbxassetid://87180667577234",
+  "RoughnessMap": "rbxassetid://93685605351865",
+  "MetalnessMap": "rbxassetid://73028962594745"
+ },
+ "VotiveStand": {
+  "dims": [
+   3.03,
+   1.51,
+   3.72
+  ],
+  "pieces": [
+   "VotiveStand_Main",
+   "VotiveStand_Glass",
+   "VotiveStand_Glow"
+  ],
+  "tris": {
+   "VotiveStand_Main": 10852,
+   "VotiveStand_Glass": 2772,
+   "VotiveStand_Glow": 1440
+  },
+  "batch": 19,
+  "light": "PointLight 12 / 1.0 crimson-warm, flickers",
+  "ColorMap": "rbxassetid://115373206995685",
+  "NormalMap": "rbxassetid://119722952441741",
+  "RoughnessMap": "rbxassetid://73925558994819",
+  "MetalnessMap": "rbxassetid://120435142706737"
+ },
+ "StageSpotlight": {
+  "dims": [
+   2.04,
+   1.95,
+   5.24
+  ],
+  "pieces": [
+   "StageSpotlight_Main",
+   "StageSpotlight_Glow",
+   "StageSpotlight_Glass"
+  ],
+  "tris": {
+   "StageSpotlight_Main": 6380,
+   "StageSpotlight_Glow": 240,
+   "StageSpotlight_Glass": 192
+  },
+  "batch": 19,
+  "light": "SpotLight 50 / 4, 38 degrees, shadows, out of the lens (NHLightSpot), steady",
+  "ColorMap": "rbxassetid://84909989432411",
+  "NormalMap": "rbxassetid://73817957223712",
+  "RoughnessMap": "rbxassetid://113737705058949",
+  "MetalnessMap": "rbxassetid://77713783385304"
+ },
+ "Footlights": {
+  "dims": [
+   8.0,
+   0.94,
+   0.66
+  ],
+  "pieces": [
+   "Footlights_Main",
+   "Footlights_Glow"
+  ],
+  "tris": {
+   "Footlights_Main": 6788,
+   "Footlights_Glow": 480
+  },
+  "batch": 19,
+  "light": "PointLight 12 / 1.0, steady",
+  "ColorMap": "rbxassetid://118043343672074",
+  "NormalMap": "rbxassetid://131540720472658",
+  "RoughnessMap": "rbxassetid://106315141757479",
+  "MetalnessMap": "rbxassetid://94435408922045"
+ },
+ "TorchSconce": {
+  "dims": [
+   0.44,
+   0.91,
+   2.0
+  ],
+  "pieces": [
+   "TorchSconce_Main",
+   "TorchSconce_Glow"
+  ],
+  "tris": {
+   "TorchSconce_Main": 2360,
+   "TorchSconce_Glow": 640
+  },
+  "batch": 19,
+  "light": "PointLight 16 / 1.3 fire, flickers, embers (NHAmbient:Embers)",
+  "ColorMap": "rbxassetid://101032081992908",
+  "NormalMap": "rbxassetid://123364618526615",
+  "RoughnessMap": "rbxassetid://78352368719800",
+  "MetalnessMap": "rbxassetid://103791215033498"
  }
 }

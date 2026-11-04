@@ -140,6 +140,22 @@ Door, flap and tap origins sit on their hinge lines.
 - **Placement** on the baseplate north of the gym for the builder (x 70 to 136, rows from z 228, 12 apart; tags `NHPropBatch15` to `NHPropBatch17`), clear of the gym, the Ink Studio and the Crimson Parlor. `Studio/props_revert15.luau` removes them.
 - **The spire** is one baked piece, so the builder can scale it for bigger towers.
 
+**Batch 19, the lamp and light kit** (`Studio/props_setup19.luau`, run after importing its FBX files from `art/props/fbx/`):
+- **What's in it:** twelve light fixtures that fill the gaps round the school's existing lights (WallSconce, OilLamp, CandleCluster, Chandelier, Candelabra, DeskLamp, PendantLamp, the menu set's lamppost).
+- **Same template steps as batch 15**, with a tuned light on every Glow piece. The lights use the tags `Controllers.World.Ambient` already reads, so no new script was needed:
+  - `NHCandle`: the light flickers on smooth noise. With Reduce Flashing (`NHReducedFlash`) it barely moves.
+  - `NHLamp`: the outdoor gas lamps (GasLampPost, GasLampTwin, WallLantern) light at dusk and go out at dawn, each a moment apart, and their mantles turn plain by day.
+  - `NHAmbient:Embers`: the torch's fire.
+- **Special lights:** the twin lamp gets a light in each lantern (invisible `NHLightSpot` parts). The stage spotlight gets a SpotLight (range 50, 38°, shadows) aimed out of its lens, plus a dim fill. It is the kit's only shadow-casting light, so the VFX bible's budget of eight shadow lights in view holds.
+- **Glass:** the votive cups are crimson glass, the chandelier's crystals clear and bright.
+- **Collision:** the floor-standing fixtures collide; wall, hanging and stage pieces don't.
+- **Placement** on the clear lot south of the Commons for the builder (`workspace.NHPropsShowcase`, tag `NHPropBatch19`; `Studio/props_revert19.luau` removes them):
+  - the floor pieces in a row at z −152 from x 30, facing −Z (view them from the south)
+  - the wall pieces on a castle-stone display wall behind them (z −140)
+  - the hanging pieces under an iron display beam, tops at 12.9
+  - The wall, beam and posts are tagged `NHLightKitDisplay`; delete them once the pieces are in the map.
+- **Textures:** all 48 maps are published under the Nightmare Highschool group (Studio Asset Manager bulk import). The meshes went to the group with the FBX import.
+
 | Prop | Triangles | Replaces / goes to |
 |---|---|---|
 | StudentDesk | 4.8k | `Desk` ×48 (R101–R106) |
@@ -280,6 +296,18 @@ Door, flap and tap origins sit on their hinge lines.
 | Spire | 4.9k | batch 17: the memorial's crocketed octagonal spire as a building piece, 12 tall and 3 across, for towers and big roofs; scale it in Studio |
 | SpireCross | 5.4k | batch 17: the same spire with the memorial's iron cross and ring on top |
 | SkateboardMoonlit, SkateboardBone, SkateboardRavens, SkateboardRovers, SkateboardWardens, SkateboardGargoyle, SkateboardVigil, SkateboardCrimson, SkateboardHeadmaster | 7.8k each (Main, TruckF, TruckB, WheelFL, WheelFR, WheelBL, WheelBR) | batch 18: the nine rideable skateboards; see [[Skateboards]] |
+| GasLampPost | 12.1k (Main, Glow, Glass) | batch 19: 11-stud cast-iron gas lamp standard: an octagonal plinth with crimson enamel lancet panels and gilt quatrefoils, a fluted shaft with a crimson crest collar, a stiff-leaf capital, the lamplighter's ladder bar, a hexagonal gothic lantern with gablets and crockets; lit at dusk, flickers |
+| GasLampTwin | 17.3k (Main, Glow, Glass) | batch 19: the same standard with a scrolled cross-arm, two lanterns and an iron raven on the centre finial |
+| WallLantern | 3.9k (Main, Glow, Glass) | batch 19: a wall piece: a hexagonal gas lantern on a scrolled bracket from a pointed iron shield with a crimson inset and a gilt quatrefoil |
+| HangingLantern | 5.7k (Main, Glow, Glass) | batch 19: a large hexagonal lantern of three candles on a chain from a ceiling rose (hang its top) |
+| FloorLamp | 9.2k (Main, Glow) | batch 19: standard lamp: a scrolled iron tripod, a fluted black lacquer and gilt column with a black marble tray, a pleated crimson silk shade with a beaded fringe |
+| ChandelierCorona | 19.4k (Main, Glow) | batch 19: a 4-across gothic iron corona: a crimson band behind a gilt arcade, eight turrets with gilt spires, sixteen candles, rods to a gilt orb and a chain |
+| ChandelierCrystal | 17.9k (Main, Glass, Glow) | batch 19: a gilt chandelier: a cut-glass bowl, twelve scrolled arms with crimson candle sleeves, crystal swags and prism drops |
+| PricketStand | 7.7k (Main, Glow) | batch 19: a tall floor candlestand: a scrolled tripod, a twisted iron shaft, a spiked brass drip pan and a guttering church candle |
+| VotiveStand | 15.1k (Main, Glass, Glow) | batch 19: a stepped iron votive rack of 18 tea lights in crimson glass cups, a pointed back panel with a gilt quatrefoil and a brass offering box |
+| StageSpotlight | 6.8k (Main, Glow, Glass) | batch 19: a Victorian limelight: crimson enamel lamp house, brass bands, cooling rings, a vent cap and a lens on a telescoping tripod; a real SpotLight |
+| Footlights | 7.3k (Main, Glow) | batch 19: an 8-stud run of stage footlights (tiles end to end): crimson and gilt front, four brass reflectors with wire guards |
+| TorchSconce | 3.0k (Main, Glow) | batch 19: a wall piece: a burning iron torch with a pitch-wrapped cresset in a ring on a gothic plate; embers |
 
 **Placed on the map** (`Studio/props_map.luau`; `Studio/props_map_revert.luau` removes them). 91 copies of the batch 4 to 9 templates, in `workspace.NHPropsMap/<Area>`, tagged `NHPropMap`, named `<Prop>_<Area>_<n>`, with a `MapArea` attribute. Each row of the script gives a prop, an area, x and z, and the way its front faces. Rays find the floor or table top under it, or the wall behind it for wall pieces.
 
@@ -482,3 +510,10 @@ Door, flap and tap origins sit on their hinge lines.
 - **Imported and set up (2026-11-04):** the owner imported the 16 FBX files; `props_setup15` made the templates and placed the three rows north of the gym with no clashes and no stray imports. The maps load in Studio (a few fill in a little later in the Edit view).
 - **Not verified yet:** the steam and lights in Play.
 
+**Batch 19, the lamp and light kit (2026-11-04, 1.36.0):**
+- **Baked:** all 12 at 2048 with 64 samples on the GPU, every piece under 20k triangles (the largest, the corona, 18.1k). Sheet `art/props/_batch19_final_sheet.png`. Five were re-baked after a first look: the wall lantern's and votive stand's crimson insets had faces sitting exactly on their panels (streaks in the bake), and the floor lamp's silk, the corona's band and the footlights' front read pink, so they use the deeper crimson now.
+- **Dry run (Edit):** stand-in boxes placed all 12 with no clashes and the right lights and tags; removed afterwards.
+- **Imported and set up:** the owner imported the 12 FBX files. The setup made the templates and placed all 12 with no clashes, the floor pieces on the plate (bottom 0.90) and the hanging pieces' tops at the beam (12.90). The lights and tags match the table above (checked by script).
+- **Textures in the group:** the owner bulk-imported the maps under the group. All 48 ids were read back by name (no duplicates) and swapped into the 12 templates and 12 copies (24 SurfaceAppearances). The meshes are group-owned too.
+- **Screenshots:** day (`docs/img/lamp-kit-day.jpg`), a close-up of the hanging pieces (`lamp-kit-hanging.jpg`), and night with Studio's clock at 0:00 (`lamp-kit-night.jpg`, the clock put back to 13:00 straight after). Every map shows, including the twin lamp and floor lamp, which were blank while they used account-owned uploads.
+- **Not verified yet** (no Play test; another session was testing in the same Studio): the flicker, the dusk switch and the embers in Play; how the kit's lights cost on a low-end device.

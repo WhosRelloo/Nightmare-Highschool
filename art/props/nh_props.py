@@ -1558,7 +1558,7 @@ import nh_props_batch9  # noqa: E402,F401
 # batches 10 to 13 (office, town street and shops, town building pieces, tables): imported when present; one that fails
 # to import is reported and skipped, so work on one batch never stops another from building
 for _b in ("nh_props_batch10", "nh_props_batch11", "nh_props_batch12", "nh_props_batch13", "nh_props_batch14",
-           "nh_props_batch15", "nh_props_batch16", "nh_props_batch17", "nh_props_batch18"):
+           "nh_props_batch15", "nh_props_batch16", "nh_props_batch17", "nh_props_batch18", "nh_props_batch19", "nh_props_batch20"):
     if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), _b + ".py")):
         try:
             __import__(_b)
