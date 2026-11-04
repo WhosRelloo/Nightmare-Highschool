@@ -2,6 +2,40 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.30.0] - 2026-11-04: Phone-size screens
+
+### Changed
+- **Phones get their own scale** (`Theme.Scale.PhoneTouchMin` 0.62, for touch screens whose shorter side is under 600 px). Tablets keep 0.92. The main menu, HUD and menus no longer run off a 375 px tall screen.
+- **Big menus fit the screen on phones** (`Components.ClampPanels`, from `AutoScale`): panels over 250 design px tall are clamped to the screen at the phone scale, keeping their text size, and their lists scroll. This covers the Journal, the phone and enrollment. Off phones, nothing changes.
+- **Phone layout:**
+  - **Top:** the compass goes under the top strip on the left when the top bar leaves no room, and re-checks every 2 s.
+  - **Left column:** the compass, the quest tracker (moved from the right) and the Factions and Journal buttons side by side.
+  - **Smaller:** the clock and tracker at 0.5, dialogue at 0.66.
+  - **KitHud:** the Yen plate sits above the health bar, and the bar stands on the Study Group dock.
+- **Touch buttons:** the third arc starts higher (150 degrees) on every touch screen, and only buttons low on the screen push the KitHud aside. The buttons hide while a menu is open.
+- **New kit functions:** `AutoScale(gui, { phoneScale })`, `Components.Viewport()`, `TouchOnly()`, `Phone()` and `PreviewChanged`.
+
+### Added
+- **Studio phone previews:**
+  - The ReplicatedStorage attribute `NHPhonePreview` (a Vector2) lays every kit screen out for that size.
+  - `Studio/tests/phone_preview.luau` draws a copy at that size and lists what sticks out.
+  - `Studio/tests/phone_panel.luau` measures open menus.
+- `Studio/fetch_big.py`: fetches long scripts in chunks. The CLI truncates output near 100 KB, which had cut off `UI.Components`; it was caught before anything was installed.
+
+### Verified (Studio previews at 667x375, 844x390 and 1024x768; no slot, at night)
+- **Main menu:** fits at 667x375, with nothing off-screen.
+- **HUD at 667x375 and 844x390:**
+  - nothing overlaps
+  - the KitHud is at 0.56 and 0.62 (it was 0.38)
+  - the posture label is clear of the Study Group dock
+  - the compass sits under the strip
+- **Tablet:** the KitHud is at 0.65 (0.52 before the arc change), with nothing overlapping.
+- **Journal:** clamped to 620x304 px with its tabs, close button and scrolling body, and the touch buttons hidden while it's open.
+- **Phone app:** 223x304 px with every icon showing.
+- **Desktop (no flags):** every position and panel size as before, and no touch buttons.
+- No errors from the changed scripts.
+- **Not checked at phone size:** the menus that are built when first opened (locker, timetable, stats, evolution, students list, identity, admin, sports) and the region cards. Notched phones' safe areas aren't modelled, and nothing has run on a real phone.
+
 ## [1.29.0] - 2026-11-04: Touch controls
 
 ### Added

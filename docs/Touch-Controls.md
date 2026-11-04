@@ -54,6 +54,54 @@ In order of importance, only when they apply:
   - **Keyboards:** nothing changes.
 - **Skill bar** (`SkillController`): it moves to just left of the arcs at their top. Today it's empty: the Fist has no skills yet.
 
+## Phone and tablet screens (1.30.0)
+
+**Before.** On touch screens every kit screen used a 0.92 minimum scale. On a 375 px tall phone that is a desktop layout: the main menu ran off the bottom, the compass sat on the top bar, the Journal was taller than the screen, and the HUD had to shrink to 0.38 to fit beside the buttons.
+
+![Before: the HUD at 667x375 in 1.29.0](img/phone-before.jpg)
+
+**Now:**
+
+| Screen | Phones (touch, shorter side under 600 px) |
+|---|---|
+| Every kit screen | `Theme.Scale.PhoneTouchMin` 0.62 instead of 0.92 (tablets keep 0.92). 44 px rows stay at about 27 px. |
+| Big panels | `Components.ClampPanels` (from `AutoScale`): a direct child panel sized in offset px and over 250 tall is clamped to the screen at the phone scale. Text keeps its size, and the panel's own scrolling lists absorb the rest. The design size is kept in the attribute `NHPhoneDesign`; the attribute `NHNoPanelClamp` on a gui opts out. Off phones, panels get their design size back. |
+| Journal, phone, enrollment | clamped this way: the Journal is 620x304 px at 667x375 with its tabs, close button and scrolling body; the phone app is 223x304 px with every app icon showing |
+| Main menu | fits at 0.62 |
+| Dialogue | `phoneScale` 0.66 (it has a 0.8 floor elsewhere) |
+| Clock, quest tracker | `phoneScale` 0.5 |
+| Compass | the phone scale. When there's no room in the top strip beside the top bar, it sits under the strip on the left. It re-checks every 2 s, because the top bar is built after it and Roblox's own buttons move it. |
+| Left column | compass, then the quest tracker (moved from under the clock: the right side holds the touch buttons), then the Factions and Journal buttons side by side |
+| KitHud | fits left of the touch buttons. Only buttons in the bottom 38% of the screen count against it, and the Yen plate moves above the bar's right end. It stands on the Study Group dock and refits when the dock or the buttons change. |
+| Touch buttons | the third arc starts at 150 degrees (above the bar) on every touch screen. All the buttons hide while a menu is open: a visible panel 400 design px tall or more, most of the screen, or the phone. The Player attribute `NHTouchMenu` (client) names the one that hid them. |
+
+![iPhone 14 size (844x390)](img/phone-844x390.jpg)
+
+![iPhone SE size (667x375)](img/phone-667x375.jpg)
+
+![The Journal clamped to the screen](img/phone-journal.jpg) ![The phone app](img/phone-phone-app.jpg)
+
+### Kit additions (`ReplicatedStorage.UI.Components`)
+
+| Function | What it does |
+|---|---|
+| `Components.Viewport()` | the viewport every scale rule uses (Studio previews can override it) |
+| `Components.TouchOnly()` | a touch screen with no keyboard (Studio: `NHTouchTest`) |
+| `Components.Phone()` | a touch-only screen whose shorter side is under `Theme.Scale.PhoneBelow` (600) |
+| `AutoScale(gui, { phoneScale = n })` | this exact scale on phones |
+| `Components.ClampPanels(gui, phone, s, vp)` | run by `AutoScale`, also when a child is added |
+| `Components.PreviewChanged` | fires when a Studio preview size is set or cleared |
+
+### Previewing a phone in Studio
+
+Studio's window can't be resized to a phone, so:
+
+1. Set the ReplicatedStorage attributes `NHTouchTest = true` and `NHPhonePreview` = `Vector2.new(667, 375)` (or `844, 390`, `1024, 768`). Every kit screen then lays itself out for that size.
+2. Run `Studio/tests/phone_preview.luau` (client). It copies every visible gui, at its own scale, into a frame of that size and lists what sticks out.
+3. Run `Studio/tests/phone_panel.luau` with a menu open to measure it.
+
+The copy is static: run it again after a change. Elements placed from another gui's real screen position (the EXP strip under the health bar) show in the wrong spot in the copy only.
+
 ## Testing in Studio
 
 - **Turn it on:** set the ReplicatedStorage attribute `NHTouchTest = true` before Play to get the touch layout with a mouse. Clicking a button works like tapping it.
@@ -64,5 +112,5 @@ In order of importance, only when they apply:
 ## Not done yet
 
 - **Not tried on a real phone or tablet**, and multi-touch (holding two buttons at once) isn't tested. The layout was checked at 1731x683 and 1447x683 in Studio; phone sizes come from Roblox's jump-button rules.
-- **Phone-size UI pass:** the rest of the UI keeps its desktop layout at a 0.92 touch scale, which is large on a phone. This covers the clock panel, the top bar, the left buttons (Factions, Journal), the region cards and the phone. It needs a pass of its own.
+- ~~**Phone-size UI pass**~~ Done in 1.30.0 (above). Not checked at phone size yet: menus that are built when first opened (the locker, timetable, stats, evolution, students list, identity, admin panel, sports screens) and the region cards. The panel clamp covers the tall ones, but nobody has looked at them. Notched phones (safe-area insets) aren't modelled in the preview either.
 - **Not covered by touch buttons:** sports (they hide the buttons; Football has its own touch check), class activities, and the hotbar's number keys (the slots are tapped instead).
