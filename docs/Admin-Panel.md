@@ -52,7 +52,7 @@ Other UI can open the desk by setting the player attribute `NHAdminOpen` to `tru
   - **Go to a place (1.18):** a button for each of the 19 regions. A toggle sends the selected student there instead of you.
   - **Announcements:** send one to the whole server.
   - **Server lock (1.18):** while it's on, new players who aren't staff are turned away. Shutting the server down is owner-only.
-- **Spawns:** a delinquent crew, a wolf pack (night only), a sparring partner, or clear all enemies.
+- **Spawns:** a delinquent crew, a wolf pack (night only), a sparring partner of any difficulty (Easy, Normal, Hard, Nightmare; 1.23), or clear all enemies.
 - **Self:** fly (WASD, Space, Ctrl, Shift for speed), noclip, ESP (names and health through walls), Ctrl+click teleport, invisibility, heal, and stop spectating.
 - **Server:** students, uptime, physics FPS, memory, school clock, enemy and wolf counts, and the staff log (the last 200 actions).
 

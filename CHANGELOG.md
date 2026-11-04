@@ -2,6 +2,57 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.23.0] - 2026-11-04: Enemies with a skill level
+
+### Added
+- **Four difficulty tiers for combat NPCs** (`Config.NPC.Tiers`: Easy, Normal, Hard, Nightmare; see `docs/Combat-System.md`, *Enemy difficulty*). A config picks one with `Tier` (default Normal), and `Config.NPC.Resolve` lays the tier's combat fields over it.
+
+  | Tier | Who | React | Parry | Dodge | Guard | Feint | Punish | Attack gap | Pips |
+  |---|---|---|---|---|---|---|---|---|---|
+  | Easy | delinquent grunt | 0.34-0.46 s | 10% | 5% | 15% after 3 hits | no | no | 1.2 s | 1 |
+  | Normal | delinquent brute, a plain spawn | 0.26-0.34 s | 25% | 12% | 30% after 2 | rare | no | 0.9 s | 2 |
+  | Hard | gang leader | 0.17-0.23 s | 45% | 20% | 45% after 2 | yes | yes | 0.6 s | 3 |
+  | Nightmare | Ring Champion, Cmdr ParryDemon | 0.11-0.17 s | 65% | 30% | 55% after 1 | reads your block | yes | 0.45 s | 4 |
+
+- **Difficulty pips**: 1 to 4 crimson pips under an enemy's name (the kit's Pip art), and the `Difficulty` attribute on the model.
+- **Punish**: Hard and Nightmare strike straight away after one of their parries lands.
+- **Admin panel → Spawns**: a sparring partner of each tier (`SpawnSparring` takes `Tier`).
+- **Studio only**: `NHStat_*` counters on each enemy (swings seen, plans, parries pressed and landed, dodges, guards, hits taken, punishes), and the test-bridge commands `AIThreat` and `AIStats`.
+
+### Changed
+- **Reactions are rolled once per swing you throw** (`NPCBehaviors.ObserveSwing`), after the tier's reaction time, instead of every update (up to 60 times a second). Before, even a 0.2-skill grunt parried most swings, and skill barely changed anything.
+- A parry is timed to the swing's hit (its animation's `Hit` marker, or Fist's fallback timings), off by up to the tier's `Timing`.
+- **No parry or guard while stunned**, so a combo that lands keeps landing. Once per stun, an enemy may break out with an evasive (tier `Evasive`).
+- Enemies guard up after a string of hits (tier `BlockAfterHits`). Every hit now reaches the AI (`AI.OnNPCHit`, from `DamageLogic`), while threat stays player-only.
+- Feints are rolled once per swing of its own (more often while you hold block), uppercuts at most once a second, jumps and slides per second, and heavies by tier.
+- Sprint and chase speed come from the tier (19 to 24), so you can still outrun them.
+
+### Fixed
+- **Outrunning an enemy left you "claimed"**: the claim was cleared after the target was dropped, so other enemies only circled you. It's now released first, and on a target switch too.
+- Enemies picked **downed, carried, gripped, dueling, protected or main-menu** players and flickered between them. A duel champion could be pulled off its opponent by a bystander's hit.
+- Parries, guards, uppercuts and weapon equips **waited inside the AI update**, pausing every NPC, and two overlapping parries cancelled each other.
+- Attacks started from up to 1.5x range and whiffed. They now start only within reach.
+- Enemies **snapped upright while ragdolled**, and strafed with a side-to-side jitter.
+- The hold-guard reaction could never fire (its hit memory was never filled).
+- One NPC's update error stopped the update for every NPC after it. Each now runs on its own `pcall` and warns at most every 10 s.
+- With more than 10 players, the nearby-target search errored (`Live` is a Folder, not a world).
+
+### Testing
+- **Per-tier test**: one enemy of each tier fought the Attacking dummy (an M1 every 0.3 s) for 35 s.
+  - Parries planned (about 30 swings each): 1 / 7 / 10 / 18.
+  - Hits taken: 13 / 11 / 10 / 5.
+  - Punishes fired on Hard and Nightmare.
+- **Single-swing test**: a dummy faced the enemy and threw one M1 every 1.5 s, 18 times.
+  - 19 of 20 parry presses landed (timing check).
+  - Parries landed: Easy 3, Normal 2, Hard 5, Nightmare 9. Nightmare took no hits.
+  - Pips showed 1 / 2 / 3 / 4 and stayed in place.
+- In Play, delinquents spawned as Easy (grunt), Normal (brute) and Hard (leader), and the console showed no AI errors. No save slot was loaded during any test.
+- **Not verified yet**:
+  - fights against a real player (every test was enemy vs dummy, because enemies now ignore main-menu players)
+  - the Ring Champion duel
+  - the admin panel tier buttons clicked in Play
+  - two enemies sharing one player (the claim fix)
+
 ## [1.22.0] - 2026-11-04: The cafeteria and the spire (props batches 15 to 17)
 
 ### Added

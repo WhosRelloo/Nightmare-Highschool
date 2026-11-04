@@ -52,7 +52,7 @@ Each attack's movement comes from one place, so nothing fights it:
 - `ActionManager.CanActivate` checks the requested action's cooldown **before** cancelling the current action. Before 1.8.4, any press on cooldown (a dash, an M1, a skill) silently ended your sprint or block.
 
 ### Enemies that use this code
-- **Delinquents** (`Features.Delinquents`) fight with the Fist moveset through the regular combat AI. `Config.Skill` (0 to 1) scales how often they block, parry, dodge, feint and uppercut.
+- **Delinquents** (`Features.Delinquents`) fight with the Fist moveset through the regular combat AI. Their difficulty tier (1.23: grunt Easy, brute Normal, leader Hard; see *Enemy difficulty*) sets how they parry, block, dodge, feint and attack. Before 1.23 a `Config.Skill` from 0 to 1 did this.
   - Since 1.8.5 they can be **downed** like students (`Config.Downed.NPCsCanBeDowned`), so they can be carried (V), gripped (B) or finished with a race action (N).
   - A downed delinquent left alone gets back up after 15 s at 25% health.
   - A finish, or any kill, pays the killer through `AI.NPCDefeated` → `Downed.GetKiller`.
@@ -141,6 +141,43 @@ On `Services.AI.AI`:
   - Holding Ctrl crouched (speed 7, Crouch animation, camera dip). Walking played CrouchWalk at speed 7. Letting go stood up and restored speed 14.4.
   - Sprint + Ctrl played the slide with no crouch. A jump while holding stood you up.
 - **Not yet:** a crouch button for phones and gamepads. After a jump you have to press Ctrl again to crouch.
+
+## Enemy difficulty (1.23)
+
+Every combat NPC (`Services.AI.AI`) has a tier: **Easy, Normal, Hard or Nightmare** (`Config.NPC.Tiers`). Its config picks one with `Tier` (default Normal); `Config.NPC.Resolve` lays the tier's combat fields over the config, and `NPCController.Create` uses the result. Older configs that only set `Skill` map to a tier.
+
+| Tier | Who | Pips |
+|---|---|---|
+| Easy | delinquent grunt | 1 |
+| Normal | delinquent brute, a plain `AI.Spawn`, the test bridge's `SpawnAI` | 2 |
+| Hard | gang leader | 3 |
+| Nightmare | the Ring Champion (duels), the Cmdr ParryDemon | 4 |
+
+Admins spawn a sparring partner of any tier from the admin panel (Spawns).
+
+**Tier fields**
+- `React`: seconds from your swing starting to a dodge or a guard (a random value in the range).
+- `Parry`, `Dodge`: the chance, rolled **once per swing you throw**, to parry or sidestep it. A heavy (M2, uppercut, slam) adds `Heavy`.
+  - A parry is timed to the swing's hit: the animation's `Hit` marker (Fist uses `Config.Weapons.Fist.Markers`), pressed 0.14 s early, off by up to `Timing` either way.
+  - The parry window is 0.25 s.
+- `Block`, `BlockAfterHits`: the chance to raise a held guard instead, once it has taken that many hits in a row (the count resets after 2.5 s without one).
+- `Evasive`: once per stun, the chance to break out with an evasive.
+- `Feint`, `ReadBlock`: the chance to feint one of its own swings, multiplied by `ReadBlock` while you hold block.
+- `Punish`: right after one of its parries lands, it attacks without waiting.
+- `Uppercut`, `M2`: the chance to open with an uppercut (at most one roll a second) or a heavy instead of a light.
+- `AttackCooldown`, `MaxStringLength`, `MaxPressureTime`, `RecoveryWindow`: attack pace and the stunlock guard (below).
+- `ChaseSpeed`, `SprintSpeed` (19 to 24, so a sprinting player still gets away), `Jump`, `Slide` (chances per second while closing in).
+
+**Rules for every tier**
+- No parry or guard while stunned, so a combo that lands keeps landing.
+- Nothing in the AI update waits. A parry or guard that has to cancel a swing first runs 50 ms later in its own thread.
+- Every hit an NPC takes reaches the AI (`AI.OnNPCHit`, called from `DamageLogic`). Threat (who it fights) still comes only from players (`AI.OnNPCDamaged`).
+- Targets must be up, in the world and fair game (`NPCController` `Local.CanTarget`): not downed, carried, gripped, `Protected`, `Dueling` or on the main menu. A duel champion ignores everyone but its opponent.
+- When an NPC drops its target it gives the `Agro` claim back first (`Local.DropTarget`), so other NPCs can take over.
+
+**Studio only:** `NHStat_*` attributes on each NPC count swings seen, plans, parries pressed and landed, dodges, guards, evasives, hits taken and punishes. The test bridge has `AIThreat(npc, attacker)` and `AIStats(npc)`.
+
+**Tested (1.23):** see CHANGELOG 1.23.0. Against a dummy that threw one swing every 1.5 s, 19 of 20 parry presses landed, and Nightmare took no hits in 18 swings.
 
 ## AI fairness (stunlock fix)
 
