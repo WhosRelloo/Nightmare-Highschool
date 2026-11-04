@@ -2,6 +2,32 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.19.0] - 2026-11-03: NPCs who move, look and talk like students
+
+### Changed
+- **NPCs are the player's size.** The NPC rig is now 0.9 scale (4.5 studs), the same as a player character, until a height system arrives.
+- **NPCs idle and walk like an unarmed player.** They used the Katana pack, so they stood in a sword stance.
+- **Feet keep to the ground.** NPCs walk at a pace that matches the walk animation (about 5.3 studs/s at 1×; they used to slide at twice the stride).
+  - **Speeds:** students and the cast 6, the hall monitor's patrol 7.
+  - **Smooth paths:** students follow their paths like the hall monitor, without stopping at every waypoint.
+- **NPC hair sits like a player's.** Roblox rescaled each NPC hair a second time when it went on, so it sat small and high on the head. It's now exactly a player's size and fit.
+- **Dress code.** NPCs in school wear only school clothes; people outside the school (the factions' turf) wear civilian clothes. Players aren't affected.
+
+### Added
+- **Voice lines.** Now and then an NPC near you says something in a small bubble: students, teachers, coaches, the hall monitor, the custodian, the lunch lady and delinquents each have their own lines, and some change after dark.
+  - **Kept sparse:** at most two bubbles at a time, a new one every 7 to 14 s, only for NPCs nearby and in view, and none in menus, dialogues or cinematic view.
+
+### Testing
+- **Studio Play** (at night with slot II, and at Break with no slot loaded):
+  - **Animations:** all 12 cast NPCs play the unarmed idle or walk. The students walk with the player's walk at 1.1× while moving at 6.
+  - **Movement:** none of 6,622 walking frames dropped to a stop.
+  - **Size:** 30 of 31 NPCs are at the player's 0.9 scale. The other is the 0.8-scale combat test dummy `ParryTrade`.
+  - **Hair:** every NPC hair is at 0.880× the catalog size, the same as the player's, and welded to the head. Close-ups show it wrapping the head.
+  - **Clothes:** 0 of 26 NPCs break the dress code; the 3 delinquents on the Back Lot are in civilian clothes.
+  - **Hall benches:** up to 3 students sat at once, with hips on the seat and never two in one place. A double-booking bug was fixed first.
+  - **Voice lines:** bubbles appeared one at a time, and the first sat over a name tag, so it now sits above it.
+- **Not tested:** two players, Reduce Motion for the bubbles, and the dress code's look on screen (checked through the data).
+
 ## [1.18.4] - 2026-11-03: Out of the lockers, NPCs in their seats, hair that fits
 
 ### Fixed

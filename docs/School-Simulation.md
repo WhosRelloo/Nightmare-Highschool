@@ -87,6 +87,8 @@ A 40-minute class is about 3 minutes 20 seconds of real time, and a passing peri
 | Evening | the even-numbered students go home at once, everyone by 19:00 |
 
 - **Movement:** PathfindingService with agent radius 1, because the 8-stud doorways have props beside them. With no path, a student stays put.
+  - **Smooth paths (1.19.0):** like the hall monitor, a student steers at its waypoint every frame and moves on to the next one while still 3.5 studs short of it, so it never brakes mid-walk. Only the last point is walked right up to. In a 12-second Break sample, none of 6,622 walking frames dropped to a stop.
+  - **Speed:** students stroll at 6 studs/s.
 - **Collisions:** collision group `NHWalkers` doesn't collide with players, other walkers or sports balls.
 - **Each model:** `Role = "Ambient"`, `NHScheduled = index`, and `NHActivity` (what they're doing).
 - **API:** `Schedules.Pause(on)`; `Schedules.Debug()`; `Schedules.PlanForTests(kind, name?, hour?)` plans a period without moving the clock.
@@ -114,3 +116,30 @@ Click the clock at the top-right (`Controllers.Gui.Timetable`). It shows the who
 - **Detention:** any detention you owe.
 
 It ticks every half second while open, and re-reads your attendance when a new segment starts.
+
+## NPCs like players (1.19.0)
+Every NPC is built from `ServerScriptService.Services.AI.AI.Rig`. Students, the cast, the hall monitor, the watchers, the lunch lady, the delinquents and the ambient students all clone it.
+
+- **Size:** the rig is now `ScaleTo(0.9)`, the player's StarterCharacter scale: 4.5 studs tall, with the same head, joints and hair attachment. The full-size original is `ServerStorage.NH_Backup.Fixes_1119.Rig_full`. When a height system arrives, scale the rig with it.
+- **Idle and walk:** an NPC idles and walks like an unarmed player, using the Default movement pack (`ReplicatedStorage.Assets.Animations.Default.Movement`, Idle `116858893264840` and Walk `113454991107499`).
+  - **Before:** NPC profiles carry a Katana, so `AI.AI.Animate` used the Katana pack, a sword stance and a blade walk.
+  - **Now:** `AI.AI.Animate` takes Idle and Walk from Default, and Schedules reads the same two ids from the pack.
+- **Walk speed matches the clip:**
+  - **The clip's pace:** measured on the 0.9 rig (a still copy playing the walk at 1×, foot sweep per step), the Default walk covers about 5.3 studs/s.
+  - **The fix:** NPCs play it at speed ÷ 5.3, so their feet keep to the ground. Before it was speed ÷ 10, so the body moved about twice as fast as the feet. Players are unchanged.
+  - **Speeds:** students 6, the cast 6, the hall monitor's patrol 7. The monitor's chase (15) and the watchers (6 and 7) are unchanged.
+- **Hair:** `Humanoid:AddAccessory` rescales a new accessory by the model's scale on the scaled NPC rig, but not on the player's character. That shrank every NPC hair a second time, so it sat small and high on the head with the forehead and crown bare. `Appearance.wearCatalogHair` now notes the size it meant before `AddAccessory`, then puts it back and re-welds if it changed. Every NPC hair, and the player's, now sits at 0.88× the catalog size.
+- **Dress code (`Appearance.DressCode`, NPCs only):**
+  - **Who:** models in `Live`, `NHSchedule`, `NHAmbient` or `NHConcession` that aren't players and aren't in the menu scene.
+  - **The rule:** where the NPC stands when its look goes on decides it. The factions' turf (Config.Regions kind Turf: the Back Lot, the West Edge) means civilian clothes; anywhere else is the school and its grounds, so school clothes.
+  - **Overrides:** scheduled students always wear school clothes. `NHDress = "School" | "Civilian"` forces either.
+  - **What counts as school:** `Appearance.SchoolTops` / `SchoolBottoms` list the school items. Anything that breaks the rule is swapped for an everyday item (`SWAP` in Appearance) that suits the body, picked the same way every time for the same NPC. PE kit, cheer and formalwear stay allowed but only appear when an NPC's own look asks for them.
+- **Voice lines:** `Controllers.World.Chatter`, client only.
+  - **What:** now and then an NPC near you says a line in a small kit bubble: an ink panel, a gold hairline and an italic Garamond line.
+  - **Lines fit the speaker:** students, teachers, coaches, the hall monitor, the custodian, the lunch lady, delinquents, and the ambient students' own lines. A few student lines change after dark.
+  - **Kept quiet:**
+    - at most 2 bubbles at once, with a new one every 7 to 14 s
+    - only NPCs within 38 studs, on screen and not behind a wall
+    - the same NPC waits 40 s between lines
+    - nothing in the menu, a dialogue or cinematic view
+    - bubbles sit above the cast's name tags
