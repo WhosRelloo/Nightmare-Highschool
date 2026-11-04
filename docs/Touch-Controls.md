@@ -1,5 +1,7 @@
 # Touch controls
 
+(For a gamepad, see [Console-Controls](Console-Controls.md).)
+
 On phones and tablets (touch-only screens), on-screen buttons do everything the keyboard does in combat, carrying, the skateboard and your race's actions. `StarterPlayerScripts.Controllers.Gui.TouchControls` (1.29.0).
 
 ![The touch buttons on foot](img/touch-controls.jpg)

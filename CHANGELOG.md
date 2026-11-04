@@ -2,6 +2,38 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.31.0] - 2026-11-04: Console controls
+
+### Added
+- **Gamepad combat** (`Bind.Keybinds.Config`):
+  - RT strike, RB heavy, LT block, LB feint, B dodge
+  - X interact / draw, Y carry, D-pad Up grip / board
+  - These run the same action modules as the keys, and a Settings rebind keeps them.
+- **`Controllers.Gui.GamepadControls`** (new; docs/Console-Controls.md):
+  - LS run and RS crouch / slide, as toggles. RS takes over the camera's zoom.
+  - D-pad Down race action, D-pad Left / Right hotbar.
+  - As a wolf, RT bites (held) and RB leaps.
+  - **Quick menu (View):** a kit panel with the phone, journal, factions, report card, students, study group, locker, wardrobe and emotes, transform and night sight for night races, cinematic and settings, plus the controls.
+- **Menu navigation:**
+  - Opening a menu on a gamepad selects its first button and holds navigation inside it. A presses, B closes it without dodging, and B also leaves the cinematic view.
+  - The selection outline is the kit's gold FrameThin.
+  - Dialogue selects its first reply.
+- **`Components.InputKind()` / `InputKindChanged`:** the main menu and dialogue hints show keyboard, gamepad or touch wording, and `KeyName` knows LS, RS, View and the D-pad.
+- **Studio:** the ReplicatedStorage attribute `NHGamepadTest` treats the session as a gamepad, and the action log (`NHLastAction`) runs with it too.
+
+### Verified (Studio, no slot, evening; simulated gamepad buttons)
+- **Actions:**
+  - LT block (held, then released), B dodge, RB heavy, LB feint, RT strike, X equip, Y carry and D-pad Up grip each ran their action.
+  - LS toggled sprint on and off. RS toggled crouch, after the camera took it until the priority binding.
+  - D-pad Right stepped the hotbar to slot 2.
+- **Quick menu:** View opened it with Phone selected and the gold outline showing. B closed it with no dodge.
+- **Journal:** J opened it with its Quests tab selected. B closed it, and a second B dodged.
+- **Phone:** selecting hotbar slot 2 opened it with its first app selected, and B closed it.
+- **Cinematic:** B left it.
+- **Hints:** the main menu showed the gamepad hint under the flag and the keyboard hint without it.
+- **Keyboard:** Ctrl still crouched, there was no touch or gamepad menu, and no script errors.
+- **Not tested:** a real controller or console (A on a selected button, stick navigation, trigger thresholds), and sliders with the D-pad.
+
 ## [1.30.0] - 2026-11-04: Phone-size screens
 
 ### Changed
