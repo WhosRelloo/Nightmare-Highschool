@@ -2,6 +2,44 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.35.0] - 2026-11-04: Joining a clique (Cliques Phase 6)
+
+### Added
+- **Clique membership** (`Services.Social.CliqueMembership`, new; docs/Cliques.md):
+  - **One crowd at a time:** join one of the six new cliques at Respected after beating their leader ("I want to join you."). The Vigil and the Court still join as factions, and you can't be in a faction and one of the six at once.
+  - **Ranks:**
+    - **Hanger-on:** members greet you by name, and their backup comes anywhere.
+    - **Member:** a crew member walks with you outside class and fights with you.
+    - **Lieutenant:** a crew of two, and jobs pay half again.
+  - **Rivals:** they confront you on their turf.
+- **Member jobs:** 18 in `Config.Quests`, one a day from your leader ("Got a job for me?"):
+  - **Hold the Line:** win 2 fights for us.
+  - **Payback:** prank the rival twice.
+  - **Guard Duty:** stop a rival prank at your hangout; one is sent soon after you take it.
+  - **Reward:** +6 standing and 25 Yen.
+- **Leaving is a betrayal:** from the leader or the phone (asked twice). Standing drops to Hostile, your showdown win is wiped, and the leader texts you, then challenges you again.
+- **Phone:** your clique's card shows MEMBER and your rank, with a Leave button. The Today tab shows your clique, rank and today's job.
+- **Quests:** `Job = true` daily jobs (`Quests.JobFor`), and the `StopPrank` objective.
+- **Test hooks:** `MemberTest`, `MemberState`, `CanJoin`, `GuardDuty`.
+
+### Verified (Studio Play, no slot, evening; `MemberTest` stood in for a saved membership)
+- **As a test Lieutenant of the Athletes:**
+  - `NHClique` was set and two Varsity Bruisers spawned. When the player moved 30 studs they followed to about 4.5 studs away.
+  - The Today summary showed the rank and today's job (Hold the Line, "Ask Captain Rhys Thorne").
+- **The crew fights:** in an Ink Club confrontation at the Ink Studio, the crew fought back. Both crew members took hits, and two pranksters were at 48 and 30 of 60 health.
+- **Phone:** the Athletes card showed "MEMBER · LIEUTENANT" with a crimson Leave button. The first press said "Press Leave again to walk out. They'll turn on you." and the button changed to "Sure?".
+- **Guard Duty:** the Ink Club came to prank the Athletes' gym (it waited for another prank already going on to finish first).
+- **Rhys's dialogue:**
+  - Not a member: "I want to join you." showed, and with no save it gave the refusal.
+  - As a member: "I'm out." showed, asked "I'm sure. I'm out." / "Forget I said anything.", and backing out kept the membership.
+- **Console:** no script errors.
+- **Not tested yet (needs a loaded slot):**
+  - a real join, rank by standing, a real leave and its betrayal (Hostile, the wiped win, the text, the challenge);
+  - the faction / clique refusals;
+  - jobs being offered, done and paid (including the Lieutenant bonus);
+  - greetings by name;
+  - the rival-turf confrontation for members.
+
 ## [1.34.0] - 2026-11-04: Leader showdowns (Cliques Phase 5)
 
 ### Added

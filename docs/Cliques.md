@@ -322,6 +322,59 @@ It refreshes every 5 s while open.
 
 **Test hooks.** `Showdown(name, clique, path?)` (start a fight now), `ShowdownState()`, `ShowdownHurt(clique, amount)`, `ShowdownWin(name, clique)` (record a win: needs a slot), `CanShowdown(name, clique)`.
 
+## Phase 6 (1.35): joining a clique
+
+`Services.Social.CliqueMembership` (new); settings in `Config.Cliques.Membership`; lines `Joined`, `Betrayed` and `Greet` on the six joinable cliques; jobs `Job<Clique>1-3` in `Config.Quests`.
+
+**One crowd at a time (owner's pick).**
+- **The Vigil and the Crimson Court** are joined through `Social.Factions`, as before.
+- **The other six** (Athletes, Delinquents, Pack, Ordinary, Choir, Ink Club) are joined through this service.
+- **No doubling up:** a faction member can't join one of the six, and the other way round. `Factions.CanJoin` returns `CliqueMember`, and the leaders' faction dialogue has a line for it.
+
+**Joining.** Respected (`JoinAt` 60) and the leader's showdown won (Phase 5). Ask the leader: "I want to join you." (`Dialogue.GiverTemplate`).
+- **Refusals:** NotRespected, NotBeaten ("Ask me for a showdown"), OtherClique.
+- **Saved in** `PlayerData.Social.Membership`.
+- **Player attributes:** `NHClique` (also set for a faction member) and `NHCliqueRank`.
+
+**Ranks** (by your standing while you're in):
+
+| Rank | From | What you get |
+|---|---|---|
+| Hanger-on | 60 | Members greet you by name (`Greet` lines, only you see them: `Cliques.SayTo`), and their backup comes anywhere (`CliqueFights` backup) |
+| Member | 75 | One crew member walks with you outside class and fights with you |
+| Lieutenant | 90 | A crew of two; member jobs pay `LieutenantBonus` (1.5x) |
+
+**The crew** (`CrewStep`, every 0.5 s).
+- **Who:** the clique's fighters (`CliqueFights.SpawnFighter`, Player attribute `NHCrewOf`).
+- **Following:** they walk 4 studs behind you, and catch up by teleporting if you get 70 studs ahead.
+- **Fighting:** they fight NPCs who hit you or that you hit. Never players.
+- **When they're gone:** in class, at night, on the main menu, in duels and sports, and while you're down.
+- **Losses:** a downed crew member is replaced after `CrewRespawn` (60) s.
+
+**Rivals.** The rival clique confronts you on its turf even if it doesn't hate you. `CliqueFights.TurfStep` reads `NHClique`.
+
+**Member jobs** (`Job = true`, Category `Job`).
+- **One a day** from the leader, "Got a job for me?" (`Quests.JobFor`, the dares' daily rules: done for the event day, gone at 6 AM).
+- **The three:**
+  - **Hold the Line:** win 2 scuffles or rumbles for us.
+  - **Payback:** prank the rival twice.
+  - **Guard Duty:** stop a rival prank at our hangout. The new `StopPrank` objective counts when you put the prankster down, and `CliquePranks.GuardDuty` sends the rival's prank about 30 s after you take the job.
+- **Reward:** +6 standing and 25 Yen, and half again for a Lieutenant.
+
+**Leaving is a betrayal (owner's pick).**
+- **How:** from the leader ("I'm out.", then "I'm sure. I'm out."), or the phone (Leave, pressed twice within 6 s; `NHCliques.Leave`).
+- **What happens:**
+  - Your standing drops to `BetrayTo` (−50, Hostile).
+  - Your showdown win with them is wiped, so their leader challenges you again (Phase 5).
+  - Their leader texts you their `Betrayed` line.
+  - Your job is dropped and the crew walks off.
+- **Rejoining** means Respected and beating them again.
+- **The factions** keep their own leaving rules (you keep half your standing).
+
+**Phone.** The clique's card in the Cliques app shows **MEMBER · rank** with a crimson **Leave** button. The Today tab shows **Your clique**: rank, points to the next rank, and today's job and its state.
+
+**Test hooks.** `MemberTest(name, clique?, rank?)` treats a no-slot player as a member at a rank, with nothing saved; no clique ends it. Also `MemberState(name)`, `CanJoin(name, clique)` and `GuardDuty(name, clique)`.
+
 ## Test hooks (Studio only, `ServerStorage.NHTestBridge`)
 - `SchedulePlan(kind, name?, hour?)`: put every student on a plan now, for example `("Break", "Break", 9)`
 - `ScheduleDebug()`: each student's index, clique, activity and seat
@@ -336,4 +389,4 @@ It refreshes every 5 s while open.
 - ~~**Phase 3:** turf, leader quests and rank rewards for every clique.~~ Done in 1.28.0 (above).
 - ~~**Phase 4:** events: pranks, rumble days, the bulletin and dares.~~ Done in 1.33.0 (above).
 - ~~**Phase 5:** leader showdowns, friend or foe, and King of the School.~~ Done in 1.34.0 (above).
-- **Phase 6:** joining a clique.
+- ~~**Phase 6:** joining a clique.~~ Done in 1.35.0 (above). That completes the owner's Phase 4-6 plan.
