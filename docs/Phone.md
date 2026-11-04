@@ -28,7 +28,7 @@ A modern smartphone layout (the owner's reference) in the school's style:
 | The Midnight Bell | grid | the live school paper |
 | Timetable | grid | opens the timetable |
 | Study Group | grid | opens the study group drawer |
-| Factions | grid | opens the factions panel |
+| Cliques | grid | all eight cliques and your standing with each; the Vigil and the Court also show your faction rank and open the factions panel (1.21.0, replaces the Factions icon; see Cliques.md) |
 | Style | grid | wallpapers: 8 presets or an image ID |
 | Options | grid | opens Options |
 

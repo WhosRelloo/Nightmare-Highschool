@@ -12,6 +12,7 @@ How each result was checked:
 
 | Change | Where | Verified |
 |---|---|---|
+| **1.21.0**: cliques Phase 1: eight Bully-style cliques with members, dress, lines, hangouts, rivals and saved standing; five stand-in hangouts (the Commons, the Chapel, the Ink Studio, the Crimson Parlor, the Den); three new leaders; the phone's Cliques app; students no longer stand up onto desks, and hop the gym's doorway ledge | `Config.Cliques` (new), `Social.Cliques` (new), `Features.Schedules`, `World.Chatter`, `Gui.Phone`, `Config.Regions`, `workspace.NHCliqueAreas` / `Regions`, `Studio.TestBridge` | **[PT]** no slot loaded; see CHANGELOG 1.21.0 |
 | Fixed mouse keybinds (M1, Feint) after Roblox renamed `KeyCode.Unknown` to `None` | `ReplicatedStorage.Packages.Bind.Keybinds` | **[PT-real]** M1 combo 1→4, damage lands |
 | Keybind callback errors now `warn` the real message | same | [CR] |
 | Moved 7 inert duplicate dummies out of `workspace.Live` | `ServerStorage._InertLiveDummies_Backup` | [PT] Live now holds only the working dummies at play time |

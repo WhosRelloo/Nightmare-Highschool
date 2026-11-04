@@ -20,6 +20,8 @@ Something is wrong with Nightmare Highschool, and two cliques have picked sides.
 | Trusted Member perk | **Vigil Pass**: once per in-game day, a hall monitor lets you off with a warning | **Shadowstep**: hall monitors lose track of you twice as fast |
 | Inner Circle perk (needs a reputation score too) | **Blessed Scholar**: +50% Yen from passed lessons (needs Academics 40) | **Unseen**: witnesses must be twice as close to recognise you marking a wall (needs Intimidation 30) |
 
+**Cliques (1.21.0):** the Vigil and the Court are two of eight cliques (Cliques.md), and *The Ordinary* is now a clique you can stand well or badly with (not a faction to join).
+
 **Rumoured, not playable:** *The Ordinary* (humans who just want to graduate alive) and *The Hollow* (tied to whatever is under the school). They're listed in `Config.Factions.Planned` and in the panel's Rumours section.
 
 ## Ranks and standing (`Config.Factions`)

@@ -10,7 +10,7 @@ Walk into a named place and a quiet title card names it, just under the compass.
   - a pip that turns into place, with the kit divider drawing out from it both ways
   - a dim italic line, and a faint glow breathing behind the name
 - **Danger places** are crimson, and the name flickers like a candle. These are the Forbidden places, faction turf, and Restricted places after dark (with their night text and the kicker "OUT OF BOUNDS AFTER DARK").
-- **A first visit** adds a row: the wax seal stamps down with a burst of glow, then "DISCOVERED N / 19", then a pip for every place, with the new one lighting up and a soft bell.
+- **A first visit** adds a row: the wax seal stamps down with a burst of glow, then "DISCOVERED N / 24" (19 before 1.21.0), then a pip for every place, with the new one lighting up and a soft bell.
 - **The compass:** when you face nothing, its readout names the place you're in (◇ The Main Hall). While a card shows, the readout stays clear.
 - **The arrival card** (leaving the main menu) now names your region too.
 
@@ -23,7 +23,7 @@ Walk into a named place and a quiet title card names it, just under the compass.
 - **Toasts** step down out of the card's way while it shows.
 - **Reduce Motion:** the card just fades.
 
-## The places (19 to find)
+## The places (24 to find)
 | Id | Card name | Kind | Priority |
 |---|---|---|---|
 | MainHall | The Main Hall | School | 2 |
@@ -38,9 +38,16 @@ Walk into a named place and a quiet title card names it, just under the compass.
 | Pitch | The West Pitch | Sports | 4 |
 | Field | The North Field | Sports | 4 |
 | PracticeLanes | The Practice Lanes | Sports | 4 |
+| Commons | The Commons (kicker "The Ordinary") | School | 3 |
+| Chapel | The Chapel (kicker "The Chapel Choir") | School | 5 |
+| InkStudio | The Ink Studio (kicker "The Ink Club") | School | 5 |
+| CrimsonParlor | The Crimson Parlor (kicker "Crimson Court turf") | Turf | 5 |
+| Den | The Den (kicker "Pack turf") | Turf | 4 |
 | BackLot | The Back Lot | Turf | 3 |
 | WestEdge | The West Edge | Turf | 3 |
 | Grounds | School Grounds (not counted, no card) | Grounds | 1 |
+
+The five clique hangouts (1.21.0) are stand-ins in `workspace.NHCliqueAreas` until the builder's map; see Cliques.md. A slot that already earned Explorer at 19 keeps the title.
 
 Each place's daytime and night line is in `ReplicatedStorage.Config.Regions`. Where boxes overlap, the highest Priority wins, then the smaller box.
 
@@ -72,7 +79,7 @@ The total count updates on its own. The build script is a scratch Edit script, `
     2. rate-limits the call to one per 0.3 s
     3. saves the place to `PlayerData.Regions.Found` (UpdateState `SetRegions`)
     4. gives `Config.Progression.Exp.RegionFound` (15 Quest EXP)
-    5. when all 19 are found, calls `Reputation.AwardTitle(Player, "Explorer")`
+    5. when all of them are found (24 since 1.21.0), calls `Reputation.AwardTitle(Player, "Explorer")`
 - **Cinematic:** `Controllers.Gui.Cinematic` now skips any ScreenGui with the attribute `ShowInCinematic = true`.
 - **Compass:** `Controllers.Gui.Compass.SetRegion(name, colour)` is the new label API.
 - **Test hooks:**

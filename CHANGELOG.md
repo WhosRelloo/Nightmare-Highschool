@@ -2,6 +2,54 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.21.0] - 2026-11-04: Cliques (Phase 1)
+
+### Added
+- **Eight cliques**, Bully-style with our theme (`Config.Cliques`, `Services.Social.Cliques`; see `docs/Cliques.md`):
+  - The Vigil and the Crimson Court (the two factions)
+  - The Athletes and the Delinquents
+  - The Pack, wolf-blooded bullies
+  - The Ordinary, humans trying to graduate alive
+  - The Chapel Choir, priest-blooded faithful
+  - The Ink Club, artists and pranksters
+
+  Each has a leader, a rival, a hangout, a school-clothes palette and five lines of its own.
+- **Students belong to cliques.**
+  - **Who:** the 14 scheduled students each have one and wear its colours. The cast, the delinquents and the ambient students are tagged by name.
+  - **Where they go:** at Break they all go to their clique's hangout. After school the athletes go to their club and everyone else goes to the hangout.
+  - **At the hangout:** they stand at gathering spots facing the group, chat, sometimes lean, and move between spots.
+- **Five new places to hang out**, stand-ins until the builder's map:
+  - The Commons: the fountain and benches of the Ordinary
+  - The Chapel: stained glass, a bell tower, an altar and pews
+  - The Ink Studio: easels, paintings and paint on every surface
+  - The Crimson Parlor: damask, a chess table and a chandelier
+  - The Den: the Pack's fire in the woods
+
+  Each has a region card, so there are now 24 places to discover.
+- **Three new leaders** stand at their hangouts with cast-style name tags: Captain Rhys Thorne (Athletes), Lucien Grey (Chapel Choir cantor) and Wren Ashby (Ink Club ringleader).
+- **Standing with every clique**, from −100 to 100 (Hostile, Wary, Neutral, Friendly, Respected), saved per slot.
+  - **Phase 1 source:** putting a member on the floor costs −8, and their rival likes you a quarter of that better.
+  - **Notifications:** a change shows one, with a line when the tier changes.
+- **The phone's Cliques app** replaces the Factions icon. It shows every clique with its crowd, hangout, tagline, leader and rival, and your standing on a bar with its tier. The Vigil and the Court also show your faction rank and a button to the factions panel, which still opens with L.
+- **Clique voice lines:** a student in a clique says its lines about half the time.
+- **Test bridge:** `SchedulePlan`, `ScheduleDebug`, `Cliques` and `CliqueAdd`.
+
+### Fixed
+- **Students stood up onto desks.** In Room 103 the spot behind a chair is the next row's desk, so students leaving class stood on it and got stuck. They now stand up at the first free place at floor level around the seat.
+- **Students couldn't get into the gym.** The gym floor sits a stud above its doorway. A student stuck at a step on its path now hops it. It never hops toward furniture.
+- **The Ink Studio's doorway** showed the sky above it (a lintel was added), and the room was too dark (two warm lamps).
+
+### Testing
+- **Studio Play, no slot loaded:**
+  - **Break:** all 14 students set off for their hangouts. After about 90 s, 13 were at their spots and 1 was still walking to the Parlor. 0 were on desks or furniture (before the fix, 3 stood up onto Room 103's desks). Both athletes reached the gym.
+  - **Leaders:** all three spawn with their feet on the floor and nothing overlapping. Close-ups show their faces render like the cast's.
+  - **Phone app:** with all-zero standing it lists all 8 cliques as Neutral. With test numbers sent from the server, the bars, colours, tiers, faction ranks and Faction buttons all showed correctly (screenshot).
+  - **Standing:** tested with a stand-in profile: −8 per down, the rival's +2, clamping at ±100, bad saved values cleaned to 0, and the notifications.
+  - **Voice lines:** Ink Club lines heard from Ink students ("Who moved my brushes?").
+  - **Region boxes:** each of the five new places has its box and card text.
+- **Not tested:** a real down of a clique member on a loaded slot, standing surviving a rejoin, the new places' region cards on screen (they need a slot), the Faction button's click, and two players.
+- **Slot II note:** during these tests slot II was loaded twice, with no test script doing it, during school hours. While it was loaded, the server added day-12456 entries to its school record (a tardy, an excused Period 1, a hall-monitor truancy, and possibly more around 11:00). They haven't been removed yet.
+
 ## [1.20.0] - 2026-11-04: The Headmaster's office, the town, tables and a new concession stand (props batches 10 to 14)
 
 ### Added

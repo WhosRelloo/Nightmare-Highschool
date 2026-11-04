@@ -81,10 +81,11 @@ A 40-minute class is about 3 minutes 20 seconds of real time, and a passing peri
 | Night, Morning | off campus |
 | Before School | walk in from the gate (near the spawn) and mill about the hallway |
 | Class | students 1 to 6 sit in that period's room (the 6 chairs nearest the door), the rest leave for "the east wing" |
-| Passing, Break | hallway: walk, chat, lean on the wall, or sit on a free place on a hall bench (two per bench, 1.18.4) |
+| Passing | hallway: walk, chat, lean on the wall, or sit on a free place on a hall bench (two per bench, 1.18.4) |
+| Break | with their clique at its hangout: a free gathering spot, facing the group (1.21.0, Cliques.md) |
 | Lunch | the concession stand: 6 queue at the `NHLunchSpot` markers, the rest stand in an arc and eat |
-| After School | each student's club (gym, field, pitch, archive); a third go home from 14:00 |
-| Evening | the even-numbered students go home at once, everyone by 19:00 |
+| After School | athletes to their club (gym, field, pitch), everyone else to their clique's hangout (1.21.0); a third go home from 14:00 |
+| Evening | the even-numbered students go home at once, the rest stay at their hangout, everyone gone by 19:00 |
 
 - **Movement:** PathfindingService with agent radius 1, because the 8-stud doorways have props beside them. With no path, a student stays put.
   - **Smooth paths (1.19.0):** like the hall monitor, a student steers at its waypoint every frame and moves on to the next one while still 3.5 studs short of it, so it never brakes mid-walk. Only the last point is walked right up to. In a 12-second Break sample, none of 6,622 walking frames dropped to a stop.
@@ -143,3 +144,9 @@ Every NPC is built from `ServerScriptService.Services.AI.AI.Rig`. Students, the 
     - the same NPC waits 40 s between lines
     - nothing in the menu, a dialogue or cinematic view
     - bubbles sit above the cast's name tags
+
+## Cliques and getting about (1.21.0)
+- **Cliques:** every student has a clique (`Config.Cliques.Students`), dresses in its palette and spends Break, and most of after school, at its hangout. See Cliques.md.
+- **Standing up from a desk:** a student used to stand up 2.2 studs behind the chair, and where rows are tight (Room 103) that spot is the next row's desk, so they stood up on top of it and got stuck. `Local.StandSpot` now tries eight places around the seat and takes the first one at floor level with room to stand.
+- **Ledges:** the gym floor sits a stud above its doorway, and the NPCs couldn't climb it. A student stuck at a step on its path now hops it, twice at most. It never hops on the straight-line fallback (used when no path is found), so it can't jump onto furniture.
+
