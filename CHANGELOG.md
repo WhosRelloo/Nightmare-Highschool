@@ -2,6 +2,20 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.26.0] - 2026-11-04: Kickflips
+
+### Added
+- **E on a skateboard does a kickflip** (the owner's request):
+  - you pop up harder than an ollie while the board flips a full turn under your feet and lands flat
+  - everyone sees it: every client turns the rider's board from the trick time (`NHSkatePose = Kickflip`)
+  - it shares the ollie's cooldown
+  - tuning: `Config.Boards.Ride.kickflip`
+- **While you ride, interact prompts are off on your screen,** so E can't open one mid-trick. On foot, E is Equip and interact as before. Sports E moves only happen in matches, where you can't ride.
+
+### Testing
+- **In Play, no save slot:** E lifted the rider 4.9 studs and flipped the board a full turn back to flat, with the rider still on it. Prompts went off on the board and came back on stepping off.
+- **Not verified yet:** another player's view of the flip.
+
 ## [1.25.1] - 2026-11-04: Pips in a wrought-iron bar
 
 ### Changed

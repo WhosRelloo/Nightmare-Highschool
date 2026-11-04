@@ -12,10 +12,11 @@ Ride around the school grounds on your own board, Bully style. Nine boards, one 
 | **A / D** | steer (you lean into the turn) |
 | **Shift** | push hard: a few kicks and a short boost of top speed while you hold it |
 | **Space** | ollie (a crouch, then the pop) |
+| **E** | kickflip: a bigger pop while the board flips a full turn under your feet and lands flat |
 
 - **Speeds:** 30 studs/s cruising, up to 50 on a boost (a sprint is 40.5; the anti-teleport check allows 100).
 - **Crashes:** riding into a wall above 20 studs/s throws you off. It's a server ragdoll, so everyone sees the fall, and you're back up after 2.6 s.
-- **While you ride:** combat and movement keys are off, any held snack is put away, and the camera is left as it is.
+- **While you ride:** combat and movement keys are off, any held snack is put away, interact prompts are off on your screen (E is the kickflip), and the camera is left as it is.
 - **Not while:** you're down, gripped or carrying someone, sitting, in the main menu or in a sports match. A rider who gets downed or sat is stepped off.
 
 ## The boards
@@ -49,11 +50,12 @@ The models are props batch 18 (`art/props/nh_props_batch18.py`, deck art from `a
   - A BodyGyro holds your facing and a BodyVelocity your speed.
   - The wheels probe the ground, and a wall-like face at speed is a crash.
   - Your hip height is raised by the deck's height while you ride, so you stand on it.
-  - Pushes and ollies are timed, not animation markers.
+  - Pushes, ollies and kickflips are timed, not animation markers.
+  - **The kickflip** (`Config.Boards.Ride.kickflip`): E pops you up harder than an ollie. Between 20% and 80% of the trick the board turns a full turn about its long axis, pivoting on the deck and rising a little. This is the ride motor's `Transform`, which every client sets from the rider's `NHSkatePose = Kickflip`.
 - **Poses** `Controllers.World.SkateboardPose`: every client poses every rider on the R6 joints, in Stepped after the Animator, within 220 studs. No animation assets are needed.
   - **Stance:** side-on, a soft crouch, arms out, head over the leading shoulder.
   - **Push:** the back foot sweeps down and back.
-  - **Ollie:** crouch, pop, tuck.
+  - **Ollie and kickflip:** crouch, pop, tuck.
   - **Lean:** into the turn.
   - Every board spins its wheels with its speed and leans its trucks.
 - **Assets** `ReplicatedStorage.NHSkate`: `Boards` (the rigged templates), `Sounds`, `FX` (the wheel trails, crimson rolling and gold on a boost) and `Effects`.
@@ -72,7 +74,12 @@ The riding is ported from the **"SkateBoard"** open-source Roblox kit by **vexar
   - **The stand-in boards:** W rolled at 25–47 studs/s, D turned 60° in 0.4 s with a lean, and Space rose 2.1 studs.
   - **A crash:** a wall at speed threw the rider into a ragdoll, who was back up afterwards.
   - **The pose:** stance yaw 78°, crouch 0.16, legs spread 29°, arms out 38°; the push squared the body to 45° and swept the back leg 28°.
+- **The kickflip (1.26.0), in Play with no save slot:**
+  - **Getting on:** interact prompts went off.
+  - **E:** the rider rose 4.9 studs, and the board turned its full turn about its long axis and landed flat, with the rider still on it.
+  - **B:** stepped off and turned prompts back on.
 - **Not verified yet:**
+  - another player watching a kickflip
   - the Locker's Boards tab, buying and equipping (they need a loaded record)
   - another player watching a rider and the crash
   - riding over kerbs, stairs and slopes
