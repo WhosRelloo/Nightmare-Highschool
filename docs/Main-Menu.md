@@ -252,3 +252,11 @@ Code review of the menu, slots, loading screen and save loader, then live tests.
 | A failed ENTER SCHOOL added another Wardrobe hook each time | One hook per menu visit (`State.WardrobeHooked`) |
 | `LastPlayed` was written straight into the profile | `UpdateState` `SetLastPlayed` action, plus the field in `PlayerData` |
 | Gamepad couldn't turn the student | Right stick orbits; the Look button is selected on arrival |
+
+## The rune clock's brightness (1.35.1)
+
+The crimson halo in front of the rune clock (`GlowImage`) is faint now (transparency 0.84-0.92), and the rune ring's glowing parts pulse between `RUNE_DIM` (120, 16, 28) and `RUNE_PEAK` (170, 38, 52), under the bloom threshold, so the PBR stone ring reads clearly. The clock tower face in the cutscene is Neon (176, 142, 108) with its light at 0.7; the old values are kept as `NHOrigColor` / `NHOrigBrightness` attributes.
+
+| Before | After |
+|---|---|
+| ![Before](img/menu-clock-before.jpg) | ![After](img/menu-clock-after.jpg) |

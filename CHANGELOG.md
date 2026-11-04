@@ -2,6 +2,29 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.35.1] - 2026-11-04: Talk cinematic, a softer menu clock
+
+### Added
+- **Talk cinematic** (`Gui.Dialogue`): when you talk to an NPC (a quest giver, a leader, anyone with dialogue), the camera eases into an over-the-shoulder shot of them, and eases back when the conversation ends.
+  - The shot has a slightly narrower field of view, thin letterbox bars (`NHTalkBars`), a soft background blur (`NHTalkDof`) and a slow drift.
+  - With Reduce Motion on, it cuts instead and doesn't drift.
+  - It's skipped in the cinematic view, the main menu, first person, and when the NPC is more than 20 studs away.
+  - The server now sends the speaker's model with each line (`Social.Dialogue`: `Model`).
+
+### Changed
+- **The main menu's rune clock is less bright** (`Gui.MainMenu`, `workspace.MenuScene`). Its PBR stone ring shows clearly now:
+  - the glow halo in front of it is much fainter (transparency 0.84-0.92, was 0.55-0.8);
+  - its glowing rings, glyphs and hands pulse a deep crimson under the bloom threshold (`RUNE_DIM` / `RUNE_PEAK`).
+- **The clock tower's face** in the cutscene is dimmer: Neon (176, 142, 108), and its light 0.7. The original colours are kept as `NHOrigColor` / `NHOrigBrightness` attributes. Before / after shots are in docs/img (`menu-clock-before.jpg`, `menu-clock-after.jpg`).
+
+### Verified (Studio Play, no slot)
+- **Menu:** with the halo hidden, the stone ring's PBR blocks showed. With the final settings the ring is a crisp deep-red line and the stone reads clearly (screenshot).
+- **Talking to Captain Rhys Thorne:**
+  - The camera went Scriptable at field of view 58 (from 70), with the bars at 5.5% and the blur on.
+  - The shot was reframed twice so the player's shoulder sits at the left edge.
+  - "Hit the showers." ended it: camera back to Custom at 70, bars gone, blur removed.
+- **Not tested:** Reduce Motion's cut, touch and gamepad players, talking to an NPC who walks away mid-shot, and two NPCs back to back.
+
 ## [1.35.0] - 2026-11-04: Joining a clique (Cliques Phase 6)
 
 ### Added

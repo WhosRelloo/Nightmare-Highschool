@@ -173,3 +173,9 @@ Everything is found by **attributes**, so the real map just needs parts with the
 - **Wrong pair:** both cards shake.
 - **Solving a case:** stamps SOLVED over the journal.
 - **Server events:** `Investigation` fires NHFx `LinkHit`, `LinkMiss` and `Solved`.
+
+## Talk cinematic (1.35.1)
+
+Opening a conversation with an NPC eases the camera into an over-the-shoulder shot of them (`Gui.Dialogue`: field of view -12, thin letterbox bars `NHTalkBars`, a soft blur `NHTalkDof`, a slow drift), and eases back when it ends. Reduce Motion cuts instead. Skipped in the cinematic view, the main menu, first person, and past 20 studs. The server sends the speaker's model with each line (`Social.Dialogue` `Model`).
+
+![The talk cinematic](img/talk-cinematic.jpg)
