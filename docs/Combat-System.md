@@ -155,6 +155,13 @@ Every combat NPC (`Services.AI.AI`) has a tier: **Easy, Normal, Hard or Nightmar
 
 Admins spawn a sparring partner of any tier from the admin panel (Spawns).
 
+**Name tag (1.25).** Each combat NPC wears the kit's tag (`NHDifficulty` on its head) instead of the Roblox name:
+- the name, in the title font (it follows `DisplayName`)
+- its pips, large, on a dark plaque whose crimson outline gets stronger with the tier
+- the tier in spaced capitals
+
+`Local.Tag` builds it. The look per tier is in `TIER_LOOK`.
+
 **Tier fields**
 - `React`: seconds from your swing starting to a dodge or a guard (a random value in the range).
 - `Parry`, `Dodge`: the chance, rolled **once per swing you throw**, to parry or sidestep it. A heavy (M2, uppercut, slam) adds `Heavy`.

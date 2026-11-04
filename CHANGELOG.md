@@ -2,6 +2,20 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.25.0] - 2026-11-04: Enemy name tags that show the difficulty
+
+### Changed
+- **Combat NPCs wear a custom name tag** (owner: "custom ones that emphasize the pips"; `AI.NPCController` `Local.Tag`, the `NHDifficulty` BillboardGui on the head). The default Roblox name is turned off (`DisplayDistanceType = None`, and kept off).
+  - The name, in the kit's title font. It follows `DisplayName`, so delinquent crews, named after they spawn, read right.
+  - The tier's **pips, large** (24 px, the kit's Pip art), on a dark plaque (the kit's SlotBg). The plaque's crimson outline gets stronger with the tier: faint on Easy, full on Nightmare.
+  - The tier's name in spaced capitals under the pips.
+  - Only existing kit art is used. Like every name tag, it hides in cinematic view. It's visible to 70 studs.
+
+### Testing
+- In Play, the four tiers were lined up and photographed at night and in daylight; the tags were readable and centred.
+- The real delinquent crews (grunts and brutes) showed their own names with the right pips, and the default name was off on every enemy.
+- Not checked: phones (small screens) and the Ring Champion in an actual duel.
+
 ## [1.24.0] - 2026-11-04: Skateboards
 
 ### Added
