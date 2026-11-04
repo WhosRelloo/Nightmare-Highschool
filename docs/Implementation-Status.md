@@ -12,6 +12,7 @@ How each result was checked:
 
 | Change | Where | Verified |
 |---|---|---|
+| **1.29.0**: touch controls: kit-orb buttons around the jump button for combat, carry, grip, race actions, the skateboard (thumbstick steering) and emotes, a MORE overflow, a cinematic RETURN; virtual key presses in `Bind.Keybinds`; the KitHud fits beside the buttons on touch screens | `Gui.TouchControls` (new), `Packages.Bind.Keybinds`, `Character.InputController` (+ `Combat.M1`), `World.Skateboard`, `Character.Emotes`, `Gui.KitHud` | **[PT]** `NHTouchTest` with a mouse, no slot: every button ran its keyboard action, MORE overflow, board ride/push/ollie/flip/off, cinematic return, hidden in dialogue, keyboard unchanged; not run on real touch hardware |
 | **1.28.0**: cliques Phase 3: 16 leader quests (two per clique) with a new Scuffle objective; three new leaders (Rhys, Lucien, Wren); rewards at Respected (titles, a one-click clique look in the Wardrobe, backup in fights, shop discounts); daily turf wars; quest props; the Regions model put back in place | `Config.Quests`, `Quests.Quests`, `Config.Cliques`, `Social.Cliques`, `Social.CliqueFights`, `Features.Schedules`, `Config.Npcs`, `Social.Npcs`, `NpcLooks`, `ServerStorage.Dialogue`, `Gui.Wardrobe`, `Locker`, `Inventory`, `Skateboard`, `RegionsClient`, `Studio.TestBridge`, `workspace.NHCliqueAreas.QuestProps`, `workspace.Regions` | **[PT]** no slot: leaders and quest props spawn, turf taken and defended, students displaced, price factor; quests, rewards, Wardrobe row, backup and checkout discounts untested (need a slot) |
 | **1.27.0**: cliques Phase 2: reaction lines and facing by standing, hostile turf confrontations, rival scuffles you can join (+standing for your side), the hall monitor breaking scuffles up, clique tiers; a Studio-only menu key guard for tests | `Social.CliqueFights` (new), `Config.Cliques`, `Social.Cliques`, `School.HallMonitor` (`Respond`), `Features.Schedules`, `World.Chatter`, `Gui.MainMenu`, `Studio.TestBridge` | **[PT]** scuffles (no slot): a decisive 3v3, a timeout, a monitor dispatch, clean-up; confrontations and on-screen reactions untested (need a slot) |
 | **1.25.1**: the pips sit in a wrought-iron bar (the HUD's caps and frame), its metal stepping up by tier; embers under the pips from Hard up | `AI.NPCController` (`Local.Tag`) | **[PT]** all four tiers photographed at night and by day |
@@ -169,7 +170,7 @@ Nothing was changed in the production place.
 
 - **Carry animations wired in.** Carry and Carried both play, and the body rests on the left shoulder. The offset was tuned with still screenshots only; check it in motion and adjust `Config.Downed.CarryOffset` if needed.
 - **Grip animations:** only Katana has a grip pair. Other weapons fall back to Katana. The victim's position relative to the gripper is set by `Config.Downed.GripVictimOffset`; adjust it if the animations don't line up.
-- **No mobile buttons for V/B.** This matches the rest of combat, which has no touch input yet.
+- ~~**No mobile buttons for V/B.**~~ Done in 1.29.0: GRIP and CARRY on the touch buttons (docs/Touch-Controls.md).
 - **Not tested with two real players** (one carrying or gripping the other), or with a disconnect while being carried.
 
 ## Next recommended work

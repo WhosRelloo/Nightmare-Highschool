@@ -19,6 +19,8 @@ Ride around the school grounds on your own board, Bully style. Nine boards, one 
 - **While you ride:** combat and movement keys are off, any held snack is put away, interact prompts are off on your screen (E is the kickflip), and the camera is left as it is.
 - **Not while:** you're down, gripped or carrying someone, sitting, in the main menu or in a sports match. A rider who gets downed or sat is stepped off.
 
+**On a touch screen** (1.29.0): the thumbstick steers (up pushes, down brakes), the jump button ollies, and the touch buttons are OLLIE, FLIP, PUSH (hold) and GET OFF. A gamepad stick steers too. See [Touch-Controls](Touch-Controls.md).
+
 ## The boards
 Owned boards live in the Locker's **Boards** tab (`` ` ``): click one to equip it, or buy the ones you don't have with Yen. The equipped board is the one B takes out.
 

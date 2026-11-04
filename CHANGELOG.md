@@ -2,6 +2,52 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.29.0] - 2026-11-04: Touch controls
+
+### Added
+- **On-screen buttons for phones and tablets** (`Controllers.Gui.TouchControls`, new; see docs/Touch-Controls.md):
+  - **Layout:** kit orbs in three arcs around Roblox's jump button, shown on touch-only screens.
+  - **On foot:** STRIKE, BLOCK, DODGE, HEAVY, FEINT, RUN (a toggle) and CROUCH / SLIDE. CROUCH held + STRIKE is an uppercut.
+  - **Third arc:** only what applies right now: GRIP, CARRY / DROP, your race's action (DRAIN, FEED, SIPHON, EXORCISE), DRAW / SHEATHE, BOARD, TURN, SIGHT and EMOTE. A MORE button holds whatever doesn't fit.
+  - **As a wolf:** STRIKE bites and HEAVY leaps.
+  - **Riding a board:** OLLIE, FLIP, PUSH and GET OFF; the thumbstick steers.
+  - **Hidden** in the main menu, dialogue, lessons and sports, and while you're down. A RETURN orb gets you out of the cinematic view, which had no touch exit.
+- **Virtual key presses** (`Bind.Keybinds`):
+  - `Virtual(input, down)`, `IsDown(input)` and `VirtualDown(input)`.
+  - `InputController.Press(Name, Down)` and `IsPressed(Name)`.
+  - The buttons press the same actions as the keys, rebinds included.
+- **Stick steering for the skateboard** (`Controllers.World.Skateboard`): the PlayerModule move vector (touch thumbstick or gamepad stick) pushes, brakes and steers. The touch jump button ollies. New `Skateboard.Ollie`, `Push` and `CanJump`.
+- `Emotes.ToggleMenu()`.
+- **Studio test switch:** the ReplicatedStorage attribute `NHTouchTest` shows the touch layout with a mouse (with a stand-in JUMP orb) and logs each action to the Player attribute `NHLastAction`.
+
+### Changed
+- **KitHud on touch screens:** the bar scales to fit left of the buttons (Player attribute `NHTouchReserveRight`) and sits above the Study Group dock. Nothing changes on a keyboard.
+- **Skill bar on touch screens:** it moves to the left of the buttons.
+- **While riding a board** the humanoid's own jump is off (the jump button ollies instead); it's restored when you get off or crash.
+
+### Verified (Studio, no slot, after school; `NHTouchTest` with mouse clicks on the buttons)
+- **Every on-foot button ran its keyboard action:**
+  - BLOCK held: Block began and ended.
+  - DODGE, HEAVY (M2) and FEINT each ran once.
+  - RUN tapped twice: Sprint began, then ended.
+  - CROUCH held: Slide began and ended.
+  - STRIKE ran M1.
+  - The keyboard's F and Q gave the same log.
+- **Third arc:** next to a downed body as a Vampire it showed GRIP, CARRY, DRAIN and MORE. MORE opened SHEATHE, TURN, SIGHT and EMOTE, and EMOTE opened the emote menu and closed the line.
+- **Board:**
+  - BOARD got on.
+  - PUSH held reached 50 studs/s.
+  - OLLIE and FLIP lifted the board.
+  - GET OFF got off.
+  - After a crash, the on-foot buttons and jumping came back.
+- **Cinematic:** RETURN turned the view off.
+- **Dialogue:** the buttons hid during it.
+- **Keyboard:** with the flag off, there were no touch buttons, the HUD was centred as before, and Ctrl crouched and stood.
+- No script errors from the changed scripts.
+- **Not tested:**
+  - **Real touch hardware:** nothing has run on a phone or tablet. That covers thumbstick steering, multi-touch, and the layout at phone size.
+  - **Combat with a drawn weapon:** without a slot the character has no weapon, so only the actions starting was checked, not the hits.
+
 ## [1.28.0] - 2026-11-04: Cliques (Phase 3): leader quests, rewards and turf wars
 
 ### Added
