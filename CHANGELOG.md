@@ -2,6 +2,53 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.28.0] - 2026-11-04: Cliques (Phase 3): leader quests, rewards and turf wars
+
+### Added
+- **Leader quests**: two per clique, 16 in all, offered by the clique's leader (`Config.Quests` `Clique<Id>1/2`, Category `Clique`).
+  - **Who offers them:** quest 1 needs Neutral standing (-10 or more). Quest 2 needs Friendly (20) and quest 1 done (`Requires.Clique`, `Config.Cliques.QuestOpen`).
+  - **Rewards:** 20 / 40 Yen and +20 / +30 standing. Some quests also cost standing with a rival (`Rewards.Cliques`).
+
+  | Clique | Leader | Quest 1 | Quest 2 |
+  |---|---|---|---|
+  | Vigil | Ezra | Lamplighter: light three Archive lamps after dark | The Missing Page: take the page from the Records Office after hours and bring it back |
+  | Crimson Court | Vesper | An Invitation: deliver it to Lucien at the Chapel before the timer runs out | Bad Blood: help the Court win a scuffle against the Vigil |
+  | Athletes | Rhys Thorne (new) | Warm-up: pass Target Practice | Bench Them: help the Athletes win a scuffle against the Ink Club |
+  | Delinquents | Bruno | Five-Finger Discount: swipe the snack crate from behind the concession stand | The Lot's Champion: down the ring champion |
+  | Pack | Dex | Lunch Money: three shakedowns at the Commons (-10 Ordinary) | Raid the Chapel: help the Pack win a scuffle against the Choir |
+  | Ordinary | Pip | Hall Pass: get the pass to Coach Mallory before the timer runs out | Stand Together: help the Ordinary win a scuffle against the Delinquents |
+  | Chapel Choir | Lucien Grey (new) | Candles at Dusk: light three votives after 5 PM | Drive Them Out: help the Choir win a scuffle against the Pack |
+  | Ink Club | Wren Ashby (new) | Fresh Canvas: bring red paint from the cupboard by Room 105 | Masterpiece: tag the gym doors after school (-10 Athletes; a monitor who sees it books Vandalism) |
+
+- **A new quest objective, `Scuffle`**: help a clique win a scuffle by putting at least one rival down (`Social.CliqueFights` reports it through `Quests.Progress`). While you have one active, scuffles favour that clique's rival pair (checked every 60 s).
+- **Three new leaders** as talkable cast: Captain Rhys Thorne (Athletes, at the gym), Lucien Grey (Choir, at the Chapel) and Wren Ashby (Ink Club, at the Ink Studio). Each has dialogue, a look and a post (`Config.Npcs`, `NpcLooks`, `ServerStorage.Dialogue`, `workspace.NHCliqueAreas.QuestProps` `NpcPost`).
+- **Clique rewards**: reach Respected (60) and finish quest 2 to unlock all four (`CliqueReward_<Id>`, `Social.Cliques.CheckRewards`):
+  - **Titles:** the clique's first title at Friendly, and its second when you unlock the reward (for example Lamplighter and Keeper of the Vigil).
+  - **One-click clique look:** a new "Clique Looks" row in the Wardrobe that wears the clique's signature top and bottoms (`SignatureLook`). The top is added to your saved uniforms (`Data.UpdateState` `SetIdentity`).
+  - **Backup:** an NPC that hits you near the clique's hangout, or within 30 studs of its students, gets two members on it. This happens at most once every 90 s, and never in duels.
+  - **Shop discounts:** 25% off at the concession stand with the Ordinary and 25% off skateboards with the Delinquents (`Config.Cliques.PriceFactor`, shown in the Locker, Inventory and board prices).
+- **Daily turf wars**:
+  - **Taking a hangout:** a rival that wins 2 scuffles at a clique's hangout in one in-game day (6 AM to 6 AM) holds it until the next 6 AM.
+  - **While it's held:** the owners' students hang out elsewhere and the holders gather there. The next scuffle there has the holders defending and the owners walking in.
+  - **Taking it back:** the owners win it back with one win.
+  - **Rewards:** students who fought in the deciding scuffle get +15 with the winners.
+  - **Signs:** you get a notification, the region card shows "Held by ..." (`workspace` `NHTurf_<RegionId>`), and the students' activity label says whose hangout it is.
+- **Quest props** (`Studio/clique_quest_props.luau`, stand-ins the builder can move): the Vigil lamps, the 1893 page, the Pack's three shakedown spots, the Choir votives, the paint cupboard, the gym doors and the Ink Studio return area. The snack crate is placed at runtime behind the concession stand.
+- **Test hook** `TurfWin(owner, rival, winner)` records a scuffle result.
+
+### Fixed
+- **`workspace.Regions` was offset:** every region box had been dragged about 60 studs out of place. They are back in place.
+- **Bruno's champion call-out** now also works for The Lot's Champion, not only King of the Ring.
+
+### Verified (Play, no slot)
+- The three leaders spawn once each with prompts and name tags, and all 13 quest objects have prompts.
+- **Turf:** one win at the Chapel left it with the Choir, and a second gave it to the Pack (`NHTurf_Chapel` = The Pack).
+  - The next scuffle there had the Pack defending; they won and kept it.
+  - At Break the Choir student went to the Hallway instead, and a Pack student hung out 11 studs from the Chapel.
+- **Price factor:** 1.00 → 0.75 at the concession stand with the Ordinary reward, and boards stayed 1.00.
+- No script errors.
+- **Not tested yet (needs a slot):** offering, doing and handing in the quests, the rewards and titles, the Wardrobe row, backup, discounts at checkout, the region card text, and scuffle quest progress.
+
 ## [1.27.0] - 2026-11-04: Cliques (Phase 2): reactions, turf and scuffles
 
 ### Added

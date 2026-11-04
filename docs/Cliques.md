@@ -32,7 +32,7 @@ NPCs carry the attribute `Clique`:
   - Lucien Grey, "Chapel Choir cantor"
   - Wren Ashby, "Ink Club ringleader"
 
-  Each stands at the middle of their clique's gathering spots. They're built from the NPC rig with a full `NpcLooks` spec, their feet are measured onto the floor, and their name tags match the cast's. Their quests come in Phase 3.
+  Each stands at the middle of their clique's gathering spots. They're built from the NPC rig with a full `NpcLooks` spec, their feet are measured onto the floor, and their name tags match the cast's. Their quests came in Phase 3 (below).
 - **Turf clothes:** each clique also has a `Civ` palette (Court, Delinquents, Pack). It's in the config only for now; the dress code still uses its own swap pools.
 
 ## Hangouts
@@ -137,14 +137,63 @@ Every clique has five lines of its own. A student in a clique says one of them a
 
 `LeaderTier` is one above.
 
+## Phase 3 (1.28): leader quests, rewards and turf wars
+
+**Leader quests.** Two per clique (`Config.Quests` `Clique<Id>1` and `Clique<Id>2`, Category `Clique`, `Giver` = the leader's NpcId).
+- **Unlocking:** quest 1 needs Neutral standing (-10 or more). Quest 2 needs Friendly (20) and quest 1 done (`Requires.Clique = { Id, Min }`, `Config.Cliques.QuestOpen`).
+- **Rewards:** `{ Yen, Cliques = { [Id] = delta } }` (20 / 40 Yen, +20 / +30), applied by `Quests` `GiveRewards` and shown by `RewardText`.
+
+| Clique | Leader | Quest 1 | Quest 2 |
+|---|---|---|---|
+| Vigil | Ezra | Lamplighter (VigilLampA-C after 5 PM) | The Missing Page (Page1893 from the Records Office, after hours) |
+| Crimson Court | Vesper | An Invitation (timed delivery to Lucien) | Bad Blood (scuffle vs the Vigil) |
+| Athletes | Rhys | Warm-up (Target Practice drill) | Bench Them (scuffle vs the Ink Club) |
+| Delinquents | Bruno | Five-Finger Discount (SnackCrate, after hours) | The Lot's Champion (down RingChampion) |
+| Pack | Dex | Lunch Money (LunchMoneyA-C; -10 Ordinary) | Raid the Chapel (scuffle vs the Choir) |
+| Ordinary | Pip | Hall Pass (timed delivery to Mallory) | Stand Together (scuffle vs the Delinquents) |
+| Chapel Choir | Lucien | Candles at Dusk (ChoirVotiveA-C after 5 PM) | Drive Them Out (scuffle vs the Pack) |
+| Ink Club | Wren | Fresh Canvas (PaintShelf to Wren) | Masterpiece (GymDoors after school, Witness = Vandalism; -10 Athletes) |
+
+**The `Scuffle` objective** (`Type = Scuffle`, `Clique = <side>`).
+- **How it counts:** `Social.CliqueFights` calls `Quests.Progress(Player, "Scuffle", Winner)` for each student who put at least one rival down on the winning side.
+- **Scuffle choice:** every 60 s, while any player has one active, the next scuffle prefers that clique's rival pair (`Wanted`).
+
+**The new leaders.** Rhys (Athletes), Lucien (Choir) and Wren (Ink Club) are regular cast now, in `Config.Npcs` (with `Clique`), `NpcLooks` and `ServerStorage.Dialogue` (GiverTemplate). `Social.Npcs` sets their `Clique` attribute. Their posts (`NpcPost`) are in the middle of their clique's spots, in `workspace.NHCliqueAreas.QuestProps`.
+
+**Quest props** (`Studio/clique_quest_props.luau`, idempotent). These are stand-ins: quests find them by attribute (`QuestObject`, `QuestArea`), so the builder can move or replace them. The snack crate is made at runtime by `Social.Cliques`, behind the `NHConcession`-tagged stand.
+
+**Rewards** (`Config.Cliques` `PHASE3`, `Social.Cliques.CheckRewards`).
+- **Unlocking:** at Respected (60) with quest 2 done, the player gets `CliqueReward_<Id>` and a notification. The clique's first title comes earlier, at Friendly.
+
+| Reward | How |
+|---|---|
+| Titles | `Titles[1]` at Friendly, `Titles[2]` at the reward (`AwardTitle`) |
+| One-click look | `SignatureLook { Top, Bottoms }`, shown in the Wardrobe's Clique Looks row. The top is granted into `Identity.Uniforms` via `Data.UpdateState` `SetIdentity`. |
+| Backup | Hit by an NPC inside the hangout (+20 studs) or within 30 studs of its students: two members spawn on the attacker. At most once every `BackupCooldown` (90) s, never in duels, and they leave after 40 s or when the fight ends. |
+| Discount | `Perk { Shop, Off }`: Ordinary gives 25% off at the Concession, Delinquents 25% off Boards. `Config.Cliques.PriceFactor(Player, Shop)` takes the best one, and the Locker, Inventory and Skateboard prices use it. |
+
+**Turf wars** (`Social.CliqueFights`).
+- **The day:** an in-game day runs from 6 AM to 6 AM.
+- **Taking a hangout:** a rival winning `TurfWins` (2) scuffles at a clique's hangout in one day takes it.
+  - The holders keep it until the next 6 AM.
+  - `workspace` gets `NHTurfHolder_<Owner>` = holder and `NHTurf_<RegionId>` = holder's name.
+- **While it's held:**
+  - `Features.Schedules` sends the owners' students elsewhere and lets the holders use the spots. Their activity label names the hangout.
+  - The region card shows "Held by ..." (`RegionsClient`).
+  - A scuffle there has the holders defending.
+- **Taking it back:** the owners retake it with one win.
+- **Bonus:** fighters on the winning side of a deciding scuffle get `TurfBonus` (+15).
+- **Notifications:** students within 220 studs get one when a hangout is taken or retaken. At 6 AM, everyone gets one when it returns.
+
 ## Test hooks (Studio only, `ServerStorage.NHTestBridge`)
 - `SchedulePlan(kind, name?, hour?)`: put every student on a plan now, for example `("Break", "Break", 9)`
 - `ScheduleDebug()`: each student's index, clique, activity and seat
 - `Cliques(name)`: the phone's list for a player
 - `CliqueAdd(name, id, amount, reason?)`: change a player's standing
-- `Scuffle(defender, attacker)`, `Confront(name, clique)`, `FightState()`: start a scuffle or a confrontation now, and see what's running (with the last result)
+- `Scuffle(defender, attacker)`, `Confront(name, clique)`, `FightState()`: start a scuffle or a confrontation now, and see what's running (with the last result and the turf)
+- `TurfWin(owner, rival, winner)`: record a scuffle result at `owner`'s hangout, as if one had ended
 - Set `ReplicatedStorage` attribute `NHTestNoMenuKeys` during automated Play tests: the main menu then ignores the keyboard, so a stray Enter or Space can't press Continue and load a slot. Clear it afterwards.
 
 ## Next phases
 - ~~**Phase 2:** reactions, turf, scuffles and the hall monitor.~~ Done in 1.27.0 (above).
-- **Phase 3:** turf, leader quests and rank rewards for every clique.
+- ~~**Phase 3:** turf, leader quests and rank rewards for every clique.~~ Done in 1.28.0 (above).
