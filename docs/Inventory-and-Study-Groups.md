@@ -35,6 +35,7 @@ Added in 1.10.0. Code lives in Studio; this page is the design and how the piece
 - **Drinks:** one snack buff at a time; a new one replaces the old. The buff is an effect source in `Progression.Effects`, like gear. It isn't saved, so it ends if you leave.
 - **Limits:** stacks cap at 20, and the pouch holds 4.
 - **The stand:** built from parts outside the west end of the hallway. Tag a part `NHConcessionSpot` to place it by hand.
+  - **The model:** when `ServerStorage.NHProps.ConcessionStand` is there (props batch 14), the stand is that model: gothic cast iron and oxblood under a slate roof, with the sign and menu drawn on its boards. Otherwise it is built from parts. See [[School-Props]].
   - **Buying:** the counter's prompt carries `NHConcession`, and you must be within 16 studs.
   - **Lunch:** the `NHLunchSpot` markers in front are where the lunch crowd queues.
 - **Save data:** `PlayerData.Inventory = { Items = { [id] = count }, Pinned = { id } }`, written with the `SetInventory` action and checked by `Config.Items.Sanitize`.

@@ -1,5 +1,5 @@
 {
- "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y).",
+ "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y). Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway.",
  "StudentDesk": {
   "dims": [
    3.0,
@@ -1561,5 +1561,891 @@
   "MetalnessMap": "rbxassetid://108682938072509",
   "NormalMap": "rbxassetid://76781498116090",
   "RoughnessMap": "rbxassetid://73781657840428"
+ },
+ "HeadmasterDesk": {
+  "dims": [
+   7.89,
+   3.69,
+   4.09
+  ],
+  "pieces": [
+   "HeadmasterDesk_Main",
+   "HeadmasterDesk_Drawer0"
+  ],
+  "tris": {
+   "HeadmasterDesk_Main": 14580,
+   "HeadmasterDesk_Drawer0": 1468
+  },
+  "batch": 10,
+  "swing": {
+   "HeadmasterDesk_Drawer0": "slides out 0.9"
+  },
+  "rig": "NHLockerProp: Desk / Open, shuts after 8 s",
+  "ColorMap": "rbxassetid://137418677226172",
+  "NormalMap": "rbxassetid://75025025821921",
+  "RoughnessMap": "rbxassetid://77754858228367",
+  "MetalnessMap": "rbxassetid://73587966509318"
+ },
+ "HeadmasterChair": {
+  "dims": [
+   3.01,
+   2.64,
+   7.2
+  ],
+  "pieces": [
+   "HeadmasterChair"
+  ],
+  "tris": {
+   "HeadmasterChair": 11086
+  },
+  "batch": 10,
+  "ColorMap": "rbxassetid://127562140574828",
+  "NormalMap": "rbxassetid://135415773004522",
+  "RoughnessMap": "rbxassetid://117845089642198",
+  "MetalnessMap": "rbxassetid://124182373387275"
+ },
+ "Fireplace": {
+  "dims": [
+   7.35,
+   2.02,
+   7.93
+  ],
+  "pieces": [
+   "Fireplace_Main",
+   "Fireplace_Glow"
+  ],
+  "tris": {
+   "Fireplace_Main": 15750,
+   "Fireplace_Glow": 1800
+  },
+  "batch": 10,
+  "ColorMap": "rbxassetid://73463962258585",
+  "NormalMap": "rbxassetid://123296460927088",
+  "RoughnessMap": "rbxassetid://76597028657305",
+  "MetalnessMap": "rbxassetid://70898023893265"
+ },
+ "FounderPortrait": {
+  "dims": [
+   4.18,
+   1.05,
+   6.25
+  ],
+  "pieces": [
+   "FounderPortrait_Main",
+   "FounderPortrait_Glow"
+  ],
+  "tris": {
+   "FounderPortrait_Main": 5228,
+   "FounderPortrait_Glow": 12
+  },
+  "batch": 10,
+  "ColorMap": "rbxassetid://118971433303683",
+  "NormalMap": "rbxassetid://75755882683834",
+  "RoughnessMap": "rbxassetid://105994785178228",
+  "MetalnessMap": "rbxassetid://121898269190466"
+ },
+ "Safe": {
+  "dims": [
+   2.97,
+   2.88,
+   4.07
+  ],
+  "pieces": [
+   "Safe_Main",
+   "Safe_Door0"
+  ],
+  "tris": {
+   "Safe_Main": 5404,
+   "Safe_Door0": 4604
+  },
+  "batch": 10,
+  "swing": {
+   "Safe_Door0": "out 100"
+  },
+  "rig": "NHLockerProp: Safe / Open, shuts after 8 s",
+  "ColorMap": "rbxassetid://97890368640916",
+  "NormalMap": "rbxassetid://124729372491527",
+  "RoughnessMap": "rbxassetid://127054312341531",
+  "MetalnessMap": "rbxassetid://100049163143313"
+ },
+ "CuriosityCabinet": {
+  "dims": [
+   3.33,
+   1.66,
+   7.43
+  ],
+  "pieces": [
+   "CuriosityCabinet_Main",
+   "CuriosityCabinet_Door0",
+   "CuriosityCabinet_Glass"
+  ],
+  "tris": {
+   "CuriosityCabinet_Main": 10836,
+   "CuriosityCabinet_Door0": 1420,
+   "CuriosityCabinet_Glass": 12
+  },
+  "batch": 10,
+  "swing": {
+   "CuriosityCabinet_Door0": "out 100",
+   "CuriosityCabinet_Glass": "with CuriosityCabinet_Door0"
+  },
+  "rig": "NHLockerProp: Cabinet / Open, shuts after 8 s",
+  "ColorMap": "rbxassetid://121049694007881",
+  "NormalMap": "rbxassetid://112483728248102",
+  "RoughnessMap": "rbxassetid://112590250533509",
+  "MetalnessMap": "rbxassetid://101194879841137"
+ },
+ "OfficeRug": {
+  "dims": [
+   12.62,
+   8.0,
+   0.05
+  ],
+  "pieces": [
+   "OfficeRug"
+  ],
+  "tris": {
+   "OfficeRug": 1004
+  },
+  "batch": 10,
+  "ColorMap": "rbxassetid://137045596217763",
+  "NormalMap": "rbxassetid://99269342621066",
+  "RoughnessMap": "rbxassetid://136841185531984",
+  "MetalnessMap": "rbxassetid://88551890064403"
+ },
+ "DeskLamp": {
+  "dims": [
+   1.19,
+   1.19,
+   2.15
+  ],
+  "pieces": [
+   "DeskLamp_Main",
+   "DeskLamp_Glow"
+  ],
+  "tris": {
+   "DeskLamp_Main": 3716,
+   "DeskLamp_Glow": 120
+  },
+  "batch": 10,
+  "ColorMap": "rbxassetid://98042038331916",
+  "NormalMap": "rbxassetid://138133917556712",
+  "RoughnessMap": "rbxassetid://128401835284507",
+  "MetalnessMap": "rbxassetid://84710293741340"
+ },
+ "FounderBust": {
+  "dims": [
+   1.55,
+   1.5,
+   5.7
+  ],
+  "pieces": [
+   "FounderBust"
+  ],
+  "tris": {
+   "FounderBust": 6244
+  },
+  "batch": 10,
+  "ColorMap": "rbxassetid://115682793252327",
+  "NormalMap": "rbxassetid://127688336021317",
+  "RoughnessMap": "rbxassetid://86938329961651",
+  "MetalnessMap": "rbxassetid://135188482244366"
+ },
+ "SchoolCrest": {
+  "dims": [
+   3.48,
+   0.47,
+   4.3
+  ],
+  "pieces": [
+   "SchoolCrest"
+  ],
+  "tris": {
+   "SchoolCrest": 8458
+  },
+  "batch": 10,
+  "ColorMap": "rbxassetid://81340069110165",
+  "NormalMap": "rbxassetid://85625186324169",
+  "RoughnessMap": "rbxassetid://88267027218522",
+  "MetalnessMap": "rbxassetid://114422818815102"
+ },
+ "DecanterTray": {
+  "dims": [
+   2.32,
+   1.25,
+   1.34
+  ],
+  "pieces": [
+   "DecanterTray_Main",
+   "DecanterTray_Glass"
+  ],
+  "tris": {
+   "DecanterTray_Main": 2552,
+   "DecanterTray_Glass": 2456
+  },
+  "batch": 10,
+  "ColorMap": "rbxassetid://125546314062625",
+  "NormalMap": "rbxassetid://71682010051530",
+  "RoughnessMap": "rbxassetid://111986186704908",
+  "MetalnessMap": "rbxassetid://75095105638036"
+ },
+ "Hourglass": {
+  "dims": [
+   0.92,
+   0.92,
+   1.72
+  ],
+  "pieces": [
+   "Hourglass_Main",
+   "Hourglass_Glass"
+  ],
+  "tris": {
+   "Hourglass_Main": 4980,
+   "Hourglass_Glass": 616
+  },
+  "batch": 10,
+  "ColorMap": "rbxassetid://96835350485491",
+  "NormalMap": "rbxassetid://123404754637287",
+  "RoughnessMap": "rbxassetid://111268235400993",
+  "MetalnessMap": "rbxassetid://77428550477501"
+ },
+ "ShopApothecary": {
+  "dims": [
+   12.2,
+   2.49,
+   12.0
+  ],
+  "pieces": [
+   "ShopApothecary_Main",
+   "ShopApothecary_Upper",
+   "ShopApothecary_Display",
+   "ShopApothecary_Glow",
+   "ShopApothecary_Glass",
+   "ShopApothecary_Door0",
+   "ShopApothecary_Cloth"
+  ],
+  "tris": {
+   "ShopApothecary_Main": 10122,
+   "ShopApothecary_Upper": 5876,
+   "ShopApothecary_Display": 10414,
+   "ShopApothecary_Glow": 244,
+   "ShopApothecary_Glass": 48,
+   "ShopApothecary_Door0": 1132,
+   "ShopApothecary_Cloth": 1660
+  },
+  "batch": 11,
+  "swing": {
+   "ShopApothecary_Door0": "out 95"
+  },
+  "rig": "NHLockerProp: Door / Open, shuts after 6 s",
+  "ColorMap": "rbxassetid://88973493155810",
+  "NormalMap": "rbxassetid://72107260608247",
+  "RoughnessMap": "rbxassetid://124655937653957",
+  "MetalnessMap": "rbxassetid://115103214737253"
+ },
+ "ShopCurio": {
+  "dims": [
+   12.21,
+   2.44,
+   12.76
+  ],
+  "pieces": [
+   "ShopCurio_Main",
+   "ShopCurio_Upper",
+   "ShopCurio_Display",
+   "ShopCurio_Glow",
+   "ShopCurio_Glass",
+   "ShopCurio_Door0",
+   "ShopCurio_Cloth"
+  ],
+  "tris": {
+   "ShopCurio_Main": 9612,
+   "ShopCurio_Upper": 6654,
+   "ShopCurio_Display": 10092,
+   "ShopCurio_Glow": 460,
+   "ShopCurio_Glass": 120,
+   "ShopCurio_Door0": 1132,
+   "ShopCurio_Cloth": 1192
+  },
+  "batch": 11,
+  "swing": {
+   "ShopCurio_Door0": "out 95"
+  },
+  "rig": "NHLockerProp: Door / Open, shuts after 6 s",
+  "ColorMap": "rbxassetid://80280861565005",
+  "NormalMap": "rbxassetid://113243902842282",
+  "RoughnessMap": "rbxassetid://94174476779172",
+  "MetalnessMap": "rbxassetid://140719016652984"
+ },
+ "MarketStall": {
+  "dims": [
+   6.32,
+   4.5,
+   5.18
+  ],
+  "pieces": [
+   "MarketStall_Main",
+   "MarketStall_Goods",
+   "MarketStall_Stand",
+   "MarketStall_Glass",
+   "MarketStall_Glow",
+   "MarketStall_Cloth"
+  ],
+  "tris": {
+   "MarketStall_Main": 6090,
+   "MarketStall_Goods": 8752,
+   "MarketStall_Stand": 12964,
+   "MarketStall_Glass": 48,
+   "MarketStall_Glow": 80,
+   "MarketStall_Cloth": 420
+  },
+  "batch": 11,
+  "ColorMap": "rbxassetid://135404837363296",
+  "NormalMap": "rbxassetid://111176377585176",
+  "RoughnessMap": "rbxassetid://124645934877325",
+  "MetalnessMap": "rbxassetid://86052637286308"
+ },
+ "HangingSign": {
+  "dims": [
+   1.54,
+   1.98,
+   2.4
+  ],
+  "pieces": [
+   "HangingSign_Main",
+   "HangingSign_Cloth"
+  ],
+  "tris": {
+   "HangingSign_Main": 1234,
+   "HangingSign_Cloth": 1660
+  },
+  "batch": 11,
+  "ColorMap": "rbxassetid://92112853042620",
+  "NormalMap": "rbxassetid://117612722873705",
+  "RoughnessMap": "rbxassetid://78860511254560",
+  "MetalnessMap": "rbxassetid://87664865262444"
+ },
+ "Postbox": {
+  "dims": [
+   1.56,
+   1.56,
+   4.93
+  ],
+  "pieces": [
+   "Postbox"
+  ],
+  "tris": {
+   "Postbox": 5154
+  },
+  "batch": 11,
+  "ColorMap": "rbxassetid://119405071767856",
+  "NormalMap": "rbxassetid://139380203408068",
+  "RoughnessMap": "rbxassetid://87893635655910",
+  "MetalnessMap": "rbxassetid://134800304572863"
+ },
+ "StreetPump": {
+  "dims": [
+   2.36,
+   2.21,
+   4.5
+  ],
+  "pieces": [
+   "StreetPump_Main",
+   "StreetPump_Pool"
+  ],
+  "tris": {
+   "StreetPump_Main": 4228,
+   "StreetPump_Pool": 116
+  },
+  "batch": 11,
+  "ColorMap": "rbxassetid://95531650453401",
+  "NormalMap": "rbxassetid://135798365560435",
+  "RoughnessMap": "rbxassetid://139991048336820",
+  "MetalnessMap": "rbxassetid://120938914304728"
+ },
+ "NewsKiosk": {
+  "dims": [
+   3.46,
+   3.89,
+   7.4
+  ],
+  "pieces": [
+   "NewsKiosk_Main",
+   "NewsKiosk_Glass",
+   "NewsKiosk_Glow"
+  ],
+  "tris": {
+   "NewsKiosk_Main": 7962,
+   "NewsKiosk_Glass": 48,
+   "NewsKiosk_Glow": 80
+  },
+  "batch": 11,
+  "ColorMap": "rbxassetid://130679061515174",
+  "NormalMap": "rbxassetid://124324908426643",
+  "RoughnessMap": "rbxassetid://100858330682151",
+  "MetalnessMap": "rbxassetid://82519048616076"
+ },
+ "TelephoneBooth": {
+  "dims": [
+   3.25,
+   3.25,
+   9.37
+  ],
+  "pieces": [
+   "TelephoneBooth_Main",
+   "TelephoneBooth_Roof",
+   "TelephoneBooth_Glass",
+   "TelephoneBooth_Glow"
+  ],
+  "tris": {
+   "TelephoneBooth_Main": 14984,
+   "TelephoneBooth_Roof": 4160,
+   "TelephoneBooth_Glass": 464,
+   "TelephoneBooth_Glow": 120
+  },
+  "batch": 11,
+  "ColorMap": "rbxassetid://131523671834726",
+  "NormalMap": "rbxassetid://128756214149836",
+  "RoughnessMap": "rbxassetid://102177190862506",
+  "MetalnessMap": "rbxassetid://96517750361758"
+ },
+ "Bollards": {
+  "dims": [
+   8.24,
+   0.84,
+   2.55
+  ],
+  "pieces": [
+   "Bollards"
+  ],
+  "tris": {
+   "Bollards": 10036
+  },
+  "batch": 11,
+  "ColorMap": "rbxassetid://99956954017579",
+  "NormalMap": "rbxassetid://92159594967486",
+  "RoughnessMap": "rbxassetid://127242982432287",
+  "MetalnessMap": "rbxassetid://71377258381350"
+ },
+ "IronRailing": {
+  "dims": [
+   8.0,
+   0.64,
+   4.13
+  ],
+  "pieces": [
+   "IronRailing"
+  ],
+  "tris": {
+   "IronRailing": 5656
+  },
+  "batch": 11,
+  "ColorMap": "rbxassetid://89586094019730",
+  "NormalMap": "rbxassetid://101294190483437",
+  "RoughnessMap": "rbxassetid://138242517184774",
+  "MetalnessMap": "rbxassetid://118582137818407"
+ },
+ "Signpost": {
+  "dims": [
+   4.43,
+   2.95,
+   8.47
+  ],
+  "pieces": [
+   "Signpost"
+  ],
+  "tris": {
+   "Signpost": 6412
+  },
+  "batch": 11,
+  "ColorMap": "rbxassetid://105382271032676",
+  "NormalMap": "rbxassetid://95536501661328",
+  "RoughnessMap": "rbxassetid://121503539552284",
+  "MetalnessMap": "rbxassetid://92136512286937"
+ },
+ "CratePile": {
+  "dims": [
+   4.66,
+   2.79,
+   2.25
+  ],
+  "pieces": [
+   "CratePile"
+  ],
+  "tris": {
+   "CratePile": 15228
+  },
+  "batch": 11,
+  "ColorMap": "rbxassetid://86372414840206",
+  "NormalMap": "rbxassetid://97824354463874",
+  "RoughnessMap": "rbxassetid://71949176820821",
+  "MetalnessMap": "rbxassetid://116840613491039"
+ },
+ "TownDoor": {
+  "dims": [
+   7.62,
+   1.83,
+   8.86
+  ],
+  "pieces": [
+   "TownDoor_Main",
+   "TownDoor_Glass",
+   "TownDoor_Door0",
+   "TownDoor_Glow"
+  ],
+  "tris": {
+   "TownDoor_Main": 5446,
+   "TownDoor_Glass": 160,
+   "TownDoor_Door0": 4688,
+   "TownDoor_Glow": 80
+  },
+  "batch": 12,
+  "swing": {
+   "TownDoor_Door0": "in 95 (into the building)"
+  },
+  "rig": "NHLockerProp: Door / Open, shuts after 6 s",
+  "ColorMap": "rbxassetid://114169486768714",
+  "NormalMap": "rbxassetid://116619362865130",
+  "RoughnessMap": "rbxassetid://105969875169811",
+  "MetalnessMap": "rbxassetid://110750342176574"
+ },
+ "TownWindow": {
+  "dims": [
+   7.24,
+   0.94,
+   6.62
+  ],
+  "pieces": [
+   "TownWindow_Main",
+   "TownWindow_Glass",
+   "TownWindow_Glow"
+  ],
+  "tris": {
+   "TownWindow_Main": 14164,
+   "TownWindow_Glass": 12,
+   "TownWindow_Glow": 244
+  },
+  "batch": 12,
+  "ColorMap": "rbxassetid://121907620056561",
+  "NormalMap": "rbxassetid://90595046212761",
+  "RoughnessMap": "rbxassetid://93793020885342",
+  "MetalnessMap": "rbxassetid://102138538722321"
+ },
+ "BayWindow": {
+  "dims": [
+   6.31,
+   2.09,
+   8.83
+  ],
+  "pieces": [
+   "BayWindow_Main",
+   "BayWindow_Glass",
+   "BayWindow_Glow"
+  ],
+  "tris": {
+   "BayWindow_Main": 11854,
+   "BayWindow_Glass": 48,
+   "BayWindow_Glow": 348
+  },
+  "batch": 12,
+  "ColorMap": "rbxassetid://136665922055918",
+  "NormalMap": "rbxassetid://116561085849956",
+  "RoughnessMap": "rbxassetid://107246054483919",
+  "MetalnessMap": "rbxassetid://77151980546192"
+ },
+ "Chimney": {
+  "dims": [
+   2.9,
+   2.13,
+   9.81
+  ],
+  "pieces": [
+   "Chimney"
+  ],
+  "tris": {
+   "Chimney": 6624
+  },
+  "batch": 12,
+  "ColorMap": "rbxassetid://116264626851944",
+  "NormalMap": "rbxassetid://71659629552822",
+  "RoughnessMap": "rbxassetid://98195085746339",
+  "MetalnessMap": "rbxassetid://82517204139039"
+ },
+ "IronBalcony": {
+  "dims": [
+   8.08,
+   1.74,
+   5.26
+  ],
+  "pieces": [
+   "IronBalcony"
+  ],
+  "tris": {
+   "IronBalcony": 14098
+  },
+  "batch": 12,
+  "ColorMap": "rbxassetid://81508750612121",
+  "NormalMap": "rbxassetid://123695790476734",
+  "RoughnessMap": "rbxassetid://83963916203983",
+  "MetalnessMap": "rbxassetid://113461576496577"
+ },
+ "ShopAwning": {
+  "dims": [
+   8.5,
+   2.6,
+   2.37
+  ],
+  "pieces": [
+   "ShopAwning_Main",
+   "ShopAwning_Cloth"
+  ],
+  "tris": {
+   "ShopAwning_Main": 6264,
+   "ShopAwning_Cloth": 4984
+  },
+  "batch": 12,
+  "ColorMap": "rbxassetid://78080732998448",
+  "NormalMap": "rbxassetid://132931729292904",
+  "RoughnessMap": "rbxassetid://140718815517648",
+  "MetalnessMap": "rbxassetid://134150902607044"
+ },
+ "Dormer": {
+  "dims": [
+   5.1,
+   6.19,
+   7.41
+  ],
+  "pieces": [
+   "Dormer_Main",
+   "Dormer_Glass",
+   "Dormer_Glow"
+  ],
+  "tris": {
+   "Dormer_Main": 8484,
+   "Dormer_Glass": 88,
+   "Dormer_Glow": 80
+  },
+  "batch": 12,
+  "ColorMap": "rbxassetid://91813686033520",
+  "NormalMap": "rbxassetid://87760442841823",
+  "RoughnessMap": "rbxassetid://77441893050573",
+  "MetalnessMap": "rbxassetid://92604812241188"
+ },
+ "Drainpipe": {
+  "dims": [
+   1.48,
+   1.28,
+   12.54
+  ],
+  "pieces": [
+   "Drainpipe"
+  ],
+  "tris": {
+   "Drainpipe": 5066
+  },
+  "batch": 12,
+  "ColorMap": "rbxassetid://85156677849554",
+  "NormalMap": "rbxassetid://86752055842721",
+  "RoughnessMap": "rbxassetid://134180152674628",
+  "MetalnessMap": "rbxassetid://81940988869956"
+ },
+ "StoneStoop": {
+  "dims": [
+   5.84,
+   4.27,
+   4.38
+  ],
+  "pieces": [
+   "StoneStoop"
+  ],
+  "tris": {
+   "StoneStoop": 5556
+  },
+  "batch": 12,
+  "ColorMap": "rbxassetid://130699754405586",
+  "NormalMap": "rbxassetid://94447767766930",
+  "RoughnessMap": "rbxassetid://105027947143645",
+  "MetalnessMap": "rbxassetid://84935405713375"
+ },
+ "TableRound": {
+  "dims": [
+   4.05,
+   4.05,
+   3.0
+  ],
+  "pieces": [
+   "TableRound"
+  ],
+  "tris": {
+   "TableRound": 13262
+  },
+  "batch": 13,
+  "ColorMap": "rbxassetid://82472586132154",
+  "NormalMap": "rbxassetid://113266559070358",
+  "RoughnessMap": "rbxassetid://80078204837952",
+  "MetalnessMap": "rbxassetid://138880174641825"
+ },
+ "TableOval": {
+  "dims": [
+   8.05,
+   4.55,
+   3.03
+  ],
+  "pieces": [
+   "TableOval"
+  ],
+  "tris": {
+   "TableOval": 12432
+  },
+  "batch": 13,
+  "ColorMap": "rbxassetid://96054464210805",
+  "NormalMap": "rbxassetid://103530974127000",
+  "RoughnessMap": "rbxassetid://112496168895670",
+  "MetalnessMap": "rbxassetid://123701376774225"
+ },
+ "TableBanquet": {
+  "dims": [
+   16.0,
+   3.5,
+   5.33
+  ],
+  "pieces": [
+   "TableBanquet_Main",
+   "TableBanquet_Glow"
+  ],
+  "tris": {
+   "TableBanquet_Main": 14880,
+   "TableBanquet_Glow": 160
+  },
+  "batch": 13,
+  "ColorMap": "rbxassetid://76061565077078",
+  "NormalMap": "rbxassetid://77693979345665",
+  "RoughnessMap": "rbxassetid://71755230230451",
+  "MetalnessMap": "rbxassetid://79759215505511"
+ },
+ "TableCafe": {
+  "dims": [
+   2.55,
+   2.55,
+   2.7
+  ],
+  "pieces": [
+   "TableCafe"
+  ],
+  "tris": {
+   "TableCafe": 5272
+  },
+  "batch": 13,
+  "ColorMap": "rbxassetid://116716779944426",
+  "NormalMap": "rbxassetid://85408583281467",
+  "RoughnessMap": "rbxassetid://132287244013832",
+  "MetalnessMap": "rbxassetid://124895904263421"
+ },
+ "TableHexagon": {
+  "dims": [
+   4.56,
+   3.95,
+   3.01
+  ],
+  "pieces": [
+   "TableHexagon"
+  ],
+  "tris": {
+   "TableHexagon": 10128
+  },
+  "batch": 13,
+  "ColorMap": "rbxassetid://127574390994698",
+  "NormalMap": "rbxassetid://86525068034663",
+  "RoughnessMap": "rbxassetid://118532055715576",
+  "MetalnessMap": "rbxassetid://95507854308227"
+ },
+ "TableDemilune": {
+  "dims": [
+   4.05,
+   2.02,
+   3.0
+  ],
+  "pieces": [
+   "TableDemilune"
+  ],
+  "tris": {
+   "TableDemilune": 11620
+  },
+  "batch": 13,
+  "ColorMap": "rbxassetid://91385214219551",
+  "NormalMap": "rbxassetid://116383583673763",
+  "RoughnessMap": "rbxassetid://92403736970928",
+  "MetalnessMap": "rbxassetid://138602330687809"
+ },
+ "TableCoffee": {
+  "dims": [
+   4.0,
+   2.2,
+   1.5
+  ],
+  "pieces": [
+   "TableCoffee_Main",
+   "TableCoffee_Glass"
+  ],
+  "tris": {
+   "TableCoffee_Main": 8352,
+   "TableCoffee_Glass": 12
+  },
+  "batch": 13,
+  "ColorMap": "rbxassetid://80251454102550",
+  "NormalMap": "rbxassetid://85403311602789",
+  "RoughnessMap": "rbxassetid://134164466824031",
+  "MetalnessMap": "rbxassetid://108288369784278"
+ },
+ "TableSide": {
+  "dims": [
+   1.6,
+   1.59,
+   2.61
+  ],
+  "pieces": [
+   "TableSide"
+  ],
+  "tris": {
+   "TableSide": 5976
+  },
+  "batch": 13,
+  "ColorMap": "rbxassetid://133905120916329",
+  "NormalMap": "rbxassetid://133468597378799",
+  "RoughnessMap": "rbxassetid://136168744126170",
+  "MetalnessMap": "rbxassetid://128564671799863"
+ },
+ "ConcessionStand": {
+  "dims": [
+   9.65,
+   8.57,
+   11.33
+  ],
+  "pieces": [
+   "ConcessionStand_Main",
+   "ConcessionStand_Shelves",
+   "ConcessionStand_Roof",
+   "ConcessionStand_Sign",
+   "ConcessionStand_Cloth",
+   "ConcessionStand_Goods",
+   "ConcessionStand_Glass",
+   "ConcessionStand_Glow"
+  ],
+  "tris": {
+   "ConcessionStand_Main": 13340,
+   "ConcessionStand_Shelves": 9488,
+   "ConcessionStand_Roof": 7730,
+   "ConcessionStand_Sign": 9780,
+   "ConcessionStand_Cloth": 4936,
+   "ConcessionStand_Goods": 14944,
+   "ConcessionStand_Glass": 1304,
+   "ConcessionStand_Glow": 240
+  },
+  "batch": 14,
+  "rig": "Services.Features.Concession builds the stand from it (CounterFrontZ, SignFace, MenuFace attributes)",
+  "ColorMap": "rbxassetid://140719223899719",
+  "NormalMap": "rbxassetid://140442470629591",
+  "RoughnessMap": "rbxassetid://79616657764426",
+  "MetalnessMap": "rbxassetid://109248421334383"
  }
 }

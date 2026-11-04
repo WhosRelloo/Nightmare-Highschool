@@ -2,6 +2,33 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.20.0] - 2026-11-04: The Headmaster's office, the town, tables and a new concession stand (props batches 10 to 14)
+
+### Added
+- **42 new props, baked at 2048** (`art/props/nh_props_batch10.py` to `nh_props_batch14.py`; FBX, maps and previews in `art/props/`, ids in `props.json`, sheet `_batch10_14_final_sheet.png`). They go on the baseplate east of the gym for the builder (`Studio/props_setup10.luau`, `workspace.NHPropsShowcase`).
+
+  | Batch | Props |
+  |---|---|
+  | 10, the Headmaster's office | HeadmasterDesk, HeadmasterChair, Fireplace, FounderPortrait, Safe, CuriosityCabinet, OfficeRug, DeskLamp, FounderBust, SchoolCrest, DecanterTray, Hourglass |
+  | 11, town shops and street | ShopApothecary, ShopCurio, MarketStall, HangingSign, Postbox, StreetPump, NewsKiosk, TelephoneBooth, Bollards, IronRailing, Signpost, CratePile |
+  | 12, town building pieces | TownDoor, TownWindow, BayWindow, Chimney, IronBalcony, ShopAwning, Dormer, Drainpipe, StoneStoop |
+  | 13, tables | TableRound, TableOval, TableBanquet, TableCafe, TableHexagon, TableDemilune, TableCoffee, TableSide |
+  | 14 | ConcessionStand |
+
+- **Rigged and animated:**
+  - **Used with a prompt:** the desk drawer slides out, the safe and the curiosity cabinet open outward (the cabinet's glass with its door), the shop doors swing out, the town door swings in.
+  - **Always on:** awnings, the stall valance and the shop signs sway, the hanging sign swings, smoke from the chimney, embers from the fireplace, candles and lanterns flicker.
+- **The building pieces** are wall pieces with flat backs on an 8-stud rhythm: a door, a lit window, a bay window, a balcony, an awning, a drainpipe, a dormer for a 45° roof, a chimney and front steps.
+
+### Changed
+- **The concession stand is remodelled** in the school's style: cast iron and oxblood enamel under a slate roof with cresting, a crimson and black awning, lanterns, and a black marble counter of sweet jars, pastries and potion sodas.
+  - `Services.Features.Concession` builds it from the model once the owner imports it (`Studio/patch_concession.luau`), on the same spot. The prompt, the lunch queue and Mrs. Okada stay; the CONCESSIONS sign and the menu are drawn on its boards. Until then the plank stand is built as before.
+- **The owner's notes:** the stone on these pieces is darker and sootier than the castle stone, which read beige; the windows glow amber, not white; less wood.
+
+### Testing
+- All 42 baked at 2048; maps uploaded; a dry run with stand-in boxes made every template and placed the rows with no clashes; the Concession patch compiles.
+- **Not verified yet:** the real import, the doors on their real hinges, and the new concession stand in Play.
+
 ## [1.19.0] - 2026-11-03: NPCs who move, look and talk like students
 
 ### Changed
