@@ -2,6 +2,49 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.27.0] - 2026-11-04: Cliques (Phase 2): reactions, turf and scuffles
+
+### Added
+- **Reactions to your standing**:
+  - Your tier with each clique is kept on your player (`CliqueTier_<Id>` attributes, `Social.Cliques.SyncTiers`).
+  - Clique members near you mostly say that clique's line for the tier (Respected, Friendly, Wary, Hostile; `Config.Cliques` `Reactions`; `Controllers.World.Chatter`).
+  - Students at a hangout turn to face you if their clique respects or hates you (`Features.Schedules` `Linger`).
+- **Turf confrontations** (`Services.Social.CliqueFights`, new; `Config.Cliques.Fights`):
+  - **Trigger:** 8 s in the hangout of a clique that's Hostile to you.
+  - **Crew:** 2 of its members (3 at -70 or lower) come out of the group, one taunts you, and they attack, fighting only you at the clique's tier.
+  - **Ends** when you're 30 studs past the hangout ("And stay out"), when you go down (a jeer), when they're all down, or after 90 s. Each clique waits 2 minutes before doing it again.
+- **Rival scuffles**:
+  - **When:** at Break, Lunch, After School and in the Evening, at most every 4 minutes, and only with a student within 120 studs to see it.
+  - **What:** one rival pair (`Config.Cliques.RivalPairs`) fights 2v2 or 3v3 at one side's hangout. The defenders come out of their group and the rivals walk in. They're the regular combat AI at their clique tiers and fight only each other, with rally lines.
+  - **Joining in:** hit a side and those fighters turn on you. Each of their members you put down is +6 with the other side, and +10 more if that side wins.
+  - **Ends:** a side is all down, 60 s pass, or a hall monitor arrives. Students of those cliques nearby turn to watch (`workspace` `NHScuffleAt`).
+- **The hall monitor breaks scuffles up on school grounds** (`School.HallMonitor.Respond`, a new Respond state): the nearest monitor on duty walks over, and the fighters scatter ("Break it up!"). Fighting in front of a monitor is still booked as Fighting. Turf hangouts (the Den, the Crimson Parlor) get no monitor.
+- **Clique tiers** (`Config.Cliques` `Tier`):
+
+  | Tier | Cliques |
+  |---|---|
+  | Easy | Ordinary, Ink Club, Chapel Choir |
+  | Normal | Vigil, Athletes, Delinquents |
+  | Hard | Crimson Court, Pack |
+
+  Fighter health by tier: 60 / 75 / 90. `LeaderTier` (one above) is stored for when leaders fight (Phase 3).
+- Every clique has fighter names, reaction lines and fight lines (taunt, jeer, leave, rally, scatter), shown as bubbles through the new remote `NHCliques.Say`.
+- **Studio only**:
+  - test-bridge commands `Scuffle`, `Confront` and `FightState`
+  - a test guard: with `ReplicatedStorage` attribute `NHTestNoMenuKeys` set, the main menu ignores the keyboard, so stray key presses can't press Continue and load a save slot mid-test. Clicks still work. It's off unless a test sets it.
+
+### Testing
+- **Evening scuffle, 3v3:** the Pack (Hard) beat the Chapel Choir (Easy) in 27 s, then all six fighters walked off and despawned. A Choir student at the Chapel stood watching.
+- **After-school scuffle:** Vigil vs Court started on its own (the student near the Archive counted as a watcher). A monitor was sent and it ended before the 60 s limit; this was before the end reason was recorded, and fighters then had 100 health.
+- **Evening Archive scuffle:** Vigil (Normal) vs Court (Hard) reached the 60 s limit and both sides gave up.
+- Fighters showed their clique names and tier pips and were dressed by the server; clean-up took under 3 s.
+- **Not verified yet** (they need a loaded save slot and a character in the world):
+  - turf confrontations
+  - the reaction lines and facing
+  - fight bubbles on screen (they only go to players within 90 studs)
+  - standing from joining a scuffle
+  - the monitor's arrival line
+
 ## [1.26.0] - 2026-11-04: Kickflips
 
 ### Added

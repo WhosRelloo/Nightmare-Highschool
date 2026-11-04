@@ -101,12 +101,50 @@ The page refreshes while it's open when your standing changes.
 ## Voice lines
 Every clique has five lines of its own. A student in a clique says one of them about half the time, and the student or kind lines otherwise (`Controllers.World.Chatter`). Staff never use clique lines.
 
+## Phase 2 (1.27): reactions, turf and scuffles
+`Services.Social.CliqueFights` (new), with its settings in `Config.Cliques.Fights`.
+
+**Reactions.** Your tier with each clique sits on your player as `CliqueTier_<Id>`; `Social.Cliques.SyncTiers` refreshes it every 3 s and on every change.
+- Clique members near you say that clique's `Reactions[tier]` line about 70% of the time. Neutral keeps their usual lines.
+- At a hangout, a student whose clique respects you or is hostile to you turns to face you within 10 studs (`Features.Schedules` `Local.Linger`).
+
+**Turf confrontations.** Stay `TurfLinger` (8) s inside the hangout box (`workspace.Regions`) of a clique that's Hostile to you.
+- **The crew:** `ConfrontCrew` (2, or 3 at -70 or lower) members spawn at the clique's spots farthest from you.
+- **The fight:** one taunts you, and they fight only you (`FixedTarget`) at the clique's tier.
+- **Ending:**
+  - you get `LetGoDistance` (30) studs past the box: a "Leave" line
+  - you go down: a jeer
+  - they're all down
+  - `ConfrontTime` (90) s pass
+- **Cooldown:** `ConfrontCooldown` (120) s per clique.
+- Dueling and protected students are left alone.
+
+**Rival scuffles.** `ScuffleKinds` segments (Break, Lunch, After School, Evening), at most every `ScuffleEvery` (240) s. A rival pair from `RivalPairs` fights at the defender's hangout, which needs a student within `ScuffleSeeRange` (120) studs.
+- **Fighters:** 2 or 3 a side. The defenders come out of their group and the rivals walk in from 22 studs. Targets come from threat, so they never pick on bystanders.
+- **Joining in:** hit one and it turns on you. You count as being on the side you've hit less. `HelpDown` (+6) with that side for each rival you put down, and `HelpWin` (+10) if it wins. The usual -8 and rival share come from `Social.Cliques`.
+- **The monitor:** on school grounds, after 4 s, `School.HallMonitor.Respond(venue, onArrive)` sends the nearest free monitor on duty. When it arrives it says "Break it up!" and the scuffle ends; survivors say their Scatter line.
+- **Ending:** a side all down, `ScuffleTime` (60) s, or the monitor. Everyone walks away from the nearest student and despawns once nobody's within 40 studs, or after 15 s (never while carried or gripped).
+
+**Fighters** are spawned for each event (`AI.Spawn`): the clique's `Fighter` name, its clothes, its `Tier` (health 60 / 75 / 90 for Easy / Normal / Hard), Fist, and the tier pips on the tag. The scheduled students keep their routine; the ones nearby watch (`workspace` `NHScuffleAt`).
+
+**Fight lines.** `Taunt`, `Jeer`, `Leave`, `Rally` and `Scatter` show as speech bubbles via `NHCliques.Say`, to students within 90 studs.
+
+| Tier | Cliques |
+|---|---|
+| Easy | Ordinary, Ink Club, Chapel Choir |
+| Normal | Vigil, Athletes, Delinquents |
+| Hard | Crimson Court, Pack |
+
+`LeaderTier` is one above.
+
 ## Test hooks (Studio only, `ServerStorage.NHTestBridge`)
 - `SchedulePlan(kind, name?, hour?)`: put every student on a plan now, for example `("Break", "Break", 9)`
 - `ScheduleDebug()`: each student's index, clique, activity and seat
 - `Cliques(name)`: the phone's list for a player
 - `CliqueAdd(name, id, amount, reason?)`: change a player's standing
+- `Scuffle(defender, attacker)`, `Confront(name, clique)`, `FightState()`: start a scuffle or a confrontation now, and see what's running (with the last result)
+- Set `ReplicatedStorage` attribute `NHTestNoMenuKeys` during automated Play tests: the main menu then ignores the keyboard, so a stray Enter or Space can't press Continue and load a slot. Clear it afterwards.
 
 ## Next phases
-- **Phase 2:** members react to your standing: greetings, taunts, cold shoulders, scuffles between rivals, and the hall monitor stepping in.
+- ~~**Phase 2:** reactions, turf, scuffles and the hall monitor.~~ Done in 1.27.0 (above).
 - **Phase 3:** turf, leader quests and rank rewards for every clique.
