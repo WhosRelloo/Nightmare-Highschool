@@ -2,6 +2,20 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.33.1] - 2026-11-04: Controller uppercut, menu cursor
+
+### Changed
+- **Uppercut on a controller: hold RS and press RT (R2)** (`Gui.GamepadControls`, `Combat.M1`). Before, RS toggled crouch the moment you pressed it, and you stayed crouched after the uppercut. An RS tap on its own still toggles crouch, now on release. RT (R2) is the strike, as before. The controls list says "Crouch (tap); hold + strike: uppercut".
+
+### Fixed
+- **No mouse on the menu screen.** The main menu hides every screen it doesn't keep, including the game's cursor, and the system cursor is off while the game draws its own, so there was no pointer at all. `NHCursor` is on the main menu's keep list now.
+
+### Verified (Studio Play, no slot)
+- **Menu cursor:** in the main menu, the cursor's screen stayed on and its image showed (it was off before).
+- **Holding RS and pressing R2:** the uppercut flag was set when the strike fired, and letting go of RS didn't crouch.
+- **Tapping RS:** crouched on release, and a second tap stood up. R2 while crouched still went to the strike.
+- **Not tested:** an uppercut actually landing (a no-slot character can't draw a weapon), and a real controller.
+
 ## [1.33.0] - 2026-11-04: Clique events (Cliques Phase 4)
 
 ### Added

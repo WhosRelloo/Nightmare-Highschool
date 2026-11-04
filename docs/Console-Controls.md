@@ -15,7 +15,7 @@ A gamepad plays the whole game: combat, carrying, race actions, the skateboard, 
 | X | Square | Interact with a prompt, or draw / sheathe | Kickflip |
 | Y | Triangle | Carry / drop (and greet a stranger's prompt) | - |
 | LS (L3) | L3 | Run, a toggle | - |
-| RS (R3) | R3 | Crouch / slide, a toggle (held with RT: uppercut) | - |
+| RS (R3) | R3 | Tap: crouch / slide, a toggle. Hold RS and press RT (R2): uppercut (1.33.1) | - |
 | D-pad Up | D-pad Up | Grip, or take out / put away your board | Get off |
 | D-pad Down | D-pad Down | Your race's action on a downed body | - |
 | D-pad Left / Right | D-pad Left / Right | The hotbar slot before / after | - |
@@ -24,6 +24,7 @@ A gamepad plays the whole game: combat, carrying, race actions, the skateboard, 
 | Right stick | Right stick | Camera | Camera |
 
 - **Combat buttons run the keyboard's action modules.** `Keybinds.Config` lists the keyboard key first, then the gamepad button. A Settings rebind replaces only the keyboard key (`InputController.Rebind` keeps `Button*` and `DPad*` entries).
+- **Uppercut (1.33.1): hold RS, press RT.** While RS is down the Player attribute `NHPadUppercut` is set, and `Combat.M1` treats it like Ctrl. An RS tap on its own toggles crouch when you let go, so the uppercut doesn't crouch you first. Pressing RT while crouched (after a tap) still uppercuts, as Ctrl + click does.
 - **LS and RS are toggles.** They press Shift and Ctrl through `InputController.Press`, as the touch buttons do. RS is bound through ContextActionService at priority 3000, because Roblox's gamepad camera uses RS for zoom.
 - **The wolf** (`WolfForm`): RT keeps biting while held (every 0.35 s) and RB leaps, the keyboard's click and R.
 - **No combat from a menu** (1.32.0): while a menu is open the Player attribute `NHPadMenu` is set, and `Bind.Keybinds` ignores pad buttons (by key code name: `Button*` and `DPad*`), so RT, LB, X and the rest drive the menu instead of striking or feinting. Releases still go through, so a held block always ends.
