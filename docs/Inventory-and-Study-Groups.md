@@ -38,7 +38,8 @@ Added in 1.10.0. Code lives in Studio; this page is the design and how the piece
   - **The model:** when `ServerStorage.NHProps.ConcessionStand` is there (props batch 14), the stand is that model: gothic cast iron and oxblood under a slate roof, with the sign and menu drawn on its boards. Otherwise it is built from parts. See [[School-Props]].
   - **Buying:** the counter's prompt carries `NHConcession`, and you must be within 16 studs.
   - **Lunch:** the `NHLunchSpot` markers in front are where the lunch crowd queues.
-- **Save data:** `PlayerData.Inventory = { Items = { [id] = count }, Pinned = { id } }`, written with the `SetInventory` action and checked by `Config.Items.Sanitize`.
+- **Skateboards:** the Locker's Boards tab lists all nine boards; equip yours, buy the rest. See [[Skateboards]].
+- **Save data:** `PlayerData.Inventory = { Items = { [id] = count }, Pinned = { id }, Boards = { Owned = { id }, Equipped = id } }`, written with the `SetInventory` action and checked by `Config.Items.Sanitize`.
 - **Remotes:** `ReplicatedStorage.NHInventory`. Get, Use, Pin, Drop and Buy (RF), plus Changed (RE).
 
 ## Study groups (U)

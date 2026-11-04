@@ -2,6 +2,40 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.24.0] - 2026-11-04: Skateboards
+
+### Added
+- **Skateboards, ridden Bully style** (see `docs/Skateboards.md`). B takes your board out and you step straight on; B again steps off.
+  - **Controls:** W push, S brake, A / D steer, Shift push hard for a short boost, Space ollie.
+  - **Crashes:** riding into a wall too fast throws you off in a ragdoll everyone sees.
+  - **B is shared with Grip:** with a downed body in reach, B still grips. Settings shows it as **Grip / Skateboard**.
+- **Nine boards** (props batch 18, 2048 maps, `art/props/nh_props_batch18.py`, sheet `_batch18_final_sheet.png`):
+  - **Free:** Moonlit; everyone owns it.
+  - **Bought with Yen in the Locker's new Boards tab:** Bone Hand, Night Ravens, Grave Rovers, Iron Wardens, Gargoyle, The Vigil, The Crimson Court and The Headmaster, from ¥350 to ¥4,000.
+  - **Rig:** every board shares one rig. The wheels spin with your speed and the trucks lean into turns.
+- **Riders are posed by hand on every client**, with no animation assets:
+  - a side-on stance with a soft crouch and arms out
+  - a back-foot push
+  - an ollie: crouch, pop and tuck
+  - a lean into the turn
+- **Code:**
+  - `ReplicatedStorage.Config.Boards`, `Services.Features.Skateboard`, `Controllers.World.Skateboard` and `Controllers.World.SkateboardPose`.
+  - `ReplicatedStorage.NHSkate`: the board templates, the kit's sounds, its wheel trails recoloured crimson and gold, and Easy Ragdoll.
+  - `Studio/skate_setup.luau` rigs the boards.
+  - **Saved:** `PlayerData.Inventory.Boards = { Owned, Equipped }`.
+  - **Changes elsewhere:** `Config.Items.Sanitize`, `Features.Inventory` (Boards / SetBoards), `InputController` (only Grip while riding), `General.Grip`, `UI.Settings` and the Locker.
+
+### Credits
+- The riding is ported from the open-source **"SkateBoard"** kit by **vexarino** (payhip.com/b/7UnMA). Its page offers it to use, modify and customise for your own projects, with no formal licence for published games, so ask the author before release.
+
+### Testing
+- **In Play, without a save slot:**
+  - getting on, pushing, steering with a lean and the ollie all work
+  - a crash ragdoll, and stepping off with B
+  - the meshed Moonlit board rides on the floor with its wheels spinning
+- **The rigs:** all nine boards are rigged from the imported meshes.
+- **Not verified yet:** the Locker's Boards tab, buying and equipping (they need a loaded record), another player's view, and riding on stairs and slopes.
+
 ## [1.23.0] - 2026-11-04: Enemies with a skill level
 
 ### Added

@@ -11,6 +11,7 @@ Two kinds of post, matching the server's channels:
 - 2026-11-02, **The Living School** (1.10 to 1.11): [post](announcements/2026-11-02-the-living-school.md)
 
 ## Game updates
+- [2026-11-04-skateboards](game-updates/2026-11-04-skateboards.md)
 - [2026-11-04-tougher-enemies](game-updates/2026-11-04-tougher-enemies.md)
 - [2026-11-04-the-cafeteria](game-updates/2026-11-04-the-cafeteria.md)
 - [2026-11-04-cliques](game-updates/2026-11-04-cliques.md)

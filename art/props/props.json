@@ -1,5 +1,5 @@
 {
- "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y). Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 15-17: the cafeteria and the spire; PendantLamp_Glass is crimson glass (set in props_setup15).",
+ "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y). Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 15-17: the cafeteria and the spire; PendantLamp_Glass is crimson glass (set in props_setup15). Batch 18: the nine skateboards; each piece's origin is its pivot (trucks lean about the long axis, wheels spin about the axle).",
  "StudentDesk": {
   "dims": [
    3.0,
@@ -2759,5 +2759,284 @@
   "NormalMap": "rbxassetid://119608850103613",
   "RoughnessMap": "rbxassetid://108548547727038",
   "MetalnessMap": "rbxassetid://102864337133413"
+ },
+ "SkateboardMoonlit": {
+  "dims": [
+   5.5,
+   1.4,
+   0.94
+  ],
+  "pieces": [
+   "SkateboardMoonlit_Main",
+   "SkateboardMoonlit_TruckF",
+   "SkateboardMoonlit_TruckB",
+   "SkateboardMoonlit_WheelFL",
+   "SkateboardMoonlit_WheelFR",
+   "SkateboardMoonlit_WheelBL",
+   "SkateboardMoonlit_WheelBR"
+  ],
+  "tris": {
+   "SkateboardMoonlit_Main": 3100,
+   "SkateboardMoonlit_TruckF": 996,
+   "SkateboardMoonlit_TruckB": 996,
+   "SkateboardMoonlit_WheelFL": 688,
+   "SkateboardMoonlit_WheelFR": 688,
+   "SkateboardMoonlit_WheelBL": 688,
+   "SkateboardMoonlit_WheelBR": 688
+  },
+  "batch": 18,
+  "rig": "skateboard: Studio/skate_setup.luau rigs it into ReplicatedStorage.NHSkate.Boards (root PartForMotor6D; TruckF/TruckB lean, WheelsFL/FR/BL/BR spin); see docs/Skateboards.md",
+  "ColorMap": "rbxassetid://111751915673937",
+  "NormalMap": "rbxassetid://84988949326093",
+  "RoughnessMap": "rbxassetid://139714904518814",
+  "MetalnessMap": "rbxassetid://84638393342086"
+ },
+ "SkateboardBone": {
+  "dims": [
+   5.5,
+   1.4,
+   0.94
+  ],
+  "pieces": [
+   "SkateboardBone_Main",
+   "SkateboardBone_TruckF",
+   "SkateboardBone_TruckB",
+   "SkateboardBone_WheelFL",
+   "SkateboardBone_WheelFR",
+   "SkateboardBone_WheelBL",
+   "SkateboardBone_WheelBR"
+  ],
+  "tris": {
+   "SkateboardBone_Main": 3100,
+   "SkateboardBone_TruckF": 996,
+   "SkateboardBone_TruckB": 996,
+   "SkateboardBone_WheelFL": 688,
+   "SkateboardBone_WheelFR": 688,
+   "SkateboardBone_WheelBL": 688,
+   "SkateboardBone_WheelBR": 688
+  },
+  "batch": 18,
+  "rig": "skateboard: Studio/skate_setup.luau rigs it into ReplicatedStorage.NHSkate.Boards (root PartForMotor6D; TruckF/TruckB lean, WheelsFL/FR/BL/BR spin); see docs/Skateboards.md",
+  "ColorMap": "rbxassetid://76600833639770",
+  "NormalMap": "rbxassetid://78060737071447",
+  "RoughnessMap": "rbxassetid://77832680379881",
+  "MetalnessMap": "rbxassetid://84025715416280"
+ },
+ "SkateboardRavens": {
+  "dims": [
+   5.5,
+   1.4,
+   0.94
+  ],
+  "pieces": [
+   "SkateboardRavens_Main",
+   "SkateboardRavens_TruckF",
+   "SkateboardRavens_TruckB",
+   "SkateboardRavens_WheelFL",
+   "SkateboardRavens_WheelFR",
+   "SkateboardRavens_WheelBL",
+   "SkateboardRavens_WheelBR"
+  ],
+  "tris": {
+   "SkateboardRavens_Main": 3100,
+   "SkateboardRavens_TruckF": 996,
+   "SkateboardRavens_TruckB": 996,
+   "SkateboardRavens_WheelFL": 688,
+   "SkateboardRavens_WheelFR": 688,
+   "SkateboardRavens_WheelBL": 688,
+   "SkateboardRavens_WheelBR": 688
+  },
+  "batch": 18,
+  "rig": "skateboard: Studio/skate_setup.luau rigs it into ReplicatedStorage.NHSkate.Boards (root PartForMotor6D; TruckF/TruckB lean, WheelsFL/FR/BL/BR spin); see docs/Skateboards.md",
+  "ColorMap": "rbxassetid://76568835369309",
+  "NormalMap": "rbxassetid://70690917342147",
+  "RoughnessMap": "rbxassetid://134731937178546",
+  "MetalnessMap": "rbxassetid://75241723110579"
+ },
+ "SkateboardRovers": {
+  "dims": [
+   5.5,
+   1.4,
+   0.94
+  ],
+  "pieces": [
+   "SkateboardRovers_Main",
+   "SkateboardRovers_TruckF",
+   "SkateboardRovers_TruckB",
+   "SkateboardRovers_WheelFL",
+   "SkateboardRovers_WheelFR",
+   "SkateboardRovers_WheelBL",
+   "SkateboardRovers_WheelBR"
+  ],
+  "tris": {
+   "SkateboardRovers_Main": 3100,
+   "SkateboardRovers_TruckF": 996,
+   "SkateboardRovers_TruckB": 996,
+   "SkateboardRovers_WheelFL": 688,
+   "SkateboardRovers_WheelFR": 688,
+   "SkateboardRovers_WheelBL": 688,
+   "SkateboardRovers_WheelBR": 688
+  },
+  "batch": 18,
+  "rig": "skateboard: Studio/skate_setup.luau rigs it into ReplicatedStorage.NHSkate.Boards (root PartForMotor6D; TruckF/TruckB lean, WheelsFL/FR/BL/BR spin); see docs/Skateboards.md",
+  "ColorMap": "rbxassetid://75861641860909",
+  "NormalMap": "rbxassetid://111279771819241",
+  "RoughnessMap": "rbxassetid://81484801742492",
+  "MetalnessMap": "rbxassetid://136854921853520"
+ },
+ "SkateboardWardens": {
+  "dims": [
+   5.5,
+   1.4,
+   0.94
+  ],
+  "pieces": [
+   "SkateboardWardens_Main",
+   "SkateboardWardens_TruckF",
+   "SkateboardWardens_TruckB",
+   "SkateboardWardens_WheelFL",
+   "SkateboardWardens_WheelFR",
+   "SkateboardWardens_WheelBL",
+   "SkateboardWardens_WheelBR"
+  ],
+  "tris": {
+   "SkateboardWardens_Main": 3100,
+   "SkateboardWardens_TruckF": 996,
+   "SkateboardWardens_TruckB": 996,
+   "SkateboardWardens_WheelFL": 688,
+   "SkateboardWardens_WheelFR": 688,
+   "SkateboardWardens_WheelBL": 688,
+   "SkateboardWardens_WheelBR": 688
+  },
+  "batch": 18,
+  "rig": "skateboard: Studio/skate_setup.luau rigs it into ReplicatedStorage.NHSkate.Boards (root PartForMotor6D; TruckF/TruckB lean, WheelsFL/FR/BL/BR spin); see docs/Skateboards.md",
+  "ColorMap": "rbxassetid://79106934428031",
+  "NormalMap": "rbxassetid://128257862059046",
+  "RoughnessMap": "rbxassetid://133039067621608",
+  "MetalnessMap": "rbxassetid://85574296007661"
+ },
+ "SkateboardGargoyle": {
+  "dims": [
+   5.5,
+   1.4,
+   0.94
+  ],
+  "pieces": [
+   "SkateboardGargoyle_Main",
+   "SkateboardGargoyle_TruckF",
+   "SkateboardGargoyle_TruckB",
+   "SkateboardGargoyle_WheelFL",
+   "SkateboardGargoyle_WheelFR",
+   "SkateboardGargoyle_WheelBL",
+   "SkateboardGargoyle_WheelBR"
+  ],
+  "tris": {
+   "SkateboardGargoyle_Main": 3100,
+   "SkateboardGargoyle_TruckF": 996,
+   "SkateboardGargoyle_TruckB": 996,
+   "SkateboardGargoyle_WheelFL": 688,
+   "SkateboardGargoyle_WheelFR": 688,
+   "SkateboardGargoyle_WheelBL": 688,
+   "SkateboardGargoyle_WheelBR": 688
+  },
+  "batch": 18,
+  "rig": "skateboard: Studio/skate_setup.luau rigs it into ReplicatedStorage.NHSkate.Boards (root PartForMotor6D; TruckF/TruckB lean, WheelsFL/FR/BL/BR spin); see docs/Skateboards.md",
+  "ColorMap": "rbxassetid://71265735178695",
+  "NormalMap": "rbxassetid://128306715696804",
+  "RoughnessMap": "rbxassetid://137908123737655",
+  "MetalnessMap": "rbxassetid://71827639907578"
+ },
+ "SkateboardVigil": {
+  "dims": [
+   5.5,
+   1.4,
+   0.94
+  ],
+  "pieces": [
+   "SkateboardVigil_Main",
+   "SkateboardVigil_TruckF",
+   "SkateboardVigil_TruckB",
+   "SkateboardVigil_WheelFL",
+   "SkateboardVigil_WheelFR",
+   "SkateboardVigil_WheelBL",
+   "SkateboardVigil_WheelBR"
+  ],
+  "tris": {
+   "SkateboardVigil_Main": 3100,
+   "SkateboardVigil_TruckF": 996,
+   "SkateboardVigil_TruckB": 996,
+   "SkateboardVigil_WheelFL": 688,
+   "SkateboardVigil_WheelFR": 688,
+   "SkateboardVigil_WheelBL": 688,
+   "SkateboardVigil_WheelBR": 688
+  },
+  "batch": 18,
+  "rig": "skateboard: Studio/skate_setup.luau rigs it into ReplicatedStorage.NHSkate.Boards (root PartForMotor6D; TruckF/TruckB lean, WheelsFL/FR/BL/BR spin); see docs/Skateboards.md",
+  "ColorMap": "rbxassetid://137683231287568",
+  "NormalMap": "rbxassetid://132310981321763",
+  "RoughnessMap": "rbxassetid://90438768225217",
+  "MetalnessMap": "rbxassetid://99412125692607"
+ },
+ "SkateboardCrimson": {
+  "dims": [
+   5.5,
+   1.4,
+   0.94
+  ],
+  "pieces": [
+   "SkateboardCrimson_Main",
+   "SkateboardCrimson_TruckF",
+   "SkateboardCrimson_TruckB",
+   "SkateboardCrimson_WheelFL",
+   "SkateboardCrimson_WheelFR",
+   "SkateboardCrimson_WheelBL",
+   "SkateboardCrimson_WheelBR"
+  ],
+  "tris": {
+   "SkateboardCrimson_Main": 3100,
+   "SkateboardCrimson_TruckF": 996,
+   "SkateboardCrimson_TruckB": 996,
+   "SkateboardCrimson_WheelFL": 688,
+   "SkateboardCrimson_WheelFR": 688,
+   "SkateboardCrimson_WheelBL": 688,
+   "SkateboardCrimson_WheelBR": 688
+  },
+  "batch": 18,
+  "rig": "skateboard: Studio/skate_setup.luau rigs it into ReplicatedStorage.NHSkate.Boards (root PartForMotor6D; TruckF/TruckB lean, WheelsFL/FR/BL/BR spin); see docs/Skateboards.md",
+  "ColorMap": "rbxassetid://108772321300143",
+  "NormalMap": "rbxassetid://83083390701187",
+  "RoughnessMap": "rbxassetid://78263132293517",
+  "MetalnessMap": "rbxassetid://127558464583555"
+ },
+ "SkateboardHeadmaster": {
+  "dims": [
+   5.5,
+   1.4,
+   0.94
+  ],
+  "pieces": [
+   "SkateboardHeadmaster_Main",
+   "SkateboardHeadmaster_TruckF",
+   "SkateboardHeadmaster_TruckB",
+   "SkateboardHeadmaster_WheelFL",
+   "SkateboardHeadmaster_WheelFR",
+   "SkateboardHeadmaster_WheelBL",
+   "SkateboardHeadmaster_WheelBR"
+  ],
+  "tris": {
+   "SkateboardHeadmaster_Main": 3100,
+   "SkateboardHeadmaster_TruckF": 996,
+   "SkateboardHeadmaster_TruckB": 996,
+   "SkateboardHeadmaster_WheelFL": 688,
+   "SkateboardHeadmaster_WheelFR": 688,
+   "SkateboardHeadmaster_WheelBL": 688,
+   "SkateboardHeadmaster_WheelBR": 688
+  },
+  "batch": 18,
+  "rig": "skateboard: Studio/skate_setup.luau rigs it into ReplicatedStorage.NHSkate.Boards (root PartForMotor6D; TruckF/TruckB lean, WheelsFL/FR/BL/BR spin); see docs/Skateboards.md",
+  "ColorMap": "rbxassetid://94544596318958",
+  "NormalMap": "rbxassetid://82986756657463",
+  "RoughnessMap": "rbxassetid://70788956534806",
+  "MetalnessMap": "rbxassetid://129925492807119"
  }
 }
