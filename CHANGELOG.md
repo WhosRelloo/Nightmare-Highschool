@@ -2,6 +2,58 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.33.0] - 2026-11-04: Clique events (Cliques Phase 4)
+
+### Added
+- **Pranks** (`Services.Social.CliquePranks`, new; docs/Cliques.md):
+  - **Where:** two prank spots per hangout.
+  - **NPC pranks:** about every 6 minutes outside class, a member of one rival sneaks in and leaves a mess (a tag in their colours, a stink bomb, or knocked-over trash). Hit them to stop it (+6 with the victims per one you put down), or keep watch to help (+6 with them, −6 with the victims).
+  - **Cleaning:** hold E on a mess (+3 with the victims). Messes go at 6 AM.
+  - **Your pranks:** with a **Prank Kit** (15 Yen at the concession stand, 3 a day) you can prank any hangout: −15 with the victims, +8 with their rival. A hall monitor who sees it books vandalism, and victims who see it come for you.
+- **Rumble days** (`CliqueFights.StartRumble`): about every 3 in-game days a rival pair is announced for the next day after school at the Commons.
+  - **The fight:** 3 waves of 3 a side. The hall monitor shows up at 60 s, and a coach ends it at 2 minutes.
+  - **Prize:** the winners hold the losers' hangout until the next night.
+  - **Joining in:** pick a side for +6 per rival you put down and +15 if your side wins.
+- **The bulletin:** the phone's Cliques app has a **Today** tab: the next or live rumble, held turf, pranks and messes, today's feuds, and your dares.
+- **Dares** (`Services.Social.CliqueEvents`, new; 24 dares in `Config.Quests`):
+  - **Delivery:** each morning 1 to 3 leaders who are Neutral or better text you their dare of the day. It goes to the new **Texts** app (Accept / Not today), or you can ask a leader in person: "Got a dare for me?".
+  - **Rewards:** +6 to +10 standing and 10 to 25 Yen.
+  - **Expiry:** an unfinished dare goes away at 6 AM. The journal tags dares.
+- **Quests:** the `Prank` objective, and daily dares (`Dare = true`: only the leader's dare of the day starts, done for the 6 AM day, gone at dawn); `Quests.DareFor`, `Quests.DareDay`.
+- **Phone:** the Texts app, saved per slot in `PlayerData.Phone.Texts` (`NHPhone.Texts`, `NHPhone.TextAction`), with an unread badge.
+- **Inventory:** items with a `DailyLimit` (`Inventory.Daily`, `LeftToday`), and `Inventory.Take`.
+- **Test hooks:** `Prank`, `PrankHit`, `PrankMine`, `Messes`, `CleanAll`, `Rumble`, `RumbleState`, `Dares`, `Today`, `DareFor`.
+
+### Verified (Studio Play, no slot, evening and after school)
+- **Prank spots:** 16 made (2 per hangout). Each leader had a different dare of the day (`DareFor`).
+- **NPC pranks:**
+  - The Pack prankster walked 26 studs to the Chapel, worked about 6 s and left a tag. A natural prank (the Court at the Archive) happened on its own.
+  - Hitting the prankster mid-prank stopped it (no mess), and they turned to fight.
+- **Messes:**
+  - Holding E for 3 s cleaned a mess and turned that spot's Prank prompt back on.
+  - Your prank with no kit was refused ("You need a prank kit"). A test prank (kit skipped) left a mess "by you" in the bulletin.
+- **Fixed while testing:**
+  - Messes were hidden under the Chapel's decorative tiles (now on the visible surface).
+  - Tags only filled half their board (scaled text tops out at 100 px; smaller canvas).
+  - The stink smoke was too faint.
+  - The first NPC prank came the moment the server started.
+- **Rumbles:**
+  - **Pack vs Choir (evening):** the coach (Coach Varga) walked over and ended it at 145 s. The Pack won on losses and held the Chapel.
+  - **Fixed while testing:** downed fighters got back up while the next wave walked in (6 standing at once). A fighter who goes down is now out for good, and the next run never had more than 3 standing.
+  - **Athletes vs Ink Club:** the Athletes won by knocking out all three Ink waves at 124 s and held the Ink Studio.
+  - **After school:** the hall monitor was sent at 60 s. It isn't sent in the evening, when the monitor is off duty.
+- **Phone:**
+  - The Texts icon (envelope glyph) shows on the home screen.
+  - The Cliques app's Today tab showed the planned rumble, turf, the messes, a Court vs Vigil feud and the empty dares line (screenshot in docs/img).
+- **Console:** no script errors from the new or changed scripts.
+- **Not tested yet (needs a loaded slot):**
+  - **Dares:** dare texts, Accept / Not today, the "Got a dare for me?" offer, a dare finishing (Done for the day), expiring at 6 AM, and the journal's DARE tag.
+  - **The kit:** buying it and the 3-a-day limit.
+  - **Standing:** the standing changes from pranks, cleaning, helping and rumbles, and the Prank objective counting.
+  - **Combat:** hitting a prankster in real combat. That combat path is the scuffles' (Phase 2).
+  - A rumble starting by itself the day after it's announced.
+- **Seen once, not explained:** the test player fell out of the world in the first run, standing at the spawn while the scripts ran elsewhere. It didn't happen in the next two runs.
+
 ## [1.32.0] - 2026-11-04: Controller gaps, PlayStation names
 
 ### Added

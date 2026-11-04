@@ -185,6 +185,97 @@ Every clique has five lines of its own. A student in a clique says one of them a
 - **Bonus:** fighters on the winning side of a deciding scuffle get `TurfBonus` (+15).
 - **Notifications:** students within 220 studs get one when a hangout is taken or retaken. At 6 AM, everyone gets one when it returns.
 
+## Phase 4 (1.33): events
+
+Design: [docs/superpowers/specs/2026-11-04-clique-events-design.md](superpowers/specs/2026-11-04-clique-events-design.md). Settings: `Config.Cliques.Events`. The owner's order for what's next: **leader showdowns (friend or foe), then joining a clique.**
+
+### Pranks (`Services.Social.CliquePranks`, new)
+
+**Prank spots.** Two per hangout (`PrankSpots`).
+- **Made at runtime:** anchors in `workspace.NHCliqueAreas.PrankSpots`, from the clique's two gathering spots farthest apart.
+- **Map override:** any part with the attribute `NHPrankSpot = <clique>` is used instead, and then none are made for that clique.
+- Each spot has a **Prank** prompt (hold E, 4 s).
+
+**Messes** (`workspace.NHCliqueAreas.Messes`, attributes `Victim`, `By`, `ByPlayer`, `Kind`, `Spot`).
+
+| Kind | Looks like |
+|---|---|
+| Tag | The pranksters' `Slogan` in their colour, in marker text (`Font.PermanentMarker`) on the floor (your own pranks: GOTCHA, WAS HERE, ...) |
+| Stink | A green canister and green smoke (the combat dust's smoke texture, tinted) |
+| Trash | The school's `TrashCan` model on its side, with paper everywhere |
+
+- **Placement:** on the visible surface. Decorative floor tiles often don't collide, so the walking floor can be lower.
+- **Cleaning:** hold E (3 s) on a mess: `PrankClean` (+3) with the victims. Messes also go at 6 AM ("The janitor cleaned up every hangout overnight.").
+- **Reactions:** the victims' students within 25 studs complain (`Pranked` lines, at most every 40 s each).
+- **One mess per spot:** a spot's Prank prompt is off while its mess is there.
+
+**NPC pranks.**
+- **When:** at Break, Lunch, After School and in the Evening, at most every `PrankEvery` (360) s (the first one 3 minutes in), and only with a student within `PrankSeeRange` (120) studs.
+- **What happens:** a member of one rival walks in from 30 studs, works for `PrankTime` (6) s (a `Shh` line) and leaves the mess.
+- **Stop it:** hit them first. They drop it and fight you; each one you put down is `PrankStop` (+6) with the victims.
+- **Help:** hold E by them ("Keep watch"). They finish twice as fast: `PrankHelp` (+6) with the pranksters, −6 with the victims.
+
+**Your pranks.**
+- **The kit:** a **Prank Kit** (`Config.Items` `PrankKit`, Kind `Prank`) costs 15 Yen at the concession stand (discounts apply). The stand sells `DailyLimit` (3) a day, counted in `Inventory.Daily` by the event day.
+- **Using it:** hold E on a prank spot, or use the kit from the hotbar while standing on one. `Inventory.Take` spends it.
+- **Standing:** `PrankMine` (−15) with the victims and `PrankMineRival` (+8) with their rival. The rival's automatic quarter share is topped up to 8.
+- **Witnesses:**
+  - `HallMonitor.CheckWitness(Player, "Vandalism")`: Recognized books it now, Spotted means the monitor comes.
+  - A victim member within `PrankSeen` (20) studs with line of sight shouts and calls a confrontation (`CliqueFights.Confront`).
+- **Quests:** counts for the `Prank` objective (`Quests.Progress(P, "Prank", victim)`).
+
+### Rumble days (`CliqueFights`)
+
+- **Planning:** every `RumbleEveryDays` (3) event days, a rival pair is picked (yesterday's most heated, else random) for the **next** day's After School at the Commons (`RumbleVenue` = the Ordinary's hangout). Everyone gets a text from one side's leader (`CliqueEvents.RumblePlanned`) and a toast.
+- **Start:** a student within `RumbleStartRange` (160) studs, or 10 in-game minutes into After School.
+- **The fight:** `RumbleWaves` (3) waves of `RumbleSize` (3) a side. A side's next wave walks in when its wave is all down. A fighter who goes down is out for good: they leave, and they count toward that side's losses. At most `RumbleTime` (240) s.
+- **Staff:**
+  - At `RumbleMonitor` (60) s, the hall monitor responds. They keep fighting: "There's only one of them!"
+  - At `RumbleStaff` (120) s, the nearest coach (Coach Mallory / Varga / Dunmore) walks over, says "That's ENOUGH! Everyone, out!", ends it, and walks back.
+- **Winning:**
+  - The side still standing wins, or the side that lost fewer when it's stopped.
+  - The winners hold the losers' hangout until 6 AM the day after (`SetTurf` with `Until`).
+  - Helpers on the winning side get `RumbleWin` (+15), and the `Scuffle` objective counts it.
+- **No overlap:** no scuffle starts during a rumble, and no rumble during a scuffle.
+- **Feuds:** `CliqueFights.Feuds()`: scuffles and rumbles per rival pair per event day.
+
+### The bulletin (the Cliques app: **Standing** | **Today**)
+
+The phone's Cliques app has a `Kit.TabBar`. **Today** (`NHCliques.Today`, `CliqueEvents.Today`) shows:
+- **Rumble:** the next one (today / tomorrow), the live one with waves left, and the last result.
+- **Turf:** hangouts held by someone else.
+- **Pranks:** one going on, and messes not cleaned yet (by a clique, "someone", or "you").
+- **Feuds today:** fights per pair, and wins.
+- **Your dares:** taken (with progress), done, or waiting in Texts, plus hours to dawn.
+
+It refreshes every 5 s while open.
+
+![The Today tab](img/cliques-today-tab.jpg)
+
+### Dares (`Services.Social.CliqueEvents`, new; `Config.Quests` `Dare<Clique>1-3`)
+
+- **The pool:** each leader has three dares. One is that leader's dare of the day (`Quests.DareFor(Leader)`, rotating by the event day, which runs 6 AM to 6 AM).
+
+| | Dare 1 | Dare 2 | Dare 3 |
+|---|---|---|---|
+| Type | Prank the rival's hangout (`Prank`) | Win a scuffle or rumble for us (`Scuffle`) | The clique's own: Vigil and Ink a lesson (B or better / pass), Court a 30-min note to Ezra, Athletes Target Practice, Delinquents a ring duel, Pack the notice-board shakedown, Ordinary attend a class, Choir a Chapel votive after 5 PM |
+| Reward | 15 Yen, +8 | 20 Yen, +10 | 10 Yen, +6 |
+
+- **Rules** (`Dare = true`, `Category = "Dare"`, `Repeatable = "Daily"`):
+  - Only today's dare can start (`CanStart` → `NotToday`).
+  - Doing it marks the event day (`Done` = `DareDay`).
+  - An unfinished dare simply goes away at 6 AM (`ExpireDare`, with a toast; no Failed entry).
+  - The journal tags it "DARE · GONE AT 6 AM".
+- **Texts:** each morning, or on loading a slot that hasn't had today's, 1 to 3 (`DaresPerDay`) leaders who are Neutral or better text you their dare (`CliqueEvents.SendDares`).
+  - The phone's new **Texts** app (an envelope glyph; red badge for unread) lists the texts, with **Accept** (starts the quest) and **Not today**.
+  - Texts are saved per slot in `PlayerData.Phone.Texts` (newest first, `TextsKept` 30), and `Phone.DareDay` records the morning's send.
+  - Remotes: `NHPhone.Texts` and `NHPhone.TextAction`.
+- **In person:** any leader you're Neutral or better with offers their dare in dialogue as "Got a dare for me?" (`QuestChoices`).
+
+### Test hooks (Studio, `ServerStorage.NHTestBridge`)
+
+`Prank(by, victim)`, `PrankHit(name, down?)` (as if you hit or downed the prankster), `PrankMine(name, victim, useKit?)`, `Messes()`, `CleanAll()`, `Rumble(a, b, now?)` (now: start it; else plan it for tomorrow), `RumbleState()`, `Dares(name)` (send today's texts again), `Today(name)`, `DareFor(leader)`. Standing only changes with a loaded slot.
+
 ## Test hooks (Studio only, `ServerStorage.NHTestBridge`)
 - `SchedulePlan(kind, name?, hour?)`: put every student on a plan now, for example `("Break", "Break", 9)`
 - `ScheduleDebug()`: each student's index, clique, activity and seat
@@ -197,3 +288,6 @@ Every clique has five lines of its own. A student in a clique says one of them a
 ## Next phases
 - ~~**Phase 2:** reactions, turf, scuffles and the hall monitor.~~ Done in 1.27.0 (above).
 - ~~**Phase 3:** turf, leader quests and rank rewards for every clique.~~ Done in 1.28.0 (above).
+- ~~**Phase 4:** events: pranks, rumble days, the bulletin and dares.~~ Done in 1.33.0 (above).
+- **Phase 5:** leader showdowns, friend or foe (owner's pick): as a friend (Friendly and quest 2 done) a test of strength that makes the clique Respected; as an enemy (Hostile) the leader comes for you, and winning forces their respect. Beat all eight for King of the School.
+- **Phase 6:** joining a clique.
