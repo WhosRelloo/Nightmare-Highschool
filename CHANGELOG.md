@@ -2,6 +2,16 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.38.2] - 2026-11-04: The spiral stair's metalness map is back
+
+### Fixed
+- **StairSpiral has all four maps again.** Its metalness map was re-uploaded under the group as image 119049869824909 (inside Decal 100237983277999). The stair's SurfaceAppearances, `art/props/props.json` and the batch 20 setup script now use it. The old id (136349045257712) is gone from all of them.
+  - A second import of the same file (Decal 70594753429054, image 116789412772878) isn't used.
+
+### Verified (Studio Edit)
+- With all four maps, the spiral rendered its stone, iron balusters and a metallic brass handrail within 10 seconds (screenshot `docs/img/stair-spiral-fixed.jpg`).
+- **Not checked:** Play or a live server.
+
 ## [1.38.1] - 2026-11-04: The spiral stair's texture
 
 ### Fixed
