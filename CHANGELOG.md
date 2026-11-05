@@ -2,6 +2,39 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.38.3] - 2026-11-04: Clique members greet you by name; the cliques tested on a save slot
+
+### Fixed
+- **Member greetings showed "{Name}"** instead of your first name, for example "{Name}! Team's here." (`Social.CliqueMembership`, `Local.Greet`). The pattern was a backtick string, so `{Name}` was read as a variable (nil) and nothing was replaced. It's a plain string now: "Testy. Pack."
+- **Test tool:** TestBridge had two `CanJoin` commands, and the factions one replaced the clique one. The clique one is `CliqueCanJoin` now (Studio only).
+
+### Verified (Studio Play, on a save slot)
+The cliques' saved paths, tested on a temporary fourth slot ("Testy"). `SlotCount` was set to 4 for the test and back to 3 afterwards, and your three characters weren't loaded. In Studio, saves go to the test store (`[Test] Studio's Data`), not production.
+- **Joining:**
+  - Rhys refused before you'd beaten him ("CJ_NotBeaten").
+  - A real showdown in the Gymnasium (the leader knocked down) saved `Showdowns.Won.Athletes`.
+  - Then "I want to join you." joined, and saved `Membership {Id, Since}`.
+- **Ranks and crew:** at 75 you're a Member and one Varsity Bruiser walks with you; at 90 you're a Lieutenant with two.
+- **The hub:** members see "Got a job for me?" and "I'm out.".
+- **Quests:**
+  - Warm-up paid 20 Yen and Bench Them paid 40.
+  - The dare (Paint the Painters) was done with one prank and paid 15.
+  - The Payback job was done with two pranks and paid 38, which is 25 × 1.5 for a Lieutenant.
+- **Prank kits:** bought through the stand's remote. Three went through (60 → 15 Yen); the fourth got "That's all the Prank Kits for today (3 a day)". Each prank used a kit and cost the Ink Club 15 standing.
+- **Rewards:** the Athletes' reward unlocked both titles (Walk-on, Varsity).
+- **King of the School:** after all eight leaders, `King` was saved, NHKing set, the title awarded, concession prices × 0.9, and the leaders texted.
+- **Leaving ("I'm out." → "I'm sure. I'm out."):**
+  - Athletes standing went to -50, `Betrayed.Athletes` was saved, and their showdown win was wiped (the King title stays).
+  - The crew walked off, and Rhys's foe challenge started.
+- **Saves:** a fresh Play session read it all back from slot 4 (Yen, kits and today's count, membership, showdowns, titles, quests, standings).
+- **Joining another clique:** joining the Pack through Dex after the betrayal worked, and the greeting came through by name.
+- **Not tested:**
+  - a lost or forfeited showdown on a slot;
+  - the Guard Duty and Hold the Line jobs;
+  - Wardrobe signature looks;
+  - leaving from the phone.
+- **Small finding:** a prank refused while you're mid-fight gives no message (`CliquePranks.PlayerPrank` returns no reason when busy).
+
 ## [1.38.2] - 2026-11-04: The spiral stair's metalness map is back
 
 ### Fixed

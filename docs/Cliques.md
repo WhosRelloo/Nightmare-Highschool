@@ -373,7 +373,13 @@ It refreshes every 5 s while open.
 
 **Phone.** The clique's card in the Cliques app shows **MEMBER · rank** with a crimson **Leave** button. The Today tab shows **Your clique**: rank, points to the next rank, and today's job and its state.
 
-**Test hooks.** `MemberTest(name, clique?, rank?)` treats a no-slot player as a member at a rank, with nothing saved; no clique ends it. Also `MemberState(name)`, `CanJoin(name, clique)` and `GuardDuty(name, clique)`.
+**Test hooks.** `MemberTest(name, clique?, rank?)` treats a no-slot player as a member at a rank, with nothing saved; no clique ends it. Also `MemberState(name)`, `CliqueCanJoin(name, clique)` (1.38.3; it was `CanJoin`, which the factions command replaced) and `GuardDuty(name, clique)`.
+
+## Save-slot test (1.38.3)
+
+Every saved clique path was played on a temporary fourth slot ("Testy"): standing, a real showdown win, joining through the leader, ranks and the walking crew, the Warm-up and Bench Them quests, a dare, a member job (with the Lieutenant bonus), prank kits and their daily limit, the clique reward and titles, King of the School, leaving, and joining another clique afterwards. A fresh Play session read it all back. The test found one bug: greetings showed "{Name}" instead of your first name (fixed in 1.38.3).
+
+To run it again: set `Config.MainMenu.SlotCount` to 4, play, and use TestBridge `ChooseSlot` 4, `SetName`, `EnterSchool`. Set it back to 3 afterwards. Studio saves go to the test store.
 
 ## Test hooks (Studio only, `ServerStorage.NHTestBridge`)
 - `SchedulePlan(kind, name?, hour?)`: put every student on a plan now, for example `("Break", "Break", 9)`
