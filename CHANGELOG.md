@@ -2,6 +2,77 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.47.0] - 2026-11-05: Substitute days, two new minigames, players can sit in class
+
+### Added
+- **Substitute teachers** (new `Services.School.Substitutes`, `Config.Substitutes`):
+  - Two or three school days a week, one random subject's class is covered for the whole day by one of four original substitutes. The week's plan comes from the week number, so every server agrees.
+  - Nobody is warned: you find out when you walk into the room.
+  - The substitute sits in the teacher's chair, lounging (the staff-room slacker's sit, feet kicked up), with a name tag. Talk to them for their rule.
+- **The four substitutes and their rules:**
+  - **Mr. Thaddeus Crane, "The Stickler":**
+    - the lesson runs one level harder and pays ×1.25;
+    - a late arrival gets an extra Tardy mark ("Twice");
+    - arriving on time earns bonus EXP.
+  - **Miss Delphine Moth, "The Dreamer":**
+    - late counts as on time;
+    - "Open Book": one level easier, half the Yen.
+  - **Signor Vittorio Lazzaro, "The Gambler"**, with one of two variants:
+    - **Double or Nothing:** a B or better pays double, anything less pays nothing.
+    - **Speed Round:** ×0.75 time, ×1.5 pay.
+  - **Mx. Ashgrove Hollow, "The Odd One":** never teaches the actual subject (×1.25 pay).
+- **The twists.** The Odd One always brings one, and the others sometimes:
+  - **Swap:** another subject's minigame ("History? No, today we mix chemicals.").
+  - **A new minigame** only substitutes run:
+    - **Candle Vigil** (reaction): candles gutter blue with a draining bar; tend them before they go dark.
+    - **Séance Sequence** (memory): six sigils glow in a growing sequence; repeat it, with three candles for mistakes.
+  - **An errand instead of a lesson:**
+    - Fetch the substitute's pocket watch, sketchbook, lunch tin, hymnal, scarf or phone. It turns up on clear floor in the Staff Room, the Archive, the Commons, the Chapel, the Gymnasium or the Main Hall.
+    - You get a hall pass, so attendance counts you as in class and the hall monitor leaves you alone.
+    - Hand it back before the bell and it counts as an A. The clock shows the errand.
+- **The grade sheet** shows the substitute's name and rule, their pay note ("Double or nothing: doubled!") and their own remark.
+- **The art** (`art/ui/hud/make_substitute_games.py`, `UI.Theme.SubGames`), all PBR and published under the group:
+  - six brass-and-enamel sigil medallions, idle and lit;
+  - the candle with its flame, gutter and smoke overlays, pinned to the wick;
+  - a new icon for each of the six lesson minigames, shown beside the countdown when a lesson starts.
+- **Sable's cards** (the Scholar) can warn of a substitute coming later in the week.
+- **Players can sit in the classroom chairs** (new `Features.PlayerSeats`, client `Controllers.World.PlayerSeat`):
+  - hold E on a student chair to sit; jump to stand up;
+  - you take the students' Sitting pose, and your hips are settled onto the cushion;
+  - students never sit in a player's chair, and a chair a student has claimed refuses you.
+- **Test hooks:** `SubForce`, `SubClear`, `SubState`, `SubPickUp`, `SubHandIn`, `AutoVigil` and `AutoSeance` on `ServerStorage.NHTestBridge`.
+
+### Changed
+- **The classrooms (Rooms 102–105):**
+  - The student desks and chairs moved 1.5 studs back toward the door; the front row was 1.45 studs from the teacher's desk (`Studio/classroom_rows.luau`).
+  - Each teacher's chair moved from half under the desk, 1.3 studs from the chalkboard, to the open floor at the east end of the desk, facing the class (`Studio/teacher_chairs.luau`).
+
+### Fixed
+- **Region boxes** that float above their rooms (the Staff Room's starts 20 studs up) weren't matched:
+  - Lost & Found's forbidden-area check missed them, so lost items could appear in staff-only rooms;
+  - the Seeker hint reported lost things as "out on the grounds".
+  Both now check the footprint and stay below the box's top. Errand spots take the lowest floor in the column, not the roof or the baseplate under it.
+
+### Verified (Studio Play, test slot "Testy")
+- **The plan:** over 20 weeks, 2 or 3 covered days a week (12 and 8 weeks); all four substitutes appeared; the same week always gave the same plan.
+- **The substitute in the chair:** the hips on the cushion (2.82 against a seat top of 2.82), touching only the chair, clear of the desk and the board, after the furniture moves (`docs/img/sub-teacher-chair.jpg`).
+- **Hollow (Candle Vigil):** a B paid ¥13 (×1.25), with Level 2 and Hollow's line (`docs/img/sub-grade-sheet.jpg`). With the real art: lit candles, blue gutters with draining bars, smoke on one gone out (`docs/img/sub-candle-vigil.jpg`).
+- **Moth:**
+  - **Séance Sequence:** a B paid ¥5 (half).
+  - **Errand:** the sketchbook in the Archive; handing it in gave an A (¥8, half of ¥15). Testy stayed "in class" there.
+  - **Late rule:** arriving at 10:07 was recorded Present, with the A on the record.
+- **Crane:**
+  - **Errand:** the watch in the Staff Room, with a hall pass; handing it in gave an A, ¥19 (126 → 145), Maths level 2.
+  - **Late rule:** a late arrival was recorded Tardy, with his extra Tardy mark.
+  - **Harder lesson:** a level-2 class ran at level 3 (6 pairs).
+  - **On time:** Present, and EXP went up (attendance plus his bonus; his part wasn't measured on its own).
+- **Lazzaro:**
+  - **Double or Nothing:** an A+ paid ¥40.
+  - **Speed Round + Swap:** Chemistry ran History's Match the Past (5 pairs) on a shortened timer, and Candle Vigil's 38 s became 28 s.
+- **The new art:** the sigils in Séance Sequence (`docs/img/sub-seance-sequence.jpg`), and the game icon beside the countdown (`docs/img/sub-intro.jpg`).
+- **A player sitting:** the prompt in an empty Room 102. The Sitting pose played and the seat correction (up 0.36, back 0.42) put the hips on the cushion (gap 0.00), arms on the desk (`docs/img/player-seat.jpg`).
+- **Not tested:** a player being refused a chair a student has claimed (the refusal path), two players on one server, the Lenient and Strict rules over a real (unjumped) school day, an errand failing at the bell, and dropping an errand item on going down.
+
 ## [1.46.1] - 2026-11-05: Sable's seated idle; NPCs sit on their seats and stay out of props
 
 ### Added

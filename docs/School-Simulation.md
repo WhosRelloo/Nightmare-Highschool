@@ -163,3 +163,15 @@ Every NPC is built from `ServerScriptService.Services.AI.AI.Rig`. Students, the 
 
 ![A class seated](img/npc-seating-class.jpg)
 ![The staff-room sofa](img/npc-seating-sofa.jpg)
+
+## Players in the chairs (1.47)
+
+- **Sitting:** `Features.PlayerSeats` gives every `StudentChair` an invisible `Seat` (`NHPlayerSeat`) on the cushion, facing the chair's front (`Seats.Top`), and a "Sit" prompt (hold E, 4.5 studs).
+  - Touching the seat does nothing (CanTouch off); jump to stand.
+  - The sitter's client (`Controllers.World.PlayerSeat`) plays the students' Sitting pose, measures the hips against the cushion and the backrest, and asks `NHPlayerSeats.Settle(Up, Back)`. The server moves the seat weld by that much, adding up and clamped.
+- **Sharing with students:** `Features.Schedules` claims each class chair for the student heading for it (`ChairTaken`). A chair a player sits in is skipped, and a claimed chair refuses a player.
+- **The classrooms (Rooms 102–105):**
+  - the student desks, chairs, collision desks and `NHPropSpot_Chair` markers moved 1.5 studs toward the door (`Studio/classroom_rows.luau`, room attribute `NHRowShift`);
+  - each teacher's chair now stands at the east end of the teacher's desk, facing the class (`Studio/teacher_chairs.luau`, `NHChairWas`). It used to be half under the desk, 1.3 studs from the chalkboard, with no room for a sitter.
+
+![A player at a desk](img/player-seat.jpg)

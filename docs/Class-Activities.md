@@ -114,6 +114,48 @@ Some checks used real key presses or mouse clicks; others used a test script.
   - mashing all lanes gets 2 of 16 hits and explodes
 
 
+## Substitute days (1.47)
+
+`Services.School.Substitutes` (server), `Config.Substitutes` (the cast, rules, games and errands).
+
+- **The plan:** each school week (Superlatives' week, `floor(EventDay / 5)`), a `Random` seeded by the week picks 2 or 3 of the five days. Each gets a random subject, a substitute (no repeats while the cast lasts), the Gambler's variant and a twist (`TwistChance`). Every server gets the same plan. `Plan(Week)`, `Today()`, `For(Subject)`, `Upcoming()`.
+- **At the desk:** from 6 AM to 5 PM the substitute sits in the covered room's teacher's chair (`Features.Seats`), playing the slacker's `SitChill`, with a name tag and a Talk prompt (a line, and the rule as a notice). There's no warning anywhere else.
+- **The rules**, applied by `School.Activities` and `School.Attendance`:
+
+  | Substitute | Rule | Level | Time | Pay | Late |
+  |---|---|---|---|---|---|
+  | Mr. Thaddeus Crane, The Stickler | Strict Hours | +1 | | x1.25 | Strict: +1 Tardy; on time +20 EXP |
+  | Miss Delphine Moth, The Dreamer | Open Book | -1 | | x0.5 | Lenient: Tardy becomes Present |
+  | Signor Vittorio Lazzaro, The Gambler | Double or Nothing / Speed Round | | / x0.75 | B or better x2, else 0 / x1.5 | |
+  | Mx. Ashgrove Hollow, The Odd One | Anything Goes | | | x1.25 | |
+
+- **The twists:**
+  - **Swap:** another subject's game.
+  - **Game:** `CandleVigil` or `SeanceSequence`.
+  - **Errand:** `StartErrand`. The thing (`Config.Substitutes.Errands`, a `Lost*` prop) turns up on clear floor in a region: the lowest walkable surface in the column, clear of props. Only you can pick it up, and you get a hall pass (`NHHallPass`) that Attendance counts as being in class. Hand it in before the bell and `Activities.GrantErrand` pays it as an A. The bell, going down or leaving ends it. The clock's carry line shows `NHErrandText`.
+  - The Odd One always twists; the others sometimes do.
+- **Candle Vigil** (`ServerStorage.Activities.CandleVigil`, reaction):
+  - 6 to 10 candles; the server times each gutter (2.4 s at level 1 down to 1.25 s);
+  - `Tend` saves a guttering candle, and tending a lit one is a slip;
+  - score: saved / (saved + gone dark), minus 4% per slip.
+- **Seance Sequence** (`ServerStorage.Activities.SeanceSequence`, memory):
+  - six sigils, a sequence that grows each round, 5 to 9 rounds, 3 lives;
+  - presses during the showing are ignored;
+  - score: rounds won out of the rounds asked for.
+- **Art:** `UI.Theme.SubGames` (`art/ui/hud/make_substitute_games.py`):
+  - the sigils, idle and lit;
+  - the candle with flame, gutter and smoke overlays (the wick tip is at (128, 208) of the 256 px overlays, and at (131.4, 80.4) of the body);
+  - one `Game<Name>` icon per minigame, shown beside the intro countdown and preloaded.
+- **Sable's Scholar card** may name a substitute coming later in the week (plainly, at Friendly).
+- **Test hooks:** `SubForce(subject, sub, twist?, extra?, variant?)`, `SubClear`, `SubState`, `SubPickUp`, `SubHandIn`, `AutoVigil(name, accuracy)`, `AutoSeance(name, accuracy)`.
+
+![A substitute at the desk](img/sub-teacher-chair.jpg)
+![Candle Vigil](img/sub-candle-vigil.jpg)
+![Seance Sequence](img/sub-seance-sequence.jpg)
+![The intro with the game icon](img/sub-intro.jpg)
+![The grade sheet](img/sub-grade-sheet.jpg)
+![The art](img/sub-games-art.png)
+
 ## Ideas for later
 
 - Teacher NPCs at the desks, using the same `ReportIncident` to report fights in class.
