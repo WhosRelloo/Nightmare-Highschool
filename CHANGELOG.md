@@ -2,6 +2,48 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.45.0] - 2026-11-05: The Ink Club fortune teller
+
+### Added
+- **Sable Vey, the Ink Club's seer** (new `Services.Features.Fortune`, `ServerStorage.Dialogue.Sable`, `Config.Npcs` Sable, `NpcLooks` Sable):
+  - Sable sits at a candlelit tarot table in the Ink Studio, by the west wall near the door.
+  - For real: the root is anchored on the chair's cushion in a seated R6 pose, and the Animate script is paused (`NHSeated`).
+  - If Sable goes down or is carried, the pose is dropped, and Sable sits back down after getting up.
+  - Wren stays the ringleader. Sable isn't a joinable leader, and counts as Ink Club for clique things like Lost & Found returns.
+- **A reading:**
+  - Talk to Sable and choose "Read my fortune. (¥5)". You get one a day (6 AM event day, saved in `PlayerData.Social.Fortune {Day, Card, Text}`).
+  - Sable draws one card and gives one vague but true hint about what's going on right now. Topics with nothing going on are skipped. If nothing at all is stirring, Sable says so and keeps your Yen.
+    - **The Tower:** a rumble today or tomorrow, a live rumble, or the most heated feud.
+    - **The Fool:** a dare you haven't finished.
+    - **The Moon:** the next crimson or blue moon, new moon or full moon.
+    - **The Seeker:** the region where a lost thing is lying (Lost & Found's new `Loose()`).
+    - **The Feast:** the daily special and its twist for your race.
+    - **The Crown:** who leads one of this week's superlatives.
+    - **The Scholar:** your grades so far this week.
+  - **At Friendly or better with the Ink Club** (20+), the hint is plain instead of a riddle.
+  - Afterwards the menu offers "What did the cards say again?".
+- **The card reveal** (new `Controllers.Gui.Fortune`):
+  - The card rises face down over a dimmed room with a candle glow, flips to its face, and an ornate plate beside it gives the numeral, the name, the hint and "Sable Vey, the Ink Club".
+  - Close it with the button, by clicking anywhere, or by walking away. Reduce Motion skips the rise and the flip.
+- **The tarot deck** (`art/ui/hud/make_tarot_cards.py`, `UI.Theme.FortuneCards`): 8 original procedural cards at 600 × 1024, published under the group. One matched deck on bone parchment with brass frames, crimson title banners and engraved art.
+  - The card back: a crimson lattice with an ink-blot eye under a crescent.
+  - The Tower, The Fool, The Moon, The Seeker, The Feast, The Crown and The Scholar.
+- **Props batch 26, the seer set** (`art/props/nh_props_batch26.py`):
+  - **SeerTable:** a crimson-draped round table with an ink chart, three face-down cards, a deck, a chamberstick candle (`SeerTable_Glow`, Neon with a flickering light), an ink pot and quill, and a wax dish.
+  - **SeerChair:** a tall gothic chair with iron studs, tracery and a crimson cushion.
+  - Baked at 2048 with 64 samples on the GPU, maps under the group.
+  - `Studio/props_setup26.luau` builds the templates, places the set in the Ink Studio (with Sable's post on the cushion) and puts a copy on the showcase at x 110, z −170.5 (`NHPropBatch26`).
+- **Test hooks:** `FortuneRead`, `FortuneReset`, `FortuneHints`, `FortuneToday`, `FortuneStanding` on `ServerStorage.NHTestBridge`.
+
+### Verified (Studio Play, test slot "Testy")
+- Sable sits in the chair (tagged Ink Club). The first stock R6 sit pose held the arms straight out, so it was replaced with a calm pose, hands lowered to the table's edge (`docs/img/fortune-sable.jpg`).
+- Every hint was asked for at once. Six had something true to say: the Vigil and the Crimson Court rumble, Testy's open dare from Vesper, a crimson moon in 3 nights, a lost sketchbook, Moon Cake, and no grades yet. The Crown was quiet, because no superlatives had been counted in Studio.
+- **Through the dialogue:** "Read my fortune. (¥5)" shows the ¥ sign, charged 116 → 111, and drew The Scholar. The menu then switched to "What did the cards say again?", and a second reading the same day was refused ("Done").
+- **The real card art:** The Moon flipped over, sharp and readable at the in-game size (`docs/img/fortune-card.jpg`). All 8 images load.
+- **Friendly:** with Testy's Ink standing set to 25 for one reading (then put back to −18), the hint was the plain one: "A crimson moon rises in 3 nights: Vampires hit harder, Ghouls and Wraiths a little." (`docs/img/fortune-reading.jpg`).
+- **Fixed during testing:** riddles that began with a clique's nickname started lowercase; the card sat on top of the dialogue box on small screens.
+- **Not tested:** Sable getting back up after being downed, Reduce Motion, walking away to close the card, the "Nothing" reply, and the Crown hint with real superlative leaders.
+
 ## [1.44.0] - 2026-11-05: The door kit, rigged and animated
 
 ### Added

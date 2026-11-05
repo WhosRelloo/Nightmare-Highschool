@@ -690,3 +690,15 @@ Door, flap and tap origins sit on their hinge lines.
 
 ![The doors, shut and open](img/door-kit-previews.jpg)
 ![On the showcase](img/door-kit-showcase.jpg)
+
+## Batch 26 (1.45): the seer set
+
+| Prop | Tris | Size (W x D x H studs) | Notes |
+|---|---|---|---|
+| SeerTable | 17.4k (Main, Glow) | 3.17 x 3.15 x 3.53 | a round table draped to the floor in crimson with a bone hem; a black velvet reading cloth with a gilt ink chart (12 houses, invented sigils, an eye), a deck and three face-down cards, a brass chamberstick (`SeerTable_Glow`), an ink pot and quill, a wax dish |
+| SeerChair | 11.8k | 2.40 x 2.01 x 6.06 | a tall black gothic chair: iron studs and straps, tracery over crimson velvet, crocketed pinnacles and an iron crescent; no arms; the cushion at 1.6 |
+
+- **Baked** at 2048 with 64 samples on the GPU. The maps are under the group (the ids are in `Studio/props_setup26.luau`). Both pieces of the table share its atlas.
+- **In Roblox:** `Studio/props_setup26.luau` builds the templates in `ServerStorage.NHProps` (`NHBuildKit = "Seer"`). It places the set in the Ink Studio (`TheInkStudio.SeerCorner`): the table at (42.2, 226.5) facing into the room, and the chair 3 studs behind it against the west wall. Sable's post (`NpcPost = Sable`) sits 0.15 in front of the chair's origin, 1.5 above the cushion. A copy is on the showcase at x 110, z −170.5 (`NHPropBatch26`).
+
+![The preview](img/seer-preview.png)

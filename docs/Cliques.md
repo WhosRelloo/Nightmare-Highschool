@@ -419,6 +419,33 @@ To run it again: set `Config.MainMenu.SlotCount` to 4, play, and use TestBridge 
 ![Lying on the floor](img/lost-found-floor.jpg)
 ![In the hand](img/lost-found-in-hand.jpg)
 
+## The Ink Club seer (1.45)
+
+`Services.Features.Fortune` (server), `Controllers.Gui.Fortune` (client), `ServerStorage.Dialogue.Sable`.
+
+- **Sable Vey**, "Ink Club Seer" (`Config.Npcs` Sable, `NpcLooks` Sable), sits at the tarot table in the Ink Studio (props batch 26).
+  - The root is anchored at the post with a seated pose (`POSE`: hips forward, hands lowered), the Animate script is paused, and the model has `NHSeated`. `Social.Npcs` doesn't turn a seated NPC to face the player.
+  - Sable carries `Clique = Ink` on the model, but has no Clique in `Config.Npcs`, so the "join us" choices don't appear.
+- **A reading:** "Read my fortune. (¥5)" in Sable's dialogue, once per event day (`PlayerData.Social.Fortune {Day, Card, Text}`). With no Yen, or nothing to tell, Sable says so and nothing is taken.
+- **The hints** (`Fortune.Hints(P)`): each topic gives a riddle and a plain line. At Ink Club standing 20+ (Friendly) you get the plain one.
+
+  | Card | Topic | Source |
+  |---|---|---|
+  | The Tower (XVI) | a live, today's or tomorrow's rumble, else the most heated feud | `CliqueFights.Rumble`, `Feuds` |
+  | The Fool (0) | a dare you haven't finished | `CliqueEvents.Today(P).Dares` |
+  | The Moon (XVIII) | the next crimson or blue moon (within 8 nights), else the new or full moon | `Lineage` |
+  | The Seeker (IX) | a lost thing and the region it lies in | `LostFound.Loose()`, `workspace.Regions` |
+  | The Feast (III) | today's special and its twist for your race | `Config.Items.TodaySpecial`, `RaceNote` |
+  | The Crown (IV) | who leads one of this week's superlatives (first initial in the riddle) | `Superlatives.Board().Leaders` |
+  | The Scholar (V) | your graded lessons and average so far this week | `ReportCards.State(P).Week` |
+
+- **The card** (`ReplicatedStorage.NHFortune.Show`): the card rises face down, flips to its face (`UI.Theme.FortuneCards`, `art/ui/hud/make_tarot_cards.py`), and an ornate plate shows the numeral, name and hint. It closes with the button, a click, or walking 22 studs from Sable. Reduce Motion skips the motion. "What did the cards say again?" shows it again.
+- **Test hooks:** `FortuneRead(name, card?)`, `FortuneReset`, `FortuneHints`, `FortuneToday`, `FortuneStanding(name, clique, value?)`.
+
+![Sable at the table](img/fortune-sable.jpg)
+![A reading](img/fortune-reading.jpg)
+![The deck](img/tarot-deck.png)
+
 ## Next phases
 - ~~**Phase 2:** reactions, turf, scuffles and the hall monitor.~~ Done in 1.27.0 (above).
 - ~~**Phase 3:** turf, leader quests and rank rewards for every clique.~~ Done in 1.28.0 (above).

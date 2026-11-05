@@ -1,5 +1,5 @@
 {
- "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y). Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 15-17: the cafeteria and the spire; PendantLamp_Glass is crimson glass (set in props_setup15). Batch 18: the nine skateboards; each piece's origin is its pivot (trucks lean about the long axis, wheels spin about the axle). Batch 19: the lamp and light kit; maps published under the Nightmare Highschool group (Asset Manager bulk import), lights and tags set in props_setup19. Batch 20: the stair and bridge kit, group-owned maps, set up by props_setup20. Batch 21: the painting and art kit; each painting's *_Canvas piece carries its own 2048 painting (CanvasColorMap), set up by props_setup21. Batch 24: the Lost & Found kit; each prop is one piece with its origin at the bottom centre (the eight lost items lie flat on z = 0); maps for the group bulk import in art/group-upload/lost-found.",
+ "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y). Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 15-17: the cafeteria and the spire; PendantLamp_Glass is crimson glass (set in props_setup15). Batch 18: the nine skateboards; each piece's origin is its pivot (trucks lean about the long axis, wheels spin about the axle). Batch 19: the lamp and light kit; maps published under the Nightmare Highschool group (Asset Manager bulk import), lights and tags set in props_setup19. Batch 20: the stair and bridge kit, group-owned maps, set up by props_setup20. Batch 21: the painting and art kit; each painting's *_Canvas piece carries its own 2048 painting (CanvasColorMap), set up by props_setup21. Batch 24: the Lost & Found kit; each prop is one piece with its origin at the bottom centre (the eight lost items lie flat on z = 0); maps for the group bulk import in art/group-upload/lost-found. Batch 26: the Seer set for the Ink Studio (SeerTable, SeerChair); origins at the bottom centre, both face -Y with the seer behind the table at +Y; SeerTable_Glow is its candle flame; maps for the group bulk import in art/group-upload/seer.",
  "StudentDesk": {
   "dims": [
    3.0,
@@ -3897,5 +3897,39 @@
    "LostFoundBox": 14589
   },
   "batch": 24
+ },
+ "SeerTable": {
+  "dims": [
+   3.17,
+   3.15,
+   3.53
+  ],
+  "pieces": [
+   "SeerTable_Main",
+   "SeerTable_Glow"
+  ],
+  "tris": {
+   "SeerTable_Main": 17272,
+   "SeerTable_Glow": 120
+  },
+  "batch": 26,
+  "glow": "SeerTable_Glow is the candle flame (Neon + a warm PointLight), about z 3.18 to 3.35 above the origin, at Blender (0.93, 0.6) from the table's centre (back right, the seer's left hand)",
+  "surface": "the velvet top (where things stand) is at 2.703; the table top is round, 2.94 across, the drape 3.2 at the floor"
+ },
+ "SeerChair": {
+  "dims": [
+   2.4,
+   2.01,
+   6.06
+  ],
+  "pieces": [
+   "SeerChair"
+  ],
+  "tris": {
+   "SeerChair": 11782
+  },
+  "batch": 26,
+  "seat": "cushion top 1.6 above the origin (1.62 at its domed middle, 1.59 where it is sat in); the sitter's hips at Blender (0, 0.15, 1.6), i.e. 0.15 behind the origin; no arms; the seat runs from y -1.03 (front) to 0.70 (the back)",
+  "pairing": "same facing as SeerTable (front -Y); place the chair's origin about 3.0 studs behind the table's centre (Blender +Y, Roblox +Z) so a seated R15's knees just meet the skirt"
  }
 }
