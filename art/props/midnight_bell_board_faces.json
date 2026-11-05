@@ -1,0 +1,163 @@
+{
+ "_note": "MidnightBellBoard cards, in the prop's own studs as modelled in Blender: origin at the board's bottom centre, X to the viewer's right when facing the board, Y into the wall (the front faces -Y, the back is flat on the wall at y = back_y), Z up. Each card is its own piece (MidnightBellBoard_CardN) whose bounding box is exactly the card (wax seals are in Main), so a SurfaceGui on that MeshPart's Front face covers the card. Roblox axes after import (front = -Z, LookVector): X_rbx = -x, Y_rbx = z, Z_rbx = y, relative to the same origin; a MeshPart's position is its bounding-box centre. text_safe keeps clear of the crimson wax seal on the top edge and the browned rim.",
+ "dims": [
+  6.824,
+  0.632,
+  4.87
+ ],
+ "bbox_min": [
+  -3.412,
+  -0.532,
+  0.0
+ ],
+ "bbox_max": [
+  3.412,
+  0.1,
+  4.87
+ ],
+ "back_y": 0.1,
+ "frame": {
+  "width": 6.0,
+  "height": 4.5,
+  "cork_opening": {
+   "x": [
+    -2.78,
+    2.78
+   ],
+   "z": [
+    0.22,
+    3.86
+   ]
+  }
+ },
+ "cards": [
+  {
+   "piece": "MidnightBellBoard_Card1",
+   "position": "top-left",
+   "center": [
+    -1.335,
+    -0.012,
+    2.905
+   ],
+   "face_center": [
+    -1.335,
+    -0.022,
+    2.905
+   ],
+   "width": 2.45,
+   "height": 1.55,
+   "thickness": 0.02,
+   "front_y": -0.022,
+   "seal": {
+    "center_x": -1.2272,
+    "center_z": 3.67,
+    "radius": 0.107
+   },
+   "text_safe": {
+    "center": [
+     -1.335,
+     -0.022,
+     2.87
+    ],
+    "width": 2.25,
+    "height": 1.32
+   }
+  },
+  {
+   "piece": "MidnightBellBoard_Card2",
+   "position": "top-right",
+   "center": [
+    1.335,
+    -0.012,
+    2.905
+   ],
+   "face_center": [
+    1.335,
+    -0.022,
+    2.905
+   ],
+   "width": 2.45,
+   "height": 1.55,
+   "thickness": 0.02,
+   "front_y": -0.022,
+   "seal": {
+    "center_x": 1.4506,
+    "center_z": 3.67,
+    "radius": 0.107
+   },
+   "text_safe": {
+    "center": [
+     1.335,
+     -0.022,
+     2.87
+    ],
+    "width": 2.25,
+    "height": 1.32
+   }
+  },
+  {
+   "piece": "MidnightBellBoard_Card3",
+   "position": "bottom-left",
+   "center": [
+    -1.335,
+    -0.012,
+    1.175
+   ],
+   "face_center": [
+    -1.335,
+    -0.022,
+    1.175
+   ],
+   "width": 2.45,
+   "height": 1.55,
+   "thickness": 0.02,
+   "front_y": -0.022,
+   "seal": {
+    "center_x": -1.2732,
+    "center_z": 1.94,
+    "radius": 0.107
+   },
+   "text_safe": {
+    "center": [
+     -1.335,
+     -0.022,
+     1.14
+    ],
+    "width": 2.25,
+    "height": 1.32
+   }
+  },
+  {
+   "piece": "MidnightBellBoard_Card4",
+   "position": "bottom-right",
+   "center": [
+    1.335,
+    -0.012,
+    1.175
+   ],
+   "face_center": [
+    1.335,
+    -0.022,
+    1.175
+   ],
+   "width": 2.45,
+   "height": 1.55,
+   "thickness": 0.02,
+   "front_y": -0.022,
+   "seal": {
+    "center_x": 1.4153,
+    "center_z": 1.94,
+    "radius": 0.107
+   },
+   "text_safe": {
+    "center": [
+     1.335,
+     -0.022,
+     1.14
+    ],
+    "width": 2.25,
+    "height": 1.32
+   }
+  }
+ ]
+}

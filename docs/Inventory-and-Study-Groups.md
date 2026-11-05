@@ -64,3 +64,17 @@ Added in 1.10.0. Code lives in Studio; this page is the design and how the piece
 
 - **Data:** comes from `NHProgress.Get`. The sheet now carries `Record`, `GearText` and `SnackText`.
 - **Opening:** `Gui.Progress.Toggle` hands off to it, so the old record panel is gone, and so is the top bar's Record button behaviour.
+
+## The daily special (1.39)
+
+One lunch item each school day, sold only on its day (the 6 AM event day), one per student, ¥30, a 5-minute snack buff with a twist for some races:
+
+| Day | Special | Everyone | Twist |
+|---|---|---|---|
+| Monday | Garlic Bread | +2% toughness | Humans double; Vampires -2% damage instead |
+| Tuesday | Mystery Meat Loaf | +2% combat EXP | Ghouls double |
+| Wednesday | Moon Cake | +1% guard | Werewolves double |
+| Thursday | Holy Water Lemonade | +2 max health | Priests double; Vampires and Wraiths -1% stealth instead |
+| Friday | Ectoplasm Jelly | +2% class EXP | Wraiths double; Humans get nothing |
+
+`Config.Items`: `Special = 1..5`, `Race = { [race] = { Mult } or { Effects }, Note }`, `Items.TodaySpecial()`, `Items.OnSale(It)`, `Items.EffectsFor(It, Race)`, `Items.RaceNote(It, Race)`. The shop shows it first ("Today: ...") with your race's note; the stand's menu board has a "Today:" line; the Midnight Bell and the notice board print it.

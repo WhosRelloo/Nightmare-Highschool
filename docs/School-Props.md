@@ -580,3 +580,14 @@ Door, flap and tap origins sit on their hinge lines.
   - **Bridges:** the character walked across the stone arch over its hump, along the iron bridge and along the deck span. Walking sideways on the iron bridge stopped at the invisible barrier, just inside the girders.
   - **Lanterns:** the same NHLamp / NHCandle setup as the lamp kit, whose dusk switch and flicker were checked in this Play test.
 - **Not verified yet:** a real player climbing with the keyboard and the camera on the spiral, and walking the iron stair's open treads with shift lock.
+
+## Batch 22 (1.39): the Midnight Bell notice board
+
+| Prop | Tris | Notes |
+|---|---|---|
+| MidnightBellBoard | 14.4k (Main, Glow, Card1-4) | a cast-iron notice board with brass corners, a crimson enamel header "THE MIDNIGHT BELL" in gilt, four blank parchment cards on cork under crimson wax seals, two candle sconces; 6.8 x 4.9 studs |
+
+- **Baked** at 2048 with 64 samples on the GPU; maps under the group (colour 92319858284386, normal 87035507197237, rough 130751943740698, metal 117676090672369). The cards' rectangles are in `art/props/midnight_bell_board_faces.json`.
+- **In Roblox:** `Studio/props_setup22.luau` builds the template (ServerStorage.NHProps.MidnightBellBoard) with an invisible upright text face on each card (`CardNFace`, `NHBoardCard`), replaces the R102 hall board (the old one is in `ServerStorage.NH_Backup.Bundle1_pre`), moved 0.85 toward the doorway so its left sconce clears the pillar, and puts a copy on a slate backing wall on the showcase at x 82 (`NHPropBatch22`). `Features.NoticeBoard` writes the live cards.
+
+![The preview](img/midnight-bell-board-preview.png)

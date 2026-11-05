@@ -2,6 +2,48 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.39.0] - 2026-11-04: The daily special, the Midnight Bell's superlatives, the notice board
+
+### Added
+- **The daily special** (`Config.Items`, `Features.Inventory`, `Features.Concession`, `Gui.Locker`):
+  - One lunch item each school day: Garlic Bread on Monday, Mystery Meat Loaf on Tuesday, Moon Cake on Wednesday, Holy Water Lemonade on Thursday and Ectoplasm Jelly on Friday.
+  - Each costs ¥30, one per student per day, and is a 5-minute snack buff. Each has a twist for some races (`Race`, `Items.EffectsFor`). For example, Humans get double toughness from Garlic Bread and Vampires lose 2% damage instead. Wraiths get double from Ectoplasm Jelly and Humans get nothing.
+  - It's sold only on its day, following the 6 AM event day like the dares (`Items.TodaySpecial`, `Items.OnSale`).
+  - The shop shows it first, as "Today: …" with your race's note. The stand's menu board has a "Today:" line that updates itself, and you get a note when you eat it.
+  - The Gazette's old text-only special is gone; the paper now prints the real one with its price and twists.
+- **Midnight Bell superlatives** (new `Social.Superlatives`):
+  - A school week is five event days, about ten real hours.
+  - Each save slot counts six things that week, saved in `Social.Weekly`. Each one has an award:
+
+    | Counted | Award |
+    |---|---|
+    | Pranks | Class Clown |
+    | Scuffles and rumbles won | Most Likely to Start a Riot |
+    | Takedowns | Most Feared |
+    | Detentions earned | Most Likely to Be Expelled |
+    | Classes with a B or better | Teacher's Pet |
+    | Dares, member jobs and showdowns | Most Likely to Run the School |
+  - Counts come from small hooks in `Quests.Progress` / `Complete`, `KillTracker`, `Discipline` and `Attendance`.
+  - Every server writes its students' counts each minute to an OrderedDataStore per award per week, so all servers share one leaderboard. Names go to `NHSupNames`, and Studio uses "[Test] " stores. The top student with at least 3 wins.
+  - Winners wear the title for the next week only (`Social.TempTitles`) and get a note when they log in; it comes off when that week ends. On Monday the Midnight Bell prints last week's winners right after the front page; the rest of the week it shows the leaders so far. Winners are printed by first name (owner's choice).
+- **The Midnight Bell notice board** (new `Features.NoticeBoard`, props batch 22 `MidnightBellBoard`):
+  - **The board:** a cast-iron board with brass corners, a crimson enamel "THE MIDNIGHT BELL" header in gilt letters, four blank parchment cards on cork under crimson wax seals, and two candle sconces. It's 6.8 × 4.9 studs, baked at 2048, with the maps under the group.
+  - **Live cards:** today's special and its twists, the superlatives, clique news (a rumble on now, today or coming, and who holds whose hangout), and two of today's dares. They refresh every 30 s.
+  - **"Read" prompt:** opens your phone at the Midnight Bell (`NHNoticeBoard.Read`, `Gui.Phone.OpenApp`).
+  - **Where it hangs:** on the R102 wall in the Main Hall, in place of the old notice board (that one is in `ServerStorage.NH_Backup.Bundle1_pre`). A copy is on the showcase baseplate at x 82 for the builder (tag `NHPropBatch22`).
+
+### Verified (Studio Play)
+- **Daily special, on the test slot "Testy" (a Human):**
+  - Bought Garlic Bread. A second was refused ("1 a day"), and Tuesday's Meat Loaf was refused ("Today's special is Garlic Bread").
+  - Eating it set damage taken to × 0.96 (double toughness) and showed the "Humans love it" note.
+  - The shop listed it first with the note and hid the other four specials. The stand's board and the Gazette both showed it.
+- **Superlatives, through a real week rollover:** 3 pranks and 4 takedowns were counted, written and read back as this week's leaders; 2 detentions stayed out, under the minimum.
+  - On the next Monday, Testy was named Class Clown and Most Feared and wore both titles. The paper printed them second, after the front page.
+  - The week after, both titles came off by themselves.
+  - Testy's test scores were then removed from the Studio test store.
+- **Board:** its cards filled on a stand-in board and then on the real board in the Main Hall (screenshot `docs/img/midnight-bell-board.jpg`). The Read prompt opened the phone to the paper.
+- **Not tested:** two servers sharing one leaderboard, the other races' twists (Vampire, Ghoul, Werewolf, Priest, Wraith), a winner who's offline at the rollover, and the Meat Loaf to Jelly days in Play.
+
 ## [1.38.4] - 2026-11-04: Prank spots say why they didn't work
 
 ### Fixed

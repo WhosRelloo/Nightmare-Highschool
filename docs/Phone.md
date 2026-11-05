@@ -81,3 +81,11 @@ Three of our own takes on classic phone-game genres, drawn only with the UI kit'
 
 ## Names
 - Wallet, Classmates and the paper show a student's name only if you know it (`Strangers.Knows`); otherwise "a stranger".
+
+## The Midnight Bell's superlatives and the notice board (1.39)
+
+**Superlatives** (`Social.Superlatives`). A school week is five event days. Each save slot counts pranks, scuffle and rumble wins, takedowns, detentions earned, classes with a B or better, and dares, member jobs and showdowns (`Social.Weekly`). Counts go every minute to an OrderedDataStore per award per week (`NHSup_<Id>`, scope = week; "[Test] " in Studio), so every server shares one leaderboard. The top student with at least 3 wins: Class Clown, Most Likely to Start a Riot, Most Feared, Most Likely to Be Expelled, Teacher's Pet, Most Likely to Run the School. Winners wear the title through the next week (`Social.TempTitles`) and are named by first name. Monday's paper prints last week's winners right after the front page; other days show the leaders so far.
+
+**The notice board** (`Features.NoticeBoard`, props batch 22 `MidnightBellBoard`). Any model tagged `NHNoticeBoard` gets live text on its card faces (`NHBoardCard` 1..4): today's special, the superlatives, clique news (rumbles, turf), and two of today's dares, refreshed every 30 s. Its "Read" prompt opens your phone at the Midnight Bell. It hangs on the R102 wall of the Main Hall.
+
+![The Midnight Bell notice board](img/midnight-bell-board.jpg)

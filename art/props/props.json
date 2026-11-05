@@ -3742,5 +3742,34 @@
   "NormalMap": "rbxassetid://94607602957519",
   "RoughnessMap": "rbxassetid://119215097113331",
   "MetalnessMap": "rbxassetid://96520068991072"
+ },
+ "MidnightBellBoard": {
+  "dims": [
+   6.82,
+   0.63,
+   4.87
+  ],
+  "pieces": [
+   "MidnightBellBoard_Main",
+   "MidnightBellBoard_Glow",
+   "MidnightBellBoard_Card1",
+   "MidnightBellBoard_Card2",
+   "MidnightBellBoard_Card3",
+   "MidnightBellBoard_Card4"
+  ],
+  "tris": {
+   "MidnightBellBoard_Main": 14342,
+   "MidnightBellBoard_Glow": 160,
+   "MidnightBellBoard_Card1": 10,
+   "MidnightBellBoard_Card2": 10,
+   "MidnightBellBoard_Card3": 10,
+   "MidnightBellBoard_Card4": 10
+  },
+  "batch": 22,
+  "faces": "art/props/midnight_bell_board_faces.json (the four blank cards' rectangles, for the game's SurfaceGuis); every piece shares the one atlas",
+  "ColorMap": "rbxassetid://92319858284386",
+  "NormalMap": "rbxassetid://87035507197237",
+  "RoughnessMap": "rbxassetid://130751943740698",
+  "MetalnessMap": "rbxassetid://117676090672369"
  }
 }
