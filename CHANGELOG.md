@@ -2,6 +2,66 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.49.0] - 2026-11-05: The soft furnishings and tapestry kit
+
+### Added
+- **Props batch 29, the soft furnishings and tapestry kit** (`art/props/nh_props_batch29.py`): 30 original pieces in the Institution's look.
+  - **Seats** (baked; upholstered in new woven fabric sets: velvet, a damask, a bat damask, a regency stripe and a small tapestry weave):
+    - **VelvetChesterfield:** crimson velvet, deep diamond tufting on the back and the rolled arms, three piped cushions, brass nailheads, ebonised bun feet.
+    - **CamelbackSofa:** black velvet on a humped back with a carved ebony rail and a gilt bead, crimson piping, bolsters, cabriole legs on gilt claw-and-ball feet.
+    - **ChaiseLongue:** a fainting couch in crimson damask with a high scrolled head, a back rail sloping away, a tasselled bolster and brass castors.
+    - **GothicSettle:** three pointed arches of tufted crimson pads, pinnacles with gilt finials, open arms with balusters, a quatrefoil apron, a tapestry-woven cushion.
+    - **ShellLoveseat:** bone velvet, a scalloped shell back with gilt channel cords and a gilt rim, tapered gilt legs.
+    - **CornerSectional:** the common room's L-shaped corner sofa in ink-blue velvet, with piped seat and back cushions and bat-damask throw pillows.
+    - **CoffinCouch:** a black lacquer coffin for a back with a tufted crimson pad, brass coffin handles, a crimson seat.
+    - **BatwingSofa:** a back of spread bat wings padded in black bat damask, gilt wing bones, a bat's head with red eyes.
+    - **ThroneSettee:** the Headmaster's settee, with a tall pointed back of tufted crimson velvet, a crocketed gilt frame, the crest, and ravens on the arms.
+    - **TuftedBench:** a long window bench deep-tufted in plum velvet, turned ebony legs with gilt collars, tassels.
+    - **RoundOttoman:** ink-blue velvet, a radially tufted top with a tasselled gilt button, a twisted gilt bullion fringe.
+  - **Rugs and mats** (knotted pile, each knot one dye, worn where feet go; fringe and bound edges):
+    - **MothMedallionRug** (12 × 8): a moth on a gilt crescent, bats circling it, cobwebs and spiders in the corners, a thorned-rose border, a field of keys.
+    - **WatchingRunner** (18 × 4): watchful eyes in lozenges with bats between them, battlement borders.
+    - **ThornRoseRug** (round, 9): a rose in a thorn wreath, a wheel of petals with roses and eyes, bats circling the rim.
+    - **StarChartRug** (octagon, 8): moon phases round a gilt crescent, constellations, an arcaded crimson border.
+    - **RavenHearthRug** (half-round, 7 × 3.5): a raven rising from the fire over a sunburst, flames round the rim.
+    - **BatDamaskRugWorn** (9 × 6): rows of damask flowers and bats in plum and bone, worn through to the knot rows in places.
+    - **Doormat** ("Nightmare High" in blackletter under a bat) and **DoormatCrest** (the key on a shield between bats), both coir.
+    - **BathMat:** cotton loops with navy stripes and the crest.
+  - **Carpet tiles** (8 × 8, seamless, butting edge to edge for wall-to-wall carpet): **CarpetDamask** (damask and bats), **CarpetWeb** (cobwebs, spiders and moths), **CarpetHarlequin** (crimson and soot diamonds with eyes), **CarpetMoth** (moths on moss).
+  - **Tapestries** (7.5 × 10; the wolf hunt 13 × 7.3), woven from painted scenes in the art kit's style, each with a woven border of thorned roses, bats in the corners, the crest and a blackletter title. They hang from a gilt rod on iron brackets, with a gold tassel fringe:
+    - **TapestryHeadmaster** ("The Headmaster"): glowing eyes, a high-collared crimson-lined cape, the school's great key blazing in his raised hand, the crescent staff with a ghost-blue orb, a raven on his shoulder, the school's towers under a vast moon.
+    - **TapestryPriestDemon** ("Lux in Tenebris"): a priest in a holy circle holds up his lantern; a horned demon with ember veins recoils in a swirl of sparks in a graveyard.
+    - **TapestryAngelDemon** ("The Last Watch"): an armoured angel with a burning sword dives from a break in the storm at a demon with a trident, under lightning, over cracked, glowing ground.
+    - **TapestryJudgement** ("Dies Irae"): a crowned, radiant sovereign enthroned on clouds; demons fall into the fiery pit below.
+    - **TapestryCrest** ("Per Noctem ad Lucem"): the crest held by two ravens, a crescent moon, candles and roses on a dark millefleur ground.
+    - **TapestryWolfHunt** ("The Hunt of the Grey Wolf"): hunters with lanterns and boar-spears and their hounds run at a werewolf on a crag under the moon.
+- **How the textiles are made** (all original, no outside art):
+  - `art/props/weave_textiles.py` draws each design and weaves it. Rugs get a knotted pile, the doormats coir and the bath mat cotton loops. It also makes the upholstery sets in `art/props/source_fabric/`.
+  - The motifs (bats, ravens, moths, eyes, webs, spiders, thorned roses, candles, bells) are in `weave_motifs.py`, and the dyes in `weave_dyes.py`.
+  - For the tapestries, `tapestry_renders.py` poses R6 figures on the statue kit's rig and renders them lit in Blender (`art/props/source_tapestry/`).
+  - `tapestry_weave.py` then paints the night scene, sets the figures in with their effects (bloom, god rays, embers, lightning, mist, holy light), gives it the paintings' brush pass, and weaves it. The weave has ribbed wool with hatched tone steps and gilt thread in the metal map.
+- **Woven pieces aren't baked:** each rug, tile and tapestry cloth maps its own woven maps straight on, so they stay sharp. The fringe, edges and backing use a 32 px swatch band at the foot of each map.
+- **Baked** at 2048 with 64 samples on the GPU. Every piece is under 20k triangles (the largest is CornerSectional at 18,432).
+  - The 131 maps are under the group (`art/group-upload/furnishings-batch29/`). The ids are in `art/props/furnishings_batch29.json`.
+  - The rugs, mats and carpet tiles have no metal map; they're wool.
+  - The FBX files are sorted into `art/props/fbx/furnishings-batch29/` (Seats, Rugs and Mats, Carpet Tiles, Tapestries).
+- **On the showcase** (`workspace.NHPropsShowcase.Furnishings`, tag `NHPropBatch29`; `Studio/props_setup29.luau`, reverted by `props_revert29.luau`):
+  - The seats sit in a row at z −252 from x 24, and the rugs lie at z −272. All face −Z.
+  - The tapestries hang on a slate wall (tag `NHFurnishingsDisplay`) whose face is at z −250, from x 140. The carpet tiles lie as 2 × 2 patches on the floor in front of it.
+  - Templates are in `ServerStorage.NHProps` (`NHBuildKit = "Furnishings"`).
+  - Seats collide precisely. Rugs collide as boxes and cast no shadow. Tapestries don't collide.
+
+### Changed
+- `nh_props.py` imports batch 29.
+
+### Verified (Studio)
+- **Placement:** all 30 were placed with no clashes, and every map loads. The carpet tiles were moved in front of the tapestry wall, because the roof kit's rows start at z −278.
+  - The seats had been imported twice and the moth rug once more. The spare copies were removed; the templates came from the first.
+- **Play** (no save slot, `NHTestNoMenuKeys` set and cleared, the camera pinned, the area streamed in):
+  - By night (21:36 school time), `docs/img/furnishings-night.jpg`.
+  - By day (the client's clock held at 12:30): the seats face the viewer, the rugs and tapestries read the right way round, and the carpet tiles join with no seam (`furnishings-day-seats.jpg`, `furnishings-day-rugs.jpg`, `furnishings-day-tapestries.jpg`).
+- **Not tested:** sitting on the seats (they have no Seat parts yet) and a player character walking on the rugs.
+
 ## [1.48.0] - 2026-11-05: The roof kit
 
 ### Added

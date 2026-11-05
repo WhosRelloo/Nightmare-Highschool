@@ -816,3 +816,61 @@ Tris are whole-prop counts. The largest single piece is FlatRoofParapet's Main a
 ![Ridges, gutter, skylight and finials](img/roof-kit-features.jpg)
 ![At night](img/roof-kit-night.jpg)
 ![The spires at night](img/roof-kit-night-spires.jpg)
+
+## Batch 29 (1.49): the soft furnishings and tapestry kit
+
+`art/props/nh_props_batch29.py`. The woven maps come from `weave_textiles.py`, using `weave_motifs.py` and `weave_dyes.py`; the tapestries from `tapestry_renders.py` (Blender) and then `tapestry_weave.py`.
+
+**Woven pieces:** the rugs, mats, carpet tiles and tapestry cloths aren't baked.
+- Each has its own maps (colour, normal, roughness, plus metal where there's gilt thread), mapped straight onto it: from above for floor pieces, from the front for hangings.
+- The foot of every woven map is a 32 px swatch band: fringe wool on the left, the binding or backing on the right. The fringe, edges and back use it.
+- `TEXTILE` in the batch file lists these pieces. The batch overrides `canvas_uv` / `canvas_material` for them, and makes the bake steps skip a prop that has only woven pieces.
+
+**The upholstery sets** (`art/props/source_fabric/`, seamless, 1024) are tinted per material and baked into each seat's atlas:
+
+| Set | Look |
+|---|---|
+| NH_Velvet | crushed pile, soft lighter patches |
+| NH_Damask | a damask flower in satin on twill (tone on tone) |
+| NH_DamaskBat | bats and crescents in satin on twill |
+| NH_Stripe | regency stripe: crimson satin, gilt pinstripes, ink ground (untinted) |
+| NH_TapestryWeave | millefleur sprigs on ink, ribbed (untinted) |
+
+| Prop | Tris | Notes |
+|---|---|---|
+| VelvetChesterfield | 12.9k | crimson velvet, diamond-tufted back and arms, rolled arms, three piped cushions, nailheads, bun feet |
+| CamelbackSofa | 15.4k | black velvet, humped back, carved ebony rail with a gilt bead, bolsters, cabriole legs on gilt claw-and-ball feet |
+| ChaiseLongue | 12.2k | crimson damask, scrolled head, sloping back rail, tasselled bolster, turned legs on brass castors |
+| GothicSettle | 14.3k | three tufted crimson arches, pinnacles with gilt finials, open arms with balusters, quatrefoil apron |
+| ShellLoveseat | 9.3k | bone velvet, scalloped shell back with gilt channel cords and rim, tapered gilt legs |
+| CornerSectional | 18.4k | 9 × 9 L in ink-blue velvet, piped seat and back cushions, bat-damask pillows |
+| CoffinCouch | 11.4k | black lacquer coffin back with a tufted crimson pad, brass coffin handles |
+| BatwingSofa | 6.9k | bat-wing back in black bat damask, gilt wing bones, a bat's head with red eyes |
+| ThroneSettee | 15.3k | the Headmaster's: tall pointed tufted back, crocketed gilt frame, the crest, ravens on the arms |
+| TuftedBench | 6.2k | 6 × 1.8 window bench, plum velvet, turned legs with gilt collars, tassels |
+| RoundOttoman | 12.5k | 3.4 across, radially tufted top, tasselled gilt button, bullion fringe |
+| MothMedallionRug | 2.8k | 12 × 8: moth on a crescent, circling bats, corner cobwebs and spiders, thorned-rose border, keys |
+| WatchingRunner | 4.1k | 18 × 4: eyes in lozenges, bats, battlement borders |
+| ThornRoseRug | 1.9k | round, 9 across: a rose in a thorn wreath, a wheel of petals, bats round the rim |
+| StarChartRug | 0.3k | octagon, 8 across the flats: moon phases, constellations, an arcaded border |
+| RavenHearthRug | 1.6k | half-round, 7 × 3.5 (the flat edge at the back, for a hearth): a raven over a sunburst, flames |
+| BatDamaskRugWorn | 2.1k | 9 × 6: damask flowers and bats, worn through to the knot rows |
+| Doormat / DoormatCrest | 0.1k | 4 × 2.4 coir: "Nightmare High" under a bat / the key on a shield between bats |
+| BathMat | 0.1k | 3.2 × 2 cotton loops, navy stripes, the crest |
+| CarpetDamask / CarpetWeb / CarpetHarlequin / CarpetMoth | 12 tris | 8 × 8 seamless tiles; butt them edge to edge for wall-to-wall carpet |
+| TapestryHeadmaster, TapestryPriestDemon, TapestryAngelDemon, TapestryJudgement, TapestryCrest | 16.6k | 7.5 × 10 cloth (`Weave`, 10.6k) on a gilt rod with brackets, rings and finials (`Main`, 5.9k); the back flat at y = 0 for a wall |
+| TapestryWolfHunt | 22.8k | the frieze, 13 × 7.3 (`Weave` 14.2k, `Main` 8.6k) |
+
+Tris are whole-prop counts; every single piece is under 20k (the largest is CornerSectional at 18,432).
+
+**The tapestries:** each is a painted night scene in the art kit's style with the figures set in.
+- The figures are R6 bodies posed on the statue kit's rig and lit in Blender: a moon rim, warm lantern light, velvet and gilt, and glowing lanterns, halos, eyes and ember veins.
+- The effects are painted on: bloom, god rays, rising embers, lightning, mist and a holy circle.
+- Then comes the paintings' brush pass, and the weave: horizontal ribs, tone stepped in hatched teeth as real tapestry weaving does, abrash, gilt thread (the metal map).
+- A woven border frames each one: a thorned rose stem, bats in the corners, the crest at the top, a blackletter title on a ribbon.
+
+![The tapestries](img/furnishings-tapestries.jpg)
+![The seats by day](img/furnishings-day-seats.jpg)
+![The rugs by day](img/furnishings-day-rugs.jpg)
+![The tapestry wall and carpet tiles by day](img/furnishings-day-tapestries.jpg)
+![At night](img/furnishings-night.jpg)

@@ -9,3 +9,7 @@ Hair FBX/
 
 # 2048 prop source sets (re-creatable: python tools/vfx/make_pbr_materials.py art/props/source_2k 2048)
 art/props/source_2k/
+
+# batch 29's woven-textile sources (re-creatable: python art/props/weave_textiles.py fabrics; blender ... tapestry_renders.py)
+art/props/source_fabric/
+art/props/source_tapestry/
