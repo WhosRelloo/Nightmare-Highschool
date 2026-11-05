@@ -1218,6 +1218,7 @@ def candelabra(M):
 PREVIEW_PAD = {}   # name -> camera distance factor for a prop that would be cropped
 OPEN_DEG = {}      # piece -> how far it opens in the _open preview (default 105)
 TILED = {}         # piece -> (seamless set in art/props/textures, studs per tile): not baked; world-scaled UVs instead
+CANVAS = {}        # piece -> painting image name in art/props/textures (<name>_canvas.png): not baked; front-projected UVs
 
 BUILD = {
     "StudentDesk": student_desk,
@@ -1494,6 +1495,36 @@ def tile_uv(ob, tile):
             uv.data[li].uv = (u / tile, v / tile)
 
 
+def canvas_uv(ob):
+    """A painting's canvas: UVs projected straight from the front (-Y) over the piece's own X / Z bounds, so the whole image
+    fills it (an arched or oval canvas crops it)."""
+    me = ob.data
+    for uv in list(me.uv_layers):
+        me.uv_layers.remove(uv)
+    uv = me.uv_layers.new(name="Bake")
+    me.uv_layers.active = uv
+    mw = ob.matrix_world
+    pts = [mw @ v.co for v in me.vertices]
+    x0, x1 = min(p.x for p in pts), max(p.x for p in pts)
+    z0, z1 = min(p.z for p in pts), max(p.z for p in pts)
+    for li, loop in enumerate(me.loops):
+        co = mw @ me.vertices[loop.vertex_index].co
+        uv.data[li].uv = ((co.x - x0) / (x1 - x0), (co.z - z0) / (z1 - z0))
+
+
+def canvas_material(ob, image):
+    m = bpy.data.materials.new(f"NH_{image}_canvas")
+    m.use_nodes = True
+    nt = m.node_tree
+    bs = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+    t = nt.nodes.new("ShaderNodeTexImage")
+    t.image = bpy.data.images.load(os.path.join(OUT_TEX, f"{image}_canvas.png"))
+    nt.links.new(t.outputs["Color"], bs.inputs["Base Color"])
+    bs.inputs["Roughness"].default_value = 0.45
+    ob.data.materials.clear()
+    ob.data.materials.append(m)
+
+
 def tile_material(ob, set_name):
     m = bpy.data.materials.new(f"NH_{set_name}")
     m.use_nodes = True
@@ -1523,10 +1554,14 @@ def run(name):
     dims = BUILD[name](M)
     objs = join_parts(name)
     tiled = [o for o in objs if o.name in TILED]
-    baked = [o for o in objs if o not in tiled]
+    canvases = [o for o in objs if o.name in CANVAS]
+    baked = [o for o in objs if o not in tiled and o not in canvases]
     bake_uv(baked)
     imgs = bake_all(baked, name)
     final_material(baked, name, imgs)
+    for o in canvases:
+        canvas_uv(o)
+        canvas_material(o, CANVAS[o.name])
     for o in tiled:
         tile_uv(o, TILED[o.name][1])
         tile_material(o, TILED[o.name][0])
@@ -1558,7 +1593,7 @@ import nh_props_batch9  # noqa: E402,F401
 # batches 10 to 13 (office, town street and shops, town building pieces, tables): imported when present; one that fails
 # to import is reported and skipped, so work on one batch never stops another from building
 for _b in ("nh_props_batch10", "nh_props_batch11", "nh_props_batch12", "nh_props_batch13", "nh_props_batch14",
-           "nh_props_batch15", "nh_props_batch16", "nh_props_batch17", "nh_props_batch18", "nh_props_batch19", "nh_props_batch20"):
+           "nh_props_batch15", "nh_props_batch16", "nh_props_batch17", "nh_props_batch18", "nh_props_batch19", "nh_props_batch20", "nh_props_batch21"):
     if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), _b + ".py")):
         try:
             __import__(_b)

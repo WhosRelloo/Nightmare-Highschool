@@ -156,6 +156,33 @@ Door, flap and tap origins sit on their hinge lines.
   - The wall, beam and posts are tagged `NHLightKitDisplay`; delete them once the pieces are in the map.
 - **Textures:** all 48 maps are published under the Nightmare Highschool group (Studio Asset Manager bulk import). The meshes went to the group with the FBX import.
 
+**Batch 20, the stair and bridge kit** (`Studio/props_setup20.luau`, run after importing its FBX files):
+- **What's in it:** building pieces for the map builder, made to the courtyard set's standard.
+  - **Stone:** dark weathered castle stone with worn treads, dirt in the joints, moss and hairline cracks.
+  - **Carving:** blind trefoil lancets, crocketed pinnacle newels, crimson and gilt crests.
+  - **Ironwork:** a gothic cast-iron balustrade on the rake (trefoil-headed arches, gilt roundels, a brass handrail).
+  - **Lights:** gas lanterns.
+- **Stairs are baked whole.** The bridges are too long for one sharp atlas. Their broad flat faces are a `_Wall` piece in the seamless castle stone (the group-owned CastleStone set, 8 studs a tile), tinted (150, 158, 150) to match the baked stone round them. The carved details are baked.
+- **Walkable:** stone pieces collide with `PreciseConvexDecomposition`, so treads, landings and decks can be walked on. Rails and girders don't collide; the iron bridge has invisible side barriers (`NHBarrier`).
+- **Lanterns:** the grand stair's, the landing's and the bridges' lanterns light at dusk and flicker (`NHLamp`, `NHCandle`).
+- **The importer caps a mesh at 2048 units.** The two 24-stud bridges came in at about 0.85 scale, so the setup scales them back to their baked width.
+- **Placement** south of the lamp kit (`workspace.NHPropsShowcase`, tag `NHPropBatch20`; `Studio/props_revert20.luau` removes them):
+  - the stairs in a row at z −200 from x 30
+  - the bridges at z −226
+  - all facing −Z
+
+**Batch 21, the painting and art kit** (`Studio/props_setup21.luau`):
+- **What's in it:** six paintings in gilt, black lacquer and ebonised frames, plus gallery stanchions with a crimson velvet rope, a stack of canvases under a drape, and a painter's table with a candle.
+- **The canvases:** each painting's `_Canvas` piece skips the frame's atlas and carries its own 2048 painting (`nh_props.CANVAS`, front-projected UVs), so the brushwork stays sharp. It gets the shared varnish roughness map and no normal map, because the canvas weave read as a screen-door grid.
+- **The paintings are original:** `art/props/paint_canvases.py` paints them procedurally with a brush-stroke pass and an aged varnish.
+  - **Moonlit Abbey:** a ruined abbey under the full moon.
+  - **Blood Moon:** a wolf howling at a blood moon.
+  - **Ghost Ship:** a ghost galleon in a moonlit storm.
+  - **Raven Still Life:** the skull, books, quill and candle are a Blender render (`art/props/paint_renders.py`), with the raven painted on.
+  - **Cameo:** a Victorian lady's silhouette.
+  - **Triptych:** the crest's moon, raven on the key, and candle, in gilt tempera.
+- **Placement:** on a crimson damask gallery wall (the `NHDamaskWallpaper` set over an `NHBloodMarble` skirting, tagged `NHArtKitDisplay`) at z −171 from x 22, with the stanchions, table and canvas stack in front (tag `NHPropBatch21`; `Studio/props_revert21.luau` removes them).
+
 | Prop | Triangles | Replaces / goes to |
 |---|---|---|
 | StudentDesk | 4.8k | `Desk` ×48 (R101–R106) |
@@ -308,6 +335,25 @@ Door, flap and tap origins sit on their hinge lines.
 | StageSpotlight | 6.8k (Main, Glow, Glass) | batch 19: a Victorian limelight: crimson enamel lamp house, brass bands, cooling rings, a vent cap and a lens on a telescoping tripod; a real SpotLight |
 | Footlights | 7.3k (Main, Glow) | batch 19: an 8-stud run of stage footlights (tiles end to end): crimson and gilt front, four brass reflectors with wire guards |
 | TorchSconce | 3.0k (Main, Glow) | batch 19: a wall piece: a burning iron torch with a pitch-wrapped cresset in a ring on a gothic plate; embers |
+| StairStone | 11.6k | batch 20: a straight flight of 8 worn stone treads (rise 0.75) between carved cheek walls, pinnacle newels with crests; 6 wide inside, 6 up, 10 long |
+| StairStoneRailed | 26.4k (Main, Rail) | batch 20: the same flight with the gothic cast-iron balustrade and brass handrail, iron newels at the head |
+| StairLanding | 33.8k (Main, Faces, Floor, Lamps, Glow, Glass) | batch 20: a 7.6 x 7.6 landing 6 high: buttresses into crocketed pinnacles, traceried lancet panels with a large crest, an arched corbel table, flagstones round a crimson and gilt quatrefoil medallion, two gas lanterns |
+| StairGrand | 39.7k (Main, Runner, Rail, Glow, Glass) | batch 20: the 12-wide grand stair: a crimson runner with gilt borders and quatrefoils on brass rods, carved cheeks, the balustrade, crested newel pedestals with gas lanterns |
+| StairSpiral | 14.5k (Main, Rail) | batch 20: a tower stair: a clustered newel, 20 wedge treads making a turn 12 high, a head landing, an iron rail with gilt roundels |
+| StairIron | 25.4k (Main, Rail) | batch 20: an open cast-iron stair: chequer-plate treads with brass nosings, stringers pierced with quatrefoils, the balustrade |
+| BridgeStoneArch | 43.5k (Wall, Main, ParapetL, ParapetR, Piers, Glow, Glass) | batch 20: a 24-long humped stone footbridge: dark voussoirs, a crested keystone, a hood moulding, pierced gothic parapets, crested end piers with lanterns |
+| BridgeIron | 37.3k (Main, Girders, Glow, Glass) | batch 20: a 24-long cast-iron footbridge: crimson lattice girders with gilt bosses and spear finials, arched ribs with ring spandrels, carved abutments, lanterns |
+| BridgeDeck | 17.7k (Wall, Main) | batch 20: a 16-stud straight span with the pierced parapets; tiles end to end |
+| BridgePier | 3.4k (Wall, Main) | batch 20: a 16-high pier with cutwaters, string courses, iron cramps and crests; carries BridgeDeck |
+| PaintingAbbey | 2.9k (Main, Canvas) | batch 21: 6 x 4: a ruined abbey under the full moon, a carved gilt frame with rosettes and a crested crown |
+| PaintingBloodMoon | 2.3k (Main, Canvas, Glow) | batch 21: 4 x 3: a wolf at a blood moon, black lacquer with a gilt slip, a brass picture light |
+| PaintingGhostShip | 6.3k (Main, Canvas, Glow) | batch 21: 5 x 3.3: a ghost galleon in a moonlit storm, an ebonised frame with a gilt rope moulding, a picture light |
+| PaintingRaven | 2.5k (Main, Canvas) | batch 21: 3 x 4 lancet-arched: a raven on a skull by candlelight, a crocketed gilt frame on a sill |
+| CameoSilhouette | 4.1k (Main, Canvas) | batch 21: a 1.5 x 2 oval: a Victorian lady's silhouette on crimson, a gilt laurel frame with a velvet bow |
+| Triptych | 7.0k (Main, Canvas) | batch 21: three arched gilt panels (moon, raven on the key, candle) with pinnacles on a crimson and gilt predella |
+| GalleryStanchions | 3.5k | batch 21: two brass posts with a sagging crimson velvet rope, 6 apart |
+| CanvasStack | 5.5k | batch 21: canvases leaning on the wall, backs out, under a crimson drape, an empty gilt frame, paint pots |
+| PainterTable | 6.1k (Main, Glow) | batch 21: an iron table with a black marble top: a palette of paints, brush jars, tubes, a rag, a small skull and a flickering candle |
 
 **Placed on the map** (`Studio/props_map.luau`; `Studio/props_map_revert.luau` removes them). 91 copies of the batch 4 to 9 templates, in `workspace.NHPropsMap/<Area>`, tagged `NHPropMap`, named `<Prop>_<Area>_<n>`, with a `MapArea` attribute. Each row of the script gives a prop, an area, x and z, and the way its front faces. Rays find the floor or table top under it, or the wall behind it for wall pieces.
 
@@ -517,3 +563,14 @@ Door, flap and tap origins sit on their hinge lines.
 - **Textures in the group:** the owner bulk-imported the maps under the group. All 48 ids were read back by name (no duplicates) and swapped into the 12 templates and 12 copies (24 SurfaceAppearances). The meshes are group-owned too.
 - **Screenshots:** day (`docs/img/lamp-kit-day.jpg`), a close-up of the hanging pieces (`lamp-kit-hanging.jpg`), and night with Studio's clock at 0:00 (`lamp-kit-night.jpg`, the clock put back to 13:00 straight after). Every map shows, including the twin lamp and floor lamp, which were blank while they used account-owned uploads.
 - **Not verified yet** (no Play test; another session was testing in the same Studio): the flicker, the dusk switch and the embers in Play; how the kit's lights cost on a low-end device.
+
+**Batches 20 and 21, stairs and bridges, the art kit (2026-11-04, 1.38.0):**
+- **Baked:** all 19 at 2048 with 64 samples on the GPU, every piece under 20k triangles (the largest, the landing's Faces, 18.0k). Sheets `art/props/_batch20_final_sheet.png` and `_batch21_final_sheet.png`.
+- **The owner's notes acted on:** "make the stair kit higher quality and more on theme" (the stairs were rebuilt in the courtyard set's manner: baked weathered stone, carving, gothic ironwork); "make the landing a little more high quality" (buttresses, pinnacles, traceried panels, a corbel table, a floor medallion, lanterns).
+- **Imported and set up:** the owner imported the 19 FBX files and bulk-imported all 85 maps under the group; the ids were read back by name (no duplicates).
+  - **Placed:** every copy with no clashes, the floor pieces on the plate (bottom 0.90).
+  - **The two long bridges:** they came in small (the 2048-unit import cap) and were scaled back to 24.25 and 24.3 wide.
+  - **The Blood Moon painting:** hung higher, so the leaning canvas stack doesn't touch it.
+  - **Stray imports:** eight duplicate imports of the art kit were removed.
+- **Screenshots:** the stairs (`docs/img/stair-kit.jpg`), a bridge by day and night (`bridge-kit.jpg`, `bridge-kit-night.jpg`, the clock put back to 13:00) and the gallery (`art-kit-gallery.jpg`, `art-kit-closeup.jpg`). Every map shows.
+- **Not verified yet** (no Play test; another session was testing in the same Studio): walking up the stairs and over the bridges, and the lanterns' dusk switch and flicker.

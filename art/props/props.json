@@ -1,5 +1,5 @@
 {
- "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y). Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 15-17: the cafeteria and the spire; PendantLamp_Glass is crimson glass (set in props_setup15). Batch 18: the nine skateboards; each piece's origin is its pivot (trucks lean about the long axis, wheels spin about the axle). Batch 19: the lamp and light kit; maps published under the Nightmare Highschool group (Asset Manager bulk import), lights and tags set in props_setup19.",
+ "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y). Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 15-17: the cafeteria and the spire; PendantLamp_Glass is crimson glass (set in props_setup15). Batch 18: the nine skateboards; each piece's origin is its pivot (trucks lean about the long axis, wheels spin about the axle). Batch 19: the lamp and light kit; maps published under the Nightmare Highschool group (Asset Manager bulk import), lights and tags set in props_setup19. Batch 20: the stair and bridge kit, group-owned maps, set up by props_setup20. Batch 21: the painting and art kit; each painting's *_Canvas piece carries its own 2048 painting (CanvasColorMap), set up by props_setup21.",
  "StudentDesk": {
   "dims": [
    3.0,
@@ -3304,5 +3304,443 @@
   "NormalMap": "rbxassetid://123364618526615",
   "RoughnessMap": "rbxassetid://78352368719800",
   "MetalnessMap": "rbxassetid://103791215033498"
+ },
+ "StairStone": {
+  "dims": [
+   8.42,
+   11.31,
+   6.87
+  ],
+  "pieces": [
+   "StairStone"
+  ],
+  "tris": {
+   "StairStone": 11592
+  },
+  "batch": 20,
+  "collision": "stone pieces PreciseConvexDecomposition; Rail / Girders don't collide",
+  "ColorMap": "rbxassetid://140441074743290",
+  "NormalMap": "rbxassetid://94271231528927",
+  "RoughnessMap": "rbxassetid://130731762719541",
+  "MetalnessMap": "rbxassetid://96375263616645"
+ },
+ "StairStoneRailed": {
+  "dims": [
+   8.42,
+   11.39,
+   9.53
+  ],
+  "pieces": [
+   "StairStoneRailed_Main",
+   "StairStoneRailed_Rail"
+  ],
+  "tris": {
+   "StairStoneRailed_Main": 11612,
+   "StairStoneRailed_Rail": 14760
+  },
+  "batch": 20,
+  "collision": "stone pieces PreciseConvexDecomposition; Rail / Girders don't collide",
+  "ColorMap": "rbxassetid://92895800461235",
+  "NormalMap": "rbxassetid://132105931227240",
+  "RoughnessMap": "rbxassetid://108861564143008",
+  "MetalnessMap": "rbxassetid://119179937964246"
+ },
+ "StairLanding": {
+  "dims": [
+   8.33,
+   9.2,
+   7.71
+  ],
+  "pieces": [
+   "StairLanding_Main",
+   "StairLanding_Faces",
+   "StairLanding_Floor",
+   "StairLanding_Lamps",
+   "StairLanding_Glow",
+   "StairLanding_Glass"
+  ],
+  "tris": {
+   "StairLanding_Main": 6850,
+   "StairLanding_Faces": 17968,
+   "StairLanding_Floor": 6048,
+   "StairLanding_Lamps": 2590,
+   "StairLanding_Glow": 240,
+   "StairLanding_Glass": 144
+  },
+  "batch": 20,
+  "collision": "stone pieces PreciseConvexDecomposition; Rail / Girders don't collide",
+  "ColorMap": "rbxassetid://90483801596867",
+  "NormalMap": "rbxassetid://129728923591326",
+  "RoughnessMap": "rbxassetid://132934515453366",
+  "MetalnessMap": "rbxassetid://86605858732261"
+ },
+ "StairGrand": {
+  "dims": [
+   14.9,
+   14.68,
+   9.34
+  ],
+  "pieces": [
+   "StairGrand_Main",
+   "StairGrand_Runner",
+   "StairGrand_Rail",
+   "StairGrand_Glow",
+   "StairGrand_Glass"
+  ],
+  "tris": {
+   "StairGrand_Main": 13822,
+   "StairGrand_Runner": 8788,
+   "StairGrand_Rail": 16662,
+   "StairGrand_Glow": 240,
+   "StairGrand_Glass": 144
+  },
+  "batch": 20,
+  "collision": "stone pieces PreciseConvexDecomposition; Rail / Girders don't collide",
+  "ColorMap": "rbxassetid://122200340880311",
+  "NormalMap": "rbxassetid://107107203367080",
+  "RoughnessMap": "rbxassetid://96549502403313",
+  "MetalnessMap": "rbxassetid://116691126246348"
+ },
+ "StairSpiral": {
+  "dims": [
+   8.0,
+   8.0,
+   14.67
+  ],
+  "pieces": [
+   "StairSpiral_Main",
+   "StairSpiral_Rail"
+  ],
+  "tris": {
+   "StairSpiral_Main": 8042,
+   "StairSpiral_Rail": 6408
+  },
+  "batch": 20,
+  "collision": "stone pieces PreciseConvexDecomposition; Rail / Girders don't collide",
+  "ColorMap": "rbxassetid://139334852900700",
+  "NormalMap": "rbxassetid://122692196451321",
+  "RoughnessMap": "rbxassetid://136355592324758",
+  "MetalnessMap": "rbxassetid://136349045257712"
+ },
+ "StairIron": {
+  "dims": [
+   4.26,
+   9.06,
+   10.69
+  ],
+  "pieces": [
+   "StairIron_Main",
+   "StairIron_Rail"
+  ],
+  "tris": {
+   "StairIron_Main": 11488,
+   "StairIron_Rail": 13936
+  },
+  "batch": 20,
+  "collision": "stone pieces PreciseConvexDecomposition; Rail / Girders don't collide",
+  "ColorMap": "rbxassetid://88728252040404",
+  "NormalMap": "rbxassetid://76538822749848",
+  "RoughnessMap": "rbxassetid://76563322444378",
+  "MetalnessMap": "rbxassetid://70394295702265"
+ },
+ "BridgeStoneArch": {
+  "dims": [
+   24.25,
+   8.43,
+   9.99
+  ],
+  "pieces": [
+   "BridgeStoneArch_Wall",
+   "BridgeStoneArch_Main",
+   "BridgeStoneArch_ParapetL",
+   "BridgeStoneArch_Piers",
+   "BridgeStoneArch_Glow",
+   "BridgeStoneArch_Glass",
+   "BridgeStoneArch_ParapetR"
+  ],
+  "tris": {
+   "BridgeStoneArch_Wall": 620,
+   "BridgeStoneArch_Main": 13004,
+   "BridgeStoneArch_ParapetL": 10924,
+   "BridgeStoneArch_Piers": 7236,
+   "BridgeStoneArch_Glow": 480,
+   "BridgeStoneArch_Glass": 288,
+   "BridgeStoneArch_ParapetR": 10924
+  },
+  "batch": 20,
+  "collision": "stone pieces PreciseConvexDecomposition; Rail / Girders don't collide",
+  "note": "Wall: tiled castle stone (CastleStone group set, tinted 150,158,150); the importer caps meshes at 2048 units, so the setup scales it back to 24.25 wide",
+  "ColorMap": "rbxassetid://138396929948974",
+  "NormalMap": "rbxassetid://83619261225388",
+  "RoughnessMap": "rbxassetid://107363980746899",
+  "MetalnessMap": "rbxassetid://122921070819099"
+ },
+ "BridgeIron": {
+  "dims": [
+   24.3,
+   7.04,
+   9.54
+  ],
+  "pieces": [
+   "BridgeIron_Main",
+   "BridgeIron_Girders",
+   "BridgeIron_Glow",
+   "BridgeIron_Glass"
+  ],
+  "tris": {
+   "BridgeIron_Main": 17888,
+   "BridgeIron_Girders": 18624,
+   "BridgeIron_Glow": 480,
+   "BridgeIron_Glass": 288
+  },
+  "batch": 20,
+  "collision": "stone pieces PreciseConvexDecomposition; Rail / Girders don't collide",
+  "note": "invisible side barriers (NHBarrier); scaled back to 24.3 wide after import (the 2048-unit cap)",
+  "ColorMap": "rbxassetid://75546469086540",
+  "NormalMap": "rbxassetid://135719624888089",
+  "RoughnessMap": "rbxassetid://79112019515006",
+  "MetalnessMap": "rbxassetid://86093765892879"
+ },
+ "BridgeDeck": {
+  "dims": [
+   16.0,
+   8.7,
+   3.6
+  ],
+  "pieces": [
+   "BridgeDeck_Wall",
+   "BridgeDeck_Main"
+  ],
+  "tris": {
+   "BridgeDeck_Wall": 108,
+   "BridgeDeck_Main": 17608
+  },
+  "batch": 20,
+  "collision": "stone pieces PreciseConvexDecomposition; Rail / Girders don't collide",
+  "note": "Wall: tiled castle stone, tinted",
+  "ColorMap": "rbxassetid://121586145211625",
+  "NormalMap": "rbxassetid://70930473387872",
+  "RoughnessMap": "rbxassetid://100209688894542",
+  "MetalnessMap": "rbxassetid://120451266813283"
+ },
+ "BridgePier": {
+  "dims": [
+   3.6,
+   11.17,
+   16.0
+  ],
+  "pieces": [
+   "BridgePier_Wall",
+   "BridgePier_Main"
+  ],
+  "tris": {
+   "BridgePier_Wall": 268,
+   "BridgePier_Main": 3176
+  },
+  "batch": 20,
+  "collision": "stone pieces PreciseConvexDecomposition; Rail / Girders don't collide",
+  "note": "Wall: tiled castle stone, tinted",
+  "ColorMap": "rbxassetid://74958326755489",
+  "NormalMap": "rbxassetid://84965737350171",
+  "RoughnessMap": "rbxassetid://124730069319903",
+  "MetalnessMap": "rbxassetid://87840835758382"
+ },
+ "PaintingAbbey": {
+  "dims": [
+   6.82,
+   0.55,
+   5.85
+  ],
+  "pieces": [
+   "PaintingAbbey_Canvas",
+   "PaintingAbbey_Main"
+  ],
+  "tris": {
+   "PaintingAbbey_Canvas": 12,
+   "PaintingAbbey_Main": 2852
+  },
+  "batch": 21,
+  "ColorMap": "rbxassetid://74574757308623",
+  "NormalMap": "rbxassetid://104986597108271",
+  "RoughnessMap": "rbxassetid://85566669211604",
+  "MetalnessMap": "rbxassetid://78962518972961",
+  "CanvasColorMap": "rbxassetid://124702591654323",
+  "CanvasRoughnessMap": "rbxassetid://109250550085797",
+  "canvas": "art/props/textures/PaintingAbbey_canvas.png (paint_canvases.py); no normal map on the canvas"
+ },
+ "PaintingBloodMoon": {
+  "dims": [
+   4.69,
+   0.8,
+   3.99
+  ],
+  "pieces": [
+   "PaintingBloodMoon_Canvas",
+   "PaintingBloodMoon_Main",
+   "PaintingBloodMoon_Glow"
+  ],
+  "tris": {
+   "PaintingBloodMoon_Canvas": 12,
+   "PaintingBloodMoon_Main": 2228,
+   "PaintingBloodMoon_Glow": 36
+  },
+  "batch": 21,
+  "ColorMap": "rbxassetid://82563026669731",
+  "NormalMap": "rbxassetid://80496959476246",
+  "RoughnessMap": "rbxassetid://99046031889774",
+  "MetalnessMap": "rbxassetid://96956686132222",
+  "CanvasColorMap": "rbxassetid://86108754743930",
+  "CanvasRoughnessMap": "rbxassetid://109250550085797",
+  "canvas": "art/props/textures/PaintingBloodMoon_canvas.png (paint_canvases.py); no normal map on the canvas"
+ },
+ "PaintingGhostShip": {
+  "dims": [
+   5.5,
+   0.8,
+   4.32
+  ],
+  "pieces": [
+   "PaintingGhostShip_Canvas",
+   "PaintingGhostShip_Main",
+   "PaintingGhostShip_Glow"
+  ],
+  "tris": {
+   "PaintingGhostShip_Canvas": 12,
+   "PaintingGhostShip_Main": 6228,
+   "PaintingGhostShip_Glow": 36
+  },
+  "batch": 21,
+  "ColorMap": "rbxassetid://116689023588726",
+  "NormalMap": "rbxassetid://140025925686820",
+  "RoughnessMap": "rbxassetid://103969142237658",
+  "MetalnessMap": "rbxassetid://126307190554167",
+  "CanvasColorMap": "rbxassetid://85566755354874",
+  "CanvasRoughnessMap": "rbxassetid://109250550085797",
+  "canvas": "art/props/textures/PaintingGhostShip_canvas.png (paint_canvases.py); no normal map on the canvas"
+ },
+ "PaintingRaven": {
+  "dims": [
+   3.85,
+   0.51,
+   5.01
+  ],
+  "pieces": [
+   "PaintingRaven_Canvas",
+   "PaintingRaven_Main"
+  ],
+  "tris": {
+   "PaintingRaven_Canvas": 104,
+   "PaintingRaven_Main": 2404
+  },
+  "batch": 21,
+  "ColorMap": "rbxassetid://85077327545233",
+  "NormalMap": "rbxassetid://97568604296969",
+  "RoughnessMap": "rbxassetid://114756131620412",
+  "MetalnessMap": "rbxassetid://103090101012659",
+  "CanvasColorMap": "rbxassetid://116861366567964",
+  "CanvasRoughnessMap": "rbxassetid://109250550085797",
+  "canvas": "art/props/textures/PaintingRaven_canvas.png (paint_canvases.py); no normal map on the canvas"
+ },
+ "CameoSilhouette": {
+  "dims": [
+   2.12,
+   0.41,
+   2.76
+  ],
+  "pieces": [
+   "CameoSilhouette_Canvas",
+   "CameoSilhouette_Main"
+  ],
+  "tris": {
+   "CameoSilhouette_Canvas": 188,
+   "CameoSilhouette_Main": 3880
+  },
+  "batch": 21,
+  "ColorMap": "rbxassetid://140534891428773",
+  "NormalMap": "rbxassetid://134307021908489",
+  "RoughnessMap": "rbxassetid://116583207806524",
+  "MetalnessMap": "rbxassetid://95682632531350",
+  "CanvasColorMap": "rbxassetid://102006203542701",
+  "CanvasRoughnessMap": "rbxassetid://109250550085797",
+  "canvas": "art/props/textures/CameoSilhouette_canvas.png (paint_canvases.py); no normal map on the canvas"
+ },
+ "Triptych": {
+  "dims": [
+   4.84,
+   0.52,
+   3.94
+  ],
+  "pieces": [
+   "Triptych_Canvas",
+   "Triptych_Main"
+  ],
+  "tris": {
+   "Triptych_Canvas": 312,
+   "Triptych_Main": 6648
+  },
+  "batch": 21,
+  "ColorMap": "rbxassetid://75238713313639",
+  "NormalMap": "rbxassetid://136909741274127",
+  "RoughnessMap": "rbxassetid://121314257440650",
+  "MetalnessMap": "rbxassetid://76109411287956",
+  "CanvasColorMap": "rbxassetid://80439457281496",
+  "CanvasRoughnessMap": "rbxassetid://109250550085797",
+  "canvas": "art/props/textures/Triptych_canvas.png (paint_canvases.py); no normal map on the canvas"
+ },
+ "GalleryStanchions": {
+  "dims": [
+   6.74,
+   0.74,
+   3.22
+  ],
+  "pieces": [
+   "GalleryStanchions"
+  ],
+  "tris": {
+   "GalleryStanchions": 3496
+  },
+  "batch": 21,
+  "ColorMap": "rbxassetid://135247794064169",
+  "NormalMap": "rbxassetid://136610411808596",
+  "RoughnessMap": "rbxassetid://140021002063282",
+  "MetalnessMap": "rbxassetid://83037880711870"
+ },
+ "CanvasStack": {
+  "dims": [
+   4.9,
+   1.88,
+   3.41
+  ],
+  "pieces": [
+   "CanvasStack"
+  ],
+  "tris": {
+   "CanvasStack": 5536
+  },
+  "batch": 21,
+  "ColorMap": "rbxassetid://120253914880581",
+  "NormalMap": "rbxassetid://123273918877157",
+  "RoughnessMap": "rbxassetid://96552911653475",
+  "MetalnessMap": "rbxassetid://136620440220208"
+ },
+ "PainterTable": {
+  "dims": [
+   3.0,
+   1.5,
+   3.77
+  ],
+  "pieces": [
+   "PainterTable_Main",
+   "PainterTable_Glow"
+  ],
+  "tris": {
+   "PainterTable_Main": 6032,
+   "PainterTable_Glow": 80
+  },
+  "batch": 21,
+  "ColorMap": "rbxassetid://106012481284823",
+  "NormalMap": "rbxassetid://94607602957519",
+  "RoughnessMap": "rbxassetid://119215097113331",
+  "MetalnessMap": "rbxassetid://96520068991072"
  }
 }

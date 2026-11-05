@@ -2,6 +2,28 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.38.0] - 2026-11-04: The stair and bridge kit, the painting and art kit
+
+### Added
+- **The stair and bridge kit: 10 building pieces, baked at 2048** (`art/props/nh_props_batch20.py`; ids in `props.json`, sheet `_batch20_final_sheet.png`). They're in the courtyard set's style: weathered castle stone, carved lancets and pinnacles, gothic cast iron, crimson and gilt crests, gas lanterns.
+  - **Stairs:** StairStone, StairStoneRailed, StairLanding, StairGrand (a crimson runner on brass rods), StairSpiral, StairIron
+  - **Bridges:** BridgeStoneArch, BridgeIron, BridgeDeck (tiles end to end), BridgePier
+  - **Walkable:** the stone collides precisely, so treads and decks can be walked on; the iron bridge has invisible side barriers.
+  - **Lanterns** light at dusk and flicker.
+- **The painting and art kit: 9 pieces** (`nh_props_batch21.py`, sheet `_batch21_final_sheet.png`):
+  - **Paintings:** six original ones on their own sharp 2048 canvases (`art/props/paint_canvases.py`, with a Blender render for the still life): PaintingAbbey, PaintingBloodMoon, PaintingGhostShip, PaintingRaven, CameoSilhouette, Triptych.
+  - **Gallery:** GalleryStanchions, CanvasStack, PainterTable.
+  - **Hung for the builder** on a crimson damask gallery wall south of the lamp kit, with picture lights on two paintings.
+- **The props pipeline:** `nh_props.CANVAS` pieces carry their own image instead of the atlas, for paintings, posters and signs.
+- **Published under the Nightmare Highschool group:** all 85 new maps (owner's bulk import) and the meshes.
+
+### Fixed
+- **The two long bridges came in small:** the importer caps a mesh at 2048 units. The setup now scales them back to their baked width.
+
+### Verified (Studio, Edit)
+- All 19 placed with no clashes and every map showing (screenshots in docs/img: `stair-kit.jpg`, `bridge-kit.jpg`, `bridge-kit-night.jpg`, `art-kit-gallery.jpg`, `art-kit-closeup.jpg`).
+- **Not tested in Play** (another session was testing in the same Studio): walking the stairs and bridges, and the lanterns at dusk.
+
 ## [1.37.0] - 2026-11-04: Clean clothing seams, transformed outfits, menacing and race faces
 
 ### Fixed
