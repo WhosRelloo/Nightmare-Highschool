@@ -62,6 +62,8 @@ Race is always **rolled by the server**; players never pick it.
 ## Looks (Races 1.1)
 Race-only cosmetics, chosen in the Bloodline tab's **Looks** section. Grander versions unlock at Tier II and III.
 
+Race faces (1.37.0) live in the Wardrobe **Face** tab instead: race marks, race mouths and **Bloodline eyes**, plus the menacing transformed faces and a transformed version of every outfit. See [Clothing-and-Faces](Clothing-and-Faces.md).
+
 | Race | Slot | Tier I | Tier II | Tier III |
 |---|---|---|---|---|
 | Vampire | Ears | Pointed, Swept | Long Swept | Elder |

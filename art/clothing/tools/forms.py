@@ -201,7 +201,6 @@ def paw_pads(c, names):
         for tx in (x + 8, x + 21, x + 34, x + 47):
             paint(c, shape(lambda d: d.ellipse((tx, y + 10, tx + 10, y + 24), fill=255)), (34, 26, 26))
             paint(c, poly([(tx + 3, y + 10), (tx + 7, y + 10), (tx + 5, y + 3)]), (214, 204, 180))
-        shade(c, outline_of(rect_mask([n]), 1).astype(F32), 0.6)
 
 
 def wolf_pants(name="pants_form_wolf.png", seed=511):
@@ -243,7 +242,7 @@ def ghoul_skin(seed, base=(124, 134, 110)):
 
 
 def rot_edges(c, gm, seed, fray_col=(150, 140, 116)):
-    e = outline_of(gm, 1)
+    e = outline_of(gm, 1)   # torn edges inside a face only (outline_of skips face edges)
     shade(c, e.astype(F32), 0.4)
     rng = np.random.default_rng(seed)
     f = ndimage.binary_dilation(e, iterations=2) & ~gm & (c[..., 3] > 0) & (rng.random((H, W)) < 0.14)

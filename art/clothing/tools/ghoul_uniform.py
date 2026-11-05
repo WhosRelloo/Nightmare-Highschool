@@ -235,7 +235,6 @@ def white_sneakers(c, seed=5, top=451):
         paint(c, np.clip(ring + heel, 0, 1) * rect_mask([n]), (176, 176, 174))
         for bx in (x + 3, x + w - 7):
             paint(c, shape(lambda d: d.rounded_rectangle((bx, y + 8, bx + 4, y + 40), 2, outline=255)), (176, 176, 174))
-        shade(c, outline_of(rect_mask([n]), 1).astype(F32), 0.7)
     return c
 
 

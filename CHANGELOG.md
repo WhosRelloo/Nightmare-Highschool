@@ -2,6 +2,39 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.37.0] - 2026-11-04: Clean clothing seams, transformed outfits, menacing and race faces
+
+### Fixed
+- **No more dark borders round body parts on clothing.** The generators darkened the outer pixels of every template face (`face_seams`, the `finish()` edge term, edge outlines in `outline_of` / `rot_edges`), and pants sat on a black margin. All of that is gone, and `nhcloth.save()` now bleeds every face's colours out into the margins (docs/Clothing-and-Faces.md).
+  - All 69 generated templates were rebuilt (designs otherwise bit-for-bit the same), re-uploaded and swapped in `UI.Appearance`: 69 ids on 62 lines (`art/clothing/variants/seamfix_id_swap.tsv`). Pieces already in the game keep their designs.
+
+### Added
+- **A transformed version of every outfit**: 56 everyday pieces (the owner's 5 originals and the ghoul race uniform included) x Vampire / Wolf / Ghoul / Wraith / Priest = 280 templates (`art/clothing/tools/form_variants.py`).
+  - New `ReplicatedStorage.UI.FormVariants`, and `Appearance.FormVariant(form, template)`.
+  - Transforming in the NH uniform or wardrobe pieces now changes *your* top and bottoms; otherwise the old form outfit is used.
+- **Menacing transformed faces:** a new `NHFormFace` layer under the eyes (sunken sockets, glow, void or ooze tears, snarl creases, cracks, fur) for vampire, vampire stage 2, wolf, ghoul, ghoul stage 2 and wraith, plus new form mouths (the vampire snarl with curved fangs over the lip and full rows of teeth, the wolf snarl, the stitched ghoul grin, the wraith wail).
+- **Higher-quality mouths:** all 54 mouths re-rendered with a PBR-style material bake (enamel, wet tongue, cavity shading, specular). Real PBR can't run on face images in Roblox, so the material is baked into the art.
+- **Race faces** (race-locked, Wardrobe Face tab):
+  - 14 face marks (new layer `NHMarks`, new saved field `Marks`), 4 of them for everyone
+  - 10 race mouths
+  - **Bloodline eyes** (new saved field `RaceEyes`): your race's eyes without transforming; Priests get a gold iris
+  - The race is only read (`Race` attribute) and also checked when the face is drawn (`Appearance.RaceAllows`). Saves still go through ProfileService only.
+
+### Changed
+- **Blood kept minimal.** Roblox moderation warned the owner's account over blood in a generated vampire variant. The new variants and face layers have no blood; only two tiny drops remain (a vampire fang tip and the Fanged Smirk). The 38 unused uploads with blood are listed for archiving in `art/clothing/variants/ARCHIVE_THESE_blood_assets.txt`.
+
+### Verified (Studio, Edit)
+- **Seams:** the seam audit, plus the Wraith Banshee before and after on R6 dummies, front and back, close up. The old template shows a black edge on every face; the new one shows none (`docs/img/clothing-seams-front.jpg`, `-back.jpg`).
+- **Outfit variants:**
+  - all 280 uploaded
+  - `FormVariant` returns the right id for all 5 forms (Werewolf too) and nothing for unknown pieces
+  - the starter blazer and slacks render in all 5 forms on dummies (`docs/img/form-variants-studio.jpg`)
+- **Faces:**
+  - every new mouth, form face and mark passed the no-overlap check against all 112 eye variants, every brow and every mouth
+  - `ApplyEyes` on dummies with race and transformation attributes builds the right layers, and they render in Studio (`docs/img/faces-studio-*.jpg`)
+  - Sanitize / Encode round-trips `Marks` and `RaceEyes`, old numeric saves still load, and the Wardrobe compiles
+- **Not tested in Play:** other sessions were using the same Studio, so the Wardrobe Face tab UI, a live transformation and the server applying it all still need a Play test. The face screenshots were taken with the strip welds removed on the temporary dummies only, because Studio draws welds in green.
+
 ## [1.36.0] - 2026-11-04: The lamp and light kit, seven grass sets
 
 ### Added

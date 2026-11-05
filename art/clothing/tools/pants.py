@@ -161,7 +161,6 @@ def school_shoes(c, seed=5, leather=(24, 22, 26)):
     for n in LEG_DOWNS:
         x, y, w, h = R[n]
         paint(c, lines([(x, y + 42), (x + w, y + 42)], 2), (18, 14, 12))
-        shade(c, outline_of(rect_mask([n]), 2).astype(np.float32), 0.6)
     return c
 
 

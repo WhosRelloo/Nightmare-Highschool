@@ -1,0 +1,394 @@
+{
+ "orig_black_shirt.png": {
+  "Vampire": "vampire/orig_black_shirt.png",
+  "Wolf": "wolf/orig_black_shirt.png",
+  "Ghoul": "ghoul/orig_black_shirt.png",
+  "Wraith": "wraith/orig_black_shirt.png",
+  "Priest": "priest/orig_black_shirt.png"
+ },
+ "orig_black_vest.png": {
+  "Vampire": "vampire/orig_black_vest.png",
+  "Wolf": "wolf/orig_black_vest.png",
+  "Ghoul": "ghoul/orig_black_vest.png",
+  "Wraith": "wraith/orig_black_vest.png",
+  "Priest": "priest/orig_black_vest.png"
+ },
+ "orig_red_shirt.png": {
+  "Vampire": "vampire/orig_red_shirt.png",
+  "Wolf": "wolf/orig_red_shirt.png",
+  "Ghoul": "ghoul/orig_red_shirt.png",
+  "Wraith": "wraith/orig_red_shirt.png",
+  "Priest": "priest/orig_red_shirt.png"
+ },
+ "orig_red_vest.png": {
+  "Vampire": "vampire/orig_red_vest.png",
+  "Wolf": "wolf/orig_red_vest.png",
+  "Ghoul": "ghoul/orig_red_vest.png",
+  "Wraith": "wraith/orig_red_vest.png",
+  "Priest": "priest/orig_red_vest.png"
+ },
+ "orig_uniform_pants.png": {
+  "Vampire": "vampire/orig_uniform_pants.png",
+  "Wolf": "wolf/orig_uniform_pants.png",
+  "Ghoul": "ghoul/orig_uniform_pants.png",
+  "Wraith": "wraith/orig_uniform_pants.png",
+  "Priest": "priest/orig_uniform_pants.png"
+ },
+ "pants_civ_black_jeans_boots.png": {
+  "Vampire": "vampire/pants_civ_black_jeans_boots.png",
+  "Wolf": "wolf/pants_civ_black_jeans_boots.png",
+  "Ghoul": "ghoul/pants_civ_black_jeans_boots.png",
+  "Wraith": "wraith/pants_civ_black_jeans_boots.png",
+  "Priest": "priest/pants_civ_black_jeans_boots.png"
+ },
+ "pants_civ_cargo_boots.png": {
+  "Vampire": "vampire/pants_civ_cargo_boots.png",
+  "Wolf": "wolf/pants_civ_cargo_boots.png",
+  "Ghoul": "ghoul/pants_civ_cargo_boots.png",
+  "Wraith": "wraith/pants_civ_cargo_boots.png",
+  "Priest": "priest/pants_civ_cargo_boots.png"
+ },
+ "pants_civ_joggers_stripe.png": {
+  "Vampire": "vampire/pants_civ_joggers_stripe.png",
+  "Wolf": "wolf/pants_civ_joggers_stripe.png",
+  "Ghoul": "ghoul/pants_civ_joggers_stripe.png",
+  "Wraith": "wraith/pants_civ_joggers_stripe.png",
+  "Priest": "priest/pants_civ_joggers_stripe.png"
+ },
+ "pants_civ_pinstripe_riding_boots.png": {
+  "Vampire": "vampire/pants_civ_pinstripe_riding_boots.png",
+  "Wolf": "wolf/pants_civ_pinstripe_riding_boots.png",
+  "Ghoul": "ghoul/pants_civ_pinstripe_riding_boots.png",
+  "Wraith": "wraith/pants_civ_pinstripe_riding_boots.png",
+  "Priest": "priest/pants_civ_pinstripe_riding_boots.png"
+ },
+ "pants_civ_skirt_fishnet.png": {
+  "Vampire": "vampire/pants_civ_skirt_fishnet.png",
+  "Wolf": "wolf/pants_civ_skirt_fishnet.png",
+  "Ghoul": "ghoul/pants_civ_skirt_fishnet.png",
+  "Wraith": "wraith/pants_civ_skirt_fishnet.png",
+  "Priest": "priest/pants_civ_skirt_fishnet.png"
+ },
+ "pants_f_chapel_skirt.png": {
+  "Vampire": "vampire/pants_f_chapel_skirt.png",
+  "Wolf": "wolf/pants_f_chapel_skirt.png",
+  "Ghoul": "ghoul/pants_f_chapel_skirt.png",
+  "Wraith": "wraith/pants_f_chapel_skirt.png",
+  "Priest": "priest/pants_f_chapel_skirt.png"
+ },
+ "pants_f_cheer_skirt.png": {
+  "Vampire": "vampire/pants_f_cheer_skirt.png",
+  "Wolf": "wolf/pants_f_cheer_skirt.png",
+  "Ghoul": "ghoul/pants_f_cheer_skirt.png",
+  "Wraith": "wraith/pants_f_cheer_skirt.png",
+  "Priest": "priest/pants_f_cheer_skirt.png"
+ },
+ "pants_f_gala_skirt.png": {
+  "Vampire": "vampire/pants_f_gala_skirt.png",
+  "Wolf": "wolf/pants_f_gala_skirt.png",
+  "Ghoul": "ghoul/pants_f_gala_skirt.png",
+  "Wraith": "wraith/pants_f_gala_skirt.png",
+  "Priest": "priest/pants_f_gala_skirt.png"
+ },
+ "pants_f_lolita_skirt.png": {
+  "Vampire": "vampire/pants_f_lolita_skirt.png",
+  "Wolf": "wolf/pants_f_lolita_skirt.png",
+  "Ghoul": "ghoul/pants_f_lolita_skirt.png",
+  "Wraith": "wraith/pants_f_lolita_skirt.png",
+  "Priest": "priest/pants_f_lolita_skirt.png"
+ },
+ "pants_f_pinafore_skirt.png": {
+  "Vampire": "vampire/pants_f_pinafore_skirt.png",
+  "Wolf": "wolf/pants_f_pinafore_skirt.png",
+  "Ghoul": "ghoul/pants_f_pinafore_skirt.png",
+  "Wraith": "wraith/pants_f_pinafore_skirt.png",
+  "Priest": "priest/pants_f_pinafore_skirt.png"
+ },
+ "pants_f_plaid_mini.png": {
+  "Vampire": "vampire/pants_f_plaid_mini.png",
+  "Wolf": "wolf/pants_f_plaid_mini.png",
+  "Ghoul": "ghoul/pants_f_plaid_mini.png",
+  "Wraith": "wraith/pants_f_plaid_mini.png",
+  "Priest": "priest/pants_f_plaid_mini.png"
+ },
+ "pants_f_sailor_skirt.png": {
+  "Vampire": "vampire/pants_f_sailor_skirt.png",
+  "Wolf": "wolf/pants_f_sailor_skirt.png",
+  "Ghoul": "ghoul/pants_f_sailor_skirt.png",
+  "Wraith": "wraith/pants_f_sailor_skirt.png",
+  "Priest": "priest/pants_f_sailor_skirt.png"
+ },
+ "pants_ghoul_uniform.png": {
+  "Vampire": "vampire/pants_ghoul_uniform.png",
+  "Wolf": "wolf/pants_ghoul_uniform.png",
+  "Ghoul": "ghoul/pants_ghoul_uniform.png",
+  "Wraith": "wraith/pants_ghoul_uniform.png",
+  "Priest": "priest/pants_ghoul_uniform.png"
+ },
+ "pants_jeans_black.png": {
+  "Vampire": "vampire/pants_jeans_black.png",
+  "Wolf": "wolf/pants_jeans_black.png",
+  "Ghoul": "ghoul/pants_jeans_black.png",
+  "Wraith": "wraith/pants_jeans_black.png",
+  "Priest": "priest/pants_jeans_black.png"
+ },
+ "pants_jeans_dark_indigo.png": {
+  "Vampire": "vampire/pants_jeans_dark_indigo.png",
+  "Wolf": "wolf/pants_jeans_dark_indigo.png",
+  "Ghoul": "ghoul/pants_jeans_dark_indigo.png",
+  "Wraith": "wraith/pants_jeans_dark_indigo.png",
+  "Priest": "priest/pants_jeans_dark_indigo.png"
+ },
+ "pants_jeans_ripped.png": {
+  "Vampire": "vampire/pants_jeans_ripped.png",
+  "Wolf": "wolf/pants_jeans_ripped.png",
+  "Ghoul": "ghoul/pants_jeans_ripped.png",
+  "Wraith": "wraith/pants_jeans_ripped.png",
+  "Priest": "priest/pants_jeans_ripped.png"
+ },
+ "pants_shorts_khaki.png": {
+  "Vampire": "vampire/pants_shorts_khaki.png",
+  "Wolf": "wolf/pants_shorts_khaki.png",
+  "Ghoul": "ghoul/pants_shorts_khaki.png",
+  "Wraith": "wraith/pants_shorts_khaki.png",
+  "Priest": "priest/pants_shorts_khaki.png"
+ },
+ "pants_skirt_pleated_tartan.png": {
+  "Vampire": "vampire/pants_skirt_pleated_tartan.png",
+  "Wolf": "wolf/pants_skirt_pleated_tartan.png",
+  "Ghoul": "ghoul/pants_skirt_pleated_tartan.png",
+  "Wraith": "wraith/pants_skirt_pleated_tartan.png",
+  "Priest": "priest/pants_skirt_pleated_tartan.png"
+ },
+ "pants_slacks_charcoal.png": {
+  "Vampire": "vampire/pants_slacks_charcoal.png",
+  "Wolf": "wolf/pants_slacks_charcoal.png",
+  "Ghoul": "ghoul/pants_slacks_charcoal.png",
+  "Wraith": "wraith/pants_slacks_charcoal.png",
+  "Priest": "priest/pants_slacks_charcoal.png"
+ },
+ "pants_trousers_khaki.png": {
+  "Vampire": "vampire/pants_trousers_khaki.png",
+  "Wolf": "wolf/pants_trousers_khaki.png",
+  "Ghoul": "ghoul/pants_trousers_khaki.png",
+  "Wraith": "wraith/pants_trousers_khaki.png",
+  "Priest": "priest/pants_trousers_khaki.png"
+ },
+ "shirt_blazer_black_crest.png": {
+  "Vampire": "vampire/shirt_blazer_black_crest.png",
+  "Wolf": "wolf/shirt_blazer_black_crest.png",
+  "Ghoul": "ghoul/shirt_blazer_black_crest.png",
+  "Wraith": "wraith/shirt_blazer_black_crest.png",
+  "Priest": "priest/shirt_blazer_black_crest.png"
+ },
+ "shirt_cardigan_charcoal_crest.png": {
+  "Vampire": "vampire/shirt_cardigan_charcoal_crest.png",
+  "Wolf": "wolf/shirt_cardigan_charcoal_crest.png",
+  "Ghoul": "ghoul/shirt_cardigan_charcoal_crest.png",
+  "Wraith": "wraith/shirt_cardigan_charcoal_crest.png",
+  "Priest": "priest/shirt_cardigan_charcoal_crest.png"
+ },
+ "shirt_civ_flannel_open.png": {
+  "Vampire": "vampire/shirt_civ_flannel_open.png",
+  "Wolf": "wolf/shirt_civ_flannel_open.png",
+  "Ghoul": "ghoul/shirt_civ_flannel_open.png",
+  "Wraith": "wraith/shirt_civ_flannel_open.png",
+  "Priest": "priest/shirt_civ_flannel_open.png"
+ },
+ "shirt_civ_hoodie_blood_moon.png": {
+  "Vampire": "vampire/shirt_civ_hoodie_blood_moon.png",
+  "Wolf": "wolf/shirt_civ_hoodie_blood_moon.png",
+  "Ghoul": "ghoul/shirt_civ_hoodie_blood_moon.png",
+  "Wraith": "wraith/shirt_civ_hoodie_blood_moon.png",
+  "Priest": "priest/shirt_civ_hoodie_blood_moon.png"
+ },
+ "shirt_civ_hussar_coat.png": {
+  "Vampire": "vampire/shirt_civ_hussar_coat.png",
+  "Wolf": "wolf/shirt_civ_hussar_coat.png",
+  "Ghoul": "ghoul/shirt_civ_hussar_coat.png",
+  "Wraith": "wraith/shirt_civ_hussar_coat.png",
+  "Priest": "priest/shirt_civ_hussar_coat.png"
+ },
+ "shirt_civ_leather_jacket.png": {
+  "Vampire": "vampire/shirt_civ_leather_jacket.png",
+  "Wolf": "wolf/shirt_civ_leather_jacket.png",
+  "Ghoul": "ghoul/shirt_civ_leather_jacket.png",
+  "Wraith": "wraith/shirt_civ_leather_jacket.png",
+  "Priest": "priest/shirt_civ_leather_jacket.png"
+ },
+ "shirt_civ_tee_the_hollow.png": {
+  "Vampire": "vampire/shirt_civ_tee_the_hollow.png",
+  "Wolf": "wolf/shirt_civ_tee_the_hollow.png",
+  "Ghoul": "ghoul/shirt_civ_tee_the_hollow.png",
+  "Wraith": "wraith/shirt_civ_tee_the_hollow.png",
+  "Priest": "priest/shirt_civ_tee_the_hollow.png"
+ },
+ "shirt_civ_victorian_waistcoat.png": {
+  "Vampire": "vampire/shirt_civ_victorian_waistcoat.png",
+  "Wolf": "wolf/shirt_civ_victorian_waistcoat.png",
+  "Ghoul": "ghoul/shirt_civ_victorian_waistcoat.png",
+  "Wraith": "wraith/shirt_civ_victorian_waistcoat.png",
+  "Priest": "priest/shirt_civ_victorian_waistcoat.png"
+ },
+ "shirt_f_bolero_pinafore.png": {
+  "Vampire": "vampire/shirt_f_bolero_pinafore.png",
+  "Wolf": "wolf/shirt_f_bolero_pinafore.png",
+  "Ghoul": "ghoul/shirt_f_bolero_pinafore.png",
+  "Wraith": "wraith/shirt_f_bolero_pinafore.png",
+  "Priest": "priest/shirt_f_bolero_pinafore.png"
+ },
+ "shirt_f_cable_knit.png": {
+  "Vampire": "vampire/shirt_f_cable_knit.png",
+  "Wolf": "wolf/shirt_f_cable_knit.png",
+  "Ghoul": "ghoul/shirt_f_cable_knit.png",
+  "Wraith": "wraith/shirt_f_cable_knit.png",
+  "Priest": "priest/shirt_f_cable_knit.png"
+ },
+ "shirt_f_chapel_corset.png": {
+  "Vampire": "vampire/shirt_f_chapel_corset.png",
+  "Wolf": "wolf/shirt_f_chapel_corset.png",
+  "Ghoul": "ghoul/shirt_f_chapel_corset.png",
+  "Wraith": "wraith/shirt_f_chapel_corset.png",
+  "Priest": "priest/shirt_f_chapel_corset.png"
+ },
+ "shirt_f_cheer_shell.png": {
+  "Vampire": "vampire/shirt_f_cheer_shell.png",
+  "Wolf": "wolf/shirt_f_cheer_shell.png",
+  "Ghoul": "ghoul/shirt_f_cheer_shell.png",
+  "Wraith": "wraith/shirt_f_cheer_shell.png",
+  "Priest": "priest/shirt_f_cheer_shell.png"
+ },
+ "shirt_f_gala_bodice.png": {
+  "Vampire": "vampire/shirt_f_gala_bodice.png",
+  "Wolf": "wolf/shirt_f_gala_bodice.png",
+  "Ghoul": "ghoul/shirt_f_gala_bodice.png",
+  "Wraith": "wraith/shirt_f_gala_bodice.png",
+  "Priest": "priest/shirt_f_gala_bodice.png"
+ },
+ "shirt_f_lolita_bodice.png": {
+  "Vampire": "vampire/shirt_f_lolita_bodice.png",
+  "Wolf": "wolf/shirt_f_lolita_bodice.png",
+  "Ghoul": "ghoul/shirt_f_lolita_bodice.png",
+  "Wraith": "wraith/shirt_f_lolita_bodice.png",
+  "Priest": "priest/shirt_f_lolita_bodice.png"
+ },
+ "shirt_f_sailor_navy.png": {
+  "Vampire": "vampire/shirt_f_sailor_navy.png",
+  "Wolf": "wolf/shirt_f_sailor_navy.png",
+  "Ghoul": "ghoul/shirt_f_sailor_navy.png",
+  "Wraith": "wraith/shirt_f_sailor_navy.png",
+  "Priest": "priest/shirt_f_sailor_navy.png"
+ },
+ "shirt_ghoul_uniform_black_shirt.png": {
+  "Vampire": "vampire/shirt_ghoul_uniform_black_shirt.png",
+  "Wolf": "wolf/shirt_ghoul_uniform_black_shirt.png",
+  "Ghoul": "ghoul/shirt_ghoul_uniform_black_shirt.png",
+  "Wraith": "wraith/shirt_ghoul_uniform_black_shirt.png",
+  "Priest": "priest/shirt_ghoul_uniform_black_shirt.png"
+ },
+ "shirt_ghoul_uniform_black_vest.png": {
+  "Vampire": "vampire/shirt_ghoul_uniform_black_vest.png",
+  "Wolf": "wolf/shirt_ghoul_uniform_black_vest.png",
+  "Ghoul": "ghoul/shirt_ghoul_uniform_black_vest.png",
+  "Wraith": "wraith/shirt_ghoul_uniform_black_vest.png",
+  "Priest": "priest/shirt_ghoul_uniform_black_vest.png"
+ },
+ "shirt_ghoul_uniform_red_shirt.png": {
+  "Vampire": "vampire/shirt_ghoul_uniform_red_shirt.png",
+  "Wolf": "wolf/shirt_ghoul_uniform_red_shirt.png",
+  "Ghoul": "ghoul/shirt_ghoul_uniform_red_shirt.png",
+  "Wraith": "wraith/shirt_ghoul_uniform_red_shirt.png",
+  "Priest": "priest/shirt_ghoul_uniform_red_shirt.png"
+ },
+ "shirt_ghoul_uniform_red_vest.png": {
+  "Vampire": "vampire/shirt_ghoul_uniform_red_vest.png",
+  "Wolf": "wolf/shirt_ghoul_uniform_red_vest.png",
+  "Ghoul": "ghoul/shirt_ghoul_uniform_red_vest.png",
+  "Wraith": "wraith/shirt_ghoul_uniform_red_vest.png",
+  "Priest": "priest/shirt_ghoul_uniform_red_vest.png"
+ },
+ "shirt_gym_pe.png": {
+  "Vampire": "vampire/shirt_gym_pe.png",
+  "Wolf": "wolf/shirt_gym_pe.png",
+  "Ghoul": "ghoul/shirt_gym_pe.png",
+  "Wraith": "wraith/shirt_gym_pe.png",
+  "Priest": "priest/shirt_gym_pe.png"
+ },
+ "shirt_polo_crimson_charcoal.png": {
+  "Vampire": "vampire/shirt_polo_crimson_charcoal.png",
+  "Wolf": "wolf/shirt_polo_crimson_charcoal.png",
+  "Ghoul": "ghoul/shirt_polo_crimson_charcoal.png",
+  "Wraith": "wraith/shirt_polo_crimson_charcoal.png",
+  "Priest": "priest/shirt_polo_crimson_charcoal.png"
+ },
+ "shirt_polo_delinquent.png": {
+  "Vampire": "vampire/shirt_polo_delinquent.png",
+  "Wolf": "wolf/shirt_polo_delinquent.png",
+  "Ghoul": "ghoul/shirt_polo_delinquent.png",
+  "Wraith": "wraith/shirt_polo_delinquent.png",
+  "Priest": "priest/shirt_polo_delinquent.png"
+ },
+ "shirt_polo_forest_khaki.png": {
+  "Vampire": "vampire/shirt_polo_forest_khaki.png",
+  "Wolf": "wolf/shirt_polo_forest_khaki.png",
+  "Ghoul": "ghoul/shirt_polo_forest_khaki.png",
+  "Wraith": "wraith/shirt_polo_forest_khaki.png",
+  "Priest": "priest/shirt_polo_forest_khaki.png"
+ },
+ "shirt_polo_ivory_crimson.png": {
+  "Vampire": "vampire/shirt_polo_ivory_crimson.png",
+  "Wolf": "wolf/shirt_polo_ivory_crimson.png",
+  "Ghoul": "ghoul/shirt_polo_ivory_crimson.png",
+  "Wraith": "wraith/shirt_polo_ivory_crimson.png",
+  "Priest": "priest/shirt_polo_ivory_crimson.png"
+ },
+ "shirt_polo_navy_khaki.png": {
+  "Vampire": "vampire/shirt_polo_navy_khaki.png",
+  "Wolf": "wolf/shirt_polo_navy_khaki.png",
+  "Ghoul": "ghoul/shirt_polo_navy_khaki.png",
+  "Wraith": "wraith/shirt_polo_navy_khaki.png",
+  "Priest": "priest/shirt_polo_navy_khaki.png"
+ },
+ "shirt_varsity_jacket.png": {
+  "Vampire": "vampire/shirt_varsity_jacket.png",
+  "Wolf": "wolf/shirt_varsity_jacket.png",
+  "Ghoul": "ghoul/shirt_varsity_jacket.png",
+  "Wraith": "wraith/shirt_varsity_jacket.png",
+  "Priest": "priest/shirt_varsity_jacket.png"
+ },
+ "shirt_vest_charcoal_crimson.png": {
+  "Vampire": "vampire/shirt_vest_charcoal_crimson.png",
+  "Wolf": "wolf/shirt_vest_charcoal_crimson.png",
+  "Ghoul": "ghoul/shirt_vest_charcoal_crimson.png",
+  "Wraith": "wraith/shirt_vest_charcoal_crimson.png",
+  "Priest": "priest/shirt_vest_charcoal_crimson.png"
+ },
+ "shirt_vest_crimson_court.png": {
+  "Vampire": "vampire/shirt_vest_crimson_court.png",
+  "Wolf": "wolf/shirt_vest_crimson_court.png",
+  "Ghoul": "ghoul/shirt_vest_crimson_court.png",
+  "Wraith": "wraith/shirt_vest_crimson_court.png",
+  "Priest": "priest/shirt_vest_crimson_court.png"
+ },
+ "shirt_vest_forest_cream.png": {
+  "Vampire": "vampire/shirt_vest_forest_cream.png",
+  "Wolf": "wolf/shirt_vest_forest_cream.png",
+  "Ghoul": "ghoul/shirt_vest_forest_cream.png",
+  "Wraith": "wraith/shirt_vest_forest_cream.png",
+  "Priest": "priest/shirt_vest_forest_cream.png"
+ },
+ "shirt_vest_navy_ivory.png": {
+  "Vampire": "vampire/shirt_vest_navy_ivory.png",
+  "Wolf": "wolf/shirt_vest_navy_ivory.png",
+  "Ghoul": "ghoul/shirt_vest_navy_ivory.png",
+  "Wraith": "wraith/shirt_vest_navy_ivory.png",
+  "Priest": "priest/shirt_vest_navy_ivory.png"
+ },
+ "shirt_vest_vigil_ivory_gold.png": {
+  "Vampire": "vampire/shirt_vest_vigil_ivory_gold.png",
+  "Wolf": "wolf/shirt_vest_vigil_ivory_gold.png",
+  "Ghoul": "ghoul/shirt_vest_vigil_ivory_gold.png",
+  "Wraith": "wraith/shirt_vest_vigil_ivory_gold.png",
+  "Priest": "priest/shirt_vest_vigil_ivory_gold.png"
+ }
+}

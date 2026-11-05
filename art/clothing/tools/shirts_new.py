@@ -47,7 +47,9 @@ def polo_hole():
 
 
 def face_seams(c, factor=0.55):
-    """Darken the outermost pixel of each face so seams read like the sources."""
+    """No-op (2026-11-04). It used to darken the outermost pixel of every face, which
+    showed in game as a dark border round each body part. Kept so callers still work."""
+    return c
     m = np.zeros((H, W), bool)
     for n in TORSO_RING + ARM_FACES:
         x, y, w, h = R[n]
@@ -240,10 +242,7 @@ def varsity(name="shirt_varsity_jacket.png", body=(26, 22, 26), sleeve=(132, 14,
     stripes = [(190, 191, gold), (195, 196, sleeve)]
     rib_band(c, TORSO_RING, 186, 201, body, stripes=stripes, seed=seed)
     rib_band(c, ARM_FACES, 440, SLEEVE_END, body, stripes=[(445, 446, gold), (450, 451, sleeve)], seed=seed + 1)
-    # shoulder seam where leather meets wool, on the arm tops
-    for n in ARM_UPS:
-        x, y, w, h = R[n]
-        shade(c, outline_of(rect_mask([n]), 1).astype(np.float32), 0.55)
+    # (no dark outline round the arm tops: it showed as a border at the shoulder)
     clear(c, hole)
     face_seams(c)
     return save_hq(c, name)

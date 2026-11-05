@@ -290,26 +290,42 @@ def render_mouth(style, full_lips, form=None, seed=1):
         C.over(np.ones(3, np.float32), C.ell(512 - 4, yb + 2.6, 4.5, 1.1, soft=1.2) * 0.5)
         C.over(LIPTINT, C.ell(512, float(top[:, 1].min()) - 1.8, W * 0.46, 1.6, soft=1.6) * 0.3)
 
-    def fang(x, y, h=8, w=4.6):
+    over_line = []
+
+    def fang(x, y, h=8, w=4.6, over=False):
         tip = np.array([x + 0.4, y + h])
         poly = np.array([[x - w / 2, y], [x + w / 2, y], tip])
         C.over(WHITE, C.mask([poly]))
-        thin_polys.append(edge_stroke(np.vstack([poly, poly[:1]]), 1.2, 1.0))
+        rim = edge_stroke(np.vstack([poly, poly[:1]]), 1.2, 1.0)
+        (over_line if over else thin_polys).append((poly, rim) if over else rim)
         return tip
 
-    def zigzag(top, bot, n, up_depth, low_depth, m, canines=()):
+    def zigzag(top, bot, n, up_depth, low_depth, m, canines=(), jitter=0.0, tooth=None, canine_k=1.9, skip=(),
+               skip_up=None, skip_low=None):
+        tooth = WHITE if tooth is None else tooth
         xs = np.linspace(top[0, 0], top[-1, 0], n + 1)
         for i in range(n):
             xa, xb = xs[i], xs[i + 1]
             xc = (xa + xb) / 2
+            if any(xa < s1 + 1.0 and xb > s0 - 1.0 for s0, s1 in skip):
+                continue
+            up_ok = not any(s0 <= xc <= s1 for s0, s1 in (skip_up or ()))
+            low_ok = not any(s0 <= xc <= s1 for s0, s1 in (skip_low or ()))
             yu = float(np.interp(xc, top[:, 0], top[:, 1]))
             yl = float(np.interp(xc, bot[:, 0], bot[:, 1]))
             gap = yl - yu
-            du = up_depth * (1.9 if i in canines else 1.0)
-            C.over(WHITE, C.mask([np.array([[xa, yu - 1], [xb, yu - 1], [xc, yu + min(du, gap * 0.7)]])]) * m)
-            if low_depth:
-                dl = low_depth * (1.7 if i in canines else 1.0)
-                C.over(WHITE, C.mask([np.array([[xa, yl + 1], [xb, yl + 1], [xc, yl - min(dl, gap * 0.6)]])]) * m)
+            du = up_depth * (canine_k if i in canines else 1.0) * (1 + jitter * rng.uniform(-1, 1))
+            xt = xc + jitter * rng.uniform(-1.2, 1.2)
+            du_c = min(du, gap * (0.56 if low_depth else 0.78))
+            if not up_ok:
+                du_c = 0.0
+            else:
+                C.over(tooth, C.mask([np.array([[xa, yu - 1], [xb, yu - 1], [xt, yu + du_c]])]) * m)
+            if low_depth and low_ok:
+                dl = low_depth * (1.7 if i in canines else 1.0) * (1 + jitter * rng.uniform(-1, 1))
+                dl_c = min(dl, gap * 0.66, max(gap - du_c - 1.6, 0.0))
+                if dl_c > 0.8:
+                    C.over(tooth, C.mask([np.array([[xa, yl + 1], [xb, yl + 1], [xc + jitter * rng.uniform(-1.2, 1.2), yl - dl_c]])]) * m)
 
     # ---------------------------------------------------------------- base styles
     SPEC = {   # style: (open, width, extras)
@@ -364,60 +380,295 @@ def render_mouth(style, full_lips, form=None, seed=1):
                 lower_shadow(float(bot[:, 1].max()) + 6.0, W)
             lips(top, bot, W)
     else:
-        if form == "vampire":
-            top, bot, W, h_bot = mouth_edges(0.26, 0.55)
-            cel_mouth(top, bot, h_bot, lens=True)
-            tips = []
-            for fx in (-9, 9):
-                y = float(np.interp(512 + fx, bot[:, 0], bot[:, 1]))
-                tips.append(fang(512 + fx, y - 1.2, 10, 5.0))
-            C.over(np.array([0.66, 0.03, 0.1], np.float32), C.ell(tips[1][0] + 0.3, tips[1][1] + 2.6, 1.9, 2.6, soft=0.9))
-            C.over(np.ones(3, np.float32), C.ell(tips[1][0] - 0.3, tips[1][1] + 1.8, 0.6, 0.8, soft=0.5) * 0.8)
-            outline(top, bot, 1.9, 1.5)
-            lower_shadow(float(bot[:, 1].max()) + 7, W)
-        elif form == "wolf":
-            top, bot, W, h_bot = mouth_edges(0.8, 0.5)
-            top = top - np.stack([np.zeros(len(top)), 2.5 * np.sin(np.pi * np.linspace(0, 1, len(top)))], 1)   # lip curled up
-            _, m = cel_mouth(top, bot, h_bot, teeth=False, tongue_on=True, dark=True)
-            C.over(np.array([0.72, 0.28, 0.34], np.float32), C.mask([poly_between(top, top + [0, 2.6])]) * m)   # gums
-            zigzag(top + [0, 2.2], bot, 9, 5.2, 4.2, m, canines=(1, 7))
-            outline(top, bot, 2.9, 2.2)
-            for sg in (-1, 1):   # snarl wrinkles
-                for j in range(2):
-                    b0 = np.array([512 + sg * (10 + j * 8), float(top[:, 1].min()) - 5 - j * 2.5])
-                    thin_polys.append(edge_stroke(np.array([b0 + [sg * 5 * q, -4.5 * q + 2.5 * q * q] for q in np.linspace(0, 1, 8)]), 1.5, 0.2))
-            lower_shadow(float(bot[:, 1].max()) + 6, W)
-        elif form == "ghoul":
-            top, bot, W, h_bot = mouth_edges(0.3, 1.0, wscale=1.55)
+        BLOOD = np.array([0.55, 0.02, 0.07], np.float32)
+        BLOOD_HI = np.array([0.86, 0.22, 0.26], np.float32)
+        VOIDC = np.array([0.02, 0.02, 0.05], np.float32)
+        ICE = np.array([0.78, 0.92, 1.0], np.float32)
+
+        def curl(top, amt):
+            return top - np.stack([np.zeros(len(top)), amt * np.sin(np.pi * np.linspace(0, 1, len(top)))], 1)
+
+        def drip(x, y, L, w=1.6):
+            pts = np.array([[x + 0.3 * np.sin(q * 3), y + L * q] for q in np.linspace(0, 1, 14)])
+            C.over(BLOOD, C.mask([stroke(pts, w, lambda q: np.clip(0.55 + 0.45 * q, 0, 1))]))
+            C.over(BLOOD, C.ell(x, y + L + 0.6, w * 0.95, w * 1.25, soft=0.8))
+            C.over(BLOOD_HI, C.ell(x - 0.4, y + L * 0.55, 0.45, L * 0.18, soft=0.6) * 0.7)
+
+        def lower_fang(x, y, h=6, w=4.0):
+            poly = np.array([[x - w / 2, y], [x + w / 2, y], [x + 0.3, y - h]])
+            C.over(WHITE, C.mask([poly]))
+            thin_polys.append(edge_stroke(np.vstack([poly, poly[:1]]), 1.1, 1.0))
+
+        def wrinkles(top, n=3, spread=7, size=5.5):
+            for sg in (-1, 1):
+                for j in range(n):
+                    b0 = np.array([512 + sg * (8 + j * spread), float(top[:, 1].min()) - 4 - j * 2.2])
+                    thin_polys.append(edge_stroke(np.array([b0 + [sg * size * q, -size * 0.95 * q + 2.6 * q * q] for q in np.linspace(0, 1, 8)]), 1.7, 0.2))
+
+        def stitch_x(c, s=1.8, h=3.0):
+            thin_polys.append(edge_stroke(np.linspace(c + [-s, -h], c + [s, h], 5), 1.15, 1.0))
+            thin_polys.append(edge_stroke(np.linspace(c + [s, -h], c + [-s, h], 5), 1.15, 1.0))
+
+        if form == "vampire":            # a wide, hungry snarl: curved fangs over the lip, every tooth sharp,
+            #                                  a void of a throat, dark veins creeping from the corners (one tiny drop only)
+            top, bot, W, h_bot = mouth_edges(0.85, 0.5, wscale=1.32)
+            top = curl(top, 4.8)
             _, m = cel_mouth(top, bot, h_bot, teeth=False, tongue_on=False, dark=True)
-            zigzag(top, bot, 13, 5.0, 4.4, m)
-            outline(top, bot, 2.4, 2.0)
-            for end, sg in ((top[0], -1), (top[-1], 1)):   # split corners + cross stitches
-                split = np.array([end + [sg * 13 * q, -6 * q * q] for q in np.linspace(0, 1, 12)])
-                line_polys.append(edge_stroke(split, 2.2, 0.25))
-                for j in range(3):
-                    c = end + [sg * (3.5 + j * 4), -1.2 - j * 1.1]
-                    thin_polys.append(edge_stroke(np.linspace(c + [-1.8, -3], c + [1.8, 3], 5), 1.1, 1.0))
-                    thin_polys.append(edge_stroke(np.linspace(c + [1.8, -3], c + [-1.8, 3], 5), 1.1, 1.0))
+            # the throat falls away into near-black
+            y0, y1 = sy(float(top[:, 1].min())), sy(float(bot[:, 1].max()))
+            gv = np.clip((C.Y - y0) / max(y1 - y0, 1), 0, 1)
+            C.over(np.array([0.05, 0.01, 0.03], np.float32), m * np.clip(1 - np.abs(gv - 0.55) * 2.4, 0, 1) * 0.85)
+            C.over(np.array([0.5, 0.1, 0.16], np.float32), C.mask([poly_between(top, top + [0, 2.6])]) * m)   # gums
+            C.over(np.array([0.5, 0.1, 0.16], np.float32), C.mask([poly_between(bot - [0, 2.2], bot)]) * m)
+            FX, FW = 11.5, 7.4
+            LX, LW = 19.0, 4.2
+            skip = [(512 - FX - FW / 2, 512 - FX + FW / 2), (512 + FX - FW / 2, 512 + FX + FW / 2),
+                    (512 - LX - LW / 2, 512 - LX + LW / 2), (512 + LX - LW / 2, 512 + LX + LW / 2)]
+            fang_r = [(512 - FX - FW / 2, 512 - FX + FW / 2), (512 + FX - FW / 2, 512 + FX + FW / 2)]
+            low_r = [(512 - LX - LW / 2, 512 - LX + LW / 2), (512 + LX - LW / 2, 512 + LX + LW / 2)]
+            zigzag(top + [0, 2.2], bot - [0, 1.8], 23, 4.0, 3.2, m, skip_up=fang_r, skip_low=fang_r + low_r)
+            tips = []
+            for fx in (-FX, FX):             # long fangs that curve in toward the tip, drawn over the lip line
+                y = float(np.interp(512 + fx, top[:, 0], top[:, 1]))
+                L = 26.0
+                sgn = -1 if fx > 0 else 1
+                poly = np.array([[512 + fx - FW / 2, y + 1.0], [512 + fx + FW / 2, y + 1.0],
+                                 [512 + fx + FW * 0.28 + sgn * 0.6, y + L * 0.55], [512 + fx + sgn * 1.6, y + L]])
+                C.over(WHITE, C.mask([poly]))
+                rim = edge_stroke(np.vstack([poly, poly[:1]]), 1.2, 1.0)
+                over_line.append((poly, rim))
+                tips.append(np.array([512 + fx + sgn * 1.6, y + L]))
+            for fx in (-LX, LX):             # lower fangs, clear of the upper ones
+                y = float(np.interp(512 + fx, bot[:, 0], bot[:, 1]))
+                yt_ = float(np.interp(512 + fx, top[:, 0], top[:, 1]))
+                lower_fang(512 + fx, y - 0.8, min(9.0, (y - yt_) * 0.38), LW)
+            outline(top, bot, 3.3, 2.6)
+            wrinkles(top, 3, 7.0, 6.0)
+            for end, sg in ((top[0], -1), (top[-1], 1)):   # dark veins creeping out from the corners
+                for j, (ang, ln) in enumerate(((-0.35, 13), (0.15, 10), (0.55, 8))):
+                    pts = np.array([end + [sg * ln * q * np.cos(ang), ln * q * np.sin(ang) + 1.2 * np.sin(q * 6 + j)] for q in np.linspace(0, 1, 12)])
+                    thin_polys.append(stroke(pts, 1.1, lambda q: np.clip(1 - q, 0, 1) ** 0.6))
+            tx, ty = tips[1]                 # minimal: one small drop on one fang tip
+            C.over(BLOOD, C.ell(tx, ty + 1.1, 1.1, 1.5, soft=0.7))
+            yb = float(bot[:, 1].max())
+            lower_shadow(yb + 7, W)
+        elif form == "wolf":             # a full snarl: lips peeled back, long canines top and bottom, drool
+            top, bot, W, h_bot = mouth_edges(1.0, 0.7, wscale=1.32)
+            top = curl(top, 5.0)
+            _, m = cel_mouth(top, bot, h_bot, teeth=False, tongue_on=True, dark=True)
+            C.over(np.array([0.72, 0.28, 0.34], np.float32), C.mask([poly_between(top, top + [0, 3.2])]) * m)
+            C.over(np.array([0.72, 0.28, 0.34], np.float32), C.mask([poly_between(bot - [0, 2.6], bot)]) * m)
+            zigzag(top + [0, 2.8], bot - [0, 2.2], 11, 6.8, 5.6, m, canines=(1, 9), jitter=0.22, canine_k=2.2)
+            for x0, x1 in ((512 - 14, 512 - 13), (512 - 6, 512 - 4), (512 + 3, 512 + 4), (512 + 11, 512 + 12)):
+                yt = float(np.interp(x0, top[:, 0], top[:, 1])) + 6
+                yb_ = float(np.interp(x1, bot[:, 0], bot[:, 1])) - 4
+                C.over(np.array([0.92, 0.9, 0.94], np.float32), C.mask([stroke(np.linspace([x0, yt], [x1, yb_], 10), 0.7, lambda q: np.clip(np.sin(np.pi * q) ** 0.5, 0, 1))]) * m * 0.55)
+            outline(top, bot, 3.2, 2.5)
+            wrinkles(top, 3, 6.5, 6.5)
             lower_shadow(float(bot[:, 1].max()) + 6, W)
-        elif form == "wraith":
-            top, bot, W, h_bot = mouth_edges(1.0, -1.0)
+        elif form == "ghoul":            # ear to ear: a too-wide grin, the corners stitched up the cheeks
+            top, bot, W, h_bot = mouth_edges(0.6, 1.0, wscale=1.85)
+            _, m = cel_mouth(top, bot, h_bot, teeth=False, tongue_on=False, dark=True)
+            zigzag(top, bot, 17, 6.4, 5.8, m, jitter=0.35, tooth=np.array([0.86, 0.8, 0.62], np.float32))
+            outline(top, bot, 2.6, 2.2)
+            for end, sg in ((top[0], -1), (top[-1], 1)):
+                split = np.array([end + [sg * 24 * q, -13 * q * q + 1.5 * np.sin(q * 9) * q] for q in np.linspace(0, 1, 20)])
+                line_polys.append(edge_stroke(split, 2.3, 0.2))
+                for j in range(5):
+                    q = (j + 0.6) / 5.5
+                    c = end + [sg * 24 * q, -13 * q * q]
+                    if j % 2 == 0:
+                        stitch_x(c, 2.0, 3.4)
+                    else:        # a snapped stitch: one arm only
+                        thin_polys.append(edge_stroke(np.linspace(c + [-2.0, -3.4], c + [2.0, 3.4], 5), 1.15, 1.0))
+            lower_shadow(float(bot[:, 1].max()) + 6, W)
+        elif form == "wraith":           # a gaping wail: the jaw hangs open into the void, a cold glow at the rim
+            top, bot, W, h_bot = mouth_edges(1.0, -1.0, wscale=1.1)
+            bump = np.sin(np.pi * np.linspace(0, 1, len(bot)))
+            bot = bot + np.stack([np.zeros(len(bot)), 16 * bump ** 0.8 + 1.2 * np.sin(np.linspace(0, 1, len(bot)) * 23)], 1)
+            top = top - np.stack([np.zeros(len(top)), 3 * bump], 1)
             hol = C.mask([poly_between(top, bot)])
-            for j in range(3):   # smoky wisps
-                w_ = C.ell(512 + rng.uniform(-3, 3), float(bot[:, 1].max()) + 5 + j * 7, 4.2 - j * 1.0, 6.5, soft=6)
-                C.over(np.array([0.1, 0.1, 0.17], np.float32), w_ * (0.22 - j * 0.06))
-            C.over(np.array([0.78, 0.9, 1.0], np.float32), np.clip(blur(hol, 5) - hol, 0, 1) * 0.6)
+            for j in range(5):
+                w_ = C.ell(512 + rng.uniform(-6, 6), float(bot[:, 1].max()) + 4 + j * 6, 5.5 - j * 0.8, 7.0, soft=6)
+                C.over(np.array([0.06, 0.06, 0.12], np.float32), w_ * (0.3 - j * 0.05))
+            C.over(ICE, np.clip(blur(hol, 7) - hol, 0, 1) * 0.75)
             y0 = sy(float(top[:, 1].min()))
-            g = np.clip((C.Y - y0) / (30 * k), 0, 1)[..., None]
-            C.over(np.array([0.02, 0.02, 0.05], np.float32) * (1 - g) + np.array([0.14, 0.14, 0.24], np.float32) * g, hol)
-            line_polys.append(edge_stroke(np.vstack([top, bot[::-1], top[:1]]), 1.6, 1.0))
+            g = np.clip((C.Y - y0) / (40 * k), 0, 1)[..., None]
+            C.over(VOIDC * (1 - g) + np.array([0.12, 0.12, 0.22], np.float32) * g, hol)
+            C.over(ICE, C.ell(512, float(top[:, 1].min()) + 10, 9, 5, soft=6) * hol * 0.12)
+            ASH = np.array([0.56, 0.58, 0.64], np.float32)
+            for x in np.linspace(top[3, 0], top[-4, 0], 7):            # broken, ash-grey teeth along the rim
+                yt = float(np.interp(x, top[:, 0], top[:, 1]))
+                L = rng.uniform(3.5, 7.5)
+                sh = np.array([[x - 1.9, yt + 0.4], [x + 1.9, yt + 0.4], [x + rng.uniform(-0.8, 0.8), yt + L]])
+                C.over(ASH, C.mask([sh]) * 0.9)
+                thin_polys.append(edge_stroke(np.vstack([sh, sh[:1]]), 0.9, 1.0))
+            for x, L in ((512 - 5, 12), (512 + 3, 18)):                 # the void drips off the jaw
+                yb_ = float(np.interp(x, bot[:, 0], bot[:, 1]))
+                pts = np.array([[x, yb_ - 1 + L * q] for q in np.linspace(0, 1, 12)])
+                C.over(VOIDC, C.mask([stroke(pts, 1.7, lambda q: np.clip(1 - 0.5 * q, 0, 1))]))
+                C.over(VOIDC, C.ell(x, yb_ - 1 + L, 1.4, 1.8, soft=0.8))
+            line_polys.append(edge_stroke(np.vstack([top, bot[::-1], top[:1]]), 1.8, 1.0))
+        # ---------------------------------------------------------- race mouths (everyday, race-locked)
+        elif form == "race_stitched":    # Ghoul: lips sewn shut
+            top, bot, W, h_bot = mouth_edges(0.0, -0.1)
+            ln = (top + bot) / 2
+            closed(ln, 2.8)
+            for x in np.linspace(512 - 15, 512 + 15, 7):
+                y = float(np.interp(x, ln[:, 0], ln[:, 1]))
+                thin_polys.append(edge_stroke(np.linspace([x - 0.6, y - 4.2], [x + 0.6, y + 4.2], 6), 1.25, 1.0))
+            lower_shadow(float(bot[:, 1].max()) + 6.5, W)
+        elif form == "race_split":       # Ghoul: a quiet smile with the corners split and stitched
+            top, bot, W, h_bot = mouth_edges(0.0, 0.6)
+            ln = (top + bot) / 2
+            closed(ln, 2.8)
+            for end, sg in ((ln[0], -1), (ln[-1], 1)):
+                split = np.array([end + [sg * 9 * q, -5 * q * q] for q in np.linspace(0, 1, 10)])
+                line_polys.append(edge_stroke(split, 1.9, 0.3))
+                for j in range(2):
+                    q = (j + 0.8) / 2.6
+                    stitch_x(end + [sg * 9 * q, -5 * q * q], 1.6, 2.8)
+            lower_shadow(float(bot[:, 1].max()) + 6.5, W)
+        elif form == "race_fang":        # Vampire: a closed smirk, both fangs over the lip, a bead of blood
+            top, bot, W, h_bot = mouth_edges(0.0, 0.45, asym=4)
+            ln = (top + bot) / 2
+            closed(ln, 2.8)
+            tips = [fang(512 + fx, float(np.interp(512 + fx, ln[:, 0], ln[:, 1])) + 0.6, 7.5, 4.4) for fx in (-8, 8)]
+            C.over(BLOOD, C.ell(tips[1][0] + 0.2, tips[1][1] + 2.2, 1.5, 2.1, soft=0.8))
+            lower_shadow(float(bot[:, 1].max()) + 6.5, W)
+        elif form == "race_wine":        # Vampire: wine-dark lips, a single fang
+            top, bot, W, h_bot = mouth_edges(0.0, 0.1)
+            ln = (top + bot) / 2
+            C.over(np.array([0.36, 0.04, 0.1], np.float32), C.ell(512, float(ln[:, 1].mean()) + 2.2, W * 0.42, 2.6, soft=1.6) * 0.75)
+            C.over(np.array([0.42, 0.05, 0.12], np.float32), C.ell(512, float(ln[:, 1].mean()) - 1.2, W * 0.4, 1.6, soft=1.4) * 0.65)
+            C.over(np.ones(3, np.float32), C.ell(512 - 5, float(ln[:, 1].mean()) + 2.4, 3.5, 0.8, soft=1.0) * 0.3)
+            closed(ln, 2.6)
+            fang(512 + 8, float(np.interp(512 + 8, ln[:, 0], ln[:, 1])) + 0.6, 7.0, 4.2)
+        elif form == "race_canine":      # Werewolf: a closed smirk, canines showing at both corners
+            top, bot, W, h_bot = mouth_edges(0.0, 0.5, asym=2)
+            ln = (top + bot) / 2
+            closed(ln, 3.0)
+            for fx in (-12, 12):
+                fang(512 + fx, float(np.interp(512 + fx, ln[:, 0], ln[:, 1])) + 0.5, 6.0, 4.0)
+            lower_shadow(float(bot[:, 1].max()) + 6.5, W)
+        elif form == "race_feral":       # Werewolf: a wolfish grin, every tooth sharp
+            top, bot, W, h_bot = mouth_edges(0.3, 0.9, wscale=1.05)
+            _, m = cel_mouth(top, bot, h_bot, teeth=False, tongue_on=False, dark=True)
+            zigzag(top, bot, 9, 4.6, 3.6, m, canines=(1, 7))
+            outline(top, bot, 2.5, 2.0)
+            lower_shadow(float(bot[:, 1].max()) + 6, W)
+        elif form == "race_sewn":        # Wraith: a mouth drawn shut into a cold seam
+            top, bot, W, h_bot = mouth_edges(0.0, -0.5)
+            ln = (top + bot) / 2
+            hol = C.mask([stroke(ln, 3.4, lambda q: np.clip(np.sin(np.pi * np.clip(q, 0, 1)) ** 0.4, 0, 1))])
+            C.over(ICE, np.clip(blur(hol, 4) - hol, 0, 1) * 0.6)
+            C.over(VOIDC, hol)
+            for x in np.linspace(512 - 11, 512 + 11, 4):
+                y = float(np.interp(x, ln[:, 0], ln[:, 1]))
+                C.over(ICE, C.mask([stroke(np.linspace([x, y - 3.4], [x, y + 3.4], 6), 0.9, lambda q: np.ones_like(q))]) * 0.8)
+        elif form == "race_hush":        # Wraith: a small dark hollow with a frost rim
+            top, bot, W, h_bot = mouth_edges(0.55, -1.0, wscale=0.85)
+            hol = C.mask([poly_between(top, bot)])
+            C.over(ICE, np.clip(blur(hol, 4) - hol, 0, 1) * 0.6)
+            C.over(VOIDC, hol)
+            line_polys.append(edge_stroke(np.vstack([top, bot[::-1], top[:1]]), 1.4, 1.0))
+        elif form == "race_serene":      # Priest: a calm, kind closed smile
+            top, bot, W, h_bot = mouth_edges(0.0, 0.7, wscale=0.9)
+            closed((top + bot) / 2, 2.4)
+            lower_shadow(float(bot[:, 1].max()) + 6.5, W * 0.9)
+        elif form == "race_solemn":      # Priest: a level, solemn line with a soft lower lip
+            top, bot, W, h_bot = mouth_edges(0.0, -0.5, down=2)
+            closed((top + bot) / 2, 2.5)
+            C.over(SHADOW, C.ell(512, float(bot[:, 1].max()) + 4.5, W * 0.36, 1.8, soft=2.0) * 0.5)
 
     if line_polys:
         C.over(LINE, C.mask(line_polys))
     if thin_polys:
         C.over(LINE, C.mask(thin_polys) * 0.85)
+    for poly, rim in over_line:
+        C.over(WHITE, C.mask([poly]))
+        C.over(LINE, C.mask([rim]) * 0.85)
+    pbr_bake(C)
     key = f"mouth_{form}.png" if form else f"mouth_{style}_{'f' if full_lips else 'm'}.png"
     return C.save(key), key
+
+
+# ------------------------------------------------------------------ PBR-style material bake (2026-11-04)
+# Roblox can't run PBR materials on face images (SurfaceAppearance needs a MeshPart), so the mouth's
+# materials are baked in: every pixel is classed (enamel, wet tongue / gums / blood, cavity, lip skin,
+# line art, void), given a height and a roughness, and lit with a key + fill light (GGX specular,
+# Lambert diffuse, cavity ambient occlusion, a little subsurface warmth). Runs at the 4x supersample,
+# before the box-filter down, so highlights stay crisp.
+PBR_MATS = {   # name: (albedo ref, height, roughness, specular, sss)
+    "enamel": (WHITE, 1.00, 0.30, 0.55, 0.00),
+    "bone": (np.array([0.86, 0.8, 0.62], np.float32), 1.00, 0.45, 0.40, 0.00),
+    "tongue": (ROSE, 0.55, 0.16, 0.80, 0.35),
+    "cavity": (MAROON, -0.60, 0.55, 0.25, 0.25),
+    "deep": (MAROON_DEEP, -1.00, 0.65, 0.10, 0.15),
+    "blood": (np.array([0.55, 0.02, 0.07], np.float32), 0.70, 0.10, 1.00, 0.20),
+    "lip": (LIPTINT, 0.45, 0.32, 0.45, 0.30),
+    "line": (LINE, 0.25, 0.70, 0.12, 0.00),
+    "void": (np.array([0.02, 0.02, 0.05], np.float32), -1.00, 0.90, 0.05, 0.00),
+}
+PBR_KEY = np.array([-0.45, -0.62, 0.64], np.float32)    # upper left, toward the viewer
+PBR_KEY /= np.linalg.norm(PBR_KEY)
+PBR_FILL = np.array([0.55, 0.15, 0.82], np.float32)
+PBR_FILL /= np.linalg.norm(PBR_FILL)
+
+
+def _gb(x, sigma):
+    from scipy import ndimage as _nd
+    return _nd.gaussian_filter(x.astype(np.float32), sigma * S)
+
+
+def pbr_bake(C, strength=1.0):
+    rgb, a = C.rgb, C.a
+    vis = a > 0.02
+    if not vis.any():
+        return
+    names = list(PBR_MATS)
+    refs = np.stack([PBR_MATS[n][0] for n in names])                       # (M, 3)
+    d = ((rgb[..., None, :] - refs[None, None]) ** 2).sum(-1)              # (h, w, M)
+    cls = d.argmin(-1)
+    near = np.take_along_axis(d, cls[..., None], -1)[..., 0] < 0.09         # far from every ref = leave unlit-ish
+    hgt = np.zeros(a.shape, np.float32)
+    rough = np.full(a.shape, 0.6, np.float32)
+    spec = np.zeros(a.shape, np.float32)
+    sss = np.zeros(a.shape, np.float32)
+    for i, n in enumerate(names):
+        m = (cls == i) & vis
+        _, hh, rr, ss, su = PBR_MATS[n]
+        hgt[m], rough[m], spec[m], sss[m] = hh, rr, ss, su
+    spec *= near
+    # each region domes from its own edge: teeth round off, the tongue swells, the cavity falls away
+    edge_soft = _gb((hgt > 0.5).astype(np.float32), 1.2)
+    dome = _gb(hgt * vis, 2.2)
+    hgt = dome * 0.75 + hgt * 0.25 + edge_soft * 0.25
+    s = 6.0 * S / 4                                                         # bump scale in supersampled px
+    gy, gx = np.gradient(hgt * s)
+    nrm = np.dstack([-gx, -gy, np.ones_like(gx)])
+    nrm /= np.linalg.norm(nrm, axis=-1, keepdims=True)
+    view = np.array([0, 0, 1], np.float32)
+
+    def ggx(L):
+        hv = L + view
+        hv = hv / np.linalg.norm(hv)
+        nh = np.clip((nrm * hv).sum(-1), 0, 1)
+        r2 = np.maximum(rough, 0.05) ** 4
+        D = r2 / (np.pi * (nh * nh * (r2 - 1) + 1) ** 2)
+        return D / (D.max() + 1e-6)
+
+    nl_k = np.clip((nrm * PBR_KEY).sum(-1), 0, 1)
+    nl_f = np.clip((nrm * PBR_FILL).sum(-1), 0, 1)
+    ao = np.clip(1 - np.clip(_gb(np.clip(-hgt, 0, 1), 3.0), 0, 1) * 0.65, 0.25, 1)
+    diffuse = (0.62 + 0.38 * nl_k + 0.12 * nl_f) * ao
+    warm = np.array([0.9, 0.25, 0.25], np.float32)[None, None] * (sss * (1 - nl_k))[..., None] * 0.18
+    hl = (ggx(PBR_KEY) * 0.95 + ggx(PBR_FILL) * 0.25) * spec
+    lit = rgb * diffuse[..., None] + warm + hl[..., None] * np.array([1.0, 0.98, 0.96], np.float32)
+    k = np.clip(strength, 0, 1)
+    out = rgb * (1 - k) + np.clip(lit, 0, 1) * k
+    C.rgb = np.where(vis[..., None], out, rgb)
+
 
 MOUTHS = ["neutral", "smile", "flat", "smirk", "hint", "grin", "small", "ooh", "open", "talk", "laugh", "shout", "pout",
           "frown", "scowl", "sulk", "grimace", "cat", "fang", "shark"]
@@ -425,6 +676,8 @@ MOUTH_LABEL = dict(neutral="Neutral", smile="Smile", flat="Flat", smirk="Smirk",
                    ooh="Ooh", open="Open", talk="Talk", laugh="Laugh", shout="Shout", pout="Pout", frown="Frown",
                    scowl="Scowl", sulk="Sulk", grimace="Grimace", cat="Cat", fang="Fang", shark="Shark")
 MFORMS = ["vampire", "wolf", "ghoul", "wraith"]
+RACE_MOUTHS = ["race_stitched", "race_split", "race_fang", "race_wine", "race_canine", "race_feral",
+               "race_sewn", "race_hush", "race_serene", "race_solemn"]
 
 def eye_alpha(name):
     a = np.asarray(Image.open(os.path.join(EYES, f"eyes_{name}_main.png")), np.float32)[..., 3] / 255
@@ -472,7 +725,7 @@ if __name__ == "__main__":
             bad = int(((out[..., 3] > 0.05) & all_solid).sum())
             if bad:
                 report.append(f"MOUTH OVERLAP {key}: {bad}px")
-    for form in MFORMS:
+    for form in MFORMS + RACE_MOUTHS:
         out, key = render_mouth(None, False, form)
         bad = int(((out[..., 3] > 0.05) & all_solid).sum())
         if bad:

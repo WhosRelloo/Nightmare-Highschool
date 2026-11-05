@@ -63,10 +63,30 @@ def load(name):
     return np.array(Image.open(SRC / name).convert("RGBA")).astype(np.float32)
 
 
+def bleed(a):
+    """Seam bleed, so no margin colour shows at the edges of a body part in game.
+
+    1. Every pixel outside the 18 face rectangles copies the nearest face pixel
+       (colour and alpha), so the 2px gaps and outer margins continue each face.
+    2. Fully transparent pixels take the colour of the nearest visible pixel
+       (alpha stays 0), so filtering never blends in white or black at an edge.
+    Only pixels Roblox doesn't show directly change; the faces are untouched."""
+    a = a.copy()
+    inside = rect_mask(ALL_REGIONS)
+    _, (iy, ix) = ndimage.distance_transform_edt(~inside, return_indices=True)
+    out = ~inside
+    a[out] = a[iy[out], ix[out]]
+    vis = a[..., 3] > 0
+    if vis.any() and (~vis).any():
+        _, (vy, vx) = ndimage.distance_transform_edt(~vis, return_indices=True)
+        t = ~vis
+        a[t, :3] = a[vy[t], vx[t], :3]
+    return a
+
+
 def save(arr, name):
     OUT.mkdir(parents=True, exist_ok=True)
-    a = np.clip(arr, 0, 255).astype(np.uint8)
-    a[a[..., 3] == 0, :3] = 255
+    a = bleed(np.clip(arr, 0, 255).astype(np.uint8))
     img = Image.fromarray(a, "RGBA")
     assert img.size == (W, H), img.size
     img.save(OUT / name, optimize=True)
@@ -278,8 +298,11 @@ def dashed_poly(d, pts, **kw):
 
 
 def outline_of(mask, width=1):
-    """Pixels on the inner edge of a bool mask."""
-    er = ndimage.binary_erosion(mask, iterations=width)
+    """Pixels on the inner edge of a bool mask.
+
+    A face's own outer edge never counts: there the mask simply continues onto the
+    next body part, and outlining it drew a dark border round every limb in game."""
+    er = ndimage.binary_erosion(mask | ~rect_mask(ALL_REGIONS), iterations=width)
     return mask & ~er
 
 
@@ -460,16 +483,11 @@ def finish(c, creases=True, seed=0):
         x, y, w, h = R[n]
         m = rect_mask([n])
         xr = (XX - (x + (w - 1) / 2)) / (w / 2)
-        dx = np.maximum(np.minimum(XX - x, x + w - 1 - XX), 0).astype(np.float32)
-        face = (1 - 0.08 * np.abs(xr) ** 2 - 0.16 * np.exp(-dx / 2.0)) * (1.05 - 0.09 * (YY - y) / h)
+        # soft rounding only: no extra darkening at the face edge (it showed as a dark border in game)
+        face = (1 - 0.08 * np.abs(xr) ** 2) * (1.05 - 0.09 * (YY - y) / h)
         if n in ("T_R", "T_L", "RA_L", "LA_R"):
             face = face * 0.9
         f = np.where(m, face, f)
-    for n in ["T_UP", "T_D"] + ARM_UPS + ARM_DOWNS:
-        x, y, w, h = R[n]
-        m = rect_mask([n])
-        d = np.maximum(np.minimum(np.minimum(XX - x, x + w - 1 - XX), np.minimum(YY - y, y + h - 1 - YY)), 0).astype(np.float32)
-        f = np.where(m, 1 - 0.14 * np.exp(-d / 2.0), f)
     c[vis, :3] = np.clip(c[vis, :3] * f[vis, None], 0, 255)
     if creases:
         rng = np.random.default_rng(seed)
