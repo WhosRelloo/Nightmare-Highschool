@@ -247,3 +247,7 @@ Verified with real presses:
 
 ## Detention animation (1.8.9)
 Players no longer play the prisoner idle while standing in detention (owner request, 2026-11-02). The ambient detention kid in Room 106 still uses it.
+
+## Report cards (1.40)
+
+Every class that's recorded (`Local.Finalize`) and every violation also goes to the week's report card (`School.ReportCards.Class` / `Violation` / `Detention`); see [Phone](Phone.md#report-cards-and-the-app-icons-140).

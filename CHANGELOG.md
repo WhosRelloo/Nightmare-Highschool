@@ -2,6 +2,41 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.40.0] - 2026-11-04: Weekly report cards, custom icons for every phone app
+
+### Added
+- **Weekly report cards** (new `School.ReportCards`):
+  - **The tally:** each save slot counts its school week in `Social.Reports.Week`: each subject's lesson grades, attendance (present, late, left early, absent) and conduct (violations, detentions). It's the same five-event-day week as the superlatives, fed by small hooks in `School.Attendance` and `School.Discipline`.
+  - **Delivery:** on Monday at 6 AM, or at your next login if you were away, last week becomes a card in `Social.Reports.Cards` (the last 4 are kept).
+  - **On the card:** each subject's average letter, attendance, conduct, and a comment from Mr. Hale, your homeroom teacher. The comment depends on how you did, with a race joke about one week in three.
+  - **Allowance, paid once:** A/A+ ¥60, B ¥40, C ¥20, D/F nothing. Perfect attendance (5+ classes, none missed, late or left) adds ¥20, and a detention halves it.
+  - The Office texts that it's in, with a toast. A week with no classes and no marks sends no card.
+- **The Report Card phone app** (`Gui.Phone`, `NHPhone.Reports`):
+  - **Masthead:** the school crest, "Nightmare High" and "Report Card".
+  - **The card:** parchment in a gilt frame, with the student's name and a crimson wax seal stamped with the average.
+  - **Inside:** subject rows on shaded stripes, with grade letters in coloured ink. Attendance has a pip per class (ink, amber or crimson), then conduct, then "Mr. Hale says", signed with a pen nib.
+  - **The allowance:** a bursar's voucher with a gold ¥ coin and a crimson PAID (or NONE) rubber stamp.
+  - **Below the card:** earlier weeks, then "this week so far".
+  - On a new card the seal and the stamp press in, unless Reduce Motion is on. The tile shows a badge until you've read the newest card.
+- **Custom icons for every phone app:** the Report Card icon plus 14 more in the same family:
+  - **Grid:** Midnight Bell, Timetable, Study Group, Cliques, Texts, Style, Options, Wisp Flight, Hex Slash, Crypt Crush.
+  - **Dock:** Wallet, Night FM, Classmates, Camera.
+  - **How they're made:** greyscale PBR relief, like the kit's seal (`art/ui/hud/make_report_icon.py`, `make_app_icons.py`), published under the group (`Theme.Images.IconReport`, `IconApp<Name>`).
+  - **On the tiles:** they fill 74% of the tile (it was 60%), share one warm bone tint so the relief reads on every tile colour, and have a soft drop shadow. The Texts, Wallet and Night FM tiles were text glyphs before. The Wallet and Report Card tiles are darker.
+- `NHNoticeBoard.Read` can name the app to open (default: the Midnight Bell).
+
+### Verified (Studio Play)
+- **On the test slot "Testy":**
+  - A week of 9 classes in 3 subjects (8 attended, 1 late, 1 absent) and 1 violation became a card at the Monday rollover: a B average (Maths A, English A, Chemistry B) and the Human comment.
+  - ¥40 was paid (41 → 81), and the Office's text was in the phone.
+- **The app** opened with every section filled. It was checked at 1080p scale with native-resolution crops: the text is sharp, and the crest was enlarged after a first pass showed it blurry (`docs/img/report-card-top.png`, `report-card-bottom.png`).
+- **Home screen:** all 15 icons showed on their tiles and were checked at native resolution (`docs/img/phone-app-icons.png`).
+- **Not tested:**
+  - classes counted from a real lesson (the test fed the week in through `ReportCards.Class`, the function the attendance hook calls);
+  - the press-in animation on a brand-new card;
+  - a student who was offline over the Monday;
+  - the comments for the other races.
+
 ## [1.39.0] - 2026-11-04: The daily special, the Midnight Bell's superlatives, the notice board
 
 ### Added

@@ -89,3 +89,17 @@ Three of our own takes on classic phone-game genres, drawn only with the UI kit'
 **The notice board** (`Features.NoticeBoard`, props batch 22 `MidnightBellBoard`). Any model tagged `NHNoticeBoard` gets live text on its card faces (`NHBoardCard` 1..4): today's special, the superlatives, clique news (rumbles, turf), and two of today's dares, refreshed every 30 s. Its "Read" prompt opens your phone at the Midnight Bell. It hangs on the R102 wall of the Main Hall.
 
 ![The Midnight Bell notice board](img/midnight-bell-board.jpg)
+
+## Report cards and the app icons (1.40)
+
+**Report cards** (`School.ReportCards`). Each save slot tallies its school week (the superlatives' week): each subject's lesson grades, attendance and conduct (`Social.Reports.Week`). On Monday at 6 AM, or at the next login, the finished week becomes a card (`Social.Reports.Cards`, last 4): each subject's average letter (F..A+), attendance, conduct, Mr. Hale's comment (by tier, with a race joke one week in three), and an allowance paid once: A/A+ 60, B 40, C 20, D/F 0, +20 for perfect attendance, halved after a detention. The Office texts that it's in.
+
+**The Report Card app**: the crest masthead, the card on parchment in a gilt frame with the average stamped on a crimson wax seal, the grades on striped rows, attendance pips, conduct, Mr. Hale's signed comment, the allowance as a bursar's voucher with a PAID stamp, earlier weeks, and this week so far. The tile has a badge until the newest card is read.
+
+| Top | Bottom |
+|---|---|
+| ![](img/report-card-top.png) | ![](img/report-card-bottom.png) |
+
+**App icons.** Every app has its own icon in one family (greyscale PBR relief, tinted warm bone, with a soft shadow): `Theme.Images.IconReport` and `IconAppGazette`, `IconAppTimetable`, `IconAppGroup`, `IconAppCliques`, `IconAppTexts`, `IconAppStyle`, `IconAppOptions`, `IconAppWisp`, `IconAppHex`, `IconAppCrypt`, `IconAppWallet`, `IconAppRadio`, `IconAppContacts`, `IconAppCamera`. Made with `art/ui/hud/make_report_icon.py` and `make_app_icons.py`.
+
+![The home screen](img/phone-app-icons.png)
