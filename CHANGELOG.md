@@ -2,6 +2,20 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.38.4] - 2026-11-04: Prank spots say why they didn't work
+
+### Fixed
+- **Holding E on a prank spot never told you why it failed** (`Social.CliquePranks`). The prompt threw the reason away. It now shows it as a short note:
+  - "Get closer to the spot."
+  - "Someone already pranked this spot."
+  - **New:** "Finish what you're doing first." when you're mid-fight or down. Before, this case gave no reason at all.
+- The no-kit case still shows its own note (where to buy kits), and it isn't shown twice.
+
+### Verified (Studio Play, no slot, after hours)
+- A test player at the Ink Studio's first prank spot was marked down. Holding the prompt (InputHoldBegin, 4 s) triggered it on the server.
+- `PlayerPrank` returned "Finish what you're doing first.", and the toast showed on screen (`PlayerGui.Notifications.Holder.Toast`).
+- **Not seen:** the other messages from the prompt (same code path), and the hotbar kit path. The hotbar already showed reasons and is unchanged.
+
 ## [1.38.3] - 2026-11-04: Clique members greet you by name; the cliques tested on a save slot
 
 ### Fixed

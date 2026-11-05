@@ -375,6 +375,8 @@ It refreshes every 5 s while open.
 
 **Test hooks.** `MemberTest(name, clique?, rank?)` treats a no-slot player as a member at a rank, with nothing saved; no clique ends it. Also `MemberState(name)`, `CliqueCanJoin(name, clique)` (1.38.3; it was `CanJoin`, which the factions command replaced) and `GuardDuty(name, clique)`.
 
+**Prank messages (1.38.4).** Holding E on a prank spot that refuses now says why: too far, already pranked, or "Finish what you're doing first." when you're mid-fight or down. The no-kit note is unchanged.
+
 ## Save-slot test (1.38.3)
 
 Every saved clique path was played on a temporary fourth slot ("Testy"): standing, a real showdown win, joining through the leader, ranks and the walking crew, the Warm-up and Bench Them quests, a dare, a member job (with the Lieutenant bonus), prank kits and their daily limit, the clique reward and titles, King of the School, leaving, and joining another clique afterwards. A fresh Play session read it all back. The test found one bug: greetings showed "{Name}" instead of your first name (fixed in 1.38.3).
