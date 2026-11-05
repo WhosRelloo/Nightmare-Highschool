@@ -2,6 +2,40 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.46.0] - 2026-11-05: The statue kit
+
+### Added
+- **Props batch 27, the statue kit** (`art/props/nh_props_batch27.py`): ten original statues of R6-built figures.
+  - **The body:** the classic blocky Roblox body (a 2 × 2 × 1 torso, 1 × 2 × 1 arms and legs, a rounded 1.2 head), measured from the owner's R6 rig in Blender and scaled 1.6×.
+  - **Posing:** each figure is posed on its real shoulder, hip and neck joints, then carved, cast or gilt in the Institution's look.
+  - **FounderStatue:** the founder in a bronze gown and mortarboard, the crest's key raised high and a book at the heart, on a tall gothic plinth with a brass plaque.
+  - **MourningAngel:** a veiled marble angel weeping into her hands, with folded feathered wings, on a tomb chest with a carved wreath.
+  - **Gargoyle:** horned and bat-winged, grinning, sitting on the edge of an octagonal column with its tail curled down.
+  - **VampireLord:** black veined marble, spreading a crimson-lined cape, with a high collar and a crimson gem.
+  - **WerewolfHowl:** a wolf-headed figure howling on a mossy rock under a gilt crescent moon.
+  - **LanternPriest:** a robed priest with a crescent staff, a lit lantern (a small flickering flame) and a gilt halo, on a stepped plinth.
+  - **HollowWraith:** a hooded wraith with no face and no feet, tattered sleeves and shackles, floating over a slim spire.
+  - **KnightGuardian:** an armoured knight leaning on a greatsword, a crimson tabard with the crest; made to stand in pairs.
+  - **FencingDuel:** two bronze students mid-lunge with sabres and fencing masks, on one long plinth.
+  - **RavenScholar:** a student reading on a stone bench, ravens on her shoulder, the bench and the book.
+- **Baked** at 2048 with 64 samples on the GPU. Every piece is under 16k triangles (the largest is 7,962).
+  - The plinth (`Main`) and the statue (`Figure`) are separate pieces on one atlas.
+  - The 37 maps are under the group (`art/group-upload/statues-batch27/`). The ids are in `art/props/statues_batch27.json`.
+  - The three all-stone statues (Gargoyle, HollowWraith, MourningAngel) have no metal map.
+- **On the showcase** (`workspace.NHPropsShowcase.Statues`, tag `NHPropBatch27`; `Studio/props_setup27.luau`, reverted by `props_revert27.luau`):
+  - A row at z −188 from x 110, facing −Z.
+  - Templates are in `ServerStorage.NHProps` (`NHBuildKit = "Statues"`).
+  - Plinths collide precisely, and the statues collide too.
+
+### Verified (Studio)
+- **Placement:** all ten were placed with no clashes, and every map loaded (`docs/img/statue-kit-day-1.jpg`, `statue-kit-day-2.jpg`).
+- **Night** (the clock put back afterwards): the priest's lantern lights him (`docs/img/statue-kit-night.jpg`).
+- **Play** (no save slot, `NHTestNoMenuKeys` set and cleared):
+  - A test rig is stopped by the founder's plinth.
+  - It can climb the lower knight and duel plinths. That's fine for statues; set the plinths' CanCollide off if it isn't wanted.
+  - The lantern flickers (0.78–0.83 around 0.8).
+- **Not tested:** a player character climbing them, and statues placed inside the school.
+
 ## [1.45.0] - 2026-11-05: The Ink Club fortune teller
 
 ### Added

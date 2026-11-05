@@ -702,3 +702,33 @@ Door, flap and tap origins sit on their hinge lines.
 - **In Roblox:** `Studio/props_setup26.luau` builds the templates in `ServerStorage.NHProps` (`NHBuildKit = "Seer"`). It places the set in the Ink Studio (`TheInkStudio.SeerCorner`): the table at (42.2, 226.5) facing into the room, and the chair 3 studs behind it against the west wall. Sable's post (`NpcPost = Sable`) sits 0.15 in front of the chair's origin, 1.5 above the cushion. A copy is on the showcase at x 110, z −170.5 (`NHPropBatch26`).
 
 ![The preview](img/seer-preview.png)
+
+## Batch 27 (1.46): the statue kit
+
+`art/props/nh_props_batch27.py`.
+
+**The R6 figures:** each statue is built on the classic R6 body, measured from the owner's R6 rig in Blender: a 2 × 2 × 1 torso, 1 × 2 × 1 arms and legs, a rounded 1.2 head, 5.1 tall. They're built at 1.6 scale (about 8.2 studs) and posed on the real joints (`R6` in the script): the neck at the torso top, the shoulders at (±1.25, 3.5), the hips at (±0.5, 2).
+
+| Prop | Tris | Notes |
+|---|---|---|
+| FounderStatue | 7.0k | bronze, gown and mortarboard, the crest's key raised, a book; a tall gothic plinth with a brass plaque |
+| MourningAngel | 5.6k | veiled marble, weeping into her hands, folded feathered wings; a tomb chest with a carved wreath |
+| Gargoyle | 4.2k | horns, bat wings, a fanged grin, a tail; sits on an octagonal column |
+| VampireLord | 4.0k | black marble, a crimson-lined cape spread from the arms, a high collar, a crimson gem |
+| WerewolfHowl | 4.3k | a wolf head howling, a fur ruff and tail, claws; a mossy rock, a gilt crescent moon on a rod |
+| LanternPriest | 6.2k | a marble robe, a crimson stole, a gilt halo, a crescent staff, a lantern with a small flame (Glow) |
+| HollowWraith | 9.7k | a faceless cowl, a robe tapering into wisps, tattered sleeves and shackles; floats over a spire |
+| KnightGuardian | 6.7k | armour, a crimson tabard with the crest, a greatsword point down, a shield on the back |
+| FencingDuel | 6.5k | two bronze students lunging with sabres and masks on one plinth (Figure, Figure2) |
+| RavenScholar | 6.1k | a marble student reading on a stone bench, three ravens |
+
+- **Baked** at 2048 with 64 samples on the GPU; maps under the group (`art/group-upload/statues-batch27/`). The ids are in `art/props/statues_batch27.json`. The all-stone Gargoyle, HollowWraith and MourningAngel have no metal map.
+- **In Roblox:** `Studio/props_setup27.luau` builds the templates in `ServerStorage.NHProps` (`NHBuildKit = "Statues"`).
+  - Plinths collide precisely and the statues collide.
+  - The priest's flame is Neon with a short flickering light (`NHCandle`).
+  - The row is on the showcase at z −188 from x 110, facing −Z (`workspace.NHPropsShowcase.Statues`, `NHPropBatch27`; `props_revert27.luau` removes it).
+
+![The statues](img/statue-kit-previews.jpg)
+![The row by day](img/statue-kit-day-1.jpg)
+![The row by day, the other half](img/statue-kit-day-2.jpg)
+![At night](img/statue-kit-night.jpg)

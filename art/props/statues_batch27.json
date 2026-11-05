@@ -1,0 +1,204 @@
+{
+ "_note": "Props batch 27 (1.45): the statue kit, from art/props/nh_props_batch27.py: R6-proportioned figures (a 2 x 2 x 1 torso, 1 x 2 x 1 limbs, a rounded 1.2 head, at 1.6 scale) posed on their joints. Maps are group-owned (15981569); the all-stone statues have no metalness map. Main = the plinth, Figure / Figure2 = the statue, Glow = the priest's flame. Set up by Studio/props_setup27.luau.",
+ "FounderStatue": {
+  "dims": [
+   7.05,
+   5.38,
+   15.09
+  ],
+  "pieces": [
+   "FounderStatue_Main",
+   "FounderStatue_Figure"
+  ],
+  "tris": {
+   "FounderStatue_Main": 2252,
+   "FounderStatue_Figure": 4724
+  },
+  "batch": 27,
+  "ColorMap": "rbxassetid://135189932634309",
+  "NormalMap": "rbxassetid://128414131645423",
+  "RoughnessMap": "rbxassetid://133307424400975",
+  "MetalnessMap": "rbxassetid://104411132955500"
+ },
+ "MourningAngel": {
+  "dims": [
+   8.59,
+   6.62,
+   11.67
+  ],
+  "pieces": [
+   "MourningAngel_Main",
+   "MourningAngel_Figure"
+  ],
+  "tris": {
+   "MourningAngel_Main": 2284,
+   "MourningAngel_Figure": 3344
+  },
+  "batch": 27,
+  "ColorMap": "rbxassetid://117367071347589",
+  "NormalMap": "rbxassetid://138017410455456",
+  "RoughnessMap": "rbxassetid://88545925127536"
+ },
+ "Gargoyle": {
+  "dims": [
+   11.98,
+   6.51,
+   10.52
+  ],
+  "pieces": [
+   "Gargoyle_Main",
+   "Gargoyle_Figure"
+  ],
+  "tris": {
+   "Gargoyle_Main": 204,
+   "Gargoyle_Figure": 4040
+  },
+  "batch": 27,
+  "ColorMap": "rbxassetid://106636100889327",
+  "NormalMap": "rbxassetid://75444126529120",
+  "RoughnessMap": "rbxassetid://96010117108887"
+ },
+ "VampireLord": {
+  "dims": [
+   9.59,
+   4.4,
+   11.18
+  ],
+  "pieces": [
+   "VampireLord_Main",
+   "VampireLord_Figure"
+  ],
+  "tris": {
+   "VampireLord_Main": 1648,
+   "VampireLord_Figure": 2312
+  },
+  "batch": 27,
+  "ColorMap": "rbxassetid://90402253101939",
+  "NormalMap": "rbxassetid://136367967796242",
+  "RoughnessMap": "rbxassetid://136487049285281",
+  "MetalnessMap": "rbxassetid://76897782851173"
+ },
+ "WerewolfHowl": {
+  "dims": [
+   6.89,
+   5.42,
+   11.59
+  ],
+  "pieces": [
+   "WerewolfHowl_Main",
+   "WerewolfHowl_Figure"
+  ],
+  "tris": {
+   "WerewolfHowl_Main": 644,
+   "WerewolfHowl_Figure": 3696
+  },
+  "batch": 27,
+  "ColorMap": "rbxassetid://85885064072104",
+  "NormalMap": "rbxassetid://91411025343983",
+  "RoughnessMap": "rbxassetid://132407211239105",
+  "MetalnessMap": "rbxassetid://72983133128150"
+ },
+ "LanternPriest": {
+  "dims": [
+   6.86,
+   5.03,
+   10.52
+  ],
+  "pieces": [
+   "LanternPriest_Main",
+   "LanternPriest_Figure",
+   "LanternPriest_Glow"
+  ],
+  "tris": {
+   "LanternPriest_Main": 364,
+   "LanternPriest_Figure": 5804,
+   "LanternPriest_Glow": 80
+  },
+  "batch": 27,
+  "ColorMap": "rbxassetid://133662518622207",
+  "NormalMap": "rbxassetid://80786776438034",
+  "RoughnessMap": "rbxassetid://105715956381078",
+  "MetalnessMap": "rbxassetid://140088026261170"
+ },
+ "HollowWraith": {
+  "dims": [
+   7.62,
+   5.81,
+   13.54
+  ],
+  "pieces": [
+   "HollowWraith_Main",
+   "HollowWraith_Figure"
+  ],
+  "tris": {
+   "HollowWraith_Main": 1784,
+   "HollowWraith_Figure": 7962
+  },
+  "batch": 27,
+  "ColorMap": "rbxassetid://103314618718256",
+  "NormalMap": "rbxassetid://110811064311420",
+  "RoughnessMap": "rbxassetid://98775938196354"
+ },
+ "KnightGuardian": {
+  "dims": [
+   8.02,
+   4.33,
+   11.19
+  ],
+  "pieces": [
+   "KnightGuardian_Main",
+   "KnightGuardian_Figure"
+  ],
+  "tris": {
+   "KnightGuardian_Main": 2340,
+   "KnightGuardian_Figure": 4324
+  },
+  "batch": 27,
+  "ColorMap": "rbxassetid://101398130091666",
+  "NormalMap": "rbxassetid://96193868451266",
+  "RoughnessMap": "rbxassetid://98293138913472",
+  "MetalnessMap": "rbxassetid://71330603541066"
+ },
+ "FencingDuel": {
+  "dims": [
+   12.65,
+   7.13,
+   9.47
+  ],
+  "pieces": [
+   "FencingDuel_Main",
+   "FencingDuel_Figure",
+   "FencingDuel_Figure2"
+  ],
+  "tris": {
+   "FencingDuel_Main": 1964,
+   "FencingDuel_Figure": 2280,
+   "FencingDuel_Figure2": 2280
+  },
+  "batch": 27,
+  "ColorMap": "rbxassetid://105683898119483",
+  "NormalMap": "rbxassetid://131344217063653",
+  "RoughnessMap": "rbxassetid://104194077849292",
+  "MetalnessMap": "rbxassetid://103622370766391"
+ },
+ "RavenScholar": {
+  "dims": [
+   8.19,
+   4.7,
+   8.23
+  ],
+  "pieces": [
+   "RavenScholar_Main",
+   "RavenScholar_Figure"
+  ],
+  "tris": {
+   "RavenScholar_Main": 1112,
+   "RavenScholar_Figure": 5026
+  },
+  "batch": 27,
+  "ColorMap": "rbxassetid://82049899635380",
+  "NormalMap": "rbxassetid://93070698386152",
+  "RoughnessMap": "rbxassetid://71287078417371",
+  "MetalnessMap": "rbxassetid://79465716153509"
+ }
+}
