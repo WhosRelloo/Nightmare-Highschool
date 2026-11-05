@@ -732,3 +732,87 @@ Door, flap and tap origins sit on their hinge lines.
 ![The row by day](img/statue-kit-day-1.jpg)
 ![The row by day, the other half](img/statue-kit-day-2.jpg)
 ![At night](img/statue-kit-night.jpg)
+
+## Batch 28 (1.48): the roof kit
+
+`art/props/nh_props_batch28.py`; the roof textures from `tools/vfx/make_roof_tiles.py`.
+
+**How a roof fits:** a pitched roof sits on a wall top at its origin (z = 0). Its footprint is the wall's outer size: 16 × 12 for the wings, 12 × 12 for the pyramid, 12 × 6 for the lean-to.
+- A moulded cornice runs round the wall top, and the roof springs from it with a 0.45 overhang at the eaves.
+- Gutters hang below the wall top, so seat a roof by its wall plate, not its lowest point. `bounds` in `roofs_batch28.json` gives each piece's bounds about that origin.
+- Turret caps fit round towers 8, 7 and 6 across. The octagonal spire and the bell-cast cap fit octagonal towers 8 across, and the broach spire a square tower 8 across.
+- The GableSection and the corner share GableRoof's 45° section. They join end to end and against its parapet gables.
+
+**The tiled roof planes:** the slate, lead and copper aren't baked. Each plane is its own piece (`<Prop>_Slate`, `_Moss`, `_Scale`, `_Crimson`, `_Copper`, `_Lead`) with UVs made in the builder:
+- u runs along the eaves and v up the slope, with the first course starting at the eaves.
+- Cones and domes get UVs round them, so the slates narrow toward the top the way real ones are cut.
+- Gable walls and parapets (`_Stone`) use the group's CastleStone set at 8 studs, as the builder's walls do.
+
+| Set | Studs a tile | Look |
+|---|---|---|
+| NH_RoofSlate | 6 | rectangular slates, 10 courses of 0.6, blue, purple and green-grey, chipped corners, rain streaks |
+| NH_RoofMoss | 6 | the same slates gone over to moss and lichen |
+| NH_RoofScale | 4 | fish-scale slates, 8 courses of 0.5 |
+| NH_RoofCrimson | 4 | fish scales in crimson glaze (#600E1A), glossy, worn thin at the edges |
+| NH_RoofCopper | 6 | standing-seam copper in verdigris, dark bronze showing in streaks |
+| NH_RoofLead | 6 | lead sheet with rolls every 2 studs and drips every 3, white bloom |
+
+| Prop | Tris | Notes |
+|---|---|---|
+| GableRoof | 10.8k | 45°, parapet gables on kneelers, crocketed pinnacles, crimson ridge tiles, iron cresting |
+| GableSection | 4.4k | an 8-stud run of the 45° roof with open ends |
+| GableRoofLow | 1.0k | 30°, slates over the gables, lead verges, lead ridge roll |
+| GableRoofSteep | 9.5k | 60°, cusped crimson-enamel bargeboards, pendants, spiked hip knobs, tall cresting |
+| HipRoof | 8.5k | 45° hipped, lead hip rolls and hooks, a crested ridge, moon knobs |
+| PyramidRoof | 7.1k | a 12 × 12 tower's pyramid at 55°, a lucarne on each face, a tall moon finial |
+| MansardRoof | 16.4k | fish-scale sides with four oeil-de-boeuf dormers, a crested lead curb, a low lead roof |
+| GambrelRoof | 3.8k | steep and shallow slopes, lead knuckle rolls, round vents in castle-stone gables |
+| LeanToRoof | 3.3k | 12 × 6 in lead against a taller wall (its back at y = +3), a crimson cusped valance |
+| FlatRoofParapet | 15.4k | a lead deck, castle-stone parapet, quatrefoil panels, corner pinnacles, grotesque spouts, hatch |
+| BattlementRoof | 9.2k | machicolated parapet on triple corbels, merlons with arrow slits, a crimson banner |
+| ConeTurretCap | 8.3k | a bell-cast fish-scale cone for a tower 8 across, four lucarnes, moon finial |
+| WitchHatCap | 6.6k | a tall flared crimson-scale cap for a tower 6 across, gilt band, gilt candle-flame finial |
+| OctagonSpire | 9.2k | octagonal slate spire, two tiers of lucarnes, corner pinnacles, the crest's gilt key |
+| BroachSpire | 6.1k | octagonal lead spire on broaches over a square tower, lucarnes, moon finial |
+| BellCastCap | 3.9k | octagonal verdigris ogee cap with copper rolls, gilt orb and spike |
+| OnionDome | 7.7k | verdigris onion with gilt ribs for a tower 7 across, gilt onion and moon finial |
+| GabledDormer | 2.3k | for 45° roofs (its foot on the slates, the roof plane rising behind): a traceried lancet with the lit room behind |
+| OxeyeDormer | 2.0k | for 60° roofs and steeper: a round window, an iron quatrefoil, a lead bonnet, the lit room behind |
+| RidgeCresting | 2.9k | 8 studs of crimson ridge tiles with iron cresting, to repeat along any ridge |
+| RidgeTiles | 2.2k | 8 studs of plain crimson ridge tiles with gilt-knobbed ends |
+| HipCap | 0.3k | a lead hip roll for a 45° hipped roof (it falls at 35°), with a hip hook |
+| RoofCornerL | 7.5k | the corner of two 45° wings in an L: a hip outside, a lead valley inside |
+| EavesGutter | 3.4k | a wall's gutter, a crimson hopper with the gilt foil, a downpipe on eared straps |
+| ChimneyStack | 3.2k | castle stone, oversailing courses, three clay pots, a lobster-back cowl |
+| TwinFlue | 9.2k | two twisted gothic shafts on a moulded base, with crowned caps |
+| Weathervane | 3.0k | an iron raven on the arrow, a gilt crescent tail, lettered quarters |
+| BellCote | 4.1k | a double bell-cote: two bronze bells, coped gable, crocketed pinnacle |
+| Cupola | 5.6k | louvred, on a lead saddle that sits astride a 45° ridge, verdigris cap |
+| LanternRoof | 16.1k | glazed octagonal lantern on a stone kerb, lead ogee dome, a lit corona of candles inside |
+| SkylightRoof | 2.0k | an 8 × 4 glazed ridge rooflight on a lead kerb |
+| RuinedRoof | 7.5k | a 12-stud run fallen in to the charred rafters, gap in the ridge, bent cresting, loose slates |
+| MossyGableRoof | 11.6k | GableRoof gone to moss, slipped slates, a broken pinnacle |
+| PatchedRoof | 1.8k | GableRoofLow with riveted lead patches, a tin sheet, odd slates, a tarred seam |
+| MoonFinial | 0.8k | iron spike, gilt orbs, gilt crescent moon |
+| KeyFinial | 1.3k | the crest's gilt key on an orb |
+| StonePinnacle | 4.2k | crocketed stone pinnacle with gablets and blind trefoils |
+
+Tris are whole-prop counts. The largest single piece is FlatRoofParapet's Main at 15,396.
+
+- **Baked** at 2048 with 64 samples on the GPU. The maps are under the group (`art/group-upload/roofs-batch28/`, 166 images), and the ids are in `art/props/roofs_batch28.json` (`_tiles` holds the roof sets).
+  - No metal map for RidgeTiles, TwinFlue, or the slate, moss, scale and crimson sets.
+- **In Roblox:** `Studio/props_setup28.luau` builds the templates in `ServerStorage.NHProps` (`NHBuildKit = "Roofs"`).
+  - Main, the roof planes and the stone collide (Main precisely, so a parapet doesn't roof over its deck).
+  - Glass is Roblox Glass, except the skylight, whose sky-facing panes are plain see-through. Room uses the window kit's WindowRoom image, and the lantern's candles are `NHCandle` flames.
+- **The showcase:** three rows facing −Z (`workspace.NHPropsShowcase.Roofs`, `NHPropBatch28`; `props_revert28.luau` removes it):
+  - z −285: the big roofs on slate wall blocks.
+  - z −322: towers and roof features.
+  - z −352: dormers on slope wedges, ridge pieces on ridge wedges, and finials.
+
+![The roof kit](img/roof-kit-previews.jpg)
+![The big roofs by day](img/roof-kit-day-1.jpg)
+![The flat, castle and worn roofs](img/roof-kit-day-2.jpg)
+![Turret caps and spires](img/roof-kit-towers.jpg)
+![Ridges, gutter, skylight and finials](img/roof-kit-features.jpg)
+![At night](img/roof-kit-night.jpg)
+![The spires at night](img/roof-kit-night-spires.jpg)

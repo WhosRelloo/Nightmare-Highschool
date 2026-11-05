@@ -1,0 +1,1265 @@
+{
+ "_note": "Props batch 28 (1.47): the roof kit, from art/props/nh_props_batch28.py. Main = the baked trim (its own four maps); the roof planes are tiled pieces using the group's roof sets in _tiles (Slate, Moss, Scale, Crimson, Copper, Lead; built by tools/vfx/make_roof_tiles.py) and Stone the group's CastleStone set; Glass is Roblox Glass, Room the window kit's WindowRoom image, Glow a candle flame. Maps are group-owned (15981569); all-black metal maps were left out. wall_origin: the Blender origin (the wall plate's centre) from the bounds. Set up by Studio/props_setup28.luau.",
+ "GableRoof": {
+  "dims": [
+   16.34,
+   13.92,
+   10.35
+  ],
+  "pieces": [
+   "GableRoof_Slate",
+   "GableRoof_Lead",
+   "GableRoof_Main",
+   "GableRoof_Stone"
+  ],
+  "tris": {
+   "GableRoof_Slate": 24,
+   "GableRoof_Lead": 24,
+   "GableRoof_Main": 10756,
+   "GableRoof_Stone": 32
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -8.15,
+    -6.96,
+    0.0
+   ],
+   "hi": [
+    8.15,
+    6.96,
+    10.349
+   ]
+  },
+  "ColorMap": "rbxassetid://133044294666252",
+  "NormalMap": "rbxassetid://87214217947031",
+  "RoughnessMap": "rbxassetid://125014973758984",
+  "MetalnessMap": "rbxassetid://121225995681171"
+ },
+ "GableSection": {
+  "dims": [
+   8.0,
+   13.92,
+   8.71
+  ],
+  "pieces": [
+   "GableSection_Slate",
+   "GableSection_Lead",
+   "GableSection_Main"
+  ],
+  "tris": {
+   "GableSection_Slate": 24,
+   "GableSection_Lead": 24,
+   "GableSection_Main": 4370
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -4.0,
+    -6.96,
+    0.0
+   ],
+   "hi": [
+    4.0,
+    6.96,
+    8.709
+   ]
+  },
+  "ColorMap": "rbxassetid://123255497886455",
+  "NormalMap": "rbxassetid://88401576576672",
+  "RoughnessMap": "rbxassetid://80107593974598",
+  "MetalnessMap": "rbxassetid://122871344944594"
+ },
+ "GableRoofLow": {
+  "dims": [
+   17.63,
+   13.92,
+   5.52
+  ],
+  "pieces": [
+   "GableRoofLow_Slate",
+   "GableRoofLow_Lead",
+   "GableRoofLow_Main",
+   "GableRoofLow_Stone"
+  ],
+  "tris": {
+   "GableRoofLow_Slate": 24,
+   "GableRoofLow_Lead": 24,
+   "GableRoofLow_Main": 956,
+   "GableRoofLow_Stone": 32
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -8.815,
+    -6.96,
+    0.0
+   ],
+   "hi": [
+    8.815,
+    6.96,
+    5.519
+   ]
+  },
+  "ColorMap": "rbxassetid://139778525860646",
+  "NormalMap": "rbxassetid://74557629126827",
+  "RoughnessMap": "rbxassetid://140095922503716",
+  "MetalnessMap": "rbxassetid://100008868741223"
+ },
+ "GableRoofSteep": {
+  "dims": [
+   17.56,
+   13.92,
+   13.69
+  ],
+  "pieces": [
+   "GableRoofSteep_Slate",
+   "GableRoofSteep_Lead",
+   "GableRoofSteep_Main",
+   "GableRoofSteep_Stone"
+  ],
+  "tris": {
+   "GableRoofSteep_Slate": 24,
+   "GableRoofSteep_Lead": 24,
+   "GableRoofSteep_Main": 9394,
+   "GableRoofSteep_Stone": 32
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -8.78,
+    -6.96,
+    -0.118
+   ],
+   "hi": [
+    8.78,
+    6.96,
+    13.692
+   ]
+  },
+  "ColorMap": "rbxassetid://114414094438907",
+  "NormalMap": "rbxassetid://99868747766624",
+  "RoughnessMap": "rbxassetid://111595406618928",
+  "MetalnessMap": "rbxassetid://126409515237329"
+ },
+ "HipRoof": {
+  "dims": [
+   18.02,
+   14.02,
+   9.25
+  ],
+  "pieces": [
+   "HipRoof_Slate",
+   "HipRoof_Lead",
+   "HipRoof_Main"
+  ],
+  "tris": {
+   "HipRoof_Slate": 40,
+   "HipRoof_Lead": 40,
+   "HipRoof_Main": 8378
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -9.01,
+    -7.01,
+    0.0
+   ],
+   "hi": [
+    9.01,
+    7.01,
+    9.249
+   ]
+  },
+  "ColorMap": "rbxassetid://86412092532037",
+  "NormalMap": "rbxassetid://129124870707322",
+  "RoughnessMap": "rbxassetid://79504952464236",
+  "MetalnessMap": "rbxassetid://72593861431418"
+ },
+ "PyramidRoof": {
+  "dims": [
+   14.02,
+   14.02,
+   13.89
+  ],
+  "pieces": [
+   "PyramidRoof_Slate",
+   "PyramidRoof_Lead",
+   "PyramidRoof_Main"
+  ],
+  "tris": {
+   "PyramidRoof_Slate": 32,
+   "PyramidRoof_Lead": 32,
+   "PyramidRoof_Main": 7030
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -7.01,
+    -7.01,
+    -0.149
+   ],
+   "hi": [
+    7.01,
+    7.01,
+    13.888
+   ]
+  },
+  "ColorMap": "rbxassetid://114148647824766",
+  "NormalMap": "rbxassetid://123863630498792",
+  "RoughnessMap": "rbxassetid://131354572909268",
+  "MetalnessMap": "rbxassetid://129530457562905"
+ },
+ "MansardRoof": {
+  "dims": [
+   17.92,
+   13.92,
+   8.61
+  ],
+  "pieces": [
+   "MansardRoof_Scale",
+   "MansardRoof_Lead",
+   "MansardRoof_Main",
+   "MansardRoof_Glass",
+   "MansardRoof_Room"
+  ],
+  "tris": {
+   "MansardRoof_Scale": 48,
+   "MansardRoof_Lead": 128,
+   "MansardRoof_Main": 15232,
+   "MansardRoof_Glass": 496,
+   "MansardRoof_Room": 496
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -8.96,
+    -6.96,
+    -0.276
+   ],
+   "hi": [
+    8.96,
+    6.96,
+    8.611
+   ]
+  },
+  "ColorMap": "rbxassetid://85935264467010",
+  "NormalMap": "rbxassetid://83775916330513",
+  "RoughnessMap": "rbxassetid://110046680918370",
+  "MetalnessMap": "rbxassetid://82016018917758"
+ },
+ "GambrelRoof": {
+  "dims": [
+   17.53,
+   13.92,
+   7.74
+  ],
+  "pieces": [
+   "GambrelRoof_Slate",
+   "GambrelRoof_Lead",
+   "GambrelRoof_Main",
+   "GambrelRoof_Stone"
+  ],
+  "tris": {
+   "GambrelRoof_Slate": 48,
+   "GambrelRoof_Lead": 48,
+   "GambrelRoof_Main": 3608,
+   "GambrelRoof_Stone": 48
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -8.765,
+    -6.96,
+    -0.259
+   ],
+   "hi": [
+    8.765,
+    6.96,
+    7.739
+   ]
+  },
+  "ColorMap": "rbxassetid://95580486103376",
+  "NormalMap": "rbxassetid://104963085009813",
+  "RoughnessMap": "rbxassetid://118625601217882",
+  "MetalnessMap": "rbxassetid://88991374661599"
+ },
+ "LeanToRoof": {
+  "dims": [
+   13.23,
+   6.92,
+   4.57
+  ],
+  "pieces": [
+   "LeanToRoof_Lead",
+   "LeanToRoof_Main",
+   "LeanToRoof_Stone"
+  ],
+  "tris": {
+   "LeanToRoof_Lead": 12,
+   "LeanToRoof_Main": 3240,
+   "LeanToRoof_Stone": 24
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -6.615,
+    -3.9,
+    0.0
+   ],
+   "hi": [
+    6.615,
+    3.024,
+    4.566
+   ]
+  },
+  "ColorMap": "rbxassetid://81322692878510",
+  "NormalMap": "rbxassetid://120925287225760",
+  "RoughnessMap": "rbxassetid://126879623947316",
+  "MetalnessMap": "rbxassetid://95215895179528"
+ },
+ "FlatRoofParapet": {
+  "dims": [
+   16.9,
+   13.48,
+   5.16
+  ],
+  "pieces": [
+   "FlatRoofParapet_Main",
+   "FlatRoofParapet_Stone",
+   "FlatRoofParapet_Lead"
+  ],
+  "tris": {
+   "FlatRoofParapet_Main": 15396,
+   "FlatRoofParapet_Stone": 32,
+   "FlatRoofParapet_Lead": 12
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -8.45,
+    -7.014,
+    0.0
+   ],
+   "hi": [
+    8.45,
+    6.45,
+    5.157
+   ]
+  },
+  "ColorMap": "rbxassetid://117455288193366",
+  "NormalMap": "rbxassetid://119619130665870",
+  "RoughnessMap": "rbxassetid://138918201684809",
+  "MetalnessMap": "rbxassetid://121500105325056"
+ },
+ "BattlementRoof": {
+  "dims": [
+   18.09,
+   14.09,
+   8.84
+  ],
+  "pieces": [
+   "BattlementRoof_Main",
+   "BattlementRoof_Stone",
+   "BattlementRoof_Lead"
+  ],
+  "tris": {
+   "BattlementRoof_Main": 8844,
+   "BattlementRoof_Stone": 320,
+   "BattlementRoof_Lead": 12
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -9.045,
+    -7.045,
+    0.0
+   ],
+   "hi": [
+    9.045,
+    7.045,
+    8.84
+   ]
+  },
+  "ColorMap": "rbxassetid://129604843192246",
+  "NormalMap": "rbxassetid://132323675903827",
+  "RoughnessMap": "rbxassetid://111754049946887",
+  "MetalnessMap": "rbxassetid://92455761517446"
+ },
+ "ConeTurretCap": {
+  "dims": [
+   9.66,
+   9.66,
+   14.79
+  ],
+  "pieces": [
+   "ConeTurretCap_Main",
+   "ConeTurretCap_Scale"
+  ],
+  "tris": {
+   "ConeTurretCap_Main": 6910,
+   "ConeTurretCap_Scale": 1344
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -4.83,
+    -4.83,
+    0.0
+   ],
+   "hi": [
+    4.83,
+    4.83,
+    14.794
+   ]
+  },
+  "ColorMap": "rbxassetid://134262564259888",
+  "NormalMap": "rbxassetid://136218574168441",
+  "RoughnessMap": "rbxassetid://105433293935450",
+  "MetalnessMap": "rbxassetid://71274742018279"
+ },
+ "WitchHatCap": {
+  "dims": [
+   8.16,
+   8.16,
+   15.6
+  ],
+  "pieces": [
+   "WitchHatCap_Main",
+   "WitchHatCap_Crimson"
+  ],
+  "tris": {
+   "WitchHatCap_Main": 5254,
+   "WitchHatCap_Crimson": 1360
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -4.08,
+    -4.08,
+    0.0
+   ],
+   "hi": [
+    4.08,
+    4.08,
+    15.6
+   ]
+  },
+  "ColorMap": "rbxassetid://106435716886224",
+  "NormalMap": "rbxassetid://95207130253557",
+  "RoughnessMap": "rbxassetid://80968485344019",
+  "MetalnessMap": "rbxassetid://98326560976552"
+ },
+ "OctagonSpire": {
+  "dims": [
+   8.9,
+   8.9,
+   18.56
+  ],
+  "pieces": [
+   "OctagonSpire_Main",
+   "OctagonSpire_Slate"
+  ],
+  "tris": {
+   "OctagonSpire_Main": 9196,
+   "OctagonSpire_Slate": 14
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -4.45,
+    -4.45,
+    0.0
+   ],
+   "hi": [
+    4.45,
+    4.45,
+    18.561
+   ]
+  },
+  "ColorMap": "rbxassetid://72337149124171",
+  "NormalMap": "rbxassetid://80728858890844",
+  "RoughnessMap": "rbxassetid://85186364650681",
+  "MetalnessMap": "rbxassetid://119805663444848"
+ },
+ "BroachSpire": {
+  "dims": [
+   8.9,
+   8.9,
+   19.0
+  ],
+  "pieces": [
+   "BroachSpire_Main",
+   "BroachSpire_Lead"
+  ],
+  "tris": {
+   "BroachSpire_Main": 6054,
+   "BroachSpire_Lead": 30
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -4.45,
+    -4.45,
+    0.0
+   ],
+   "hi": [
+    4.45,
+    4.45,
+    19.0
+   ]
+  },
+  "ColorMap": "rbxassetid://125552072668341",
+  "NormalMap": "rbxassetid://84334739919284",
+  "RoughnessMap": "rbxassetid://115466489629580",
+  "MetalnessMap": "rbxassetid://107312608539133"
+ },
+ "BellCastCap": {
+  "dims": [
+   12.78,
+   12.78,
+   10.05
+  ],
+  "pieces": [
+   "BellCastCap_Main",
+   "BellCastCap_Copper"
+  ],
+  "tris": {
+   "BellCastCap_Main": 3666,
+   "BellCastCap_Copper": 224
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -4.52,
+    -4.52,
+    0.0
+   ],
+   "hi": [
+    4.52,
+    4.52,
+    10.05
+   ]
+  },
+  "ColorMap": "rbxassetid://88985936868363",
+  "NormalMap": "rbxassetid://115701069920258",
+  "RoughnessMap": "rbxassetid://87911262951677",
+  "MetalnessMap": "rbxassetid://73517757315831"
+ },
+ "OnionDome": {
+  "dims": [
+   8.44,
+   8.44,
+   11.27
+  ],
+  "pieces": [
+   "OnionDome_Main",
+   "OnionDome_Copper"
+  ],
+  "tris": {
+   "OnionDome_Main": 6624,
+   "OnionDome_Copper": 1120
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -4.22,
+    -4.22,
+    0.0
+   ],
+   "hi": [
+    4.22,
+    4.22,
+    11.268
+   ]
+  },
+  "ColorMap": "rbxassetid://121516166786773",
+  "NormalMap": "rbxassetid://109666242624757",
+  "RoughnessMap": "rbxassetid://112727661652494",
+  "MetalnessMap": "rbxassetid://138845702264268"
+ },
+ "GabledDormer": {
+  "dims": [
+   4.32,
+   5.6,
+   5.76
+  ],
+  "pieces": [
+   "GabledDormer_Main",
+   "GabledDormer_Glass",
+   "GabledDormer_Room",
+   "GabledDormer_Slate"
+  ],
+  "tris": {
+   "GabledDormer_Main": 2074,
+   "GabledDormer_Glass": 104,
+   "GabledDormer_Room": 104,
+   "GabledDormer_Slate": 40
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -2.158,
+    -0.735,
+    -0.68
+   ],
+   "hi": [
+    2.158,
+    4.86,
+    5.76
+   ]
+  },
+  "ColorMap": "rbxassetid://137862495526460",
+  "NormalMap": "rbxassetid://134086780815037",
+  "RoughnessMap": "rbxassetid://88503350640007",
+  "MetalnessMap": "rbxassetid://77924904756822"
+ },
+ "OxeyeDormer": {
+  "dims": [
+   2.3,
+   1.89,
+   2.05
+  ],
+  "pieces": [
+   "OxeyeDormer_Main",
+   "OxeyeDormer_Glass",
+   "OxeyeDormer_Room"
+  ],
+  "tris": {
+   "OxeyeDormer_Main": 1716,
+   "OxeyeDormer_Glass": 124,
+   "OxeyeDormer_Room": 124
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -1.15,
+    -0.443,
+    -0.673
+   ],
+   "hi": [
+    1.15,
+    1.45,
+    2.05
+   ]
+  },
+  "ColorMap": "rbxassetid://119745463727531",
+  "NormalMap": "rbxassetid://123685816834557",
+  "RoughnessMap": "rbxassetid://120452824761372",
+  "MetalnessMap": "rbxassetid://133359381534715"
+ },
+ "RidgeCresting": {
+  "dims": [
+   8.0,
+   0.59,
+   1.54
+  ],
+  "pieces": [
+   "RidgeCresting"
+  ],
+  "tris": {
+   "RidgeCresting": 2938
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -4.0,
+    -0.295,
+    -0.035
+   ],
+   "hi": [
+    4.0,
+    0.295,
+    1.54
+   ]
+  },
+  "ColorMap": "rbxassetid://120706355318540",
+  "NormalMap": "rbxassetid://116250450301117",
+  "RoughnessMap": "rbxassetid://71227180304757",
+  "MetalnessMap": "rbxassetid://98390819829370"
+ },
+ "RidgeTiles": {
+  "dims": [
+   8.0,
+   0.62,
+   0.57
+  ],
+  "pieces": [
+   "RidgeTiles"
+  ],
+  "tris": {
+   "RidgeTiles": 2200
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -4.0,
+    -0.31,
+    -0.05
+   ],
+   "hi": [
+    4.0,
+    0.31,
+    0.57
+   ]
+  },
+  "ColorMap": "rbxassetid://114806630218100",
+  "NormalMap": "rbxassetid://100657473413665",
+  "RoughnessMap": "rbxassetid://115179666326667"
+ },
+ "HipCap": {
+  "dims": [
+   0.5,
+   7.05,
+   4.86
+  ],
+  "pieces": [
+   "HipCap"
+  ],
+  "tris": {
+   "HipCap": 328
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -0.25,
+    -3.715,
+    -0.0
+   ],
+   "hi": [
+    0.25,
+    3.336,
+    4.858
+   ]
+  },
+  "ColorMap": "rbxassetid://87078307051983",
+  "NormalMap": "rbxassetid://133292163479922",
+  "RoughnessMap": "rbxassetid://131451747873819",
+  "MetalnessMap": "rbxassetid://91316049770283"
+ },
+ "RoofCornerL": {
+  "dims": [
+   13.2,
+   13.2,
+   9.47
+  ],
+  "pieces": [
+   "RoofCornerL_Slate",
+   "RoofCornerL_Lead",
+   "RoofCornerL_Main"
+  ],
+  "tris": {
+   "RoofCornerL_Slate": 40,
+   "RoofCornerL_Lead": 40,
+   "RoofCornerL_Main": 7370
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -6.187,
+    -7.01,
+    0.0
+   ],
+   "hi": [
+    7.01,
+    6.187,
+    9.469
+   ]
+  },
+  "ColorMap": "rbxassetid://77907555003483",
+  "NormalMap": "rbxassetid://117541745416657",
+  "RoughnessMap": "rbxassetid://100850812002529",
+  "MetalnessMap": "rbxassetid://131391179158704"
+ },
+ "EavesGutter": {
+  "dims": [
+   8.0,
+   0.67,
+   10.65
+  ],
+  "pieces": [
+   "EavesGutter"
+  ],
+  "tris": {
+   "EavesGutter": 3364
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -4.0,
+    -0.66,
+    0.024
+   ],
+   "hi": [
+    4.0,
+    0.01,
+    10.65
+   ]
+  },
+  "ColorMap": "rbxassetid://126934872865006",
+  "NormalMap": "rbxassetid://136749136357914",
+  "RoughnessMap": "rbxassetid://76209352298555",
+  "MetalnessMap": "rbxassetid://128411226614923"
+ },
+ "ChimneyStack": {
+  "dims": [
+   3.56,
+   2.24,
+   9.03
+  ],
+  "pieces": [
+   "ChimneyStack_Stone",
+   "ChimneyStack_Main"
+  ],
+  "tris": {
+   "ChimneyStack_Stone": 44,
+   "ChimneyStack_Main": 3132
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -1.78,
+    -1.12,
+    0.0
+   ],
+   "hi": [
+    1.78,
+    1.122,
+    9.032
+   ]
+  },
+  "ColorMap": "rbxassetid://131105549467925",
+  "NormalMap": "rbxassetid://91550077546353",
+  "RoughnessMap": "rbxassetid://135655441838332",
+  "MetalnessMap": "rbxassetid://109313666494119"
+ },
+ "TwinFlue": {
+  "dims": [
+   3.4,
+   1.8,
+   6.41
+  ],
+  "pieces": [
+   "TwinFlue"
+  ],
+  "tris": {
+   "TwinFlue": 9168
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -1.7,
+    -0.9,
+    0.0
+   ],
+   "hi": [
+    1.7,
+    0.9,
+    6.41
+   ]
+  },
+  "ColorMap": "rbxassetid://101090987548578",
+  "NormalMap": "rbxassetid://99407078414786",
+  "RoughnessMap": "rbxassetid://113733750455550"
+ },
+ "Weathervane": {
+  "dims": [
+   4.32,
+   2.74,
+   6.93
+  ],
+  "pieces": [
+   "Weathervane"
+  ],
+  "tris": {
+   "Weathervane": 2996
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -2.17,
+    -1.37,
+    0.0
+   ],
+   "hi": [
+    2.15,
+    1.37,
+    6.925
+   ]
+  },
+  "ColorMap": "rbxassetid://94624547850304",
+  "NormalMap": "rbxassetid://108940549259358",
+  "RoughnessMap": "rbxassetid://84582413716922",
+  "MetalnessMap": "rbxassetid://117478964975449"
+ },
+ "BellCote": {
+  "dims": [
+   4.92,
+   1.3,
+   7.78
+  ],
+  "pieces": [
+   "BellCote_Main",
+   "BellCote_Stone"
+  ],
+  "tris": {
+   "BellCote_Main": 3894,
+   "BellCote_Stone": 200
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -2.459,
+    -0.65,
+    0.0
+   ],
+   "hi": [
+    2.459,
+    0.65,
+    7.78
+   ]
+  },
+  "ColorMap": "rbxassetid://78145457913783",
+  "NormalMap": "rbxassetid://95417429552645",
+  "RoughnessMap": "rbxassetid://98741270602785",
+  "MetalnessMap": "rbxassetid://72782462875791"
+ },
+ "Cupola": {
+  "dims": [
+   5.43,
+   5.43,
+   9.34
+  ],
+  "pieces": [
+   "Cupola_Main",
+   "Cupola_Copper"
+  ],
+  "tris": {
+   "Cupola_Main": 5430,
+   "Cupola_Copper": 144
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -1.995,
+    -1.995,
+    0.0
+   ],
+   "hi": [
+    1.995,
+    1.995,
+    9.34
+   ]
+  },
+  "ColorMap": "rbxassetid://130507659108251",
+  "NormalMap": "rbxassetid://135838073677969",
+  "RoughnessMap": "rbxassetid://138559356196741",
+  "MetalnessMap": "rbxassetid://125387279151437"
+ },
+ "LanternRoof": {
+  "dims": [
+   8.77,
+   8.77,
+   9.61
+  ],
+  "pieces": [
+   "LanternRoof_Stone",
+   "LanternRoof_Main",
+   "LanternRoof_Glass",
+   "LanternRoof_Lead",
+   "LanternRoof_Glow"
+  ],
+  "tris": {
+   "LanternRoof_Stone": 80,
+   "LanternRoof_Main": 15122,
+   "LanternRoof_Glass": 96,
+   "LanternRoof_Lead": 160,
+   "LanternRoof_Glow": 640
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -3.218,
+    -3.218,
+    0.0
+   ],
+   "hi": [
+    3.218,
+    3.218,
+    9.613
+   ]
+  },
+  "ColorMap": "rbxassetid://80398113939993",
+  "NormalMap": "rbxassetid://71134754757127",
+  "RoughnessMap": "rbxassetid://139955362606915",
+  "MetalnessMap": "rbxassetid://80381675820814"
+ },
+ "SkylightRoof": {
+  "dims": [
+   8.3,
+   4.12,
+   3.22
+  ],
+  "pieces": [
+   "SkylightRoof_Main",
+   "SkylightRoof_Glass"
+  ],
+  "tris": {
+   "SkylightRoof_Main": 1992,
+   "SkylightRoof_Glass": 40
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -4.15,
+    -2.06,
+    0.0
+   ],
+   "hi": [
+    4.15,
+    2.06,
+    3.22
+   ]
+  },
+  "ColorMap": "rbxassetid://74455022866980",
+  "NormalMap": "rbxassetid://99497820167901",
+  "RoughnessMap": "rbxassetid://87177856392922",
+  "MetalnessMap": "rbxassetid://124602571337655"
+ },
+ "RuinedRoof": {
+  "dims": [
+   12.2,
+   13.96,
+   8.71
+  ],
+  "pieces": [
+   "RuinedRoof_Moss",
+   "RuinedRoof_Lead",
+   "RuinedRoof_Main"
+  ],
+  "tris": {
+   "RuinedRoof_Moss": 772,
+   "RuinedRoof_Lead": 672,
+   "RuinedRoof_Main": 6076
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -6.0,
+    -6.994,
+    -0.547
+   ],
+   "hi": [
+    6.2,
+    6.96,
+    8.709
+   ]
+  },
+  "ColorMap": "rbxassetid://120670697390271",
+  "NormalMap": "rbxassetid://90626039288077",
+  "RoughnessMap": "rbxassetid://83611872180599",
+  "MetalnessMap": "rbxassetid://80374018387284"
+ },
+ "MossyGableRoof": {
+  "dims": [
+   16.32,
+   13.93,
+   10.35
+  ],
+  "pieces": [
+   "MossyGableRoof_Moss",
+   "MossyGableRoof_Lead",
+   "MossyGableRoof_Main",
+   "MossyGableRoof_Stone"
+  ],
+  "tris": {
+   "MossyGableRoof_Moss": 24,
+   "MossyGableRoof_Lead": 24,
+   "MossyGableRoof_Main": 11498,
+   "MossyGableRoof_Stone": 32
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -8.15,
+    -6.96,
+    0.0
+   ],
+   "hi": [
+    8.15,
+    6.966,
+    10.349
+   ]
+  },
+  "ColorMap": "rbxassetid://140146960705972",
+  "NormalMap": "rbxassetid://132144188016700",
+  "RoughnessMap": "rbxassetid://100429393225354",
+  "MetalnessMap": "rbxassetid://111253733874415"
+ },
+ "PatchedRoof": {
+  "dims": [
+   17.63,
+   13.92,
+   5.52
+  ],
+  "pieces": [
+   "PatchedRoof_Slate",
+   "PatchedRoof_Lead",
+   "PatchedRoof_Main",
+   "PatchedRoof_Stone"
+  ],
+  "tris": {
+   "PatchedRoof_Slate": 24,
+   "PatchedRoof_Lead": 24,
+   "PatchedRoof_Main": 1736,
+   "PatchedRoof_Stone": 32
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -8.815,
+    -6.96,
+    0.0
+   ],
+   "hi": [
+    8.815,
+    6.96,
+    5.519
+   ]
+  },
+  "ColorMap": "rbxassetid://133089429523884",
+  "NormalMap": "rbxassetid://81540320958110",
+  "RoughnessMap": "rbxassetid://108619957296259",
+  "MetalnessMap": "rbxassetid://78868567542737"
+ },
+ "MoonFinial": {
+  "dims": [
+   0.72,
+   0.66,
+   3.47
+  ],
+  "pieces": [
+   "MoonFinial"
+  ],
+  "tris": {
+   "MoonFinial": 758
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -0.36,
+    -0.33,
+    0.0
+   ],
+   "hi": [
+    0.36,
+    0.33,
+    3.471
+   ]
+  },
+  "ColorMap": "rbxassetid://113629570626253",
+  "NormalMap": "rbxassetid://106750332407443",
+  "RoughnessMap": "rbxassetid://100945722364263",
+  "MetalnessMap": "rbxassetid://73837796960551"
+ },
+ "KeyFinial": {
+  "dims": [
+   0.93,
+   0.72,
+   4.39
+  ],
+  "pieces": [
+   "KeyFinial"
+  ],
+  "tris": {
+   "KeyFinial": 1256
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -0.463,
+    -0.36,
+    0.0
+   ],
+   "hi": [
+    0.463,
+    0.36,
+    4.393
+   ]
+  },
+  "ColorMap": "rbxassetid://96379618352244",
+  "NormalMap": "rbxassetid://97081376123876",
+  "RoughnessMap": "rbxassetid://83581309025971",
+  "MetalnessMap": "rbxassetid://90041018431080"
+ },
+ "StonePinnacle": {
+  "dims": [
+   1.75,
+   1.75,
+   6.36
+  ],
+  "pieces": [
+   "StonePinnacle"
+  ],
+  "tris": {
+   "StonePinnacle": 4162
+  },
+  "batch": 28,
+  "bounds": {
+   "lo": [
+    -0.75,
+    -0.75,
+    0.0
+   ],
+   "hi": [
+    0.75,
+    0.75,
+    6.36
+   ]
+  },
+  "ColorMap": "rbxassetid://88154599217575",
+  "NormalMap": "rbxassetid://105042429119114",
+  "RoughnessMap": "rbxassetid://98959776780020",
+  "MetalnessMap": "rbxassetid://126221335777603"
+ },
+ "_tiles": {
+  "NH_RoofSlate": {
+   "studs_per_tile": 6,
+   "ColorMap": "rbxassetid://123615612587298",
+   "NormalMap": "rbxassetid://133943919563593",
+   "RoughnessMap": "rbxassetid://126995529745381"
+  },
+  "NH_RoofMoss": {
+   "studs_per_tile": 6,
+   "ColorMap": "rbxassetid://108981995033053",
+   "NormalMap": "rbxassetid://99586876648770",
+   "RoughnessMap": "rbxassetid://93101380202517"
+  },
+  "NH_RoofScale": {
+   "studs_per_tile": 4,
+   "ColorMap": "rbxassetid://70427492702368",
+   "NormalMap": "rbxassetid://99332816718754",
+   "RoughnessMap": "rbxassetid://89218230770674"
+  },
+  "NH_RoofCrimson": {
+   "studs_per_tile": 4,
+   "ColorMap": "rbxassetid://72252302151568",
+   "NormalMap": "rbxassetid://126101391192913",
+   "RoughnessMap": "rbxassetid://112684453774345"
+  },
+  "NH_RoofCopper": {
+   "studs_per_tile": 6,
+   "ColorMap": "rbxassetid://98720076946596",
+   "NormalMap": "rbxassetid://114333025787470",
+   "RoughnessMap": "rbxassetid://127070985657037",
+   "MetalnessMap": "rbxassetid://96032822000369"
+  },
+  "NH_RoofLead": {
+   "studs_per_tile": 6,
+   "ColorMap": "rbxassetid://77529840371121",
+   "NormalMap": "rbxassetid://123825947125852",
+   "RoughnessMap": "rbxassetid://104602493163584",
+   "MetalnessMap": "rbxassetid://98084647545641"
+  }
+ }
+}

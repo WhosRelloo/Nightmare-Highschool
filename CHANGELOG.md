@@ -2,6 +2,72 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.48.0] - 2026-11-05: The roof kit
+
+### Added
+- **Props batch 28, the roof kit** (`art/props/nh_props_batch28.py`): 37 original roof pieces in the Institution's look, enough to roof the school and the town.
+  - **Pitched roofs** (on a 16 × 12 wall top unless noted; each has a corbelled stone cornice and cast-iron gutters):
+    - **GableRoof** (45°): stone-coped parapet gables on kneelers, with crocketed pinnacles, crimson glazed ridge tiles and iron cresting.
+    - **GableSection:** an 8-stud run of it with open ends, to make it longer or join it to the corner.
+    - **GableRoofLow** (30°): slates over the gables, lead verges and a lead ridge roll.
+    - **GableRoofSteep** (60°): verges on cusped crimson-enamel bargeboards with pendants and spiked hip knobs.
+    - **HipRoof:** lead hip rolls, a short crested ridge and gilt moon knobs.
+    - **PyramidRoof** (12 × 12, 55°): a louvred lucarne on each face and a tall moon finial.
+    - **MansardRoof:** fish-scale slate sides, four round dormers, a crested lead curb.
+    - **GambrelRoof:** lead rolls at the knuckles and round louvred vents in the castle-stone gables.
+    - **LeanToRoof** (12 × 6): lead, against a taller wall, with a crimson cusped valance.
+  - **Flat roofs:**
+    - **FlatRoofParapet:** a lead deck behind a castle-stone parapet with quatrefoil panels, corner pinnacles, two grotesque spouts, a hatch and a ventilator.
+    - **BattlementRoof:** a machicolated parapet on triple corbels, merlons with arrow slits, and a crimson banner.
+  - **Turret caps and spires:**
+    - **ConeTurretCap** (a round tower 8 across): a bell-cast cone of fish-scale slates with four lucarnes.
+    - **WitchHatCap** (6 across): a tall flared cap of crimson glazed scales, a gilt band and a gilt candle-flame finial.
+    - **OctagonSpire:** an octagonal slate spire with two tiers of lucarnes, corner pinnacles and the crest's gilt key on top.
+    - **BroachSpire:** an octagonal lead spire on broaches over a square tower.
+    - **BellCastCap:** an octagonal ogee cap in verdigris copper.
+    - **OnionDome:** verdigris copper with gilt ribs and a gilt onion-and-moon finial.
+  - **Roof features:**
+    - **GabledDormer** (for 45° roofs) and **OxeyeDormer** (for 60° and steeper): both have the warm lit room behind the glass, glowing at night.
+    - **RidgeCresting**, **RidgeTiles** and **HipCap:** runs to cap any ridge or hip.
+    - **RoofCornerL:** where two 45° wings meet, with a hip outside and a lead valley inside.
+    - **EavesGutter:** a gutter, a crimson hopper with the gilt foil, and a downpipe.
+    - **ChimneyStack** (three pots, one under a lobster-back cowl) and **TwinFlue** (two twisted gothic shafts).
+    - **Weathervane:** an iron raven on the arrow, a gilt crescent tail, N E S W.
+    - **BellCote:** two bronze bells.
+    - **Cupola:** louvred, sitting astride a ridge.
+    - **LanternRoof:** a glazed octagonal lantern with a lit corona of candles inside.
+    - **SkylightRoof:** a glazed ridge rooflight.
+  - **Old and worn:**
+    - **RuinedRoof:** slates torn off course by course round a hole down to charred rafters and broken battens, a gap in the ridge, bent cresting, loose slates in a sagging gutter.
+    - **MossyGableRoof:** moss on the roof, with slipped slates and a broken pinnacle.
+    - **PatchedRoof:** riveted lead patches, a tin sheet, odd slates and a tarred seam.
+  - **Finials:** **MoonFinial**, **KeyFinial** and **StonePinnacle**.
+- **Sharp roof surfaces at any size:** the big roof planes aren't baked into each prop's atlas.
+  - They're tiled pieces with world-scaled UVs made in the builder: u runs along the eaves and v up the slope, with the first course on the eaves. Cones and domes get UVs round them.
+  - They use six new seamless 2048 roof sets from `tools/vfx/make_roof_tiles.py`: `NH_RoofSlate`, `NH_RoofMoss`, `NH_RoofScale` (fish scales), `NH_RoofCrimson` (#600E1A glaze), `NH_RoofCopper` (standing-seam verdigris) and `NH_RoofLead`.
+  - Gable walls and parapets use the group's CastleStone set, like the builder's walls. Everything else (`Main`) is baked.
+- **Baked** at 2048 with 64 samples on the GPU. Every piece is under 16k triangles (the largest is FlatRoofParapet's Main at 15,396).
+  - The 166 maps are under the group (`art/group-upload/roofs-batch28/`). The ids are in `art/props/roofs_batch28.json`.
+  - No metal map for RidgeTiles, TwinFlue or the slate, moss, scale and crimson sets: they were all black.
+- **On the showcase** (`workspace.NHPropsShowcase.Roofs`, tag `NHPropBatch28`; `Studio/props_setup28.luau`, reverted by `props_revert28.luau`):
+  - Three rows facing −Z: the big roofs on slate wall blocks at z −285, towers and features at z −322, dormers, ridges and finials at z −352. The rows run from x −30 to about 260.
+  - Each roof is seated by its wall plate, since gutters hang below the wall top. Dormers sit on slope wedges, the ridge pieces and the cupola on ridge wedges.
+  - Templates are in `ServerStorage.NHProps` (`NHBuildKit = "Roofs"`).
+  - Roofs, walls and stone collide (`Main` precisely, so a parapet never roofs over its deck). Glass and flames don't.
+
+### Changed
+- `nh_props.py` imports batch 28. Its `tile_uv` hook only keeps the builder's UVs for batch 28's own props.
+
+### Verified (Studio)
+- **Placement:** all 37 were placed with no clashes, each roof sits exactly on its wall block (6.90 / 6.90), and every map loads (`docs/img/roof-kit-day-1.jpg`, `roof-kit-day-2.jpg`, `roof-kit-towers.jpg`, `roof-kit-features.jpg`).
+  - Fresh maps show white until Roblox finishes processing them (about half an hour here). Re-creating the SurfaceAppearances afterwards loads them.
+- **Night** (the clock put back afterwards): the lantern's candles and the dormers' rooms glow (`docs/img/roof-kit-night.jpg`, `roof-kit-night-spires.jpg`).
+  - The skylight's sky-facing Glass glared solid white, so it's plain see-through panes now.
+- **Play** (no save slot, `NHTestNoMenuKeys` set and cleared):
+  - Test blocks dropped on the gable, hip and cone roofs land on them and slide off.
+  - On the flat parapet roof and the battlements they rest on the lead decks (7.58 and 8.52, the decks at 7.10 and 8.03).
+- **Not tested:** a player character walking on the roofs, and the pieces fitted to the school's own buildings.
+
 ## [1.47.0] - 2026-11-05: Substitute days, two new minigames, players can sit in class
 
 ### Added
