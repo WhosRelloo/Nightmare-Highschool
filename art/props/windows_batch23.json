@@ -1,0 +1,594 @@
+{
+ "_note": "Props batch 23 (1.42): the window kit and the conservatory, from art/props/nh_props_batch23.py (shapes in window_shapes.py, stained glass from stained_glass.py). Dims are studs (W, D, H) as modelled; front faces -Z after import. Maps are group-owned (15981569). Main/Spires/Crown/Drum/Dome/Plants share the baked maps; *_Glass is Roblox Glass (no maps); *_Room carries the shared WindowRoom image with its emissive mask; *_Stained carries its window's stained glass with its emissive mask; the conservatory's *_Wall and *_Floor carry the group CastleStone set. ArrowSlit has no metalness map (all black). Set up by Studio/props_setup23.luau.",
+ "WindowRoom": {
+  "ColorMap": "rbxassetid://133614693107945",
+  "EmissiveMask": "rbxassetid://78532894402751"
+ },
+ "ConservatoryDome": {
+  "dims": [
+   18.83,
+   18.83,
+   24.81
+  ],
+  "pieces": [
+   "ConservatoryDome_Wall",
+   "ConservatoryDome_Floor",
+   "ConservatoryDome_Main",
+   "ConservatoryDome_Drum",
+   "ConservatoryDome_Spires",
+   "ConservatoryDome_Crown",
+   "ConservatoryDome_Dome",
+   "ConservatoryDome_Glass",
+   "ConservatoryDome_Glow"
+  ],
+  "tris": {
+   "ConservatoryDome_Wall": 144,
+   "ConservatoryDome_Floor": 28,
+   "ConservatoryDome_Main": 4250,
+   "ConservatoryDome_Drum": 14100,
+   "ConservatoryDome_Spires": 10734,
+   "ConservatoryDome_Crown": 14496,
+   "ConservatoryDome_Dome": 10528,
+   "ConservatoryDome_Glass": 1956,
+   "ConservatoryDome_Glow": 640
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://105621248618361",
+  "NormalMap": "rbxassetid://125545891010926",
+  "RoughnessMap": "rbxassetid://115195510988061",
+  "MetalnessMap": "rbxassetid://132463800254236"
+ },
+ "ConservatoryBeds": {
+  "dims": [
+   8.16,
+   8.12,
+   6.82
+  ],
+  "pieces": [
+   "ConservatoryBeds_Main",
+   "ConservatoryBeds_Plants"
+  ],
+  "tris": {
+   "ConservatoryBeds_Main": 6082,
+   "ConservatoryBeds_Plants": 14952
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://86487166675098",
+  "NormalMap": "rbxassetid://106676120486026",
+  "RoughnessMap": "rbxassetid://134510456763168",
+  "MetalnessMap": "rbxassetid://95878086539255"
+ },
+ "LancetWindow": {
+  "dims": [
+   4.38,
+   1.0,
+   8.55
+  ],
+  "pieces": [
+   "LancetWindow_Main",
+   "LancetWindow_Glass",
+   "LancetWindow_Room",
+   "LancetWindow_Glow"
+  ],
+  "tris": {
+   "LancetWindow_Main": 2656,
+   "LancetWindow_Glass": 104,
+   "LancetWindow_Room": 104,
+   "LancetWindow_Glow": 80
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://91953301339321",
+  "NormalMap": "rbxassetid://76230896909322",
+  "RoughnessMap": "rbxassetid://99541522293172",
+  "MetalnessMap": "rbxassetid://115181449654402"
+ },
+ "TwinLancet": {
+  "dims": [
+   6.74,
+   1.1,
+   8.64
+  ],
+  "pieces": [
+   "TwinLancet_Main",
+   "TwinLancet_Glass",
+   "TwinLancet_Room"
+  ],
+  "tris": {
+   "TwinLancet_Main": 6280,
+   "TwinLancet_Glass": 428,
+   "TwinLancet_Room": 428
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://120604005662419",
+  "NormalMap": "rbxassetid://139976726654100",
+  "RoughnessMap": "rbxassetid://124036861547963",
+  "MetalnessMap": "rbxassetid://119996933819350"
+ },
+ "TripletLancet": {
+  "dims": [
+   7.0,
+   1.02,
+   8.29
+  ],
+  "pieces": [
+   "TripletLancet_Main",
+   "TripletLancet_Glass",
+   "TripletLancet_Room"
+  ],
+  "tris": {
+   "TripletLancet_Main": 5260,
+   "TripletLancet_Glass": 312,
+   "TripletLancet_Room": 312
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://79235202866979",
+  "NormalMap": "rbxassetid://94164234612197",
+  "RoughnessMap": "rbxassetid://114858603951934",
+  "MetalnessMap": "rbxassetid://123092815400963"
+ },
+ "TraceryWindow": {
+  "dims": [
+   9.6,
+   1.32,
+   13.38
+  ],
+  "pieces": [
+   "TraceryWindow_Main",
+   "TraceryWindow_Stained"
+  ],
+  "tris": {
+   "TraceryWindow_Main": 8012,
+   "TraceryWindow_Stained": 136
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://128830951261256",
+  "NormalMap": "rbxassetid://139814322860522",
+  "RoughnessMap": "rbxassetid://103097016889034",
+  "MetalnessMap": "rbxassetid://101110877239422",
+  "StainedColorMap": "rbxassetid://71578619756581",
+  "StainedEmissiveMask": "rbxassetid://81567452191155"
+ },
+ "RoseWindow": {
+  "dims": [
+   9.64,
+   1.15,
+   9.82
+  ],
+  "pieces": [
+   "RoseWindow_Main",
+   "RoseWindow_Stained"
+  ],
+  "tris": {
+   "RoseWindow_Main": 7728,
+   "RoseWindow_Stained": 252
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://137216061516427",
+  "NormalMap": "rbxassetid://77750492858287",
+  "RoughnessMap": "rbxassetid://99941597597848",
+  "MetalnessMap": "rbxassetid://90223762696365",
+  "StainedColorMap": "rbxassetid://83933681495835",
+  "StainedEmissiveMask": "rbxassetid://89269458837505"
+ },
+ "StainedLancet": {
+  "dims": [
+   4.96,
+   1.21,
+   9.68
+  ],
+  "pieces": [
+   "StainedLancet_Main",
+   "StainedLancet_Stained",
+   "StainedLancet_Glow"
+  ],
+  "tris": {
+   "StainedLancet_Main": 4308,
+   "StainedLancet_Stained": 120,
+   "StainedLancet_Glow": 80
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://110133098489011",
+  "NormalMap": "rbxassetid://121118264935978",
+  "RoughnessMap": "rbxassetid://91705449298890",
+  "MetalnessMap": "rbxassetid://102993779770293",
+  "StainedColorMap": "rbxassetid://130437896078519",
+  "StainedEmissiveMask": "rbxassetid://139881123425650"
+ },
+ "Oculus": {
+  "dims": [
+   4.04,
+   0.85,
+   4.02
+  ],
+  "pieces": [
+   "Oculus_Main",
+   "Oculus_Glass",
+   "Oculus_Room"
+  ],
+  "tris": {
+   "Oculus_Main": 2480,
+   "Oculus_Glass": 156,
+   "Oculus_Room": 156
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://103693710604004",
+  "NormalMap": "rbxassetid://133363482511372",
+  "RoughnessMap": "rbxassetid://117479977870535",
+  "MetalnessMap": "rbxassetid://113620443121941"
+ },
+ "DiamondPaneArch": {
+  "dims": [
+   5.24,
+   1.0,
+   7.07
+  ],
+  "pieces": [
+   "DiamondPaneArch_Main",
+   "DiamondPaneArch_Glass",
+   "DiamondPaneArch_Room",
+   "DiamondPaneArch_Glow"
+  ],
+  "tris": {
+   "DiamondPaneArch_Main": 4064,
+   "DiamondPaneArch_Glass": 120,
+   "DiamondPaneArch_Room": 120,
+   "DiamondPaneArch_Glow": 80
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://97662817291289",
+  "NormalMap": "rbxassetid://118049208507168",
+  "RoughnessMap": "rbxassetid://125132039537370",
+  "MetalnessMap": "rbxassetid://71731569489875"
+ },
+ "SashWindow": {
+  "dims": [
+   4.8,
+   1.06,
+   8.2
+  ],
+  "pieces": [
+   "SashWindow_Main",
+   "SashWindow_Glass",
+   "SashWindow_Room"
+  ],
+  "tris": {
+   "SashWindow_Main": 2624,
+   "SashWindow_Glass": 76,
+   "SashWindow_Room": 64
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://88069065643543",
+  "NormalMap": "rbxassetid://92398566207715",
+  "RoughnessMap": "rbxassetid://109733688219985",
+  "MetalnessMap": "rbxassetid://104228946932613"
+ },
+ "GothicBay": {
+  "dims": [
+   6.21,
+   3.08,
+   8.87
+  ],
+  "pieces": [
+   "GothicBay_Main",
+   "GothicBay_Glass",
+   "GothicBay_Room",
+   "GothicBay_Glow"
+  ],
+  "tris": {
+   "GothicBay_Main": 8128,
+   "GothicBay_Glass": 352,
+   "GothicBay_Room": 12,
+   "GothicBay_Glow": 80
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://91189858653486",
+  "NormalMap": "rbxassetid://138778916659036",
+  "RoughnessMap": "rbxassetid://126972149731297",
+  "MetalnessMap": "rbxassetid://122527641809911"
+ },
+ "LucarneDormer": {
+  "dims": [
+   5.2,
+   4.31,
+   9.04
+  ],
+  "pieces": [
+   "LucarneDormer_Main",
+   "LucarneDormer_Glass",
+   "LucarneDormer_Room",
+   "LucarneDormer_Glow"
+  ],
+  "tris": {
+   "LucarneDormer_Main": 5724,
+   "LucarneDormer_Glass": 364,
+   "LucarneDormer_Room": 12,
+   "LucarneDormer_Glow": 100
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://73337541516055",
+  "NormalMap": "rbxassetid://120046556410806",
+  "RoughnessMap": "rbxassetid://117243179953539",
+  "MetalnessMap": "rbxassetid://79135934799003"
+ },
+ "ArrowSlit": {
+  "dims": [
+   3.1,
+   1.46,
+   7.53
+  ],
+  "pieces": [
+   "ArrowSlit_Main",
+   "ArrowSlit_Room"
+  ],
+  "tris": {
+   "ArrowSlit_Main": 2954,
+   "ArrowSlit_Room": 12
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://94313929383458",
+  "NormalMap": "rbxassetid://71649452241291",
+  "RoughnessMap": "rbxassetid://127191546372049"
+ },
+ "Fanlight": {
+  "dims": [
+   5.6,
+   1.08,
+   3.4
+  ],
+  "pieces": [
+   "Fanlight_Main",
+   "Fanlight_Glass",
+   "Fanlight_Room"
+  ],
+  "tris": {
+   "Fanlight_Main": 3086,
+   "Fanlight_Glass": 96,
+   "Fanlight_Room": 96
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://71156438201095",
+  "NormalMap": "rbxassetid://75224872721737",
+  "RoughnessMap": "rbxassetid://104296194943200",
+  "MetalnessMap": "rbxassetid://99082683344888"
+ },
+ "BasementGrate": {
+  "dims": [
+   5.6,
+   1.15,
+   3.29
+  ],
+  "pieces": [
+   "BasementGrate_Main",
+   "BasementGrate_Glass",
+   "BasementGrate_Room"
+  ],
+  "tris": {
+   "BasementGrate_Main": 2846,
+   "BasementGrate_Glass": 56,
+   "BasementGrate_Room": 56
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://134131781511867",
+  "NormalMap": "rbxassetid://121675375033434",
+  "RoughnessMap": "rbxassetid://118490806967064",
+  "MetalnessMap": "rbxassetid://70655501210912"
+ },
+ "BrokenWindow": {
+  "dims": [
+   4.78,
+   1.03,
+   7.74
+  ],
+  "pieces": [
+   "BrokenWindow_Main",
+   "BrokenWindow_Glass",
+   "BrokenWindow_Room"
+  ],
+  "tris": {
+   "BrokenWindow_Main": 3694,
+   "BrokenWindow_Glass": 1228,
+   "BrokenWindow_Room": 104
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://81269566602939",
+  "NormalMap": "rbxassetid://73022576051185",
+  "RoughnessMap": "rbxassetid://137353579977049",
+  "MetalnessMap": "rbxassetid://86427430765095"
+ },
+ "ShutteredWindow": {
+  "dims": [
+   5.1,
+   1.03,
+   6.76
+  ],
+  "pieces": [
+   "ShutteredWindow_Main",
+   "ShutteredWindow_Room"
+  ],
+  "tris": {
+   "ShutteredWindow_Main": 5014,
+   "ShutteredWindow_Room": 64
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://77517036579704",
+  "NormalMap": "rbxassetid://113123933722296",
+  "RoughnessMap": "rbxassetid://124917619088139",
+  "MetalnessMap": "rbxassetid://75866341116701"
+ },
+ "TraceryWindowClear": {
+  "dims": [
+   9.6,
+   1.32,
+   13.38
+  ],
+  "pieces": [
+   "TraceryWindowClear_Main",
+   "TraceryWindowClear_Glass",
+   "TraceryWindowClear_Room"
+  ],
+  "tris": {
+   "TraceryWindowClear_Main": 9900,
+   "TraceryWindowClear_Glass": 136,
+   "TraceryWindowClear_Room": 136
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://137952543790041",
+  "NormalMap": "rbxassetid://105399731189294",
+  "RoughnessMap": "rbxassetid://71205485538142",
+  "MetalnessMap": "rbxassetid://90686624753992"
+ },
+ "RoseWindowClear": {
+  "dims": [
+   9.64,
+   1.15,
+   9.82
+  ],
+  "pieces": [
+   "RoseWindowClear_Main",
+   "RoseWindowClear_Glass",
+   "RoseWindowClear_Room"
+  ],
+  "tris": {
+   "RoseWindowClear_Main": 7728,
+   "RoseWindowClear_Glass": 252,
+   "RoseWindowClear_Room": 252
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://73006367684926",
+  "NormalMap": "rbxassetid://107065909390104",
+  "RoughnessMap": "rbxassetid://136649394623859",
+  "MetalnessMap": "rbxassetid://124217513453308"
+ },
+ "PlainSash": {
+  "dims": [
+   3.9,
+   1.0,
+   6.75
+  ],
+  "pieces": [
+   "PlainSash_Main",
+   "PlainSash_Glass",
+   "PlainSash_Room"
+  ],
+  "tris": {
+   "PlainSash_Main": 1548,
+   "PlainSash_Glass": 24,
+   "PlainSash_Room": 12
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://123736823020821",
+  "NormalMap": "rbxassetid://137012023880679",
+  "RoughnessMap": "rbxassetid://125911098101216",
+  "MetalnessMap": "rbxassetid://133139133442402"
+ },
+ "CrossWindow": {
+  "dims": [
+   5.0,
+   1.05,
+   7.08
+  ],
+  "pieces": [
+   "CrossWindow_Main",
+   "CrossWindow_Glass",
+   "CrossWindow_Room"
+  ],
+  "tris": {
+   "CrossWindow_Main": 2444,
+   "CrossWindow_Glass": 48,
+   "CrossWindow_Room": 12
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://111957903569177",
+  "NormalMap": "rbxassetid://139296386469706",
+  "RoughnessMap": "rbxassetid://74527335795981",
+  "MetalnessMap": "rbxassetid://96513745600793"
+ },
+ "PictureWindow": {
+  "dims": [
+   6.1,
+   0.9,
+   5.55
+  ],
+  "pieces": [
+   "PictureWindow_Main",
+   "PictureWindow_Glass",
+   "PictureWindow_Room"
+  ],
+  "tris": {
+   "PictureWindow_Main": 1500,
+   "PictureWindow_Glass": 12,
+   "PictureWindow_Room": 12
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://80968039176650",
+  "NormalMap": "rbxassetid://115472787646762",
+  "RoughnessMap": "rbxassetid://128661340986319",
+  "MetalnessMap": "rbxassetid://76901547828494"
+ },
+ "RoundArchWindow": {
+  "dims": [
+   3.9,
+   1.0,
+   6.73
+  ],
+  "pieces": [
+   "RoundArchWindow_Main",
+   "RoundArchWindow_Glass",
+   "RoundArchWindow_Room"
+  ],
+  "tris": {
+   "RoundArchWindow_Main": 1804,
+   "RoundArchWindow_Glass": 72,
+   "RoundArchWindow_Room": 72
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://111417566228821",
+  "NormalMap": "rbxassetid://82694206660027",
+  "RoughnessMap": "rbxassetid://111999385303149",
+  "MetalnessMap": "rbxassetid://92312701273239"
+ },
+ "HalfRoundWindow": {
+  "dims": [
+   6.9,
+   1.0,
+   4.2
+  ],
+  "pieces": [
+   "HalfRoundWindow_Main",
+   "HalfRoundWindow_Glass",
+   "HalfRoundWindow_Room"
+  ],
+  "tris": {
+   "HalfRoundWindow_Main": 2384,
+   "HalfRoundWindow_Glass": 112,
+   "HalfRoundWindow_Room": 112
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://72836486182997",
+  "NormalMap": "rbxassetid://136163175648256",
+  "RoughnessMap": "rbxassetid://134256098250258",
+  "MetalnessMap": "rbxassetid://113652432940033"
+ },
+ "SquareWindow": {
+  "dims": [
+   3.0,
+   0.88,
+   3.55
+  ],
+  "pieces": [
+   "SquareWindow_Main",
+   "SquareWindow_Glass",
+   "SquareWindow_Room"
+  ],
+  "tris": {
+   "SquareWindow_Main": 420,
+   "SquareWindow_Glass": 12,
+   "SquareWindow_Room": 12
+  },
+  "batch": 23,
+  "ColorMap": "rbxassetid://74535779082837",
+  "NormalMap": "rbxassetid://136194274234755",
+  "RoughnessMap": "rbxassetid://107894653077217",
+  "MetalnessMap": "rbxassetid://136240993635110"
+ }
+}

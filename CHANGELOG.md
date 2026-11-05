@@ -2,6 +2,57 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.43.0] - 2026-11-05: The window kit and the gothic crown conservatory
+
+### Added
+- **Props batch 23, the window kit** (`art/props/nh_props_batch23.py`, shapes in `art/props/window_shapes.py`): 24 windows for the builder, in soot-dark stone, cast iron and lead, brass, gilt and crimson enamel.
+  - **Gothic:**
+    - LancetWindow, TwinLancet (plate tracery with a pierced quatrefoil) and TripletLancet (three stepped lights).
+    - TraceryWindow (a great four-light window with a cusped head circle) and RoseWindow (a wheel of twelve petals).
+    - Oculus, DiamondPaneArch (an iron casement with diamond leading) and StainedLancet.
+  - **Other shapes:**
+    - SashWindow (a classroom sash with Y-tracery), GothicBay (a canted bay with a crenellated parapet) and LucarneDormer.
+    - ArrowSlit (a cross loop), Fanlight (an iron sunburst) and BasementGrate.
+    - BrokenWindow (smashed leaded glass, boarded) and ShutteredWindow (closed crimson iron shutters with a pierced moon).
+  - **Regular clear windows** (plain glass, no lead):
+    - PlainSash, CrossWindow, PictureWindow, RoundArchWindow, HalfRoundWindow (a half-circle lunette) and SquareWindow.
+    - Clear versions of the big two: TraceryWindowClear and RoseWindowClear.
+  - **Stained glass:** three original designs in crimson, gold and deep blue, from the school crest's candle, crescent moon and key and the Midnight Bell.
+    - Each is painted at 2048 by `art/props/stained_glass.py` from the same layout the stone tracery is modelled from, so the lights line up with the bars.
+    - Each glows through its own emissive mask (SurfaceAppearance `EmissiveMaskContent`), not Neon, so it never blows out to white.
+  - **Glass and light:** clear panes are a `_Glass` piece (Roblox Glass). The lit room behind them is a `_Room` piece: one shared warm amber image with an emissive mask. Delete it from a placed window to see through the opening.
+  - A few windows have a candle on the sill. Their small flames are `_Glow` (Neon, a short light, `NHCandle` flicker).
+- **The gothic crown conservatory** (in the same batch): ConservatoryDome and ConservatoryBeds, a walk-in glass house about 19 studs across and 25 high.
+  - **The hall:** an octagonal glass hall of tall two-light iron lancets with crimson enamel spandrels. Above it is a steep faceted glass crown dome on eight crocketed iron ribs. An openwork iron spire on top carries a gilt crescent moon.
+  - **The spires:** eight soot-stone piers with crocketed pinnacles stand round the hall, each joined to it by a pierced flying buttress. A crown band of iron tracery with gilt quatrefoils runs between them.
+  - **The doorway and inside:** a crocketed gable with a rose over the doorway, and a hanging iron corona of eight candles that lights the floor.
+  - **The beds:** a round bed with an iron obelisk trellis of climbing crimson roses, ferns and broad leaves, and four iron urns of ferns.
+  - **Sharp at this size:** the plinth and floor use the group's tiled CastleStone set, and the glass needs no maps. That leaves the whole 2048 atlas for the ironwork and carving. The plants have their own atlas in the beds piece.
+- **Baked** at 2048 with 64 samples on the GPU. Every piece is under 16k triangles (the largest is 14,952).
+  - The 112 maps are published under the group (`art/group-upload/windows-batch23/`). The ids are in `art/props/windows_batch23.json`.
+  - ArrowSlit has no metal map: its map is all black (all stone), and that upload didn't come through.
+- **On the showcase** (`workspace.NHPropsShowcase.Windows`, tag `NHPropBatch23`; `Studio/props_setup23.luau`, reverted by `props_revert23.luau`):
+  - Two slate display walls facing −Z: gothic and stained at z −95 from x 88, regular and the rest at z −125 from x 88.
+  - The dormer stands free at the end of the first wall.
+  - The conservatory and its beds stand at x 195, z −215.
+  - Templates are in `ServerStorage.NHProps` (`NHBuildKit = "Windows"`).
+
+### Verified (Studio)
+- **Placement:** every template was built and placed, with no clashes reported. All maps and stained glass loaded.
+- **Day and night:** checked by screenshot at 1 PM and 11 PM (`docs/img/window-kit-gothic-day.jpg`, `window-kit-gothic-night.jpg`, `window-kit-regular-day.jpg`, `conservatory-day.jpg`, `conservatory-night.jpg`, `conservatory-inside-night.jpg`). The clock was put back afterwards.
+  - The stained glass glows richly at night without going white.
+  - The lit rooms read warm.
+  - The conservatory's interior was too dark at night, so its corona's light was lengthened to 22 studs (now candlelit).
+- **Play** (no save slot, `NHTestNoMenuKeys` set and cleared afterwards), with a test rig walking on the server:
+  - It walks in through the conservatory's doorway and back out.
+  - An invisible `NHBarrier` panel stops it at the glass, and a spire pier stops it from outside.
+  - The corona and the window candles flicker (sampled with the camera held near them).
+  - No errors from the kit.
+- **Fixed during testing:**
+  - The hall's iron Drum piece bridged the doorway with its precise collision hull, so it no longer collides (the barriers hold the glass).
+  - Clones made in the same frame as the precise-collision change came out with Default collision, so the setup now waits a moment before placing.
+- **Not tested:** a player character walking through (the rig stood in for one), and a window placed in a real wall opening with its Room piece removed.
+
 ## [1.42.0] - 2026-11-05: Lost & Found
 
 ### Added

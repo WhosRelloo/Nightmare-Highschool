@@ -592,6 +592,56 @@ Door, flap and tap origins sit on their hinge lines.
 
 ![The preview](img/midnight-bell-board-preview.png)
 
+## Batch 23 (1.43): the window kit and the gothic crown conservatory
+
+`art/props/nh_props_batch23.py`; the 2D shapes (lancets, tracery, rose, crescent, foils) are in `art/props/window_shapes.py`, shared with the stained-glass painter `art/props/stained_glass.py`.
+
+| Prop | Tris | Notes |
+|---|---|---|
+| LancetWindow | 2.9k (Main, Glass, Room, Glow) | a tall lancet, chamfered jamb stones, square quarries, iron saddle bars, a hood mould on carved label stops, a candle on the inner sill |
+| TwinLancet | 7.1k (Main, Glass, Room) | two lancets under one arch, plate tracery pierced by a quatrefoil, a shafted mullion, diamond leading |
+| TripletLancet | 5.9k (Main, Glass, Room) | three stepped lancets with shafts between, square quarries, a shared sill |
+| TraceryWindow | 8.1k (Main, Stained) | four lights, two sub-arches, a cusped head circle and spandrel foils in bar tracery; stained glass |
+| RoseWindow | 8.0k (Main, Stained) | twelve petals round a cusped hub, foils between the petal heads; stained glass |
+| StainedLancet | 4.5k (Main, Stained, Glow) | a candle under a crescent moon on starry blue, a gilt trefoil in the head; a pricket candle on the sill |
+| TraceryWindowClear, RoseWindowClear | 10.2k, 8.2k (Main, Glass, Room) | the same with clear (leaded) glass and the lit room behind |
+| Oculus | 2.8k | a round window, four keystones, an iron quatrefoil grille |
+| DiamondPaneArch | 4.4k | a pointed iron casement: two leaves and a head light, diamond leading, brass handles and stays, a candle |
+| SashWindow | 2.8k | a classroom sash under a segmental voussoir head: crimson enamel sashes, iron Y-tracery in the top sash, a brass lock |
+| GothicBay | 8.6k | a canted bay on a traceried plinth, trefoil-headed lights, a crenellated parapet, a crimson window seat and a candle |
+| LucarneDormer | 6.2k | a stone dormer: twin lights, pinnacled piers, a crocketed gable with a foil, a slate roof with iron cresting (runs back +Y) |
+| ArrowSlit | 3.0k (Main, Room) | a cross loop with oillets through coursed ashlar, a slice of warm light behind |
+| Fanlight | 3.3k | a half-round iron sunburst over a door, voussoirs, a crimson and gilt keystone shield |
+| BasementGrate | 3.0k | a segmental window in a rusticated plinth, heavy bars and rivetted flats, rust stains |
+| BrokenWindow | 5.0k | a smashed leaded lancet: shards in the cames, bent leads, two boards nailed across, glass on the sill |
+| ShutteredWindow | 5.1k (Main, Room) | closed crimson enamel iron shutters: louvres, a pierced crescent moon, strap hinges, a drop bar |
+| PlainSash, CrossWindow, PictureWindow, RoundArchWindow, HalfRoundWindow, SquareWindow | 0.4k to 2.6k (Main, Glass, Room) | the regular clear windows: plain glass in slim iron frames, stone surrounds |
+| ConservatoryDome | 56.9k in 9 pieces, the largest 14.5k | the gothic crown: an octagonal glass hall of iron lancets, a faceted glass crown dome on crocketed ribs, an openwork spire with a gilt crescent, eight pinnacled piers with flying buttresses, an iron tracery crown band, a candle corona; 18.8 x 24.9 studs |
+| ConservatoryBeds | 21.0k (Main 6.1k, Plants 15.0k) | a round bed with a rose-climbed iron obelisk, ferns and broad leaves, four iron urns |
+
+- **Baked** at 2048 with 64 samples on the GPU; 100% crops checked. Maps are under the group (`art/group-upload/windows-batch23/`, 112 images). The ids are in `art/props/windows_batch23.json`. ArrowSlit has no metal map (all black).
+- **Pieces:**
+  - **Glass:** Roblox Glass.
+  - **Room:** the lit room behind clear glass. One shared image (`WindowRoom`, warm amber), front-projected, glowing through its emissive mask. Delete it from a placed window when the opening is a real hole in a wall.
+  - **Stained:** the stained glass, the same way. Each is its own 2048 painting, original (no copied church designs, no figures, no gore).
+  - **Glow:** a few small candle flames (`NHCandle`).
+- **The conservatory:**
+  - **Tiled stone:** the plinth and floor are `_Wall` / `_Floor` in the group's tiled CastleStone set, darkened to (104, 108, 102). Its glass needs no maps, so the 2048 atlas goes to the ironwork.
+  - **Collision:** the stone, the columns and the spires collide precisely. Seven invisible `NHBarrier` panels hold the glazed bays, so you go in by the doorway only. The iron Drum doesn't collide, because its hull bridged the doorway.
+  - **Light:** the corona's light reaches 22 studs.
+- **In Roblox:** `Studio/props_setup23.luau` builds the templates in `ServerStorage.NHProps` (`NHBuildKit = "Windows"`) and places the showcase (`workspace.NHPropsShowcase.Windows`, `NHPropBatch23`). `props_revert23.luau` removes them.
+  - Two slate walls face −Z: gothic and stained at z −95 from x 88, regular and the rest at z −125.
+  - The dormer stands free at the end of the first wall.
+  - The conservatory and its beds stand at x 195, z −215.
+
+![The previews](img/window-kit-previews.jpg)
+![Gothic and stained windows by day](img/window-kit-gothic-day.jpg)
+![The same at night](img/window-kit-gothic-night.jpg)
+![The regular windows](img/window-kit-regular-day.jpg)
+![The conservatory by day](img/conservatory-day.jpg)
+![The conservatory at night](img/conservatory-night.jpg)
+![Inside at night](img/conservatory-inside-night.jpg)
+
 ## Batch 24 (1.42): the Lost & Found kit
 
 | Prop | Tris | Size (W x D x H studs) | Notes |
