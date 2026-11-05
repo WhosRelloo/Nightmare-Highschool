@@ -2,6 +2,19 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.38.1] - 2026-11-04: The spiral stair's texture
+
+### Fixed
+- **StairSpiral rendered plain white** in Studio (`workspace.NHPropsShowcase.StairSpiral_Showcase`, Main and Rail). All four of its maps were set and each one loads, but Studio would not render the set of four together. Any three of them render fine.
+  - It now uses its colour, normal and roughness maps. The stone, iron balusters and brass handrail all show.
+  - The metalness id (136349045257712) is kept in a `NHMetalnessMap` attribute on each SurfaceAppearance and in `art/props/props.json` (`MetalnessMapUnused`). Re-uploading that map under the group gives it a new id, so it can go back in.
+  - The batch 20 setup script skips an empty metalness id, so a rebuild won't bring the failing set back. A copy of the stair from before the fix is in `ServerStorage.NH_Backup.StairSpiral_pre_metal`.
+
+### Verified (Studio Edit)
+- The same maps tested on copies of the iron stair: the colour map alone, every pair, and every set of three rendered within a few seconds. The set of four stayed white, even after waiting and swapping in fresh SurfaceAppearances.
+- After the fix the spiral rendered textured beside StairStone and StairGrand (screenshot `docs/img/stair-spiral-fixed.jpg`).
+- **Not checked:** a Play session or a live server. There, the four-map set might load fine.
+
 ## [1.38.0] - 2026-11-04: The stair and bridge kit, the painting and art kit
 
 ### Added

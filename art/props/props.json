@@ -3420,7 +3420,8 @@
   "ColorMap": "rbxassetid://139334852900700",
   "NormalMap": "rbxassetid://122692196451321",
   "RoughnessMap": "rbxassetid://136355592324758",
-  "MetalnessMap": "rbxassetid://136349045257712"
+  "MetalnessMap": "",
+  "MetalnessMapUnused": "rbxassetid://136349045257712 (fails to load with the other three in Studio; re-upload needed, 2026-11-04)"
  },
  "StairIron": {
   "dims": [
