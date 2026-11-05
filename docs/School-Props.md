@@ -699,7 +699,7 @@ Door, flap and tap origins sit on their hinge lines.
 | SeerChair | 11.8k | 2.40 x 2.01 x 6.06 | a tall black gothic chair: iron studs and straps, tracery over crimson velvet, crocketed pinnacles and an iron crescent; no arms; the cushion at 1.6 |
 
 - **Baked** at 2048 with 64 samples on the GPU. The maps are under the group (the ids are in `Studio/props_setup26.luau`). Both pieces of the table share its atlas.
-- **In Roblox:** `Studio/props_setup26.luau` builds the templates in `ServerStorage.NHProps` (`NHBuildKit = "Seer"`). It places the set in the Ink Studio (`TheInkStudio.SeerCorner`): the table at (42.2, 226.5) facing into the room, and the chair 3 studs behind it against the west wall. Sable's post (`NpcPost = Sable`) sits 0.15 in front of the chair's origin, 1.5 above the cushion. A copy is on the showcase at x 110, z −170.5 (`NHPropBatch26`).
+- **In Roblox:** `Studio/props_setup26.luau` builds the templates in `ServerStorage.NHProps` (`NHBuildKit = "Seer"`). It places the set in the Ink Studio (`TheInkStudio.SeerCorner`): the table at (42.2, 226.5) facing into the room, and the chair 3 studs behind it against the west wall. Sable's post (`NpcPost = Sable`) sits 0.15 in front of the chair's origin, 1.5 above the cushion. A copy is on the showcase at x 110, z −170.5 (`NHPropBatch26`). (1.46.1) Placed tables are scaled to 0.9 (`TABLE_SCALE`) so the top sits at a seated R6's middle, with the chair 3.25 behind; the chair has `SeatHeight` 1.6.
 
 ![The preview](img/seer-preview.png)
 

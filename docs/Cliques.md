@@ -43,7 +43,7 @@ Students go to their clique's hangout:
 
 At the hangout they walk to a free **gathering spot**, face the group, sometimes lean, chat a while, then move to another spot.
 
-- **Spots** are parts tagged `NHCliqueSpot`, with the attribute `NHCliqueSpot = <clique id>`.
+- **Spots** are parts tagged `NHCliqueSpot`, with the attribute `NHCliqueSpot = <clique id>`. (1.46.1) None of them puts a student inside a prop any more; see School-Simulation.md, Standing clear of props.
   - **Count:** 61 in all: Athletes 8, Court 8, Delinquents 8, Ordinary 8, Pack 8, Vigil 7, Choir 7, Ink 7.
   - **In existing places:** the Vigil's are in the Archive, the Athletes' are courtside in the gym, and the Delinquents' are on the Back Lot.
 - **Taken spots:** a spot counts as taken while a student is walking to it.
@@ -425,6 +425,9 @@ To run it again: set `Config.MainMenu.SlotCount` to 4, play, and use TestBridge 
 
 - **Sable Vey**, "Ink Club Seer" (`Config.Npcs` Sable, `NpcLooks` Sable), sits at the tarot table in the Ink Studio (props batch 26).
   - The root is anchored at the post with a seated pose (`POSE`: hips forward, hands lowered), the Animate script is paused, and the model has `NHSeated`. `Social.Npcs` doesn't turn a seated NPC to face the player.
+  - **(1.46.1) On the cushion:** the hip joints lift the legs half their thickness, so the thighs lie level with the hips. `Features.Seats` then rests Sable on the chair's cushion (`SeatHeight` 1.6) and keeps clear of the chair back.
+  - **(1.46.1) The table:** placed at 0.9 scale, 3.25 in front of the chair, so the knees clear the cloth.
+  - **(1.46.1) The idle** (`Controllers.World.SeerIdle`, every client): a 9-second keyframed loop on the joints. Sable breathes, looks down at the cards, glances up at the nearest student within 14 studs, leans in toward them and settles back.
   - Sable carries `Clique = Ink` on the model, but has no Clique in `Config.Npcs`, so the "join us" choices don't appear.
 - **A reading:** "Read my fortune. (¥5)" in Sable's dialogue, once per event day (`PlayerData.Social.Fortune {Day, Card, Text}`). With no Yen, or nothing to tell, Sable says so and nothing is taken.
 - **The hints** (`Fortune.Hints(P)`): each topic gives a riddle and a plain line. At Ink Club standing 20+ (Friendly) you get the plain one.

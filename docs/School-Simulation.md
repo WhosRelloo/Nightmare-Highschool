@@ -106,6 +106,9 @@ A 40-minute class is about 3 minutes 20 seconds of real time, and a passing peri
 
     A prop's `SeatHeight` attribute overrides its height. Other seats fall back to a raycast.
   - **The fix:** once the sitting pose plays, the hips are settled onto that height, a little toward the backrest. Before this, every seated NPC sank 1.2 to 1.9 studs into the seat, and the chair sitter's legs went through the floor.
+  - **Thighs too (1.46.1):** `Seats.Settle` rests whichever is lower, the hips or the thighs' hip end, on the seat. R6 sitting poses swing the legs forward from the hip, so the thighs used to sink half their thickness into the cushion.
+  - **Out of what's behind (1.46.1):** when given the seat prop, `Seats.Unclip` slides the sitter forward 0.1 at a time, up to 1.2. It stops at the first place where the torso, head and arms touch nothing but the seat and the floor, or else at the place with the fewest parts touching. Nearby props have CanQuery off, so they're switched on for the test and back off afterwards. `Schedules` passes the chair, and `AmbientNpcs` uses this instead of its own copy.
+  - **Armchairs are too narrow for an R6** (2.7 studs against about 3.6 with the arms), so nobody is seated in them. The Thinker sits in the staff room's armless teacher chair, and the slacker in the middle of the sofa.
   - **Standing up:** students stand up behind a chair (the desk is in front) and in front of a bench.
 - **Test note:** moving the clock into a class period marks Studio test players absent, so use `PlanForTests`.
 
@@ -150,3 +153,13 @@ Every NPC is built from `ServerScriptService.Services.AI.AI.Rig`. Students, the 
 - **Standing up from a desk:** a student used to stand up 2.2 studs behind the chair, and where rows are tight (Room 103) that spot is the next row's desk, so they stood up on top of it and got stuck. `Local.StandSpot` now tries eight places around the seat and takes the first one at floor level with room to stand.
 - **Ledges:** the gym floor sits a stud above its doorway, and the NPCs couldn't climb it. A student stuck at a step on its path now hops it, twice at most. It never hops on the straight-line fallback (used when no path is found), so it can't jump onto furniture.
 
+## Standing clear of props (1.46.1)
+
+- **Gathering spots:** 24 of the 61 clique gathering spots (`NHCliqueSpot`) put a standing student inside a prop: a study table, the Parlor's sofa and armchairs, chapel pews and the altar, easels, the fountain, the bleachers, a log.
+  - `Studio/spots_clear.luau` treats a student's body as a 1.8 × 4.4 × 1.8 box on the floor. It moves each blocked spot to the nearest clear floor (rings of 0.5 to 5 studs) at the same floor height, inside the same region box, at least 2 studs from the clique's other spots (1.6 past 3 studs).
+  - The old place is kept as the spot's `NHSpotWas` attribute. Run it again with `DRY = true` to check: all 61 come back clear.
+- **Corners:** walking students used to turn toward the next waypoint while still 3.5 studs short of the current one, cutting doorframes and corners. They now cut early only when `Local.LineClear` finds a body-wide line (three rays, 0.9 apart, at waist height) to the next waypoint clear; otherwise they walk to within 1.2.
+- **Checking it:** `Studio/tests/npc_audit.luau` (server, in Play) reports every NPC's gap under its lowest body part, or under its torso when it's sitting, and every prop its body passes through, with the no-query props counted.
+
+![A class seated](img/npc-seating-class.jpg)
+![The staff-room sofa](img/npc-seating-sofa.jpg)

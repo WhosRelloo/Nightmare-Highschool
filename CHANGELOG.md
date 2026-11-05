@@ -2,6 +2,44 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.46.1] - 2026-11-05: Sable's seated idle; NPCs sit on their seats and stay out of props
+
+### Added
+- **Sable's seated idle** (new `Controllers.World.SeerIdle`, owner: "Give the seer an actual sit idle anim too"):
+  - A 9-second keyframed loop that every client plays on Sable's R6 joints while Sable sits, on top of the seated pose.
+  - Sable breathes, looks down across the cards, glances up at the nearest student within 14 studs (or out at the room), leans in toward them, then settles back over the cards.
+  - Eased between keys, and it only runs within 90 studs of the camera.
+  - The first draft had Sable reach out and tap a card, but an R6 arm can't reach the table from the chair, so the hands stay low.
+
+### Fixed
+- **Seated NPCs sat inside their seats or floated over them** (`Features.Seats`, used by `Features.Schedules` and `Features.AmbientNpcs`, owner: "Make sure the seer and the other NPC's arent hovering over seats or overlap with anything"):
+  - **Hips and thighs:** both rest on the seat now. R6 sitting poses swing the legs forward from the hip, so the thighs used to sink half their thickness into the cushion.
+  - **Out of backrests and walls:** after seating, a sitter slides forward a little at a time until nothing behind them is pushed into (the wall, a picture frame, the next prop), or as far as it gets (`Seats.Unclip`). Props switch CanQuery off, so the nearby ones are counted for that test and put back afterwards.
+  - `AmbientNpcs` now uses the shared seat code instead of its own copy.
+- **The ambient sitters:**
+  - **The Thinker** moves to the staff room's armless teacher chair. An R6 student, about 3.6 studs across with the arms, is wider than the 2.7-stud armchairs, so the arms always went through the armrests.
+  - **The staff-room slacker** moves to the middle of the sofa, clear of both armrests.
+- **Sable:**
+  - The torso floated 0.7 above the cushion and the legs went into the tablecloth. Sable is now seated through the same seat code, with the legs lifted onto the cushion level with the hips.
+  - The table is placed at 0.9 scale (its top at a seated R6's middle) and 0.25 further out, so the knees clear the cloth (`Studio/props_setup26.luau`, `TABLE_SCALE`).
+- **Students stood inside props at 24 of the 61 clique gathering spots**, among them a study table, a sofa and armchairs, chapel pews, the altar, easels, a fountain, bleachers and a log. `Studio/spots_clear.luau` moved each blocked spot to the nearest clear floor in the same room, at least 2 studs from the clique's other spots (attribute `NHSpotWas` keeps the old place). All 61 now check clear.
+- **Walking students cut corners into walls:** they used to turn toward the next waypoint while still 3.5 studs short, dragging along doorframes and corners. Now they only cut early when a body-wide line to the next waypoint is clear (`Schedules` `LineClear`).
+
+### Verified (Studio Play, test slot "Testy")
+- **An audit of every NPC** (its lowest body part against the surface under it, and every prop its body passes through, with no-query props counted):
+  - **The 13 cast NPCs at their posts:** standing on the floor, clear.
+  - **Sable:** on the cushion (−0.09), touching only the chair, the legs out of the table (`docs/img/fortune-sable.jpg`).
+  - **The slacker:** on the sofa, the head out of the picture frame (`docs/img/npc-seating-sofa.jpg`).
+  - **A Room 103 class of six** (9:20 AM): all on their chairs (−0.09), legs under the desks, arms on the desktops (`docs/img/npc-seating-class.jpg`).
+  - **The Early bird:** at the desk, arms folded on it.
+- **Walking:** 120 samples of moving students over 24 s. 6 brushed something in passing: two bumped each other, two passed pillars, one squeezed between chapel pews. None was stuck in a wall. Before, a student was stuck in an outer wall corner for 6 s.
+- No script errors.
+- **Left as they are:**
+  - The kneeling Detention kid and the push-up and pull-up kids are posed off the floor on purpose.
+  - The test dummies and the cape mannequins in the combat test area weren't touched.
+  - The slacker's crossed leg passes through the other leg, which is the SitChill animation itself.
+- **Not tested:** benches with a student sitting on them during a break, Sable getting up after being downed, and the idle on another player's screen.
+
 ## [1.46.0] - 2026-11-05: The statue kit
 
 ### Added
