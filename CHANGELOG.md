@@ -2,6 +2,38 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.42.0] - 2026-11-05: Lost & Found
+
+### Added
+- **Lost & Found** (new `Services.Features.LostFound`, client `Controllers.World.LostFound`):
+  - Up to 3 lost things lie around the grounds at a time, near the cliques' gathering spots and never in a Forbidden region. Each has a soft glint and a "Pick up" prompt.
+  - There are 8 things to find. Six belong to a clique: the Athletes' varsity scarf, the Ink Club's ink-stained sketchbook, the Delinquents' studded wristband, the Pack's wolf-tooth pendant, the Choir's ribboned hymnal and an Ordinary student's dented lunch tin. Nobody claims the other two: a brass pocket watch and a cracked phone.
+  - Pick one up and you carry it in your right hand, one at a time. The clock shows "Carrying: …".
+  - **Return it:** walk up to any student of the owner's clique and hold "Return". You get +5 standing with that clique and a thank-you line.
+  - **Or hand it in:** take it to a Lost & Found box for Yen: ¥15 for something with an owner, ¥20 for something nobody can claim.
+  - Up to 5 returns or hand-ins a day each (the 6 AM event day, saved in `PlayerData.Social.LostFound {Day, N}`).
+  - A taken item turns up somewhere else 2½ to 5 minutes later.
+  - What you carry isn't saved: you drop it if you leave or go down.
+  - Test hooks: `LostSpawn` and `LostState` on `ServerStorage.NHTestBridge`.
+- **Props batch 24, the Lost & Found kit** (`art/props/nh_props_batch24.py`): the 8 lost things at real hand size, plus the Lost & Found chest with its hand-lettered LOST & FOUND board.
+  - Each is a single piece, baked at 2048 with 64 samples on the GPU; the maps are under the group.
+  - `Studio/props_setup24.luau` builds the templates in `ServerStorage.NHProps` (Lost* and LostFoundBox, `NHBuildKit = "LostFound"`).
+  - The box and the 8 things on a plinth are on the showcase at x 94, z −170.5 (`NHPropBatch24`). The box there is tagged `NHLostFoundBox`, so it's a working hand-in point. The builder can tag any box placed in the school the same way.
+  - The scarf has no metal map: it's all black (no metal), and that upload didn't come through.
+
+### Verified (Studio Play, test slot "Testy")
+- **With stand-in blocks** (before the kit was imported):
+  - Pick up: the item sat in the hand and the clock showed "Carrying: …".
+  - Returns: the Return prompt showed on a clique student, and two scarf returns took the Athletes from −50 to −40.
+  - Hand-in: an unclaimed pocket watch paid ¥20 (81 → 101).
+  - The day's count reached 3.
+- **With the real props:**
+  - All 8 spawned as the real models, both from the test hook and the server's own spawns. They look right lying on the floor (`docs/img/lost-found-floor.jpg`).
+  - The hymnal and the scarf sit right in the hand, the hymnal with its cover facing out (`docs/img/lost-found-in-hand.jpg`).
+  - Handing the hymnal in at the showcase box paid ¥15 (101 → 116).
+  - On the showcase, every map loaded (`docs/img/lost-found-showcase.jpg`).
+- **Not tested:** the 5-a-day limit, dropping the item on going down or leaving, and a box placed inside the school.
+
 ## [1.41.0] - 2026-11-05: Moon phases, the crimson moon and the blue moon
 
 ### Added

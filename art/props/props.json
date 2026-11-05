@@ -1,5 +1,5 @@
 {
- "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y). Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 15-17: the cafeteria and the spire; PendantLamp_Glass is crimson glass (set in props_setup15). Batch 18: the nine skateboards; each piece's origin is its pivot (trucks lean about the long axis, wheels spin about the axle). Batch 19: the lamp and light kit; maps published under the Nightmare Highschool group (Asset Manager bulk import), lights and tags set in props_setup19. Batch 20: the stair and bridge kit, group-owned maps, set up by props_setup20. Batch 21: the painting and art kit; each painting's *_Canvas piece carries its own 2048 painting (CanvasColorMap), set up by props_setup21.",
+ "_note": "School props from art/props/nh_props.py. Dims are studs (W, D, H) as modelled; front faces -Z (LookVector) after import. Each prop uses one SurfaceAppearance with these maps. Door pieces swing on their hinge edge (swing -1 = hinge on the left, +1 = hinge on the right). Batch 3 pivot = the swing hinge (Blender X, Y, Z of a rocking piece: the clock's pendulum, the bell); *_Glow pieces become Neon, *_Glass pieces Glass. Batches 4-5: baked at 2048 from the 2048 source sets; *_Mirror pieces become reflective glass, *_Water pieces hidden water shown while open; rigged pieces (Door0, TapHot, TapCold) turn about their pivot (the FBX origin) through the locker system, the football machine's WheelL / WheelR spin about Z (Blender) on theirs. Batches 6-9: as 4-5; *_Pool pieces are water that always shows; *_Cloth pieces sway (NHSwing about their origin on the rod); Gramophone_Record spins (NHSpin); FilingCabinet_Drawer0 slides; ValveWheel_Wheel turns about its axle (Blender Y). Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 10-14: as 6-9; *_Door0 pieces swing about their origin (the hinge), the TownDoor's into the building; CuriosityCabinet_Glass swings with its door; HeadmasterDesk_Drawer0 slides; *_Cloth pieces sway. Batches 15-17: the cafeteria and the spire; PendantLamp_Glass is crimson glass (set in props_setup15). Batch 18: the nine skateboards; each piece's origin is its pivot (trucks lean about the long axis, wheels spin about the axle). Batch 19: the lamp and light kit; maps published under the Nightmare Highschool group (Asset Manager bulk import), lights and tags set in props_setup19. Batch 20: the stair and bridge kit, group-owned maps, set up by props_setup20. Batch 21: the painting and art kit; each painting's *_Canvas piece carries its own 2048 painting (CanvasColorMap), set up by props_setup21. Batch 24: the Lost & Found kit; each prop is one piece with its origin at the bottom centre (the eight lost items lie flat on z = 0); maps for the group bulk import in art/group-upload/lost-found.",
  "StudentDesk": {
   "dims": [
    3.0,
@@ -3771,5 +3771,131 @@
   "NormalMap": "rbxassetid://87035507197237",
   "RoughnessMap": "rbxassetid://130751943740698",
   "MetalnessMap": "rbxassetid://117676090672369"
+ },
+ "LostScarf": {
+  "dims": [
+   1.35,
+   0.44,
+   0.18
+  ],
+  "pieces": [
+   "LostScarf"
+  ],
+  "tris": {
+   "LostScarf": 6452
+  },
+  "batch": 24
+ },
+ "LostSketchbook": {
+  "dims": [
+   0.87,
+   1.06,
+   0.14
+  ],
+  "pieces": [
+   "LostSketchbook"
+  ],
+  "tris": {
+   "LostSketchbook": 5422
+  },
+  "batch": 24
+ },
+ "LostWristband": {
+  "dims": [
+   0.51,
+   0.47,
+   0.15
+  ],
+  "pieces": [
+   "LostWristband"
+  ],
+  "tris": {
+   "LostWristband": 1756
+  },
+  "batch": 24
+ },
+ "LostPendant": {
+  "dims": [
+   0.42,
+   0.83,
+   0.09
+  ],
+  "pieces": [
+   "LostPendant"
+  ],
+  "tris": {
+   "LostPendant": 2964
+  },
+  "batch": 24
+ },
+ "LostHymnal": {
+  "dims": [
+   0.52,
+   0.86,
+   0.14
+  ],
+  "pieces": [
+   "LostHymnal"
+  ],
+  "tris": {
+   "LostHymnal": 3396
+  },
+  "batch": 24
+ },
+ "LostLunchTin": {
+  "dims": [
+   0.89,
+   0.55,
+   0.43
+  ],
+  "pieces": [
+   "LostLunchTin"
+  ],
+  "tris": {
+   "LostLunchTin": 7528
+  },
+  "batch": 24
+ },
+ "LostPocketWatch": {
+  "dims": [
+   0.74,
+   0.83,
+   0.38
+  ],
+  "pieces": [
+   "LostPocketWatch"
+  ],
+  "tris": {
+   "LostPocketWatch": 8244
+  },
+  "batch": 24
+ },
+ "LostPhone": {
+  "dims": [
+   0.46,
+   0.94,
+   0.05
+  ],
+  "pieces": [
+   "LostPhone"
+  ],
+  "tris": {
+   "LostPhone": 5516
+  },
+  "batch": 24
+ },
+ "LostFoundBox": {
+  "dims": [
+   2.68,
+   2.12,
+   3.49
+  ],
+  "pieces": [
+   "LostFoundBox"
+  ],
+  "tris": {
+   "LostFoundBox": 14589
+  },
+  "batch": 24
  }
 }

@@ -591,3 +591,25 @@ Door, flap and tap origins sit on their hinge lines.
 - **In Roblox:** `Studio/props_setup22.luau` builds the template (ServerStorage.NHProps.MidnightBellBoard) with an invisible upright text face on each card (`CardNFace`, `NHBoardCard`), replaces the R102 hall board (the old one is in `ServerStorage.NH_Backup.Bundle1_pre`), moved 0.85 toward the doorway so its left sconce clears the pillar, and puts a copy on a slate backing wall on the showcase at x 82 (`NHPropBatch22`). `Features.NoticeBoard` writes the live cards.
 
 ![The preview](img/midnight-bell-board-preview.png)
+
+## Batch 24 (1.42): the Lost & Found kit
+
+| Prop | Tris | Size (W x D x H studs) | Notes |
+|---|---|---|---|
+| LostScarf | 6.5k | 1.35 x 0.44 x 0.18 | the Athletes' varsity scarf, folded: crimson knit, bone stripes, a shield patch |
+| LostSketchbook | 5.4k | 0.87 x 1.06 x 0.14 | the Ink Club's black cloth sketchbook, blue-black ink splatters, a crimson pencil |
+| LostWristband | 1.8k | 0.51 x 0.47 x 0.15 | the Delinquents' studded leather cuff |
+| LostPendant | 3.0k | 0.42 x 0.83 x 0.09 | the Pack's wolf-tooth pendant on a coiled cord |
+| LostHymnal | 3.4k | 0.52 x 0.86 x 0.14 | the Choir's crimson hymnal, gilt cross and edges, two ribbons |
+| LostLunchTin | 7.5k | 0.89 x 0.55 x 0.43 | a dented tin with a hand-painted LUNCH label |
+| LostPocketWatch | 8.2k | 0.74 x 0.83 x 0.38 | a brass hunter watch lying open, cracked dial, coiled chain |
+| LostPhone | 5.5k | 0.46 x 0.94 x 0.05 | a cracked phone with a crimson crescent charm |
+| LostFoundBox | 14.6k | 2.68 x 2.12 x 3.49 | an iron-bound oak chest, lid propped open, overflowing, with a hand-lettered LOST & FOUND board |
+
+- **Baked** at 2048 with 64 samples on the GPU. Each prop is one piece, with its origin at the bottom centre; the 35 maps are under the group (the ids are in `Studio/props_setup24.luau`). The scarf has no metal map.
+- **In Roblox:** `Studio/props_setup24.luau` builds the templates in `ServerStorage.NHProps` (`NHBuildKit = "LostFound"`). `Features.LostFound` clones the item templates for the loose items and the one held in the hand.
+  - The showcase has the box and the 8 things on a slate plinth, at x 94, z −170.5, east of the notice board (`NHPropBatch24`).
+  - Any Model tagged `NHLostFoundBox` is a hand-in point (the showcase box is tagged).
+
+![The preview](img/lost-found-preview.png)
+![On the showcase](img/lost-found-showcase.jpg)

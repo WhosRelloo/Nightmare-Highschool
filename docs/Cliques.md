@@ -392,6 +392,33 @@ To run it again: set `Config.MainMenu.SlotCount` to 4, play, and use TestBridge 
 - `TurfWin(owner, rival, winner)`: record a scuffle result at `owner`'s hangout, as if one had ended
 - Set `ReplicatedStorage` attribute `NHTestNoMenuKeys` during automated Play tests: the main menu then ignores the keyboard, so a stray Enter or Space can't press Continue and load a slot. Clear it afterwards.
 
+## Lost & Found (1.42)
+
+`Services.Features.LostFound` (server) and `Controllers.World.LostFound` (client).
+
+- **Where:** up to 3 lost things lie around at a time, near the `NHCliqueSpot` gathering spots, never in a Forbidden region. Each has a glint and a "Pick up" prompt (`NHLostPickUp`). A taken item turns up somewhere else 150 to 300 seconds later.
+- **The things:**
+
+  | Item | Owner |
+  |---|---|
+  | varsity scarf | Athletes |
+  | ink-stained sketchbook | Ink |
+  | studded wristband | Delinquents |
+  | wolf-tooth pendant | Pack |
+  | ribboned hymnal | Choir |
+  | dented lunch tin | Ordinary |
+  | brass pocket watch, cracked phone | nobody |
+
+- **Carrying:** one at a time, welded to the right hand (`NHHeldLost`). The Player attributes are `NHLostItem`, `NHLostItemText` and `NHLostItemClique`, and the clock shows "Carrying: …". It isn't saved: you drop it if you leave or go down.
+- **Returning:** your client shows a "Return" prompt (`NHLostReturn`) on students (`workspace.NHSchedule`) of the owner's clique, and calls `ReplicatedStorage.NHLostFound.Return`. The return gives +5 standing with that clique and a thank-you line.
+- **Handing in:** the "Hand in" prompt (`NHLostHandIn`) is on any Model tagged `NHLostFoundBox`. It pays ¥15 for an owned item and ¥20 for an unowned one.
+- **The limit:** 5 returns or hand-ins a day, on the 6 AM event day (`PlayerData.Social.LostFound {Day, N}`).
+- **Props:** batch 24 (`School-Props.md`); the items fall back to a plain block if a template is missing.
+- **Test hooks:** `LostSpawn(id, position)` and `LostState` on `ServerStorage.NHTestBridge`.
+
+![Lying on the floor](img/lost-found-floor.jpg)
+![In the hand](img/lost-found-in-hand.jpg)
+
 ## Next phases
 - ~~**Phase 2:** reactions, turf, scuffles and the hall monitor.~~ Done in 1.27.0 (above).
 - ~~**Phase 3:** turf, leader quests and rank rewards for every clique.~~ Done in 1.28.0 (above).
