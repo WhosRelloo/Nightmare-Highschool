@@ -22,7 +22,7 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 ### Verified (Studio, Edit)
 - All 19 placed with no clashes and every map showing (screenshots in docs/img: `stair-kit.jpg`, `bridge-kit.jpg`, `bridge-kit-night.jpg`, `art-kit-gallery.jpg`, `art-kit-closeup.jpg`).
-- **Not tested in Play** (another session was testing in the same Studio): walking the stairs and bridges, and the lanterns at dusk.
+- **Play (solo, tested after release):** every flight walked to the top (the spiral tread by tread), the landing holds a player, both bridges and the deck walked across, and the iron bridge's side barrier stops a player walking off.
 
 ## [1.37.0] - 2026-11-04: Clean clothing seams, transformed outfits, menacing and race faces
 
@@ -77,7 +77,7 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 - Day and night screenshots (`docs/img/lamp-kit-day.jpg`, `lamp-kit-night.jpg`, `lamp-kit-hanging.jpg`).
 - All 70 group ids read back by name and swapped in; every lamp map and all seven grass sets show (`docs/img/grass-sets.jpg`).
 - Three grass sets showed blank white while three of them shared one base material. They now sit at most two to a base (Grass, LeafyGrass, Ground, Mud).
-- **Not tested in Play** (another session was testing in the same Studio): the flicker, the dusk switch and the embers.
+- **Play (solo, tested after release):** candles, gas and fire flicker; the outdoor gas lamps light at 21:00 and go out by day; the floor lamp stays steady. Not yet tried: Reduce Flashing's calmer flicker, the embers up close.
 
 ## [1.35.1] - 2026-11-04: Talk cinematic, a softer menu clock
 

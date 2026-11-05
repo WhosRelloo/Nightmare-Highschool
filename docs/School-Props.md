@@ -562,7 +562,8 @@ Door, flap and tap origins sit on their hinge lines.
 - **Imported and set up:** the owner imported the 12 FBX files. The setup made the templates and placed all 12 with no clashes, the floor pieces on the plate (bottom 0.90) and the hanging pieces' tops at the beam (12.90). The lights and tags match the table above (checked by script).
 - **Textures in the group:** the owner bulk-imported the maps under the group. All 48 ids were read back by name (no duplicates) and swapped into the 12 templates and 12 copies (24 SurfaceAppearances). The meshes are group-owned too.
 - **Screenshots:** day (`docs/img/lamp-kit-day.jpg`), a close-up of the hanging pieces (`lamp-kit-hanging.jpg`), and night with Studio's clock at 0:00 (`lamp-kit-night.jpg`, the clock put back to 13:00 straight after). Every map shows, including the twin lamp and floor lamp, which were blank while they used account-owned uploads.
-- **Not verified yet** (no Play test; another session was testing in the same Studio): the flicker, the dusk switch and the embers in Play; how the kit's lights cost on a low-end device.
+- **Tested in Play (solo, slot II, 2026-11-04):** with the camera close by, the candles and fire flickered (the pricket 0.95 to 1.10, the corona 1.41 to 1.59, the torch 1.23 to 1.40; Reduce Flashing off) and the floor lamp stayed steady at 1.0. With the client's clock moved to 21:00 (on that client only, so no save data was touched), the gas post, the twin lamp and the wall lantern all lit, their mantles turned to Neon, and they went out again back at day.
+- **Not verified yet:** Reduce Flashing's calmer flicker in Play, the embers up close, and how the kit's lights cost on a low-end device.
 
 **Batches 20 and 21, stairs and bridges, the art kit (2026-11-04, 1.38.0):**
 - **Baked:** all 19 at 2048 with 64 samples on the GPU, every piece under 20k triangles (the largest, the landing's Faces, 18.0k). Sheets `art/props/_batch20_final_sheet.png` and `_batch21_final_sheet.png`.
@@ -573,4 +574,9 @@ Door, flap and tap origins sit on their hinge lines.
   - **The Blood Moon painting:** hung higher, so the leaning canvas stack doesn't touch it.
   - **Stray imports:** eight duplicate imports of the art kit were removed.
 - **Screenshots:** the stairs (`docs/img/stair-kit.jpg`), a bridge by day and night (`bridge-kit.jpg`, `bridge-kit-night.jpg`, the clock put back to 13:00) and the gallery (`art-kit-gallery.jpg`, `art-kit-closeup.jpg`). Every map shows.
-- **Not verified yet** (no Play test; another session was testing in the same Studio): walking up the stairs and over the bridges, and the lanterns' dusk switch and flicker.
+- **Tested in Play (solo, slot II, 2026-11-04):**
+  - **Stairs:** the character walked (Humanoid MoveTo) from the ground to the top tread of StairStone, StairStoneRailed, StairGrand and StairIron, and tread by tread up StairSpiral onto its head landing.
+  - **Landing:** it holds a player on its flagstones (a ray finds the floor at 6.94).
+  - **Bridges:** the character walked across the stone arch over its hump, along the iron bridge and along the deck span. Walking sideways on the iron bridge stopped at the invisible barrier, just inside the girders.
+  - **Lanterns:** the same NHLamp / NHCandle setup as the lamp kit, whose dusk switch and flicker were checked in this Play test.
+- **Not verified yet:** a real player climbing with the keyboard and the camera on the spiral, and walking the iron stair's open treads with shift lock.
