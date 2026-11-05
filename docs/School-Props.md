@@ -663,3 +663,30 @@ Door, flap and tap origins sit on their hinge lines.
 
 ![The preview](img/lost-found-preview.png)
 ![On the showcase](img/lost-found-showcase.jpg)
+
+## Batch 25 (1.44): the door kit, rigged and animated
+
+`art/props/nh_props_batch25.py`. Every door is finished the same on both faces (architraves, panels, straps and studs, handles, the crest), so it looks right from whichever side you come through.
+
+| Prop | Tris | Notes |
+|---|---|---|
+| ClassroomDoor | 4.3k (Main, Glass, Leaf0, Leaf0Glass) | crimson enamel iron, raised panels, a wired-glass light, brass levers and kick plates both sides, a glazed transom |
+| GothicDoubleDoor | 13.3k (Main, Leaf0, Leaf1) | pointed-arch pair, iron-sheathed and studded, strap hinges and ring pulls both faces, a moulded portal with a hood mould both faces |
+| IronGate | 10.7k (Main, Leaf0, Leaf1) | wrought-iron double gate, spear tops, scrolls, gilt quatrefoil medallions, stone piers with ball finials |
+| HeadmasterDoor | 8.3k (Main, Glass, Leaf0) | black lacquer, six gilt-moulded panels and the crest both faces, brass knobs, an iron sunburst fanlight, a keystone with the crest |
+| BookcaseDoor | 9.8k (Main, Leaf0) | a secret oak bookcase of leather-bound books, a panelled iron-strapped back, a hidden pivot |
+| SlidingIronDoor | 5.9k (Main, Leaf0, Leaf0Glass) | riveted iron, crimson X-braces, a wired port, an iron head box; slides 4.37 into the wall |
+| CellarHatch | 3.6k (Main, Leaf0) | an iron-banded floor hatch with a ring pull over stone steps; its origin is at floor level, the pit below |
+
+- **Baked** at 2048 with 64 samples on the GPU; maps under the group (`art/group-upload/doors-batch25/`). The ids and the rig are in `art/props/doors_batch25.json`.
+- **The rig:** each leaf is its own piece whose FBX origin (the Roblox PivotOffset) is the hinge, on the wall's centre line. A leaf's glass is a leaf of its own on the same hinge.
+  - `props_setup25.luau` gives each leaf `DoorLeaf`, `DoorKind` (swing, hatch, slide), `SwingDeg` (signed by a test turn so `OpenDir = +1` swings toward the back), `DoorAxis` / `SlideBy` and `SwingTime`.
+  - On the model it sets `PromptObject`, `AutoClose`, `OneWay`, `Locked`, `DoorwaySize`, a `DoorPrompt` attachment, and the empty `OpenSound` / `CloseSound` / `RattleSound`.
+- **In game:**
+  - **Server:** `Services.Features.Doors` adds the prompt and decides `Open` and `OpenDir`, so a door swings away from whoever opened it. It auto-closes after `AutoClose` seconds, holding while a character is in the doorway (up to 30 s more). A locked door rattles.
+  - **Client:** `Controllers.World.Doors` moves the leaves with weighted easing, and the leaves collide where each client moves them. Reduce Motion snaps them.
+- **Showcase:** a row at z −110 from x 96, between the two window walls, each door between slate wall stubs (`workspace.NHPropsShowcase.Doors`, `NHPropBatch25`; `props_revert25.luau` removes them).
+- **For the builder:** set a door into a wall opening of its width (the frames are 1.1 to 1.4 deep). Set `Locked` to lock it, `AutoClose = 0` to keep it open, and fill the sound attributes when there are sounds.
+
+![The doors, shut and open](img/door-kit-previews.jpg)
+![On the showcase](img/door-kit-showcase.jpg)

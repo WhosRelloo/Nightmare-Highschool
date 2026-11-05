@@ -1,0 +1,268 @@
+{
+ "_note": "Props batch 25 (1.44): the door kit, from art/props/nh_props_batch25.py. Each door's leaves are rigged pieces whose FBX origin (Roblox PivotOffset) is the hinge; 'rig' gives each moving piece's kind (swing, with = moves with its leaf, slide, hatch), hinge (Blender X, Y, Z, studs), axis and slide. Maps are group-owned (15981569). Set up by Studio/props_setup25.luau; animated by Services.Features.Doors (server) and Controllers.World.Doors (client).",
+ "ClassroomDoor": {
+  "rig": {
+   "ClassroomDoor_Leaf0": {
+    "kind": "swing",
+    "hinge": [
+     -1.77,
+     0.0,
+     0.02
+    ],
+    "axis": [
+     0,
+     0,
+     1
+    ],
+    "slide": [
+     0,
+     0,
+     0
+    ],
+    "angle": 100
+   },
+   "ClassroomDoor_Leaf0Glass": {
+    "kind": "with",
+    "hinge": [
+     -1.77,
+     0.0,
+     0.02
+    ],
+    "axis": [
+     0,
+     0,
+     1
+    ],
+    "slide": [
+     0,
+     0,
+     0
+    ],
+    "angle": 100
+   }
+  },
+  "ColorMap": "rbxassetid://130567413381834",
+  "NormalMap": "rbxassetid://124379976239530",
+  "RoughnessMap": "rbxassetid://125249760714133",
+  "MetalnessMap": "rbxassetid://117203725385553"
+ },
+ "GothicDoubleDoor": {
+  "rig": {
+   "GothicDoubleDoor_Leaf0": {
+    "kind": "swing",
+    "hinge": [
+     -2.97,
+     0.0,
+     0.02
+    ],
+    "axis": [
+     0,
+     0,
+     1
+    ],
+    "slide": [
+     0,
+     0,
+     0
+    ],
+    "angle": 95
+   },
+   "GothicDoubleDoor_Leaf1": {
+    "kind": "swing",
+    "hinge": [
+     2.97,
+     0.0,
+     0.02
+    ],
+    "axis": [
+     0,
+     0,
+     1
+    ],
+    "slide": [
+     0,
+     0,
+     0
+    ],
+    "angle": 95
+   }
+  },
+  "ColorMap": "rbxassetid://72040146478893",
+  "NormalMap": "rbxassetid://85970138235288",
+  "RoughnessMap": "rbxassetid://104079557018860",
+  "MetalnessMap": "rbxassetid://83024957892439"
+ },
+ "IronGate": {
+  "rig": {
+   "IronGate_Leaf0": {
+    "kind": "swing",
+    "hinge": [
+     -2.96,
+     0.0,
+     0.1
+    ],
+    "axis": [
+     0,
+     0,
+     1
+    ],
+    "slide": [
+     0,
+     0,
+     0
+    ],
+    "angle": 100
+   },
+   "IronGate_Leaf1": {
+    "kind": "swing",
+    "hinge": [
+     2.96,
+     0.0,
+     0.1
+    ],
+    "axis": [
+     0,
+     0,
+     1
+    ],
+    "slide": [
+     0,
+     0,
+     0
+    ],
+    "angle": 100
+   }
+  },
+  "ColorMap": "rbxassetid://123512274700381",
+  "NormalMap": "rbxassetid://113725170040844",
+  "RoughnessMap": "rbxassetid://111825573445081",
+  "MetalnessMap": "rbxassetid://82969546525682"
+ },
+ "HeadmasterDoor": {
+  "rig": {
+   "HeadmasterDoor_Leaf0": {
+    "kind": "swing",
+    "hinge": [
+     -2.0700000000000003,
+     0.0,
+     0.02
+    ],
+    "axis": [
+     0,
+     0,
+     1
+    ],
+    "slide": [
+     0,
+     0,
+     0
+    ],
+    "angle": 100
+   }
+  },
+  "ColorMap": "rbxassetid://130991145844791",
+  "NormalMap": "rbxassetid://122803536953024",
+  "RoughnessMap": "rbxassetid://91925322193993",
+  "MetalnessMap": "rbxassetid://128632676882388"
+ },
+ "BookcaseDoor": {
+  "rig": {
+   "BookcaseDoor_Leaf0": {
+    "kind": "swing",
+    "hinge": [
+     -2.09,
+     0.0,
+     0.02
+    ],
+    "axis": [
+     0,
+     0,
+     1
+    ],
+    "slide": [
+     0,
+     0,
+     0
+    ],
+    "angle": 80
+   }
+  },
+  "ColorMap": "rbxassetid://84990518018250",
+  "NormalMap": "rbxassetid://94054666456401",
+  "RoughnessMap": "rbxassetid://107428610319600",
+  "MetalnessMap": "rbxassetid://116609406346348"
+ },
+ "SlidingIronDoor": {
+  "rig": {
+   "SlidingIronDoor_Leaf0": {
+    "kind": "slide",
+    "hinge": [
+     -2.36,
+     0.0,
+     0.02
+    ],
+    "axis": [
+     0,
+     0,
+     1
+    ],
+    "slide": [
+     4.37,
+     0,
+     0
+    ],
+    "angle": 100
+   },
+   "SlidingIronDoor_Leaf0Glass": {
+    "kind": "with",
+    "hinge": [
+     -2.36,
+     0.0,
+     0.02
+    ],
+    "axis": [
+     0,
+     0,
+     1
+    ],
+    "slide": [
+     0,
+     0,
+     0
+    ],
+    "angle": 100
+   }
+  },
+  "ColorMap": "rbxassetid://90954148113180",
+  "NormalMap": "rbxassetid://129537109031049",
+  "RoughnessMap": "rbxassetid://79308584803377",
+  "MetalnessMap": "rbxassetid://72883510094354"
+ },
+ "CellarHatch": {
+  "rig": {
+   "CellarHatch_Leaf0": {
+    "kind": "hatch",
+    "hinge": [
+     0.0,
+     1.78,
+     0.02
+    ],
+    "axis": [
+     1,
+     0,
+     0
+    ],
+    "slide": [
+     0,
+     0,
+     0
+    ],
+    "angle": 105
+   }
+  },
+  "ColorMap": "rbxassetid://129013664753202",
+  "NormalMap": "rbxassetid://87516133856222",
+  "RoughnessMap": "rbxassetid://90384555465545",
+  "MetalnessMap": "rbxassetid://108556815366985"
+ }
+}

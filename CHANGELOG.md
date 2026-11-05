@@ -2,6 +2,46 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.44.0] - 2026-11-05: The door kit, rigged and animated
+
+### Added
+- **Props batch 25, the door kit** (`art/props/nh_props_batch25.py`): 7 doors, finished on both faces so they look right from whichever side you come through.
+  - **ClassroomDoor:** a crimson enamel iron door with raised panels, a wired-glass light and brass levers, under a glazed transom in a soot-stone frame.
+  - **GothicDoubleDoor:** pointed-arch double doors, iron-sheathed and studded, with strap hinges and ring pulls, in a moulded stone portal with a hood mould on both faces.
+  - **IronGate:** a wrought-iron double gate (spear-topped bars, scrolls, gilt quatrefoil medallions) between stone piers with ball finials.
+  - **HeadmasterDoor:** black lacquer with six gilt-moulded panels and the crest, brass knobs, under an iron sunburst fanlight in a round-headed frame with a keystone.
+  - **BookcaseDoor:** a secret door. One face is a full oak bookcase of leather-bound books; the other is a panelled, iron-strapped back.
+  - **SlidingIronDoor:** a riveted iron boiler-room door with crimson X-braces and a wired port, sliding into the wall.
+  - **CellarHatch:** an iron-banded floor hatch with a ring pull, hinged on its back edge over stone steps going down.
+- **Rigged:** every moving piece is its own part with its pivot on the hinge. Leaves pivot on the wall's centre line, so a door can swing either way. A leaf's glass moves with it. The ids and the rig are in `art/props/doors_batch25.json`.
+- **Animated** (new `Services.Features.Doors` and `Controllers.World.Doors`; doors are tagged `NHDoor`):
+  - **The prompt:** an Open / Close prompt sits in each doorway. A door swings away from whoever opens it.
+  - **Closing:** it shuts by itself after its `AutoClose` time, and waits while anyone stands in the doorway.
+  - **The motion:** heavy leaves open with a little overshoot and shut with a small bounce. The hatch lifts up, and the boiler door slides into the wall. Reduce Motion snaps them instead.
+  - **Locked:** set `Locked` on a door and the prompt reads "Locked"; the door only rattles in its frame.
+  - **Sounds:** `OpenSound`, `CloseSound` and `RattleSound` are empty slots for sounds to come.
+- **Baked** at 2048 with 64 samples on the GPU. Every piece is under 16k triangles (the largest is 8,984). The 28 maps are under the group (`art/group-upload/doors-batch25/`).
+- **On the showcase** (`workspace.NHPropsShowcase.Doors`, tag `NHPropBatch25`; `Studio/props_setup25.luau`, reverted by `props_revert25.luau`):
+  - A row of doors at z −110 from x 96, between the two window walls.
+  - Each stands between short slate wall stubs, so you can walk through it both ways.
+  - Templates are in `ServerStorage.NHProps` (`NHBuildKit = "Doors"`).
+
+### Verified (Studio Play, no save slot; `NHTestNoMenuKeys` set and cleared afterwards)
+- **Prompts:** every door's prompt is set up ("Open Door", "Open Gate", "Open Hatch"…), and every frame has precise collision.
+- **With a test rig on the server** (ClassroomDoor):
+  - Closed, the door stops it.
+  - Opened from the front, it swings to the back, and the rig walks through.
+  - With the rig in the doorway it stayed open past its 7 s, then shut 1.6 s after the rig stepped out.
+  - Opened from the back, it swings the other way.
+  - Locked, it only rattles.
+- **On the client:** every leaf moved as rigged.
+  - The swinging leaves and their glass turned toward the back.
+  - The hatch lifted 105° up.
+  - The boiler door slid 4.37 studs into its stub.
+- **Fixed during testing:** at 100° the single doors brushed their own architrave near the hinge, so they now open 92° (the gothic pair 90°).
+- **Not tested:** a real player character walking through, a door placed in a school wall, and a hatch over a real floor opening (on the showcase its pit is under the baseplate).
+- **Note:** the models were first imported into the Map place by mistake. They were copied to NH Combat Test from the same meshes and removed from Map.
+
 ## [1.43.0] - 2026-11-05: The window kit and the gothic crown conservatory
 
 ### Added
