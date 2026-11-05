@@ -176,3 +176,22 @@ Night races (Vampire, Werewolf, Ghoul, Wraith) press **H** to see in the dark.
 
 ## A race spin starts over (Races 1.3)
 A **race** spin resets `Tier = 1`, `Hunger = 0` and `Looks = {}`, keeps traits and spins, and sets `Earned = true` so the old kill-count migration can't raise the tier again. This matches the bite (`Lineage.Turn`). A **variant** spin keeps race, tier and hunger. The rule lives in the `Spin` handler in `ReplicatedStorage.Lineage`; the Bloodline tab's spin note tells the player before they spin.
+
+## Moon phases and the special moons (1.41)
+
+The night sky runs a 4-night cycle (`Lineage.MoonPhase`): **full** (every 4th night, as before), **waning**, **new**, **waxing**.
+
+| Night | Who it helps | Look |
+|---|---|---|
+| Full moon | Werewolves: full-moon power (+2.5% to 5%), and amber eyes all night | the moon swells, a pale-crimson grade |
+| New moon | Wraiths: +5% damage, 5% harder to spot (`NewMoonPower`, `NewMoonStealth`) | darker and cooler, 5,000 stars, a banner |
+| **Crimson moon** (every 4th full moon, alternating) | Vampires +8% damage and crimson eyes; Ghouls and Wraiths +3% | a blood-red moon with glowing fissures, a red grade, the front page |
+| **Blue moon** (every 4th full moon, alternating) | Priests +8% damage; Humans +5% | an icy halo moon, a cold grade, the front page |
+
+The special moons are every 16th night (`Lineage.MoonEvent`, `MoonEvents`); Werewolves keep their full-moon power on them. `Features.MoonPhases` publishes `workspace` `NHMoonPhase`, `NHMoonNight`, `NHMoonEvent` / `NHMoonEventTonight` and the eyes (`NHMoonEyes`); `Controllers.World.MoonPhases` sets the sky texture, the grades and the banners; the clock shows the moon's icon and name; the Midnight Bell has a SKYWATCH article. Textures and icons: `art/ui/hud/make_moon_phases.py` (the sky draws its moon mirrored, so the waning and waxing textures are swapped in `Lineage.MoonTextures`).
+
+| Full | Crimson | Blue | Waxing |
+|---|---|---|---|
+| ![](img/moon-full.jpg) | ![](img/moon-crimson.jpg) | ![](img/moon-blue.jpg) | ![](img/moon-waxing.jpg) |
+
+![A Werewolf's eyes under the full moon](img/full-moon-werewolf-eyes.jpg)

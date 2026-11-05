@@ -2,6 +2,45 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.41.0] - 2026-11-05: Moon phases, the crimson moon and the blue moon
+
+### Added
+- **Moon phases** (`ReplicatedStorage.Lineage`: `MoonPhase`, `IsNewMoon`, `NightsUntilFull`):
+  - Each night has a phase: full, waning, new, waxing, then full again. The full moon keeps its old nights (every 4th).
+  - **The sky:** the moon wears tonight's phase, from 6 original moon textures (`art/ui/hud/make_moon_phases.py`, published under the group, in `Lineage.MoonTextures`). Roblox draws the sky moon mirrored, so the waning texture is the right-lit image and the waxing one the left-lit image.
+- **New-moon nights** (new `Controllers.World.MoonPhases`):
+  - Darker and cooler (`NHNewMoonGrade`), with 5,000 stars instead of 3,000.
+  - A banner: "The new moon rises."
+  - Wraiths get +5% damage and are 5% harder to spot (`NewMoonPower`, `NewMoonStealth`).
+- **Full moons:** a Werewolf's eyes glow amber all night for everyone. The new `Features.MoonPhases` sets `NHMoonEyes`, and `NightSight` reuses its eye glow.
+- **The crimson and blue moons:** every 4th full moon is special (about once every 16 nights), alternating crimson and blue (`Lineage.MoonEvent`, `MoonEvents`).
+  - **Crimson moon:**
+    - Vampires get +8% damage, and their eyes glow crimson. Ghouls and Wraiths get +3%.
+    - A blood-red grade, its own banner, and the paper's front page.
+    - The texture is deep red with glowing hairline fissures and a red corona.
+  - **Blue moon:**
+    - Priests get +8% damage and Humans +5%.
+    - A cold grade, its own banner, and the front page.
+    - The texture is icy blue-silver with frost-bright rims, a faint etched astrolabe and a halo ring.
+  - Werewolves keep their full-moon power on both, and the usual "The moon is full" banner is held back for the special moon's banner.
+- **Where you see it:**
+  - The clock shows tonight's moon icon (6 icons) before the day, and the moon's name after the period at night.
+  - The Midnight Bell has a SKYWATCH article ("Tonight: a new moon…", "Full in 2 nights."), and the special moons take the front page.
+
+### Verified (Studio Play)
+- On the test slot "Testy" (a Human), at 11:30 PM, the camera was aimed at the moon on each night (screenshots `docs/img/moon-full.jpg`, `moon-crimson.jpg`, `moon-blue.jpg`, `moon-waxing.jpg`):
+  - **Full:** the custom moon swelled, the clock read "full moon" and showed its icon.
+  - **Crimson:** the red moon with its fissures, and "crimson moon" on the clock.
+  - **Blue:** the halo moon, "blue moon", and Testy's damage at × 1.05.
+  - **Waxing:** lit on the right after the mirror fix, and "waxing moon" on the clock.
+- **New moon (a test player with no slot):** the grade, 5,000 stars, the clock line and the SKYWATCH article.
+- **Full moon with Testy set to Werewolf for that session only** (attribute only; the saved race stays Human): 12 eye-glow surfaces, amber eyes (`docs/img/full-moon-werewolf-eyes.jpg`).
+- **Fixed during testing:** the clock icon sat over the day's first letter, because the panel is scaled. It's now placed in design pixels.
+- **Not tested:**
+  - Vampires' crimson eyes and bonus, the Ghoul, Wraith and Priest bonuses, and the new moon's Wraith bonus in a real fight (the values were checked in `Lineage`);
+  - the banners on screen;
+  - the waning moon in the sky after the swap.
+
 ## [1.40.0] - 2026-11-04: Weekly report cards, custom icons for every phone app
 
 ### Added
