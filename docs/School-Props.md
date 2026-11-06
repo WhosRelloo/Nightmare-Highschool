@@ -178,6 +178,20 @@ Door, flap and tap origins sit on their hinge lines.
 - **StairRailLevel:** the stair balustrade as a level 8-stud run. Lengths butt end to end (there's no bar at the +X end). Copy the `_Post` piece to the open end of a run.
 - **Showcase:** at x 122, z −200 on the stair row, two blocks with a rail on top (`docs/img/stair-blend-showcase.jpg`; matched against a stair cheek in `docs/img/stair-block-match.jpg` and `stair-block-match-render.png`).
 
+**Batch 32, the school entrance kit** (1.51.0, `Studio/props_setup32.luau`, run after importing `art/props/fbx/entrance-batch32/`):
+- **What's in it:** 15 pieces in the stair kit's stone, carving and ironwork. Every flight is 10 treads (rise 0.6) up to a 6-high porch, so they join each other and the batch 20 stairs.
+  - **Straight and split:** EntranceFlight (under a pierced stone parapet), EntranceFlightBowed (flared, bowed treads), EntranceSideFlightL / R (a split stair either side of a porch), EntrancePorch, EntranceNewelLantern.
+  - **Curved:** EntranceHalfRound, EntranceHalfRoundMoon, EntranceQuarterRound, EntranceRoundDais, and EntranceSweepL / R (a horseshoe stair's two arms).
+  - **The Moonrise entrance:** EntranceMoonStair (a phase in every tread, from the new moon to the full), EntranceMoonPorch (a moon dial in the floor), EntranceMoonPortico (the doorway, PER NOCTEM AD LUCEM, a full-moon rose window that glows at night).
+- **Porch railings are separate pieces** (`_RailFrontL`, `_RailFrontR`, `_RailLeft`, `_RailRight`). Delete the ones where a flight joins.
+- **Left and right:** the import turns Blender +X into Roblox -X, but L and R are named from the viewer's side, facing the front: SideFlightL and SweepL stand on the viewer's left.
+- **Wide pieces:** the half-rounds are wider than the importer's 20.48-stud cap, so the setup scales them back.
+- **Collision:** stone collides. Rails, nosings, inlays, glass and glow don't (as the stair kit).
+- **Showcase:**
+  - Row 1, z -375: Grand, Bowed, Split, Moonrise and Horseshoe, as whole entrances.
+  - Row 2, z -410: the round pieces.
+  - Screenshots: `docs/img/entrance-kit.jpg`, `entrance-kit-night.jpg`, `entrance-kit-round.jpg`, `entrance-portico.jpg`.
+
 **Batch 21, the painting and art kit** (`Studio/props_setup21.luau`):
 - **What's in it:** six paintings in gilt, black lacquer and ebonised frames, plus gallery stanchions with a crimson velvet rope, a stack of canvases under a drape, and a painter's table with a candle.
 - **The canvases:** each painting's `_Canvas` piece skips the frame's atlas and carries its own 2048 painting (`nh_props.CANVAS`, front-projected UVs), so the brushwork stays sharp. It gets the shared varnish roughness map and no normal map, because the canvas weave read as a screen-door grid.
@@ -350,6 +364,19 @@ Door, flap and tap origins sit on their hinge lines.
 | StairIron | 25.4k (Main, Rail) | batch 20: an open cast-iron stair: chequer-plate treads with brass nosings, stringers pierced with quatrefoils, the balustrade |
 | StairStoneBlock | 0.1k | batch 31: a 4 x 4 x 4 block of the stair cheeks' baked castle stone (1.50.2 maps StairStoneBlock2_*, softened to the stairs' detail and darkened 0.85; no metal map) |
 | StairRailLevel | 6.0k (Main, Post) | batch 31: the stair balustrade on a level 8-stud run that butts end to end, and its turned iron post |
+| EntranceFlight | 31.3k (Main, Parapet, Newels, Glow, Glass) | batch 32: the straight grand flight under a pierced stone parapet, lantern newels |
+| EntranceFlightBowed | 37.9k (Main, Rail, Newels, Glow, Glass) | batch 32: bowed treads flaring 15 to 10 wide between splayed cheeks, the iron balustrade |
+| EntranceSideFlightL / R | 17.7k (Main, Rail) | batch 32: a split stair's 5-wide flights climbing along the facade |
+| EntrancePorch | 31.4k (Main, Deck, 4 rails) | batch 32: an 18 x 9 flagstone porch, crocketed piers, removable railings |
+| EntranceNewelLantern | 4.6k (Main, Glow, Glass) | batch 32: a crested pedestal with a gas lantern |
+| EntranceHalfRound | 29.0k (Main, Noses, Newels, Glow, Glass) | batch 32: half-round steps fanning from a doorway, a crest landing |
+| EntranceHalfRoundMoon | 53.3k (Main, Noses, Inlays, Newels, Glow, Glass) | batch 32: the half-round with moon phases, a moon dial and crescent piers |
+| EntranceQuarterRound | 21.6k (Main, Noses, Newels, Glow, Glass) | batch 32: a quarter fan for a corner |
+| EntranceRoundDais | 34.3k (Main, Noses, Newels, Glow, Glass) | batch 32: five steps all round a round platform, four lantern newels |
+| EntranceSweepL / R | 27.8k (Main, Cheeks, Rail, Newels, Glow, Glass) | batch 32: a horseshoe stair's curved arms, the balustrade bent round both sides |
+| EntranceMoonStair | 48.0k (Main, Cheeks, Rail, Piers, Glow, Glass) | batch 32: the moon-phase grand flight, crescent-and-raven piers |
+| EntranceMoonPorch | 41.9k (Main, Deck, 2 rails) | batch 32: the porch with the moon dial |
+| EntranceMoonPortico | 23.1k (Main, Gable, MoonGlow, Glow, Glass) | batch 32: the PER NOCTEM AD LUCEM doorway, the full-moon rose window |
 | BridgeStoneArch | 43.5k (Wall, Main, ParapetL, ParapetR, Piers, Glow, Glass) | batch 20: a 24-long humped stone footbridge: dark voussoirs, a crested keystone, a hood moulding, pierced gothic parapets, crested end piers with lanterns |
 | BridgeIron | 37.3k (Main, Girders, Glow, Glass) | batch 20: a 24-long cast-iron footbridge: crimson lattice girders with gilt bosses and spear finials, arched ribs with ring spandrels, carved abutments, lanterns |
 | BridgeDeck | 17.7k (Wall, Main) | batch 20: a 16-stud straight span with the pierced parapets; tiles end to end |

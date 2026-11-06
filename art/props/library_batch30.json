@@ -224,7 +224,10 @@
   "ColorMap": "rbxassetid://135922484519250",
   "NormalMap": "rbxassetid://101991746059393",
   "RoughnessMap": "rbxassetid://83790282289030",
-  "MetalnessMap": "rbxassetid://80187885816205"
+  "MetalnessMap": "rbxassetid://80187885816205",
+  "meshes_1_51_0": {
+   "LibCandelabra_Glow": "rbxassetid://76794815165182 (the final mesh; the draft 96137824496533 had been kept)"
+  }
  },
  "LibShelfArched": {
   "dims": [
@@ -670,6 +673,16 @@
   "ColorMap": "rbxassetid://110750153077587",
   "NormalMap": "rbxassetid://107048719774053",
   "RoughnessMap": "rbxassetid://72006888413076",
-  "MetalnessMap": "rbxassetid://111539269814370"
+  "MetalnessMap": "rbxassetid://111539269814370",
+  "meshes_1_51_0": {
+   "TerrestrialGlobe_Main": "rbxassetid://90724704303056 (the final mesh; the draft 76136132212874 had been kept)",
+   "TerrestrialGlobe_Globe": "rbxassetid://71026455528184 (rebuilt by globe_sphere.py with an equirectangular layout)"
+  },
+  "GlobeMaps_1_51_0": {
+   "ColorMap": "rbxassetid://125656379518520",
+   "NormalMap": "rbxassetid://75440922296299",
+   "RoughnessMap": "rbxassetid://125156481915674",
+   "MetalnessMap": "rbxassetid://129261785465166"
+  }
  }
 }

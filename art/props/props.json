@@ -3972,5 +3972,402 @@
   "NormalMap": "rbxassetid://108122531882700",
   "RoughnessMap": "rbxassetid://88235285953982",
   "MetalnessMap": "rbxassetid://84080787351765"
+ },
+ "EntranceFlight": {
+  "dims": [
+   12.9,
+   14.68,
+   8.72
+  ],
+  "pieces": [
+   "EntranceFlight_Main",
+   "EntranceFlight_Parapet",
+   "EntranceFlight_Newels",
+   "EntranceFlight_Glow",
+   "EntranceFlight_Glass"
+  ],
+  "tris": {
+   "EntranceFlight_Main": 7404,
+   "EntranceFlight_Parapet": 14768,
+   "EntranceFlight_Newels": 8740,
+   "EntranceFlight_Glow": 240,
+   "EntranceFlight_Glass": 144
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://129822950182491",
+  "NormalMap": "rbxassetid://91901855400934",
+  "RoughnessMap": "rbxassetid://116657372995357",
+  "MetalnessMap": "rbxassetid://108620997197138"
+ },
+ "EntranceFlightBowed": {
+  "dims": [
+   18.0,
+   14.87,
+   9.29
+  ],
+  "pieces": [
+   "EntranceFlightBowed_Main",
+   "EntranceFlightBowed_Rail",
+   "EntranceFlightBowed_Newels",
+   "EntranceFlightBowed_Glow",
+   "EntranceFlightBowed_Glass"
+  ],
+  "tris": {
+   "EntranceFlightBowed_Main": 13144,
+   "EntranceFlightBowed_Rail": 15656,
+   "EntranceFlightBowed_Newels": 8740,
+   "EntranceFlightBowed_Glow": 240,
+   "EntranceFlightBowed_Glass": 144
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://109736693597391",
+  "NormalMap": "rbxassetid://127300883140829",
+  "RoughnessMap": "rbxassetid://118219884602849",
+  "MetalnessMap": "rbxassetid://88660484995291"
+ },
+ "EntranceSideFlightL": {
+  "dims": [
+   14.39,
+   7.21,
+   9.53
+  ],
+  "pieces": [
+   "EntranceSideFlightL_Main",
+   "EntranceSideFlightL_Rail"
+  ],
+  "tris": {
+   "EntranceSideFlightL_Main": 7766,
+   "EntranceSideFlightL_Rail": 9988
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://70620903144658",
+  "NormalMap": "rbxassetid://75167035118731",
+  "RoughnessMap": "rbxassetid://139521139769185",
+  "MetalnessMap": "rbxassetid://102358269766055"
+ },
+ "EntranceSideFlightR": {
+  "dims": [
+   14.39,
+   7.21,
+   9.53
+  ],
+  "pieces": [
+   "EntranceSideFlightR_Main",
+   "EntranceSideFlightR_Rail"
+  ],
+  "tris": {
+   "EntranceSideFlightR_Main": 7726,
+   "EntranceSideFlightR_Rail": 9988
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://72171588727927",
+  "NormalMap": "rbxassetid://110016292830425",
+  "RoughnessMap": "rbxassetid://125824792555058",
+  "MetalnessMap": "rbxassetid://109880576417108"
+ },
+ "EntrancePorch": {
+  "dims": [
+   18.57,
+   9.36,
+   10.75
+  ],
+  "pieces": [
+   "EntrancePorch_Main",
+   "EntrancePorch_Deck",
+   "EntrancePorch_RailFrontL",
+   "EntrancePorch_RailLeft",
+   "EntrancePorch_RailFrontR",
+   "EntrancePorch_RailRight"
+  ],
+  "tris": {
+   "EntrancePorch_Main": 9436,
+   "EntrancePorch_Deck": 8100,
+   "EntrancePorch_RailFrontL": 1048,
+   "EntrancePorch_RailLeft": 5880,
+   "EntrancePorch_RailFrontR": 1048,
+   "EntrancePorch_RailRight": 5880
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://122999441074138",
+  "NormalMap": "rbxassetid://81506803665758",
+  "RoughnessMap": "rbxassetid://99427497665614",
+  "MetalnessMap": "rbxassetid://89315055064767"
+ },
+ "EntranceNewelLantern": {
+  "dims": [
+   1.8,
+   1.8,
+   7.19
+  ],
+  "pieces": [
+   "EntranceNewelLantern_Main",
+   "EntranceNewelLantern_Glow",
+   "EntranceNewelLantern_Glass"
+  ],
+  "tris": {
+   "EntranceNewelLantern_Main": 4370,
+   "EntranceNewelLantern_Glow": 120,
+   "EntranceNewelLantern_Glass": 72
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://84509611607309",
+  "NormalMap": "rbxassetid://137264880683034",
+  "RoughnessMap": "rbxassetid://80589683569857",
+  "MetalnessMap": "rbxassetid://89806796258339"
+ },
+ "EntranceMoonStair": {
+  "dims": [
+   15.98,
+   15.82,
+   9.52
+  ],
+  "pieces": [
+   "EntranceMoonStair_Main",
+   "EntranceMoonStair_Cheeks",
+   "EntranceMoonStair_Rail",
+   "EntranceMoonStair_Piers",
+   "EntranceMoonStair_Glow",
+   "EntranceMoonStair_Glass"
+  ],
+  "tris": {
+   "EntranceMoonStair_Main": 11316,
+   "EntranceMoonStair_Cheeks": 8848,
+   "EntranceMoonStair_Rail": 14888,
+   "EntranceMoonStair_Piers": 12552,
+   "EntranceMoonStair_Glow": 240,
+   "EntranceMoonStair_Glass": 144
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://95710714216304",
+  "NormalMap": "rbxassetid://105913076863260",
+  "RoughnessMap": "rbxassetid://125138541528002",
+  "MetalnessMap": "rbxassetid://105047493164753"
+ },
+ "EntranceMoonPorch": {
+  "dims": [
+   19.36,
+   10.4,
+   11.37
+  ],
+  "pieces": [
+   "EntranceMoonPorch_Main",
+   "EntranceMoonPorch_Deck",
+   "EntranceMoonPorch_RailLeft",
+   "EntranceMoonPorch_RailRight"
+  ],
+  "tris": {
+   "EntranceMoonPorch_Main": 12932,
+   "EntranceMoonPorch_Deck": 16584,
+   "EntranceMoonPorch_RailLeft": 6184,
+   "EntranceMoonPorch_RailRight": 6184
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://122458055585088",
+  "NormalMap": "rbxassetid://80784940119354",
+  "RoughnessMap": "rbxassetid://91451522645249",
+  "MetalnessMap": "rbxassetid://88240259647666"
+ },
+ "EntranceMoonPortico": {
+  "dims": [
+   14.45,
+   3.68,
+   22.93
+  ],
+  "pieces": [
+   "EntranceMoonPortico_Main",
+   "EntranceMoonPortico_Gable",
+   "EntranceMoonPortico_MoonGlow",
+   "EntranceMoonPortico_Glow",
+   "EntranceMoonPortico_Glass"
+  ],
+  "tris": {
+   "EntranceMoonPortico_Main": 11430,
+   "EntranceMoonPortico_Gable": 11343,
+   "EntranceMoonPortico_MoonGlow": 156,
+   "EntranceMoonPortico_Glow": 120,
+   "EntranceMoonPortico_Glass": 72
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://110749022596712",
+  "NormalMap": "rbxassetid://71762037241618",
+  "RoughnessMap": "rbxassetid://102539103325729",
+  "MetalnessMap": "rbxassetid://125920383671450"
+ },
+ "EntranceHalfRound": {
+  "dims": [
+   34.74,
+   16.12,
+   7.19
+  ],
+  "pieces": [
+   "EntranceHalfRound_Main",
+   "EntranceHalfRound_Noses",
+   "EntranceHalfRound_Newels",
+   "EntranceHalfRound_Glow",
+   "EntranceHalfRound_Glass"
+  ],
+  "tris": {
+   "EntranceHalfRound_Main": 12116,
+   "EntranceHalfRound_Noses": 7800,
+   "EntranceHalfRound_Newels": 8740,
+   "EntranceHalfRound_Glow": 240,
+   "EntranceHalfRound_Glass": 144
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://139039236989201",
+  "NormalMap": "rbxassetid://78174158917289",
+  "RoughnessMap": "rbxassetid://140696950162337",
+  "MetalnessMap": "rbxassetid://108146863033794"
+ },
+ "EntranceHalfRoundMoon": {
+  "dims": [
+   35.6,
+   16.12,
+   6.53
+  ],
+  "pieces": [
+   "EntranceHalfRoundMoon_Main",
+   "EntranceHalfRoundMoon_Noses",
+   "EntranceHalfRoundMoon_Inlays",
+   "EntranceHalfRoundMoon_Newels",
+   "EntranceHalfRoundMoon_Glow",
+   "EntranceHalfRoundMoon_Glass"
+  ],
+  "tris": {
+   "EntranceHalfRoundMoon_Main": 15756,
+   "EntranceHalfRoundMoon_Noses": 7800,
+   "EntranceHalfRoundMoon_Inlays": 18320,
+   "EntranceHalfRoundMoon_Newels": 11048,
+   "EntranceHalfRoundMoon_Glow": 240,
+   "EntranceHalfRoundMoon_Glass": 144
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://81976637015127",
+  "NormalMap": "rbxassetid://126217789767474",
+  "RoughnessMap": "rbxassetid://85936340313158",
+  "MetalnessMap": "rbxassetid://84627217064613"
+ },
+ "EntranceQuarterRound": {
+  "dims": [
+   17.35,
+   17.35,
+   7.19
+  ],
+  "pieces": [
+   "EntranceQuarterRound_Main",
+   "EntranceQuarterRound_Noses",
+   "EntranceQuarterRound_Newels",
+   "EntranceQuarterRound_Glow",
+   "EntranceQuarterRound_Glass"
+  ],
+  "tris": {
+   "EntranceQuarterRound_Main": 8252,
+   "EntranceQuarterRound_Noses": 4200,
+   "EntranceQuarterRound_Newels": 8740,
+   "EntranceQuarterRound_Glow": 240,
+   "EntranceQuarterRound_Glass": 144
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://81360317712629",
+  "NormalMap": "rbxassetid://110811448656720",
+  "RoughnessMap": "rbxassetid://87717225982096",
+  "MetalnessMap": "rbxassetid://96155180134030"
+ },
+ "EntranceRoundDais": {
+  "dims": [
+   19.08,
+   19.04,
+   7.19
+  ],
+  "pieces": [
+   "EntranceRoundDais_Main",
+   "EntranceRoundDais_Noses",
+   "EntranceRoundDais_Newels",
+   "EntranceRoundDais_Glow",
+   "EntranceRoundDais_Glass"
+  ],
+  "tris": {
+   "EntranceRoundDais_Main": 9220,
+   "EntranceRoundDais_Noses": 6840,
+   "EntranceRoundDais_Newels": 17480,
+   "EntranceRoundDais_Glow": 480,
+   "EntranceRoundDais_Glass": 288
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://116089011490514",
+  "NormalMap": "rbxassetid://121112742255135",
+  "RoughnessMap": "rbxassetid://138315750560700",
+  "MetalnessMap": "rbxassetid://98399367691299"
+ },
+ "EntranceSweepL": {
+  "dims": [
+   12.77,
+   12.73,
+   9.3
+  ],
+  "pieces": [
+   "EntranceSweepL_Main",
+   "EntranceSweepL_Cheeks",
+   "EntranceSweepL_Rail",
+   "EntranceSweepL_Newels",
+   "EntranceSweepL_Glow",
+   "EntranceSweepL_Glass"
+  ],
+  "tris": {
+   "EntranceSweepL_Main": 3700,
+   "EntranceSweepL_Cheeks": 7080,
+   "EntranceSweepL_Rail": 9940,
+   "EntranceSweepL_Newels": 6888,
+   "EntranceSweepL_Glow": 120,
+   "EntranceSweepL_Glass": 72
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://73260610624194",
+  "NormalMap": "rbxassetid://92754252900478",
+  "RoughnessMap": "rbxassetid://88595934556184",
+  "MetalnessMap": "rbxassetid://99387315160186"
+ },
+ "EntranceSweepR": {
+  "dims": [
+   12.77,
+   12.73,
+   9.3
+  ],
+  "pieces": [
+   "EntranceSweepR_Main",
+   "EntranceSweepR_Cheeks",
+   "EntranceSweepR_Rail",
+   "EntranceSweepR_Newels",
+   "EntranceSweepR_Glow",
+   "EntranceSweepR_Glass"
+  ],
+  "tris": {
+   "EntranceSweepR_Main": 3740,
+   "EntranceSweepR_Cheeks": 7080,
+   "EntranceSweepR_Rail": 9940,
+   "EntranceSweepR_Newels": 6888,
+   "EntranceSweepR_Glow": 120,
+   "EntranceSweepR_Glass": 72
+  },
+  "batch": 32,
+  "collision": "stone pieces PreciseConvexDecomposition; rails, nosings, inlays, glass and glow don't collide",
+  "ColorMap": "rbxassetid://111777987758790",
+  "NormalMap": "rbxassetid://86254174778371",
+  "RoughnessMap": "rbxassetid://100304883828395",
+  "MetalnessMap": "rbxassetid://103472236343509"
  }
 }

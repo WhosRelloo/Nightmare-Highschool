@@ -2,6 +2,55 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.51.0] - 2026-11-05: The school entrance kit; the library globe fixed
+
+### Added
+- **Props batch 32, the school entrance kit** (`art/props/nh_props_batch32.py`). Owner: "make an entrance/stairway to the school model same style and texture as the stairs"; "make all of them then throw them in NH Combat Test and we'll see which we like more"; "something really cool, unique, and on themed with the game"; "Make a curved half circle stairway too"; "Make some more like that".
+  - **15 pieces:**
+    - in the stair kit's own baked castle stone (batch 8's `castle()`), with its carving (blind lancets, crocketed pinnacles, crimson and gilt crests), its gothic cast-iron balustrade and brass handrail, and its gas lanterns;
+    - every flight is 10 treads (rise 0.6) up to a 6-high porch, so the pieces join each other and the batch 20 stairs and landing.
+  - **Straight and split:**
+    - **EntranceFlight:** the straight grand flight, 10 wide inside, under a pierced gothic stone parapet (the bridges' balustrade, raked), with lantern newels at the foot.
+    - **EntranceFlightBowed:** bowed treads flaring from 15 wide at the foot to 10 at the top, between splayed cheeks with the iron balustrade.
+    - **EntranceSideFlightL / R:** 5-wide flights that climb along the facade either side of a porch, making a split stair.
+    - **EntrancePorch:** an 18 x 9 flagstone porch with crocketed corner piers and crests, and lancet panels. Its four railings are separate pieces (RailFrontL, RailFrontR, RailLeft, RailRight), so the builder can take one away where a flight joins.
+    - **EntranceNewelLantern:** a standalone crested pedestal with a gas lantern.
+  - **Curved:**
+    - **EntranceHalfRound:** concentric half-round steps fanning out from a doorway, with a crest-inlaid landing and lantern newels at both ends.
+    - **EntranceHalfRoundMoon:** the same with gilt moon phases inlaid round the treads, a moon dial on the landing, and crescent-and-raven piers with bracket lanterns.
+    - **EntranceQuarterRound:** a quarter fan for a corner or the end of a wall.
+    - **EntranceRoundDais:** five steps all the way round a round platform, with four lantern newels on the diagonals; for a statue, a fountain or a round tower door.
+    - **EntranceSweepL / R:** flights curving through a quarter turn, with curved stone cheeks, lancets and the iron balustrade bent round both sides. They sweep in from the sides to meet a porch: a horseshoe stair.
+  - **The Moonrise entrance (the showpiece):**
+    - **EntranceMoonStair:** a 12-wide flight climbing from the new moon to the full, with a gilt phase inlaid on night-blue enamel in every tread, moon roundels on the cheeks and gilt crescents on the balustrade. At its foot two piers each hold up a gilt crescent with a raven on its outer horn, and hang a gas lantern.
+    - **EntranceMoonPorch:** an 18.4 x 10 porch flush with the stair's cheeks, with a great moon dial set in its floor (the eight phases round a crimson and gilt star), crescent-crowned corner piers, and moon roundels in its lancet panels.
+    - **EntranceMoonPortico:** the doorway: clustered piers with crocketed pinnacles, a deep pointed arch with moulded rings and cusps, crests in the spandrels, and a frieze lettered PER NOCTEM AD LUCEM in gilt. Above it, a crocketed gable with a full-moon rose window that glows at night (`MoonGlow`, a pale Neon disc with a cool light), a gilt crescent and raven on the apex, and a gas lantern hung on a chain in the arch.
+  - **Pieces, maps and setup:**
+    - Big pieces are split into their own meshes (Parapet, Newels, Cheeks, Rail, Deck, Gable, Noses, Inlays), so every mesh stays under 20,000 triangles. They share one 2048 atlas per prop (64 GPU samples).
+    - The two half-rounds are wider than the importer's 20.48-stud cap, and `Studio/props_setup32.luau` scales them back to their baked width.
+    - Stone collides with PreciseConvexDecomposition. Rails, nosings, inlays, glass and glow don't (as in the stair kit). Lanterns are gas lights and the rose window a moonlit one (`NHLamp`; lanterns also `NHCandle`).
+  - **Showcase** (`workspace.NHPropsShowcase.Entrances`, tag `NHPropBatch32`):
+    - Row 1, at z -375: whole entrances. Grand (flight + porch), Bowed, Split (porch with a side flight either side, its side rails removed), Moonrise (stair + porch + portico), Horseshoe (porch with a sweep arm either side, its front rails removed).
+    - Row 2, at z -410 (off the baseplate, as the owner said not to worry about it): the half-round, the moon half-round, the quarter round, the round dais and a spare lantern newel.
+- **`art/props/globe_sphere.py`:** rebuilds TerrestrialGlobe's sphere with the UV sphere's own equirectangular layout and its own maps from the printed globe.
+
+### Fixed
+- **The library's floor globe looked like streaky chrome** (owner: "let's fix this globe model"):
+  - **The stand:** TerrestrialGlobe_Main was still the draft mesh (76136132212874), whose layout didn't match the final maps. The 1.50.0 rebuild's fingerprint match allows 0.003 of drift, and the draft (0.6266) and the final (0.6283) both fell inside it, so the first listed (the draft) was taken. It now uses the final mesh 90724704303056.
+  - **The sphere:** the smart-UV unwrap cut it into gores squashed one way, which smeared the lettering and coastlines in Roblox. It's rebuilt as mesh 71026455528184 with its own maps (TerrestrialGlobeSphere_*: color 125656379518520, normal 75440922296299, rough 125156481915674, metal 129261785465166).
+  - **The candelabra:** an audit of all 48 library pieces, picking the closest match, found one more draft mesh, LibCandelabra_Glow (now 76794815165182). It is applied to the template and the showcase.
+
+### Verified (Studio)
+- **All 15 templates set up**, with every map processed before Studio first loaded it. The showcase touches nothing outside it (`docs/img/entrance-kit.jpg`, `entrance-kit-round.jpg`). The motto reads clearly (`entrance-portico.jpg`).
+- **At midnight** the lanterns throw warm light and the rose window glows (`entrance-kit-night.jpg`). In Play at 9:00 they are off, as the lamp script keeps them by day.
+- **Walkable** (rays down along each walking line, against the collision shapes):
+  - Grand, Bowed and Moonrise rise tread by tread to 6.0 at the porch;
+  - the half-rounds rise to 6.0 at their landings;
+  - the dais rises to 3.0.
+  - The portico's doorway is clear from 1.5 to 8.5 studs high across its width.
+- **The globe in Play:** the ORBIS NOCTURNUS cartouche and THE STILL WATERS read sharply (`docs/img/library-globe-fixed.jpg`). Studio's Edit view still draws the sphere white, a cached failed load from before the maps finished processing, which clears when Studio reopens.
+- **Not tried:** a player walking the flights and curves in Play, and fitting an entrance to the builder's school in the Map place (read only; the builder is still building it).
+
 ## [1.50.2] - 2026-11-05: The stair stone block matches the stairs
 
 ### Fixed
