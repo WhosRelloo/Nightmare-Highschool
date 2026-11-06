@@ -53,7 +53,7 @@ Other UI can open the desk by setting the player attribute `NHAdminOpen` to `tru
   - **Announcements:** send one to the whole server.
   - **Server lock (1.18):** while it's on, new players who aren't staff are turned away. Shutting the server down is owner-only.
 - **Spawns:** a delinquent crew, a wolf pack (night only), a sparring partner of any difficulty (Easy, Normal, Hard, Nightmare; 1.23), or clear all enemies.
-  - (1.56) **Beast: <name>**, one button per beast in `Config.Beasts`, by name ("Beast: Hellhound", "Beast: Grave Ghoul", "Beast: Night Stalker"). It spawns that beast 22 studs in front of you, facing you, at any time of day, and it stays until killed or cleared (`SpawnBeast`). "Clear all enemies" removes beasts too, and the alive line counts them. See [[Beasts]].
+  - (1.56) **Beast: <name>**, one button per beast in `Config.Beasts`, by name ("Beast: Hellhound", "Beast: Grave Ghoul", "Beast: Night Stalker", "Beast: Bone Spider"). It spawns that beast 22 studs in front of you, facing you, at any time of day, and it stays until killed or cleared (`SpawnBeast`). "Clear all enemies" removes beasts too, and the alive line counts them. See [[Beasts]].
 - **Self:** fly (WASD, Space, Ctrl, Shift for speed), noclip, ESP (names and health through walls), Ctrl+click teleport, invisibility, heal, and stop spectating.
 - **Server:** students, uptime, physics FPS, memory, school clock, enemy and wolf counts, and the staff log (the last 200 actions).
 

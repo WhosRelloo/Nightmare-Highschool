@@ -2,6 +2,34 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.60.0] - 2026-11-06: The Bone Spider
+
+The fourth beast of six (design: `docs/superpowers/specs/2026-11-05-beasts-design.md`; the owner pre-approved the beasts' designs). Full page: `docs/Beasts.md`.
+
+### Added
+- **The Bone Spider** (`ServerStorage.NHBeasts.BoneSpider`):
+  - **Look:** a skull for a body, a ribcage for an abdomen, and eight jointed bone legs, with a red light burning in the skull. The pieces were generated one at a time (asking for "a spider" made whole spiders).
+  - **Rig:** it isn't humanoid, so instead of the R15 auto-rig it has its own Motor6D rig: `RootJoint`, `Pedicel` (the abdomen), and a hip and a knee for each leg.
+  - **Clips:** 12 hand-keyed ones: an alternating four-legs-at-a-time walk and run, a rear-up fang strike, a twisting side snap, the spit, two stuns, a guard break where its legs buckle, hanging, dropping, and a death where it rolls onto its back and curls its legs up. They're KeyframeSequences in `ServerStorage.NHBeasts.Clips.BoneSpider`, waiting for the owner to publish.
+- **Hanging (Ambush `From = Above`):** it waits head down on a silk thread 13 studs over its lair (lower under a ceiling). A student within 9 studs of the spot below gets the Kanji on the floor and the thread trembles; then it drops, turns to land on its feet facing them, and hits anyone within 5 studs for 7, throwing them clear. Alone for 12 s, it walks back and climbs its thread again. This stands in for the design's wall climbing, which a Humanoid can't do.
+- **Its fight:** a pattern of Fang (6), Fang 2 (8), Fang (6) and **WebSpit**. WebSpit is a special, so the Kanji shows first. It spits a glob of silk at where you stood when the Kanji ended: a hit does 4 and the game's Slow state (walk speed 5, no jumping) for 2.5 s with silk clinging to you, and a miss leaves a fading splat. Then it stands open.
+- **Stats:** Health 65, a 1.2 s stun guard, 2 at night.
+- **Reward:** 70 Combat EXP, ¥28, and a 15% chance of the **Bone Spider's Fang** trophy (the fang model in the Locker).
+- **Placeholder lair:** `workspace.NHBeastLairs.BoneSpiderLair` on open ground at (-220, 60).
+
+### Fixed (every beast)
+- **A move in flight when a beast died still played and could still hit.** A spider killed during its wind-up started Attack1 at -4 HP. Now nothing plays over the Death clip and a dead beast's hits don't land.
+- **The body stood back up when the Death clip ended.** The clip now holds its last frame until the body fades.
+
+### Verified (Play, slot 4 "Testy")
+- **Night:** both lair spiders hung on their threads at 13 studs.
+- **The drop:** the Kanji and tremble for 0.8 s, then the drop, landing upright, hit for 7; with nobody left it climbed back up.
+- **The fight:** the pattern ran in order: fang 6, fang 2 8, WebSpit 4 with walk speed 5 for 2.5 s.
+- **Fighting back:** punches landed and stunned it (Stun1, Stun2), and it struck back between combos.
+- **Kill and reward:** it died in 15 s of punching and paid ¥28. After the fix it stayed on its back (the clip held at 2.1 s) with nothing else playing and no damage to the player.
+- **Admin:** the spawn worked through the admin remote.
+- **Not tried in play:** the Fang drop itself (it rolls at 15%; the item resolves in `Config.Items` and the reward path is the other beasts'), and two students at once.
+
 ## [1.59.1] - 2026-11-06: Map place: the doors open
 
 Owner (with a screenshot of the two arched double doors under the awning): "Make it so these doors are openable". NH Combat Test is unchanged.
