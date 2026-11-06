@@ -1,6 +1,6 @@
 # Height spin: design
 
-**Status:** design, for the owner's review (2026-11-06). Nothing is built yet.
+**Status:** approved by the owner ("Yes, build it") and built as 1.62.0. The page for how it works now is `docs/Height.md`.
 **Owner's asks:** "create a good height system for the game that works with everything we currently have. (Concept first)"; on the concept: "I like it. Make the height system a spin system within those ranges."
 
 ## The idea
@@ -26,7 +26,7 @@ A roll picks a number **p** between 0 and 1, evenly. `p` is your place within yo
 | over 0.99 | Giant | Legendary | 1% |
 
 - **Both ends are rare.** Short and tall are equally hard to get, so neither is the "right" roll.
-- **No repeats:** a spin never lands in the band you already have.
+- **No repeats:** a spin never lands in the band you already have. (As built: a spin picks a rarity by its share first, then a band of that rarity you don't have, so the odds stay exact. Common has only Average, so Average can repeat.)
 - **Pity:** after **30 spins in a row** without Epic or better, the next spin is Epic or better (either end).
 - **Odds shown:** the reel shows each band's share, as the clan reel does.
 

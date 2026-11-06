@@ -52,6 +52,7 @@ All 28 clans are original names. Each has a lore line and a perk.
 | Product | Gives | Price hint |
 |---|---|---|
 | Clan1 / Clan5 / Clan15 | 1 / 5 / 15 clan spins ("Popular", "Best value") | R$ 49 / 199 / 499 |
+| Height3 / Height10 (1.62) | 3 / 10 height spins ("Best value"); see [[Height]] | R$ 49 / 149 |
 | Race3 / Race10 | 3 / 10 race spins | R$ 129 / 349 |
 | Variant3 | 3 variant spins | R$ 99 |
 | Trait5 | 5 trait spins | R$ 99 |
@@ -113,3 +114,6 @@ All 28 clans are original names. Each has a lore line and a perk.
 
 ## Audit fix (Menu 1.2)
 `Identity.SetName` waits on the text filter. Before this fix it saved a copy taken before the wait, wiping spins bought or the enrolment lock set during it. Now the record is re-read after the filter, the lock is re-checked, and only `First` and `NameChanges` change. If the player switched save slots during the wait, the rename is refused.
+
+## Height (1.62)
+The Name & Clan tab also has your **height** on its own reel, rolled by the server like the clan, with its own spins, pity and shop group. See [[Height]].

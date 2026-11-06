@@ -2,6 +2,37 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.62.0] - 2026-11-06: Height spins
+
+Owner: "create a good height system for the game that works with everything we currently have. (Concept first)", then on the concept "I like it. Make the height system a spin system within those ranges.", then "Yes, build it". Design: `docs/superpowers/specs/2026-11-06-height-spin-design.md`. Full page: `docs/Height.md`.
+
+### Added
+- **Every student has a height, rolled by the server, never chosen.** A roll picks your place in your race's range. Where it lands is the rarity: Average is Common (40%), and both ends are rare, from Short / Tall (Uncommon, 15% each) to Pint-Sized / Giant (Legendary, 1% each). It's cosmetic only.
+- **Ranges by race** (today's body is 5'9"): Human and Priest 5'3" to 6'3", Vampire 5'6" to 6'4", Werewolf 5'9" to 6'5", Ghoul 5'2" to 6'0", Wraith 5'6" to 6'4". A race spin keeps your place in the range.
+- **Spins:** a new student gets a free first roll plus 2 height spins. A save from before heights gets a free first roll the next time it loads, and the creator plays the reveal on the register. Pity: Epic or better after 30 spins in a row without one. Free in Studio.
+- **Spin Shop:** Height3 and Height10 (3 / 10 spins, price hints R$ 49 / 149). They're placeholders (`ProductId = 0`) until the owner creates them.
+- **Name & Clan tab:** a Height reel under the clan, with its rarity, "1 in N", a Spin height button, your race's range, the pity bar and the height odds. When it lands the camera pulls back to show your whole body.
+- **Slot cards** show the height in its rarity's colour, and each card's student stands at their height.
+- **NPC students** (class and ambient) get fixed heights from their name and look, so the school doesn't look cloned.
+
+### How it works
+- `Services.Player.Height` scales the whole R6 body evenly (`Model:ScaleTo`). It runs once the entity loader has rebuilt the body (the new `NHDescribed` flag), after each spin, and when the race changes. `ScaleTo` also raised walk speed (14.4 to 16.1 at the tallest), so speed and jump are put back straight after: a tall student is never faster.
+- Looks and weapons are built at the base size: `Appearance.ApplyTo` and `EntityLoader.SetWeapon` return the body to today's size while they build, then restore the height, so hair, marks, capes and a weapon swapped mid-game always fit.
+- The vault's knee, waist and head heights now scale with the body. Race cosmetics, 3D gear and seating were already size-aware. Combat hitboxes are fixed boxes from the attacker's root, so reach doesn't change.
+- Saved as `PlayerData.Identity.Height = { P, Band, Spins, Pity, Seen }` through ProfileService only.
+
+### Verified (Play, slot 4 "Testy")
+- **Before building:** scaled to the tallest and the shortest, the face strips, uniform, hair and held item stayed right, and the feet stayed on the floor while walking (0.75 to 0.86, floor 0.80).
+- **Old save:** slot 4 (from before heights) rolled on load: Average 5'9", 2 spins, unseen.
+- **Odds over 20,000 rolls:** Common 39.4%, Uncommon 30.0%, Rare 20.4%, Epic 8.1%, Legendary 2.2%. Every place landed inside its band, the longest run without Epic or better was exactly 30, and no non-Average band came up twice in a row.
+- **Spins:** six spins through the real remote each resized the body within a second, and walk speed stayed at 14.4.
+- **Looks:** re-applying the saved look on a 6'0" body kept the hair at exactly the same offsets and sizes.
+- **Shop:** Height3 and Height10 added 13 spins; the same receipt again added nothing.
+- **Real clicks in the menu:** the card read "Human · 6'0"", then "Human · 6'2"" in Epic purple; the Name & Clan reel spun and landed (5'8", then 5'4"); the camera pulled back about 2 s after landing and came back; the Spin Shop group showed. With the height marked unseen, opening the student switched to Name & Clan and played the reveal to 6'2" Towering, then saved it as seen.
+- **In school:** seated in a classroom chair at 5'4" and at 6'2", hips on the cushion.
+- **NPCs:** 26 NPC students from 5'4" to 6'2" (after a fix: all the class students are named "Student" and first came out the same height).
+- **Not tried:** carrying a downed student and the ghoul's grab between different heights, football / soccer catching and kicking, skateboards, a vault in motion, held items in the hand by eye, a race spin moving the height, seated NPCs by eye, and two players at once.
+
 ## [1.61.0] - 2026-11-06: The Crypt Bat
 
 The fifth beast of six (design: `docs/superpowers/specs/2026-11-05-beasts-design.md`; the owner pre-approved the beasts' designs). Full page: `docs/Beasts.md`.
