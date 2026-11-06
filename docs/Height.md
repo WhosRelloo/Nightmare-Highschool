@@ -82,3 +82,11 @@ Class students (`NHSchedule`) and ambient students (`NHAmbient`) each get a fixe
 | Slot cards and menu students | `Services.Player.Slots` (`HeightText`, `HeightBand`, `HeightScale`), `Controllers.Gui.MainMenu` |
 | Looks / weapons at the base size; NPC heights | `UI.Appearance` (the `ApplyTo` wrapper), `Managers.EntityLoader` (`SetWeapon`) |
 | Test bridge (Studio) | `SpinHeight`, `HeightUnseen` (marks it unseen so the reveal plays again) |
+
+## Admin (1.63)
+
+The admin panel's Student tab has **Spin height** (a free re-roll) and **Shortest**, **Average**, **Tallest** (the ends and the middle of the student's race range), and the Self tab has **Spin my height**. In NH Combat Test these are saved like a normal spin; they're commands `SpinHeight` and `SetHeight` (`Pick = Shortest | Average | Tallest`) on `Features.Admin`, through `Height.Spin` / `Height.Set`. The roll itself now lives in `Config.Heights.Roll`, shared by both places.
+
+## The Map place (1.63)
+
+Heights are in the Map place's core add-on too, so the owner and the builder see students at different heights on the real map. The Map has no saving and no register, so its `Services.Player.Height` is its own version: every player rolls a height when they join (the same odds), kept for the session only, and the admin panel re-rolls or sets it. The rest is the same code: `Config.Heights`, the look wrapper in the Map's `UI.Appearance`, the loader's `NHDescribed` flag and the weapon wrapper in `EntityLoader`, and the vault. See [[Map-Core-Preview]].

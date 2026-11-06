@@ -31,6 +31,7 @@ Other UI can open the desk by setting the player attribute `NHAdminOpen` to `tru
   - Heal, revive, god mode, transform, bring, go to, clear the disciplinary record, kill, and a walk-speed slider.
   - Give Yen, Combat EXP, lineage spins or a name change.
   - Give any of the 40 gear pieces (listed by rarity colour).
+  - (1.63) **Height:** Spin height (a free re-roll), Shortest, Average, Tallest, in the student's race range (`SpinHeight`, `SetHeight`). The student list shows each student's height. The Self tab has Spin my height. See [[Height]].
 - **School (1.18):**
   - **Discipline:** set points (the ladder recomputes the level, probation and suspension).
   - **Excuse today:** today's absences, tardies and early leaves become Excused, and their discipline points come back off.

@@ -94,3 +94,16 @@ for _, s in {game.ReplicatedStorage, game.ReplicatedFirst, game.ServerScriptServ
 ## Keeping it in step
 The add-on is a copy taken at 1.53.0, with the 37 core scripts changed in 1.55.0 copied in afterwards (verified byte for byte). Later changes in NH Combat Test don't reach the Map place by themselves: copy it
 again the same way (remove it with the command above first).
+
+
+## Added 2026-11-06 (1.63.0): the admin panel and heights
+
+Owner: "make sure to throw the admin panel in "Map" place as well as the height system".
+
+- **The admin panel** (the Headmaster's Desk, F3): `Services.Features.Admin` and `Controllers.Gui.AdminPanel`, the same as NH Combat Test's. Staff are the group's high ranks (254+); in Studio, including Team Create play-tests, everyone is. Commands for systems the Map doesn't have (beasts, quests, sports, school) answer with a message instead of erroring.
+- **Heights:** `ReplicatedStorage.Config.Heights` and a Map version of `Services.Player.Height`. Every player rolls a height when they join (the same odds as the full game), kept for the session only, since the Map doesn't save. The desk's Student tab has Spin height, Shortest, Average and Tallest.
+- **Updated for heights** (copies of NH Combat Test's, or the same edit): the Map's `UI.Appearance` (looks are built at the base size, then the height is restored), `Managers.EntityLoader` (the `NHDescribed` flag; weapons built at the base size) and `Character.Vault` (its heights scale with the body). The Map's own copies from before were identical to NH Combat Test's except for these edits.
+- All of it is tagged `NHCore`, so the removal command takes it. `ServerStorage.NHCore.README` lists it.
+- **Tested (Map place, local play-test):** a 5'10" roll on join with the body scaled to match and walk speed unchanged; F3's desk opened with the Height section; real clicks set Tallest (6'3") and spun (5'10"); a look re-applied on the tall body kept the hair exactly in place; Heal, Announce, God on and off, Clear enemies and the inspector worked, and Spawn beast and Teleport answered with messages; no errors. Not tried: two people at once, and a play-test in Team Create with the builder.
+
+![The desk in the Map place](img/map-admin-height.jpg)

@@ -2,6 +2,26 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.63.0] - 2026-11-06: The admin panel and heights in the Map place
+
+Owner: "make sure to throw the admin panel in "Map" place as well as the height system". (The owner also asked to wire the newly imported developer products, then said to leave that for now: none of the group's three experiences, NH Combat Test, Map or the main game, had any developer products yet.)
+
+### Added (Map place, tagged NHCore)
+- **The admin panel** (F3, the Headmaster's Desk): `Services.Features.Admin` and `Controllers.Gui.AdminPanel`, the same as NH Combat Test's. In Studio, including Team Create play-tests, everyone is staff; on a live server it's the group's high ranks. Commands for systems the Map doesn't have answer with a message instead of erroring.
+- **Heights:** `Config.Heights` and a Map version of `Services.Player.Height`. Every player rolls a height when they join, with the full game's odds, kept for the session (the Map doesn't save).
+- **Updated for heights:** the Map's `UI.Appearance` (looks built at the base size), `Managers.EntityLoader` (the `NHDescribed` flag, weapons built at the base size) and `Character.Vault` (heights scale). Their earlier copies were identical to NH Combat Test's apart from these edits, and backups were kept.
+
+### Added (both places)
+- **Admin height commands:** the Student tab has Spin height (a free re-roll), Shortest, Average and Tallest, in the student's race range, and the Self tab has Spin my height. The student list shows each student's height. In NH Combat Test these save like a normal spin.
+
+### Changed
+- The height roll moved into `Config.Heights.Roll`, so the full game and the Map place share it. `Identity` uses it and gained `SetHeightP` for the admin.
+
+### Verified
+- **NH Combat Test:** 20,000 rolls of the shared roll: Common 39.5%, Uncommon 29.9%, Rare 20.0%, Epic 8.6%, Legendary 2.1%, the longest run without Epic or better 30, no band repeats. Through the real admin remote on slot 4: Shortest 5'3", Tallest 6'3", Average 5'9", a spin, and a bad pick refused, with walk speed 14.4 throughout; the student list showed the height.
+- **Map place (local play-test):** a 5'10" Average roll on join with the body scaled to match; F3's desk opened with the Height section; real clicks selected the student and set Tallest (6'3" Giant), then Spin height (5'10"); a look re-applied on the tall body kept the hair exactly in place; Heal, Announce, God on and off, Clear enemies and the inspector worked, and Spawn beast and Teleport answered with messages; no console errors.
+- **Not tried:** two people in the Map at once, a Team Create play-test with the builder, and the desk opened with the F3 key itself (it was opened through its attribute).
+
 ## [1.62.0] - 2026-11-06: Height spins
 
 Owner: "create a good height system for the game that works with everything we currently have. (Concept first)", then on the concept "I like it. Make the height system a spin system within those ranges.", then "Yes, build it". Design: `docs/superpowers/specs/2026-11-06-height-spin-design.md`. Full page: `docs/Height.md`.
