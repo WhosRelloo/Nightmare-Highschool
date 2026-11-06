@@ -2,6 +2,49 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.57.0] - 2026-11-06: The Grave Ghoul
+
+The second beast of six (design: `docs/superpowers/specs/2026-11-05-beasts-design.md`). The owner pre-approved the beasts' designs ("I approve all designs you come up with for the beasts"). Full page: `docs/Beasts.md`.
+
+### Added
+- **The Grave Ghoul** (`ServerStorage.NHBeasts.GraveGhoul`):
+  - **Look:** an AI-generated grey-hided ghoul (pointed ears, a grin of teeth, long claws, clawed feet, a burial rag), picked from five tries. The others came out as skeletons or a robed man in one white sneaker. Auto-rigged as an R15 body.
+  - **Effects:** a faint grave mist at its feet and a dim glow in its eyes.
+  - **Clips:** 11 hand-keyed ones for a hunched, twitchy crawler (Idle, Walk, Run, two claw rakes, two stuns, GuardBroken, a collapsing Death, **Emerge** and **Grab**). They're built as KeyframeSequences in `ServerStorage.NHBeasts.Clips.GraveGhoul`, waiting for the owner to publish.
+- **Ambush (Emerge):** it waits buried under its grave.
+  - A student within 16 studs gets churning dirt and the Kanji over the grave, then it bursts up.
+  - The burst hits anyone within 6 studs for 8 and throws them clear.
+  - With nobody about, it walks home and digs back in.
+- **Grab:** a special, so the Kanji shows first.
+  - It lunges with both claws. Caught, you're held stunned for 1 s, then slammed for 14.
+  - **A friend's hit on it breaks the hold.**
+  - A miss leaves it stumbling, a 2.4 s opening.
+- **Its fight:** a pattern of swipe, swipe, swipe, grab. Health 110, a 1.5 s stun guard, 2 at night.
+- **Reward:** 90 Combat EXP, ¥35, and a 15% chance of the **Grave-Dirt Locket** trophy (a locket model in the Locker).
+- **Placeholder lair:** `workspace.NHBeastLairs.GraveGhoulLair` on open ground at (-200, -200). This map has no graveyard, so the builder can tag real graves `NHBeastLair` with `Beast = GraveGhoul`.
+- **The Beasts system:**
+  - new move kinds (`Grab`, and `Ambush` with `Emerge`);
+  - unpublished clips play from their KeyframeSequences in Studio, and a beast whose clips aren't published yet stays out of live servers.
+
+### Changed / fixed
+- **Placement:** beasts are placed by their root part (a model's pivot isn't always its root). A ghoul started 3.5 studs in the air before.
+- **Falling:** beasts never tip over or ragdoll. They only hop or pounce onto floor, never off an edge, and one that falls off the world is put back at its lair. In a test the Hellhound hopped back off the baseplate's edge.
+- **Burial:** a buried ghoul's torso and head pass through the ground while it's buried, rising or sinking. They're their own physical pieces on an R15 rig, and they had been trapped under the floor, dragging it down.
+- **Admin:** the Spawns buttons show each beast's name ("Beast: Grave Ghoul"), and so does the spawn message.
+
+### Verified (Play, slot 4 "Testy")
+- **Spawning:** it spawned fully buried, and every clip played on the client from its KeyframeSequence.
+- **Emerge:** a student 9 to 10 studs away woke it and wasn't hit. A student on the grave took 8 and was thrown 10 studs. It rose to its full height and stood.
+- **The fight:** the pattern ran twice, and swipes hit for 7 and 9.
+- **Grab:** caught, it held for 1 s and slammed for 14. A sidestep dodged it, with no damage and a long stumble. A friend's hit broke the hold, with no damage.
+- **The Kanji:** it showed only before the emerge (above the grave) and before each grab.
+- **Fighting back:** with a weapon out, punches landed (8 hits in 6 s).
+- **Kill and reward:** the Death clip played, the body faded, and Testy got ¥35.
+- **Re-burying:** it dug back in when led away.
+- **Admin:** the spawn worked through the admin remote.
+- **The Hellhound after these changes:** it still stands, fights and lands hits.
+- **Not tried in play:** two ghouls at once, the night lair spawn and respawn timer, the morning despawn, the Grave-Dirt Locket drop, and two students (the hold break was simulated with a direct hit).
+
 ## [1.56.0] - 2026-11-05: The Hellhound, and the shared Beasts system
 
 Owner: "make a kit for rigged and animated beasts for the game", the first of six (design: `docs/superpowers/specs/2026-11-05-beasts-design.md`). Its look followed the owner's notes: "match the quality of the wolf", "more fire aspects", "I don't want any outline on it", "Take the fire completely off the head too", "Make the eyes still glow with flame", "1 horn in the middle of it's head". Its warning followed "Use the Kanji VFX in the game", "for all special attacks", and "Normal attacks shouldn't have a kanji". Its fight followed "The pattern idea was right" and "Just make it winnable against". Full page: `docs/Beasts.md`.
