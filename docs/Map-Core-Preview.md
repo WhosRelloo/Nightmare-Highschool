@@ -77,6 +77,13 @@ is already taken. The module list came from tracing every `require` from the cho
 - **Removing it:** the removal command below also takes these (they're tagged). The three place settings are set back in
   Properties if wanted.
 
+
+## Added 2026-11-06 (1.59.1): the doors open
+
+The game's door system (`Services.Features.Doors`, `Controllers.World.Doors`) is in the add-on, so every door-kit door
+in the Map (all already tagged `NHDoor`) opens and closes with E, swings away from you and shuts itself after 7 seconds.
+The doors themselves weren't changed. Tested on both Gothic double doors.
+
 ## Removing it
 Run this in the Map place's command bar, then save:
 

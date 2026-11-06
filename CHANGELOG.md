@@ -2,6 +2,17 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.59.1] - 2026-11-06: Map place: the doors open
+
+Owner (with a screenshot of the two arched double doors under the awning): "Make it so these doors are openable". NH Combat Test is unchanged.
+
+### Added (Map place, tagged NHCore)
+- **The game's door system** (`Services.Features.Doors`, `Controllers.World.Doors`, the same fixed versions NH Combat Test runs). Every door-kit door in the Map was already tagged `NHDoor` and set up (prompt point, leaves, doorway size), so they work as they do in the game: walk up, press E to Open or Close, the leaves swing away from you, and the door shuts by itself after 7 seconds once the doorway is clear. Open leaves stop blocking.
+- The builder's doors weren't changed: the prompts and open state exist only while the game runs.
+
+### Verified (Map place play-test)
+- Both Gothic double doors: the prompt reads Open, the leaves swing 90 degrees, the prompt reads Close; one closed by itself after its delay once I stepped away; open leaves don't collide; no errors. The other door-kit pieces (classroom, headmaster, bookcase, iron gate, sliding iron door, cellar hatch) use the same system but weren't each opened.
+
 ## [1.59.0] - 2026-11-06: The Night Stalker
 
 The third beast of six (design: `docs/superpowers/specs/2026-11-05-beasts-design.md`; the owner pre-approved the beasts' designs). The owner rejected the first look, a pale grinning mannequin: "Nah make it cooler and higher quality". Full page: `docs/Beasts.md`.
