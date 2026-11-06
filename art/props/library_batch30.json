@@ -1,5 +1,5 @@
 {
- "_note": "Props batch 30 (1.50): the library kit, from art/props/nh_props_batch30.py. Every book's spine comes from the printed atlas art/props/library_atlas.py (142 original bindings) and is baked with extra room so titles read. Maps are group-owned (15981569); ScrollRack and CobwebCorner have no metal map (all black); NewspaperRack's four maps are not uploaded yet. Pieces: Main; Glow (Neon); Glass; Ladder; Globe / Rings (NHSpin); Pendulum (NHSwing). Set up by Studio/props_setup30.luau.",
+ "_note": "Props batch 30 (1.50): the library kit, from art/props/nh_props_batch30.py. Every book's spine comes from the printed atlas art/props/library_atlas.py (142 original bindings) and is baked with extra room so titles read. Maps are group-owned (15981569); ScrollRack and CobwebCorner have no metal map (all black). Pieces: Main; Glow (Neon); Glass; Ladder; Globe / Rings (NHSpin); Pendulum (NHSwing). Set up by Studio/props_setup30.luau.",
  "ArmillarySphere": {
   "dims": [
    2.89,

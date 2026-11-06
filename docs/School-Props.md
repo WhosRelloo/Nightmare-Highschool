@@ -927,7 +927,7 @@ Tris are whole-prop counts; every single piece is under 20k (the largest is Corn
 | LibraryChair | 2.1k | armless, pointed back, crimson cushion; seat top 1.55 (SeatHeight 1.55) |
 | LibraryClock | 7.3k | black and crimson longcase: moon-phase arch, lancet door (Glass), Pendulum swings (NHSwing) |
 | MapChest | 6.0k | six plan drawers with cup handles; the map of the moor, brass weights, dividers, a roll |
-| NewspaperRack | 2.0k | three Nightmare Heralds on reading sticks, NEWSPAPERS plaque (maps not uploaded yet) |
+| NewspaperRack | 2.0k | three Nightmare Heralds on reading sticks, NEWSPAPERS plaque |
 | OpenBook | 2.0k | the phases of the moon on a tasselled crimson velvet cushion |
 | ReadingTableLong | 4.9k | 12 × 4.2, pierced trestles, crimson leather top, a raised rail with two banker's lamps (Glow), open books, inkwell |
 | ReadingTableRound | 4.5k | 5 across, baluster and scroll feet, crimson inset, books, a magnifier |
