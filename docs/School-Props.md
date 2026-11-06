@@ -874,3 +874,83 @@ Tris are whole-prop counts; every single piece is under 20k (the largest is Corn
 ![The rugs by day](img/furnishings-day-rugs.jpg)
 ![The tapestry wall and carpet tiles by day](img/furnishings-day-tapestries.jpg)
 ![At night](img/furnishings-night.jpg)
+
+## Batch 30 (1.50): the library kit
+
+`art/props/nh_props_batch30.py`. The printed atlas comes from `art/props/library_atlas.py`, run with the system Python and PIL. It writes `textures/LibraryAtlas_{color,gilt,height}.png` and `LibraryGlobe_color.png`. The atlas regions and the 142 book designs are in `art/props/library_atlas.json`.
+
+**The books:**
+- Each book is a box mapped onto the atlas through a "Spine" UV layer: the spine onto its cell, the boards onto its leather swatch, the edges onto its paper swatch.
+- The atlas material reads colour, gilt (metal, smoother) and height (a bump for the raised bands and the debossed titles) over a fine leather grain, then gets the usual bake weathering.
+- The atlas is drawn at twice its size and filtered down. Gilt is tooled: a dark pressed rim, a sheen and pinhole wear.
+- `fill_row` stands books on a shelf. It makes runs of matching sets, stacks lying flat with their titles across, books leaning on a neighbour's top corner (placed by geometry, never through it) and the odd gap. `dfun` caps the depth on a shaped shelf (the corner case).
+
+**The bake layout:** batch 30 replaces `bake_uv` with `bake_uv_weighted`. It falls back to the usual one for a prop with no books or printed faces.
+- Each book is laid out as one island from its "Unfold" layer: the spine at 2.6 times the kit's texel density, the boards and edges as thin strips (0.12) folded off it.
+- Faces with an `nh_uvk` weight are scaled by it: printed plates 2, chain links 0.5, cobweb threads 0.25.
+- After the pack, the layout is shrunk to fit the tile if it overruns. A second pack would collapse it to a point.
+- Result: 38 to 70% of a book-heavy prop's 2048 map is used, against about 30% with the usual layout.
+- The 8-pixel gap is too wide for a small test bake (512), which comes out empty. Test at 1024 or more.
+
+**Dust:** `dustify()` mixes dust into every material's colour where it faces up (with a soft noise), making it rougher and less metallic, before the bake (ShelfDusty).
+
+| Prop | Tris | Notes |
+|---|---|---|
+| ArmillarySphere | 7.5k | brass rings, a gilt ecliptic, a little earth; Rings turn (NHSpin, 9°/s) |
+| BankerLamp | 0.6k | green glass shade on brass (Glow: the bulb) |
+| BookCart | 3.8k | two tiers of books both sides, iron frame, castors, brass handles |
+| BookPile | 0.8k | three floor piles, one with an open book on top |
+| CandleLamp | 3.9k | two candles under a crimson tole shade on a brass rod (Glow) |
+| CardCatalogue | 14.5k | 30 labelled drawers (A to Fa-Fz) on a stand, one pulled out with its cards, CATALOGUE plaque |
+| ChainedBookcase | 19.3k | a press with every other book on an iron chain to a rod, a sloping desk with a chained open book |
+| CirculationDesk | 7.8k | traceried front, LIBRARIAN plaque and crest; bell, date stamp, ledger, card box, returned books, candle lamp (Glow); shelves behind |
+| CobwebCorner | 3.1k | sheet webs and threads for a room's top corner (walls at +Y, like LibShelfCorner); no metal map |
+| ForbiddenCage | 14.8k | black and plum books in an iron cage: spear-tipped bars, two doors chained shut, padlock, RESTRICTED plaque, DO NOT OPEN tag |
+| Lectern | 4.6k | a dark bronze raven, wings spread as the rest for a chained bestiary, on an iron column |
+| LibCandelabra | 2.5k | three lights, dripping wax (Glow) |
+| LibShelfArched | 8.0k | under a pointed arch: carved spandrels, pinnacles, a traceried niche, ASTRONOMY plaque |
+| LibShelfCorner | 5.4k | for a room corner, its two backs meeting at +Y (turn it 45° for a square room), POETRY plaque |
+| LibShelfDouble | 13.6k | double-sided, books both faces, traceried end panels, LANGUAGES plaques both sides |
+| LibShelfHalf | 4.0k | half height, moulded top with brass bookends, a pile and a chamber candle (Glow) |
+| LibShelfLadder | 11.6k | 14 tall, a brass rail on three arms and a rolling ladder hooked on it (Ladder: its own piece) |
+| LibShelfTall | 7.5k | seven shelves, ebony pilasters with brass capitals, cornice and crest, gilt HISTORY plaque |
+| LibrarianBust | 4.6k | bronze R6 bust: spectacles, soft cap, quill behind the ear, crimson scarf; LIBRARIAN plaque on the pedestal |
+| LibraryChair | 2.1k | armless, pointed back, crimson cushion; seat top 1.55 (SeatHeight 1.55) |
+| LibraryClock | 7.3k | black and crimson longcase: moon-phase arch, lancet door (Glass), Pendulum swings (NHSwing) |
+| MapChest | 6.0k | six plan drawers with cup handles; the map of the moor, brass weights, dividers, a roll |
+| NewspaperRack | 2.0k | three Nightmare Heralds on reading sticks, NEWSPAPERS plaque (maps not uploaded yet) |
+| OpenBook | 2.0k | the phases of the moon on a tasselled crimson velvet cushion |
+| ReadingTableLong | 4.9k | 12 × 4.2, pierced trestles, crimson leather top, a raised rail with two banker's lamps (Glow), open books, inkwell |
+| ReadingTableRound | 4.5k | 5 across, baluster and scroll feet, crimson inset, books, a magnifier |
+| ReturnsBox | 1.7k | iron-bound, brass slot with a book half posted, RETURNS plaque |
+| RollingLadder | 2.1k | platform ladder on castors, brass handrails |
+| ScrollRack | 7.7k | diamond lattice of scrolls, eight numbered tags; no metal map |
+| ShelfDusty | 12.0k | dust on every ledge (baked), cobwebs, gaps, fallen books, a candle stub |
+| ShelfEndCap | 3.8k | end panel for a stack: twin lancets, crocketed gable and pinnacles, POETRY plaque, a shelf card |
+| ShelfToppled | 7.8k | fallen on its back, books tumbled inside and spilled round it (12 × 12 footprint) |
+| SilenceSign | 8.7k | crimson enamel, SILENCE in raised gilt letters, "quiet in the stacks", iron tripod stand |
+| StepStool | 2.0k | two steps, crimson leather treads, quatrefoil cheeks |
+| StudyCarrel | 2.7k | arched sides, a shelf of books, a hooded lamp (Glow), a QUIET PLEASE card; 4.5 inside for R6 arms |
+| TerrestrialGlobe | 5.8k | an invented world (Orbis Nocturnus) in a brass meridian and oak horizon ring; Globe turns (NHSpin, 6°/s) |
+
+- **Baked** at 2048 with 64 samples on the GPU, one prop per Blender run (`Studio/bake30.sh`, resumable). Every piece is under 20k triangles.
+  - The maps are under the group (`art/group-upload/library-batch30/`). The ids are in `art/props/library_batch30.json`.
+  - ScrollRack and CobwebCorner have no metal map.
+- **Importing:** the FBX files must be the final ones. The first import was made from drafts, and its UVs didn't match the maps.
+  - `Studio/match30.luau` checks each imported mesh against the final FBX by UV fingerprint (distinct UVs and their mean u).
+  - `Studio/rebuild30.luau` builds a prop from its final mesh assets. Those come in at 100 times, so the setup scales them down; `fixpieces30.luau` then puts the small pieces back.
+- **In Roblox:** `Studio/props_setup30.luau` builds the templates in `ServerStorage.NHProps` (`NHBuildKit = "Library"`).
+  - Cases collide as boxes and furniture precisely. Lamps, books, the open book and the web don't collide.
+  - Glow is Neon with a small light; flames flicker (`NHCandle`). The clock's door is Glass.
+  - The Pendulum swings (`NHSwing`, 4°, 2 s). Globe and Rings turn about the tilted axis (`NHSpin`; Blender (sin 23.4°, 0, cos 23.4°) is Roblox (−sin, cos, 0)).
+  - LibraryChair has `SeatHeight` 1.55.
+- **The showcase** (`workspace.NHPropsShowcase.Library`, `NHPropBatch30`; `props_revert30.luau` removes it): four rows facing −Z from x 252, at z −130 (shelving), −160 (furniture), −190 (fittings and books) and −220 (atmosphere).
+  - Chairs are drawn up to the tables and the carrel.
+  - The small pieces stand on dark blocks, and the web hangs between two dark walls (`NHLibraryKitDisplay`).
+
+![The library kit](img/library-kit-previews.jpg)
+![Spines up close](img/library-kit-spines.jpg)
+![By day](img/library-kit-day-1.jpg)
+![By day, the rows](img/library-kit-day-2.jpg)
+![At night](img/library-kit-night.jpg)
+![Candles at night](img/library-kit-night-candles.jpg)

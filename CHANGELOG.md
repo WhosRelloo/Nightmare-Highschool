@@ -2,6 +2,86 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.50.0] - 2026-11-05: The library kit
+
+### Added
+- **Props batch 30, the library kit** (`art/props/nh_props_batch30.py`; owner: "create me a library kit with a BUNCH of models for it. same theme"): 36 original pieces for an old haunted school library, in dark oak, ebony, brass and gilt, iron, crimson leather and enamel, paper and wax.
+  - **Shelving:**
+    - **LibShelfTall:** seven shelves, ebony pilasters with brass capitals, a cornice, a crest and a gilt HISTORY plaque.
+    - **LibShelfArched:** under a pointed arch with carved spandrels and pinnacles, and a traceried niche at the top.
+    - **LibShelfCorner:** for a room corner; its two backs meet behind it.
+    - **LibShelfDouble:** a double-sided stack with books on both faces and traceried ends.
+    - **LibShelfLadder:** 14 tall, with a brass rail and a rolling ladder hooked on it. The ladder is its own piece.
+    - **LibShelfHalf:** half height, with brass bookends, a book pile and a chamber candle on top.
+    - **ShelfEndCap:** an end panel for a stack, with twin lancets, a crocketed gable and a POETRY plaque.
+    - **ForbiddenCage:** the restricted section. A case of black and plum books is locked in an iron cage, chained shut with a padlock, a RESTRICTED plaque and a DO NOT OPEN tag.
+    - **ChainedBookcase:** an old chained-library press. Every other book is chained to an iron rod, and an open book is chained to the sloping desk.
+  - **Furniture:**
+    - **ReadingTableLong:** a 12-stud table on pierced trestles with a crimson leather top and a raised rail with two green banker's lamps.
+    - **ReadingTableRound:** a round table on a baluster and scroll feet.
+    - **StudyCarrel:** high arched sides, a book shelf and a lamp, and a QUIET PLEASE card.
+    - **LibraryChair:** armless, so R6 arms don't clip, with a pointed back and a crimson cushion. Its seat top is at 1.55, and the template carries `SeatHeight` 1.55.
+    - **CirculationDesk:** the librarian's desk, with a traceried front and a LIBRARIAN plaque. On it are a bell, a date stamp, the borrowing ledger (in handwriting), a card box, returned books and a candle lamp. The librarian's side has shelves.
+    - **Lectern:** a dark bronze raven whose spread wings hold a chained bestiary.
+    - **CardCatalogue:** 30 labelled drawers, one pulled out with its cards.
+    - **MapChest:** six plan drawers, with the map of the moor, brass weights, dividers and a roll on top.
+    - **NewspaperRack:** three issues of *The Nightmare Herald* on reading sticks.
+  - **Fittings:**
+    - **StepStool** and **RollingLadder**.
+    - **TerrestrialGlobe:** an invented world, Orbis Nocturnus. It turns slowly on its tilted axis.
+    - **ArmillarySphere:** its rings turn the same way.
+    - **BankerLamp**, **CandleLamp** (two candles under a crimson shade) and **LibCandelabra**.
+    - **LibrarianBust:** bronze, with spectacles and a quill behind the ear, on a gilt-edged pedestal.
+    - **LibraryClock:** black and crimson, with a moon-phase arch, a lancet glass door and a swinging pendulum.
+    - **SilenceSign:** a crimson enamel sign, SILENCE in raised gilt letters over "quiet in the stacks".
+  - **Books:** BookPile, OpenBook (the phases of the moon, on a velvet cushion), ScrollRack (a diamond rack of scrolls with numbered tags), BookCart and ReturnsBox (a book half posted through the slot).
+  - **Atmosphere:**
+    - **ShelfDusty:** dust on every ledge, cobwebs, gaps, fallen books and a candle stub.
+    - **ShelfToppled:** fallen on its back, with books tumbled inside and spilled round it.
+    - **CobwebCorner:** sheet webs for a room's top corner.
+- **Every book is a bound book with a readable title** (`art/props/library_atlas.py` prints `textures/LibraryAtlas_*`):
+  - There are 142 original bindings, among them sets such as the Encyclopaedia (I to XII), the Annals, a Bestiary, a Herbarium and an Almanac. Titles include *Moonlight Botany*, *A Grammar of Shadows*, *Ravens & Rooks* and *The Library Cat*.
+  - **Owner: "make it a little more high quality":**
+    - The atlas is drawn at twice its size and filtered down.
+    - The gilt is tooled: pressed in with a dark rim, a sheen and a little wear. It also goes into the metal and bump maps.
+    - Raised bands have dotted gilt, and the panels have fleurons. The leather has a pebble grain.
+  - The same atlas carries:
+    - the plaques and drawer labels;
+    - three newspapers;
+    - the ledger;
+    - three open-book spreads;
+    - the map of the moor;
+    - catalogue cards and scroll tags.
+  - The globe's map is drawn separately: invented continents with labels set in open sea.
+  - Books stand, lean on a neighbour's top corner (never through it), lie in stacks with their titles across, and come in runs of matching sets.
+- **Sharper titles in the bake:** each book is unwrapped as one island. The spine is at 2.6 times the texel density, with the boards and edges as thin strips folded off it. The book bottoms hidden on shelves are dropped.
+  - Book-heavy props use 38 to 70% of their 2048 map, against about 30% before.
+  - A book is a 10-triangle box: the bake rounds its edges in the normal map.
+
+### Changed
+- `nh_props.py` imports batch 30. Batch 30 replaces `bake_uv` with a weighted version that falls back to the usual one for any prop without books or printed faces.
+
+### Verified (Studio, NH Combat Test)
+- **Bakes:** 2048 with 64 samples on the GPU. Every piece is under 20k triangles (the largest is ChainedBookcase at 19,298).
+  - The maps are under the group (`art/group-upload/library-batch30/`). The ids are in `art/props/library_batch30.json`.
+  - ScrollRack and CobwebCorner have no metal map.
+  - The previews are in `art/props/_batch30_final_sheet.png`.
+- **Imports:** the first import was from the draft FBX files. Each piece was matched to the final FBX by its UV fingerprint (`Studio/match30.luau`). 29 props were rebuilt from the final mesh assets, and 7 were re-imported. 29 duplicate imports were removed.
+- **Showcase** (`workspace.NHPropsShowcase.Library`, tag `NHPropBatch30`; `Studio/props_setup30.luau`, reverted by `props_revert30.luau`):
+  - Four rows face −Z east of the window walls, at x 252 to 343 and z −130, −160, −190 and −220.
+  - Chairs are drawn up to the tables and the carrel.
+  - Small pieces stand on dark display blocks, and the corner web hangs between two dark walls.
+  - No piece clashes with another, apart from the web on its own walls.
+- **Play** (test slot 4 "Testy", `NHTestNoMenuKeys` set and cleared, `SlotCount` set back to 3):
+  - **By day:** 1:03 PM, `docs/img/library-kit-day-1.jpg` and `-day-2.jpg`.
+  - **By night:** 10 PM, `library-kit-night.jpg`. The four candle flames flicker (`NHCandle`), and there are 7 lights.
+  - **Moving parts:** the globe turned 12° in 2 s about the tilted axis, and the armillary rings 18°, each about a fixed centre. The pendulum swings 4° each way when the camera is within 60 studs.
+  - **Collision:** a walking character was stopped by the tall bookcase, the cage and the circulation desk.
+- **Not done or not tested:**
+  - **NewspaperRack's four maps** aren't in the group yet (two bulk imports didn't bring them in). Its import waits in the workspace, and its `MAPS` line in `props_setup30.luau` is empty.
+  - A few other maps were still pending Roblox's review at setup and may show white until they're approved.
+  - Sitting in the library chair (there's no Seat part) was not tested. The lamp glows are as baked; the owner will swap in their own lights.
+
 ## [1.49.0] - 2026-11-05: The soft furnishings and tapestry kit
 
 ### Added

@@ -1,0 +1,675 @@
+{
+ "_note": "Props batch 30 (1.50): the library kit, from art/props/nh_props_batch30.py. Every book's spine comes from the printed atlas art/props/library_atlas.py (142 original bindings) and is baked with extra room so titles read. Maps are group-owned (15981569); ScrollRack and CobwebCorner have no metal map (all black); NewspaperRack's four maps are not uploaded yet. Pieces: Main; Glow (Neon); Glass; Ladder; Globe / Rings (NHSpin); Pendulum (NHSwing). Set up by Studio/props_setup30.luau.",
+ "ArmillarySphere": {
+  "dims": [
+   2.89,
+   2.42,
+   4.65
+  ],
+  "pieces": [
+   "ArmillarySphere_Main",
+   "ArmillarySphere_Rings"
+  ],
+  "tris": {
+   "ArmillarySphere_Main": 2776,
+   "ArmillarySphere_Rings": 4772
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://122774982901786",
+  "NormalMap": "rbxassetid://93301530227620",
+  "RoughnessMap": "rbxassetid://110505047769918",
+  "MetalnessMap": "rbxassetid://79440376037013"
+ },
+ "BankerLamp": {
+  "dims": [
+   0.92,
+   0.63,
+   1.1
+  ],
+  "pieces": [
+   "BankerLamp_Main",
+   "BankerLamp_Glow"
+  ],
+  "tris": {
+   "BankerLamp_Main": 480,
+   "BankerLamp_Glow": 100
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://128541532628268",
+  "NormalMap": "rbxassetid://131892744668323",
+  "RoughnessMap": "rbxassetid://84078180680510",
+  "MetalnessMap": "rbxassetid://126989347844357"
+ },
+ "BookCart": {
+  "dims": [
+   4.34,
+   1.88,
+   4.23
+  ],
+  "pieces": [
+   "BookCart"
+  ],
+  "tris": {
+   "BookCart": 3832
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://121294804382382",
+  "NormalMap": "rbxassetid://126819435337635",
+  "RoughnessMap": "rbxassetid://77542024410357",
+  "MetalnessMap": "rbxassetid://80263453811902"
+ },
+ "BookPile": {
+  "dims": [
+   4.13,
+   3.03,
+   2.07
+  ],
+  "pieces": [
+   "BookPile"
+  ],
+  "tris": {
+   "BookPile": 816
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://107502021757449",
+  "NormalMap": "rbxassetid://73484461987313",
+  "RoughnessMap": "rbxassetid://75252547462883",
+  "MetalnessMap": "rbxassetid://90082428695444"
+ },
+ "CandleLamp": {
+  "dims": [
+   1.52,
+   1.47,
+   2.16
+  ],
+  "pieces": [
+   "CandleLamp_Main",
+   "CandleLamp_Glow"
+  ],
+  "tris": {
+   "CandleLamp_Main": 3788,
+   "CandleLamp_Glow": 160
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://82117590217017",
+  "NormalMap": "rbxassetid://87922568429005",
+  "RoughnessMap": "rbxassetid://83504811415637",
+  "MetalnessMap": "rbxassetid://71997656365258"
+ },
+ "CardCatalogue": {
+  "dims": [
+   4.8,
+   2.97,
+   5.42
+  ],
+  "pieces": [
+   "CardCatalogue"
+  ],
+  "tris": {
+   "CardCatalogue": 14536
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://99852640658745",
+  "NormalMap": "rbxassetid://120575851650541",
+  "RoughnessMap": "rbxassetid://110709251965057",
+  "MetalnessMap": "rbxassetid://74774396573103"
+ },
+ "ChainedBookcase": {
+  "dims": [
+   5.66,
+   2.93,
+   8.97
+  ],
+  "pieces": [
+   "ChainedBookcase"
+  ],
+  "tris": {
+   "ChainedBookcase": 19298
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://103981607732883",
+  "NormalMap": "rbxassetid://128290411395531",
+  "RoughnessMap": "rbxassetid://120769409703791",
+  "MetalnessMap": "rbxassetid://115472399943732"
+ },
+ "CirculationDesk": {
+  "dims": [
+   10.4,
+   3.55,
+   4.38
+  ],
+  "pieces": [
+   "CirculationDesk_Main",
+   "CirculationDesk_Glow"
+  ],
+  "tris": {
+   "CirculationDesk_Main": 7728,
+   "CirculationDesk_Glow": 80
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://81467089098064",
+  "NormalMap": "rbxassetid://126144233968414",
+  "RoughnessMap": "rbxassetid://113722039725582",
+  "MetalnessMap": "rbxassetid://118779375332750"
+ },
+ "CobwebCorner": {
+  "dims": [
+   2.69,
+   1.5,
+   2.52
+  ],
+  "pieces": [
+   "CobwebCorner"
+  ],
+  "tris": {
+   "CobwebCorner": 3144
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://86126268264629",
+  "NormalMap": "rbxassetid://88157844077851",
+  "RoughnessMap": "rbxassetid://139790279873324",
+  "MetalnessMap": ""
+ },
+ "ForbiddenCage": {
+  "dims": [
+   6.54,
+   2.57,
+   9.26
+  ],
+  "pieces": [
+   "ForbiddenCage"
+  ],
+  "tris": {
+   "ForbiddenCage": 14774
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://95467398299279",
+  "NormalMap": "rbxassetid://125423441302408",
+  "RoughnessMap": "rbxassetid://86603498665785",
+  "MetalnessMap": "rbxassetid://94227078050114"
+ },
+ "Lectern": {
+  "dims": [
+   4.0,
+   2.7,
+   4.57
+  ],
+  "pieces": [
+   "Lectern"
+  ],
+  "tris": {
+   "Lectern": 4570
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://77040009022237",
+  "NormalMap": "rbxassetid://132561053062053",
+  "RoughnessMap": "rbxassetid://77022144823787",
+  "MetalnessMap": "rbxassetid://101151239636241"
+ },
+ "LibCandelabra": {
+  "dims": [
+   1.4,
+   0.91,
+   2.37
+  ],
+  "pieces": [
+   "LibCandelabra_Main",
+   "LibCandelabra_Glow"
+  ],
+  "tris": {
+   "LibCandelabra_Main": 2276,
+   "LibCandelabra_Glow": 240
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://135922484519250",
+  "NormalMap": "rbxassetid://101991746059393",
+  "RoughnessMap": "rbxassetid://83790282289030",
+  "MetalnessMap": "rbxassetid://80187885816205"
+ },
+ "LibShelfArched": {
+  "dims": [
+   6.46,
+   1.95,
+   12.84
+  ],
+  "pieces": [
+   "LibShelfArched"
+  ],
+  "tris": {
+   "LibShelfArched": 7994
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://98681163725226",
+  "NormalMap": "rbxassetid://113735363105108",
+  "RoughnessMap": "rbxassetid://123215492385117",
+  "MetalnessMap": "rbxassetid://116491966872846"
+ },
+ "LibShelfCorner": {
+  "dims": [
+   4.93,
+   2.46,
+   10.45
+  ],
+  "pieces": [
+   "LibShelfCorner"
+  ],
+  "tris": {
+   "LibShelfCorner": 5436
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://137520003340295",
+  "NormalMap": "rbxassetid://75118839410052",
+  "RoughnessMap": "rbxassetid://127380660673844",
+  "MetalnessMap": "rbxassetid://138175457334591"
+ },
+ "LibShelfDouble": {
+  "dims": [
+   6.46,
+   3.3,
+   9.77
+  ],
+  "pieces": [
+   "LibShelfDouble"
+  ],
+  "tris": {
+   "LibShelfDouble": 13626
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://103999328172344",
+  "NormalMap": "rbxassetid://120501685970794",
+  "RoughnessMap": "rbxassetid://134014803795527",
+  "MetalnessMap": "rbxassetid://95932339940786"
+ },
+ "LibShelfHalf": {
+  "dims": [
+   5.3,
+   1.68,
+   5.1
+  ],
+  "pieces": [
+   "LibShelfHalf_Main",
+   "LibShelfHalf_Glow"
+  ],
+  "tris": {
+   "LibShelfHalf_Main": 3964,
+   "LibShelfHalf_Glow": 80
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://90007623380409",
+  "NormalMap": "rbxassetid://114755090695379",
+  "RoughnessMap": "rbxassetid://125648248034475",
+  "MetalnessMap": "rbxassetid://125068759013637"
+ },
+ "LibShelfLadder": {
+  "dims": [
+   7.46,
+   5.15,
+   13.97
+  ],
+  "pieces": [
+   "LibShelfLadder_Main",
+   "LibShelfLadder_Ladder"
+  ],
+  "tris": {
+   "LibShelfLadder_Main": 9404,
+   "LibShelfLadder_Ladder": 2168
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://80455791783023",
+  "NormalMap": "rbxassetid://113521290912396",
+  "RoughnessMap": "rbxassetid://122917252645211",
+  "MetalnessMap": "rbxassetid://93607340408333"
+ },
+ "LibShelfTall": {
+  "dims": [
+   6.46,
+   1.95,
+   11.77
+  ],
+  "pieces": [
+   "LibShelfTall"
+  ],
+  "tris": {
+   "LibShelfTall": 7542
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://102867728713502",
+  "NormalMap": "rbxassetid://90238610896260",
+  "RoughnessMap": "rbxassetid://110359238111274",
+  "MetalnessMap": "rbxassetid://127669352593478"
+ },
+ "LibrarianBust": {
+  "dims": [
+   1.76,
+   1.78,
+   6.5
+  ],
+  "pieces": [
+   "LibrarianBust"
+  ],
+  "tris": {
+   "LibrarianBust": 4576
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://127519804028824",
+  "NormalMap": "rbxassetid://112676189798768",
+  "RoughnessMap": "rbxassetid://79631755147611",
+  "MetalnessMap": "rbxassetid://106534336789918"
+ },
+ "LibraryChair": {
+  "dims": [
+   2.3,
+   2.0,
+   4.78
+  ],
+  "pieces": [
+   "LibraryChair"
+  ],
+  "tris": {
+   "LibraryChair": 2144
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://95126100280970",
+  "NormalMap": "rbxassetid://88115166701852",
+  "RoughnessMap": "rbxassetid://130038533045572",
+  "MetalnessMap": "rbxassetid://135407760625715"
+ },
+ "LibraryClock": {
+  "dims": [
+   3.16,
+   1.61,
+   10.33
+  ],
+  "pieces": [
+   "LibraryClock_Main",
+   "LibraryClock_Glass",
+   "LibraryClock_Pendulum"
+  ],
+  "tris": {
+   "LibraryClock_Main": 6472,
+   "LibraryClock_Glass": 88,
+   "LibraryClock_Pendulum": 720
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://83572972985370",
+  "NormalMap": "rbxassetid://87951443992118",
+  "RoughnessMap": "rbxassetid://101272950523845",
+  "MetalnessMap": "rbxassetid://128281913941912"
+ },
+ "MapChest": {
+  "dims": [
+   6.6,
+   4.24,
+   3.4
+  ],
+  "pieces": [
+   "MapChest"
+  ],
+  "tris": {
+   "MapChest": 6044
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://108191345812247",
+  "NormalMap": "rbxassetid://115326988190776",
+  "RoughnessMap": "rbxassetid://90126852174754",
+  "MetalnessMap": "rbxassetid://74302886662501"
+ },
+ "NewspaperRack": {
+  "dims": [
+   3.78,
+   1.96,
+   5.66
+  ],
+  "pieces": [
+   "NewspaperRack"
+  ],
+  "tris": {
+   "NewspaperRack": 1988
+  },
+  "batch": 30,
+  "ColorMap": "",
+  "NormalMap": "",
+  "RoughnessMap": "",
+  "MetalnessMap": ""
+ },
+ "OpenBook": {
+  "dims": [
+   2.59,
+   2.01,
+   0.64
+  ],
+  "pieces": [
+   "OpenBook"
+  ],
+  "tris": {
+   "OpenBook": 1984
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://79430171964696",
+  "NormalMap": "rbxassetid://80086427732024",
+  "RoughnessMap": "rbxassetid://86359819051420",
+  "MetalnessMap": "rbxassetid://104078460963870"
+ },
+ "ReadingTableLong": {
+  "dims": [
+   12.0,
+   4.56,
+   4.05
+  ],
+  "pieces": [
+   "ReadingTableLong_Main",
+   "ReadingTableLong_Glow"
+  ],
+  "tris": {
+   "ReadingTableLong_Main": 4696,
+   "ReadingTableLong_Glow": 200
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://135263634858551",
+  "NormalMap": "rbxassetid://126043707821101",
+  "RoughnessMap": "rbxassetid://76217450306349",
+  "MetalnessMap": "rbxassetid://126440287459795"
+ },
+ "ReadingTableRound": {
+  "dims": [
+   5.09,
+   5.09,
+   3.57
+  ],
+  "pieces": [
+   "ReadingTableRound"
+  ],
+  "tris": {
+   "ReadingTableRound": 4536
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://93356240160656",
+  "NormalMap": "rbxassetid://96551175178568",
+  "RoughnessMap": "rbxassetid://85335475054082",
+  "MetalnessMap": "rbxassetid://94813821196703"
+ },
+ "ReturnsBox": {
+  "dims": [
+   2.96,
+   2.7,
+   4.03
+  ],
+  "pieces": [
+   "ReturnsBox"
+  ],
+  "tris": {
+   "ReturnsBox": 1652
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://111995744234207",
+  "NormalMap": "rbxassetid://76482753805807",
+  "RoughnessMap": "rbxassetid://136514423002752",
+  "MetalnessMap": "rbxassetid://123236112671617"
+ },
+ "RollingLadder": {
+  "dims": [
+   2.36,
+   3.65,
+   7.83
+  ],
+  "pieces": [
+   "RollingLadder"
+  ],
+  "tris": {
+   "RollingLadder": 2120
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://81380653802529",
+  "NormalMap": "rbxassetid://97317655333809",
+  "RoughnessMap": "rbxassetid://107063061421916",
+  "MetalnessMap": "rbxassetid://118909110309297"
+ },
+ "ScrollRack": {
+  "dims": [
+   4.2,
+   1.71,
+   4.34
+  ],
+  "pieces": [
+   "ScrollRack"
+  ],
+  "tris": {
+   "ScrollRack": 7664
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://77561621573283",
+  "NormalMap": "rbxassetid://76562206064725",
+  "RoughnessMap": "rbxassetid://113772799215863",
+  "MetalnessMap": ""
+ },
+ "ShelfDusty": {
+  "dims": [
+   6.88,
+   3.6,
+   11.77
+  ],
+  "pieces": [
+   "ShelfDusty"
+  ],
+  "tris": {
+   "ShelfDusty": 12020
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://95219797119800",
+  "NormalMap": "rbxassetid://71546193421109",
+  "RoughnessMap": "rbxassetid://72743029720711",
+  "MetalnessMap": "rbxassetid://75490754984369"
+ },
+ "ShelfEndCap": {
+  "dims": [
+   3.16,
+   0.66,
+   10.15
+  ],
+  "pieces": [
+   "ShelfEndCap"
+  ],
+  "tris": {
+   "ShelfEndCap": 3808
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://97714539863707",
+  "NormalMap": "rbxassetid://105918519517797",
+  "RoughnessMap": "rbxassetid://97562434972554",
+  "MetalnessMap": "rbxassetid://125761684299185"
+ },
+ "ShelfToppled": {
+  "dims": [
+   12.43,
+   11.82,
+   1.85
+  ],
+  "pieces": [
+   "ShelfToppled"
+  ],
+  "tris": {
+   "ShelfToppled": 7796
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://121552782191963",
+  "NormalMap": "rbxassetid://139481579949416",
+  "RoughnessMap": "rbxassetid://87224784817785",
+  "MetalnessMap": "rbxassetid://140367817862304"
+ },
+ "SilenceSign": {
+  "dims": [
+   3.0,
+   1.31,
+   5.37
+  ],
+  "pieces": [
+   "SilenceSign"
+  ],
+  "tris": {
+   "SilenceSign": 8727
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://101585112420514",
+  "NormalMap": "rbxassetid://71432835915683",
+  "RoughnessMap": "rbxassetid://94115595411879",
+  "MetalnessMap": "rbxassetid://75360991542152"
+ },
+ "StepStool": {
+  "dims": [
+   2.24,
+   2.31,
+   1.61
+  ],
+  "pieces": [
+   "StepStool"
+  ],
+  "tris": {
+   "StepStool": 1992
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://115640597735459",
+  "NormalMap": "rbxassetid://111921992589672",
+  "RoughnessMap": "rbxassetid://81560805862978",
+  "MetalnessMap": "rbxassetid://113316560409103"
+ },
+ "StudyCarrel": {
+  "dims": [
+   4.9,
+   2.8,
+   5.8
+  ],
+  "pieces": [
+   "StudyCarrel_Main",
+   "StudyCarrel_Glow"
+  ],
+  "tris": {
+   "StudyCarrel_Main": 2636,
+   "StudyCarrel_Glow": 100
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://73539407343092",
+  "NormalMap": "rbxassetid://98272586099820",
+  "RoughnessMap": "rbxassetid://114871160641221",
+  "MetalnessMap": "rbxassetid://81345436224829"
+ },
+ "TerrestrialGlobe": {
+  "dims": [
+   3.42,
+   3.34,
+   5.01
+  ],
+  "pieces": [
+   "TerrestrialGlobe_Main",
+   "TerrestrialGlobe_Globe"
+  ],
+  "tris": {
+   "TerrestrialGlobe_Main": 3464,
+   "TerrestrialGlobe_Globe": 2304
+  },
+  "batch": 30,
+  "ColorMap": "rbxassetid://110750153077587",
+  "NormalMap": "rbxassetid://107048719774053",
+  "RoughnessMap": "rbxassetid://72006888413076",
+  "MetalnessMap": "rbxassetid://111539269814370"
+ }
+}
