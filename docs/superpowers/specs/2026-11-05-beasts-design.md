@@ -21,8 +21,12 @@ Owner's choices:
   - its unique moves (`Specials`), each with its own hook in the system;
   - `Spawn`: `Night`, `Max`, `Respawn`, and which lairs;
   - `Reward`: `Exp`, `Yen` and `Trophy` with its chance.
+- **The attack warning (owner, 2026-11-05):** the game's critical-attack Kanji (`CombatFX.Heavy`'s Kanji, the one students see before a critical), over the beast's head, with the Critical sound. Beasts never get an outline.
+  - Only special attacks show it (the Hellhound's `Pounce` and `FireBreath`, and every unique move), with the critical glow and ring. Normal attacks get no Kanji (owner: "Normal attacks shouldn't have a kanji").
+  - The client indicator is `StarterPlayerScripts.Controllers.StateController.Indicators.BeastTell`. The server sends `Packets.Replicate:Fire("Indicators", "BeastTell", { User = beast })`, sized to the beast's height.
+- **The fight must be winnable (owner, 2026-11-05):** a fixed, learnable pattern ("The pattern idea was right"); every special is followed by an opening; a short stun guard after each stun so mashing can't stun-lock it; a leash you can lead it past.
 - **The wolf rules hold for every beast:**
-  - a red tell before every attack;
+  - the Kanji before every special (the wolves keep their red tell);
   - one beast attacks a given student at a time while the rest circle;
   - your hits stun it (`Stun1` or `Stun2`), and posture break (`Paralyzed`) plays `GuardBroken`;
   - its damage goes through `Downed.ApplyDamage`, so a beast can down a student but never execute one;

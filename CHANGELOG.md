@@ -2,6 +2,50 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.56.0] - 2026-11-05: The Hellhound, and the shared Beasts system
+
+Owner: "make a kit for rigged and animated beasts for the game", the first of six (design: `docs/superpowers/specs/2026-11-05-beasts-design.md`). Its look followed the owner's notes: "match the quality of the wolf", "more fire aspects", "I don't want any outline on it", "Take the fire completely off the head too", "Make the eyes still glow with flame", "1 horn in the middle of it's head". Its warning followed "Use the Kanji VFX in the game", "for all special attacks", and "Normal attacks shouldn't have a kanji". Its fight followed "The pattern idea was right" and "Just make it winnable against". Full page: `docs/Beasts.md`.
+
+### Added
+- **The Hellhound** (`ServerStorage.NHBeasts.Hellhound`), a mini-boss:
+  - **Look:** the owner's wolf rig scaled up 1.35x and charred black, with one horn on the forehead and nine bone spikes down the spine.
+  - **Fire:** the game's own burning-status flame on a continuous mane down the back, the tail and the paws, plus smoke, embers, a body glow and burning eyes. There's no other fire on the head and no outline.
+  - **Animation:** the horn and spikes are held to the head and spine bones, so they move with every clip.
+  - **Clips:** the wolf's 12, renamed for the Beasts system (`Attack1`, `Attack2`, `Pounce`, `Howl`, `JumpBack`, the stuns, `GuardBroken`, `Death`).
+  - **Fire breath:** built in, aimed out of the snout, about 14 studs of flame.
+- **The Beasts system** (`Services.Features.Beasts`, `ReplicatedStorage.Config.Beasts`): every beast runs from its config. The wolves are untouched.
+  - **Pattern:** a fixed, learnable loop. The Hellhound's is bite, bite, **fire breath**, bite, hop back, **pounce**.
+  - **The Kanji:** only special attacks show the game's critical Kanji first, bigger and with the critical glow and ring (`StateController.Indicators.BeastTell`). Normal attacks have none.
+  - **Made to be won:**
+    - every bite can be stepped away from;
+    - the breath's aim and the pounce's direction lock when the Kanji shows;
+    - after the breath it stands still about 2 s, and after the pounce it pants about 4 s;
+    - it howls once when it spots you;
+    - for 2 s after a stun, hits can't stun it again or call off its attack, so mashing can't stun-lock it (a posture break always works);
+    - it gives up past its leash;
+    - it downs you, never kills you;
+    - only one beast attacks you at a time.
+  - **Stats:** Health 180 (a wolf is 70).
+  - **Spawning:** at night from parts tagged `NHBeastLair` (attribute `Beast`), gone by morning, back 4 minutes after a kill. A placeholder lair is in the boiler yard (`workspace.NHBeastLairs`), and the Hellhound stays in the yard unless it's chasing you.
+  - **Rewards:** 160 Combat EXP and ¥60, plus a 15% chance of the **Ember Tooth** trophy.
+- **Trophies:** a new Locker item kind (`Kind = Trophy`, `Config.Items.Trophies`), shown under All with a fang model and a Drop-only card. Trophies are never sold, pinned or used, and they save like other items.
+- **Admin panel:** a "Beast: Hellhound" button on the Spawns tab. It spawns one 22 studs in front of you, facing you, at any time of day, and it stays until killed or cleared. "Clear all enemies" removes beasts too, and the Spawns line counts them.
+
+### Changed
+- `Features.Inventory`: a trophy is never auto-pinned, can't be pinned, used or bought, and Buy refuses items with no price. `Gui.Locker`: the trophy kind, the fang prop, and a strict sort order across item kinds.
+
+### Verified (Play, slot 4 "Testy")
+- **Spawning:** at 22:00 it spawned at the lair.
+- **The fight, standing still:**
+  - the pattern ran in order twice;
+  - every attack landed (bites 8 and 10, the full breath 7 x 3, the pounce 14);
+  - the Kanji showed exactly before each breath and pounce, five times, and never before a bite.
+- **Dodging:** stepping back dodged every bite, and sidestepping the breath after it started cost one tick.
+- **Fighting back:** with a weapon out, punches landed and stunned it. Mashing for 16 s took it from 180 to 107 while it still got five attacks off.
+- **Kill and reward:** the Death clip played and the body faded. Testy got ¥60 and levelled 5 to 6. A forced trophy drop landed in the Locker, and Use, Pin and Buy were refused with their messages.
+- **Admin:** the spawn worked through the real admin remote.
+- **Not tried in play:** the pounce dodged on its Kanji, two students at once, the lair respawn timer, the morning despawn, and the admin panel's button clicked by hand (its server command and lists were tested).
+
 ## [1.55.0] - 2026-11-05: The audit's remaining fixes
 
 Owner: "Yes, fix them". Full list: `docs/Bug-Audit-2026-11-05.md`, round 2 (125 fixes across 90 scripts).

@@ -39,6 +39,7 @@ Added in 1.10.0. Code lives in Studio; this page is the design and how the piece
   - **Buying:** the counter's prompt carries `NHConcession`, and you must be within 16 studs.
   - **Lunch:** the `NHLunchSpot` markers in front are where the lunch crowd queues.
 - **Skateboards:** the Locker's Boards tab lists all nine boards; equip yours, buy the rest. See [[Skateboards]].
+- **Trophies (1.56):** a rare drop from a beast you kill (`Config.Items.Trophies`, `Kind = Trophy`; the first is the Hellhound's Ember Tooth). It shows under All with its own model, labelled Trophy, with a Drop-only card. It's never sold at the stand, pinned to the hotbar or used, and it saves with your other items. See [[Beasts]].
 - **Save data:** `PlayerData.Inventory = { Items = { [id] = count }, Pinned = { id }, Boards = { Owned = { id }, Equipped = id } }`, written with the `SetInventory` action and checked by `Config.Items.Sanitize`.
 - **Remotes:** `ReplicatedStorage.NHInventory`. Get, Use, Pin, Drop and Buy (RF), plus Changed (RE).
 
