@@ -427,10 +427,10 @@
    "NewspaperRack": 1988
   },
   "batch": 30,
-  "ColorMap": "",
-  "NormalMap": "",
-  "RoughnessMap": "",
-  "MetalnessMap": ""
+  "ColorMap": "rbxassetid://73034271452001",
+  "NormalMap": "rbxassetid://111044283092576",
+  "RoughnessMap": "rbxassetid://71725564165349",
+  "MetalnessMap": "rbxassetid://85432358891784"
  },
  "OpenBook": {
   "dims": [
