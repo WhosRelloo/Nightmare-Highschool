@@ -2,6 +2,31 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.54.0] - 2026-11-05: The core game in the Map place
+
+Owner: "let's transfer the core game (movement, cinematic mode, etc.) into the "Map" place first so me and the builder can preview how the game's gonna FEEL with the map". Full record: `docs/Map-Core-Preview.md`.
+
+### Added (Map place, placeId 111107083446202; NH Combat Test is unchanged)
+- **The core game as an add-on**, every top-level piece tagged `NHCore` and listed in `ServerStorage.NHCore.README`:
+  - **Movement:** sprint and fast sprint, dash, slide, crouch, vault, shift lock on Left Alt, the custom R6 character and its animations (with the new jump and landing).
+  - **Cinematic mode and the camera:** the `\` cinematic view, the game's camera, cursor and shift-lock reticle.
+  - **Day/night and ambience:** the school clock, the day cycle's grades, moon phases, ambient sounds and the soundscape.
+  - **Combat:** M1/M2, block, weapons, posture, combat tag, downed, the wolf form.
+- **No saving:** the Map place's `Player.Data` is an in-memory stand-in with the same API (no ProfileService, no DataStore).
+- **Roblox's standard PlayerModule** (owner approved): the Map place uses Roblox's newer built-in controls, which put shift lock on Shift (sprint) and have nothing for the game's camera hooks.
+- **Applied only while playing** (by the `NHCoreMap` bootstrap, never saved): gravity 210, jump-power mode, the character, the vignette, the runtime folders.
+- Owner's choices: movement, cinematic and camera, day/night and ambience, and combat; no training dummies.
+
+### Not touched
+- Nothing the builder made; no Workspace, Lighting or StarterPlayer property in Edit (checked after the transfer).
+
+### Verified (Map place play-test, real keys and mouse)
+- Spawns on the game's rig, gravity 210, clock running, no errors; walk, sprint to fast sprint (40.5 at 2.2 s), slide, dash, jump/fall/land; shift lock on Left Alt with the reticle; cinematic hides and restores the HUD; equip, three M1s and an M2 swing with hitboxes; at 23:00 the night grade and moon apply.
+- Not tried: fighting another player, the wolf form, the downed state, two people in the place at once.
+
+### How to remove
+- The one-line command in `docs/Map-Core-Preview.md` (and in the README in the place) deletes everything tagged `NHCore`.
+
 ## [1.53.0] - 2026-11-05: The full bug audit; jump and landing animations
 
 Owner: "let's completely audit and bugfix the "NH Combat Test" game for ALL BUGS." Full record: `docs/Bug-Audit-2026-11-05.md`.
