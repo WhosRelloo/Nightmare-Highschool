@@ -59,6 +59,24 @@ is already taken. The module list came from tracing every `require` from the cho
 - **Not tried:** a fight against another player (there's no one to hit without dummies), the wolf form, the downed
   state, and walking the whole map. Two people in the place at once (the builder and the owner) wasn't tried.
 
+
+## Added 2026-11-06 (1.58.0): shift lock fixed, character customization
+
+- **Shift lock.** The Map runs Roblox's newer player scripts, so the engine made its own PlayerModule
+  (`StarterPlayer.PlayerModule`) alongside the game's classic one: Shift (sprint) toggled shift lock and the camera lost
+  its shoulder offset. Fixed with three place settings: `Workspace.PlayerScriptsUseInputActionSystem` off (the owner),
+  `StarterPlayer.CreateDefaultPlayerModule` false, `StarterPlayer.EnableMouseLockOption` on. Tested: Shift doesn't lock,
+  Left Alt does with the game's reticle, the character sits 1.75 studs to the side.
+- **Customization.** The Wardrobe with faces, hair, capes and accessories. K opens it anywhere (the Map has no wardrobe
+  stations); the server accepts changes anywhere while `workspace.NHAnywhereWardrobe` is on (set by `NHCoreMap`).
+  Everything is unlocked by the Data stand-in, and nothing is saved. Added (tagged NHCore): `UI.Appearance` (Map
+  version), `UI.EyeArt`, `UI.FormVariants`, `ReplicatedStorage.NHCapes`, `NHHairCatalog`, `NHGear`,
+  `ServerScriptService.NHAppearance`, `Services.Features.Gear`, `Services.Player.Identity` (a stand-in: owned items only),
+  `Controllers.Gui.Wardrobe` (Map version). Tested: the look applies, K opens it, a school top, a cape and an accessory
+  apply away from any station.
+- **Removing it:** the removal command below also takes these (they're tagged). The three place settings are set back in
+  Properties if wanted.
+
 ## Removing it
 Run this in the Map place's command bar, then save:
 

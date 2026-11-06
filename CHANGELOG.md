@@ -2,6 +2,26 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.58.0] - 2026-11-06: Map place: shift lock fixed, character customization
+
+Owner: "fix the shift locking in the "Map" place. And make it so we can customize their character in the "Map" place (for now until everything is finished on our end)". Record: `docs/Map-Core-Preview.md`. NH Combat Test is unchanged.
+
+### Fixed (Map place)
+- **Shift lock:** Shift (sprint) also toggled shift lock, the camera had no over-the-shoulder offset, and the game's reticle didn't line up. The Map, a new place, runs Roblox's newer player scripts: the engine made its own PlayerModule (`StarterPlayer.PlayerModule`) next to the game's classic one, so two cameras fought. Now the classic PlayerModule (as NH Combat Test runs it) is the only one:
+  - `Workspace.PlayerScriptsUseInputActionSystem` off (the owner unticked it: plugins can't);
+  - `StarterPlayer.CreateDefaultPlayerModule` false;
+  - `StarterPlayer.EnableMouseLockOption` back on (it had been switched off, which disables shift lock entirely).
+
+### Added (Map place, tagged NHCore)
+- **Character customization:** the Wardrobe (Look, Face, Hair, Outfit, capes and accessories) with the game's painted faces, hair catalog, capes and gear. **K opens it anywhere** in the Map (it has no wardrobe stations), and the server accepts changes anywhere there (a Map-only switch, `NHAnywhereWardrobe`).
+- **Everything unlocked** for the preview (owner's choice): every school top, cape and accessory, and enrolled. **Nothing is saved**: a look lasts until you leave.
+- Pieces: `UI.Appearance` (Map version), `UI.EyeArt`, `UI.FormVariants`, `NHCapes`, `NHHairCatalog`, `NHGear`, the `NHAppearance` server script, `Features.Gear`, a small `Player.Identity` stand-in (what you own), and `Gui.Wardrobe` (Map version).
+
+### Verified (Map place play-test)
+- Shift doesn't lock; Left Alt does, with the game's reticle, and the character sits 1.75 studs to the side (over the shoulder).
+- The character has the game's look (painted face, uniform) instead of a blank head; K opens the wardrobe; a school top (Black Blazer), a cape and an accessory (Common Hood) apply away from any station; no errors on either side.
+- Not tried: every wardrobe option one by one, and two people in the place.
+
 ## [1.57.0] - 2026-11-06: The Grave Ghoul
 
 The second beast of six (design: `docs/superpowers/specs/2026-11-05-beasts-design.md`). The owner pre-approved the beasts' designs ("I approve all designs you come up with for the beasts"). Full page: `docs/Beasts.md`.
