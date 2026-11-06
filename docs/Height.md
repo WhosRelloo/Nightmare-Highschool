@@ -22,7 +22,9 @@ A roll picks **P**, your place in your race's range (0 is the shortest that race
 
 ## The ranges
 
-Today's body (model scale 0.9) is shown as **5'9"**. Inches are the height scale × 69, rounded.
+**Average (5'9") is a standard R6 body**: model scale 1.0, the 2-stud torso of a plain Roblox R6 rig (1.63.1, owner: "Normal height should be the height of a normal r6 character"). Every height goes up and down from there. Inches are the height scale × 69, rounded.
+
+![Average next to the Map place's standard R6 rig](img/height-normal-r6.jpg)
 
 | Race | Range (scale) | Shortest to tallest |
 |---|---|---|
@@ -53,10 +55,10 @@ NPC students use the Human range.
 
 ## How the body is scaled
 
-- Players use the classic R6 body (`StarterPlayer.StarterCharacter`, model scale 0.9). R6 has no body-height sliders, so the **whole character is scaled evenly** with `Model:ScaleTo(0.9 × height)`. Faces (the SurfaceGui strips), clothes, hair, held items, race looks and gear all stay in proportion, and the animations scale with the model.
+- Players use the classic R6 body (`StarterPlayer.StarterCharacter`, built at model scale 0.9). R6 has no body-height sliders, so the **whole character is scaled evenly** with `Model:ScaleTo(Heights.Normal × height)`, where `Normal` is 1.0, a standard R6 body. Faces (the SurfaceGui strips), clothes, hair, held items, race looks and gear all stay in proportion, and the animations scale with the model.
 - **`Services.Player.Height`** (server) applies it after `EntityLoader` has rebuilt the body (it sets `NHDescribed` after `ApplyDescriptionReset`; scaling before that would be undone), after every spin, and when the race changes. It mirrors read-only `HeightScale`, `HeightBand` and `HeightText` on the player.
 - **Speed and jump are put back** right after scaling, because `ScaleTo` also multiplies `WalkSpeed` and `JumpPower`. A tall student is never faster.
-- **Looks and weapons are built at the base size.** `UI.Appearance.ApplyTo` and `EntityLoader.SetWeapon` put a scaled body back to 0.9 while they build (hair, marks, capes and weapons are placed in studs for that body), then restore the height. Catalog hair is loaded first, so nothing waits while the body is at the base size.
+- **Looks and weapons are built at the base size.** `UI.Appearance.ApplyTo` and `EntityLoader.SetWeapon` put a scaled body back to 0.9 (`Heights.Base`, the size they're designed for) while they build (hair, marks, capes and weapons are placed in studs for that body), then restore the height. Catalog hair is loaded first, so nothing waits while the body is at the base size.
 - **Already height-aware:** race cosmetics (sized from the torso), 3D gear (sized from the head), and seating (the client measures the hips against the cushion).
 - **Made height-aware:** the vault's knee, waist and head heights scale with the body.
 - **Combat:** hitboxes are fixed boxes in front of the attacker's root (6 × 10 × 7), so reach never changes, and a body up to 12% bigger is barely bigger inside that box.

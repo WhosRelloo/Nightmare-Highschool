@@ -2,6 +2,18 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.63.1] - 2026-11-06: Average height is a normal R6
+
+Owner (with a screenshot of the standard R6 rig in the Map place): "Normal height should be the height of a normal r6 character like the one that's in "Map" place. Then make the height go up and down based on that."
+
+### Changed
+- **Average (5'9") is now a standard R6 body:** model scale 1.0, the 2-stud torso of a plain Roblox R6 rig. Before, it was the game's own build size (0.9), about 10% smaller. Every height still goes up and down from Average with the same ranges and odds. A student's model scale is `Heights.Normal` (1.0) × their height. This applies in NH Combat Test and the Map place, to players and NPC students.
+- Looks, capes and weapons are still built at 0.9 (`Heights.Base`, the size they're designed for), then the height applies.
+
+### Verified
+- **Map place:** Average stood 5.29 studs, exactly the Map's `Workspace.Rig`, with the same 2 × 2 × 1 torso, side by side. Shortest (Human) was 4.86 and Tallest 5.67, with walk speed unchanged.
+- **NH Combat Test (slot 4):** a 5'9" student at scale 1.007 with a 2-stud torso; NPC students between 0.92 and 1.06; a look re-applied at the new size kept the hair at exactly the same offsets.
+
 ## [1.63.0] - 2026-11-06: The admin panel and heights in the Map place
 
 Owner: "make sure to throw the admin panel in "Map" place as well as the height system". (The owner also asked to wire the newly imported developer products, then said to leave that for now: none of the group's three experiences, NH Combat Test, Map or the main game, had any developer products yet.)

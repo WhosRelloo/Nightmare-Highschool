@@ -107,3 +107,5 @@ Owner: "make sure to throw the admin panel in "Map" place as well as the height 
 - **Tested (Map place, local play-test):** a 5'10" roll on join with the body scaled to match and walk speed unchanged; F3's desk opened with the Height section; real clicks set Tallest (6'3") and spun (5'10"); a look re-applied on the tall body kept the hair exactly in place; Heal, Announce, God on and off, Clear enemies and the inspector worked, and Spawn beast and Teleport answered with messages; no errors. Not tried: two people at once, and a play-test in Team Create with the builder.
 
 ![The desk in the Map place](img/map-admin-height.jpg)
+
+**1.63.1:** Average is now the size of the Map's standard R6 rig (`Workspace.Rig`, model scale 1.0): side by side both stand 5.29 studs tall. Heights go up and down from there.
