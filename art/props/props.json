@@ -3946,11 +3946,11 @@
   },
   "batch": 31,
   "collision": "Box",
-  "tint": "SurfaceAppearance.Color 0.86",
-  "ColorMap": "rbxassetid://98066206274785",
-  "NormalMap": "rbxassetid://71792608703339",
-  "RoughnessMap": "rbxassetid://110621250773996",
-  "MetalnessMap": ""
+  "ColorMap": "rbxassetid://84496950751766",
+  "NormalMap": "rbxassetid://116046043009154",
+  "RoughnessMap": "rbxassetid://138623038477314",
+  "MetalnessMap": "",
+  "maps": "1.50.2: StairStoneBlock2_* (resampled to the stairs' ~33 px a stud, colour darkened 0.85)"
  },
  "StairRailLevel": {
   "dims": [

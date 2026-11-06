@@ -2,6 +2,26 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.50.2] - 2026-11-05: The stair stone block matches the stairs
+
+### Fixed
+- **StairStoneBlock was a little too bright** (owner: "It's a little too bright"):
+  - **The real cause:** the block's texture was about five times sharper than the stairs'. The block packs 167 texture pixels per stud; StairStoneRailed has 33 and StairStone 43, because each stair shares one 2048 map over its whole surface. The block's crisp pitting read as lighter and busier.
+  - **Softened:** the block's maps are now resampled to the stairs' level of detail (through 552 px, back to 2048).
+  - **Darkened in the map:** the colour map is darkened to 0.85 in linear light, replacing the 1.50.1 SurfaceAppearance tint (now plain white).
+  - **New maps:** published under the group as `StairStoneBlock2_color` 84496950751766, `_normal` 116046043009154 and `_rough` 138623038477314. There's still no metal map. The mesh is unchanged.
+  - The template, the showcase and `Studio/props_setup31.luau` use them.
+
+### Verified
+- **Blender:** StairStoneRailed's own FBX and maps beside the block, both faces in even sun with nothing able to shade them, measured on clean patches away from the carving and the dirt.
+  - **Shade:** the block's median (108, 110, 107) sits between the cheek right beside it (105, 108, 105) and the cheek's average (113, 116, 112).
+  - **Detail:** fine detail 1.28 against the cheek's 1.36.
+  - **Already matching:** the hue and the roughness (median 209 both).
+  - `docs/img/stair-block-match-render.png`
+- **Studio, stock Baseplate lighting** (put on for the test, then the place's own lighting restored exactly): the block flush with StairStoneRailed's west cheek.
+  - **No shadows:** rays toward the sun from 20 points on each face hit nothing.
+  - **Shade:** the block's median (103, 122, 123) against the cheek beside it (100, 124, 128), the cheek a touch bluer (`docs/img/stair-block-match.jpg`).
+
 ## [1.50.1] - 2026-11-05: Stair blending pieces, a stone block and a level stair rail
 
 ### Added
