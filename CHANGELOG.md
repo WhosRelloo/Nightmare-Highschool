@@ -103,7 +103,7 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
   - **Moving parts:** the globe turned 12° in 2 s about the tilted axis, and the armillary rings 18°, each about a fixed centre. The pendulum swings 4° each way when the camera is within 60 studs.
   - **Collision:** a walking character was stopped by the tall bookcase, the cage and the circulation desk.
 - **Not done or not tested:**
-  - **NewspaperRack's four maps** didn't show in the group's creations by name at first (they were still in Roblox's review). The owner found them under the group, and the rack is set up with them (ids in `library_batch30.json`). It shows white until the review clears.
+  - **NewspaperRack's four maps** were first uploaded as Decals, which a SurfaceAppearance can't use, so the rack showed white. The rack now uses the group images behind those decals (ids in `library_batch30.json`) and loads in Studio.
   - A few other maps were still pending Roblox's review at setup and may show white until they're approved.
   - Sitting in the library chair (there's no Seat part) was not tested. The lamp glows are as baked; the owner will swap in their own lights.
 
