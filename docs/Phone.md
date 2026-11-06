@@ -23,7 +23,7 @@ A modern smartphone layout (the owner's reference) in the school's style:
 |---|---|---|
 | Wallet | dock | send Yen (1 to 5,000, 5 s apart, confirm step); history (last 15) |
 | Night FM | dock | your own music by audio ID (only you hear it); recent IDs (last 10) |
-| Classmates | dock | everyone in the building; send Yen, invite to your study group |
+| Classmates | dock | everyone in the building; send Yen, invite to your study group, invite to your dorm room (`docs/Homes.md`) |
 | Camera | dock | the cinematic view |
 | The Midnight Bell | grid | the live school paper |
 | Timetable | grid | opens the timetable |
@@ -92,7 +92,7 @@ Three of our own takes on classic phone-game genres, drawn only with the UI kit'
 
 ## Report cards and the app icons (1.40)
 
-**Report cards** (`School.ReportCards`). Each save slot tallies its school week (the superlatives' week): each subject's lesson grades, attendance and conduct (`Social.Reports.Week`). On Monday at 6 AM, or at the next login, the finished week becomes a card (`Social.Reports.Cards`, last 4): each subject's average letter (F..A+), attendance, conduct, Mr. Hale's comment (by tier, with a race joke one week in three), and an allowance paid once: A/A+ 60, B 40, C 20, D/F 0, +20 for perfect attendance, halved after a detention. The Office texts that it's in.
+**Report cards** (`School.ReportCards`). Each save slot tallies its school week (the superlatives' week): each subject's lesson grades, attendance and conduct (`Social.Reports.Week`). On Monday at 6 AM, or at the next login, the finished week becomes a card (`Social.Reports.Cards`, last 4): each subject's average letter (F..A+), attendance, conduct, Mr. Hale's comment (by tier, with a race joke one week in three), and an allowance paid once: A/A+ 60, B 40, C 20, D/F 0, +20 for perfect attendance, halved after a detention. The Office texts that it's in. Then **Mom & Dad** text about it, and can add +¥20 on an A or cut the allowance off (`docs/Homes.md`).
 
 **The Report Card app**: the crest masthead, the card on parchment in a gilt frame with the average stamped on a crimson wax seal, the grades on striped rows, attendance pips, conduct, Mr. Hale's signed comment, the allowance as a bursar's voucher with a PAID stamp, earlier weeks, and this week so far. The tile has a badge until the newest card is read.
 

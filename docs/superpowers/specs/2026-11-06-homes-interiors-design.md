@@ -1,6 +1,6 @@
 # Homes and interiors: design
 
-**Status:** concept approved by the owner ("Good", 2026-11-06). This spec is for the owner's go before building.
+**Status:** concept approved by the owner ("Good", 2026-11-06); phase 1 built in 1.64.0 (`docs/Homes.md`), with the dorm kit art to follow.
 **Owner's ask:** "a big kit for the player home interior, building interiors, house interiors, etc. ... me and the builder want a mechanic in the game where the players have a starting dorm room and can later purchase a place off campus (once we do that later). And I want the interiors to change automatically depending on the student's grades. And when a student is doing bad in school they'll receive a text from their parents saying they're cutting them off from allowance, etc."
 
 ## What exists already

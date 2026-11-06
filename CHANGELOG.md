@@ -2,6 +2,32 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.64.0] - 2026-11-06: Dorm rooms, and Mom & Dad
+
+Owner: "me and the builder want a mechanic in the game where the players have a starting dorm room and can later purchase a place off campus (once we do that later). And I want the interiors to change automatically depending on the student's grades. And when a student is doing bad in school they'll receive a text from their parents saying they're cutting them off from allowance, etc." Phase 1 of `docs/superpowers/specs/2026-11-06-homes-interiors-design.md`; the full write-up is `docs/Homes.md`.
+
+### Added
+- **A private dorm room for every student.** Hallway doors tagged `NHHomeDoor` say "Enter your room"; walking in takes you to your own copy of the room, built from a template far below the map, so one hallway serves the whole server. Inside, the door says **Leave** (back to the hallway), and for the owner **Send guests out**. Your room is removed when you leave the server.
+- **The room follows your grades.** Five states from your latest report card: Spotless (A+/A), Tidy (B, and before your first card), Lived-in (C), Slipping (D) and A wreck (F). Made or unmade bed, a full, sparse or empty shelf, a healthy, wilting or dead plant, framed certificates, a jacket on the chair, papers, clothes, pizza boxes, overdue notices, cans, and the light from warm and bright to dim and flickering. A new card changes the room at once.
+- **The trophy shelf** shows up to four of your beast trophies (Spotless and Tidy).
+- **Mom & Dad** text right after the Office's report-card text: proud with **+¥20** on an A, pleased on a B, disappointed on a C, a warning on a D, and on an F or a second D in a row they **cut off your allowance** (the attendance bonus too) until a card of C or better brings it back.
+- **Visitors:** "Invite to my room" on a classmate's card in the phone's Classmates app sends them a text with **Visit** and **Maybe later**, good for 10 minutes.
+- **A stand-in dorm wing** in NH Combat Test (`workspace.NHDormWing`, rooms 101 to 103) and a **plain-part stand-in room** (`ServerStorage.NHHomes.Dorm`) with the same structure the real template will have. The dorm room art kit (props batch 34) is in progress and will replace it. The builder makes the real dorm wing in the Map place.
+- Saved as `PlayerData.Housing` (what you own, cut off or not, D cards in a row) through ProfileService.
+- Test commands: `HomeInfo`, `HomeEnter`, `HomeLeave`, `HomeState`, `HomeCard`, `HomeTrophy`, `HomeInvite`, `ReportDeliver`.
+
+### Changed
+- `School.ReportCards` asks Homes for the A bonus and the cut-off before paying the allowance, then sends Mom & Dad's text.
+- Phone texts can carry an invite (a Visit button, like a dare's Accept).
+
+### Verified
+- **Slot 4:** a real E press on the hallway door went into the private room, and a real E press on Leave came back out in front of door 102.
+- All five states showed the right pieces, with the light scaled and A wreck flickering.
+- A run of cards (A, D, D, C, F, F, B): paid ¥80 (Top), ¥0 (Warn), ¥0 (CutOff), ¥20 (Restored), ¥0 (CutOff), ¥0 (StillCut), ¥40 (Restored), the room following each card, and every one of Mom & Dad's texts in the phone in order.
+- **The real Monday hand-out** (`ReportDeliver`): a C card paid its allowance, Mom & Dad's "Fair" text came right after the Office's, and the room turned Lived-in.
+- The trophy shelf showed four trophies in order, redrawn as new ones were granted.
+- **Not yet tested:** the invite and Visit between two players, and Send guests out (both need a second player).
+
 ## [1.63.2] - 2026-11-06: Heights more noticeable
 
 Owner: "Make the heights a little more noticeable from normal R6. Especially the tallest heights."
