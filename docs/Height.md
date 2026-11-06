@@ -26,13 +26,19 @@ A roll picks **P**, your place in your race's range (0 is the shortest that race
 
 ![Average next to the Map place's standard R6 rig](img/height-normal-r6.jpg)
 
-| Race | Range (scale) | Shortest to tallest |
-|---|---|---|
-| Human, Priest | 0.92 to 1.08 | 5'3" to 6'3" |
-| Vampire | 0.95 to 1.10 | 5'6" to 6'4" |
-| Werewolf | 1.00 to 1.12 | 5'9" to 6'5" |
-| Ghoul | 0.90 to 1.04 | 5'2" to 6'0" |
-| Wraith | 0.96 to 1.10 | 5'6" to 6'4" |
+Each race has a shortest, a middle and a tallest height (1.63.2, owner: "Make the heights a little more noticeable from normal R6. Especially the tallest heights."):
+
+| Race | Shortest | Middle (P = 0.5) | Tallest |
+|---|---|---|---|
+| Human, Priest | 4'11" (0.86) | 5'9" (1.00, a normal R6) | 7'0" (1.22) |
+| Vampire, Wraith | 5'2" (0.90) | 5'10" (1.02) | 7'0" (1.22) |
+| Werewolf | 5'6" (0.95) | 6'1" (1.06) | 7'0" (1.22) |
+| Ghoul | 4'9" (0.82) | 5'6" (0.96) | 6'7" (1.14) |
+
+- **The curve:** the distance from the middle grows with the square of how far your place is from the middle, so Average stays close to normal and each rarer band steps further out. For a Human: Average 5'7" to 5'11", Tall to 6'4", Very Tall to 6'9", Towering to 7'0", Giant 7'0"; Short down to 5'4", Small to 5'1", Tiny to 5'0", Pint-Sized 4'11".
+- **The ceiling is 7'0" (1.22):** a body's torso is 2 studs wide times its scale, and the door kit's classroom doorway is 2.49 studs wide. Werewolves are still the tallest race through their higher middle.
+
+![A Giant (7'0") next to the Map's normal R6 rig](img/height-giant-vs-r6.jpg)
 
 NPC students use the Human range.
 
@@ -60,7 +66,7 @@ NPC students use the Human range.
 - **Speed and jump are put back** right after scaling, because `ScaleTo` also multiplies `WalkSpeed` and `JumpPower`. A tall student is never faster.
 - **Looks and weapons are built at the base size.** `UI.Appearance.ApplyTo` and `EntityLoader.SetWeapon` put a scaled body back to 0.9 (`Heights.Base`, the size they're designed for) while they build (hair, marks, capes and weapons are placed in studs for that body), then restore the height. Catalog hair is loaded first, so nothing waits while the body is at the base size.
 - **Already height-aware:** race cosmetics (sized from the torso), 3D gear (sized from the head), and seating (the client measures the hips against the cushion).
-- **Made height-aware:** the vault's knee, waist and head heights scale with the body.
+- **Made height-aware:** the vault's knee, waist and head heights scale with the body (for bodies from 0.85 to 1.55 times the game's build size).
 - **Combat:** hitboxes are fixed boxes in front of the attacker's root (6 × 10 × 7), so reach never changes, and a body up to 12% bigger is barely bigger inside that box.
 
 ![Seated, shortest](img/height-seated-short.jpg) ![Seated, tall](img/height-seated-tall.jpg)

@@ -109,3 +109,5 @@ Owner: "make sure to throw the admin panel in "Map" place as well as the height 
 ![The desk in the Map place](img/map-admin-height.jpg)
 
 **1.63.1:** Average is now the size of the Map's standard R6 rig (`Workspace.Rig`, model scale 1.0): side by side both stand 5.29 studs tall. Heights go up and down from there.
+
+**1.63.2:** wider heights, the same as the full game: 4'11" to 7'0" for the Map's students (the Human range), with Average still the rig's size.

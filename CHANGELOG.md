@@ -2,6 +2,21 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.63.2] - 2026-11-06: Heights more noticeable
+
+Owner: "Make the heights a little more noticeable from normal R6. Especially the tallest heights."
+
+### Changed
+- **Wider ranges, mostly upward.** Each race now has a shortest, a middle and a tallest height: Human and Priest 4'11" / 5'9" / 7'0", Vampire and Wraith 5'2" / 5'10" / 7'0", Werewolf 5'6" / 6'1" / 7'0", Ghoul 4'9" / 5'6" / 6'7". Before, the tallest anyone got was 6'5" (a Werewolf).
+- **A curve, not a straight line:** Average stays close to a normal R6 (Human Average 5'7" to 5'11"), and each rarer band steps further out: Tall to 6'4", Very Tall to 6'9", Towering to 7'0", Giant 7'0". The bands, rarities and odds are unchanged, and saves keep their place, so every student's height moves with the new ranges.
+- **A 7'0" ceiling** (1.22 times a normal R6) for every race: a body's torso is 2 studs wide times its scale, and the door kit's classroom doorway is 2.49 studs wide. Werewolves are still the tallest race through their higher middle. (A first try gave Werewolves 7'7", which would be too wide for those doors.)
+- The vault's size limit was raised to fit the tallest bodies.
+- Applies in NH Combat Test and the Map place.
+
+### Verified
+- **Map place:** Shortest 4'11" stood 4.52 studs, Average 5.27 (the Map's R6 rig 5.29), Tallest 7'0" 6.42, with walk speed unchanged.
+- **Doors:** the owner walked the doors himself at the new heights and they work.
+
 ## [1.63.1] - 2026-11-06: Average height is a normal R6
 
 Owner (with a screenshot of the standard R6 rig in the Map place): "Normal height should be the height of a normal r6 character like the one that's in "Map" place. Then make the height go up and down based on that."
