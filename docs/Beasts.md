@@ -2,8 +2,8 @@
 
 Night creatures run by one shared system. The wolves (`Features.WildWolves`) are separate and untouched. Design: `docs/superpowers/specs/2026-11-05-beasts-design.md`.
 
-**Built so far:** the Hellhound (1.56.0), the Grave Ghoul (1.57.0; its clips are waiting for the owner to publish them, see below).
-**Planned, one at a time:** the Bone Spider, the Crypt Bat, the Night Stalker, the Stone Gargoyle.
+**Built so far:** the Hellhound (1.56.0), the Grave Ghoul (1.57.0) and the Night Stalker (1.59.0). The ghoul's and the stalker's clips are waiting for the owner to publish them (see "Publishing their clips").
+**Planned, one at a time:** the Bone Spider, the Crypt Bat, the Stone Gargoyle.
 
 ![The Hellhound by day](img/hellhound-day.jpg)
 
@@ -16,8 +16,9 @@ Night creatures run by one shared system. The wolves (`Features.WildWolves`) are
 | The beast models | `ServerStorage.NHBeasts.<Model>`, with an `Animations` folder inside |
 | The Hellhound's fire | `ReplicatedStorage.Beasts.HellhoundFX` (`Apply(model)`, `Breath(model, on)`) |
 | The special-attack warning (client) | `StarterPlayerScripts.Controllers.StateController.Indicators.BeastTell` |
-| Lairs | parts tagged `NHBeastLair` with a `Beast` attribute. Placeholders in `workspace.NHBeastLairs`: `HellhoundLair` in the boiler yard, `GraveGhoulLair` on open ground at (-200, -200) (this map has no graveyard yet) |
+| Lairs | parts tagged `NHBeastLair` with a `Beast` attribute. Placeholders in `workspace.NHBeastLairs`: `HellhoundLair` in the boiler yard, `GraveGhoulLair` on open ground at (-200, -200) (this map has no graveyard yet), `NightStalkerLair` at (300, 200) |
 | Unpublished clips | `ServerStorage.NHBeasts.Clips.<Model>`: one KeyframeSequence per clip, waiting for the owner to publish |
+| Where students look (Freeze) | client `StarterPlayerScripts.Controllers.World.BeastGaze` sends to `ReplicatedStorage.NHBeastGaze` |
 | Trophies | `ReplicatedStorage.Config.Items.Trophies` (`Kind = Trophy`) |
 | Admin | the admin panel's Spawns tab, "Beast: <Name>" (command `SpawnBeast`) |
 
@@ -74,15 +75,34 @@ It's an AI-generated grey-hided ghoul (pointed ears, a grin of teeth, long claws
 
 ![Its hunched stance](img/grave-ghoul-stance.jpg) ![The grab](img/grave-ghoul-grab.jpg)
 
-### Publishing its clips (owner)
+## The Night Stalker
 
-The ghoul plays its clips in Studio straight from the KeyframeSequences. A live server needs them published, so until then **it doesn't spawn in live servers** (the Hellhound does).
+| | |
+|---|---|
+| Health | 130 |
+| Freeze | it can't move while a student is looking at it (within 32° of the centre of their view, 70 studs, clear sight). It stops dead mid-stride. Turn your back and it closes in |
+| Pattern | Sweep (9), Chop (11), **Reach** (13: a lunge spearing one arm 11 studs out; the Kanji first; then an opening) |
+| Stun guard | 1.8 s |
+| Spawns | 1 at night, placeholder lair at (300, 200); back 4 minutes after a kill |
+| Reward | 120 Combat EXP, ¥45, a 15% chance of the Stalker's Finger-Bone |
 
-For each of the 11 KeyframeSequences in `ServerStorage.NHBeasts.Clips.GraveGhoul` (Idle, Walk, Run, Attack1, Attack2, Stun1, Stun2, GuardBroken, Death, Emerge, Grab):
+It's an AI-generated lean, muscular dark creature with long clawed arms and an eyeless, grinning head, picked from nine tries after the owner turned down a pale mannequin ("make it cooler and higher quality"). It's scaled to 9 studs and auto-rigged R15. Shadow wisps curl off its shoulders and arms, a cold pale light comes from its head, and a faint bluish mist sits at its feet. Its 10 clips are hand-keyed for a tall, deliberate, wrong-moving thing, with the head cocked hard to one side.
+
+Where students look comes from `StarterPlayerScripts.Controllers.World.BeastGaze`. It sends the camera's position and direction to `ReplicatedStorage.NHBeastGaze` a few times a second, only while a freezing beast is within 90 studs. The server ignores a camera more than 40 studs from its character.
+
+![The Night Stalker](img/night-stalker.jpg)
+
+![Its stance](img/night-stalker-stance.jpg) ![The chop wind-up](img/night-stalker-chop.jpg)
+
+## Publishing their clips (owner)
+
+The Grave Ghoul and the Night Stalker play their clips in Studio straight from the KeyframeSequences. A live server needs them published, so until then **they don't spawn in live servers** (the Hellhound does).
+
+For each KeyframeSequence in `ServerStorage.NHBeasts.Clips.GraveGhoul` (11: Idle, Walk, Run, Attack1, Attack2, Stun1, Stun2, GuardBroken, Death, Emerge, Grab) and `ServerStorage.NHBeasts.Clips.NightStalker` (10: the same without Emerge and Grab, plus Reach):
 1. Right-click it, choose **Save to Roblox**, and publish it under the group so the game can play it.
-2. Paste the new id into the `AnimationId` of the Animation with the same name in `ServerStorage.NHBeasts.GraveGhoul.Animations`.
+2. Paste the new id into the `AnimationId` of the Animation with the same name in that beast's `Animations` folder (`ServerStorage.NHBeasts.<Beast>.Animations`).
 
-Once all 11 have ids, the ghoul spawns everywhere.
+Once all of a beast's clips have ids, it spawns everywhere.
 
 ## Trophies
 

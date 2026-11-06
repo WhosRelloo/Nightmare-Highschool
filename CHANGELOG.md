@@ -2,6 +2,31 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.59.0] - 2026-11-06: The Night Stalker
+
+The third beast of six (design: `docs/superpowers/specs/2026-11-05-beasts-design.md`; the owner pre-approved the beasts' designs). The owner rejected the first look, a pale grinning mannequin: "Nah make it cooler and higher quality". Full page: `docs/Beasts.md`.
+
+### Added
+- **The Night Stalker** (`ServerStorage.NHBeasts.NightStalker`):
+  - **Look:** an AI-generated lean, muscular dark creature with long clawed arms and an eyeless grinning head, in a ragged loincloth. It was picked from nine tries; the others came out as skeletons, mannequins, robes or squat brutes.
+  - **Rig:** scaled to 9 studs and auto-rigged as an R15 body.
+  - **Effects:** shadow wisps curl off its shoulders and forearms, a cold pale light comes from its head, and a faint bluish mist sits at its feet.
+  - **Clips:** 10 hand-keyed ones for a tall, deliberate, wrong-moving thing: the head cocked hard to one side, long arms hanging, a head that rolls and snaps in its idle. They're KeyframeSequences in `ServerStorage.NHBeasts.Clips.NightStalker`, waiting for the owner to publish.
+- **Freeze:** it can't move while a student is looking at it. Within 32° of the centre of their view and 70 studs, in clear sight, it stops dead, its clip paused mid-stride. Turn your back and it closes in.
+  - Where students look comes from `Controllers.World.BeastGaze` through `ReplicatedStorage.NHBeastGaze`. It only sends while a freezing beast is near, and it's checked against the character's position.
+- **Its fight:** a pattern of a long Sweep (9), an overhead Chop (11) and **Reach** (13). Reach is a special, so the Kanji shows first, and it's a lunge that spears one arm 11 studs out, followed by an opening.
+- **Stats:** Health 130, a 1.8 s stun guard, 1 at night.
+- **Reward:** 120 Combat EXP, ¥45, and a 15% chance of the **Stalker's Finger-Bone** trophy (a bone model in the Locker).
+- **Placeholder lair:** `workspace.NHBeastLairs.NightStalkerLair` on open ground at (300, 200).
+
+### Verified (Play, slot 4 "Testy")
+- **Freeze:** with the camera on it, it stayed frozen for 7 s, 0 studs moved, with its Run clip at speed 0. Looking away, it closed in within a second.
+- **The fight:** the sweep hit for 9, the chop for 11 and the Reach for 13.
+- **Fighting back:** punches landed (6 hits in 5 s).
+- **Kill and reward:** a kill paid ¥45.
+- **Admin:** the spawn worked through the admin remote.
+- **Not tried in play:** two students watching it (one looking keeps it frozen for everyone), the night lair spawn, the Finger-Bone drop, and its Death clip seen on screen.
+
 ## [1.58.0] - 2026-11-06: Map place: shift lock fixed, character customization
 
 Owner: "fix the shift locking in the "Map" place. And make it so we can customize their character in the "Map" place (for now until everything is finished on our end)". Record: `docs/Map-Core-Preview.md`. NH Combat Test is unchanged.
