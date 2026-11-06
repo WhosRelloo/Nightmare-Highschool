@@ -2,6 +2,30 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.55.0] - 2026-11-05: The audit's remaining fixes
+
+Owner: "Yes, fix them". Full list: `docs/Bug-Audit-2026-11-05.md`, round 2 (125 fixes across 90 scripts).
+
+### Changed (owner's choices)
+- **Grabs** (Body Slam, Bear Hug, Ripper's Waltz) can't catch someone dodging, parrying, or protected in a duel.
+- **An interrupted heavy (M2) still goes on cooldown.**
+- **The chain-slide bonus works** (one chained slide after a slide-jump gets its +10).
+- **Duels and lessons are protected:** only your duel opponent can hurt you in a duel; nobody can hurt a student in a class minigame.
+- **Word Scramble:** 6 wrong guesses skip the word. **Phone arcade:** scores count at most a maximum run length.
+- **No Abandon** on rite or showdown quests. **Clan pity** lands on spin 41, as the shop text says.
+- **Removed:** the unused `ServerStorage.NHWolf.Wolf_Original` (backed up outside the repo history, in `backups/`).
+
+### Fixed (the rest of the audit's findings)
+- **Combat:** stun can't be cut short by an overlapping state; timed tags remove only themselves; missing animation markers no longer make endless states; a feinted M1 cleans up; flash step hides the face too; the double critical indicator; hit effects for damage types without their own; the transformation cooldown survives respawn; crouch and evolution restore the right speed; slide needs a sprint; cinematic and cursor agree; animation packs swap cleanly.
+- **School and social:** Seance presses aren't dropped; the bell can't lose a lesson's grade; errands after the bell don't pay; hall monitors see past students and finish responding; superlatives keep the last minute of a week; stealth zones without routes stop rescanning; wall marks expire; prank spots are reserved; a Foe challenge keeps its path; dialogue errors close the talk; sitting is refused while busy; Sable's idle after standing.
+- **Phone, UI and core:** the wallet badge is right after 15 rows and after a rejoin; texts are matched by id; device settings stay device defaults; server-browser rows clear old fields; hair lookups have a server budget; the top bar fades on touch; clan perks refresh after a spin; Robux receipts are confirmed only once saved; the main menu's startup error path, slot-list retry, hero and avatar waits; the evolution cutscene's error path; Back to Menu re-enables after a failed teleport; spin reels can't stick.
+- **World and sports:** vending and bookshelf prompts come back after streaming; skateboard crashes use the server's speed, trails survive the board's removal, recovery leaves downed riders alone; the admin panel's pins, Heal me, refresh and Invisible; the locker view yields to newer camera shots; mirror and ward effects restore; region boxes by RegionId; open doors stop blocking NPCs; Lost & Found drops when you go down; wardrobe reach matches the server; skateboard pose and race-action effects; basketball (no snatching a shot off the hand, sport keys) and football (jukes, shrugs, out-of-bounds fumbles).
+- **Map place:** the 37 changed core scripts copied in, so it runs the same code.
+
+### Verified (Studio)
+- Every module loads; no new console errors on server or client; all three sports, fortune, Lost & Found, the board, substitutes, report cards, quests and a clique scuffle run; sprint, slide, dash, equip, M1, M2, block and jump/land with real keys. Every installed script checksummed against its local copy (one shared-buffer casualty, Doors, reinstalled).
+- Not tried in play: most single fixes on their own (duels, grabs, the phone badge and texts, admin panel, skateboards, purchases, menu error paths).
+
 ## [1.54.0] - 2026-11-05: The core game in the Map place
 
 Owner: "let's transfer the core game (movement, cinematic mode, etc.) into the "Map" place first so me and the builder can preview how the game's gonna FEEL with the map". Full record: `docs/Map-Core-Preview.md`.

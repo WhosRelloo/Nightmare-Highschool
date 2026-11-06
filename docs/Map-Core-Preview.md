@@ -67,5 +67,5 @@ for _, s in {game.ReplicatedStorage, game.ReplicatedFirst, game.ServerScriptServ
 ```
 
 ## Keeping it in step
-The add-on is a copy taken at 1.53.0. Later changes in NH Combat Test don't reach the Map place by themselves: copy it
+The add-on is a copy taken at 1.53.0, with the 37 core scripts changed in 1.55.0 copied in afterwards (verified byte for byte). Later changes in NH Combat Test don't reach the Map place by themselves: copy it
 again the same way (remove it with the command above first).
