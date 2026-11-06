@@ -2,6 +2,36 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.61.0] - 2026-11-06: The Crypt Bat
+
+The fifth beast of six (design: `docs/superpowers/specs/2026-11-05-beasts-design.md`; the owner pre-approved the beasts' designs). Full page: `docs/Beasts.md`.
+
+### Added
+- **The Crypt Bat** (`ServerStorage.NHBeasts.CryptBat`):
+  - **Look:** an AI-generated bat with red eyes, fangs, tall ears, a ribbed belly and dark crimson, torn wings, picked from three tries. A faint red light glows at its eyes and a dark crimson streak trails off each wingtip.
+  - **Rig:** the generator left the wings inside the body mesh, so Studio's segment tool cut it into a body and two wings, on its own Motor6D rig (`RootJoint`, `RShoulder`, `LShoulder`).
+  - **Flight:** it hovers about chest-high, flying on its Humanoid's HipHeight (5 studs), so it moves like any other beast.
+  - **Clips:** 11 hand-keyed ones built around the wingbeat: hover, fly and fast-fly, a rear-and-rake, a twisting snap, the dive, the screech, two stuns, a guard break where it drops out of the air and flutters back up, and a death where it falls onto its back, wings spread. They're KeyframeSequences in `ServerStorage.NHBeasts.Clips.CryptBat`, waiting for the owner to publish.
+- **Its fight:** a pattern of Rake (5), Rake 2 (6), **Dive**, Rake (5) and **Screech**. Both specials show the Kanji first and leave an opening after.
+  - **Dive:** a swoop down through where you stood, carrying on past you, for 10. It's the Hellhound's Leap with new options: `Arc` (negative dives instead of bounding), `Dur` and `Through`.
+  - **Screech:** a shriek with the game's blunt block-hit shockwave, tinted pale violet. Everyone within 40° in front of it, out to 14 studs, takes 3 and a 1 s Stun.
+- **Stats:** Health 50, a 1.0 s stun guard, 2 at night (they take turns).
+- **Reward:** 60 Combat EXP, ¥24, and a 15% chance of the **Crypt Bat's Wing-Claw** trophy (a dark fang model in the Locker).
+- **Placeholder lair:** `workspace.NHBeastLairs.CryptBatLair` on open ground at (-100, -420); the bell tower isn't in this map yet.
+
+### Fixed (every beast)
+- **A dead flyer fell through the floor.** A dead Humanoid stops holding its HipHeight, so the bat's body dropped with its death clip on top, to y -2.3. Now a beast's root is pinned at standing height when it dies, and the clip does the falling.
+- **A student could be flung across the map.** During testing the player was thrown at about 24,000 studs/s after a fight with two bats. The likely cause was a beast's solid body being moved by script through them. A beast now isn't solid while a leap or dive carries it, and once it's dead.
+
+### Verified (Play, slot 4 "Testy")
+- **Night:** both lair bats hovered at the right height (5.9, the floor at 0.8).
+- **The fight:** the pattern ran in order with the two bats taking turns: rake 5, rake 6, dive 10, screech 3 with the player in the Stun state for about a second (walk speed 5), and the shockwave appeared.
+- **Fighting back:** punches landed and stunned them (Stun1, Stun2). Two bats died in about 30 s and paid ¥48.
+- **Death:** after the fix the dead bat lay on its back on the floor (body at 1.75), its clip held.
+- **No fling:** after the fix, chasing and fighting two bats through a dive and both kills, the player's top speed was 11.6 (running).
+- **Admin:** the spawn worked through the admin remote.
+- **Not tried in play:** the Wing-Claw drop (15%), and the Hellhound's pounce since the leap change (it now turns its collision off in the air, as the bat's dive does).
+
 ## [1.60.0] - 2026-11-06: The Bone Spider
 
 The fourth beast of six (design: `docs/superpowers/specs/2026-11-05-beasts-design.md`; the owner pre-approved the beasts' designs). Full page: `docs/Beasts.md`.

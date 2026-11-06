@@ -2,8 +2,8 @@
 
 Night creatures run by one shared system. The wolves (`Features.WildWolves`) are separate and untouched. Design: `docs/superpowers/specs/2026-11-05-beasts-design.md`.
 
-**Built so far:** the Hellhound (1.56.0), the Grave Ghoul (1.57.0), the Night Stalker (1.59.0) and the Bone Spider (1.60.0). The ghoul's, the stalker's and the spider's clips are waiting for the owner to publish them (see "Publishing their clips").
-**Planned, one at a time:** the Crypt Bat, the Stone Gargoyle.
+**Built so far:** the Hellhound (1.56.0), the Grave Ghoul (1.57.0), the Night Stalker (1.59.0), the Bone Spider (1.60.0) and the Crypt Bat (1.61.0). The ghoul's, the stalker's, the spider's and the bat's clips are waiting for the owner to publish them (see "Publishing their clips").
+**Planned:** the Stone Gargoyle.
 
 ![The Hellhound by day](img/hellhound-day.jpg)
 
@@ -16,7 +16,7 @@ Night creatures run by one shared system. The wolves (`Features.WildWolves`) are
 | The beast models | `ServerStorage.NHBeasts.<Model>`, with an `Animations` folder inside |
 | The Hellhound's fire | `ReplicatedStorage.Beasts.HellhoundFX` (`Apply(model)`, `Breath(model, on)`) |
 | The special-attack warning (client) | `StarterPlayerScripts.Controllers.StateController.Indicators.BeastTell` |
-| Lairs | parts tagged `NHBeastLair` with a `Beast` attribute. Placeholders in `workspace.NHBeastLairs`: `HellhoundLair` in the boiler yard, `GraveGhoulLair` on open ground at (-200, -200) (this map has no graveyard yet), `NightStalkerLair` at (300, 200), `BoneSpiderLair` at (-220, 60) |
+| Lairs | parts tagged `NHBeastLair` with a `Beast` attribute. Placeholders in `workspace.NHBeastLairs`: `HellhoundLair` in the boiler yard, `GraveGhoulLair` on open ground at (-200, -200) (this map has no graveyard yet), `NightStalkerLair` at (300, 200), `BoneSpiderLair` at (-220, 60), `CryptBatLair` at (-100, -420) |
 | Unpublished clips | `ServerStorage.NHBeasts.Clips.<Model>`: one KeyframeSequence per clip, waiting for the owner to publish |
 | Where students look (Freeze) | client `StarterPlayerScripts.Controllers.World.BeastGaze` sends to `ReplicatedStorage.NHBeastGaze` |
 | Trophies | `ReplicatedStorage.Config.Items.Trophies` (`Kind = Trophy`) |
@@ -33,8 +33,8 @@ Night creatures run by one shared system. The wolves (`Features.WildWolves`) are
 - **Giving up:** it gives up past its `Leash` and walks home.
 - **Damage:** it goes through `Downed.ApplyDamage`, so a beast can down a student but never kill one. Beasts are `NoDowned`: they die outright.
 - **Reach:** measured from the beast's body, out to its mouth plus the move's range. A big beast's mouth is studs ahead of its middle, so a student pressed against it is still in reach.
-- **Death:** the `Death` clip plays and holds its last frame, and the body fades. A move under way when it died doesn't land or play. The killer gets `Reward.Exp` (Combat), `Reward.Yen`, and a `Reward.Trophy` at its chance, with a notice.
-- **Safety:** a beast never tips over or ragdolls. It only hops or pounces onto floor, never off an edge. If it ever falls off the world, it's put back at its lair.
+- **Death:** the `Death` clip plays and holds its last frame, and the body fades. Its root is pinned at standing height and stops being solid, so the clip does all the falling (a dead Humanoid stops holding its HipHeight). A move under way when it died doesn't land or play. The killer gets `Reward.Exp` (Combat), `Reward.Yen`, and a `Reward.Trophy` at its chance, with a notice.
+- **Safety:** a beast never tips over or ragdolls. It isn't solid while a leap or dive carries it through the air, so it can't fling a student it passes through. It only hops or pounces onto floor, never off an edge. If it ever falls off the world, it's put back at its lair.
 
 ## The Hellhound
 
@@ -113,11 +113,30 @@ The design called for wall climbing. It's done as the hang and drop instead: the
 
 ![Hanging over its lair at night](img/bone-spider-hang.jpg) ![Dead, legs curled](img/bone-spider-death.jpg)
 
+## The Crypt Bat
+
+| | |
+|---|---|
+| Health | 50 |
+| Flight | it hovers about chest-high on a student, flying on its Humanoid's HipHeight (5 studs), so it moves like any other beast |
+| Pattern | Rake (5), Rake 2 (6), **Dive** (10: the Kanji first; it swoops down through where you stood and carries on past; then an opening), Rake (5), **Screech** (the Kanji first; a shriek and a pale violet shockwave: 3 and a 1 s Stun to everyone within 40° in front of it, out to 14 studs; then an opening) |
+| Stun guard | 1.0 s |
+| Spawns | 2 at night, placeholder lair on open ground at (-100, -420) (the bell tower isn't in this map yet); back 2.5 minutes after a kill |
+| Reward | 60 Combat EXP, ¥24, a 15% chance of the Crypt Bat's Wing-Claw |
+
+It's an AI-generated bat (picked from three tries) with red eyes, fangs, tall ears, a ribbed belly and dark crimson, torn wings. The generator's own parts left the wings inside the body mesh, so Studio's segment tool cut it into a body and two wings. Those sit on its own Motor6D rig: `RootJoint` and a shoulder per wing (`RShoulder`, `LShoulder`). A faint red light glows at its eyes and a dark crimson streak trails off each wingtip as it beats. Its 11 clips are hand-keyed around the wingbeat: hover, fly and fast-fly loops, a rear-and-rake, a twisting snap, the dive, the screech, two stuns, a guard break where it drops out of the air and flutters back up, and a death where it falls onto its back with its wings spread.
+
+The Dive is the Hellhound's Leap with three new options: `Arc` (negative swoops down instead of bounding up), `Dur` and `Through` (it carries on past you). The Screech's shockwave is the game's own blunt block-hit effect, tinted.
+
+![The Crypt Bat](img/crypt-bat.jpg)
+
+![The downstroke](img/crypt-bat-downstroke.jpg) ![Dead, wings spread](img/crypt-bat-death.jpg)
+
 ## Publishing their clips (owner)
 
-The Grave Ghoul, the Night Stalker and the Bone Spider play their clips in Studio straight from the KeyframeSequences. A live server needs them published, so until then **they don't spawn in live servers** (the Hellhound does).
+The Grave Ghoul, the Night Stalker, the Bone Spider and the Crypt Bat play their clips in Studio straight from the KeyframeSequences. A live server needs them published, so until then **they don't spawn in live servers** (the Hellhound does).
 
-For each KeyframeSequence in `ServerStorage.NHBeasts.Clips.GraveGhoul` (11: Idle, Walk, Run, Attack1, Attack2, Stun1, Stun2, GuardBroken, Death, Emerge, Grab) and `ServerStorage.NHBeasts.Clips.NightStalker` (10: the same without Emerge and Grab, plus Reach) and `ServerStorage.NHBeasts.Clips.BoneSpider` (12: Idle, Walk, Run, Attack1, Attack2, WebSpit, Stun1, Stun2, GuardBroken, Death, Hang, Drop):
+For each KeyframeSequence in `ServerStorage.NHBeasts.Clips.GraveGhoul` (11: Idle, Walk, Run, Attack1, Attack2, Stun1, Stun2, GuardBroken, Death, Emerge, Grab) and `ServerStorage.NHBeasts.Clips.NightStalker` (10: the same without Emerge and Grab, plus Reach) and `ServerStorage.NHBeasts.Clips.BoneSpider` (12: Idle, Walk, Run, Attack1, Attack2, WebSpit, Stun1, Stun2, GuardBroken, Death, Hang, Drop) and `ServerStorage.NHBeasts.Clips.CryptBat` (11: Idle, Walk, Run, Attack1, Attack2, Dive, Screech, Stun1, Stun2, GuardBroken, Death):
 1. Right-click it, choose **Save to Roblox**, and publish it under the group so the game can play it.
 2. Paste the new id into the `AnimationId` of the Animation with the same name in that beast's `Animations` folder (`ServerStorage.NHBeasts.<Beast>.Animations`).
 
@@ -131,7 +150,7 @@ A rare drop from a beast you kill, kept in your Locker under All. A trophy is ne
 
 ## Adding a beast
 
-1. Build its model and rig. The Grave Ghoul's route works well for anything shaped like a person: an AI-generated mesh, then Studio's auto-rig as an R15 body. Anything else (the Bone Spider) gets its own Motor6D rig built from generated pieces.
+1. Build its model and rig. The Grave Ghoul's route works well for anything shaped like a person: an AI-generated mesh, then Studio's auto-rig as an R15 body. Anything else gets its own Motor6D rig: the Bone Spider's from separately generated pieces, the Crypt Bat's from one mesh cut apart with Studio's segment tool.
 2. Put the template in `ServerStorage.NHBeasts` with an `Animations` folder: `Idle`, `Walk`, `Run`, its attack clips, `Stun1`, `Stun2`, `GuardBroken`, `Death`, plus its unique clips. Unpublished clips go in `ServerStorage.NHBeasts.Clips.<Model>` as KeyframeSequences, and their Animations stay blank until the owner publishes them.
 3. Add its entry to `Config.Beasts.Defs`: stats, `Pattern`, `Moves`, `Spawn`, `Reward`.
 4. Tag its lair parts `NHBeastLair` with `Beast = <its Spawn.Lair>`.
