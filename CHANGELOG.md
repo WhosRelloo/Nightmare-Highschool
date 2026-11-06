@@ -2,6 +2,31 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.50.1] - 2026-11-05: Stair blending pieces, a stone block and a level stair rail
+
+### Added
+- **Props batch 31, two builder's pieces for the stair kit** (`art/props/nh_props_batch31.py`). Owner: "Create me a mesh block with this texture. My builder said he can't blend the stairs because of it", and "I need the rails for the stairs but in a horizontal row".
+  - **StairStoneBlock:** a 4 x 4 x 4 block of the stair cheeks' own castle stone, with their softly worn edges (bevel 0.03).
+    - It uses batch 8's `castle()` material (NH_Limestone at 0.28, the greenish tint, wear and dirt), baked at 2048 with 64 GPU samples the way the cheeks are, so the grain and the cloudy dirt match.
+    - The bake has no shading from neighbouring parts, so its SurfaceAppearance is tinted 0.86 to bring its lit faces down to the stair cheeks'.
+    - It has no metalness map: the bake came out all black, which means non-metal.
+    - Box collision.
+  - **StairRailLevel:** StairStoneRailed's gothic cast-iron balustrade on a level run, 8 long and 2.3 high.
+    - 12 trefoil-headed bays with gilt roundels and collars, and the brass handrail.
+    - It has no bar at its +X end, so lengths butt end to end with the bays, collars and roundels running on unbroken.
+    - A separate `_Post` piece (the stair's turned iron newel with its gilt ball) stands at the −X end. Copy it to the open end of a run.
+    - Main and Post share one 2048 atlas. Hull collision, so it works as a balcony or landing guard.
+  - **Showcase:** both are templates in `ServerStorage.NHProps` (`NHBuildKit = "Stairs"`). On the stair row (`workspace.NHPropsShowcase.Stairs.StairBlend_Showcase`, tag `NHPropBatch31`, x 122, z −200) two blocks make an 8-long wall with a rail length on top and a post at each end.
+- **The pipeline:** `nh_props.run()` skips the bake for a piece that is all tiled or canvas, so a prop with nothing to bake no longer fails.
+
+### Not used
+- The bridges' seamless NH_CastleStone (MaterialVariant NHCastleStone) was tried first for the block. Side by side with a stair its colour is right but its pitting is clearly coarser, so it doesn't blend with the stairs.
+
+### Verified (Studio, Edit)
+- A block set flush against StairStoneRailed's west cheek: the grain, dirt and edges match. With the 0.86 tint the lit faces read the same as the newel's (`docs/img/stair-block-match.jpg`).
+- The showcase wall and rail: the rail's foot sits on the wall top (4.50) and its posts close both ends. Every map loads (`docs/img/stair-blend-showcase.jpg`).
+- **Not tried:** a player walking along a railed wall top in Play, and the pieces placed in the map itself.
+
 ## [1.50.0] - 2026-11-05: The library kit
 
 ### Added

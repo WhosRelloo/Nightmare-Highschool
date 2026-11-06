@@ -171,6 +171,13 @@ Door, flap and tap origins sit on their hinge lines.
   - the bridges at z −226
   - all facing −Z
 
+**Batch 31, stair blending pieces** (1.50.1, `Studio/props_setup31.luau`, run after importing `art/props/fbx/stair-blend-batch31/`):
+- **StairStoneBlock:** a 4 x 4 x 4 block of the stairs' own stone, for filling round, under and between the stairs.
+  - It is baked from the same material as the stair cheeks (not the bridges' tiled castle stone, whose grain is coarser), and its SurfaceAppearance is tinted 0.86 so it reads the same shade as a cheek beside it.
+  - Resizing a block stretches its texture. Build long walls from several blocks, and turn some 90° or 180° so the dirt pattern doesn't repeat.
+- **StairRailLevel:** the stair balustrade as a level 8-stud run. Lengths butt end to end (there's no bar at the +X end). Copy the `_Post` piece to the open end of a run.
+- **Showcase:** at x 122, z −200 on the stair row, two blocks with a rail on top (`docs/img/stair-blend-showcase.jpg`; matched against a stair cheek in `docs/img/stair-block-match.jpg`).
+
 **Batch 21, the painting and art kit** (`Studio/props_setup21.luau`):
 - **What's in it:** six paintings in gilt, black lacquer and ebonised frames, plus gallery stanchions with a crimson velvet rope, a stack of canvases under a drape, and a painter's table with a candle.
 - **The canvases:** each painting's `_Canvas` piece skips the frame's atlas and carries its own 2048 painting (`nh_props.CANVAS`, front-projected UVs), so the brushwork stays sharp. It gets the shared varnish roughness map and no normal map, because the canvas weave read as a screen-door grid.
@@ -341,6 +348,8 @@ Door, flap and tap origins sit on their hinge lines.
 | StairGrand | 39.7k (Main, Runner, Rail, Glow, Glass) | batch 20: the 12-wide grand stair: a crimson runner with gilt borders and quatrefoils on brass rods, carved cheeks, the balustrade, crested newel pedestals with gas lanterns |
 | StairSpiral | 14.5k (Main, Rail) | batch 20: a tower stair: a clustered newel, 20 wedge treads making a turn 12 high, a head landing, an iron rail with gilt roundels (1.38.2: metalness map re-uploaded as 119049869824909) |
 | StairIron | 25.4k (Main, Rail) | batch 20: an open cast-iron stair: chequer-plate treads with brass nosings, stringers pierced with quatrefoils, the balustrade |
+| StairStoneBlock | 0.1k | batch 31: a 4 x 4 x 4 block of the stair cheeks' baked castle stone (SurfaceAppearance tint 0.86; no metal map) |
+| StairRailLevel | 6.0k (Main, Post) | batch 31: the stair balustrade on a level 8-stud run that butts end to end, and its turned iron post |
 | BridgeStoneArch | 43.5k (Wall, Main, ParapetL, ParapetR, Piers, Glow, Glass) | batch 20: a 24-long humped stone footbridge: dark voussoirs, a crested keystone, a hood moulding, pierced gothic parapets, crested end piers with lanterns |
 | BridgeIron | 37.3k (Main, Girders, Glow, Glass) | batch 20: a 24-long cast-iron footbridge: crimson lattice girders with gilt bosses and spear finials, arched ribs with ring spandrels, carved abutments, lanterns |
 | BridgeDeck | 17.7k (Wall, Main) | batch 20: a 16-stud straight span with the pierced parapets; tiles end to end |

@@ -3931,5 +3931,46 @@
   "batch": 26,
   "seat": "cushion top 1.6 above the origin (1.62 at its domed middle, 1.59 where it is sat in); the sitter's hips at Blender (0, 0.15, 1.6), i.e. 0.15 behind the origin; no arms; the seat runs from y -1.03 (front) to 0.70 (the back)",
   "pairing": "same facing as SeerTable (front -Y); place the chair's origin about 3.0 studs behind the table's centre (Blender +Y, Roblox +Z) so a seated R15's knees just meet the skirt"
+ },
+ "StairStoneBlock": {
+  "dims": [
+   4.0,
+   4.0,
+   4.0
+  ],
+  "pieces": [
+   "StairStoneBlock"
+  ],
+  "tris": {
+   "StairStoneBlock": 108
+  },
+  "batch": 31,
+  "collision": "Box",
+  "tint": "SurfaceAppearance.Color 0.86",
+  "ColorMap": "rbxassetid://98066206274785",
+  "NormalMap": "rbxassetid://71792608703339",
+  "RoughnessMap": "rbxassetid://110621250773996",
+  "MetalnessMap": ""
+ },
+ "StairRailLevel": {
+  "dims": [
+   8.14,
+   0.26,
+   2.66
+  ],
+  "pieces": [
+   "StairRailLevel_Main",
+   "StairRailLevel_Post"
+  ],
+  "tris": {
+   "StairRailLevel_Main": 5804,
+   "StairRailLevel_Post": 240
+  },
+  "batch": 31,
+  "collision": "Hull",
+  "ColorMap": "rbxassetid://82740435038757",
+  "NormalMap": "rbxassetid://108122531882700",
+  "RoughnessMap": "rbxassetid://88235285953982",
+  "MetalnessMap": "rbxassetid://84080787351765"
  }
 }

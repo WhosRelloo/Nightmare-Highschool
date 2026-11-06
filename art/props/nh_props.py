@@ -1556,9 +1556,10 @@ def run(name):
     tiled = [o for o in objs if o.name in TILED]
     canvases = [o for o in objs if o.name in CANVAS]
     baked = [o for o in objs if o not in tiled and o not in canvases]
-    bake_uv(baked)
-    imgs = bake_all(baked, name)
-    final_material(baked, name, imgs)
+    if baked:  # a piece that is all tiled (none yet) has nothing to bake
+        bake_uv(baked)
+        imgs = bake_all(baked, name)
+        final_material(baked, name, imgs)
     for o in canvases:
         canvas_uv(o)
         canvas_material(o, CANVAS[o.name])
@@ -1594,7 +1595,7 @@ import nh_props_batch9  # noqa: E402,F401
 # to import is reported and skipped, so work on one batch never stops another from building
 for _b in ("nh_props_batch10", "nh_props_batch11", "nh_props_batch12", "nh_props_batch13", "nh_props_batch14",
            "nh_props_batch15", "nh_props_batch16", "nh_props_batch17", "nh_props_batch18", "nh_props_batch19", "nh_props_batch20", "nh_props_batch21",
-           "nh_props_batch22", "nh_props_batch23", "nh_props_batch24", "nh_props_batch25", "nh_props_batch26", "nh_props_batch27", "nh_props_batch28", "nh_props_batch29", "nh_props_batch30"):
+           "nh_props_batch22", "nh_props_batch23", "nh_props_batch24", "nh_props_batch25", "nh_props_batch26", "nh_props_batch27", "nh_props_batch28", "nh_props_batch29", "nh_props_batch30", "nh_props_batch31"):
     if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), _b + ".py")):
         try:
             __import__(_b)
