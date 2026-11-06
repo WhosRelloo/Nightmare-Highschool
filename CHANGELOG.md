@@ -2,6 +2,44 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.52.0] - 2026-11-05: The dead oak, rigged and animated
+
+### Added
+- **Props batch 33, DeadOak** (`art/props/nh_props_batch33.py`). Owner: "make a few ON THEMED plants and tree models", "make them match the spooky, gothic theme", "Make the trees wayy better quality than that", "only make the dead one", "Make the tree rigged and animated too. With a cool spooky kind of animation".
+  - **The tree:** a great dead oak about 10 studs tall.
+    - a flared foot with long roots arching over the ground and diving in (sunk 1.14 below the ground line);
+    - a twisting trunk splitting into four contorted limbs, one snapped off short with splinters at the break;
+    - clawing side branches and crooked twigs;
+    - a dark hollow in the trunk.
+  - **The bark:** soot-dark, in long cracked furrows (a procedural Voronoi and noise material baked at 2048 with 64 GPU samples), weathered grey on the ridges, moss on the upward faces.
+  - **How it is made:**
+    - A branching skeleton is grown so every limb bends in smooth, low-frequency curves, not a random walk.
+    - Blender's Skin modifier turns it into one continuous mesh, so the limbs grow out of the trunk without seams. It is smoothed once and given a broad knobbly displacement.
+    - The twigs are three pieces of their own (Main 15.4k, Twigs 17.2k, Twigs2 19.4k, Twigs3 17.7k triangles, each under 20k).
+  - **The rig:** 43 bones built from the skeleton.
+    - Root holds the foot and the roots, which never move. Then Trunk1-3, Limb<k>_1-3 for each great limb (the snapped one _1-2) and Limb<k>S<s>_1-2 for every side branch.
+    - Every vertex is weighted to its two nearest bones.
+    - The FBX carries the armature (`nh_props.RIGS`, new: a prop can register a rig function, and export then includes its armature).
+  - **The animation** (new client controller `Controllers.World.SpookyTree`, source `Studio/src/trees/SpookyTree.luau`). It drives the bones of every model tagged `NHSpookyTree` through `Bone.Transform`, so nothing has to be published:
+    - **creaks:** a slow sway, bigger toward the limb ends, every bone on its own beat;
+    - **groans:** a sharp creak-jolt every 7 to 13 s;
+    - **claws:** one limb at a time slowly curls its end in, holds and lets go;
+    - **notices you:** within 16 studs of the trunk a shudder runs through it, the trunk leans toward you and the limbs on your side reach and curl toward you, letting go slowly once you leave.
+    - Only trees within 160 studs of the camera move, and those beyond 70 every third frame.
+  - **In Studio** (`Studio/props_setup33.luau`, `props_maps33.luau`):
+    - the template `ServerStorage.NHProps.DeadOak` (NHBuildKit "Grounds");
+    - a copy on the showcase beside the entrance kit's second row (`workspace.NHPropsShowcase.Entrances.DeadOak_Showcase`, x 214, z -410).
+    - The trunk and great limbs collide (Hull); the twigs don't.
+    - Maps: DeadOak_color 122867638410571, _normal 110174801188609, _rough 116039585600889 (no metalness map: bark).
+
+### Verified (Studio)
+- **The rig, in Blender:** the exported FBX imports with all 43 bones and every piece skinned to them. Bent hard at the trunk and three limbs, it deforms with no tearing at the joins, and the roots stay put.
+- **The animation, in Play:**
+  - At rest a limb's claw curled smoothly to 13 degrees while the trunk swayed under a degree.
+  - With a stand-in character placed 8.6 studs in front (no character spawns at the main menu), within about 1.5 s the limb facing it (facing 0.85) reached to 9 degrees, one partly facing it (0.21) to 7, and the trunk leaned 2 degrees its way. The limb facing away (-0.86) kept to its sway.
+  - No errors (`docs/img/dead-oak-night.jpg`; by day with its bark `docs/img/dead-oak.jpg`).
+- **Not tried:** a real player walking up to it in Play, the groan's jolt caught on screen, and many trees at once (each runs its own animation on every client).
+
 ## [1.51.0] - 2026-11-05: The school entrance kit; the library globe fixed
 
 ### Added

@@ -192,6 +192,12 @@ Door, flap and tap origins sit on their hinge lines.
   - Row 2, z -410: the round pieces.
   - Screenshots: `docs/img/entrance-kit.jpg`, `entrance-kit-night.jpg`, `entrance-kit-round.jpg`, `entrance-portico.jpg`.
 
+**Batch 33, the dead oak** (1.52.0, `Studio/props_setup33.luau` then `props_maps33.luau`, after importing `art/props/fbx/deadoak-batch33/DeadOak.fbx` with its rig):
+- **DeadOak:** a great dead oak, about 10 studs tall, rigged (43 bones) and animated on the client (`Controllers.World.SpookyTree`). It creaks, groans, curls its limbs like claws, and shudders and reaches toward a player within 16 studs.
+- **To place more:** copy the template and keep its `NHSpookyTree` tag; the controller picks up every tagged tree. Its pivot is the ground line, and the roots sink 1.14 below it.
+- **Pieces:** the trunk and great limbs collide (Hull); the twigs don't.
+- **Showcase:** x 214, z -410 (`docs/img/dead-oak.jpg`, `dead-oak-night.jpg`).
+
 **Batch 21, the painting and art kit** (`Studio/props_setup21.luau`):
 - **What's in it:** six paintings in gilt, black lacquer and ebonised frames, plus gallery stanchions with a crimson velvet rope, a stack of canvases under a drape, and a painter's table with a candle.
 - **The canvases:** each painting's `_Canvas` piece skips the frame's atlas and carries its own 2048 painting (`nh_props.CANVAS`, front-projected UVs), so the brushwork stays sharp. It gets the shared varnish roughness map and no normal map, because the canvas weave read as a screen-door grid.
@@ -377,6 +383,7 @@ Door, flap and tap origins sit on their hinge lines.
 | EntranceMoonStair | 48.0k (Main, Cheeks, Rail, Piers, Glow, Glass) | batch 32: the moon-phase grand flight, crescent-and-raven piers |
 | EntranceMoonPorch | 41.9k (Main, Deck, 2 rails) | batch 32: the porch with the moon dial |
 | EntranceMoonPortico | 23.1k (Main, Gable, MoonGlow, Glow, Glass) | batch 32: the PER NOCTEM AD LUCEM doorway, the full-moon rose window |
+| DeadOak | 69.7k (Main, Twigs, Twigs2, Twigs3) | batch 33: a rigged (43 bones), client-animated dead oak, procedural cracked bark |
 | BridgeStoneArch | 43.5k (Wall, Main, ParapetL, ParapetR, Piers, Glow, Glass) | batch 20: a 24-long humped stone footbridge: dark voussoirs, a crested keystone, a hood moulding, pierced gothic parapets, crested end piers with lanterns |
 | BridgeIron | 37.3k (Main, Girders, Glow, Glass) | batch 20: a 24-long cast-iron footbridge: crimson lattice girders with gilt bosses and spear finials, arched ribs with ring spandrels, carved abutments, lanterns |
 | BridgeDeck | 17.7k (Wall, Main) | batch 20: a 16-stud straight span with the pierced parapets; tiles end to end |

@@ -1219,6 +1219,7 @@ PREVIEW_PAD = {}   # name -> camera distance factor for a prop that would be cro
 OPEN_DEG = {}      # piece -> how far it opens in the _open preview (default 105)
 TILED = {}         # piece -> (seamless set in art/props/textures, studs per tile): not baked; world-scaled UVs instead
 CANVAS = {}        # piece -> painting image name in art/props/textures (<name>_canvas.png): not baked; front-projected UVs
+RIGS = {}          # prop -> fn(objs) that builds an armature, weights the pieces to it and returns it (exported with them)
 
 BUILD = {
     "StudentDesk": student_desk,
@@ -1404,14 +1405,17 @@ def final_material(objs, name, imgs):
                 ob.data.uv_layers.remove(uv)
 
 
-def export(objs, name):
+def export(objs, name, arm=None):
     bpy.ops.object.select_all(action="DESELECT")
     for ob in objs:
         ob.select_set(True)
+    if arm is not None:
+        arm.select_set(True)
     bpy.context.view_layer.objects.active = objs[0]
-    bpy.ops.export_scene.fbx(filepath=os.path.join(OUT_FBX, f"{name}.fbx"), use_selection=True, object_types={"MESH"},
+    bpy.ops.export_scene.fbx(filepath=os.path.join(OUT_FBX, f"{name}.fbx"), use_selection=True,
+                             object_types={"MESH", "ARMATURE"} if arm is not None else {"MESH"},
                              apply_unit_scale=True, global_scale=1.0, axis_forward="-Z", axis_up="Y", mesh_smooth_type="FACE",
-                             path_mode="STRIP", embed_textures=False)
+                             path_mode="STRIP", embed_textures=False, add_leaf_bones=False, bake_anim=False)
 
 
 def preview(objs, name, dims, suffix=""):
@@ -1567,7 +1571,8 @@ def run(name):
         tile_uv(o, TILED[o.name][1])
         tile_material(o, TILED[o.name][0])
     tris = sum(len(p.vertices) - 2 for o in objs for p in o.data.polygons)
-    export(objs, name)
+    arm = RIGS[name](objs) if name in RIGS else None
+    export(objs, name, arm)
     preview(objs, name, dims)
     doors = [o for o in objs if "nh_swing" in o.keys()]
     if doors:
@@ -1595,7 +1600,7 @@ import nh_props_batch9  # noqa: E402,F401
 # to import is reported and skipped, so work on one batch never stops another from building
 for _b in ("nh_props_batch10", "nh_props_batch11", "nh_props_batch12", "nh_props_batch13", "nh_props_batch14",
            "nh_props_batch15", "nh_props_batch16", "nh_props_batch17", "nh_props_batch18", "nh_props_batch19", "nh_props_batch20", "nh_props_batch21",
-           "nh_props_batch22", "nh_props_batch23", "nh_props_batch24", "nh_props_batch25", "nh_props_batch26", "nh_props_batch27", "nh_props_batch28", "nh_props_batch29", "nh_props_batch30", "nh_props_batch31", "nh_props_batch32"):
+           "nh_props_batch22", "nh_props_batch23", "nh_props_batch24", "nh_props_batch25", "nh_props_batch26", "nh_props_batch27", "nh_props_batch28", "nh_props_batch29", "nh_props_batch30", "nh_props_batch31", "nh_props_batch32", "nh_props_batch33"):
     if os.path.exists(os.path.join(os.path.dirname(os.path.abspath(__file__)), _b + ".py")):
         try:
             __import__(_b)

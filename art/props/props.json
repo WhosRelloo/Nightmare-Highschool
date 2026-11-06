@@ -4369,5 +4369,32 @@
   "NormalMap": "rbxassetid://86254174778371",
   "RoughnessMap": "rbxassetid://100304883828395",
   "MetalnessMap": "rbxassetid://103472236343509"
+ },
+ "DeadOak": {
+  "dims": [
+   8.46,
+   11.63,
+   10.09
+  ],
+  "pieces": [
+   "DeadOak_Main",
+   "DeadOak_Twigs",
+   "DeadOak_Twigs2",
+   "DeadOak_Twigs3"
+  ],
+  "tris": {
+   "DeadOak_Main": 15410,
+   "DeadOak_Twigs": 17248,
+   "DeadOak_Twigs2": 19408,
+   "DeadOak_Twigs3": 17664
+  },
+  "batch": 33,
+  "rig": "43 bones (Root, Trunk1-3, Limb<k>_<j>, Limb<k>S<s>_<j>); animated by Controllers.World.SpookyTree (tag NHSpookyTree)",
+  "collision": "DeadOak_Main Hull; twigs don't collide",
+  "ground_line": "pivot 1.14 above the root tips",
+  "ColorMap": "rbxassetid://122867638410571",
+  "NormalMap": "rbxassetid://110174801188609",
+  "RoughnessMap": "rbxassetid://116039585600889",
+  "MetalnessMap": ""
  }
 }
