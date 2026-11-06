@@ -2,6 +2,43 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.53.0] - 2026-11-05: The full bug audit; jump and landing animations
+
+Owner: "let's completely audit and bugfix the "NH Combat Test" game for ALL BUGS." Full record: `docs/Bug-Audit-2026-11-05.md`.
+
+### How
+- Play-tests on slot 4 (Testy) with a fast-forwarded school day and the test bridge's hooks for every system; console read on server and client.
+- Every first-party script (376 plus 23 first-party packages) read line by line by system, plus a scan for locals used before they're declared, plus a scan of 146,216 instances for failing assets.
+- Fixes in small tested batches. Every replaced script is backed up in `ServerStorage.NH_Backup.Audit_pre`; every changed line is marked `-- (audit)`.
+
+### Fixed (45; the biggest)
+- **Students never stood up** from class chairs or benches, so the whole schedule froze after the first class (`Schedules`: `ChairBy` used before it was declared, a nil global).
+- **Broken modules vanished silently:** the module loader now warns with the path and the error.
+- **Combat actions overlapped:** a Sprint/Block/Equip thread that outlived its release cleared the next action's state. A grabber leaving mid-grab no longer leaves the victim anchored.
+- **No animations after entering school** straight after picking a slot (a race in the animation controller).
+- **A stunned sprinter kept running at 40.5**, and the speed lines could stay on.
+- **`Downed` read from the wrong place** (it's on the Humanoid): wolves kept biting downed players, a downed werewolf stayed a wolf, Back to Menu worked while downed or carried.
+- **Sports:** no jumping after any sports stun; vampire night accuracy never applied; football pads/board broken until the first match; football hung if the carrier or kicker died; every catch click errored; skateboards ridable in matches.
+- **Cliques:** leaving one made rejoining impossible (and sent a daily challenge that couldn't start); showdowns are one-on-one again (no clique backup, crew or turf ambush); a failed spawn no longer counts as a loss; Queen of the School is awarded; walking-off fighters give no standing.
+- **Exploits closed:** a NaN stat spend wiping stats; a slot-list burst using the DataStore budget; NPCs hitting protected players; hidden quest answers sent to the client; phone read remotes with no limit; the wallet sending an unconfirmed amount; admin GiveYen saving a negative balance.
+- **Smaller:** stealth catches stacking violations, region boxes counting points below them, a blank fortune card, the gamepad wolf bite firing forever, T transforming in soccer and on the bite prompt, vault while stunned, slide dust, the parry flash on bystanders, Trident heavies erroring, popup UI leaks, combat keys bindable to WASD, a StateManager leak, hotbar snack counts, a stuck locker tooltip, doors re-creaking, console spam.
+- **Owner-approved behaviour fixes:** night wolves respawn at the configured 45 s (were ~10 s); dying or being carried out of detention pauses it instead of costing +4 points; the server checks aerial attacks are really airborne.
+- **Removed (owner):** the old duplicate `Sports.Basketball` module and the broken script in `Workspace."Sean White"` (both backed up).
+
+### Added
+- **The owner's jump and landing animations** (133312166780518, 90775551383967): every movement pack uses the new Jump and has a new `Land`; Land plays when you touch down from a fall (not while sprinting, like the jump), and the jump now plays until you start coming down (the fall used to cut it off at once). Old jump ids are kept as `NHOldAnimationId`.
+
+### Kept (owner)
+- The Katana's blood. Blocking/parrying while stunned.
+
+### Needs the owner
+- "Share access" for sound 71086651442213 (the aerial move's sound, silent now), the 8 unused sounds in `Workspace."VFX Stuff"`, and 123100877371584.
+
+### Verified (Studio)
+- [PT] students sit in Period 2 and all stand at Break, no Schedules errors; aerial M1 refused on the ground and accepted 2 of 2 at take-off; Back to Menu refused while downed (real remote); a NaN spend took 1 point with nothing NaN saved; basketball, soccer and football matches start and end; phone remotes answer; jump then Fall then Land then Idle; fast choose-then-enter keeps animations; server console clean.
+- Code-reviewed and compiled but not exercised in play: the rest (see the [CR] rows in the audit doc).
+- About 80 minor issues were found and **not** fixed; they're listed in the audit doc.
+
 ## [1.52.0] - 2026-11-05: The dead oak, rigged and animated
 
 ### Added
