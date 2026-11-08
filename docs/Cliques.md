@@ -209,6 +209,8 @@ Design: [docs/superpowers/specs/2026-11-04-clique-events-design.md](superpowers/
 - **Reactions:** the victims' students within 25 studs complain (`Pranked` lines, at most every 40 s each).
 - **One mess per spot:** a spot's Prank prompt is off while its mess is there.
 
+**Prank desks (1.66).** A landed prank also swaps one classroom desk for the pranksters' `StudentDeskPrank<Clique>` (their colour, a slogan and an emblem). Your own prank uses the clique you stand 60+ with, or a carved or graffiti desk. Hold F (3 s) to scrub it. The janitor clears them at 6 AM. At most 6 at once (`CliquePranks.TagDesk`).
+
 **NPC pranks.**
 - **When:** at Break, Lunch, After School and in the Evening, at most every `PrankEvery` (360) s (the first one 3 minutes in), and only with a student within `PrankSeeRange` (120) studs.
 - **What happens:** a member of one rival walks in from 30 studs, works for `PrankTime` (6) s (a `Shh` line) and leaves the mess.

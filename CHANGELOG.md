@@ -2,6 +2,28 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.66.0] - 2026-11-08: Prank desks
+
+Owner: "For the carvings on the desk, add variations for the cliques and factions for when they do pranks", then "yes wire the prank desk swap in".
+
+### Added
+- **A prank that lands also tags a classroom desk.** When a clique pranks a rival's hangout (an NPC prank or yours), one of the classroom desks (`workspace.School.NHProps` StudentDesk) is swapped for that clique's prank desk: `ServerStorage.NHProps.StudentDeskPrank<Clique>`, carved and marker-painted in its colour with one of its slogans (the art is in the detention kit, props batch 37).
+  - Your own prank uses the clique you stand highest with, from Hanger-on (60) up. Without one, it uses a carved or graffiti desk (`StudentDeskCarved`, `StudentDeskGraffiti`).
+  - The real desk only turns see-through and keeps its collision. The tag is a non-colliding copy at the same pivot.
+  - **Scrub desk:** hold **F** (Y on a gamepad) for 3 s. It's F because every desk's chair has Sit on E, and the nearest E prompt wins.
+  - The janitor clears every tagged desk at 6 AM with the hangout messes (`CleanAll`).
+  - At most 6 tagged desks at once.
+- `CliquePranks.TagDesk(By?, Player?)`, and `State().Desks`. The patch is `tools/races-map/prank_desks.luau`.
+- **Until the detention kit is imported** there are no prank desk templates, and the swap does nothing.
+
+### Verified (NH Combat Test, Play, with temporary stand-in desks)
+- A Court tag landed exactly on the real desk's pivot. The real desk went see-through, and the tag didn't collide.
+- The cap held at 6, and a clique with no template was skipped.
+- A student with no clique got the graffiti desk 5 of 5 times when only it existed.
+- `CleanAll` restored all 48 desks, and with no templates nothing happened.
+- A real 3 s hold on F scrubbed the desk back.
+- **Not tried:** a full NPC prank ending in a desk tag (the hook is one call after the mess is made).
+
 ## [1.65.1] - 2026-11-08: The wolf form in the Map place
 
 Owner: "I want the builder to be able to test the wolf form for werewolves in the map place".
