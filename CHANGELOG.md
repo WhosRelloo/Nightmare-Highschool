@@ -2,6 +2,26 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.64.1] - 2026-11-08: The real dorm room
+
+Owner: "Imported, build the real room". The dorm room art kit (props batch 34) replaces the plain-part stand-in.
+
+### Added
+- **The dorm room, built from the kit.** `ServerStorage.NHHomes.Dorm` is now a 20 by 10 stud room, two kit tiles wide: slate floor, sooty plaster walls over a crimson enamel wainscot, a cornice ceiling, a lancet window at the back, and a classroom door in the front wall (its door behaviour stripped: the `Exit` prompt is the way out). The bed has its head against the back wall, under the trophy shelf, with the certificates on the wall beside it. The desk, lamp and chair sit under the window, the fern stands below the bookshelf, the wardrobe is on the right wall, the rug is in the middle and the pendant light hangs from the centre. Every grade piece keeps its stand-in name and states, so the Homes code is unchanged.
+- **The kit's 35 templates** in `ServerStorage.NHProps` (attribute `NHBuildKit = "Dorm"`), at 1:1 with their maps, for the builder. All 142 maps were read back from the group by name, with no duplicates.
+- The room build is `tools/homes/build_dorm_room.luau`, and the template setup is `tools/homes/dorm_kit_templates.luau`. The old stand-in is kept in `ServerStorage.NH_Backup.NHHomes_DormStandIn`.
+
+### Fixed
+- **Trophies no longer float when the shelf is hidden.** Trophies are rebuilt each time you walk in. In Lived-in, Slipping and A wreck, where the trophy shelf is hidden, they used to appear in mid-air. Now they start hidden and come back with the shelf. The spots are part of the shelf's model.
+- The `HomeInfo` test command counts tagged models, not just tagged parts.
+
+### Verified
+- **Slot 2 [PT]:** HomeEnter put the player on the room's floor, 1.5 studs from the door, facing into the room. The door had Leave and Send guests out, and Leave brought them back to where they came in.
+- All five states showed exactly their pieces (checked per model), with the light at 1.84, 1.60, 1.44, 0.88 and 0.74, and A wreck flickering.
+- With four trophies faked through a Play-only script (nothing was saved), they sat on the shelf top (gap 0.00), hid with the shelf in Lived-in, stayed hidden when walking back in, and came back in Spotless.
+- Slot 2's discipline is still 0 points.
+- **Not yet tested:** the invite and Visit between two players, and Send guests out with a guest inside.
+
 ## [1.64.0] - 2026-11-06: Dorm rooms, and Mom & Dad
 
 Owner: "me and the builder want a mechanic in the game where the players have a starting dorm room and can later purchase a place off campus (once we do that later). And I want the interiors to change automatically depending on the student's grades. And when a student is doing bad in school they'll receive a text from their parents saying they're cutting them off from allowance, etc." Phase 1 of `docs/superpowers/specs/2026-11-06-homes-interiors-design.md`; the full write-up is `docs/Homes.md`.

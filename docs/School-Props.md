@@ -1000,7 +1000,7 @@ Tris are whole-prop counts; every single piece is under 20k (the largest is Corn
 
 ## Batch 34 (dorm): the dorm room kit
 
-`art/props/nh_props_batch34_dorm.py` (named `_dorm` because `nh_props_batch34.py` is the beasts kit). The private dorm room of the homes spec (`docs/superpowers/specs/2026-11-06-homes-interiors-design.md`): one furniture set with tidy-to-messy variants and state-only extras, so a room can follow the report card. Not in Studio yet.
+`art/props/nh_props_batch34_dorm.py` (named `_dorm` because `nh_props_batch34.py` is the beasts kit). The private dorm room of the homes spec (`docs/superpowers/specs/2026-11-06-homes-interiors-design.md`): one furniture set with tidy-to-messy variants and state-only extras, so a room can follow the report card. In Studio since 1.64.1: the owner imported the 35 FBX files and bulk-imported the 142 maps under the group, and the ids were read back by name (no duplicates). The templates are in `ServerStorage.NHProps` (`NHBuildKit = "Dorm"`, scaled to 1:1, pivots at the kit origins, fronts facing -Z), and the dorm room is built from them (see [[Homes]]).
 
 - **Printed atlases:** `art/props/dorm_atlas.py` (system Python, PIL) writes `textures/DormPrint_*` (certificates, notices, papers, the marked test, the pizza box, can wraps, the mug, the night outside the window) and `textures/DormCloth_*` (the clothes' flat patterns), and `art/props/dorm_atlas.json` (regions and garment outlines). Faces map onto them through the "Spine" UV, as the library kit's books do, and are baked.
 - **The rug:** `art/props/dorm_weave.py` weaves `DormRug` with batch 29's machinery (not baked, like the other rugs).

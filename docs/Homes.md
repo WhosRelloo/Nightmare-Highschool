@@ -58,7 +58,11 @@ A template is a Model in `ServerStorage.NHHomes` (the dorm is `Dorm`), with:
 - lights: any Light whose part (or the light itself) has the attribute `NHHomeLight`; each state scales their brightness (`Light`) and A wreck flickers them;
 - props with the attribute **`NHHomeState`**, a comma list of the states they show in (`"Spotless,Tidy"`). Props without it always show. Hidden pieces are see-through and don't collide.
 
-The dorm in NH Combat Test is a **plain-part stand-in** (built by `DormStandIn.luau`, attribute `NHStandIn`) until the dorm kit art (props batch 34) is imported; the real template keeps the same names and attributes.
+The dorm is built from the dorm room kit (props batch 34, 1.64.1) by `tools/homes/build_dorm_room.luau`. It is a 20 by 10 stud room (interior x -10 to 10, z -8 to 2, floor top -0.1). The door wall is at the front left, the window at the back right, and the trophy spots sit on the trophy shelf's top, inside its model. The old plain-part stand-in is in `ServerStorage.NH_Backup.NHHomes_DormStandIn`.
+
+![Spotless](img/dorm-room-spotless.jpg)
+![A wreck](img/dorm-room-wreck.jpg)
+![A wreck, the wardrobe side](img/dorm-room-wreck-wardrobe.jpg)
 
 ## In NH Combat Test
 
