@@ -126,3 +126,12 @@ Owner: "Now transfer the race, gender, and face system over to the "Map" place",
 - **Not here:** race passives (no stats system), hunger, rites, the evolution cutscenes and the bite.
 - **How:** serialized in NH Combat Test (`tools/races-map/export_race_pieces.luau`), moved as text in chunks, and unpacked in the Map (`import_race_pieces_map.luau`), which refuses if a name is taken. The admin and wardrobe patches are in `tools/races-map/`.
 - **Tested (local play-test):** a Werewolf rolled on join with ears, tail and fur; every race and tier command through the remote; night sight on and off; real clicks on the wardrobe's Spin race and the desk's Ghast and Tier II; no script errors.
+
+
+## Added 2026-11-08 (1.65.1): the wolf form works
+
+The add-on had the server side of transforming and the wolf since 1.54, but not `Controllers.Character.Transformation`, the client controller that sends T. It is now copied from NH Combat Test, byte for byte. As the wolf, a click bites and R jump-bites.
+
+**To test it (for the builder):** F3 > Self > My race **Werewolf** (or Bloodmoon or Alpha) > My tier **Tier II** or **Tier III**, then **T**. The form lasts 60 s, then a 30 s cooldown. Tier I only gets the claw stance and the eyes. The desk works for everyone in Studio play-tests (Team Create included); on a live Map server, only the group's rank 254+ can use it.
+
+**Tested:** a Tier II Alpha transformed (body hidden, wolf welded, Howl), walked (Walk, then Idle), bit (Bite1), jump-bit (JumpBite, a 16-stud lunge) and changed back.

@@ -2,6 +2,24 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.65.1] - 2026-11-08: The wolf form in the Map place
+
+Owner: "I want the builder to be able to test the wolf form for werewolves in the map place".
+
+### Fixed (Map place)
+- **T did nothing in the Map.** The add-on (1.54) brought the server side of transforming and the owner's rigged wolf, but not the client controller that sends T, so nobody could change. `Controllers.Character.Transformation` is now copied from NH Combat Test, byte for byte (the checksums match). As the wolf, a click bites and R jump-bites.
+- **How the builder tests it:** F3 > Self > My race **Werewolf** (or Bloodmoon or Alpha) > My tier **Tier II** or **Tier III**, then press **T**. The form lasts 60 s, then there's a 30 s cooldown. Tier I only gets the claw stance and the eyes.
+  - In Studio play-tests, Team Create included, everyone can use the desk.
+  - On a live Map server, only the group's rank 254+ can.
+
+### Verified (Map place, local play-test)
+- Became a Tier II Alpha through the desk's remote, then sent Transform (the same packet T sends). `WolfForm` came on, the body hid, and the 60-part wolf was welded in with its Howl.
+- **Movement:** walking 17.5 studs played Walk, and stopping went back to Idle.
+- **Attacks:** the bite played Bite1, and the jump-bite played JumpBite and lunged 16 studs.
+- **Changing back:** T again restored the body.
+- A transform during the cooldown was refused, as designed.
+- **Not tried:** the physical T key itself (test keys don't reach the game; the controller is identical to NH Combat Test's, where T is in use), and biting another player.
+
 ## [1.65.0] - 2026-11-08: Races, gender and faces in the Map place, and race and tier on the admin desk
 
 Owner: "Now transfer the race, gender, and face system over to the "Map" place. Also add a command in the admin panel for setting you or others a race", then "And a setting in the admin panel to force tiers on yourself or others". Record: `docs/Map-Core-Preview.md`.
