@@ -997,3 +997,39 @@ Tris are whole-prop counts; every single piece is under 20k (the largest is Corn
 ![By day, the rows](img/library-kit-day-2.jpg)
 ![At night](img/library-kit-night.jpg)
 ![Candles at night](img/library-kit-night-candles.jpg)
+
+## Batch 34 (dorm): the dorm room kit
+
+`art/props/nh_props_batch34_dorm.py` (named `_dorm` because `nh_props_batch34.py` is the beasts kit). The private dorm room of the homes spec (`docs/superpowers/specs/2026-11-06-homes-interiors-design.md`): one furniture set with tidy-to-messy variants and state-only extras, so a room can follow the report card. Not in Studio yet.
+
+- **Printed atlases:** `art/props/dorm_atlas.py` (system Python, PIL) writes `textures/DormPrint_*` (certificates, notices, papers, the marked test, the pizza box, can wraps, the mug, the night outside the window) and `textures/DormCloth_*` (the clothes' flat patterns), and `art/props/dorm_atlas.json` (regions and garment outlines). Faces map onto them through the "Spine" UV, as the library kit's books do, and are baked.
+- **The rug:** `art/props/dorm_weave.py` weaves `DormRug` with batch 29's machinery (not baked, like the other rugs).
+- **Tiled sets:** `tools/vfx/make_dorm_sets.py` makes `NH_DormPlaster`, `NH_DormEnamel` and `NH_DormFloor` (seamless 2048, 5 studs a tile) for the shell's `_Plaster`, `_Panel` pieces and the floor. The furniture's crimson enamel is the same set.
+- **Cloth:** the blankets, sheets and clothes are Blender cloth simulations (joined pieces fall together on smooth proxy colliders; flung vertices are pulled back and cut). `JacketOnChair` and `ClothesOnChair` are built in DormChair's frame: put them at the chair's pivot.
+- **Run:** `Studio/run34.py` (scratch) through nh_props without editing its import list; `bake34.sh` bakes 2048 / 64 samples / GPU, FBX to `art/props/fbx/dorm-batch34/`. `upload34.py` fills `art/group-upload/dorm-batch34/` (142 maps). `sheet34.py` and `render34.py` make the review sheets and room renders in `art/props/renders/dorm-batch34/`.
+
+| Prop | Tris | Notes |
+|---|---|---|
+| DormBed / DormBedUnmade | 17.2k / 19.4k | cast iron, brass knobs; crimson damask blanket with a bone binding; mattress top 1.84 |
+| DormDesk | 9.0k | iron trestles, ebonised top 2.95 with a crimson leather inset, shallow drawer, a hutch of pigeonholes |
+| DormChair | 3.9k | iron, pointed back, crimson leather pad; seat top 1.7 |
+| DormWardrobe / DormWardrobeOpen | 9.0k / 22.4k (Main 10.5k, Clothes 11.9k) | enamel inserts, brass strap hinges; the right door open, clothes hanging and spilled |
+| DormShelfFull / Sparse / Empty | 3.4-4.4k | wall shelf on iron brackets, library-atlas books; Empty is dusty with cobwebs |
+| DormPlantHealthy / Wilting / Dead | 13.3k / 10.6k / 9.1k | a fern in a brass pot on an iron stand |
+| DormDeskLamp | 3.0k | brass; Glow: the bulb |
+| DormCeilingLight | 4.3k | iron pendant, Glass: the frosted globe, Glow: the bulb; 2.75 tall (its top meets the ceiling) |
+| DormRug | 1.4k | 6 x 4 woven |
+| CertificateHonourRoll / DeansList / PerfectAttendance | 2.1k | gilt frame, printed certificate with the crest, wax seal |
+| TrophyShelf | 6.8k | black marble, brass TROPHIES plaque; spots for beast trophies at (±0.75, -0.05, 1.0) and (±2.25, -0.05, 1.0) |
+| JacketOnChair, ClothesOnChair | 6.3k, 8.8k | in DormChair's frame |
+| DormBookStack, CoffeeCup, PaperScatter | 0.1k, 1.6k, 3.4k | |
+| ClothesPile, PizzaBoxes, OverdueNotices, EmptyCans | 11.1k, 1.2k, 5.7k, 2.9k | |
+| DormWall / DormWallWindow / DormWallDoor | 2.6k / 5.2k / 2.9k | 10 x 12 x 0.5; Window: Glass and Sky pieces; Door: a 5 x 8 opening |
+| DormFloor, DormCeiling | 12, 2.5k | 10 x 10; floor top 0.3; the ceiling's underside 0.6 above its origin (the cornice hangs to 0) |
+| RoomNumberPlate / RoomNumberPlateBlank | 1.2k / 0.3k | brass, 101 raised / blank |
+
+The upload folder leaves out five metal maps that are pure black (ClothesOnChair, ClothesPile, PizzaBoxes, NH_DormFloor, NH_DormPlaster) and the rug has none, so it holds 142 of the 147 maps.
+
+![The kit](img/dorm-kit-contact.jpg)
+![Tidy to messy](img/dorm-kit-states.jpg)
+![The room at A, C, D and F](img/dorm-kit-rooms.jpg)
