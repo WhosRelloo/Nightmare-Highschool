@@ -2,6 +2,46 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.65.0] - 2026-11-08: Races, gender and faces in the Map place, and race and tier on the admin desk
+
+Owner: "Now transfer the race, gender, and face system over to the "Map" place. Also add a command in the admin panel for setting you or others a race", then "And a setting in the admin panel to force tiers on yourself or others". Record: `docs/Map-Core-Preview.md`.
+
+### Added (Map place, tagged NHCore)
+- **Races.** `ServerScriptService.NHLineage` starts `ReplicatedStorage.Lineage`, so every player rolls a race, a variant and two traits when they join, with the full game's odds. Like everything in the Map, it's kept for the session only.
+- **Race looks:** `ServerStorage.NHRaceCosmetics`, `Services.Player.RaceCosmetics` and `Controllers.Character.TailSway` bring the ears, tails, fur colours, grave wear, cold wisps and frost.
+- **Night sight** (H for Vampires, Werewolves, Ghouls and Wraiths): `Services.Features.NightSight` and `Controllers.Character.NightSight`.
+- **A Bloodline tab in the wardrobe (K):** the full game's Bloodline tab (`Controllers.Gui.Bloodline`) shows race, variant, tier, the race and variant spins (free in Studio), the passive, race looks and traits. The Map has no creator or Student Record, so it lives in the wardrobe.
+- **Gender and faces:** the wardrobe already had the body choice (male or female) and every face option, and NH Combat Test hasn't changed them since. With a race now set, race skin palettes and race mouths and marks switch on as in the full game.
+- The pieces were copied from NH Combat Test (serialized, moved as text, unpacked). Every script matches NH Combat Test's checksum. `ServerStorage.NHCore.README` lists them, and the removal command takes them.
+
+### Added (both places)
+- **Race on the admin desk (F3):** the Student tab has **Race**, with every race and variant (the base race in gold), and **Tier** (I, II, III). The Self tab has **My race** and **My tier**. The commands are `SetRace` and `SetTier`, through `Lineage.AdminSetRace` and `Lineage.AdminSetTier`.
+  - A new race keeps the tier but clears hunger and race looks, like a race spin.
+  - Bad picks are refused.
+  - NH Combat Test saves the change, and the Map keeps it for the session.
+- The student list shows each student's variant and tier ("Royal Vamp III").
+
+### Not in the Map
+- **Race passives:** the Map has no stats system (`Player.Progression`).
+- **Hunger, rites, evolution cutscenes and the bite:** these need quests. The Bloodline tab still shows the hunger bar and the rite note.
+
+### Verified
+- **Map place (local play-test):**
+  - The player rolled a Werewolf on join, with ears, tail and fur, and the height re-scaled to the Werewolf range.
+  - Through the real admin remote:
+    - Royal Vamp brought vampire ears and Tier III gave Elder. Tier 9 and "Dragon" were refused.
+    - Night sight worked as a Vampire and switched off on becoming a Pope.
+    - Hollow King at Tier II brought the wraith wisps.
+  - Real clicks:
+    - The wardrobe's Bloodline tab drew 26 rows with no cut-off text, and Spin race rolled a Priest at Tier I.
+    - On the desk's Self tab, Ghast and then Tier II applied.
+  - Both new desk tabs drew with every button's text fitting. There were no script errors.
+- **NH Combat Test (slot 2):**
+  - Through the real remote, Tier III raised an Alpha's max health from 119 to 132, Ghast at Tier III had 106, and Superhuman applied.
+  - The student list showed "Superhuman", Tier 3.
+  - Slot 2's race data was snapshotted first and restored exactly (Alpha, Tier I, hunger 110, its looks), with max health back to 119.
+- **Not tried:** two people in the Map at once, and the F3 key itself (the desk was opened through its attribute).
+
 ## [1.64.1] - 2026-11-08: The real dorm room
 
 Owner: "Imported, build the real room". The dorm room art kit (props batch 34) replaces the plain-part stand-in.

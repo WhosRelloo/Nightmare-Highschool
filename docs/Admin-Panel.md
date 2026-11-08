@@ -32,6 +32,7 @@ Other UI can open the desk by setting the player attribute `NHAdminOpen` to `tru
   - Give Yen, Combat EXP, lineage spins or a name change.
   - Give any of the 40 gear pieces (listed by rarity colour).
   - (1.63) **Height:** Spin height (a free re-roll), Shortest, Average, Tallest, in the student's race range (`SpinHeight`, `SetHeight`). The student list shows each student's height. The Self tab has Spin my height. See [[Height]].
+  - (1.65) **Race** (every race and variant, the base race in gold) and **Tier** (I, II, III): `SetRace` and `SetTier` through `Lineage.AdminSetRace` / `AdminSetTier`. A new race keeps the tier and clears hunger and race looks. The Self tab has My race and My tier. The student list shows the variant and tier. See [[Races-and-Bloodlines]].
 - **School (1.18):**
   - **Discipline:** set points (the ladder recomputes the level, probation and suspension).
   - **Excuse today:** today's absences, tardies and early leaves become Excused, and their discipline points come back off.

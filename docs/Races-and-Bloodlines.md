@@ -123,6 +123,7 @@ Race faces (1.37.0) live in the Wardrobe **Face** tab instead: race marks, race 
 - **The bite** (`Services.Player.Turning`): T while gripping (Tier II+ monster, Mortal victim) offers the turn (`NHTurn.Offer`). The grip stops and the victim gets `NHTurn.Ask` with 15 s to answer.
   - **Accept:** `Lineage.Turn` (the biter's base race, Tier I, hunger 0, looks reset; spins and traits kept). The biter gets +5 hunger and uses their daily turn (`Lineage.TurnDay`).
 - **Test bridge:** `GiveHunger(name, n)`, `Evolve(name, tier)`.
+- **Admin desk (1.65):** staff set any race and variant, or force Tier I to III, on themselves or a student (`Lineage.AdminSetRace`, `Lineage.AdminSetTier`; see [[Admin-Panel]]).
 
 
 **The bite, two-player test (2026-10-30):**

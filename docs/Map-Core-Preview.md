@@ -111,3 +111,18 @@ Owner: "make sure to throw the admin panel in "Map" place as well as the height 
 **1.63.1:** Average is now the size of the Map's standard R6 rig (`Workspace.Rig`, model scale 1.0): side by side both stand 5.29 studs tall. Heights go up and down from there.
 
 **1.63.2:** wider heights, the same as the full game: 4'11" to 7'0" for the Map's students (the Human range), with Average still the rig's size.
+
+
+## Added 2026-11-08 (1.65.0): races, gender and faces
+
+Owner: "Now transfer the race, gender, and face system over to the "Map" place", plus race and tier on the admin desk.
+
+- **Races:** `ServerScriptService.NHLineage` starts `ReplicatedStorage.Lineage` (the Map already had it), so every player rolls a race, variant and two traits on join, kept for the session. Heights re-scale to the race's range on their own.
+- **Race looks:** `ServerStorage.NHRaceCosmetics` (228 instances), `Services.Player.RaceCosmetics` and `Controllers.Character.TailSway`.
+- **Night sight:** `Services.Features.NightSight` and `Controllers.Character.NightSight` (H).
+- **The Bloodline tab** (`Controllers.Gui.Bloodline`) is a fifth tab in the Map's wardrobe (K), through a small adapter in the Map's `Gui.Wardrobe`.
+- **Gender and faces:** the wardrobe already had the body choice and all the faces, unchanged in NH Combat Test since 1.58. The race skin palettes and race faces switch on now that a race is set.
+- **Admin:** Race and Tier on the desk's Student tab, and My race and My tier on the Self tab (the same Admin, AdminPanel and Lineage as NH Combat Test, checksums equal).
+- **Not here:** race passives (no stats system), hunger, rites, the evolution cutscenes and the bite.
+- **How:** serialized in NH Combat Test (`tools/races-map/export_race_pieces.luau`), moved as text in chunks, and unpacked in the Map (`import_race_pieces_map.luau`), which refuses if a name is taken. The admin and wardrobe patches are in `tools/races-map/`.
+- **Tested (local play-test):** a Werewolf rolled on join with ears, tail and fur; every race and tier command through the remote; night sight on and off; real clicks on the wardrobe's Spin race and the desk's Ghast and Tier II; no script errors.
