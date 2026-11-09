@@ -1033,3 +1033,64 @@ The upload folder leaves out five metal maps that are pure black (ClothesOnChair
 ![The kit](img/dorm-kit-contact.jpg)
 ![Tidy to messy](img/dorm-kit-states.jpg)
 ![The room at A, C, D and F](img/dorm-kit-rooms.jpg)
+
+## Batch 35 (lounge): the Teachers' Lounge kit
+
+`art/props/nh_props_batch35.py`. The staff room: a corner to brew tea, mark books and sit out a free period. Cast iron, black marble, crimson enamel, brass and gilt, dark oak and ebonised wood, bone china, ink, paper and slate. Every name and word on the props is invented (the crest, STAFF ONLY, the chalked rota, the staff Mr. Hale, Miss Vane, Dr. Crowe, Mrs. Ashby, Mr. Thorne and Mr. Graves).
+
+- **Printed atlas:** `art/props/staff_atlas.py` (system Python, PIL) writes `textures/StaffPrint_{color,gilt,height}.png` and `art/props/staff_atlas.json`. It holds the rota slate and name tags, the ledger pages, exercise book covers, marked sheets, playing cards, the dartboard face and score slate, mug wraps and the biscuit barrel wrap, plus batch 36's prints. It reuses `dorm_atlas.py`'s drawing code. Faces map onto it through the "Spine" UV and are baked, as in the dorm kit.
+- **China and mugs:** `wrap_lathe` turns a profile with a Spine UV, so a print wraps round it once (u = 0.25 faces the front) and plain bands (the crimson band, the gilt lines) are painted from swatches.
+- **Run:** `E:/NH-Work/props3536/run3536.py` loads nh_props without editing its import list (add `--fast` for a quick unbaked look). `bake3536.sh` bakes 2048 / 64 samples / GPU, one Blender process per prop, FBX to `art/props/fbx/lounge-batch35/`. `upload3536.py` fills `art/group-upload/lounge-batch35/`. `sheet3536.py` and `render3536.py` make the contact sheet and the staged render in `art/props/renders/lounge-batch35/`.
+
+| Prop | Tris | Notes |
+|---|---|---|
+| TeaUrn | 8.3k | brass samovar on an iron stand with a spirit lamp; tap at the front; crest medallion; 2.3 tall, stands on a counter |
+| SpiritKettle | 4.5k | copper kettle, brass swing handle, on a cast-iron spirit stove; 1.15 tall |
+| TeaSet | 12.2k | ebonised tray (1.9 x 1.25), teapot, three cups and saucers, sugar bowl, milk jug, spoon; bone china with a crimson band between gilt lines |
+| MugRack | 13.2k | wall piece (hangs from its back face): dark oak board, a shelf with a tea caddy and sugar jar, six iron hooks and six mugs; 2.6 wide |
+| BiscuitBarrel | 9.3k | bone china printed with the crest and BISCUITS; brass lid, foot and bail handle |
+| KitchenetteCounter | 7.9k | 6 x 2.2; black marble top at 3.0 with a marble upstand behind; three drawers, two drawers over two crimson-panelled doors, brass pulls |
+| IceBox | 5.3k | dark oak, 2.4 x 1.7 x 3.5; ice door over food door, zinc-lined openings, brass latches, hinges and an ICE plate, zinc drip tray; top at 3.54 |
+| MarkingStack | 2.1k | nine printed exercise books, a red fountain pen on top, three marked sheets and an open book beside it |
+| Gradebook | 1.9k | open ledger (1.7 x 1.15) with printed pages of marks, an inkwell and a dip pen |
+| StaffRotaBoard | 5.5k | wall piece: 4.6 x 4.2 framed slate chalked STAFF DUTY ROTA (DUTY / MON..FRI), chalk ledge, a brass rail of six name hooks with tags |
+| WallTelephone | 4.4k | wall piece: oak crank telephone, two brass bells, mouthpiece horn, crank, earpiece on its hook, writing shelf, battery box; 2.9 tall, hang its bottom about 2.5 up |
+| CardTable | 7.8k | folding card table, 2.8 square, green baize top at 2.45; two hands of cards, the deck, a face-up pile, chips |
+| StaffOnlySign | 4.4k | wall piece: 1.8 x 0.55 brass plaque, crimson enamel field, raised gilt STAFF ONLY |
+| Dartboard | 5.4k | wall piece: dark oak cabinet (2.2 x 2.4) with both doors swung open (4.3 wide open); the board centred 1.25 up; three darts; chalk score slate in the left door |
+| StaffLockers | 14.0k | three tall dark oak lockers, 5.0 x 1.6 x 7.0; louvred pointed-arch vents, raised panels, brass name plates with tags, keyholes, lever handles |
+
+All 15 metal maps have some metal, so the upload folder holds all 60 maps.
+
+![The kit](img/lounge-kit-contact.jpg)
+![A lounge corner](img/lounge-corner.jpg)
+
+## Batch 36 (school): the School prop kit
+
+`art/props/nh_props_batch36.py`. Classrooms, the laboratory, the music room and the gymnasium. Same house look and the same printed atlas as batch 35 (the wall map, a slate of sums, sheet music, the blotter, specimen labels, the fire bucket wrap, the dunce cap, the metronome scale). The wall map is an invented country (The Nocturne Reaches) with invented place names. The skeleton is clean and educational. Run, bake and upload as batch 35 (`run3536.py`, `bake3536.sh`, `upload3536.py`); FBX in `art/props/fbx/school-batch36/`, renders in `art/props/renders/school-batch36/`.
+
+| Prop | Tris | Notes |
+|---|---|---|
+| Abacus | 11.1k | dark oak frame on splayed feet, ten rods of crimson and bone beads; 1.8 wide, 1.8 tall |
+| AnatomySkeleton | 16.9k | life-size teaching skeleton (5.3 tall) hung from an iron stand on a cross base; 5.7 tall overall |
+| LabBench | 15.3k | 6 x 2.6; slate top at 3.0; three brass gas pillars with swan-neck nozzles and lever valves; cupboards and drawers; reagent shelf at 4.15 with labelled bottles |
+| TestTubeRack | 5.0k (Main 3.5k, Glass 1.5k) | oak rack, six tubes (Glass) with coloured liquids, a Bunsen burner and hose; stands on a bench |
+| SpecimenJars | 10.7k (Main 8.2k, Glass 2.5k) | wall piece: 3.4 wide ebonised shelf (top 0.6 above its origin), five labelled jars (Glass): frog, sea-horse, beetles, mandrake root, octopus |
+| Microscope | 3.6k | brass on a black horseshoe foot; 1.66 tall; stands on a bench |
+| WallMap | 2.6k | wall piece: oak batten and roller, 4.1 x 2.8 pull-down map, pull ring at the bottom (origin at the ring); batten top 3.55 above it |
+| WritingSlate | 1.3k | slate in an oak frame, lying flat, chalked sums; chalk and a slate pencil |
+| InkwellSet | 2.4k | blotter pad (1.7 x 1.05), standish with two inkwells and two dip pens, rocker blotter |
+| Satchel | 4.0k | oxblood leather, flap, two brass buckles, handle, shoulder strap; 1.25 wide |
+| DunceStool | 4.5k | tall oak stool, seat top 2.6, a printed paper dunce cap on it |
+| UprightPiano | 17.8k | ebonised, 5.2 x 2.0 x 4.6; key tops at 2.45; pointed fretwork over crimson silk, sheet music, two brass candle sconces, brass pedals |
+| MusicStand | 2.7k | iron tripod, lyre desk with two sheets; 4.15 tall |
+| Metronome | 0.5k | ebonised pyramid, printed tempo scale, brass pendulum, winding key; 0.9 tall |
+| Radiator | 13.3k | cast iron, fourteen sections, 2.9 wide, 2.55 tall; brass valve wheel at the left (its pipe goes into the floor), bleed key at the right |
+| FireBucketRack | 14.9k | wall piece: 3.4 wide oak board, crimson field, four crimson FIRE buckets on iron hooks, sand in them |
+| DrinkingFountain | 3.8k | wall piece: pointed black marble back, marble basin rim at 2.8, brass bubbler and push button, drain pipe down to the floor at the origin |
+| VaultingHorse | 3.5k | leather body, top at 4.0, on four splayed adjustable oak legs; 4.4 long |
+
+The upload folder leaves out WritingSlate's metal map (pure black), so it holds 71 of the 72 maps.
+
+![The kit](img/school-kit-contact.jpg)
+![A classroom corner](img/classroom-corner.jpg)
