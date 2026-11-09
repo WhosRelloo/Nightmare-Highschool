@@ -1213,3 +1213,12 @@ The upload folder holds all 100 maps (25 props x 4; no metal map is pure black).
 ![A girls' room](img/dormhouse-girls-corner.jpg)
 ![A boys' room](img/dormhouse-boys-corner.jpg)
 ![The boys' bathroom](img/dormhouse-boys-bathroom.jpg)
+
+## Batches 35-39 in NH Combat Test (2026-11-08)
+
+- `tools/props/kits_35_39_templates.luau` turns the imported models into templates in `ServerStorage.NHProps`: scaled to 0.01, one SurfaceAppearance per piece from the group's images (ids in base 36 in its `PK` string), and `NHBuildKit` set to Lounge, School, Detention, Electives or DormHouse.
+  - `_Glow` pieces are Neon (the darkroom safelight red), except the TV screen: it keeps its picture and gets a violet SurfaceLight.
+  - `_Glass` pieces are Glass at 0.45 transparency. `_Mirror` pieces are reflective Glass.
+  - Small and wall props don't collide.
+- **90 of 101 imported.** Not imported yet: Kiln, MixingBowlSet, PotRack, PottersWheel, PottingBench, Sawhorse, Terrarium, TheatreMasks, ToolWall, TreadleSewingMachine, WoodLathe. Their images are uploaded, so the script sets them up when run again after the import.
+- **Prank desks verified in Play:** `CliquePranks.TagDesk` put the real Vigil, Court, Ink and Pack desks exactly on classroom desks' pivots, at StudentDesk's size, and `CleanAll` removed them all.
