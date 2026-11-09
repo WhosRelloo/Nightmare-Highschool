@@ -99,6 +99,12 @@ for name, kitName in KIT do
 			p.Transparency = 0
 			p.Reflectance = 0.6
 			p.Color = Color3.fromRGB(200, 205, 210)
+		elseif n:match("_Leaves$") then
+			-- (batch 40 on) alpha-cut foliage cards: the cut-out is in the colour map's alpha
+			surface(p, name)
+			local sa = p:FindFirstChildOfClass("SurfaceAppearance")
+			if sa then sa.AlphaMode = Enum.AlphaMode.Transparency end
+			p.CanCollide = false p.CanTouch = false p.CastShadow = true
 		else
 			surface(p, name)
 		end

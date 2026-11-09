@@ -1244,16 +1244,18 @@ The upload folder holds all 100 maps (25 props x 4; no metal map is pure black).
 - **Pivots:** bottom centre, front toward -Y, unless the table says otherwise. Nothing goes below the pivot.
 - **Glow colours for the template:** MushroomRing gills, MoonflowerPatch and GhostOrchid are moonlight blue-white (about 190, 215, 255). NightshadeShrub berries are faint violet (about 150, 90, 255). StoneLanternPost, PathGateArch and the PumpkinPatch face are candle amber.
 
+- **In Studio:** `tools/props/garden_kit_templates.luau` makes the 67 templates in ServerStorage.NHProps (NHBuildKit `Garden`); fill its PK from the group's images first, as for kits 35-39. Leaves get NH_GardenLeaves with AlphaMode Transparency and DoubleSided; Path pieces get their tiled set; the roundel's Inlay gets MoonRoundelInlay; Glass on the pond, bird bath, puddle and rill is dark water; the lantern and gate-arch flames carry an amber PointLight. The walk-through and walk-under props (archway, gate arch, pergola, arbor, gazebo, willow, crabapple, steps, bridge, pond, roundel) collide on their precise shape. `tools/props/showcase_garden_kit.luau` lines them up in workspace.NHPropsShowcase.Garden: three rows (paths, plants, features) east of the other kits, x 24 to 276, walls at z -690, -650 and -610.
+
 ### Garden texture sets (MaterialVariants)
 
-`art/textures/nh_textures.py` makes five new seamless sets in the style of the existing ones: 2048 masters in `_master`, 1024 game copies in `art/textures/<Set>/`. Their ids go into `textures.json` after upload.
+`art/textures/nh_textures.py` makes five new seamless sets in the style of the existing ones: 2048 masters in `_master`, 1024 game copies in `art/textures/<Set>/`. Their ids are in `textures.json`, and each is a MaterialVariant `NH<Set>` in both NH Combat Test and the Map (tagged NHCore there).
 
 | Set | Base | Studs per tile | What |
 |---|---|---|---|
 | GardenGravel | Pebble | 10 | crushed slate chips (blue-black, grey-green, a few rust-stained and pale ones) in dark grit, dark rose petals blown into drifts |
 | HerringboneBrick | Brick | 10 | aged crimson brick in a 45-degree herringbone, soot-blackened bricks mixed in, white efflorescence at some joints, mossy joints; an even tone overall, so long paths show no repeat |
 | MossyPaving | Slate | 10 | hand-cut limestone flags of every size laid by eye, broken corners, a few cracked, deep moss in the joints, lichen rosettes |
-| CrazyPaving | Slate | 10 | broken flags of cleft slate, limestone and rust sandstone with small spalls between, wide mossy joints |
+| CrazyPaving | Basalt | 10 | broken flags of cleft slate, limestone and rust sandstone with small spalls between, wide mossy joints |
 | GardenCobble | Cobblestone | 10 | fan-laid granite cobbles in overlapping arcs, a few warm and pale stones, moss and grit between; the fans have a direction |
 
 ### Props

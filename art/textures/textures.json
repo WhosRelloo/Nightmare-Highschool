@@ -262,5 +262,45 @@
   "Rough": "80308530532421",
   "Metal": "118881099203550",
   "Note": "2048 px, published under the Nightmare Highschool group. Spread over Grass, LeafyGrass, Ground and Mud: with three on one base material Studio left one blank (white)"
+ },
+ "GardenGravel": {
+  "Base": "Pebble",
+  "StudsPerTile": 10,
+  "Color": "120309160384810",
+  "Normal": "111483683429733",
+  "Rough": "106907942993781",
+  "Metal": "103839246941343"
+ },
+ "HerringboneBrick": {
+  "Base": "Brick",
+  "StudsPerTile": 10,
+  "Color": "137221802878465",
+  "Normal": "130633255605358",
+  "Rough": "79027364211787",
+  "Metal": "103839246941343"
+ },
+ "MossyPaving": {
+  "Base": "Slate",
+  "StudsPerTile": 10,
+  "Color": "109068241085583",
+  "Normal": "126342547335743",
+  "Rough": "139144983403203",
+  "Metal": "103839246941343"
+ },
+ "CrazyPaving": {
+  "Base": "Basalt",
+  "StudsPerTile": 10,
+  "Color": "95785728249002",
+  "Normal": "140101079161690",
+  "Rough": "123686014269017",
+  "Metal": "103839246941343"
+ },
+ "GardenCobble": {
+  "Base": "Cobblestone",
+  "StudsPerTile": 10,
+  "Color": "133824011813047",
+  "Normal": "122288702843423",
+  "Rough": "77922663733832",
+  "Metal": "103839246941343"
  }
 }
