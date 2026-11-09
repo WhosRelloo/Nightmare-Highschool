@@ -1222,3 +1222,9 @@ The upload folder holds all 100 maps (25 props x 4; no metal map is pure black).
   - Small and wall props don't collide.
 - **90 of 101 imported.** Not imported yet: Kiln, MixingBowlSet, PotRack, PottersWheel, PottingBench, Sawhorse, Terrarium, TheatreMasks, ToolWall, TreadleSewingMachine, WoodLathe. Their images are uploaded, so the script sets them up when run again after the import.
 - **Prank desks verified in Play:** `CliquePranks.TagDesk` put the real Vigil, Court, Ink and Pack desks exactly on classroom desks' pivots, at StudentDesk's size, and `CleanAll` removed them all.
+
+- **All 101 templates are in** (the 11 electives were imported later and set up by re-running the script).
+- **Showcase:** `tools/props/showcase_kits_34_39.luau` lines up the dorm kit and batches 35-39 in `workspace.NHPropsShowcase`, one folder per kit: Dorm Room, Teachers Lounge, School Props, Detention, Electives and Dorm House.
+  - The rows are in the free strip at the north end of the baseplate: x from -236, a dark slate backing wall at z -682, -646, -610, -574, -538 and -502.
+  - The props face south, toward the map. Wall pieces hang on the wall, table-top things stand on plinths (`<Name>_ShowcasePlinth`), and the pot rack and the dorm ceiling light hang from a beam.
+  - Re-running it rebuilds the six folders.
