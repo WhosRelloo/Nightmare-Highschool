@@ -1489,3 +1489,5 @@ Every piece is under 20k triangles. Every prop is baked at 2048.
 ![The gymnasium](img/gym-hall.jpg)
 ![Fitness and fencing](img/gym-fitness.jpg)
 ![The changing room and the trophy](img/gym-changing.jpg)
+
+**In Studio (2026-11-09):** `tools/props/gym_kit_templates.luau` makes the 33 templates in ServerStorage.NHProps (NHBuildKit `Gym`; fill its PK from the group's images). Every piece takes its own prop's maps; collision is precise on the solid props and off on the no-collide ones and the ropes and rings; CursedTrophy_Glow is violet neon with a small PointLight; SaunaDoor is on the locker system like the Safe ("Sweatbox / Open", Door0 keeps its hinge as its PivotOffset, swings out 95°, NHPropSpot in front of it). `tools/props/showcase_gym_kit.luau` lines them up in workspace.NHPropsShowcase.Gym: one row at z -466 (south of Dorm House), x -236 to 35, the ropes and rings standing under their own beams on iron posts, the gloves and megaphone on plinths.
