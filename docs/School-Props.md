@@ -1094,3 +1094,122 @@ The upload folder leaves out WritingSlate's metal map (pure black), so it holds 
 
 ![The kit](img/school-kit-contact.jpg)
 ![A classroom corner](img/classroom-corner.jpg)
+
+## Batch 37 (detention): the detention kit
+
+`art/props/nh_props_batch37.py`. Room 106, detention: strict and grim, never violent (no canes, no shackles). It also holds the StudentDesk variants and the clique prank desks, all built on `nh_props.student_desk`, so they share StudentDesk's size, frame, heights, footprint and pivot (only StudentDeskBroken changes its heights). The prank desks use the slogans and colours from `ReplicatedStorage.Config.Cliques`.
+
+- **Printed atlases:** `art/props/kits3739_atlas.py` (system Python, PIL; it reuses `dorm_atlas.py`) writes `textures/DetentionPrint_*`, `ElectivesPrint_*` and `DormHousePrint_*`, and `art/props/kits3739_atlas.json` (regions, and the tool wall's layout). Faces map onto them through the "Spine" UV and are baked. All text, names and designs are invented.
+- **Run:** `E:/NH-Work/props373839/run373839.py` runs nh_props without editing its import list. `bake373839.sh all37|all38|all39|<Prop>` bakes at 2048 / 64 samples / GPU, one Blender at a time (it waits for any other bake). `upload373839.py`, `sheet373839.py` and `render373839.py` make the upload folders, contact sheets and staged renders.
+- **Files:** FBX in `art/props/fbx/detention-batch37/`, maps in `art/props/textures/<Prop>_*.png`, upload copies in `art/group-upload/detention-batch37/`, renders in `art/props/renders/detention-batch37/`.
+
+The upload folder holds all 100 maps (25 props x 4; no metal map is pure black).
+
+| Prop | Tris | Notes |
+|---|---|---|
+| DetentionDesk | 12.6k | heavy desk and seat on one cast-iron frame bolted to an iron floor plate; carved initials and scratches; desk top 2.45, seat top 1.7; seat at -Y (the student faces +Y); pivot at the desk's centre |
+| LinesChalkboard | 5.2k | wall board, back on the wall (y = 0), foot of the tray at z = 0; slate 6.8 x 3.9 full of "I will not talk in class." in chalk; ROOM 106 on the crest |
+| LinesPaperStack | 3.6k | a stack of lined pages full of lines, a loose page, a worn pencil; for a desk top |
+| SupervisorPodium | 8.2k (Main 8.0k, Glow 0.2k) | oak platform 7 x 5 x 0.7 with a step at the back; desk top 3.7 above the floor (3.0 above the platform); Glow: the lamp bulb; bell, register, pen |
+| DetentionLog | 4.2k | the register open on a slanted iron stand (reading face about 3.1-3.5), pen on a chain |
+| ConfiscatedBox | 6.0k | open crate 2.2 x 1.5 x 1.2, CONFISCATED board; a slingshot, two phones, three comics (invented), cards, a skateboard wheel |
+| SchoolRulesBoard | 2.1k | ten invented rules under the crest, gilt frame, wax seal; back on the wall (y = 0), foot at z = 0, 3.4 tall |
+| DetentionSign | 5.2k | door sign 2.6 x 1.15: DETENTION in raised gilt, SILENCE under it; back at y = 0, foot at z = 0 |
+| FacingWallDesk | 2.4k | desk top 2.45 between 5.0-tall side panels and a front board; set its +Y side to the wall (the student sits at -Y) |
+| WindowGrille | 4.9k | cast-iron bars with spear finials and a quatrefoil band, 4 x 6; back lugs on the wall (y = 0), foot at z = 0 |
+| KeyRingHook | 9.2k | eight big keys on a ring; plate on the wall (y = 0), the hook at z = 1.0 above the pivot |
+| WallBell | 3.0k | red enamel dome, brass striker and coil box, conduit up the wall; plate centre 0.6 above the pivot, back at y = 0 |
+| StudentDeskCarved | 15.1k | heart with initials, tally marks, a crude skull, R.V. WAS HERE carved into the lid; same size, frame, heights, footprint and pivot as StudentDesk (top 2.38-2.45) |
+| StudentDeskGraffiti | 10.9k | ballpoint and marker doodles: a crossed-out heart, a bat, BORED, SOS; gum under the shelf and lip; same size, frame, heights, footprint and pivot as StudentDesk (top 2.38-2.45) |
+| StudentDeskBroken | 5.6k | front right leg snapped (the piece on the floor), tipped onto that corner, lid split with the right half hanging off its hinge; same footprint and pivot as StudentDesk, heights differ |
+| StudentDeskWobbly | 5.6k | front left foot short, propped on a book and a folded wad of paper; scuffs and chips; same size, frame, heights, footprint and pivot as StudentDesk (top 2.38-2.45) |
+| StudentDeskInkStained | 6.1k | toppled inkwell, a dried ink pool running off the front edge, drips, ink fingerprints; same size, frame, heights, footprint and pivot as StudentDesk (top 2.38-2.45) |
+| StudentDeskPrankVigil | 17.1k | #EBCD78 marker over carving: THE VIGIL REMEMBERS, a lit candle; swapped in on a classroom StudentDesk's pivot when the clique pranks the room; same size, frame, heights, footprint and pivot as StudentDesk (top 2.38-2.45) |
+| StudentDeskPrankCourt | 10.6k | #C8283C marker over carving: FANGS OUT, a crown with fangs and a drip; swapped in on a classroom StudentDesk's pivot when the clique pranks the room; same size, frame, heights, footprint and pivot as StudentDesk (top 2.38-2.45) |
+| StudentDeskPrankAthletes | 10.3k | #5A96DC marker over carving: VARSITY, a pennant and a star; swapped in on a classroom StudentDesk's pivot when the clique pranks the room; same size, frame, heights, footprint and pivot as StudentDesk (top 2.38-2.45) |
+| StudentDeskPrankDelinquents | 13.8k | #966E46 marker over carving: BACK LOT RULES, hot-rod flames and a comb; swapped in on a classroom StudentDesk's pivot when the clique pranks the room; same size, frame, heights, footprint and pivot as StudentDesk (top 2.38-2.45) |
+| StudentDeskPrankPack | 13.2k | #82965A marker over carving: PACK RUNS THIS, a paw print and claw gouges; swapped in on a classroom StudentDesk's pivot when the clique pranks the room; same size, frame, heights, footprint and pivot as StudentDesk (top 2.38-2.45) |
+| StudentDeskPrankOrdinary | 9.3k | #C8BEAA marker over carving: HI MOM, a smiley; swapped in on a classroom StudentDesk's pivot when the clique pranks the room; same size, frame, heights, footprint and pivot as StudentDesk (top 2.38-2.45) |
+| StudentDeskPrankChoir | 9.5k | #E6E1D2 marker over carving: REPENT, a halo over a cross; swapped in on a classroom StudentDesk's pivot when the clique pranks the room; same size, frame, heights, footprint and pivot as StudentDesk (top 2.38-2.45) |
+| StudentDeskPrankInk | 14.2k | #9650BE marker over carving: ART IS A WEAPON, a dripping quill and splatter; swapped in on a classroom StudentDesk's pivot when the clique pranks the room; same size, frame, heights, footprint and pivot as StudentDesk (top 2.38-2.45) |
+
+![The kit](img/detention-kit-contact.jpg)
+![The prank desks](img/detention-prank-desks.jpg)
+![The detention room](img/detention-room.jpg)
+
+## Batch 38 (electives): the electives kit
+
+`art/props/nh_props_batch38.py`. Pieces to dress the new elective classrooms: herbology, home economics, sewing, photography, woodshop, ceramics and drama. The costumes are Blender cloth simulations on pleated patterns.
+
+- **Atlases and run:** as batch 37 (`kits3739_atlas.py`, `run373839.py`, `bake373839.sh`).
+- **Files:** FBX in `art/props/fbx/electives-batch38/`, maps in `art/props/textures/<Prop>_*.png`, upload copies in `art/group-upload/electives-batch38/`, renders in `art/props/renders/electives-batch38/`.
+
+The upload folder holds all 72 maps (18 props x 4; no metal map is pure black).
+
+| Prop | Tris | Notes |
+|---|---|---|
+| PottingBench | 16.1k | slatted bench, top 2.9; terracotta pots with seedlings and plant markers, a soil heap, two trowels, a compost sack below |
+| HerbDryingRack | 19.1k | freestanding rack 4.6 wide, 5.6 tall; twelve bundles of drying herbs (sage, thyme, lavender, rue, mint, moonwort) |
+| Terrarium | 9.7k (Main 9.6k, Glass 0.1k) | tabletop gothic glass case 2.2 x 1.4, 2.6 to the finials; ferns, moss and pebbles; Glass: the panes |
+| CastIronRange | 14.7k | range 5.2 wide, hob 3.0; firebox and two oven doors, hotplates, NOCTURNE maker's plate, warming shelf, flue to 7.5, a kettle |
+| PotRack | 15.1k | hangs from the ceiling: its top (the ceiling plates) is 3.4 above the pivot; copper pans on S-hooks, two lids |
+| MixingBowlSet | 4.8k | three stacked glazed bowls with flour, a whisk, a rolling pin, a wooden spoon; for a counter |
+| TreadleSewingMachine | 7.1k | iron treadle stand, table top 2.6; black japanned machine with gilt RAVENSWORTH decals, belt to the wheel |
+| DressForm | 6.3k | form on an iron tripod (shoulders about 5.0); a half-made damask garment pinned round its left side, a tape measure |
+| FabricBolts | 1.4k | sloped rack 5.0 wide, 4.4 tall; fourteen bolts in six invented prints, one length unrolled to the floor |
+| BellowsCamera | 4.0k | wooden field camera on a tripod, lens centre about 4.6; brass lens, leather bellows, a shutter bulb |
+| DarkroomTrays | 5.1k (Main 5.0k, Glow 0.1k) | bench top 3.0, back board to 6.2; DEVELOPER, STOP BATH, FIXER trays, prints pegged on a line; Glow: the red safelight lens |
+| WoodLathe | 8.8k | cast-iron lathe on an oak bench (bench top 2.7); a half-turned spindle, gouges, shavings, a flywheel below |
+| ToolWall | 4.4k | pegboard 6.0 x 3.6 in an oak frame, its foot 0.4 above the pivot; tools over painted outlines, three outlines empty; back at y = 0 |
+| Sawhorse | 1.7k | a pair of sawhorses with a plank (top 2.56) and a saw, sawdust |
+| PottersWheel | 5.4k | kick wheel: seat top 1.7 at +Y, wheel head 2.5, a wet clay pot, a slurry bowl, a sponge |
+| Kiln | 4.6k | firebrick body in an iron frame 4.4 x 3.6, arched top 5.3, flue to 7.7; iron door with a wheel latch, gauge, spy hole |
+| CostumeRack | 10.0k (Main 2.1k, Clothes 7.9k) | rolling rail 6 wide, 6.3 tall; a velvet cape, a gown and a crimson tabard with a gilt key (Clothes: its own piece) |
+| TheatreMasks | 13.7k | gilt comedy and silver tragedy masks on a black plaque 2.6 wide, crimson ribbons; back at y = 0, plaque centre 1.0 above the pivot |
+
+![The kit](img/electives-kit-contact.jpg)
+![Home economics and sewing](img/electives-homeec-sewing.jpg)
+![Woodshop, ceramics and photography](img/electives-woodshop-ceramics-photo.jpg)
+
+## Batch 39 (dorm house): the dorm house kit
+
+`art/props/nh_props_batch39.py`. The dorm building beyond the private room (batch 34's look), personal things for the girls' and boys' rooms, and urinals for the boys' bathroom (batch 5's porcelain, marble and brass).
+
+- **Atlases and run:** as batch 37 (`kits3739_atlas.py`, `run373839.py`, `bake373839.sh`).
+- **Files:** FBX in `art/props/fbx/dormhouse-batch39/`, maps in `art/props/textures/<Prop>_*.png`, upload copies in `art/group-upload/dormhouse-batch39/`, renders in `art/props/renders/dormhouse-batch39/`.
+
+The upload folder holds all 100 maps (25 props x 4; no metal map is pure black).
+
+| Prop | Tris | Notes |
+|---|---|---|
+| BunkBed | 21.1k (Main 10.0k, Bedding 11.0k) | cast iron, 4 x 8; mattress tops 1.84 (like DormBed) and 5.5, posts to 7.5; ladder on the right; Bedding: its own piece |
+| Nightstand | 2.4k | ebonised, black marble top 2.3; enamel insets, an alarm clock and a book |
+| FloorMirror | 1.6k (Main 1.5k, Mirror 0.1k) | cheval mirror 6.4 tall; Mirror: the glass (like BathroomMirror) |
+| LaundryHamper | 8.6k | wicker hamper 2.3 tall on an iron frame, lid propped against it, laundry heaped in it, a sleeve over the rim, a tee on the floor |
+| WashingMachine | 4.5k (Main 4.3k, Glass 0.2k) | crimson enamel washer 2.4 x 2.3, top 3.1; RAVENWASH panel, brass dials and porthole; Glass: the window |
+| ShowerStall | 11.2k | tiled stall 3.8 x 3.8, walls 7.6; checked floor tray (top 0.38), brass rose and valve, striped curtain on rings |
+| MiniFridge | 3.1k | crimson enamel, 1.6 x 1.5 x 2.5; stickers, a note, a soda can on top |
+| BeanBag | 1.7k | slumped crimson leather, 3.3 across, 1.4 tall, dented seat |
+| PingPongTable | 3.7k | 9 x 5, top 2.5; crimson top with bone lines, printed net on brass posts, two paddles and a ball |
+| RADesk | 16.8k | lobby counter 6.0 wide, top 3.0; RESIDENT ADVISER plate, sign-in book (invented names), bell, KEYS board with numbered tags |
+| VanityTable | 5.9k (Main 4.4k, Mirror 0.1k, Glow 1.4k) | ebonised, marble top 2.6; arched mirror (Mirror) ringed with twelve bulbs (Glow); a brush and a bottle |
+| MakeupSet | 7.3k | an open palette (MOTH & MIRROR lid, mirror inside), brushes in a cup, three lipsticks, a compact |
+| JewelryBox | 10.1k | open box 1.2 x 0.8, velvet lined, mirror in the lid; rings, necklaces over the front edge |
+| PerfumeTray | 2.7k (Main 1.8k, Glass 0.8k) | mirrored silver tray, three bottles with invented labels and an atomiser; Glass: the bottles (the scent is in Main) |
+| ShoeRack | 14.2k | three-tier iron rack 3.0 wide; heels on the top tiers, boots on the floor tier, one boot fallen |
+| FairyLights | 13.0k (Main 9.6k, Glow 3.4k) | a string of little bulbs (Glow) in swags from a brass hook; back at y = 0, the hook 3.0 above the pivot |
+| WeightBench | 4.1k | pad top 1.6, iron uprights, loaded barbell at 3.4 |
+| Dumbbells | 6.4k | A-frame rack 2.6 wide with six hex dumbbells, a pair on the floor |
+| GuitarStand | 6.3k | acoustic guitar (invented maker RAVENSWORTH) leaning on an iron stand, headstock about 4.5 |
+| TVConsole | 8.1k (Main 8.1k, Glow 0.1k) | slim flat screen (3.6 wide) in a carved dark-oak gothic frame with brass inlay and a crest, on iron feet, on a marble-topped media console (top 1.5); Glow: the screen (the invented game CRYPT CRAWLER is in its baked colour map) and the console's crimson light; an invented slim console, games and a black-and-crimson controller |
+| SneakerPile | 11.5k | five sneakers, invented designs (a quatrefoil on the side) |
+| DoorHoop | 2.7k | hooks over a door: backboard's back at y = 0, the hooks' top 5.7 above the pivot (raise it so they sit on the door top); a ball |
+| Urinal | 4.5k | wall-hung porcelain; pivot on the wall plane at floor level; lip 2.0, bowl top 3.4, push valve at 4.6, brass trap to the floor |
+| UrinalDivider | 1.2k | black marble screen 2.2 out from the wall, 1.2 to 4.4, brass brackets and a floor post; pivot on the wall plane at floor level |
+| UrinalTrough | 2.4k | floor-standing trough 6.0 wide on a marble step, lip 2.0, tiled splash-back to 5.7, perforated brass flush pipe; pivot at the back on the wall plane |
+
+![The kit](img/dormhouse-kit-contact.jpg)
+![The common room](img/dormhouse-common-room.jpg)
+![A girls' room](img/dormhouse-girls-corner.jpg)
+![A boys' room](img/dormhouse-boys-corner.jpg)
+![The boys' bathroom](img/dormhouse-boys-bathroom.jpg)
