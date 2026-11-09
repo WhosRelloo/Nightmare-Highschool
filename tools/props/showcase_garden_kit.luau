@@ -1,6 +1,6 @@
 --!nocheck
 -- Lines up the garden kit (batch 40) in workspace.NHPropsShowcase like the other kits: one "Garden" folder, three rows
--- (paths, plants, features) of "<Name>_Showcase" clones on the baseplate (top y = 0.9), each row in front of a dark slate
+-- (plants at the back, features, then the flat paths at the front) of "<Name>_Showcase" clones on the baseplate (top y = 0.9), each row in front of a dark slate
 -- backing wall on its north side with the props facing south (+Z). The rows sit east of the dorm/lounge/school rows in
 -- the free strip at the north end of the baseplate (x 20 .. 376, z -694 .. -454), 40 apart because the willow, gazebo
 -- and roundel are deep. Run again to rebuild.
@@ -13,14 +13,14 @@ local X0 = 24
 local XMAX = 376
 local GAP = 2.5
 local ROWS = { -- docs/School-Props.md order
-	{ "Paths", -690, [[PathFlagstone PathFlagstoneCurve PathFlagstoneJunction PathFlagstoneCross PathCobble PathCobbleCurve PathGravel
+	{ "Paths", -610, [[PathFlagstone PathFlagstoneCurve PathFlagstoneJunction PathFlagstoneCross PathCobble PathCobbleCurve PathGravel
 		PathGravelCurve PathHerringbone PathCrazyPaving PathPuddleFlag PathMoonRoundel SteppingStones GardenSteps PathEdgingIron
 		PathBridgeSlab PathGateArch]] },
-	{ "Plants", -650, [[RoseBushCrimson RoseBushBlack HedgeStraight HedgeBattlement HedgeCorner HedgeEnd HedgeArchway HedgeWolf
+	{ "Plants", -690, [[RoseBushCrimson RoseBushBlack HedgeStraight HedgeBattlement HedgeCorner HedgeEnd HedgeArchway HedgeWolf
 		HedgeRaven WeepingWillow YewTree GnarledCrabapple CypressPair IvyWallPanel WisteriaPergola FernCluster LavenderBed
 		RaisedFlowerBed MushroomRing MoonflowerPatch TallGrassClump ThornBramble NightshadeShrub PumpkinPatch PoppyBed LilyPads
 		BloodRoseUrn GhostOrchid]] },
-	{ "Features", -610, [[KoiPond BirdBath GardenBench CurvedStoneBench LogBench IronGazebo RoseArbor GardenObelisk UrnPedestal
+	{ "Features", -650, [[KoiPond BirdBath GardenBench CurvedStoneBench LogBench IronGazebo RoseArbor GardenObelisk UrnPedestal
 		LowGardenWall GardenWallPier StoneLanternPost Wheelbarrow GardenToolsLean PottingCluster ColdFrame TrellisPanel
 		KeepOffGrassSign Birdhouse Scarecrow CourtyardBenchTable CrowPerch]] },
 }
