@@ -1350,3 +1350,142 @@ Every piece is under 20k triangles. Every prop is baked at 2048.
 ![The courtyard at night](img/garden-courtyard-night.jpg)
 ![The overgrown corner](img/garden-overgrown-corner.jpg)
 ![The path pieces joined](img/garden-path-tiling.jpg)
+
+## Batch 43 (gym): the gymnasium and sports hall kit
+
+`art/props/nh_props_batch43.py`. The old gothic gymnasium of the Institution: Victorian and Edwardian apparatus with a dark academy twist, in the house look of batches 34-39 (cast iron, dark oak and ebony, crimson leather and enamel, brass and gilt, black marble, bone, hemp and canvas). The five houses (Crimson, Ravens, Rovers, Vigil, Wardens) and the Athletes' blue give the crests and colours. It has 33 props, each built around one signature idea, and none repeats the existing gym props (BallRack, Bleachers, GymMatStack, Hurdle, TackleDummy, FootballMachine, Scoreboard, VaultingHorse, WeightBench, Dumbbells, the lockers, TrophyShelf, TrophyCabinet). All names, mottoes and designs are invented.
+
+- **Printed atlas:** `art/props/gym_atlas.py` (system Python with PIL and numpy, on `dorm_atlas.py`'s Cell and Atlas) paints `GymPrint` (4096; colour, gilt and height). It is a bake source only, so it isn't uploaded. It holds:
+  - the five house shields on one outline, with invented mottoes: SANGUIS ET ROSA, NOX ALAS DAT, ULTRA TUMULUM, LUX IN TENEBRIS and FERRO CUSTODIMUS
+  - the Athletes' VARSITY pennant and the school crest
+  - a stopwatch dial (maker GRAVESEND & THORNE), the First Eleven team sheet and a chalked lap slate
+  - the HOUSE POINTS header and its digit tiles, the archery target face, and the SWEATBOX, FIRST AID and HOUSE KIT signs
+  - a thermometer scale, the fencing touch dial and the hook-rail name tags
+
+  Its regions and the shield outline are in `art/props/gym_atlas.json`.
+- **Run:** `E:/NH-Work/props43/`.
+  - `run43.py` runs nh_props without editing its import list (`--check` builds and counts tris; `--fast` previews without baking).
+  - `bake43.sh all|<Prop>` bakes at 2048 with 64 samples on the GPU. It holds a shared bake slot (`E:/NH-Work/bakeslots/slot1|slot2`).
+  - `sheet43.py`, `render43.py`, `upload43.py` and `names43.py` make the contact sheets, staged renders and upload folder.
+- **Files:**
+  - FBX in `art/props/fbx/gym-batch43/`
+  - maps in `art/props/textures/<Prop>_*.png` (2048)
+  - previews in `art/props/previews/`
+  - upload copies (all at 1024) in `art/group-upload/gym-batch43/`: 132 maps, 33 props × 4, with no metal map entirely black
+  - contact sheets and renders in `art/props/renders/gym-batch43/`
+- **Pieces:** each prop is one mesh named after it, except:
+  - `CursedTrophy_Main` + `CursedTrophy_Glow`
+  - `SaunaDoor_Main` + `SaunaDoor_Door0`
+  - `StopwatchStand_Main` + `StopwatchStand_Glass`
+- **Pivots:** bottom centre, front toward -Y. Wall pieces have their back on the wall plane (y = 0), with the pivot at their lowest point on that plane. Nothing goes below the pivot.
+- **The character rule:** no prop shows a figure or character (the cursed trophy is a cup), so the R6 rig rule didn't apply.
+
+### Template notes (NHBuildKit `Gym`)
+
+- **Kit name:** `Gym`. Every piece takes its own prop's four maps. No piece uses a shared map set.
+- **Collisions:**
+  - **Floor apparatus and furniture collide** on their precise shape: the horse, bars, beam, box, springboard, stands, trolley, racks, rowing machine, ring corner, target, bow rack, hamper, bench, cage, trophy, stopwatch, chair, sauna surround, wall bars, pulley and first-aid station.
+  - **The ceiling pieces** (ClimbingRopes, GymRings) collide on the beam only, so players can walk into the ropes and rings.
+  - **PunchingBag** collides on the bag and the wall plate.
+  - **BasketballHoop** collides on the uprights and the backboard (not the net).
+  - **These don't collide:** FencingPiste (flat; its end posts and scoring box could), BoxingGloves, Megaphone, IndianClubRack, FencingMaskRack, WhistleBoard and HousePointsBoard.
+- **Glow:** `CursedTrophy_Glow` is the curse leaking from under the lid and through cracks in the bowl, in a faint violet (about 150, 70, 255). Give it a small violet PointLight (range about 6, brightness about 0.6) above the cup. No other piece glows.
+- **Glass:** `StopwatchStand_Glass` is the crystal over the dial: clear Glass, about 0.6 transparency.
+- **Door:** `SaunaDoor_Door0` swings out on its left hinge (origin on the hinge line). Rig it like the other `Door0` pieces on the locker system (prompt "Sweatbox / Open").
+- **Lights:** only the trophy's violet glow. The gym is lit by the room's own lamps.
+
+### Showcase placement notes
+
+**Wall pieces** (back on the wall; the suggested bottom height is where the pivot goes on the showcase wall):
+
+| Prop | Bottom on the wall | Notes |
+|---|---|---|
+| WallBars | 0 (stands on the floor) | 6.97 wide, 10.9 tall |
+| WallPulley | 0 (stands on the floor) | 8.6 tall |
+| LockerBench | 0 (stands on the floor) | hooks at 5.0 |
+| SaunaDoor | 0 (stands on the floor) | doorway 3.4 × 7.2 |
+| FirstAidStation | 0 (stands on the floor) | 8.1 tall |
+| BasketballHoop | 0 (its iron uprights stand on the floor) | rim at 10.0, 13.3 tall |
+| PunchingBag | 0 (the bag hangs clear) | the wall plate is at 7.8-10.6, the bag's bottom at 3.4 |
+| IndianClubRack | 3.0 | 5.3 tall |
+| FencingMaskRack | 3.2 | 3.75 tall |
+| WhistleBoard | 3.0 | 4.9 tall |
+| HousePointsBoard | 3.2 | 7.6 tall |
+
+**Ceiling pieces:** ClimbingRopes and GymRings hang from a beam. Their pivot is at floor level, under the middle of the beam.
+- **Heights:**
+  - ClimbingRopes: beam bottom 19.0, top 20.3, ceiling plates' top 22.4; the ropes end 0.3 above the floor.
+  - GymRings: beam bottom 18.0, top 19.3, ceiling plates' top 21.3; the rings' bottoms at 7.4.
+- **In a room with a ceiling at height C:** place the pivot at C - 22.4 (ropes) or C - 21.3 (rings), and the plates meet the ceiling. The ropes stop short of the floor if C is below 22.4.
+- **On the showcase:** stand them on the floor (pivot at 0).
+
+**Small pieces for a plinth:** BoxingGloves (1.7 × 1.6, 0.8 tall) and Megaphone (2.1 long, 1.3 tall). CursedTrophy brings its own marble plinth.
+
+### Props
+
+Every piece is under 20k triangles. Every prop is baked at 2048.
+
+**Apparatus**
+
+| Prop | Tris | Collides | Notes |
+|---|---|---|---|
+| ClimbingRopes | 19.7k | beam only | ceiling piece: three thick hemp ropes on brass swivel shackles from a heavy riveted iron I-beam on pierced lancet hangers; long crimson leather whippings bound in brass, knotted and frayed ends; the middle rope knotted for climbing; a brass bell under the beam to ring at the top; 9.0 wide, 22.4 tall |
+| GymRings | 15.5k | beam only | ceiling piece: two thick ash rings wrapped in crimson leather with brass bands, on broad stitched leather straps studded in brass with big buckles, from swivels under a short heavy beam; 4.2 wide, 21.3 tall |
+| WallBars | 12.3k | yes | wall piece: two bays of ash rungs between dark oak posts, the top rung swept forward on iron arms, pointed oak tracery arches over the bays with brass quatrefoils, the school crest in the spandrel; 6.97 x 1.09 x 10.9 |
+| PommelHorse | 7.0k | yes | stitched leather body (top 3.8) with bentwood oak pommels, brass end caps with the Crimson and Ravens shields, on two turned cast-iron columns with brass height wheels over soles on wolf-paw feet; 5.1 long |
+| ParallelBars | 11.2k | yes | two oval oak rails (tops 4.3), 8.4 long, on iron uprights with brass collars and T-screws, cast-iron soles with gothic gussets and quatrefoil ties, castors |
+| BalanceBeam | 8.3k | yes | the house beam: an 11-long suede-topped oak beam (top 4.0) whose ends are carved raven heads with gilt eyes, the five house shields along its front under a brass distance rule, on iron A-trestles pierced with brass-lined lancets and raven-wing brackets; 13.2 long overall |
+| VaultingBox | 8.2k | yes | five tapering oak tiers, each banded in a house colour and numbered I-V in gilt, oval hand slots, iron corners, a buttoned leather top at 4.05, castor levers at the ends; 5.0 x 2.6 at the foot |
+| Springboard | 8.3k | yes | a curved oak board in ribbed crimson felt rising from 0.25 (front, -Y) to 1.05, on four iron coil springs and an oak sledge, THORNE PATENT plate on the nose; 2.0 x 3.7 |
+| HighJumpStands | 6.2k | yes | two stout iron posts 8 apart on heavy bases weighted with stacked iron discs, brass height scales, brass peg carriers with thumb screws, a thick ash bar banded crimson at 4.3; 9.7 wide, 7.65 tall |
+| MatTrolley | 13.7k | yes | an iron cradle on castors with pointed-arch ends and a push bar, three rolled leather mats (crimson, ink, crimson) with spiral ends and buckled straps; 5.1 x 2.3 x 3.4 |
+
+**Fitness and boxing**
+
+| Prop | Tris | Collides | Notes |
+|---|---|---|---|
+| MedicineBallRack | 12.6k | yes | a three-tier stepped oak rack of seven stitched leather medicine balls with brass tags, a pointed back board with the Wardens' shield, a WEIGHTS plate; 4.5 x 2.5 x 4.5 |
+| IndianClubRack | 7.1k | no | wall piece: a pointed oak board with the Athletes' VARSITY pennant, three crossed pairs of ebonised Indian clubs banded in house colours and gilt, brass pegs, a chalk shelf; 3.6 wide, 5.3 tall |
+| RowingMachine | 4.8k | yes | an oak monorail on iron feet, a crimson leather sliding seat on brass rails, a raked foot stretcher with leather shoes, two iron oar levers on outriggers working brass dashpots, oak handles, a stroke-counter dial; 7.5 x 3.3 x 2.5 |
+| WallPulley | 6.2k | yes | wall piece: a cast-iron cabinet like a lancet window (2.5 wide, 8.6 tall), the iron weight stack on steel guides behind a grille of bars, a brass pulley, hemp cord to two oak handles at about 2.6, the Wardens' shield on the hood |
+| PunchingBag | 8.5k | bag and plate | wall piece: a scrolled iron gallows bracket (arm at 10.2, 3 out from the wall), swivel, chain and four short chains to a heavy leather bag (3.4 to 7.15) with crimson bands and the Crimson shield, laced seam at the back |
+| BoxingRingCorner | 5.8k | yes | a 5 x 5 block of raised canvas ring floor (top 1.4) with a crimson skirt; the corner post at the front left with a buttoned crimson pad bearing the Crimson shield; three crimson-wrapped ropes on brass turnbuckles run off to +X and +Y (where the ring continues), spacer straps, a towel on the top rope; a corner stool and a bucket with a sponge on the floor in front |
+| BoxingGloves | 4.3k | no | plinth piece: a pair of crimson leather gloves laced together with bone laces and brass eyelets, lying on their sides; 1.7 x 1.6 x 0.8 |
+
+**Fencing and archery**
+
+| Prop | Tris | Collides | Notes |
+|---|---|---|---|
+| FencingPiste | 6.8k | no | a raised piste 18 x 2.6 (top 0.3) along X: dark oak boards on a crimson plinth, inlaid brass lines (centre, on guard, end), crimson warning zones, brass edging; brass-capped iron on-guard blocks at the sides; a squat cast-iron end post at each end with a house shield and a brass cord reel; an iron scoring box on legs behind the middle (+Y) with two touch dials, crimson and green lamps; 20.2 overall |
+| FencingMaskRack | 13.0k | no | wall piece: a battlemented dark oak board, four fencing masks on iron hooks (mesh faces, white padded rims and bibs with house-coloured trims), two crossed foils above, a SALLE D'ARMES plate; 4.6 wide, 3.75 tall |
+| ArcheryTarget | 4.6k | yes | a coiled straw boss with a painted face in the house colours (a raven in the gold), bound in cord, leaning back 15° on an oak tripod easel with brass pegs; three arrows in the face, one in a leg; 5.35 tall |
+| BowRack | 9.5k | yes | an oak rack of four strung longbows with leather grips and horn nocks, a top rail ending in carved raven heads, a leather quiver of fletched arrows on the right post, an ARCHERY SOCIETY plate; 5.2 x 1.2 x 5.9 |
+
+**House and team**
+
+| Prop | Tris | Collides | Notes |
+|---|---|---|---|
+| KitHamper | 6.9k | yes | a wicker kit hamper 3.6 x 2.2 x 2.0, its lid thrown back on a check strap; leather straps, brass buckles, the HOUSE KIT label; house jerseys heaped inside, a Ravens sleeve over the rim, a striped crimson scarf, a football |
+| WhistleBoard | 4.2k | no | wall piece: the coach's pointed oak board, a brass COACH plate, the First Eleven team sheet pinned up, a framed slate of laps in chalk, a brass whistle on a crimson lanyard, a stopwatch on a hook, a chalk ledge; 3.2 wide, 4.9 tall |
+| HousePointsBoard | 4.8k | no | wall piece: an ebonised gothic board between crocketed pinnacles, the gilt HOUSE POINTS header, the five house shields and the term's points on hanging enamel digit tiles (Crimson 412, Ravens 389, Rovers 251, Vigil 407, Wardens 298), a box of spare tiles; 8.1 wide, 7.6 tall |
+| CursedTrophy | 14.6k (Main 13.9k, Glow 0.7k) | yes | the Thorne Cup on its black marble plinth (top 3.4) with gilt columns and a plaque (THE THORNE CUP, never won twice): a tarnished silver cup with bat-wing handles and a bone skull on its lid, bound in an iron chain with a padlock; Glow: violet light under the lid and through cracks in the bowl; 5.9 tall |
+| LockerBench | 9.1k | yes | wall piece: a slatted oak bench 8 long (seat 1.6) on three cast-iron frames with pointed arches and a shoe rack, a panelled back with a rail of iron double hooks (5.0) and the house name tags, a towel and a Ravens no. 7 jersey hung up, a canvas kit bag under the seat |
+| Megaphone | 2.1k | no | plinth piece: a coach's megaphone in the Athletes' blue enamel with a brass bell rim, mouthpiece, handle and gilt bands, lying on its side; 2.1 long |
+
+**Facilities**
+
+| Prop | Tris | Collides | Notes |
+|---|---|---|---|
+| SaunaDoor | 6.1k (Main 3.1k, Door0 3.0k) | surround yes | wall piece: the sweatbox, a limestone gothic doorway 5.8 wide and 9.8 tall, an enamel SWEATBOX sign; Door0: a heavy oak plank door with iron strap hinges, a steamed porthole in a brass ring and a ring pull (hinge on the left, opens out); a thermometer on the left jamb, a copper steam pipe with a valve and gauge on the right, an oak bucket and ladle at the foot |
+| EquipmentCage | 17.5k | yes | an iron mesh cage 5 x 2.4 x 7 with a crested front and spear finials, its right-hand door padlocked, an EQUIPMENT plate; oak shelves inside with leather balls and footballs, cricket bats and hockey sticks |
+| FirstAidStation | 3.4k | yes | wall piece: a canvas stretcher on oak poles stood on end on iron wall brackets, a crimson enamel cabinet (bottom 2.8) with the FIRST AID sign (the Matron is in the east wing), a rolled blanket on top, a brass bell-pull; 5.3 wide, 8.1 tall |
+| StopwatchStand | 5.1k (Main 5.0k, Glass 0.2k) | yes | the race clock: a giant brass stopwatch (dial 1.6 across) with a bow, crown and pushers on a fluted cast-iron column on an octagonal base, a last-lap bell on a bracket; Glass: the crystal; 7.6 tall |
+| RefereeChair | 2.6k | yes | an umpire's chair: a splayed oak tower with a ladder up its front, iron cross braces, a brass footrest, a crimson leather seat (5.6) and back, a pointed back with the school crest, a crimson flag in a brass socket; 9.3 tall |
+| BasketballHoop | 9.5k | uprights and board | wall piece: two flat iron uprights pinned to the wall from the floor, riveted truss arms with brass quatrefoils, an oak backboard (9.6 to 13.2) with a crimson square and the school crest, an iron rim at 10.0 (3.0 out from the wall plus the rim) and a corded net |
+
+![Apparatus](img/gym-apparatus-contact.jpg)
+![Fitness and fencing](img/gym-fitness-fencing-contact.jpg)
+![House and facilities](img/gym-house-facilities-contact.jpg)
+![The gymnasium](img/gym-hall.jpg)
+![Fitness and fencing](img/gym-fitness.jpg)
+![The changing room and the trophy](img/gym-changing.jpg)
