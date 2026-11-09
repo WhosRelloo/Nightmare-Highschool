@@ -1,0 +1,164 @@
+{
+ "leaves": {
+  "ivy": {
+   "uv": [
+    0.0,
+    0.75,
+    0.25,
+    1.0
+   ],
+   "anchor": "fill",
+   "index": 0
+  },
+  "hedge": {
+   "uv": [
+    0.25,
+    0.75,
+    0.5,
+    1.0
+   ],
+   "anchor": "fill",
+   "index": 1
+  },
+  "yew": {
+   "uv": [
+    0.5,
+    0.75,
+    0.75,
+    1.0
+   ],
+   "anchor": "base",
+   "index": 2
+  },
+  "willow": {
+   "uv": [
+    0.75,
+    0.75,
+    1.0,
+    1.0
+   ],
+   "anchor": "top",
+   "index": 3
+  },
+  "rose_crimson": {
+   "uv": [
+    0.0,
+    0.5,
+    0.25,
+    0.75
+   ],
+   "anchor": "fill",
+   "index": 4
+  },
+  "rose_leaves": {
+   "uv": [
+    0.25,
+    0.5,
+    0.5,
+    0.75
+   ],
+   "anchor": "fill",
+   "index": 5
+  },
+  "wisteria": {
+   "uv": [
+    0.5,
+    0.5,
+    0.75,
+    0.75
+   ],
+   "anchor": "top",
+   "index": 6
+  },
+  "fern": {
+   "uv": [
+    0.75,
+    0.5,
+    1.0,
+    0.75
+   ],
+   "anchor": "base",
+   "index": 7
+  },
+  "lavender": {
+   "uv": [
+    0.0,
+    0.25,
+    0.25,
+    0.5
+   ],
+   "anchor": "base",
+   "index": 8
+  },
+  "grass": {
+   "uv": [
+    0.25,
+    0.25,
+    0.5,
+    0.5
+   ],
+   "anchor": "base",
+   "index": 9
+  },
+  "bramble": {
+   "uv": [
+    0.5,
+    0.25,
+    0.75,
+    0.5
+   ],
+   "anchor": "fill",
+   "index": 10
+  },
+  "crabapple": {
+   "uv": [
+    0.75,
+    0.25,
+    1.0,
+    0.5
+   ],
+   "anchor": "fill",
+   "index": 11
+  },
+  "nightshade": {
+   "uv": [
+    0.0,
+    0.0,
+    0.25,
+    0.25
+   ],
+   "anchor": "fill",
+   "index": 12
+  },
+  "poppy": {
+   "uv": [
+    0.25,
+    0.0,
+    0.5,
+    0.25
+   ],
+   "anchor": "base",
+   "index": 13
+  },
+  "moonflower": {
+   "uv": [
+    0.5,
+    0.0,
+    0.75,
+    0.25
+   ],
+   "anchor": "fill",
+   "index": 14
+  },
+  "twigs": {
+   "uv": [
+    0.75,
+    0.0,
+    1.0,
+    0.25
+   ],
+   "anchor": "base",
+   "index": 15
+  }
+ }
+}

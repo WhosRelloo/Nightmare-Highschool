@@ -232,12 +232,15 @@ ALBEDO = 0.88    # every colour map a touch darker, to sit at the props' brightn
 GRUNGE = {"BloodMarble": 0.35, "StainedGlass": 0.45, "CrimsonVelvet": 0.4, "SnowGround": 0.25, "DamaskWallpaper": 0.75,
           "CheckerMarble": 0.8, "QuatrefoilTile": 0.85, "DirtyTile": 1.4, "Concrete": 1.3, "DarkPlaster": 1.2,
           "PaintedMetal": 1.2, "OldBoards": 1.3, "Cobblestone": 1.2, "GothicStone": 1.2, "MossyFlagstone": 1.1, "MoonlitGrass": 0.3,
-          "SchoolLawn": 0.25, "OvergrownGrass": 0.3, "DeadGrass": 0.4, "MossyTurf": 0.35, "TroddenGrass": 0.6, "FrostGrass": 0.2}
+          "SchoolLawn": 0.25, "OvergrownGrass": 0.3, "DeadGrass": 0.4, "MossyTurf": 0.35, "TroddenGrass": 0.6, "FrostGrass": 0.2,
+          "GardenGravel": 0.5, "HerringboneBrick": 0.45, "MossyPaving": 0.8, "CrazyPaving": 0.75, "GardenCobble": 0.8}
 
 
-def write(name, color, height, rough, metal, strength, rng=None, cavity=0.6):
+def write(name, color, height, rough, metal, strength, rng=None, cavity=0.6, sym=False):
     rng = rng or np.random.default_rng(len(name))
     color, height, rough = finish(color, height, rough, rng, cavity, grunge=GRUNGE.get(name, 1.0))
+    if sym:     # the garden path sets: the same under a quarter turn, so path pieces join seamlessly however they are turned
+        color, height, rough = p4(color), p4(height), p4(rough)
     nrm = normal_from(height, strength)
     maps = {"color": color, "normal": nrm, "rough": rough, "metal": metal}
     # the 2048 masters (local only: rebuilt by this script) and the 1024 game copies (Roblox caps images at 1024)
@@ -978,11 +981,256 @@ def FrostGrass(rng):
     return grass(rng, "FrostGrass", [(0.08, 0.15, 0.1), (0.1, 0.17, 0.12), (0.12, 0.18, 0.11)], STRAW, dead=0.06,
                  dead_patch=0.5, frost=0.85, leaves=40, leaf_pal=[(0.25, 0.03, 0.05), (0.2, 0.08, 0.16)], strength=5)
 
+
+# ---------- the garden path sets (props batch 40) ----------
+# Long garden walks as MaterialVariants (and the tiled faces of the batch-40 gravel, cobble and herringbone path pieces, at 10
+# studs a tile). Hand-laid irregularity: nothing is on a visible grid except where the pattern is a laid pattern.
+
+def p4(a):
+    """The average of a map over its four quarter turns (kept for write(sym=True); the garden sets no longer use it)."""
+    return (a + np.rot90(a, 1) + np.rot90(a, 2) + np.rot90(a, 3)) * 0.25
+
+
+def _petals(rng, n, col, h, rough, size=(5, 9)):
+    """Scatter fallen petals (small curled ovals, wrapped) over colour, height and roughness maps, in drifts."""
+    drift = fbm(rng, 4, 4, 3)
+    placed = 0
+    while placed < n:
+        x, y = rng.random() * N, rng.random() * N
+        if drift[int(y) % N, int(x) % N] < 0.52 and rng.random() < 0.8:
+            continue
+        placed += 1
+        a = rng.random() * math.pi
+        L, W = rng.uniform(*size), rng.uniform(size[0] * 0.5, size[0] * 0.8)
+        r = int(L + 2)
+        ys, xs = np.mgrid[-r:r + 1, -r:r + 1].astype(np.float32)
+        u = xs * math.cos(a) + ys * math.sin(a)
+        v = -xs * math.sin(a) + ys * math.cos(a)
+        d = (u / L) ** 2 + (v / W) ** 2
+        m = np.clip((1 - d) * 3, 0, 1)
+        if not m.any():
+            continue
+        rows = (np.arange(-r, r + 1) + int(y)) % N
+        cols = (np.arange(-r, r + 1) + int(x)) % N
+        pc = np.array(col, np.float32) * rng.uniform(0.7, 1.15)
+        edge = np.clip(d, 0, 1)[..., None]
+        cc = pc * (1 - edge * 0.45)
+        blk = np.ix_(rows, cols)
+        COL[blk] = COL[blk] * (1 - m[..., None]) + cc * m[..., None]
+        H[blk] = np.maximum(H[blk], m * 0.06 + H[blk] * (1 - m) + (1 - d.clip(0, 1)) * 0.02 * m)
+        RG[blk] = RG[blk] * (1 - m) + 0.55 * m
+
+
+def GardenGravel(rng):
+    """Crushed slate for the garden walks: angular chips of blue-black and grey-green slate, a few rust-stained and pale ones,
+    in dark grit, with fallen crimson-black rose petals blown into drifts. 10 studs a tile."""
+    global COL, H, RG
+    f1, f2, ids = voronoi(rng, 70, jitter=1.0)
+    f1b, f2b, idsb = voronoi(rng, 140, jitter=1.0)
+    e = f2 - f1
+    # angular chips: flat-topped facets, a tilt per chip, sharp edges
+    tilt = (cellrand(rng, 4900, ids) - 0.5) * 2
+    tilt2 = (cellrand(rng, 4900, ids * 3 + 1) - 0.5) * 2
+    X, Y = U * 70, V * 70
+    facet = 0.6 + 0.25 * (tilt * (X % 1.0 - 0.5) + tilt2 * (Y % 1.0 - 0.5))
+    chip = smooth(0.02, 0.09, e)
+    small = smooth(0.02, 0.08, f2b - f1b) * (cellrand(rng, 19600, idsb) > 0.6)
+    pick = cellrand(rng, 4900, ids * 7 + 3)
+    base = np.where((pick < 0.4)[..., None], rgb(0.2, 0.21, 0.25)[None, None, :],
+                    np.where((pick < 0.72)[..., None], rgb(0.27, 0.3, 0.28)[None, None, :],
+                             np.where((pick < 0.9)[..., None], rgb(0.42, 0.42, 0.43)[None, None, :], rgb(0.4, 0.27, 0.18)[None, None, :])))
+    lay = np.sin((U * 3.0 + V * 1.7) * math.pi * 90 + tilt[..., None][..., 0] * 3) * 0.5 + 0.5
+    col = base * (0.85 + 0.25 * facet[..., None] + 0.08 * lay[..., None])
+    grit = tint(rgb(0.07, 0.065, 0.06), (fbm(rng, 128, 128, 3) - 0.5) * 0.7)
+    col = mix(grit, col, np.clip(chip + small * 0.7, 0, 1))
+    h = chip * facet * 0.8 + small * 0.3
+    rough = np.clip(0.55 - facet * 0.15 + (1 - chip) * 0.35, 0, 1)
+    COL, H, RG = col, h, rough
+    _petals(rng, 150, (0.3, 0.02, 0.04), H, RG, size=(14, 24))
+    _petals(rng, 70, (0.06, 0.012, 0.025), H, RG, size=(14, 22))
+    return write("GardenGravel", COL, H, RG, np.zeros_like(H), 5, rng, cavity=0.7)
+
+
+def herringbone(n, mortar):
+    """Bricks 2 x 1 in a 90-degree herringbone on a grid turned 45 degrees, n (even) bricks' widths along each diagonal.
+    Returns inside (0..1, 0 in the joints), a brick id (wrapped with the tile) and the brick-local (along, across) 0..1."""
+    a = (U + V) * n
+    b = (V - U) * n
+    i, j = np.floor(a), np.floor(b)
+    fa, fb = a - i, b - j
+    k = (i - j) % 4
+    horiz = k < 2
+    x0 = i - k
+    y0 = np.where(k == 2, j - 1, j)
+    al = np.where(horiz, (a - x0) / 2, (b - y0) / 2)
+    ac = np.where(horiz, fb, fa)
+    mx, my = mortar / 2, mortar
+    inside = smooth(0, mx, al) * smooth(1, 1 - mx, al) * smooth(0, my, ac) * smooth(1, 1 - my, ac)
+    bx, by = np.where(horiz, x0, i), np.where(horiz, j, y0)
+    m2 = 2 * n
+    bid = ((np.mod(bx + by, m2) * m2 + np.mod(bx - by, m2)) * 2 + horiz).astype(np.int64)
+    return inside, bid, al, ac
+
+
+def HerringboneBrick(rng):
+    """Aged crimson garden brick in a 45-degree herringbone, soot-blackened bricks mixed in, white efflorescence blooming at
+    some joints, worn soft arrises, moss in the joints. Even tone overall (no blotches to repeat). 10 studs a tile."""
+    inside, bid, al, ac = herringbone(18, 0.13)
+    e = (fbm(rng, 48, 48, 3) - 0.5) * 0.1
+    inside = smooth(0.2, 0.6, inside + e)
+    hb = (bid * 2654435761 + 12345) % 1048573          # scramble the ids, so neighbouring bricks don't fall into runs
+    r = cellrand(rng, 1048573, hb)
+    r2 = cellrand(rng, 1048573, (hb * 7 + 3) % 1048573)
+    face = fbm(rng, 40, 40, 5)
+    crimson = rgb(0.36, 0.09, 0.07)
+    soot = rgb(0.07, 0.045, 0.045)
+    col = crimson[None, None, :] * (1 + (r[..., None] - 0.5) * 0.25 + (face[..., None] - 0.5) * 0.35)
+    sooty = smooth(0.84, 0.9, r)                                  # one brick in seven blackened, its soot fading at an end
+    sfade = np.clip(sooty * (0.55 + 0.45 * np.where(r2 > 0.5, al, 1 - al)), 0, 1)
+    col = mix(col, soot * (0.8 + 0.4 * face[..., None]), sfade * 0.9)
+    rim = inside * (1 - smooth(0.3, 0.9, inside))
+    col = mix(col, rgb(0.46, 0.2, 0.15), rim * 0.35)
+    moss_n = warped(rng, 14, 0.6, 5)
+    joint = tint(rgb(0.3, 0.28, 0.24), (fbm(rng, 64, 64, 3) - 0.5) * 0.4)
+    joint = mix(joint, tint(rgb(0.13, 0.19, 0.06), (moss_n - 0.5) * 0.6), smooth(0.5, 0.68, moss_n))
+    col = mix(joint, col, inside)
+    efflo = smooth(0.7, 0.85, warped(rng, 8, 0.7, 5)) * (1 - smooth(0.2, 0.9, inside)) * 0.8 + \
+        smooth(0.78, 0.9, warped(rng, 10, 0.6, 5)) * rim * 0.6
+    col = mix(col, rgb(0.62, 0.6, 0.56), np.clip(efflo, 0, 1) * 0.7)
+    h = inside * (0.72 + face * 0.28)
+    rough = np.clip(0.72 + (face - 0.5) * 0.15 + (1 - inside) * 0.18 + efflo * 0.1 - sooty * 0.06, 0, 1)
+    return write("HerringboneBrick", col, h, rough, np.zeros_like(h), 8, rng)
+
+
+def MossyPaving(rng):
+    """Hand-cut limestone flags of every size and shape, laid by eye (no grid): irregular quadrilaterals and pentagons with
+    worn, rounded arrises and broken corners, a few cracked, deep moss and soil in the joints, lichen rosettes on the faces,
+    the odd worn carved mark. 10 studs a tile."""
+    f1, f2, ids = voronoi(rng, 6, jitter=0.85)
+    wob = (warped(rng, 22, 0.5, 4) - 0.5) * 0.09
+    e = f2 - f1 + wob
+    inside = smooth(0.04, 0.1, e)
+    arris = smooth(0.04, 0.32, e)
+    r = cellrand(rng, 64, ids)
+    face = warped(rng, 16, 0.4, 7)
+    col = tint(rgb(0.45, 0.43, 0.38), (r - 0.5) * 0.35 + (face - 0.5) * 0.45)
+    col = mix(col, rgb(0.52, 0.46, 0.36), smooth(0.65, 0.9, cellrand(rng, 64, ids * 5 + 1)) * 0.4)
+    # cracks through a few flags
+    cf1, cf2, cids = voronoi(rng, 13, jitter=1.0)
+    crack = (1 - smooth(0.0, 0.02, cf2 - cf1)) * (cellrand(rng, 64, ids * 9 + 4) > 0.7) * inside
+    moss_n = warped(rng, 18, 0.6, 5)
+    moss = np.clip((1 - smooth(0.03, 0.3, e)) * smooth(0.35, 0.62, moss_n) + (1 - inside) * smooth(0.25, 0.55, moss_n) + crack * 0.6, 0, 1)
+    moss_col = tint(rgb(0.12, 0.18, 0.055), (moss_n - 0.5) * 0.7 + (fbm(rng, 220, 220, 2) - 0.5) * 0.5)
+    soil = tint(rgb(0.08, 0.07, 0.055), (face - 0.5) * 0.4)
+    col = mix(col, soil, (1 - inside) * 0.85)
+    col = mix(col, rgb(0.1, 0.09, 0.08), crack * 0.8)
+    col = mix(col, moss_col, moss * 0.85)
+    # lichen rosettes: pale grey-green and ochre rings
+    lf1, lf2, lids = voronoi(rng, 40, jitter=1.0)
+    lsel = cellrand(rng, 1600, lids) > 0.86
+    ring = smooth(0.32, 0.22, lf1) * lsel * inside
+    lc = np.where((cellrand(rng, 1600, lids * 3) > 0.5)[..., None], rgb(0.6, 0.6, 0.48)[None, None, :], rgb(0.55, 0.45, 0.2)[None, None, :])
+    col = mix(col, lc, ring * (0.6 + 0.3 * smooth(0.2, 0.3, lf1)))
+    h = inside * (0.7 + arris * 0.12 + face * 0.18) - crack * 0.15 + moss * 0.05 + ring * 0.01
+    rough = np.clip(0.72 + (face - 0.5) * 0.2 + moss * 0.15 - arris * 0.05, 0, 1)
+    return write("MossyPaving", col, h, rough, np.zeros_like(h), 6, rng)
+
+
+def CrazyPaving(rng):
+    """Crazy paving: broken flags of slate (with its layered cleaves), limestone and rust sandstone in all sizes, small
+    spalls packed between the big ones, wide mossy joints. 10 studs a tile."""
+    f1, f2, ids = voronoi(rng, 9, jitter=1.0)
+    g1, g2, gids = voronoi(rng, 23, jitter=1.0)
+    wob = (warped(rng, 24, 0.5, 4) - 0.5) * 0.1
+    big = cellrand(rng, 81, ids) > 0.35
+    e = np.where(big, f2 - f1, (g2 - g1) * 0.55) + wob
+    cid = np.where(big, ids, gids + 1000)
+    inside = smooth(0.045, 0.1, e)
+    arris = smooth(0.045, 0.3, e)
+    pick = cellrand(rng, 2000, cid)
+    tone = (cellrand(rng, 2000, cid * 3 + 1) - 0.5) * 0.4
+    face = warped(rng, 14, 0.45, 7)
+    ang = cellrand(rng, 2000, cid * 7 + 2) * math.pi
+    lay = np.sin((U * np.cos(ang) + V * np.sin(ang)) * math.pi * 60 + face * 4) * 0.5 + 0.5
+    step = np.floor(lay * 3) / 3
+    slate = tint(rgb(0.19, 0.21, 0.24), tone + (face - 0.5) * 0.3 + (step - 0.5) * 0.18)
+    lime = tint(rgb(0.46, 0.44, 0.39), tone + (face - 0.5) * 0.45)
+    sand = tint(rgb(0.42, 0.25, 0.17), tone + (face - 0.5) * 0.4)
+    isl = (pick >= 0.45) & (pick < 0.85)
+    col = np.where((pick < 0.45)[..., None], lime, np.where(isl[..., None], slate, sand))
+    moss_n = warped(rng, 16, 0.6, 5)
+    moss = np.clip((1 - inside) * 0.9 + (1 - smooth(0.045, 0.22, e)) * smooth(0.35, 0.6, moss_n) * 0.8, 0, 1)
+    moss_col = tint(rgb(0.13, 0.19, 0.06), (moss_n - 0.5) * 0.7 + (fbm(rng, 180, 180, 2) - 0.5) * 0.45)
+    soil = tint(rgb(0.08, 0.07, 0.055), (face - 0.5) * 0.4)
+    col = mix(col, soil, (1 - inside) * 0.75)
+    col = mix(col, moss_col, moss * 0.85)
+    h = inside * (0.72 + arris * 0.1 + face * 0.14 + step * 0.06 * isl) + moss * 0.06
+    rough = np.clip(0.66 + (face - 0.5) * 0.25 + moss * 0.18 - isl * 0.1, 0, 1)
+    return write("CrazyPaving", col, h, rough, np.zeros_like(h), 6, rng)
+
+
+def GardenCobble(rng):
+    """Fan-laid granite cobbles: overlapping fans (scales) of cobbles laid in arcs, the old way, domed and polished, a few warm
+    and pale stones, moss and grit between. The fans open toward +V (along a path). 10 studs a tile (fans 2.5 wide)."""
+    F = 4                    # fans across the tile
+    R = 1.0 / F              # fan radius (UV) = its spacing
+    col_ = np.zeros((N, N, 3), np.float32)
+    best = np.full((N, N), -1e9, np.float32)
+    fid = np.zeros((N, N), np.int64)
+    rr = np.zeros((N, N), np.float32)
+    th = np.zeros((N, N), np.float32)
+    rows = int(round(1.0 / (R * 0.5)))           # rows of fans, half a radius apart
+    for j in range(rows):
+        for i in range(F):
+            cx = (i + 0.5 * (j % 2)) * R * 1.0 + 0.0
+            cy = j * R * 0.5
+            for ox in (-1, 0, 1):
+                for oy in (-1, 0, 1):
+                    dx = U - (cx + ox)
+                    dy = (cy + oy) - V                # the fan opens upward from its centre (toward smaller V on the image)
+                    d = np.hypot(dx, dy)
+                    inside = (d < R * 1.02) & (dy > -0.002)
+                    # later rows (larger j) are laid over earlier ones
+                    pri = np.where(inside, j + (oy * rows), -1e9)
+                    take = pri > best
+                    best = np.where(take, pri, best)
+                    fid = np.where(take, j * F + i, fid)
+                    rr = np.where(take, d / R, rr)
+                    th = np.where(take, np.arctan2(dy, dx), th)
+    ring = np.floor(rr * 4.0)
+    fr = rr * 4.0 - ring
+    nseg = np.maximum(2, np.round((ring + 0.5) * 3.0))
+    ta = th / math.pi * nseg
+    seg = np.floor(ta)
+    ft = ta - seg
+    cid = ((fid * 37 + ring.astype(np.int64) * 11 + seg.astype(np.int64)) & 0xFFFF)
+    inside = smooth(0.0, 0.14, fr) * smooth(1.0, 0.86, fr) * smooth(0.0, 0.12, ft) * smooth(1.0, 0.88, ft)
+    wob = (fbm(rng, 96, 96, 3) - 0.5) * 0.25
+    inside = smooth(0.15, 0.6, inside + wob)
+    dome = np.sqrt(np.clip(inside, 0, 1))
+    tab = rng.random(1 << 16).astype(np.float32)
+    pick = tab[cid]
+    tone = (tab[(cid * 7 + 3) & 0xFFFF] - 0.5) * 0.45
+    face = fbm(rng, 48, 48, 4)
+    base = np.where((pick > 0.85)[..., None], rgb(0.46, 0.39, 0.33)[None, None, :], rgb(0.33, 0.33, 0.35)[None, None, :])
+    base = np.where((pick < 0.07)[..., None], rgb(0.54, 0.53, 0.5)[None, None, :], base)
+    ringtone = np.where((ring % 2) == 0, 1.08, 0.86)               # alternate courses lighter and darker: the fans read
+    col = base * (1 + tone[..., None] + (face[..., None] - 0.5) * 0.3) * ringtone[..., None]
+    col = col * (0.72 + 0.42 * dome[..., None])
+    moss_n = warped(rng, 14, 0.6, 5)
+    gap = 1 - smooth(0.05, 0.3, inside)
+    gap_col = mix(tint(rgb(0.05, 0.045, 0.04), (face - 0.5) * 0.5), tint(rgb(0.1, 0.15, 0.05), (moss_n - 0.5) * 0.6), smooth(0.4, 0.65, moss_n))
+    col = mix(col, gap_col, gap)
+    h = dome * 0.85 + face * 0.1
+    rough = np.clip(0.55 + (face - 0.5) * 0.25 + gap * 0.35 - dome * 0.12, 0, 1)
+    return write("GardenCobble", col, h, rough, np.zeros_like(h), 7, rng)
+
+
 SETS = [ParquetWood, FloorPlanks, RedBrick, StoneBlock, Cobblestone, HexTile, Pavers, Concrete,
         PaintedMetal, DirtyTile, DarkPlaster, CheckerMarble, OldBoards, SnowGround,
         DamaskWallpaper, CrimsonVelvet, GothicStone, WroughtIron, StainedGlass, BloodMarble, GothicOakPanel,
         RuneSlate, MossyFlagstone, QuatrefoilTile, MoonlitGrass, SchoolLawn, OvergrownGrass, DeadGrass, MossyTurf,
-        TroddenGrass, FrostGrass]
+        TroddenGrass, FrostGrass, GardenGravel, HerringboneBrick, MossyPaving, CrazyPaving, GardenCobble]
 
 
 def sheet(colors):

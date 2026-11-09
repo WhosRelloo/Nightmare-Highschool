@@ -1220,6 +1220,9 @@ OPEN_DEG = {}      # piece -> how far it opens in the _open preview (default 105
 TILED = {}         # piece -> (seamless set in art/props/textures, studs per tile): not baked; world-scaled UVs instead
 CANVAS = {}        # piece -> painting image name in art/props/textures (<name>_canvas.png): not baked; front-projected UVs
 RIGS = {}          # prop -> fn(objs) that builds an armature, weights the pieces to it and returns it (exported with them)
+ATLAS = {}         # piece -> painted set in art/props/textures (<set>_{color,normal,rough,metal}.png): not baked; keeps the "Bake" UV the
+                   # builder made (batch 40's alpha-cut leaf cards, whose colour map carries the cut-out in its alpha, and the roundel's
+                   # mosaic). A vertex attribute "nh_n" (point, float vector) on such a piece becomes its custom normals.
 
 BUILD = {
     "StudentDesk": student_desk,
@@ -1550,6 +1553,39 @@ def tile_material(ob, set_name):
     ob.data.materials.append(m)
 
 
+def atlas_material(ob, set_name):
+    m = bpy.data.materials.new(f"NH_{set_name}")
+    m.use_nodes = True
+    nt = m.node_tree
+    bs = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+    def tex(kind, color=False):
+        t = nt.nodes.new("ShaderNodeTexImage")
+        t.image = bpy.data.images.load(os.path.join(OUT_TEX, f"{set_name}_{kind}.png"), check_existing=True)
+        if not color:
+            t.image.colorspace_settings.name = "Non-Color"
+        return t
+    c = tex("color", True)
+    nt.links.new(c.outputs["Color"], bs.inputs["Base Color"])
+    if c.image.channels == 4:
+        nt.links.new(c.outputs["Alpha"], bs.inputs["Alpha"])
+    nm = nt.nodes.new("ShaderNodeNormalMap")
+    nt.links.new(tex("normal").outputs["Color"], nm.inputs["Color"])
+    nt.links.new(nm.outputs["Normal"], bs.inputs["Normal"])
+    nt.links.new(tex("rough").outputs["Color"], bs.inputs["Roughness"])
+    nt.links.new(tex("metal").outputs["Color"], bs.inputs["Metallic"])
+    ob.data.materials.clear()
+    ob.data.materials.append(m)
+    me = ob.data
+    for uv in list(me.uv_layers):
+        if uv.name != "Bake":
+            me.uv_layers.remove(uv)
+    nn = me.attributes.get("nh_n")
+    if nn is not None and nn.domain == "POINT":
+        vals = [tuple(d.vector) for d in nn.data]
+        me.attributes.remove(nn)
+        me.normals_split_custom_set_from_vertices(vals)
+
+
 def run(name):
     global PARTS, GROUP, HINGES
     PARTS, GROUP, HINGES = [], "Main", {}
@@ -1559,11 +1595,17 @@ def run(name):
     objs = join_parts(name)
     tiled = [o for o in objs if o.name in TILED]
     canvases = [o for o in objs if o.name in CANVAS]
-    baked = [o for o in objs if o not in tiled and o not in canvases]
+    atlased = [o for o in objs if o.name in ATLAS]
+    baked = [o for o in objs if o not in tiled and o not in canvases and o not in atlased]
+    for o in atlased:   # out of the bake (a leaf card's quad would shadow the wood under it)
+        o.hide_render = True
     if baked:  # a piece that is all tiled (none yet) has nothing to bake
         bake_uv(baked)
         imgs = bake_all(baked, name)
         final_material(baked, name, imgs)
+    for o in atlased:
+        o.hide_render = False
+        atlas_material(o, ATLAS[o.name])
     for o in canvases:
         canvas_uv(o)
         canvas_material(o, CANVAS[o.name])

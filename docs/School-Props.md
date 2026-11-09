@@ -1228,3 +1228,123 @@ The upload folder holds all 100 maps (25 props x 4; no metal map is pure black).
   - The rows are in the free strip at the north end of the baseplate: x from -236, a dark slate backing wall at z -682, -646, -610, -574, -538 and -502.
   - The props face south, toward the map. Wall pieces hang on the wall, table-top things stand on plinths (`<Name>_ShowcasePlinth`), and the pot rack and the dorm ceiling light hang from a beam.
   - Re-running it rebuilds the six folders.
+
+## Batch 40 (garden): the courtyard and garden kit
+
+`art/props/nh_props_batch40.py`. A haunted gothic academy garden for the courtyards at night, with the school's black wrought iron, weathered limestone, slate, aged brass and moss, plus crimson and violet accents. It has 17 path pieces, 28 plants and 22 features and pieces of furniture, each built around one signature idea. The paths are hand-cut stones; the hedges are clipped into lancet points, battlements, a wolf and a raven; the roundel is a carved compass of moon phases. Glows are kept to moonlight blue-white, candle amber and a faint violet. All designs and text are invented.
+
+- **Run:** `E:/NH-Work/props40/run40.py` runs nh_props without editing its import list (`--check` builds and counts tris only; `--fast` previews without baking). `bake40.sh all|<Prop>` bakes at 2048 with 64 samples on the GPU, one Blender at a time (it waits for any other Blender). `sheet40.py`, `render40.py` (`render.sh`), `upload40.py` and `docs40.py` make the contact sheets, staged renders, upload folder and this section.
+- **Files:** FBX in `art/props/fbx/garden-batch40/`, maps in `art/props/textures/<Prop>_*.png` (2048), previews in `art/props/previews/`, upload copies (all resized to 1024) in `art/group-upload/garden-batch40/`, renders in `art/props/renders/garden-batch40/`.
+- **Pieces:** each prop is a Main piece plus, where needed, `_Leaves`, `_Path`, `_Inlay`, `_Glass` and `_Glow`. A prop with nothing but Main is one mesh named after the prop.
+- **Leaves (`<Prop>_Leaves`, 41 props):** alpha-cut cards on `NH_GardenLeaves`, a 4 x 4 atlas painted by `art/props/garden_atlas.py` (system Python with PIL, numpy and scipy). Its 16 sprites are ivy, hedge leaves, yew, willow, crimson roses, rose leaves, wisteria, fern, lavender, tall grass, bramble, crabapple, nightshade, poppies, moonflowers and thorny twigs. The colour map carries the cut-out in its alpha. **Give every `_Leaves` piece these maps with AlphaMode = Transparency, and turn its DoubleSided on.** The cards carry custom normals pointing out of the plant (the FBX keeps them), so a bush shades as one mass. The clipped topiary is modelled; its cards only soften the edges.
+- **nh_props.ATLAS (new):** pieces listed in it skip the bake and keep the UVs their builder made, with a painted map set (`atlas_material`). A point attribute `nh_n` on a piece becomes its custom normals. Three things use it: the Leaves pieces, the roundel's Inlay (`MoonRoundelInlay`, from `garden_atlas.py`) and PathCobbleCurve's Path (curved UVs on `NH_GardenCobble`).
+  - `garden_atlas.py` also makes two bake sources that are not uploaded: the bark set `NH_GardenBark` and the worn carvings `NH_GardenRune0-3`.
+- **Tiled path faces (`<Prop>_Path`, the gravel, cobble and herringbone pieces):** world-scaled UVs (nh_props.TILED), 10 studs a tile. Their images are the new MaterialVariant sets below, copied into `art/props/textures` as `NH_<Set>` for Blender. Upload the `art/textures` copies once and use them for both the MaterialVariants and these faces.
+- **Hand-cut flagstone pieces** (PathFlagstone and its curve, junction and cross, plus PathCrazyPaving and PathPuddleFlag) are real stones, baked. Their open ends are straight on the cell edges, so a run meets on a joint. The 20-wide roundel's centre sits on a cell corner, so the paths enter it at its threshold stones.
+- **Pivots:** bottom centre, front toward -Y, unless the table says otherwise. Nothing goes below the pivot.
+- **Glow colours for the template:** MushroomRing gills, MoonflowerPatch and GhostOrchid are moonlight blue-white (about 190, 215, 255). NightshadeShrub berries are faint violet (about 150, 90, 255). StoneLanternPost, PathGateArch and the PumpkinPatch face are candle amber.
+
+### Garden texture sets (MaterialVariants)
+
+`art/textures/nh_textures.py` makes five new seamless sets in the style of the existing ones: 2048 masters in `_master`, 1024 game copies in `art/textures/<Set>/`. Their ids go into `textures.json` after upload.
+
+| Set | Base | Studs per tile | What |
+|---|---|---|---|
+| GardenGravel | Pebble | 10 | crushed slate chips (blue-black, grey-green, a few rust-stained and pale ones) in dark grit, dark rose petals blown into drifts |
+| HerringboneBrick | Brick | 10 | aged crimson brick in a 45-degree herringbone, soot-blackened bricks mixed in, white efflorescence at some joints, mossy joints; an even tone overall, so long paths show no repeat |
+| MossyPaving | Slate | 10 | hand-cut limestone flags of every size laid by eye, broken corners, a few cracked, deep moss in the joints, lichen rosettes |
+| CrazyPaving | Slate | 10 | broken flags of cleft slate, limestone and rust sandstone with small spalls between, wide mossy joints |
+| GardenCobble | Cobblestone | 10 | fan-laid granite cobbles in overlapping arcs, a few warm and pale stones, moss and grit between; the fans have a direction |
+
+### Props
+
+Every piece is under 20k triangles. Every prop is baked at 2048.
+
+**Pathways**
+
+| Prop | Tris | Collides | Notes |
+|---|---|---|---|
+| PathFlagstone | 3.7k (Main 3.7k, Leaves 0.0k) | yes | 10-stud straight along Y: hand-cut limestone flags (top about 0.3) laid by eye over a moss bed, broken edges that bleed into the grass (about 6.4 wide), one cracked with a root pushing up through it, one with a worn carving (a crescent and stars, a quatrefoil, NOX SERVAT or a bat-winged sigil); the open ends are straight on the cell edges (y = +-5), so runs meet on a joint; grass tufts in the gaps (Leaves) |
+| PathFlagstoneCurve | 3.1k | yes | 90-degree turn in a 10 x 10 cell: in at the front (-Y) edge, out at the right (+X) edge (arc centre at the cell's front-right corner); pivot at the cell centre |
+| PathFlagstoneJunction | 4.0k (Main 4.0k, Leaves 0.0k) | yes | T in a 10 x 10 cell: through along X, branch to the front (-Y) |
+| PathFlagstoneCross | 5.5k (Main 5.5k, Leaves 0.0k) | yes | crossroads in a 10 x 10 cell |
+| PathCobble | 7.7k (Path 0.0k, Main 7.6k) | yes | 10-stud straight along Y: fan-laid granite cobbles (Path: GardenCobble, 10 studs a tile; the fans open toward +Y, so lay every piece the same way round), granite kerbs topped with wrought-iron S-curls (to 0.7) |
+| PathCobbleCurve | 5.9k (Path 0.1k, Main 5.7k) | yes | 90-degree turn, front (-Y) to right (+X): its Path has its own UVs that bend the fans round the curve (NH_GardenCobble, not world-tiled) and meet the straights at both ends |
+| PathGravel | 4.8k (Path 0.0k, Main 4.8k) | yes | 10-stud straight along Y: crushed slate strewn with dark rose petals (Path: GardenGravel, top 0.26), scalloped bat-wing limestone edging (points to 0.6), a few modelled petals |
+| PathGravelCurve | 3.8k (Path 0.1k, Main 3.6k) | yes | 90-degree turn, front (-Y) to right (+X), bat-wing edging; Path: GardenGravel |
+| PathHerringbone | 3.3k (Path 0.0k, Main 3.3k) | yes | 10-stud straight along Y: aged crimson brick in a herringbone with soot-blackened bricks (Path: HerringboneBrick; lay every piece the same way round), a soldier course each side, one brick toppled onto the grass |
+| PathCrazyPaving | 6.4k (Main 6.3k, Leaves 0.0k) | yes | 10-stud straight along Y: small broken flags of cleft slate, limestone and sandstone over moss, one cracked with a root |
+| PathPuddleFlag | 4.8k (Main 4.7k, Glass 0.1k) | yes | PathFlagstone with a hollow of sunken stones holding a rain puddle (Glass: the water, top 0.235) |
+| PathMoonRoundel | 14.2k (Inlay 0.1k, Main 14.2k) | yes | 20 x 20 round junction, the showpiece (pivot at its centre, which sits on a cell corner of the 10-stud grid): the Inlay (a crescent cradling the school shield, MoonRoundelInlay maps, radius 4.2) in a brass ring; a pale limestone compass field with slate rays (the four long ones to 7.4) and eight brass-ringed moon-phase medallions; a brass band with degree ticks; hand-cut flags out to the kerb ring at 10; four threshold stones with brass arrows where the paths join (the mid-sides) |
+| SteppingStones | 1.4k | no | five hand-cut stones (tops 0.15-0.22) bedded in moss along a 10-stud run (Y), the middle one carved with a worn crescent |
+| GardenSteps | 4.2k (Main 4.1k, Leaves 0.1k) | yes | three shallow steps 8 wide between mossy cheek walls (11.5 wide), 10 deep: risers 0.6 from the path top (0.3) to a landing at 2.1 at the back (+Y), the bottom step at -Y; each tread three hand-cut slabs, the middle ones worn into hollows; grass and ferns at the foot (Leaves) |
+| PathEdgingIron | 3.7k | no | a 10-long run of wrought-iron scroll edging, 0.9 to its spear stakes, along X in the XZ plane |
+| PathBridgeSlab | 3.4k (Main 3.4k, Glass 0.0k) | yes | a 10-stud cell where the path (along Y) crosses a narrow rill (along X): two hand-cut limestone slabs bowing up to 0.7 over it, their ends at the path height (0.3) on the cell edges, rough abutments, mossy banks; Glass: the water (top 0.16) |
+| PathGateArch | 3.1k (Main 3.0k, Glass 0.0k, Glow 0.0k) | yes | a gothic wrought-iron arch over a path, 8.1 wide, 12.5 to its spear finials, on stone footings (the opening is 7.2); quatrefoil tracery, a brass crescent at the crown, an iron lantern hanging from a hook over the path (Glass: its panes; Glow: the candle flame); walk through along Y; collide on the footings and posts only |
+
+**Plants**
+
+| Prop | Tris | Collides | Notes |
+|---|---|---|---|
+| RoseBushCrimson | 20.2k (Main 19.0k, Leaves 1.2k) | yes | a full shrub rose 4.6 tall, 4.9 across: a dense leaf mass (Leaves), thorny canes arching out in S-curves, modelled dark crimson roses and buds on its surface and the cane tips, fallen petals round its foot |
+| RoseBushBlack | 20.2k (Main 18.9k, Leaves 1.2k) | yes | the same shrub with near-black roses, each with a crimson heart |
+| HedgeStraight | 1.0k (Main 0.8k, Leaves 0.3k) | yes | clipped yew 8 long (X), 2.3 thick, its top cut into two lancet points (valleys 4.6, points 6.6); snaps end to end |
+| HedgeBattlement | 1.1k (Main 0.9k, Leaves 0.3k) | yes | clipped yew 8 long, 2.3 thick: a wall 5.0 tall with four merlons to 6.2; snaps end to end |
+| HedgeCorner | 1.2k (Main 0.8k, Leaves 0.4k) | yes | a square yew tower 3.0 across under a clipped pyramid spire (to 9.6), arms to +X and +Y ending at x = 4.0 and y = 4.0 (butt straights onto them); pivot at the tower's centre |
+| HedgeEnd | 0.7k (Main 0.5k, Leaves 0.2k) | yes | a 2.6-square yew pier 5.6 tall with a clipped obelisk on top (to 10.0); its +Y face (y = 1.3) butts onto a straight |
+| HedgeArchway | 1.5k (Main 1.2k, Leaves 0.3k) | yes | 8 wide, 2.3 thick, its top rising with the arch to a point at 10.2, yew pinnacles at both ends; a pointed walk-through opening 4.4 wide and 7.6 high (path along Y); collide with a hull that leaves the opening clear |
+| HedgeWolf | 3.9k (Main 3.7k, Leaves 0.2k) | yes | estate topiary: a great wolf lying like a sphinx on a clipped plinth (3.6 x 7.2), head up and ears pricked (5.5), its tail curled round; it faces -Y |
+| HedgeRaven | 4.5k (Main 4.3k, Leaves 0.1k) | yes | estate topiary: a raven standing on a clipped column (to 6.9): heavy beak, a ruff at its throat, folded wings with long primaries, a wedge tail; it looks out to -Y |
+| WeepingWillow | 8.5k (Main 5.3k, Leaves 3.2k) | yes | a weeping willow 12.6 tall, its curtain about 19 across: a thick, burred, leaning trunk splitting into three leaders, limbs arching into a dome, long tapering fronds (Leaves) longest at the rim, with a ragged hem and gaps; walk in under it; collide on the trunk only |
+| YewTree | 3.5k (Main 2.9k, Leaves 0.6k) | yes | an ancient yew 12.9 tall: a fluted trunk of four twisted stems over a heaved-up knot of roots, a dark, layered, columnar crown (Leaves) |
+| GnarledCrabapple | 4.2k (Main 3.3k, Leaves 0.9k) | yes | a crabapple 9.4 tall bent like a hunched figure: its trunk bows forward (-Y) into a hooded crown, two crooked branches hang in front like arms; red crabapples, windfalls; collide on the trunk only |
+| CypressPair | 1.6k (Main 0.8k, Leaves 0.9k) | yes | two cypress spires 16.7 and 13.7 tall, under 2 across, 4 apart on a mulch bed |
+| IvyWallPanel | 0.7k (Main 0.4k, Leaves 0.3k) | no | ivy for a wall, 8 x 8.8: back on the wall plane (y = 0), pivot at the bottom centre |
+| WisteriaPergola | 3.7k (Main 3.1k, Leaves 0.5k) | yes | a walk-through iron pergola 7.6 wide (posts at x = +-3.4) and 10 long (posts at y = +-4.6; the path runs along Y), beams at 8.4; wisteria racemes and leaves (Leaves); collide on the posts only |
+| FernCluster | 0.4k (Main 0.3k, Leaves 0.1k) | no | a fern clump 2.0 tall, 4.3 across, on a moss mound |
+| LavenderBed | 1.0k (Main 0.9k, Leaves 0.1k) | no | a brick-edged bed 6.3 x 2.6 of lavender, 2.25 tall |
+| RaisedFlowerBed | 0.5k (Main 0.4k, Leaves 0.1k) | yes | a limestone-capped raised bed 6 x 3, rim 1.64; poppies, lavender, moonflowers, ferns, ivy over the front (-Y) |
+| MushroomRing | 3.8k (Main 2.7k, Glow 1.1k, Leaves 0.0k) | no | a fairy ring 7.4 across of fifteen tall, thin toadstools (0.5 to 2.3) with pale, lichened bell caps; Glow: the gills under the caps (moonlight blue-white) |
+| MoonflowerPatch | 3.0k (Main 2.5k, Glow 0.2k, Leaves 0.3k) | no | a moonflower tangle 4.2 x 3.1, 1.7 tall; Glow: the eight big blooms' centres (pale blue-white) |
+| TallGrassClump | 0.1k (Main 0.1k, Leaves 0.0k) | no | wild grass 3.2 tall, 2.5 across |
+| ThornBramble | 4.9k (Main 4.8k, Leaves 0.1k) | yes | a bramble thicket 7.5 x 6.4, 2.6 tall: thorny canes, blackberries, bare thorny twigs |
+| NightshadeShrub | 10.2k (Main 7.0k, Glow 3.0k, Leaves 0.1k) | no | a nightshade shrub 4 tall with violet star flowers; Glow: its berry clusters (a faint violet) |
+| PumpkinPatch | 2.1k (Main 2.0k, Glow 0.0k, Leaves 0.0k) | no | five pumpkins on straw and soil, 6.5 x 5.3, under lobed leaves; Glow: the carved lantern's face (candle amber, toward -Y) |
+| PoppyBed | 0.2k (Main 0.1k, Leaves 0.1k) | no | a low bed of crimson poppies 7 x 4, 2.6 tall |
+| LilyPads | 3.7k | no | nine pads and three lilies, 3.5 x 4.5; pivot on the water line (KoiPond's water is 0.75 above its pivot) |
+| BloodRoseUrn | 13.3k (Main 13.1k, Leaves 0.1k) | yes | a cast-iron urn on a square foot, four bat wings spread from its rim, overflowing with modelled crimson roses, canes trailing down its sides, petals fallen round it; 4.1 tall |
+| GhostOrchid | 9.4k (Main 1.6k, Glass 6.9k, Glow 0.9k) | no | ghost orchids on a mossy stump (1.2): leafless, roots clasping the bark, five pale flowers on fine stems to 2.45; Glass: the petals (translucent); Glow: a faint moonlight heart in each |
+
+**Features and furniture**
+
+| Prop | Tris | Collides | Notes |
+|---|---|---|---|
+| KoiPond | 5.7k (Main 5.4k, Glass 0.2k, Leaves 0.0k) | yes | a kidney-shaped raised pond 13.3 x 8.5: big hand-cut coping stones overhanging the water (top 0.95); Glass: the water (0.75) and the arc a stone toad on the coping spits into it; two koi, lily pads, a lily, reeds (Leaves) |
+| BirdBath | 1.8k (Main 1.7k, Glass 0.1k) | yes | a bird bath held up by a carved stone hand, 3.7 tall: the forearm rises from a cuffed plinth and the fingers curl round a scalloped basin; Glass: the water; a brass sparrow on the rim |
+| GardenBench | 2.5k | yes | an iron and oak bench 5.8 wide whose back is a raven with its wings spread in layered iron feathers (to 4.6), crimson eyes; seat top 1.7; faces -Y |
+| CurvedStoneBench | 0.5k | yes | a curved limestone bench, a 100-degree arc (radius 4.5), 7.8 wide, seat top 1.6; the concave side faces -Y; pivot at the middle support's base |
+| LogBench | 1.4k | yes | half a fallen oak as a bench, 7 long: the sawn seat at 1.65, three hammered iron bands, two stone blocks under it, bracket fungi on its bark (front, -Y) |
+| IronGazebo | 17.2k (Main 17.1k, Glass 0.0k) | yes | an octagonal gothic iron gazebo 14 across (platform and step), 19.6 to the crescent on its lantern: posts with bat-wing brackets, filigree arches and quatrefoils, a cresting of spears, an onion dome of slate on iron ribs, a lantern on top (Glass); walk in from the front (-Y), up a 0.3 step onto the platform at 0.6; seven benches inside (seat tops 2.3); collide on the platform, posts and benches |
+| RoseArbor | 2.0k (Main 1.7k, Leaves 0.2k) | yes | an iron rose arbor 6.8 wide, 4 deep, 9.6 tall; walk through along Y (opening 5 wide); climbing roses (Leaves); collide on the uprights only |
+| GardenObelisk | 6.6k (Main 6.5k, Leaves 0.0k) | yes | a limestone obelisk 8.9 tall on a stepped base 2.6 square: the moon's phases in raised slate-and-limestone discs down every face, a brass-capped pyramidion, ivy at its foot (Leaves) |
+| UrnPedestal | 2.2k (Main 2.2k, Leaves 0.1k) | yes | a gadrooned limestone urn on a panelled pedestal, rim 5.4: two serpents coiled on its shoulders for handles, heads raised over the lip; lavender, a fern, trailing ivy (Leaves); 7.0 tall |
+| LowGardenWall | 0.5k (Main 0.4k, Leaves 0.1k) | yes | a mossy ashlar wall 8 long (X), 1.4 thick at the plinth, 3.08 to the coping; snaps end to end; ivy over its right end |
+| GardenWallPier | 0.5k | yes | a wall pier 2.15 square, 4.9 to the ball; stands at a wall run's end |
+| StoneLanternPost | 3.1k (Main 2.9k, Glass 0.1k, Glow 0.1k) | yes | a gothic stone lantern 7.4 tall: a twisted Solomonic column, a forged iron cage round a glass chimney (Glass) with a candle flame (Glow, amber), a crocketed canopy |
+| Wheelbarrow | 1.4k | no | a wooden wheelbarrow 5.9 long (wheel at -Y), 2.5 tall, soil and a trowel in it |
+| GardenToolsLean | 2.9k | no | a spade, a fork and a rake leaning on a crate (2.4 wide, 1.6 tall) from the front (-Y), a sack of bulbs |
+| PottingCluster | 2.2k (Main 2.2k, Leaves 0.1k) | no | terracotta pots (a fern, lavender, a seedling), a stack of empties, one on its side, a zinc watering can, a trowel; 4.3 x 3.3 |
+| ColdFrame | 0.6k (Main 0.5k, Glass 0.0k, Leaves 0.1k) | yes | a brick cold frame 4.4 x 2.6 (back 1.3, front 0.8), its glazed lid propped open; seedlings; Glass: the panes |
+| TrellisPanel | 0.6k (Main 0.6k, Leaves 0.1k) | no | an iron trellis 4 wide, 7.6 tall, on two stone feet, in the XZ plane; climbing roses on both sides (Leaves) |
+| KeepOffGrassSign | 2.1k | no | a brass plaque, KEEP OFF THE LAWN, on an iron stake, 1.9 tall, facing -Y (invented) |
+| Birdhouse | 1.1k | no | a birdhouse built as a little gothic chapel on a post, 7.9 tall: a slate roof, buttresses, a pointed door hole under a crimson rose window, a bell tower and needle spire over the front (-Y) |
+| Scarecrow | 2.4k (Main 2.4k, Leaves 0.0k) | no | an unsettling scarecrow 7.1 tall in a tattered school blazer with the crest: too thin, its sack head lolling, a stitched grin and mismatched button eyes, straw at the cuffs and collar (Leaves), a crow on each arm |
+| CourtyardBenchTable | 1.0k | yes | an iron-framed oak table for students, 6 x 4.5: top 2.66, bench seats 1.64 on either side (Y) |
+| CrowPerch | 1.4k (Main 1.4k, Leaves 0.0k) | no | a dead snag on a mossy stump, 7.3 tall, two crows (one cawing toward -Y), thorny twigs (Leaves) |
+
+![Pathways](img/garden-pathways-contact.jpg)
+![Plants](img/garden-plants-contact.jpg)
+![Features](img/garden-features-contact.jpg)
+![The courtyard at night](img/garden-courtyard-night.jpg)
+![The overgrown corner](img/garden-overgrown-corner.jpg)
+![The path pieces joined](img/garden-path-tiling.jpg)
