@@ -82,6 +82,10 @@ for name in NAMES:gmatch("%S+") do
 	if not fresh then m = P:FindFirstChild(name) end
 	if not m then table.insert(absent, name) continue end
 	if m:GetScale() == 1 and m:GetExtentsSize().Magnitude > 60 then m:ScaleTo(0.01) end
+	-- Roblox's importer caps a mesh at 2048 studs (20.48 at the FBX's 100x): the ropes are 22.08 tall (from the FBX)
+	if name == "ClimbingRopes" and math.abs(m:GetExtentsSize().Y - 22.08) > 0.05 then
+		m:ScaleTo(m:GetScale() * 22.08 / m:GetExtentsSize().Y)
+	end
 	local door
 	for _, p in m:GetDescendants() do
 		if not p:IsA("MeshPart") then continue end
