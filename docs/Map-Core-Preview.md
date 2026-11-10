@@ -131,6 +131,33 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 
 - `Controllers.Character.HairSway` is the fixed version (bend, never twist; capped per strand and per joint; dash and teleport spikes ignored), byte-identical to NH Combat Test's. See `docs/Clothing-and-Faces.md` (Living hair). The old one is in `ServerStorage.NHCore.Backups.HairSway_preStretchFix`.
 
+
+## What the Map still lacks (2026-11-10), lowest priority first
+
+Owner: "let's start porting some more things over to the map place (low > high priority)". Each item is ported, play-tested in the Map and logged. The owner sees the list before anything high-priority or risky (saving, combat, economy).
+
+**Low: client polish (no saving, combat or money)**
+1. ~~`Gui.PromptUi`~~ (1.71.1)
+2. ~~`Character.Emotes`, `Character.ContextAnims`~~ (1.71.1)
+3. ~~`World.SpookyTree`~~ (1.71.1)
+4. `Gui.SettingsMenu` + `Gui.TopBar` (+ the `NHSettings` server script): volumes, FOV, keybinds, the themed top bar. In the Map, settings would be kept for the session only.
+
+**Medium: gameplay, or needs map data or an owner decision**
+- Regions and Compass (`Features.Regions`, `World.Regions`, `Gui.Compass`): they need region boxes and points of interest placed for the builder's map. NH Combat Test's are for its own layout.
+- Seats (`Features.Seats`, `Features.PlayerSeats`, `World.PlayerSeat`): they add "Sit" E prompts to chairs, which goes against "E only on doors" (1.67.0). This needs the owner's call.
+- Skateboards; Lost & Found; the fortune teller (Sable, `Features.Fortune` + `World.SeerIdle`); the notice board; locker hiding (`LockerProps`, `World.LockerDoors`, `LockerPOV`).
+- NPC students (`AmbientNpcs`, `NpcLooks`, `Schedules`, `Social.Npcs`, `Dialogue`).
+- Beasts and wild wolves, delinquents (AI enemies: combat).
+
+**High / risky: saving, economy, progression, combat systems (owner check-in first)**
+- **Saving:** save slots, the main menu, Back to Menu (the Map has no saving at all).
+- **Progression and money:** progression and stats; purchases and the Spin Shop (Robux); inventory; the phone and its yen transfers, phone games; the concession stand; homes; gear chests.
+- **Social:** cliques (events, fights, membership, pranks, showdowns), factions, reputation, hangouts, strangers, superlatives.
+- **Quests:** quests, investigation, stealth, duels.
+- **School:** attendance, detention, discipline, enrollment, the hall monitor, report cards, substitutes, activities, the timetable and clock HUD, the class locker, study groups.
+- **Sports:** football, soccer, basketball, clubs, matches.
+- **Other:** race evolution, race actions, the anti-teleport and kill trackers, the party system, Cmdr.
+
 ## Removing it
 Run this in the Map place's command bar, then save:
 

@@ -2,6 +2,25 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.71.1] - 2026-11-10: Map place: prompts, emotes, context animations, the creaking oaks
+
+Owner: "let's start porting some more things over to the map place (low > high priority)". The list, lowest priority first, is in `docs/Map-Core-Preview.md` (What the Map still lacks). This is its first batch: four client-only pieces that save nothing and touch no combat or money.
+
+### Added (Map place, NH Combat Test's files byte for byte, tagged NHCore)
+- **`Controllers.Gui.PromptUi`:** the game's engraved prompt (a key cap that fills with candle-gold) instead of Roblox's default popup. In the Map only doors have prompts.
+- **`Controllers.Character.Emotes`:** the emote menu on `.` (Default Dance, Floss, Fresh) and `/e dance`, `/e floss`, `/e fresh` in chat. An emote stops when you move, jump or get hit.
+- **`Controllers.Character.ContextAnims`:** small animations on your own character, such as the "OW" kneel as you transform.
+- **`Controllers.World.SpookyTree`:** the dead oaks (tagged `NHSpookyTree`; the builder has placed two) creak, sway and reach toward a nearby student.
+- Everything they use (`UI.Components`, `UI.Theme`) was already in the Map and identical. Their animations load there.
+
+### Verified (Map place, local play-test, real keys and clicks)
+- **SpookyTree:** both oaks' 43 bones moved, swinging 10 to 12 degrees over 2 s.
+- **PromptUi:** next to a classroom door, the prompt was `Style = Custom` with the game's `NHPrompt` billboard on the door, and the real E key opened the door.
+- **Emotes:** the real `.` key opened the menu with its three emotes. A click on Floss played it (the animation loaded, 1.6 s long), and moving stopped it.
+- **ContextAnims:** after Werewolf and Tier II on the admin desk, the real T key transformed the character and played the transform kneel.
+- No errors.
+- **Not tried:** the chat commands (test players don't type in chat), Steal and search (needs quest prompts, which the Map doesn't have), and a second player seeing the trees and emotes.
+
 ## [1.71.0] - 2026-11-10: Hair swings without stretching
 
 Owner: "Fix the rigging and animation on the hair. I don't want the weird stretch thing with them." Their screenshot showed long dark hair, mid-dash, splayed into stretched flaps behind and to the side. Record: `docs/Clothing-and-Faces.md` (Living hair).
