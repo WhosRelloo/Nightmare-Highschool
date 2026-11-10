@@ -2,6 +2,34 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.71.0] - 2026-11-10: Hair swings without stretching
+
+Owner: "Fix the rigging and animation on the hair. I don't want the weird stretch thing with them." Their screenshot showed long dark hair, mid-dash, splayed into stretched flaps behind and to the side. Record: `docs/Clothing-and-Faces.md` (Living hair).
+
+### Fixed (NH Combat Test and the Map place; `Controllers.Character.HairSway`, byte-identical in both)
+- **Why the hair stretched:** the rigs were fine (4 to 6 bones a strand, 0.29 to 0.53 studs a link). The cause was the sway code:
+  - **The bends added up down each strand.** Each bone's weight grew with its depth ((depth - 1) x 0.16), and every bone also inherits its parent's bend, so a 6-deep strand's tip bent 2.4 times the target, and its last joint 0.8 times it on its own. A sharp bend at one joint pinches and smears a skinned mesh.
+  - **The swing used fixed head axes** (a pitch about the head's right axis, a roll about its forward axis). A strand lying along one of those axes, like a ponytail or long hair running back over the skull, was spun around its own length. A twisted skinned strand looks stretched.
+  - **Nothing stopped spikes:** the spring was under-damped, its value wasn't capped, and a frame hitch, dash or teleport fed straight in.
+- **The new sway:**
+  - Every bone bends its strand toward one drag direction (behind the motion, outward on a turn, up when falling, the wind), about an axis at right angles to the strand. It bends, never twists.
+  - The bend is shared down each chain (the shares add up to 1). A strand's tip bends at most 50 degrees at full drag, and no joint more than 15.
+  - The frame time is clamped, a jump of more than 6 studs in one frame (a dash or teleport) is ignored, speeds are capped, and the spring is nearly critically damped.
+  - Roots on the scalp still never move, and Reduce Motion still halves it and drops the wind.
+- Backups of the old script: NH Combat Test `ServerStorage.NH_Backup.HairSway_preStretchFix`, Map `ServerStorage.NHCore.Backups.HairSway_preStretchFix`.
+
+### Verified (real keys; NH Combat Test on slot 4 "Testy", and the Map place)
+- A probe measured, every frame, the biggest single-joint bend and the biggest whole-strand bend (each bone against its rest pose).
+- **Before the fix** (Map, Super Long Straight): joint 20 degrees and strand 39 sprinting, 25 and 47 landing a jump, 17 and 33 strafing.
+- **After the fix, NH Combat Test, slot 4** (the test hairs were put on the character only, so Testy's save wasn't changed):
+  - **Super Long Straight:** sprinting at 30 studs/s gave joint 14.7 and strand 30.6. A dash peaking at 84 studs/s gave 12.8 and 27, with no spike. A jump gave a strand of 5.6, strafing and turning 19, and it was under 1 degree at rest.
+  - **Side Ponytail:** a dash at 76 studs/s gave joint 15.0 (the cap) and strand 32.6. A lit mid-dash shot showed the ponytail lying neatly down the back, with no flaps.
+  - **Sweetheart Pigtails:** a dash at 86 studs/s gave 14.4 and 28.3, and 3 degrees at rest.
+- **Map place:** the same, with Super Long Straight. Sprint and dash at 87 studs/s gave at most 14.5 and 30. A 40-stud server teleport gave no change (it's ignored), and a jump gave a strand of 6. A mid-dash shot from behind showed the hair neat on the head.
+- Twist (rotation about a strand's own length) measured at about zero on every strand bone.
+- No HairSway warnings in either place.
+- **Not tried:** a second player watching someone else's hair, Reduce Motion, mouse-look turning (strafe turns were tested), and every one of the 35 styles (three long ones were measured).
+
 ## [1.70.1] - 2026-11-10: Height v2 in the Map place
 
 Owner: "Sync" (NH Combat Test's 1.70.0 height shapes, into the Map place). Record: `docs/Map-Core-Preview.md` (the system: `docs/Height.md`).

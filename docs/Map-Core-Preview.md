@@ -126,6 +126,11 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 - **Tested (local play-test):** Tallest (7'0") and a Human's Shortest (4'11") through the desk gave NH Combat Test's exact part sizes. Walking, sprinting and the katana M1 worked at both, and the stretch survived a look change.
 - **When the Map's Height is copied again:** it's a Map version (no saving), so port only `Apply` from NH Combat Test.
 
+
+## Changed 2026-11-10 (1.71.0): hair swings without stretching
+
+- `Controllers.Character.HairSway` is the fixed version (bend, never twist; capped per strand and per joint; dash and teleport spikes ignored), byte-identical to NH Combat Test's. See `docs/Clothing-and-Faces.md` (Living hair). The old one is in `ServerStorage.NHCore.Backups.HairSway_preStretchFix`.
+
 ## Removing it
 Run this in the Map place's command bar, then save:
 

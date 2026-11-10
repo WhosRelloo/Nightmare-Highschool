@@ -103,3 +103,20 @@ python art/clothing/tools/seam_audit.py               # seam check
 python tools/ui-textures/gen_eyes.py eyes; python tools/ui-textures/gen_face.py faceparts eyes
 python tools/ui-textures/gen_menace.py menace eyes faceparts    # form faces + marks, overlap-checked
 ```
+
+## Living hair (HairSway, 1.71.0)
+
+`StarterPlayer.StarterPlayerScripts.Controllers.Character.HairSway` (client) moves the bones of the barber's rigged hairs (`ReplicatedStorage.NHHairCatalog`, 4 to 6 bones a strand) on every character within 90 studs. NH Combat Test and the Map place run the same file.
+
+- **What pulls the hair:** one drag direction in world space, made of:
+  - behind the motion (full at 22 studs/s);
+  - up when falling (full at 45 studs/s);
+  - outward on a turn;
+  - a shared breeze with gusts;
+  - a faint breath.
+  It goes through a spring (K 60, D 13: damping ratio about 0.84, no overshoot).
+- **How a strand bends:** each bone rotates toward the drag about an axis at right angles to its strand (from its rest frame), so strands bend and never twist around their own length.
+- **How much:** each chain shares its bend by depth, and the shares add up to 1. A tip bends at most `MAX_BEND` (50 degrees) at full drag, any joint at most `MAX_JOINT` (15). Depth-1 bones (the roots on the scalp) don't move.
+- **Spikes:** the frame time is clamped to 1/20 s, and a jump of more than 6 studs in one frame (a dash or teleport) isn't read as motion.
+- **Reduce Motion** (`NHReducedMotion`): half the drag, no wind.
+- **Before 1.71.0**, the weight grew with depth ((depth - 1) x 0.16) and the swing used fixed head axes. Bends added up to 2.4 times the target at a 6-deep tip, and strands lying along the head were twisted. The owner saw that as the hair stretching.
