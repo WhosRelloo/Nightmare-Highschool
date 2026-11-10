@@ -108,7 +108,7 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 - The Map has NH Combat Test's 1.69.0 body types (`docs/Body-Types.md`): twelve bodies, a build from the admin desk only, gender from the Wardrobe.
 - **Files:** `UI.Appearance` (NH Combat Test's live file + the Map's `NHAnywhereWardrobe` line), `Services.Features.Admin` and `Controllers.Gui.AdminPanel` (NH Combat Test's, byte for byte), `Controllers.Gui.Wardrobe` (NH Combat Test's Body row and `IsFemale`, on top of the Map adapters). Before-copies in `ServerStorage.NHCore.Backups.BodyTypes_pre`.
 - **To try it:** F3 > Student > click your name > Build: Skinny, Conditioned I/II or Heavy I/II. Switch gender in K > Look > Body; the build carries over. Nothing is saved in the Map.
-- **Tested (local play-test):** every Build button with real clicks gave the right body for both genders, Female carried Heavy II over to Plus, and the Strong body walked and swung the katana (M1.1, M1.2).
+- **Tested (local play-test):** every Build button with real clicks gave the right body for both genders, Female carried Heavy II over to Plus, and the Strong body walked and swung the katana (M1.1, M1.2). A second check gave Muscular through the desk; a barber cut kept the build, and it walked and swung too. A build is saved as the body inside the look, so there is no separate data field.
 - **When copying the Wardrobe again:** take NH Combat Test's live file and re-add the Map adapters: `Bloodline` in `TABS`, `Local.BloodlineTab`, it in the Render list, the `NHAnywhereWardrobe` check in `Shared.Toggle`, and the K handler at the end of `OnStart`.
 
 
