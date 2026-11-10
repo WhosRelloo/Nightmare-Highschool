@@ -1,4 +1,4 @@
-# Female body (1.68.0)
+# Female body (1.68.0, v2 in 1.68.1)
 
 The Female body choice is a full feminine R6 body: torso, arms and legs. It keeps the hourglass of the old Female torso, but it still reads as a classic R6 character, as the owner asked: "MAKE THEM STILL RESEMBLE NORMAL R6 CHARACTER PROPORTIONS THOUGH."
 
@@ -6,14 +6,18 @@ The Female body choice is a full feminine R6 body: torso, arms and legs. It keep
 
 ## The shape
 
-Every mesh stays inside its R6 part box: 2 x 2 x 1 for the torso and 1 x 2 x 1 for each limb. The head, the part sizes, the joints and the animations are unchanged.
+Every limb mesh stays inside its R6 part box (1 x 2 x 1). The torso is 2 x 2 wide and tall, and 1.08 studs deep at the bust (v2). The head, the part sizes, the joints and the animations are unchanged.
 
 - **Torso:** the old torso's hourglass, smoothed.
   - The waist curves in to 1.58 studs. The old torso pinched to 1.40 in a sharp V; standard R6 is 2.0.
   - The shoulders and hips stay at the full 2 studs, and the top edge rolls over softly.
-  - A soft bust and seat, both kept inside the 1-stud depth.
+  - **v2 (1.68.1, owner: "make the bust a little more noticeable"):** the bust projects 0.105 studs, up from 0.06, with a clearer underside. The torso is 1.08 studs deep at the bust instead of 1.0. The seat got a little fuller too, so the front and back depths match and the mesh stays centred.
 - **Arms:** full width at the shoulder, so they sit flush against the torso. They taper on the outer side to 0.85 studs at the wrist, with rounded tops. The inner side stays flat.
 - **Legs:** full width at the hip, tapering on the outer side to 0.88 studs at the ankle. The inner sides stay flush, so the legs meet in the middle.
+  - **v2 (owner: "The legs should still connect like these kind of. I don't like how much of a gap there is"):** the inner edges are near-square (radius 0.02, was 0.09), so the legs touch with only a fine seam like standard R6. In v1, the rounded inner edges made a wide V-groove.
+  - **The idle stance:** the game's idle animation stands every character with its feet slightly apart, standard bodies too. Measured on NPCs, the legs sit at +0.51 / -0.585 at their 0.9 scale, the same as on the Female body. So at idle the legs touch at the hips and open toward the feet. That comes from the animation, not the meshes.
+
+![v1 vs v2](img/female-body-v1-vs-v2.jpg)
 
 ## How it's applied
 
@@ -28,13 +32,15 @@ Every mesh stays inside its R6 part box: 2 x 2 x 1 for the torso and 1 x 2 x 1 f
 
 | Part | Mesh id (group 15981569) |
 |---|---|
-| Torso | 100376795847355 |
+| Torso | 107771235632658 (v2; v1 was 100376795847355) |
 | Right Arm | 107796907683955 |
 | Left Arm | 80112520115136 |
-| Right Leg | 118860096662549 |
-| Left Leg | 115152584533690 |
+| Right Leg | 111053847385892 (v2; v1 was 118860096662549) |
+| Left Leg | 87713593848889 (v2; v1 was 115152584533690) |
 
-The previous Female torso was 48112070, Roblox's 2011 "ROBLOX Girl - Torso" (asset 48474356), on standard limbs. The imported MeshParts are kept in `ServerStorage.NHFemaleBody`, and the pre-change `UI.Appearance` is in `ServerStorage.NH_Backup.FemaleBody_pre`.
+The previous Female torso was 48112070, Roblox's 2011 "ROBLOX Girl - Torso" (asset 48474356), on standard limbs. The imported MeshParts are kept in `ServerStorage.NHFemaleBody` (v1) and `ServerStorage.NHFemaleBody_v2` (the torso and legs). Backups of `UI.Appearance`:
+- `ServerStorage.NH_Backup.FemaleBody_pre`: before the new body.
+- `ServerStorage.NH_Backup.FemaleBody_v1`: before the v2 ids.
 
 ## Clothing: the R6 CharacterMesh atlas
 
@@ -82,7 +88,7 @@ E:/Blender/blender.exe -b --factory-startup -P nh_female_body.py -- [--render]
 
 - The parts are shaped as lofted rounded-rectangle rings from smooth profiles.
 - The bounding box of every part is centred and symmetric, so the importer can't shift it.
-- It writes `E:/NH-Work/femalebody/fbx/NHFemaleBody.fbx`.
+- It writes `E:/NH-Work/femalebody/fbx/NHFemaleBody.fbx`. `--parts Torso,RightLeg,LeftLeg --name NHFemaleBody_v2` exports only those parts, which is how v2 was imported.
 - `--render` also runs `render_compare.py`, and `compose_sheet.py` builds the comparison and UV sheets.
 
 **Roblox's 3D importer (measured on 2026-11-10, three imports):**
@@ -107,10 +113,21 @@ E:/Blender/blender.exe -b --factory-startup -P nh_female_body.py -- [--render]
 - **Hair and eyes:** both still show on the head.
 - **Console:** nothing new. There were only the place's existing sound-permission and archived-asset messages.
 
+## Play-tested again (v2, 1.68.1, slot 4)
+
+![v2 play-test](img/female-body-v2-playtest.jpg)
+
+- The server character had the v2 torso and legs, with the v1 arms.
+- Front: the legs meet at the hips. A close-up showed the square inner edges, with the feet apart in the idle stance.
+- Side, with the near arm hidden on the client: the fuller bust, the waist and the seat, with the blazer mapped down the side.
+- The Walk track played, and a real E and click played the M1 swing.
+- Female NPC students also have the five meshes: Vesper Crane, Sable Vey, Coach Mallory and Wren Ashby.
+- Console: nothing new.
+
 ## Not verified
 
 - **Not checked:**
-  - NPC students with a Female look: they use the same `ApplyTo`, but I didn't inspect one.
+  - How female NPC students look up close (v2 confirmed only that they have the meshes).
   - A second player watching. The meshes are created on the server and replicate like the rest of the look, but this wasn't tested with two players.
   - The `CharacterPreview` viewport and the slot-card pedestals, which weren't checked closely.
   - The other female outfits (sailor uniform, gala gown and others).

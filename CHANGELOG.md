@@ -2,6 +2,22 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.68.1] - 2026-11-10: Female body v2: the legs meet, a fuller bust
+
+Owner: "The legs should still connect like these kind of. I don't like how much of a gap there is in it. And make the bust a little more noticeable". Record: `docs/Female-Body.md`.
+
+### Changed (NH Combat Test)
+- **The legs meet like standard R6.** Each leg's inner edges are now near-square (radius 0.02, was 0.09), so the two legs touch with only a fine seam instead of a wide V-groove. The outer taper is the same.
+- **A fuller bust:** 0.105 studs of projection (was 0.06), with a clearer underside. The torso is 1.08 studs deep at the bust. The seat got slightly fuller so the front and back depths match.
+- **New mesh ids** for the torso (107771235632658) and the legs (Right 111053847385892, Left 87713593848889). The arms are unchanged.
+
+### Verified (NH Combat Test, slot 4, Play)
+- The v2 meshes were on the server character. Each import was read back with `EditableMesh`: its size, which way is the front, the flat inner faces and the UVs.
+- **Shots:** a front shot, a close-up of the leg seam, and a side profile with the bust.
+- **Animations and console:** the Walk track and a real E plus click M1 played, with no new console messages.
+- **NPCs:** female NPC students (Vesper Crane, Sable Vey, Coach Mallory, Wren Ashby) have the five meshes.
+- **The idle stance** stands every character with its feet slightly apart, standard bodies too (NPC legs at +0.51 / -0.585 at 0.9 scale). So at idle the Female legs touch at the hips and open toward the feet, the same as everyone's.
+
 ## [1.68.0] - 2026-11-10: A full feminine R6 body
 
 Task: a Female body type that keeps the old Female torso but adds more feminine features. Owner: "MAKE THEM STILL RESEMBLE NORMAL R6 CHARACTER PROPORTIONS THOUGH." The owner approved the Blender design before it was built. Record: `docs/Female-Body.md`.

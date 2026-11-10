@@ -17,6 +17,9 @@ import atlas  # noqa: E402
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
 OUT = argv[argv.index("--out") + 1] if "--out" in argv else "E:/NH-Work/femalebody"
 DO_RENDER = "--render" in argv
+# --parts Torso,RightLeg,LeftLeg exports only those parts, to <name>.fbx (--name, default NHFemaleBody)
+ONLY = argv[argv.index("--parts") + 1].split(",") if "--parts" in argv else None
+FBX_NAME = argv[argv.index("--name") + 1] if "--name" in argv else "NHFemaleBody"
 os.makedirs(os.path.join(OUT, "fbx"), exist_ok=True)
 os.makedirs(os.path.join(OUT, "renders"), exist_ok=True)
 
@@ -54,30 +57,38 @@ def smooth(e0, e1, x):
 
 
 # ---------- ring: rounded rectangle, walked +x -> front(-z) -> -x -> back(+z) ----------
+DEPTH_CAP = 0.54  # torso half-depth limit (bust / seat peak); 0.5 is the R6 box, v2 lets the bust read a little past it
 NC = 3          # segments per half corner (6 per 90 deg corner)
 NX = 4          # straight segments on the x faces (sides)
 NZ_T = 12       # straight segments on front/back of the torso
 NZ_L = 5        # ... of a limb
 
 
-def ring(hw, hd, rc, cx, nz):
-    rc = min(rc, hw - 1e-3, hd - 1e-3)
-    ax, az = hw - rc, hd - rc
+def ring(hw, hd, rc, cx, nz, inner=0, rin=None):
+    """inner: -1 / +1 = the side (-x / +x) that touches the body; its two corners get radius rin (near-square, like R6)"""
+    def rad(sx):
+        r = rin if (inner != 0 and sx == inner and rin is not None) else rc
+        return min(r, hw - 1e-3, hd - 1e-3)
+    rp, rm = rad(1), rad(-1)          # radius of the +x corners / -x corners
     faces = [
-        [("arc", (cx + ax, az), 45, 0), ("line", (cx + hw, az), (cx + hw, -az), NX), ("arc", (cx + ax, -az), 0, -45)],
-        [("arc", (cx + ax, -az), -45, -90), ("line", (cx + ax, -hd), (cx - ax, -hd), nz), ("arc", (cx - ax, -az), -90, -135)],
-        [("arc", (cx - ax, -az), -135, -180), ("line", (cx - hw, -az), (cx - hw, az), NX), ("arc", (cx - ax, az), 180, 135)],
-        [("arc", (cx - ax, az), 135, 90), ("line", (cx - ax, hd), (cx + ax, hd), nz), ("arc", (cx + ax, az), 90, 45)],
+        [("arc", (cx + hw - rp, hd - rp), 45, 0, rp), ("line", (cx + hw, hd - rp), (cx + hw, -(hd - rp)), NX),
+         ("arc", (cx + hw - rp, -(hd - rp)), 0, -45, rp)],
+        [("arc", (cx + hw - rp, -(hd - rp)), -45, -90, rp), ("line", (cx + hw - rp, -hd), (cx - hw + rm, -hd), nz),
+         ("arc", (cx - hw + rm, -(hd - rm)), -90, -135, rm)],
+        [("arc", (cx - hw + rm, -(hd - rm)), -135, -180, rm), ("line", (cx - hw, -(hd - rm)), (cx - hw, hd - rm), NX),
+         ("arc", (cx - hw + rm, hd - rm), 180, 135, rm)],
+        [("arc", (cx - hw + rm, hd - rm), 135, 90, rm), ("line", (cx - hw + rm, hd), (cx + hw - rp, hd), nz),
+         ("arc", (cx + hw - rp, hd - rp), 90, 45, rp)],
     ]
     pts = []
     for fi, path in enumerate(faces):
         fp = []  # (x, z, nx, nz)
         for seg in path:
             if seg[0] == "arc":
-                (ccx, ccz), a0, a1 = seg[1], seg[2], seg[3]
+                (ccx, ccz), a0, a1, r = seg[1], seg[2], seg[3], seg[4]
                 for k in range(NC + 1):
                     a = math.radians(a0 + (a1 - a0) * k / NC)
-                    p = (ccx + rc * math.cos(a), ccz + rc * math.sin(a), math.cos(a), math.sin(a))
+                    p = (ccx + r * math.cos(a), ccz + r * math.sin(a), math.cos(a), math.sin(a))
                     if not fp or (abs(fp[-1][0] - p[0]) > 1e-9 or abs(fp[-1][1] - p[1]) > 1e-9):
                         fp.append(p)
             else:
@@ -101,11 +112,12 @@ def torso_rings():
                  (0.25, 0.90), (0.50, 0.975), (0.70, 1.0), (1.0, 1.0)])
     hdf = pchip([(-1.0, 0.475), (-0.80, 0.475), (-0.55, 0.46), (-0.20, 0.405), (0.05, 0.415), (0.30, 0.455),
                  (0.55, 0.47), (1.0, 0.47)])
-    BUST, SEAT = 0.06, 0.05      # extra depth front / back (balanced below so the z extents match)
+    BUST, SEAT = 0.105, 0.07     # extra depth front / back (balanced below so the z extents match)
+    # 2026-11-10 v2 (owner: "make the bust a little more noticeable"): 0.06 -> 0.105, clearer underside and lobes
 
     def bust(y, x):
-        g = math.exp(-((y - 0.32) / (0.22 if y > 0.32 else 0.16)) ** 2)
-        lobe = 0.62 + 0.38 * math.exp(-((abs(x) - 0.40) / 0.25) ** 2)
+        g = math.exp(-((y - 0.33) / (0.21 if y > 0.33 else 0.13)) ** 2)
+        lobe = 0.50 + 0.50 * math.exp(-((abs(x) - 0.40) / 0.24) ** 2)
         return BUST * g * lobe * (1 - smooth(0.62, 0.95, abs(x)))
 
     def seat(y, x):
@@ -148,6 +160,9 @@ def limb_rings(kind, side):
         hwf = pchip([(-1.0, 0.44), (-0.40, 0.452), (0.30, 0.478), (0.75, 0.50), (1.0, 0.50)])
         hdf = pchip([(-1.0, 0.44), (-0.40, 0.448), (0.40, 0.468), (1.0, 0.47)])
         RT, RB, RC = 0.04, 0.05, 0.09
+    # legs meet in the middle like standard R6 (owner, 2026-11-10: "I don't like how much of a gap there is"):
+    # the inner corners are near-square, so the two legs touch with only a fine seam
+    RIN = 0.02 if kind == "leg" else None
     spec = []
     for k in range(0, 4):
         th = math.radians(90 * (4 - k) / 4)      # bottom ring first
@@ -163,7 +178,7 @@ def limb_rings(kind, side):
         hw_full = hwf(y)
         cx = -side * (0.5 - hw_full)       # inner face stays at -0.5 (right) / +0.5 (left)
         hw, hd = hw_full - ins, hdf(y) - ins
-        rings.append({"y": y, "hw": hw, "hd": hd, "cx": cx, "pts": ring(hw, hd, RC, cx, NZ_L)})
+        rings.append({"y": y, "hw": hw, "hd": hd, "cx": cx, "pts": ring(hw, hd, RC, cx, NZ_L, -side, RIN)})
     return rings
 
 
@@ -275,9 +290,9 @@ def main():
         "NHFem_LeftLeg": build("NHFem_LeftLeg", limb_rings("leg", -1), "LeftLeg"),
     }
     balance_torso_depth(parts["NHFem_Torso"])
-    # keep the whole torso inside the R6 Torso box (1 stud deep): scale depth so the bust/seat peak is 0.5
+    # keep the torso near the R6 Torso box: scale depth so the bust/seat peak is DEPTH_CAP
     tv = parts["NHFem_Torso"].data.vertices
-    k = 0.5 / max(abs(v.co.y) for v in tv)
+    k = DEPTH_CAP / max(abs(v.co.y) for v in tv)
     for v in tv:
         v.co.y *= k
     report = [centre_check(ob, n) for n, ob in parts.items()]
@@ -286,9 +301,10 @@ def main():
     print(json.dumps(report))
     # FBX: every part at the origin, in its own R6 part space
     bpy.ops.object.select_all(action="DESELECT")
-    for ob in parts.values():
+    chosen = [ob for n, ob in parts.items() if ONLY is None or n[len("NHFem_"):] in ONLY]
+    for ob in chosen:
         ob.select_set(True)
-    bpy.context.view_layer.objects.active = parts["NHFem_Torso"]
+    bpy.context.view_layer.objects.active = chosen[0]
     # Roblox's 3D importer (measured on two imports, 2026-11-10): it reads this FBX as centimetres (export at 0.01),
     # and it maps Blender -Y to the Roblox front, so turn the geometry 180 deg about Z for the export (then back).
     def turn(obs):
@@ -296,7 +312,7 @@ def main():
             for v in ob.data.vertices:
                 v.co.x, v.co.y = -v.co.x, -v.co.y
     turn(parts.values())
-    bpy.ops.export_scene.fbx(filepath=os.path.join(OUT, "fbx", "NHFemaleBody.fbx"), use_selection=True,
+    bpy.ops.export_scene.fbx(filepath=os.path.join(OUT, "fbx", FBX_NAME + ".fbx"), use_selection=True,
                              object_types={"MESH"}, apply_unit_scale=True, global_scale=0.01, axis_forward="-Z",
                              axis_up="Y", mesh_smooth_type="FACE", path_mode="STRIP", embed_textures=False,
                              add_leaf_bones=False, bake_anim=False)
