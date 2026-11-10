@@ -1928,3 +1928,139 @@ Every piece is under 20k triangles. Every prop is baked at 2048.
 ![Cafe, signs and fittings](img/interiors45-cafe-fittings-contact.jpg)
 ![The general store](img/interiors45-store.jpg)
 ![The bookseller and its cafe corner](img/interiors45-books.jpg)
+
+## Batch 46 (shops): the armory and the spell shop
+
+`art/props/nh_props_batch46.py`. Homes phase 2: two shared shop interiors the builder places in the town. The **armory** is a monster-hunters' outfitter for the Vigil, built round the game's three weapon classes (katana, fist, claws) and the hunt (silver and ash against vampires, werewolves, ghouls and wraiths); it is iron, steel, silver, leather and crimson, and nothing in it glows. The **spell shop** (Hex and Hollow) is night-violet enamel, brass, black marble and velvet, and it is the one place in this kit where things glow. 29 props, each with its own silhouette and one signature idea. None repeats batch 45's general shop pieces, batch 47's witch-hut pieces, the library's ChainedBookcase / ForbiddenCage / ScrollRack, the seer set, the ArmillarySphere, CelestialGlobe, StarChartRug, SpecimenJars, CrowPerch, TackleDummy or the gym's BowRack. All names, mottoes and designs are invented; no blood or gore anywhere (the claw marks are clean grooves).
+
+- **Which shop is which:** NHBuildKit `Armory` takes the 15 armory props, NHBuildKit `SpellShop` the 14 spell-shop props (the two lists below).
+- **Run:** `E:/NH-Work/props46/`.
+  - `run46.py` runs nh_props without editing its import list (`--check` counts tris, `--quick` workbench views, `--fast` previews without baking, `--previewonly` re-renders previews on the exported FBX meshes via `fbxswap`).
+  - `bake46.sh armory|spell|all|<Prop>` bakes at 2048 with 64 samples on the GPU, holding a shared bake slot.
+  - `sheet46.py`, `render46.py`, `upload46.py`, `docs46.py` and `names46.py` make the contact sheets, staged renders, upload folder and this section.
+- **Files:**
+  - FBX in `art/props/fbx/shops-batch46/`
+  - maps in `art/props/textures/<Prop>_*.png` (2048)
+  - previews in `art/props/previews/`
+  - upload copies (1024) in `art/group-upload/shops-batch46/` (115 maps)
+  - contact sheets and the two interiors in `art/props/renders/shops-batch46/`
+- **Shared maps:** none. The house crests and the school shield (ShieldWall, KatanaStand, PlateArmourStand) come from batch 43's GymPrint atlas and are baked into each prop's own maps.
+- **Pivots:** bottom centre, front toward -Y. Wall pieces have their back on y = 0 with the pivot at their lowest point. No door rigs in this batch: the dagger case is padlocked shut and the wand coffin's glass front is fixed.
+- **Square bars:** the builder wraps `nh_props.tube` so square-section bars get outward normals (as built they point in, which the bake's AO turned black and Roblox would cull); the same fix as batch 45. KatanaStand, PolearmRack, Grindstone, HelmShelf, ArmorySign, ClawGauntletDisplay, OddmentsEtagere and SpellShopSign were rebaked with it.
+
+### Template notes (NHBuildKit `Armory` and `SpellShop`)
+
+- **Kit names:** `Armory` for the armory list, `SpellShop` for the spell-shop list. Every piece takes its own prop's four maps.
+- **Glass:** SilverDaggerCase_Glass (the sloped lid and front), HuntersReliquary_Glass (the holy-water flasks and the wolfsbane jar), ScryingOrbStand_Glass (the orb), WandCoffin_Glass (the coffin front), PotionHoneycomb_Glass (every bottle), OddmentsEtagere_Glass (the jars): Roblox Glass, about 0.5 transparency (0.3 for the orb, so its mist reads).
+- **Glow (Neon), spell shop only:**
+  - TetheredGrimoires: `TetheredGrimoires_Glow` (180, 120, 255)
+  - PotionHoneycomb: `PotionHoneycomb_Glow` (190, 110, 255), `PotionHoneycomb_Glow2` (120, 255, 150)
+  - ScryingOrbStand: `ScryingOrbStand_Glow` (160, 205, 255)
+  - WandCoffin: `WandCoffin_Glow` (210, 180, 255)
+  - RuneStoneTable: `RuneStoneTable_Glow` (90, 230, 220)
+  - ScrollCarousel: `ScrollCarousel_Glow` (220, 230, 255)
+  - WaxfallAltar: `WaxfallAltar_Glow` (190, 140, 255)
+  - OrreryCounter: `OrreryCounter_Glow` (255, 190, 90)
+  - StarChartBanner: `StarChartBanner_Glow` (200, 220, 255)
+  - HangingCrystals: `HangingCrystals_Glow` (180, 120, 255), `HangingCrystals_Glow2` (100, 230, 230)
+  - FamiliarPerch: `FamiliarPerch_Glow` (255, 180, 60)
+  - RuneCircleRug: `RuneCircleRug_Glow` (90, 230, 220)
+  - OddmentsEtagere: `OddmentsEtagere_Glow` (170, 255, 120), `OddmentsEtagere_Glow2` (190, 215, 255)
+  - SpellShopSign: `SpellShopSign_Glow` (220, 200, 255)
+- **Lights and particles** (the template script adds these; positions are from the prop's pivot):
+  - Grindstone: light none; particles: optional, while someone uses it: sparks off the wheel's front, colour (255, 190, 110), rate 30, speed 6, lifetime 0.3, size 0.04, spread 25
+  - TetheredGrimoires: light PointLight (180, 120, 255), brightness 0.8, range 10, at 3.8 over the plinth; particles: a slow drift of violet motes round the books: colour (190, 140, 255), rate 4, speed 0.3, lifetime 3-5, size 0.08-0.15, light emission 1
+  - PotionHoneycomb: light two PointLights in front of the comb at 2.0 and 3.8 (one violet 190, 110, 255, one green 120, 255, 150), brightness 0.6, range 9
+  - ScryingOrbStand: light PointLight (160, 205, 255), brightness 0.7, range 9, at the orb (4.25); NHCandle (slow) so the mist breathes; particles: inside the orb: colour (170, 210, 255), rate 6, speed 0.1, lifetime 2, size 0.05-0.1, LockedToPart
+  - WandCoffin: light PointLight (210, 180, 255), brightness 0.4, range 5, at the glowing wand tip
+  - RuneStoneTable: light PointLight (90, 230, 220), brightness 0.7, range 9, at 3.3 over the table
+  - ScrollCarousel: light PointLight (220, 230, 255), brightness 0.4, range 6, at the star (5.9)
+  - WaxfallAltar: light two PointLights (190, 140, 255) at 2.3, brightness 1.0, range 12, `NHCandle`; particles: none (the flames are Neon; no fire particles, they would read as real fire)
+  - OrreryCounter: light PointLight (255, 190, 90), brightness 0.9, range 10, at the sun (about 5.1 up)
+  - StarChartBanner: light none (the stars are small; a SurfaceLight would wash the cloth)
+  - HangingCrystals: light PointLight (180, 120, 255), brightness 1.0, range 14, at the big crystal; a second one teal (100, 230, 230), brightness 0.5, range 10; particles: a few sparkles falling off the crystals: colour (200, 180, 255), rate 3, speed 0.5, lifetime 2, size 0.05
+  - FamiliarPerch: light PointLight (255, 180, 60), brightness 0.2, range 3, at the owl's eyes (or none)
+  - RuneCircleRug: light SurfaceLight or a PointLight 1.0 over the centre (90, 230, 220), brightness 0.5, range 10
+  - OddmentsEtagere: light PointLight (170, 255, 120), brightness 0.4, range 5, at the firefly jar (5.2); particles: fireflies in their jar: colour (170, 255, 120), rate 3, speed 0.2, lifetime 2, size 0.03, LockedToPart
+  - SpellShopSign: light PointLight (220, 200, 255), brightness 0.6, range 8, at the star (3.0)
+- **Collisions:** the Collides column below. Floor furniture collides; signs, wall racks, the rug, the crystals and small clutter don't.
+
+### Showcase placement notes
+
+- **Wall pieces** (bottom height on the wall in the Showcase column): ShieldWall, HelmShelf, CrossbowRack, ArmorySign, PotionHoneycomb, StarChartBanner, SpellShopSign. The two signs are hanging shop signs: their arm sticks out from the wall along the pivot's -Y, the board hangs in the plane at right angles to the wall and is lettered on both faces.
+- **Against a wall (floor pieces):** PolearmRack, HuntersReliquary, WandCoffin (its easel legs go 1.3 back), WaxfallAltar, OddmentsEtagere.
+- **Ceiling:** HangingCrystals: the pivot is at its lowest point; the ceiling rose's top is 5.2 above it. In a room with a ceiling at height C, place the pivot at C - 5.2. On the showcase, stand it on the floor.
+- **Plinth / counter top:** ClawGauntletDisplay (1.8 x 1.0, 2.0 tall) sits on ArmoryCounter (top at 3.18).
+- **Pairs:** RuneStoneTable stands on RuneCircleRug (rug top 0.09).
+
+### Props
+
+Every piece is under 20k triangles (the builder decimates anything over 19.5k to 19k). Every prop is baked at 2048.
+
+#### Armory (NHBuildKit `Armory`)
+
+**Weapons**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| KatanaStand | 11.3k | yes | floor | A three-tier katana stand in black lacquer with a crimson torii-style top bar (upswept ends) and a Vigil crest plaque: a crimson-sheathed katana, a black one, and on top a katana half drawn to show its blade; 4.6 wide, 3.9 tall. (W x D x H 4.84 x 1.3 x 3.77) |
+| PolearmRack | 16.8k | plinth, posts and panel (not the heads) | floor (against a wall) | A monster hunters' polearm rack: a crimson-enamelled plinth banded in black iron with the Vigil crest, two heavy iron posts with silver crescent finials and two loop rails, and five polearms standing broadside with their silver-edged heads up: a halberd, a raven's-beak bec de corbin, a boar spear (silver crossbar lugs, a crimson pennon) in the middle, a tasselled silver pike and a hooked glaive; 4.9 wide, 1.6 deep, 9.0 tall. (W x D x H 5.35 x 1.6 x 9.32) |
+| CrossbowRack | 12.0k | no | wall 1.2 | A black iron wall rack of three crossbows standing butt-down, strings drawn: a steel-prod arbalest with its windlass in the middle, a hunting crossbow and a light one either side; a leather bolt case of silver bolts along the bottom rail and a brass BOLT AND BRACE plate; 5.6 wide, 5.3 tall (wall). (W x D x H 5.56 x 0.47 x 5.34) |
+| BoltBarrel | 10.9k | barrel only | floor | An iron-hooped oak barrel of hunting ammunition split by an iron cross divider: silver-headed bolts fletched in crimson and bone, longer arrows standing out of one quarter, a SILVER TIPPED brass plate, its lid leaning on the side; 2.2 across, 2.9 tall. (W x D x H 1.99 x 1.63 x 2.74) |
+| ClawGauntletDisplay | 6.8k | no | plinth / counter top | A counter-top display for the fist and claw classes: on a raked black iron stand with a crimson velvet bed, a steel Specter-claw gauntlet with three long hooked blades raised on an iron hand-form, a spiked fist gauntlet beside it, a row of brass knuckle-dusters on a rail and two rolled crimson hand wraps; 1.9 wide, 1.1 deep, 1.7 tall (plinth). (W x D x H 1.8 x 1.0 x 1.97) |
+
+**Armour**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| PlateArmourStand | 11.3k | yes (the suit and stand as one) | floor | A suit of Vigil plate on a cross-shaped iron stand: a ridged breastplate scored by three claw gouges (a werewolf's, no blood), pauldrons and faulds, a plumed bascinet with a mail aventail, a crimson Vigil tabard and gauntlets hung from the crossbar; 3.0 wide, 6.3 tall. (W x D x H 2.89 x 1.62 x 5.56) |
+| MailHauberkStand | 11.3k | yes | floor | A knee-length hauberk of silver mail on an iron dress form: brass-ringed sleeves and hem, a crimson quilted gambeson showing beneath, a mail coif and mantle over the head form, a leather belt with a silver buckle and a price tag reading SILVER MAIL; 2.0 wide, 5.6 tall. (W x D x H 2.54 x 1.68 x 5.25) |
+| HelmShelf | 14.7k | no | wall 2.2 | A two-tier black iron helm shelf on scrolled brackets under a gothic arcade with fleur cresting: a gilt-crossed great helm, a lacquered kabuto with a gilt crescent and crimson lacing, a sallet with its bevor, and a wolf-snouted hunter's bascinet with iron ears; 5.4 wide, 1.2 deep, 4.9 tall (wall). (W x D x H 5.3 x 1.76 x 4.84) |
+| ShieldWall | 8.2k | no | wall 1.6 | A wall of house arms on a black iron trellis: the school's great shield over two crossed silver-headed spears, the five house shields round it (Crimson, Ravens, Rovers, Vigil, Wardens), spear-tipped top rail, a brass HOUSE ARMS plate; 6.6 wide, 6.7 tall (wall). (W x D x H 6.56 x 0.32 x 6.44) |
+
+**The shop**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| ArmoryCounter | 12.4k | yes (body and top; not the scale or bell) | floor | The armourer's counter: crimson-enamelled steel banded and riveted in black iron, a portcullis grille panel with spiked feet either side of a crossed-katanas roundel, a black marble top with a brass blade-length rule inlaid along its front, a brass balance weighing silver shot, a ledger with quill and ink, a service bell and a tray of silver bullets; 6.6 wide, 2.4 deep, 3.9 tall. (W x D x H 6.7 x 2.38 x 4.39) |
+| SilverDaggerCase | 12.5k (Main 12.4k, Glass 0.0k) | yes | floor | A locked display case of hunters' silver on iron legs with lion-claw feet: silver daggers fanned on crimson velvet with four silver-capped ash stakes and a silver rosary, under a sloped glass lid (Glass) barred by an iron cross-hasp and padlock; a SILVER ASH IRON plate; 3.8 wide, 1.9 deep, 3.4 tall. (W x D x H 3.88 x 1.89 x 3.38) |
+| HuntersReliquary | 18.7k (Main 17.6k, Glass 1.1k) | yes | floor (against a wall) | A limestone reliquary shelf under a pointed arch and silver cross, against the night: holy-water flasks with cross stoppers (Glass), tins and pouches of silver shot, a bundle of ash stakes, a jar of wolfsbane, a garlic braid on the jamb and a rosary over the top shelf; a brass AGAINST THE NIGHT plate; 3.6 wide, 1.4 deep, 7.6 tall. (W x D x H 3.3 x 1.55 x 7.85) |
+| Grindstone | 5.4k | yes | floor | A treadle grindstone: a sandstone wheel on a cast-iron A-frame dipping into an iron water trough, a crank and treadle pedal, a copper drip can over the wheel, a tool rest with a blade on it and a side tray with a whetstone and oil can; 1.9 wide, 3.4 deep, 3.3 tall. (W x D x H 1.95 x 2.67 x 3.35) |
+| BeastPell | 9.6k | yes (post, torso, head; the arms too, so it can be hit) | floor | A beast-fighting pell for fist and claw training: a leather-hide torso on an iron post with three spring-loaded striking arms (coiled springs at the joints), a riveted iron wolf mask for a head, claw-scored hide, on a bolted iron cross foot weighed down with sandbags; 2.6 wide, 2.6 deep, 6.4 tall. (W x D x H 1.91 x 3.19 x 6.06) |
+| ArmorySign | 10.0k | no | wall 4.6 (the arm sticks 3.7 out) | The hanging sign: a scrolled wrought-iron bracket off the wall holding a crimson enamel shield on two rings, crossed silver katanas over three claw slashes, and IRON VIGIL / ARMOURER in gilt on both faces; 3.6 out from the wall, 3.9 tall (wall; pivot on the wall plate). (W x D x H 0.6 x 3.73 x 3.4) |
+
+#### Spell shop (NHBuildKit `SpellShop`)
+
+**Books, scrolls and runes**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| TetheredGrimoires | 20.2k (Main 17.7k, Glow 2.5k) | plinth only (players walk under the books) | floor | Five grimoires that will not stay shelved: they float over an octagonal black marble plinth, straining upward at the taut iron chains that moor them to its bollards, boards ajar and loose pages drifting, a violet sigil glowing on each cover and a glowing rune ring set in the plinth (Glow); 2.8 across, 6.4 tall. (W x D x H 2.92 x 2.75 x 5.96); Glow Glow (180, 120, 255) |
+| ScrollCarousel | 15.0k (Main 15.0k, Glow 0.0k) | yes | floor | A revolving brass scroll carousel: three tiers of night-enamel trays on a bronze tripod and centre post, rolled scrolls standing in each tier's gallery with coloured wax seals and ribbons, crowned by a crescent moon cradling a glowing star (Glow); 2.2 across, 6.6 tall. (W x D x H 1.94 x 2.03 x 6.35); Glow Glow (220, 230, 255) |
+| RuneStoneTable | 5.6k (Main 4.2k, Glow 1.4k) | yes (stones and top; not the floating stones) | floor | A rune-casting table: a round slate top on three squared standing stones, a glowing rune ring cut round its rim (Glow), a brass casting bowl, scattered carved rune stones and a velvet bag, and three stones hanging in the air over the centre, their runes lit (Glow); 3.0 across, 3.6 tall. (W x D x H 2.94 x 2.94 x 3.72); Glow Glow (90, 230, 220) |
+| RuneCircleRug | 5.6k (Main 2.4k, Glow 3.2k) | no (flat) | floor | A round rug of deep violet wool with a crimson border and fringe, a glowing rune circle worked into it (Glow): two rings, a seven-pointed star, a crescent at the centre and runes between the rings; 8.4 across, flat. (W x D x H 8.4 x 8.4 x 0.09); Glow Glow (90, 230, 220) |
+| StarChartBanner | 5.2k (Main 3.4k, Glow 1.8k) | no | wall 0.8 (rod at 7.15) | A star-chart banner of indigo cloth on an iron rod with crescent finials: five gilt-threaded constellations whose stars glow (Glow), a great gilt crescent at the top and a sun medallion near the hem, a gilt border and a dagged hem with tassels; 4.2 wide, 7.6 tall (wall). (W x D x H 4.66 x 0.47 x 7.35); Glow Glow (200, 220, 255) |
+
+**Potions, crystals and curios**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| PotionHoneycomb | 17.1k (Main 9.8k, Glass 5.5k, Glow2 0.6k, Glow 1.2k) | no | wall 1.2 | A brass honeycomb wall of potions: 21 hexagonal cells backed in night-violet enamel, each holding a different bottle (round, tall, cone, bulb, square, heart) of glowing violet or green elixir (Glow, Glow2), a gilt crescent on top and an ELIXIRS plate below; 5.6 wide, 0.6 deep, 5.0 tall (wall). (W x D x H 5.4 x 0.6 x 4.75); Glow Glow (190, 110, 255), Glow2 (120, 255, 150) |
+| OddmentsEtagere | 11.1k (Main 8.4k, Glass 1.4k, Glow 0.7k, Glow2 0.5k) | yes | floor (against a wall) | A tall narrow black iron etagere of strange ingredients under a pointed arch: four shelves of glass jars (Glass) holding fireflies and glowing toadstools (Glow), a storm cloud with its lightning (Glow2) and drifting star dust, raven feathers, quartz points, moon salt and snail shells, each with a paper label; 2.2 wide, 1.0 deep, 7.2 tall. (W x D x H 2.14 x 1.04 x 7.29); Glow Glow (170, 255, 120), Glow2 (190, 215, 255) |
+| HangingCrystals | 13.6k (Main 8.5k, Glow 3.2k, Glow2 1.9k) | no | ceiling (5.2 from the rose to the lowest point) | A ceiling cluster of glowing quartz: an iron ring hung on three chains from a ceiling rose, nine quartz points on fine chains at different drops round it and a great double cluster in the middle, violet and teal (Glow, Glow2), with brass caps; 3.0 across, 5.2 from the ceiling plate to the lowest point (ceiling). (W x D x H 2.72 x 2.64 x 5.2); Glow Glow (180, 120, 255), Glow2 (100, 230, 230) |
+| ScryingOrbStand | 7.1k (Main 5.6k, Glass 1.0k, Glow 0.6k) | yes | floor | A scrying orb held up in a cupped bronze hand on a three-strand twisted bronze column: the orb (Glass) holds a spiral of pale mist round a bright core (Glow), and three silver moon-phase lenses on curling arms circle it; 2.4 across, 5.0 tall. (W x D x H 1.96 x 2.01 x 4.8); Glow Glow (160, 205, 255) |
+| WandCoffin | 7.6k (Main 7.4k, Glow 0.1k, Glass 0.0k) | yes | floor (against a wall) | A coffin-shaped wand case stood up on a black iron easel, leaning back: black lacquer with gilt corner fittings, seven wands of ebony, bone, twisted oak, silver and crystal laid across in plum velvet behind a coffin-shaped glass front (Glass) with a brass cross, the crystal-tipped wand glowing (Glow), and a WANDS CHOOSE plate on the ledge; 1.6 wide, 1.9 deep, 4.2 tall. (W x D x H 1.5 x 2.03 x 4.36); Glow Glow (210, 180, 255) |
+
+**The shop**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| OrreryCounter | 15.4k (Main 14.9k, Glow 0.4k) | yes (body and top; not the orrery) | floor | The spell shop counter: night-violet enamel between brass pilasters, a row of silver moon-phase medallions along the front, a black marble top; on it a great brass orrery (a glowing sun, Glow, five planets on arms, one ringed, one with a moon), a brass till and an open ledger; 6.4 wide, 2.4 deep, 5.4 tall. (W x D x H 6.32 x 2.47 x 5.37); Glow Glow (255, 190, 90) |
+| WaxfallAltar | 9.4k (Main 7.2k, Glow 2.1k) | yes | floor (against a wall) | A black marble altar of three steps crowded with burned-down pillar candles whose wax has poured down every riser in a frozen waterfall, violet flames (Glow); an open spellbook on a gilt stand on top and a tall pointed backboard with a glowing moon sigil (Glow); 3.6 wide, 2.6 deep, 6.0 tall. (W x D x H 3.44 x 2.67 x 5.9); Glow Glow (190, 140, 255) |
+| FamiliarPerch | 6.9k (Main 6.6k, Glow 0.3k) | column and foot | floor | A familiar's perch: a brass T-perch with seed and water cups on a twisted iron column and marble foot, a bronze crescent arching over it with a little bell, and a great horned owl on the bar, ear tufts up, amber eyes glowing (Glow), a brass message tube on its leg; 2.2 wide, 1.6 deep, 6.4 tall. (W x D x H 2.38 x 1.59 x 6.15); Glow Glow (255, 180, 60) |
+| SpellShopSign | 10.5k (Main 10.4k, Glow 0.0k) | no | wall 4.8 (the arm sticks 3.3 out) | The spell shop's hanging sign: a wrought-iron arm off the wall holding a bronze crescent moon that cradles a glowing star on a chain (Glow), and beneath it a pointed night-enamel board lettered HEX AND HOLLOW / spells charms oddments in gilt on both faces; 3.3 out from the wall, 4.4 tall (wall; pivot on the wall plate). (W x D x H 0.5 x 3.4 x 4.1); Glow Glow (220, 200, 255) |
+
+![The armory props](img/shops46-armory-contact.jpg)
+![The spell shop props](img/shops46-spellshop-contact.jpg)
+![The armory](img/shops46-armory-interior.jpg)
+![The spell shop](img/shops46-spellshop-interior.jpg)
