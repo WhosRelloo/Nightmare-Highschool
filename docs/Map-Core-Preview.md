@@ -102,6 +102,15 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 - **When `UI.Appearance` is copied again:** take NH Combat Test's live file, then put this line back as the first line of `function Appearance.AtTag(p, tag)`: `if workspace:GetAttribute("NHAnywhereWardrobe") then return true end`.
 - **Tested (local play-test):** K > Look > Body: Female (real click) gave all five meshes on a 0.87-scale character, with clothing, skin and hair showing and the Walk track playing. The owner then checked it in the same play-test ("I checked everything. It looks good."). Claude didn't try an M1.
 
+
+## Added 2026-11-10 (1.69.1): body types
+
+- The Map has NH Combat Test's 1.69.0 body types (`docs/Body-Types.md`): twelve bodies, a build from the admin desk only, gender from the Wardrobe.
+- **Files:** `UI.Appearance` (NH Combat Test's live file + the Map's `NHAnywhereWardrobe` line), `Services.Features.Admin` and `Controllers.Gui.AdminPanel` (NH Combat Test's, byte for byte), `Controllers.Gui.Wardrobe` (NH Combat Test's Body row and `IsFemale`, on top of the Map adapters). Before-copies in `ServerStorage.NHCore.Backups.BodyTypes_pre`.
+- **To try it:** F3 > Student > click your name > Build: Skinny, Conditioned I/II or Heavy I/II. Switch gender in K > Look > Body; the build carries over. Nothing is saved in the Map.
+- **Tested (local play-test):** every Build button with real clicks gave the right body for both genders, Female carried Heavy II over to Plus, and the Strong body walked and swung the katana (M1.1, M1.2).
+- **When copying the Wardrobe again:** take NH Combat Test's live file and re-add the Map adapters: `Bloodline` in `TABS`, `Local.BloodlineTab`, it in the Render list, the `NHAnywhereWardrobe` check in `Shared.Toggle`, and the K handler at the end of `OnStart`.
+
 ## Removing it
 Run this in the Map place's command bar, then save:
 

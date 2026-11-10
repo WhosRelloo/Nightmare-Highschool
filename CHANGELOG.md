@@ -2,6 +2,30 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.69.1] - 2026-11-10: Body types in the Map place
+
+Owner: "Do it" (sync NH Combat Test's 1.69.0 body types into the Map place). Record: `docs/Map-Core-Preview.md` (the bodies themselves: `docs/Body-Types.md`).
+
+### Changed (Map place)
+- **All twelve bodies are in the Map:** Standard and Female, plus Lean, Athletic, Muscular, Stocky, Heavy, Petite, Toned, Curvy, Strong and Plus. A build comes only from the admin desk (no training system in the Map yet), as in the full game.
+- **The four scripts 1.69.0 changed that the Map has:**
+  - `UI.Appearance` is NH Combat Test's live file plus the Map's one `NHAnywhereWardrobe` line (byte for byte against that). It brings the bodies, `BodyGender` / `IsFemale` / `BodyBuild` / `BodyFor`, the server build guard and `SetBuild`.
+  - `Services.Features.Admin` and `Controllers.Gui.AdminPanel` are NH Combat Test's live files, byte for byte (the Map's copies were identical to NH Combat Test's before 1.69.0). The desk's Student tab has the Build row.
+  - `Controllers.Gui.Wardrobe` got NH Combat Test's Body row (Standard / Female, the build carries over) and the `IsFemale` hair order. A line diff against NH Combat Test's live file shows only the Map's own adapters (the Bloodline tab, K anywhere).
+- The other five scripts 1.69.0 changed (NpcLooks, AmbientNpcs, Schedules, Enrollment, CliqueShowdowns) aren't in the Map, and no other Map script tested `Body == 2`. Nothing else was needed: the meshes are group assets, and `SetBuild` saves through the same `Data.UpdateState` path as every look change, which the Map's in-memory stand-in already handles.
+- The Map's previous copies are in `ServerStorage.NHCore.Backups.BodyTypes_pre`.
+
+### Verified (Map place, local play-test)
+- **The desk:** the real F3 key, a click on the student, then real clicks on every Build button. The server character got the right five meshes each time:
+  - Male: Conditioned II gave Muscular, Skinny Lean, Conditioned I Athletic, Heavy I Stocky, Heavy II Heavy. Average went back to Standard with no meshes.
+  - Female: Conditioned I gave Toned, Skinny Petite, Heavy I Curvy, Conditioned II Strong.
+  - The desk answered "WhosRello is now Muscular", and each click is in the server log as `[Admin] SetBuild`.
+- **The Wardrobe (K):** the Body row showed only Standard / Female. Clicking Female as a trained Heavy II gave **Plus**: the build carried over through the server guard.
+- **On the Strong body:** a lit three-quarter shot showed the hoodie and jeans mapped, with the katana. A real W walked 15.6 studs on the Walk track. A real E drew the katana, and real clicks played Katana M1.1 and M1.2. The five meshes stayed on throughout.
+- No errors from the changed scripts.
+- **Not tried:** Petite, Toned, Curvy and Plus up close (their meshes were checked, not shots), walking and M1 on the other bodies, capes and transformation outfits on them, and a second player.
+- **Seen, not changed:** after the desk changes a build, the open Wardrobe doesn't show the "Build: ..." note until the look is loaded again, because it keeps the look it read on spawn. NH Combat Test's Wardrobe works the same way.
+
 ## [1.69.0] - 2026-11-10: Body types, earned through training
 
 Owner: "model some more body types for both genders ... different shapes, muscles, etc. Make them all respective to their current models", "Only through training (or the admin menu)". The owner reviewed three rounds of renders: "more detailed & exaggerated", then "no overlap in the legs", "no shoulder pads", "less cartoony". Record: `docs/Body-Types.md`.
