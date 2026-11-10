@@ -2,6 +2,21 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.68.2] - 2026-11-10: The female body in the Map place
+
+Owner: "Throw the new female body in "Map" place". Record: `docs/Map-Core-Preview.md` (the body itself: `docs/Female-Body.md`).
+
+### Changed (Map place)
+- **The Map's Female body is now the full v2 body** (five R6 CharacterMeshes: torso, arms, legs), the same as NH Combat Test's 1.68.1. It used to be the old single Female torso (48112070) on standard limbs.
+- **How:** the Map's `ReplicatedStorage.UI.Appearance` got NH Combat Test's two changed blocks, `Bodies.female` (with `Meshes`) and the body-shape section of `ApplyTo`. A line-by-line diff showed those were the only changes since the Map's copy. The result is NH Combat Test's live file plus the Map's one extra line (`NHAnywhereWardrobe` in `AtTag`), checked byte for byte against that.
+- The meshes are group asset ids, so nothing else needed copying. The Map's copy from before is kept in `ServerStorage.NHCore.Backups.Appearance_pre_FemaleBody`.
+
+### Verified (Map place, local play-test)
+- The real K key and a real click on Look > Body: **Female** gave the server character all five v2 `NHBodyMesh` meshes (Torso 107771235632658, the arms, Right Leg 111053847385892, Left Leg 87713593848889), with a shirt, pants and skin colours.
+- **The Map's heights:** the character had rolled 0.87 scale, and the meshes scale with the parts. The front view showed the waist, the tapered arms and the legs meeting at the hips, and the Wardrobe's preview showed the same shape.
+- During the test the owner took over the character. They put on a vest, blouse and fishnets and "Super Long Straight" hair, and walked. All of it showed on the new body (clothing mapped, skin on the hands, hair on the head), and the Walk track played.
+- **Not tried:** an M1 (the owner was driving the character), M2, blocking, capes on the new torso, the transformation outfits, and a second player.
+
 ## [1.68.1] - 2026-11-10: Female body v2: the legs meet, a fuller bust
 
 Owner: "The legs should still connect like these kind of. I don't like how much of a gap there is in it. And make the bust a little more noticeable". Record: `docs/Female-Body.md`.

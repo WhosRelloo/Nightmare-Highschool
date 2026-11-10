@@ -95,6 +95,13 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 - The two controllers are tagged `NHCore` (they also go with the Controllers folder in the removal command). `ServerStorage.NHCore.README` lists them.
 - **1.67.1, capes sway:** `Controllers.Character.CapeSway` (NH Combat Test's, byte for byte, tagged `NHCore`). The Vamp, Rogue and Fur capes were already here, rigged the same as NH Combat Test's; they now swing when you run, lag on turns, flutter in the air and breathe at rest. Tested: the Vamp Cape, put on with real clicks, breathed 0.1 to 1.5 degrees at rest, swung to 18.7 while walking and fluttered to 7.8 after a jump.
 
+
+## Added 2026-11-10 (1.68.2): the female body
+
+- The Map's `UI.Appearance` now has NH Combat Test's v2 Female body (`docs/Female-Body.md`): five R6 CharacterMeshes instead of the old single torso. It's NH Combat Test's live file plus the Map's one `NHAnywhereWardrobe` line, checked byte for byte. The previous Map copy is in `ServerStorage.NHCore.Backups.Appearance_pre_FemaleBody`.
+- **When `UI.Appearance` is copied again:** take NH Combat Test's live file, then put this line back as the first line of `function Appearance.AtTag(p, tag)`: `if workspace:GetAttribute("NHAnywhereWardrobe") then return true end`.
+- **Tested (local play-test):** K > Look > Body: Female (real click) gave all five meshes on a 0.87-scale character, with clothing, skin and hair showing and the Walk track playing. An M1 wasn't tried.
+
 ## Removing it
 Run this in the Map place's command bar, then save:
 
