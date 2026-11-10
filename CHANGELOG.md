@@ -2,6 +2,46 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.69.0] - 2026-11-10: Body types, earned through training
+
+Owner: "model some more body types for both genders ... different shapes, muscles, etc. Make them all respective to their current models", "Only through training (or the admin menu)". The owner reviewed three rounds of renders: "more detailed & exaggerated", then "no overlap in the legs", "no shoulder pads", "less cartoony". Record: `docs/Body-Types.md`.
+
+### Added (NH Combat Test)
+- **Ten body types**, each a variant of that gender's current body. They keep the same head, height, joints and animations, and widths inside the R6 boxes.
+  - **Male:** Lean (skinny), Athletic and Muscular (conditioned), Stocky and Heavy (heavy).
+  - **Female:** Petite, Toned and Strong, Curvy and Plus.
+  - **Detail:** muscle definition, collarbones, spines, bellies with back rolls, and hips that meet the legs like standard R6.
+- **Builds:** every body has a `Gender`, a `Build` (Average, Skinny, Conditioned or Heavy) and a `Step`. `Appearance.SetBuild(player, build, step)` is the server call for the coming training system: it keeps the gender, saves and re-applies the look.
+- **Admin desk (F3):** a Build row (Average, Skinny, Conditioned I and II, Heavy I and II).
+
+### Changed
+- **Creator Body is Standard / Female only.** A trained build carries over when you switch gender. The server enforces this, so a client can't pick a build.
+- **Every `Body == 2` "female" check now uses `Appearance.IsFemale`**, so the new female bodies count as female:
+  - Wardrobe hair order, NpcLooks, AmbientNpcs and Schedules;
+  - Enrollment;
+  - CliqueShowdowns' Queen title;
+  - dressPick and FormOutfit.
+
+### Verified (NH Combat Test, slot 4 "Testy", Play)
+- **All ten bodies:** the right meshes on the server, clothing with skin and hair, walking (real keys for the male bodies), and a real-click M1 (all but Toned).
+- **All 50 imported meshes** read back with `EditableMesh` (size, centring, facing, inner sides).
+- **Saving and the creator:** the build survived a Studio restart, and the creator showed only Standard / Female with the trained build named.
+- **The server guard:** a forged look asking for an untrained build was turned into the saved build in the new gender.
+- **Console:** no new messages.
+
+### Not yet
+- **Not tried:**
+  - real clicks on the creator's gender buttons with a trained body;
+  - Toned's M1;
+  - an unknown build name (the rate limit answered first);
+  - NPC body types;
+  - a second player;
+  - the viewport previews;
+  - every outfit, form and cape on every body;
+  - M2, blocking and taking hits.
+- **A grey flash on first load:** a new body can show grey for about 5 seconds while Roblox builds its clothing texture.
+- **The Map place** doesn't have the body types yet.
+
 ## [1.68.2] - 2026-11-10: The female body in the Map place
 
 Owner: "Throw the new female body in "Map" place". Record: `docs/Map-Core-Preview.md` (the body itself: `docs/Female-Body.md`).

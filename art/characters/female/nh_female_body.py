@@ -323,4 +323,5 @@ def main():
         render_compare.run(parts, OUT)
 
 
-main()
+if __name__ == "__main__":
+    main()
