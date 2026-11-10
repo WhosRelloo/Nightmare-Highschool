@@ -2,6 +2,26 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.67.0] - 2026-11-10: Living hair, blinking eyes, and "Open" only on doors in the Map place
+
+Task: port the hair rigging and its animation, the eyes and their animation, and the UI for both from NH Combat Test to the Map place, and make the "E to open" prompt show only on doors. Record: `docs/Map-Core-Preview.md`.
+
+### Added (Map place, tagged NHCore)
+- **Hair that moves.** `Controllers.Character.HairSway`, the same as NH Combat Test's (byte for byte, checksums equal). The barber's 35 rigged hairs (1,133 bones) have been in the Map since 1.58, identical to NH Combat Test's, but nothing animated them. Now the hanging strands sway when you move, turn and fall, and in the wind, while the roots stay put.
+- **Eyes that blink.** `Controllers.Character.EyeBlink`, the same as NH Combat Test's (byte for byte). Painted eyes blink every 2.5 to 6 s (sometimes twice), with lids drawn for each eye shape and tinted to the skin, and they squint while you're combat-tagged. The lid art was already in the Map's `UI.EyeArt`.
+- **Nothing else to copy for the UI.** The Map's Wardrobe (K) Face and Hair tabs (eye shape, eye set, colour, brows, mouth, marks; built styles, the Barber's book, catalog hair, hair colour) and `UI.Appearance` were already NH Combat Test's current code. A line-by-line diff showed only the Map's own adapters (the Bloodline tab, and K opening it anywhere).
+- NH Combat Test has no eye-movement (look-around) system, so there was none to bring.
+
+### Fixed (Map place)
+- **"Open" showed on archways.** 33 of the builder's archways and window frames are built from the Headmaster door's frame, with the door leaf removed but still tagged `NHDoor`, so each one got an "Open Door" prompt with nothing to open. `Services.Features.Doors` in the Map now gives a door-kit model a prompt only if it has a door leaf. The builder's models weren't changed. All 86 real doors keep their prompt.
+
+### Verified (Map place, local play-test)
+- **Doors:** the server made 86 prompts, all on doors with a leaf; none on the 33 leafless frames; no other prompt anywhere in the workspace. Walking up to a classroom door showed "Open Door", and the real E key opened it (the prompt then read "Close"). Walking 18 studs straight through a leafless archway showed no prompt.
+- **Eyes:** 3 blinks in 10 s (each shut 0.12 to 0.15 s, the "sharp" lids tinted to the skin). A 6 s combat tag gave a squint for the 5 samples inside it, and open eyes after.
+- **Hair:** the real K key opened the Wardrobe, a real click on the Hair tab and then Barber's book "Wolfcut Ponytail" put on the 40-bone hair. At rest the strands drifted 1 to 3 degrees in the wind; walking with W at 12 studs/s swung them to 11 to 14 degrees; they settled back within a second of stopping.
+- No errors from HairSway, EyeBlink or Doors.
+- **Not tried:** a second player watching (both controllers animate every nearby player, as in NH Combat Test), sprinting and falling hair, an unrigged catalog hair, Reduce Motion, and night-sight eyes blinking.
+
 ## [1.66.0] - 2026-11-08: Prank desks
 
 Owner: "For the carvings on the desk, add variations for the cliques and factions for when they do pranks", then "yes wire the prank desk swap in".

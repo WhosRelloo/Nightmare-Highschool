@@ -84,6 +84,16 @@ The game's door system (`Services.Features.Doors`, `Controllers.World.Doors`) is
 in the Map (all already tagged `NHDoor`) opens and closes with E, swings away from you and shuts itself after 7 seconds.
 The doors themselves weren't changed. Tested on both Gothic double doors.
 
+
+## Added 2026-11-10 (1.67.0): living hair, blinking eyes, "Open" only on doors
+
+- **Hair sway:** `Controllers.Character.HairSway` (NH Combat Test's, byte for byte). The barber's 35 rigged hairs were already here (`ReplicatedStorage.NHHairCatalog`, identical to NH Combat Test's: 1,133 bones), but nothing moved them. The strands now sway with movement, turns, falls and wind.
+- **Blinking:** `Controllers.Character.EyeBlink` (NH Combat Test's, byte for byte). Eyes blink every 2.5 to 6 s and squint while combat-tagged. The lid art was already in `UI.EyeArt`.
+- **The UI was already here:** the Wardrobe's Face and Hair tabs and `UI.Appearance` match NH Combat Test's line for line, apart from the Map's own adapters. NH Combat Test has no eye look-around system.
+- **Doors:** 33 archways and window frames in the Map are the Headmaster door's frame with the leaf taken out, still tagged `NHDoor`, so they showed "Open Door". The Map's `Services.Features.Doors` now skips a door-kit model with no `DoorLeaf` part. The 86 real doors are unchanged. If the builder puts a leaf back in one of those frames, it gets its prompt again on the next run.
+- **Tested (local play-test):** 86 prompts, none on the archways; E opened a classroom door; 18 studs through an archway showed nothing; 3 blinks in 10 s and a squint during a combat tag; the Barber's book picked a 40-bone hair with real clicks, and it swayed 1 to 3 degrees at rest and 11 to 14 while walking. Not tried: a second player, sprint/fall sway, Reduce Motion.
+- The two controllers are tagged `NHCore` (they also go with the Controllers folder in the removal command). `ServerStorage.NHCore.README` lists them.
+
 ## Removing it
 Run this in the Map place's command bar, then save:
 
