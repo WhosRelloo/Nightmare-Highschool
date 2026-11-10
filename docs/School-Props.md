@@ -2068,3 +2068,176 @@ Every piece is under 20k triangles (the builder decimates anything over 19.5k to
 ![The spell shop](img/shops46-spellshop-interior.jpg)
 
 **In Studio (2026-11-10):** the same `tools/props/shop_kits_templates.luau` makes the 29 templates (NHBuildKits `Armory` and `SpellShop`). The spell shop's glows are Neon in the colours above with their PointLights (the scrying orb and the waxfall altar tagged `NHCandle`), plus four particle effects: the grimoires' violet motes, the mist in the orb, the crystals' falling sparkles and the fireflies in their jar. The grindstone's optional sparks are left out. Props marked "Collides: no" don't collide, and the rest collide on their precise shape. The showcase rows are "Armory" at z -862 and "Spell Shop" at z -898, with the rune-stone table standing on its rug.
+
+## Batch 47 (witchhut): the witch hut kit
+
+`art/props/nh_props_batch47.py`. Homes phase 2: a crooked, hand-built, mossy witch's hut for the builder to put up in the woods by the town, inside and out. The house look gives way here to weathered oak, wattle and lime daub, mossy fieldstone, reed thatch and mossy shingles, with hand-forged iron, bone, horn, wax, old bottle glass and patchwork mixed in. The witchy glow (sickly green, faint violet) is only on the magical pieces: the brew, the wisp, the spellbook's sigils, the moon-dew jar, the fairy ring and one charm. Everything else is lit by fire and candle. It is rustic and lived-in, not a shop: the spell shop (batch 46) has the potion wall, crystal ball, wand case and spellbook shelf. There is no blood or gore anywhere, only animal skulls (a goat, a fox, birds), bones, feathers and bottles. It has 26 props: 10 hut pieces and 16 things for inside and around it, each with one signature idea. All text and designs are invented.
+
+It doesn't repeat the existing kits. Next to the garden's MushroomRing (tall, pale, blue gills), PumpkinPatch and StoneLanternPost, the electives' freestanding HerbDryingRack, the gothic Fireplace and CastIronRange, the lounge's SpiritKettle, the library's raven Lectern and the rugs, this kit's ToadstoolRing, GourdPile, WispLanternPost, HerbBeamRack, HearthKettle, SpellLectern and BraidedRug are rustic, hand-made versions with a different silhouette.
+
+- **Printed atlas:** `art/props/witchhut_atlas.py` (system Python with PIL and numpy, on `dorm_atlas.py`'s Cell and Atlas) paints `WitchPrint` (4096; colour, gilt and height). It is a bake source only, so it isn't uploaded. It holds:
+  - 16 hand-written jar labels on torn parchment: Moonwort, Wolfsbane, Black Salt, Moon Dew, Toadstool, Crow Quills, Mandrake, Hemlock ("NOT for tea"), Willow Bark, Elderflower, Fen Moss, Dried Moths, Spider Silk, Hag Stones, Thistle Seed and Rue
+  - the spellbook's two pages: a moon circle with a finding charm, and moonwort and rue with a pressed leaf
+  - four loose notes: a moon calendar, a hiccup remedy ("ask the cat"), a toadstool study and a list of chores
+  - ten stitched spellbook spines, the patchwork quilt, the braided rug's coils, the door's hex sign and six burnt sigils for the tags
+
+  Its regions are in `art/props/witchhut_atlas.json`.
+- **Run:** `E:/NH-Work/props47/`.
+  - `run47.py` runs nh_props without editing its import list (`--check` counts tris; `--quick` makes workbench views; `--fast` previews without baking; `--previewonly` re-renders a preview from the exported FBX).
+  - `bake47.sh all|<Prop>` bakes at 2048 with 64 samples on the GPU, holding a shared bake slot.
+  - The builder is put together from `src/part*.py` by `asm.sh`.
+  - `sheet47.py`, `render47.py`, `upload47.py` and `names47.py` make the contact sheets, staged renders and upload folder.
+- **Files:**
+  - FBX in `art/props/fbx/witchhut-batch47/`
+  - maps in `art/props/textures/<Prop>_*.png` (2048)
+  - previews in `art/props/previews/` (plus `HutWallDoor_open.png`)
+  - upload copies (all at 1024) in `art/group-upload/witchhut-batch47/`: 94 maps (26 props x 4, less the all-black metal maps)
+  - contact sheets and renders in `art/props/renders/witchhut-batch47/`
+- **Pieces:** Main (named after the prop when it is the only piece), plus:
+  - `_Glow`: green or violet neon (see below)
+  - `_Glow2`: fire and candle flames
+  - `_Glass`
+  - `_Leaves`: alpha-cut cards on batch 40's shared `NH_GardenLeaves` set (ivy, grass, fern, lavender, herbs)
+  - `_Door0`: HutWallDoor's door
+- **Pivots:** bottom centre, front toward -Y (Roblox -Z), nothing below the pivot, except the hut's roof pieces, which sit on the wall plate like the roof kit's (see the snap table). Wall-hung pieces have their back on y = 0.
+
+### Building the hut (the snap grid)
+
+The hut goes up on an **8-stud grid**. The standard hut is **24 × 16** between post centres: three walls on each long side, two on each end, and a 45° thatched roof whose ridge runs along the middle. The walls stand on a rubble footing, so the **floor is 1.6 above the ground**, and the **wall plates' top is at 12.6**. Put a Part floor (FloorPlanks or OldBoards) at 1.6 inside.
+
+| Piece | Size | Pivot | Where it goes |
+|---|---|---|---|
+| HutPost | a 2.0 pier to 1.6, a 1.45 post to 12.6 | ground, on the post centre | at every corner and every joint between walls (every 8 along a wall line). A 24 × 16 hut takes 10. |
+| HutFooting | 8 long, 1.8 wide, top 1.6 | ground, mid-run | on a wall line between two posts. Its ends tuck into the piers. |
+| HutWall, HutWallWindow, HutWallDoor | 8 between post centres, 11 tall, 0.9 thick | the floor (1.6), mid-run, on the wall's centre line | on a footing between two posts, the outside facing out. Their ends tuck into the posts. |
+| HutGable | 16 wide, 8.7 to the apex | the wall plates' top (12.6), on the end wall's centre line, mid-end | on a 16-wide end, over its two walls, the skull and owl hole outward |
+| HutRoof | one 45° slope, 8 long (the thatch runs 1 past each end, overlapping its neighbours) | the wall plates' top (12.6) at the long wall's centre line | one per 8 along each long wall. Turn the back slope 180°. The eaves hang 1.6 below the plate and 2.4 out, and the slopes meet over the centre line. |
+| HutRidge | 8 long (overlaps like the roof), the roll's top 12.05 above its pivot | the wall plates' top (12.6), on the hut's centre line | one per 8 along the ridge. It also carries the ridge pole inside. |
+| HutChimney | base 4.4 × 2.8, about 30 tall | ground, its back on the gable wall's outside face | against a gable end (the end wall's line + 0.45). It leans away from the wall. Put HearthKettle inside on the same spot. |
+| HutPorch | 8.8 × 5 deck at 1.6, steps to 8.1 out | ground, on the door wall's centre line | under HutWallDoor. Its shingle lean-to tucks under the thatch eaves. |
+
+Other sizes work on the same grid (16 × 16, 32 × 16). Keep the ends 16 wide for the gable and the 45° roof.
+
+### Template notes (NHBuildKit `WitchHut`)
+
+- **Kit name:** `WitchHut`. Every piece takes its own prop's four maps, except the `_Leaves` pieces, which take batch 40's `NH_GardenLeaves` maps (already under the group). Give those AlphaMode = Transparency and turn DoubleSided on. The FBX keeps their custom normals.
+- **Collisions:**
+  - **The hut pieces collide** on their precise shape: footings, posts, walls (the door opening stays clear), gables, roofs and ridges (so nobody falls through), chimney and porch (deck, steps, posts, rails; not the charms).
+  - **Floor furniture collides:** WitchCauldron (pot and hearthstones, not the flames), HearthKettle (stone and hearthstone, not the fire), StrawBed, WitchWorkTable, SpellLectern, WitchHatStand (trunk only), SpellNoteShelf, WitchJarShelf (shelves), BroomCorner (bucket and brooms), CatBasket (basket), GourdPile, WispLanternPost (cairn and staff).
+  - **These don't collide:** BraidedRug (flat), ToadstoolRing (walk through it, at your own risk), HerbBeamRack, BoneChimes, and every `_Glow`, `_Glow2`, `_Glass` and `_Leaves` piece.
+- **Door:** `HutWallDoor_Door0` swings out (toward the porch) on its left hinge. Its FBX origin is on the hinge line at the door's foot, on the wall's outside face. Rig it like the other `Door0` pieces on the locker system (prompt "Door / Open", PivotOffset = the hinge, swing about 100°). The opening behind it is 4.0 wide and about 7.4 tall.
+- **Glass:**
+  - HutWallWindow's diamond-leaded panes: old green glass, transparency about 0.4
+  - WitchJarShelf's jars: clear, about 0.5
+  - BoneChimes' shards and bead: sea-green, about 0.3
+  - WispLanternPost's panes: smoky green, about 0.4
+- **Glow colours (Neon):**
+
+| Piece | Colour | What |
+|---|---|---|
+| WitchCauldron_Glow | sickly green (120, 255, 90) | the brew, its bubbles, the slop over the rim |
+| WitchCauldron_Glow2 | fire (255, 150, 60) | embers and flames under the pot |
+| HearthKettle_Glow2 | fire (255, 150, 60) | embers and low flames |
+| SpellLectern_Glow | faint violet (170, 90, 255) | the moon circle and crescent on the left page |
+| SpellLectern_Glow2, WitchWorkTable_Glow2 | candle (255, 150, 60) | candle flames |
+| WitchJarShelf_Glow | green (120, 255, 90) | the moon dew and the glow-worms in their jars |
+| WispLanternPost_Glow | sickly green (120, 255, 90) | the will-o'-the-wisp in the lantern |
+| ToadstoolRing_Glow | violet (170, 90, 255) | the gills of the small violet toadstools |
+| CatBasket_Glow | cat-eye (190, 255, 80) | the one eye open a slit |
+| HutPorch_Glow | violet (170, 90, 255) | the crystal charm |
+
+- **Lights for the template script** (positions from the pivot in studs, as (right, up, forward), forward being toward the prop's front):
+
+| Prop | Light | Colour | Brightness | Range | Where |
+|---|---|---|---|---|---|
+| WitchCauldron | PointLight | (120, 255, 90) | 1.2 | 14 | over the brew (0, 3.4, 0) |
+| WitchCauldron | PointLight, flickers | (255, 150, 60) | 1.5 | 16 | in the fire (0, 0.8, 0) |
+| HearthKettle | PointLight, flickers | (255, 150, 60) | 1.6 | 18 | in the fire (0, 1.4, 1.5) |
+| SpellLectern | PointLight, flickers | (255, 180, 110) | 0.8 | 8 | at the candle (1.6, 4.0, 0.1) |
+| SpellLectern | PointLight | (170, 90, 255) | 0.3 | 5 | over the open book (0, 4.4, 0) |
+| WitchWorkTable | PointLight, flickers | (255, 180, 110) | 0.7 | 8 | at the candle (3.0, 4.0, -1.1) |
+| WitchJarShelf | PointLight | (120, 255, 90) | 0.35 | 5 | at the moon-dew jar (0.25, 1.2, 0.55) |
+| WispLanternPost | PointLight, a slow pulse | (120, 255, 90) | 1.0 | 14 | in the lantern (1.7, 6.3, 0.2) |
+| ToadstoolRing | PointLight | (170, 90, 255) | 0.4 | 8 | in the middle (0, 0.8, 0) |
+| HutPorch | PointLight | (170, 90, 255) | 0.2 | 4 | at the crystal (0.9, 7.6, 4.6) |
+
+- **ParticleEmitters:**
+
+| Prop | Emitter | Colour | Rate | Speed | Lifetime | Size | Notes |
+|---|---|---|---|---|---|---|---|
+| WitchCauldron | bubbles | (120, 255, 90) | 6 | 1-2 up | 1-1.6 | 0.15 to 0.35 | from a disc r 1.3 at the brew (y 3.1); LightEmission 1 |
+| WitchCauldron | green steam | (90, 200, 80), transparency 0.7 | 4 | 0.5-1 up | 3-4 | 1 to 3 | from the brew, drifting |
+| WitchCauldron | embers | (255, 150, 60) | 12 | 2-4 up | 1-2 | 0.08 | from the fire; LightEmission 1 |
+| WitchCauldron | smoke | (60, 60, 60), transparency 0.8 | 3 | 2 up | 4-6 | 1 to 4 | from round the pot's belly |
+| HearthKettle | embers | (255, 150, 60) | 8 | 2-4 up | 1-2 | 0.08 | from the fire |
+| HearthKettle | steam | (220, 220, 220), transparency 0.6 | 3 | 1 | 1.5 | 0.2 to 0.8 | from the kettle's spout (about 2.3, 2.6, 0.8) |
+| HutChimney | smoke | (70, 70, 72), transparency 0.75 | 2 | 2-3 up | 6-8 | 1.5 to 5 | from the tall pot's mouth (-0.14, 29.2, 1.95); drift with the wind |
+| SpellLectern | violet motes | (170, 90, 255) | 2 | 0.3-0.6 up | 2-3 | 0.06 | from the open book; LightEmission 1 |
+| ToadstoolRing | fairy motes | (170, 90, 255) | 3 | 0.2-0.5 | 3-5 | 0.08 | over the ring (a disc r 3.2, y 0.5) |
+| WispLanternPost | green sparks | (120, 255, 90) | 2 | 0.3 | 1.5 | 0.06 | from the wisp |
+
+### Showcase placement notes
+
+- **The hut:** build one standard 24 × 16 hut on the showcase (posts, footings, walls with a window either side of the door, gables, roofs, ridges, the chimney on one end, the porch). Hang BoneChimes from the porch beam's end, and put WispLanternPost, ToadstoolRing and GourdPile outside.
+- **Wall pieces** (back on the wall):
+
+| Prop | Bottom on the wall | Notes |
+|---|---|---|
+| HearthKettle | 0 (stands on the floor) | 8.85 wide, 10.5 tall; back on the chimney's wall |
+| SpellNoteShelf | 0 (stands on the floor) | 5.7 wide, 8.7 tall, leaning a little |
+| WitchJarShelf | 2.4 | 5.4 wide, 5.8 tall |
+
+- **The corner piece:** BroomCorner's pivot is the inside corner itself (walls behind it on y = 0 and to its left on x = 0). Turn it to fit the corner.
+- **Hanging pieces:** HerbBeamRack (its ropes' toggles 4.2 above its pivot: tie them to a rafter or beam) and BoneChimes (its loop 4.0 above its pivot). Their pivots are their lowest points.
+- **Small pieces for a plinth:** CatBasket (4.3 × 3.5, 1.3 tall).
+
+### Props
+
+Every piece is under 20k triangles. Every prop is baked at 2048.
+
+**The hut**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| HutFooting | 4.6k (Main 4.5k, Leaves 0.1k) | yes | floor | an 8-long rubble run (top 1.6, 1.8 wide): fieldstones in mossy mortar on both faces, flat capstones, a little arched crawl vent with an iron grate, toadstools and ferns in the damp at its foot; its ends tuck into the piers |
+| HutPost | 1.6k (Main 1.6k, Leaves 0.0k) | yes | floor | a rubble pier with fieldstone quoins and a cap (ground to 1.6) under an eight-sided hewn oak post to 12.6, bowed, knotted, swelling into a jowl at the top, a burnt sigil on its face; grass round its foot |
+| HutWall | 9.2k (Main 9.1k, Leaves 0.0k) | yes | floor | 8 between post centres, 11 tall: crooked studs, sagging rails and a curved brace, pillowed daub that bellies out and sags between the posts, fresh and old lime patches, cracks running from the timbers, a place where it has fallen off the wattle (both faces), a course of mossy fieldstones along its foot, a fox skull on a nail, three pegs inside; ivy up one end |
+| HutWallWindow | 11.2k (Main 11.0k, Glass 0.0k, Leaves 0.1k) | yes (not the glass) | floor | the same wall round a crooked oak casement 2.7 x 3.4 (sill 3.6): diamond-leaded green panes (Glass), one shutter open flat with a burnt moon sigil, the other hanging askew off one hinge, a window box of fern, lavender and nightshade on iron brackets, a string of small bones; a bottle and a candle stub on the inside sill |
+| HutWallDoor | 9.3k (Main 7.2k, Door0 2.0k, Leaves 0.1k) | yes (opening clear) | floor | the wall round a 4.0-wide door opening under a soot-dark lintel that slopes: a horseshoe and a rowan cross in red thread over it, a threshold stone, a bird skull with feathers by it. Door0: five crooked planks of different lengths, forged strap hinges with curled ends, clinched nails, the painted hex sign, a carved bone pull outside; ledges, a brace and a latch bar inside (hinge on the left, swings out) |
+| HutGable | 7.5k | yes | floor | the 16-wide end triangle (apex 8.7 over the wall plate) on a tie beam: a king post, raking struts and studs, daub with patches of wattle showing, a round owl hole ringed in willow with a perch, a goat's skull with curled horns and a rowan cross under the apex, raking boards under the thatch; a cobweb in the apex inside |
+| HutRoof | 13.4k (Main 13.4k, Leaves 0.0k) | yes | floor | 8 long of one 45-degree slope: pole rafters every 2 and hazel battens (the inside of the roof), 1.3 of combed reed thatch with a bell at the eaves, hollows over the rafters, courses, cushions of moss and seeded grass, a hazel ligger and spars along the eaves; the thatch runs 1 past each end and the runs overlap without fighting |
+| HutRidge | 7.0k | yes | floor | 8 long: a block-cut sedge ridge roll astride the slopes, its lower edges cut into points, two hazel liggers a side with criss-cross spars, moss; the ridge pole inside where the rafters cross |
+| HutChimney | 12.4k (Main 12.2k, Leaves 0.1k) | yes | floor | a leaning fieldstone stack for a gable end, about 30 tall: a wide firebox base, weathered shoulders, the stack leaning out and kinking back, quoins, iron bands tied back to the wall, an oversailing cap, a crooked clay pot with a tin cowl and a broken one, soot, moss, ivy; a cleanout door, an ash heap and logs at its foot |
+| HutPorch | 13.9k (Main 13.5k, Glow 0.2k, Leaves 0.2k) | deck, steps, posts, rails | floor | a plank deck on log joists and stone piers (top 1.6, 8.8 x 4.5) with three big stone steps, two crooked tree-trunk posts with forked tops carrying a log beam, a mossy shingle lean-to under the thatch eaves, branch railings; charms on the beam: a bird skull and feathers, three witch bottles, a straw star, a violet crystal (Glow), a hag stone with bells, a tin moon and star; dried herbs tied up |
+
+**The hearth side**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| WitchCauldron | 8.7k (Main 5.8k, Glow2 1.1k, Glow 1.9k) | pot and stones | floor | a cast-iron cauldron (rim 3.3, 3.4 across) on three stubby legs over a ring of hearthstones and crossed charred logs: the brew to the rim with bubbles bursting and rings spreading and a slop down the side (Glow, green), embers and flames licking the belly (Glow2); a bail, a long paddle, a bone-handled copper ladle, a toad on a stone, logs to hand |
+| HerbBeamRack | 10.0k (Main 9.9k, Leaves 0.1k) | no | hanging | ceiling piece: a crooked hazel ladder 7.6 long slung on four ropes, hung with ten bundles of drying herbs (lavender, fern, nightshade, poppy heads, rose leaves, twigs), a braid of garlic, a string of chillies, a string of dried mushrooms, a copper sickle on an S-hook |
+| WitchJarShelf | 12.2k (Main 9.1k, Glass 2.7k, Glow 0.4k, Leaves 0.0k) | shelves | wall 2.4 | wall piece: three crooked plank shelves on forked branch brackets (the middle one sagging), crowded with hand-blown jars (Glass) and their contents, bottles and glazed crocks, every one hand-labelled (wrapped labels, tags on strings); a jar of moon dew and one of glow-worms (Glow), a bird skull, a candle stub, herbs hung under, a cobweb |
+| BroomCorner | 5.5k (Main 5.5k, Leaves 0.0k) | bucket, brooms | corner | corner piece: the witch's flying besom (a crooked handle, birch twigs bound in willow, a copper collar, a violet ribbon and a bell) leaning in the corner, a sweeping broom, a hearth brush and a tin dustpan on a peg board, a bucket of kindling, a swept pile of dust and leaves, a cobweb across the corner |
+| SpellLectern | 4.3k (Main 3.6k, Glow 0.6k, Glow2 0.0k) | yes | floor | three roots twisting up from a stump with spreading feet into a crooked book rest (front edge about 4.3): the open spellbook (a moon circle and a finding charm, moonwort and rue) whose sigils glow (Glow, violet), a ribbon, brass corners; a fat candle in a pool of wax on a side branch (Glow2), an inkpot and a quill |
+| BoneChimes | 4.9k (Main 4.7k, Glass 0.2k) | no | hanging | hanging piece: a crooked driftwood ring on three cords, strung with bird bones, vertebrae, sea-glass and bottle-glass shards (Glass), copper bells and feathers, a hag stone in the middle with a green glass bead under it |
+| HearthKettle | 10.1k (Main 9.2k, Glow2 0.8k, Leaves 0.0k) | stone and hearthstone | wall 0 | wall piece: a fieldstone hearth 7.2 wide under a soot-black lintel cut with witch marks, the fire opening 4.2 x 3.7, the breast to 10.5; a raised hearthstone, firedogs, logs, embers and low flames (Glow2), an iron crane swung over the fire with a soot-black kettle on a pot hook; a mantel of crocks, a candle stub, a carved wooden toad and drying herbs; bellows, a toasting fork, a basket of logs |
+| StrawBed | 6.3k (Main 6.3k, Leaves 0.0k) | yes | floor | a low box bed of rough logs (4.6 x 7.6), a lumpy straw mattress with straw poking out, the patchwork quilt (moons and stars stitched on the patches) thrown over and hanging down, a lumpy linen pillow, a headboard of woven bent branches with a bone-hoop charm and dried flowers, a sheepskin on the floor |
+
+**The cottage things and outside**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| WitchWorkTable | 6.8k (Main 6.7k, Glow2 0.0k, Leaves 0.0k) | yes | floor | a split-log top (7.4 x 3.4, at 3.2) scored by the knife, on crossed branch trestles lashed with rope, a shelf of crocks and a sack of roots under it; a stone mortar and pestle of crushed herbs, gnarled roots, a board of cut leaves, a brass sickle, bowls of seeds, chillies and lavender, garlic, a notebook open at the hiccup remedy, a candle (Glow2) and a toad |
+| WitchHatStand | 6.0k | trunk | floor | a hat stand grown from a sapling (three root feet, 6.6 tall, forked hooks): the tall black hat with a wavy brim and a crown bending over at the tip, a violet band and a tin buckle; a hooded green cloak, a striped scarf, a satchel; buckled pointed boots at its foot, one fallen over |
+| CatBasket | 5.0k (Main 5.0k, Glow 0.0k) | basket | plinth | plinth piece: a wicker basket 2.7 across with a patchwork cushion, the witch's black cat curled asleep in it, its tail round its nose, one eye open a slit (Glow); a ball of violet wool with a loose end, a saucer of milk, a picked fish-bone |
+| GourdPile | 8.9k (Main 8.9k, Leaves 0.0k) | yes | floor | a heap spilling from a tipped wicker basket: big ribbed pumpkins, a pale ghost pumpkin, warty yellow gourds, a swan-neck gourd, bottle gourds, striped pear gourds, a gourd dipper; straw and fallen leaves |
+| BraidedRug | 13.1k | no | floor | an oval braided rag rug 9 x 6.4: sixteen raised coils of three-strand braid in faded rags (crimson, violet, moss, ochre, ink), one end kicked up in a ripple |
+| SpellNoteShelf | 10.2k | yes | wall 0 | wall piece: a crooked bookshelf of rough planks with the bark on their edges, leaning a little, five uneven shelves of hand-bound spellbooks with inked titles (Herbal, Of Moons, Hexes, Familiars, Cures ...), scrolls tied with twine, bundles of notes under stones; a fox skull, a jar of quills and a candle stub on top; the moon calendar, the remedy, the toadstool study and the chores list pinned to it |
+| ToadstoolRing | 16.5k (Main 14.4k, Glow 2.0k, Leaves 0.0k) | no | floor | a fairy ring 6.4 across: fat fly-agaric toadstools (crimson caps spotted in bone, ringed stems) in clusters round a ring of deep moss, small violet toadstools whose gills glow (Glow) between them, old stones, grass and fallen leaves |
+| WispLanternPost | 5.0k (Main 4.6k, Glass 0.0k, Glow 0.3k, Leaves 0.1k) | cairn, staff | floor | a gnarled staff driven into a mossy cairn, crooked up to 8 with a curled arm; a crude iron-banded lantern with smoky panes (Glass) and a peaked tin cap on a chain, a will-o'-the-wisp curling inside it instead of a candle (Glow, green); a bone charm, a crow feather and herbs tied to the staff |
+
+![The hut pieces](img/witchhut47-hut-contact.jpg)
+![The hearth side](img/witchhut47-hearth-contact.jpg)
+![The cottage things](img/witchhut47-cottage-contact.jpg)
+![The witch hut in the woods](img/witchhut47-exterior.jpg)
+![Inside the witch hut](img/witchhut47-interior.jpg)
