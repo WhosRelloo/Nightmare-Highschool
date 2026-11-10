@@ -1351,6 +1351,115 @@ Every piece is under 20k triangles. Every prop is baked at 2048.
 ![The overgrown corner](img/garden-overgrown-corner.jpg)
 ![The path pieces joined](img/garden-path-tiling.jpg)
 
+## Batch 42 (lighting): the indoor lighting kit
+
+`art/props/nh_props_batch42.py`. Thirty-two indoor light fittings so the school's halls, classrooms and corridors are no longer too dim. Each has its own silhouette and one signature idea, and none repeats the lights the school already has (batch 19's lamp kit, the dorm, library and lounge lights). It has sixteen ceiling pieces (seven chandeliers, pendants and a lantern cluster, classroom lights, the moon orb, gothic ceiling lights and a corridor strip), eight wall pieces and eight floor and table lamps. They are made of black wrought iron, gilt and aged brass, crimson enamel, bone, dark oak, limestone, alabaster and wax. The light is warm candle, gas and lamp light, with four cool pieces: the crystal cascade and the moon orb in moonlight blue, the inverted spire and the witchlight sconce in violet. All designs are invented.
+
+- **Run:** `E:/NH-Work/props42/run42.py` runs nh_props without editing its import list (`--check` builds and counts tris only; `--fast` previews without baking, each prop's glow in its own colour). `bake42.sh all|<Prop>` bakes at 2048 with 64 samples on the GPU, one prop per Blender, taking a shared bake slot (`E:/NH-Work/bakeslots/slot1|2`). `lightbox_glass.py` paints the lightbox's stained glass with the window kit's painter. `sheet42.py`, `render42.py`, `upload42.py` and `docs42.py` make the contact sheets, staged renders, upload folder and this section.
+- **Files:** FBX in `art/props/fbx/lighting-batch42/`, maps in `art/props/textures/<Prop>_*.png` (2048, as batch 19's), previews in `art/props/previews/`, upload copies (resized to 1024) in `art/group-upload/lighting-batch42/`, renders in `art/props/renders/lighting-batch42/`.
+- **Pieces:** a Main piece plus `_Glow` on every prop. Lanterns, the cascade's crystals, the spire's panes, the witchlight's orb and the mirror sconce's drops have `_Glass`. The mirror sconce has `_Mirror`, and the lightbox has `_Stained`. Every prop's maps are its own; there is no shared atlas. The only extra image set is `StainedLightboxStained_canvas` / `_emissive`, for the lightbox's Stained piece. Give it these the way the window kit's stained glass gets its own: front-projected UVs, ColorMap the canvas, and the emissive mask with EmissiveStrength about 2.
+- **Pivots:** bottom centre, front toward -Y (-Z in Roblox). Ceiling pieces are modelled hanging, with their top at the ceiling, so their height is their **drop** (place the pivot at ceiling height minus the drop). Wall pieces have their pivot at the bottom centre of the back face (y = 0), so their back is flat on the wall. Nothing is below the pivot.
+- **Glass:** Roblox Glass, Transparency about 0.4. Tint the spire's panes and the witchlight's orb violet (about (120, 70, 180)), and the rest pale.
+- **Mirror:** SconceMirror_Mirror is Roblox Glass, Reflectance 0.6, colour (200, 205, 210), like the bathroom mirror.
+
+### Lights for the template
+
+These lights are what make the rooms bright. For each prop, the template sets every `_Glow` piece to Neon in its glow colour, CastShadow off, and adds the light below to the piece named in the On column. Colours are sRGB 0-255. Brightness and Range are the Roblox properties. The big pieces use Range 22-30 and Brightness 2-3, so one chandelier lights a classroom and two light a hall.
+
+- **Shadows:** only the seven chandeliers and the wolf torchère cast shadows (Shadows = yes). The VFX bible allows eight shadow lights in view, so hang at most two shadowed chandeliers per room and leave the rest unshadowed.
+- **Flicker:** candle and fire pieces get the tags `Controllers.World.Ambient` already reads (the Flicker column). `NHCandle` makes the light flicker on smooth noise, and only a little under Reduce Flashing. `NHAmbient:Embers` adds sparks over the torch and fire-bowl flames. Gas, bulb, glass and moon pieces are steady.
+- **Fill:** five pieces also get a second, dimmer PointLight on the Glow piece (the Fill column): the lamps whose main light is a spot, and the lightbox. Without the fill, the room round a spot stays dark.
+- **SpotLight / SurfaceLight Face** is the face of the piece it is on, in Roblox terms once the piece is imported (front = -Z).
+
+| Prop | Light (Face, Angle) | On | Colour | Brightness | Range | Shadows | Fill | Glow colour | Flicker | Drop / mount |
+|---|---|---|---|---|---|---|---|---|---|---|
+| ChandelierGreatWheel | PointLight | `ChandelierGreatWheel_Glow` | (255, 190, 120) | 3.0 | 30 | yes |  | (255, 170, 90) | NHCandle | drop 8.26 |
+| ChandelierAntler | PointLight | `ChandelierAntler_Glow` | (255, 185, 115) | 2.5 | 26 | yes |  | (255, 170, 90) | NHCandle | drop 5.6 |
+| ChandelierCage | PointLight | `ChandelierCage_Glow` | (255, 185, 115) | 2.2 | 22 | yes |  | (255, 170, 90) | NHCandle | drop 5.45 |
+| ChandelierCascade | PointLight | `ChandelierCascade_Glow` | (200, 220, 255) | 2.5 | 26 | yes |  | (185, 210, 255) | steady | drop 5.0 |
+| ChandelierRavenWing | PointLight | `ChandelierRavenWing_Glow` | (255, 185, 115) | 2.5 | 26 | yes |  | (255, 170, 90) | NHCandle | drop 5.3 |
+| ChandelierShipHull | PointLight | `ChandelierShipHull_Glow` | (255, 185, 115) | 2.8 | 28 | yes |  | (255, 170, 90) | NHCandle | drop 5.64 |
+| ChandelierThornCrown | PointLight | `ChandelierThornCrown_Glow` | (255, 150, 120) | 2.2 | 22 | yes |  | (255, 120, 105) | steady | drop 4.9 |
+| LanternCluster | PointLight | `LanternCluster_Glow` | (255, 185, 115) | 2.0 | 20 | no |  | (255, 170, 90) | NHCandle | drop 4.25 |
+| PendantSpire | PointLight | `PendantSpire_Glow` | (175, 120, 255) | 1.8 | 18 | no |  | (170, 110, 255) | NHCandle (slow) | drop 4.71 |
+| PendantBellCage | PointLight | `PendantBellCage_Glow` | (255, 205, 150) | 2.0 | 20 | no |  | (255, 214, 160) | steady | drop 3.9 |
+| ClassroomPendant | PointLight | `ClassroomPendant_Glow` | (255, 232, 200) | 2.0 | 20 | no |  | (255, 236, 205) | steady | drop 4.0 |
+| ClassroomTriPendant | SpotLight (Face Bottom, Angle 120) | `ClassroomTriPendant_Glow` | (255, 225, 185) | 2.5 | 24 | no | PointLight (255, 225, 185), 1.0, range 16 | (255, 222, 175) | steady | drop 4.0 |
+| MoonOrb | PointLight | `MoonOrb_Glow` | (185, 210, 255) | 2.0 | 22 | no |  | (185, 210, 255) | steady | drop 5.27 |
+| TraceryCeilingRose | SurfaceLight (Face Bottom, Angle 160) | `TraceryCeilingRose_Glow` | (255, 225, 185) | 2.0 | 22 | no |  | (255, 228, 190) | steady | drop 0.82 |
+| VaultBossLight | PointLight | `VaultBossLight_Glow` | (255, 180, 100) | 2.2 | 22 | no |  | (255, 165, 70) | steady | drop 2.52 |
+| CorridorStripLight | SurfaceLight (Face Bottom, Angle 150) | `CorridorStripLight_Glow` | (255, 228, 195) | 1.8 | 18 | no |  | (255, 230, 195) | steady | drop 0.5 |
+| SconceIronHand | PointLight | `SconceIronHand_Glow` | (255, 150, 75) | 1.8 | 18 | no |  | (255, 130, 55) | NHAmbient:Embers + NHCandle | pivot at 4.5 |
+| SconceBatWing | PointLight | `SconceBatWing_Glow` | (255, 185, 115) | 1.5 | 16 | no |  | (255, 170, 90) | NHCandle | pivot at 4.5 |
+| SconceGasBracket | PointLight | `SconceGasBracket_Glow` | (255, 225, 185) | 1.6 | 16 | no |  | (255, 232, 200) | steady | pivot at 5.0 |
+| SconceMirror | PointLight | `SconceMirror_Glow` | (255, 190, 125) | 1.6 | 16 | no |  | (255, 170, 90) | NHCandle | pivot at 4.0 |
+| SconceGargoyle | PointLight | `SconceGargoyle_Glow` | (255, 150, 75) | 2.0 | 20 | no |  | (255, 130, 55) | NHAmbient:Embers + NHCandle | pivot at 5.0 |
+| SconceWitchlight | PointLight | `SconceWitchlight_Glow` | (175, 120, 255) | 1.4 | 14 | no |  | (170, 110, 255) | NHCandle (slow) | pivot at 4.5 |
+| CorridorUplighter | SurfaceLight (Face Top, Angle 150) | `CorridorUplighter_Glow` | (255, 222, 180) | 2.0 | 18 | no |  | (255, 225, 185) | steady | pivot at 8.0 |
+| StainedLightbox | SurfaceLight (Face Front, Angle 120) | `StainedLightbox_Stained` | (255, 185, 140) | 1.5 | 14 | no | PointLight (255, 180, 110), 0.8, range 10 | (255, 180, 110) | steady | pivot at 3.5 |
+| TorchereWolves | PointLight | `TorchereWolves_Glow` | (255, 150, 75) | 2.5 | 24 | yes |  | (255, 130, 55) | NHAmbient:Embers + NHCandle | floor |
+| CandelabraDeadTree | PointLight | `CandelabraDeadTree_Glow` | (255, 185, 115) | 1.8 | 18 | no |  | (255, 170, 90) | NHCandle | floor |
+| TorchereAlabaster | SpotLight (Face Top, Angle 120) | `TorchereAlabaster_Glow` | (255, 215, 165) | 2.5 | 24 | no | PointLight (255, 215, 165), 1.0, range 14 | (255, 218, 170) | steady | floor |
+| CandleHearse | PointLight | `CandleHearse_Glow` | (255, 185, 115) | 2.0 | 20 | no |  | (255, 170, 90) | NHCandle | floor |
+| PianoLamp | SpotLight (Face Bottom, Angle 90) | `PianoLamp_Glow` | (255, 222, 175) | 1.5 | 12 | no | PointLight (255, 222, 175), 0.6, range 8 | (255, 222, 175) | steady | table / mantel |
+| ReadingLampSwing | SpotLight (Face Bottom, Angle 80) | `ReadingLampSwing_Glow` | (255, 222, 175) | 1.5 | 12 | no | PointLight (255, 222, 175), 0.6, range 8 | (255, 222, 175) | steady | table / mantel |
+| DeskLampChapel | PointLight | `DeskLampChapel_Glow` | (255, 175, 95) | 1.2 | 12 | no |  | (255, 165, 70) | steady | table / mantel |
+| MantelLampBat | PointLight | `MantelLampBat_Glow` | (255, 140, 90) | 1.2 | 12 | no |  | (255, 120, 75) | steady | table / mantel |
+
+### Props
+
+Every piece is under 20k triangles. Every prop is baked at 2048.
+
+**Ceiling: chandeliers, pendants, ceiling and corridor lights**
+
+| Prop | Tris | Collides | Notes |
+|---|---|---|---|
+| ChandelierGreatWheel | 22.3k (Main 19.7k, Glow 2.6k) | no | **drop 8.26** (top at the ceiling); 7.13 x 7.13: the great hall wheel: a 7-across iron cartwheel, a crimson felloe between iron tyres, twelve spokes with gilt knops, a mid ring with gilt bosses and iron scrolls in every bay, a crimson drum hub with gilt bands and quatrefoils over a turned pendant; 24 candles on the tyre, 8 in crimson sleeves on the mid ring; four flat bars with knops to a crown, a chain to the rose |
+| ChandelierAntler | 21.4k (Main 19.5k, Glow 1.9k) | no | **drop 5.6** (top at the ceiling); 4.57 x 4.57: eight bone antler racks (pitted, tapering beams with burrs and three tines each) bound with iron straps to a turned iron hub, 24 candles on the tines and beam tips, a gilt crescent hanging under the drop; the Pack's |
+| ChandelierCage | 15.0k (Main 14.3k, Glow 0.6k) | no | **drop 5.45** (top at the ceiling); 2.16 x 2.16: a domed gothic birdcage 2 across: twenty bars over a crimson-banded tray, a gilt arcade round the middle, a pointed door with a brass latch, a candle tree of eight candles inside, an iron raven on the cage ring |
+| ChandelierCascade | 20.3k (Main 8.3k, Glass 10.9k, Glow 1.2k) | no | **drop 5.0** (top at the ceiling); 3.05 x 3.06: a crystal cascade: three gilt hoops of bead strands with prism drops falling in a cone (Glass) round a gilt stem of sixteen moonlight bulb-candles and a lit heart; the cool chandelier |
+| ChandelierRavenWing | 15.3k (Main 14.5k, Glow 0.8k) | no | **drop 5.3** (top at the ceiling); 9.61 x 3.23: a sculpted iron raven 8.9 across with its wings spread: a heavy curved beak, crimson eyes, layered hackles at the throat, broad wings of primaries, a run of secondaries and coverts, a fanned tail, talons gripping a gilt orb; ten candles ride the wings' leading edges |
+| ChandelierShipHull | 21.2k (Main 19.6k, Glass 0.1k, Glow 1.4k) | no | **drop 5.64** (top at the ceiling); 7.97 x 3.12: an upturned ship's hull of dark oak 8 long, keel to the ceiling: planking seams, ribs inside, scrolled stem and stern posts with gilt knobs, iron-bound gunwales carrying fourteen candles on brackets, three square lanterns hanging under the keel |
+| ChandelierThornCrown | 17.9k (Main 16.2k, Glow 1.7k) | no | **drop 4.9** (top at the ceiling); 3.88 x 3.85: a crown of thorns 3.9 across: three twisted iron vines with thorns, a gilt inner ring, twelve rose-glass buds (Glow) on iron calyxes with leaves, thorned rods to an apex and one great glowing rose hanging in its heart |
+| LanternCluster | 17.3k (Main 16.7k, Glass 0.2k, Glow 0.4k) | no | **drop 4.25** (top at the ceiling); 1.6 x 1.6: five square gothic lanterns (pierced quatrefoil crowns, pyramid roofs, a candle each; Glass panes) at staggered drops from one octagonal crimson-inset ceiling plate with gilt crockets |
+| PendantSpire | 7.7k (Main 7.0k, Glass 0.4k, Glow 0.3k) | no | **drop 4.71** (top at the ceiling); 1.45 x 1.27: an inverted openwork spire: six crocketed iron ribs closing to a gilt point, violet glass between them (Glass: tint it violet, about (120, 70, 180), Transparency 0.4), a gabled crown with gilt trefoils, a violet witchlight burning inside |
+| PendantBellCage | 12.0k (Main 11.6k, Glow 0.5k) | no | **drop 3.9** (top at the ceiling); 1.99 x 1.99: the Midnight Bell as a lamp: an openwork bell of sixteen iron ribs, a crimson lip band with gilt quatrefoils, canon loops on the crown; a lit heart inside and a glowing ember clapper below the lip |
+| ClassroomPendant | 4.2k (Main 3.6k, Glow 0.6k) | no | **drop 4.0** (top at the ceiling); 0.86 x 0.86: the classroom light: an opal schoolhouse globe (Glow) in four iron straps under a crimson crested gallery, on a downrod with gilt knops |
+| ClassroomTriPendant | 8.0k (Main 7.0k, Glow 1.1k) | no | **drop 4.0** (top at the ceiling); 6.6 x 1.15: a 6.6-long gothic iron bar (an arcade of pointed arches between two chords, gilt bosses, spired ends) on two hangers, three crimson enamel cone shades lit cream inside with an opal diffuser and a bulb in each (Glow); for a row of desks |
+| MoonOrb | 6.8k (Main 2.8k, Glow 4.0k) | no | **drop 5.27** (top at the ceiling); 3.15 x 2.8: a cratered moon 2.8 across (the Glow) cradled in an iron crescent with a gilt edge, three gilt stars on fine chains, a rod with knops to the rose; moonlight blue |
+| TraceryCeilingRose | 12.8k (Main 11.8k, Glow 1.0k) | no | **drop 0.82** (top at the ceiling); 3.69 x 3.69: a flush ceiling light 3.7 across, a rose window laid on the ceiling: twelve spokes, pointed petals, gilt lancets and trefoils, a gilt quatrefoil hub and pendant, over a frosted disc (Glow); its rim is a ring of 24 lit lancets with ballflowers above |
+| VaultBossLight | 4.3k (Main 3.9k, Glow 0.4k) | no | **drop 2.52** (top at the ceiling); 3.0 x 3.0: a rib vault in miniature for a ceiling: a 3 x 3 limestone plate, eight moulded ribs (gilt bosses on the diagonals) springing down to an octagonal boss lantern of eight lit amber lancets with a gilt pine-cone drop |
+| CorridorStripLight | 8.2k (Main 7.1k, Glow 1.1k) | no | **drop 0.5** (top at the ceiling); 8.03 x 1.01: an 8-stud iron ceiling housing (along X; tiles end to end): a frosted strip behind a gilt grille of pointed arches underneath, and a row of sixteen lit lancets down each side, so it reads from along a corridor as well as from below (all Glow) |
+
+**Wall: sconces, the corridor uplighter and the lightbox**
+
+| Prop | Tris | Collides | Notes |
+|---|---|---|---|
+| SconceIronHand | 7.3k (Main 6.6k, Glow 0.6k) | no | **mount the pivot 4.5 above the floor**; 0.76 x 1.24, 2.6 tall, stands out 1.24: a sculpted iron hand (knuckled fingers curled round the haft, a thumb over them, claw-tipped, tendons on its back, a gilt ring) reaching out of a gilt-banded lace cuff in a pointed plate, gripping a burning torch (pitch-wrapped cresset, Glow: the fire) |
+| SconceBatWing | 7.7k (Main 7.5k, Glow 0.2k) | no | **mount the pivot 4.5 above the floor**; 2.6 x 0.69, 2.18 tall, stands out 0.69: a sculpted iron bat (big ears, fangs, crimson eyes) spread on the wall, its wings scalloped iron plates lined crimson with finger bones; three scrolled arms with crimson candle sleeves |
+| SconceGasBracket | 3.4k (Main 2.6k, Glow 0.9k) | no | **mount the pivot 5.0 above the floor**; 0.8 x 1.32, 1.79 tall, stands out 1.32: a brass gas bracket: a wall rose on an iron backplate, a tap with a T key, a jointed swing arm with knuckles and a scrolled iron brace, a pronged gallery holding a frosted tulip shade (Glow) round a mantle; a pull chain with a gilt acorn |
+| SconceMirror | 3.2k (Main 2.7k, Glass 0.3k, Mirror 0.1k, Glow 0.2k) | no | **mount the pivot 4.0 above the floor**; 1.45 x 0.67, 2.97 tall, stands out 0.67: a gilt lancet mirror (Mirror) with crockets and a quatrefoil crest; two scrolled arms with crimson candle sleeves and crystal drops (Glass) on their pans, so the mirror doubles the flames |
+| SconceGargoyle | 21.2k (Main 19.9k, Glow 1.3k) | no | **mount the pivot 5.0 above the floor**; 1.46 x 1.32, 2.39 tall, stands out 1.32: a sculpted gothic gargoyle crouched on a moulded ogee corbel with ballflowers: muscular haunches, clawed feet hooked over the ledge, a hunched spine with a vertebral ridge, folded bat wings (finger bones and membranes), a long neck with an iron collar chained to the wall, a snarling head (heavy brow, deep-set eyes, ribbed horns, pointed ears, jaws wide open on fangs and a lolling tongue), a barbed tail curling down the corbel; its forepaws clutch an iron cresset on an iron bracket from the corbel's face, the fire rising into its jaws and flames licking from them (Glow). Weathered limestone with lichen blooms and soot streaks above the fire, chipped edges |
+| SconceWitchlight | 3.7k (Main 2.9k, Glass 0.4k, Glow 0.3k) | no | **mount the pivot 4.5 above the floor**; 1.34 x 0.82, 2.62 tall, stands out 0.82: a crescent moon of iron on the wall (gilt rim, gilt stars), a violet glass orb lantern (Glass: tint it violet) hung by a chain from its lower horn on a scrolled arm, a gilt star below; Glow: the violet wisp |
+| CorridorUplighter | 5.2k (Main 5.0k, Glow 0.2k) | no | **mount the pivot 8.0 above the floor**; 6.06 x 0.68, 1.27 tall, stands out 0.68: a 6-stud wall trough on three bat-wing brackets: a crimson frieze behind a gilt arcade of lancets with trefoils, spired ends; Glow: the open top (uplight) and a slot underneath |
+| StainedLightbox | 2.5k (Main 2.2k, Stained 0.1k, Glow 0.2k) | no | **mount the pivot 3.5 above the floor**; 2.67 x 0.5, 4.98 tall, stands out 0.5: a lit lancet of stained glass 1.9 x 3.5 (Stained: a silver crescent cradling a crimson rose over a gilt key, a violet and blue night with gold stars, a ruby and gold border, a gilt trefoil in the head) in a gothic iron case, a crocketed hood with label stops, saddle bars, a stone sill on brackets; Glow: a thin line of light leaking round the glass |
+
+**Floor and table: torchères, floor candelabra, desk, piano, reading and mantel lamps**
+
+| Prop | Tris | Collides | Notes |
+|---|---|---|---|
+| TorchereWolves | 19.7k (Main 18.6k, Glow 1.1k) | yes | 2.14 x 1.97, 5.75 tall: a fire bowl on a fluted iron column 5.8 tall: a hexagonal plinth with gilt lancets on clawed feet, three sculpted iron wolves' heads howling up from a collar under the bowl (open jaws with fangs, ears laid back, ruffs of fur), a spiked bowl of coals and tall flames; the Pack's |
+| CandelabraDeadTree | 7.3k (Main 6.4k, Glow 0.9k) | yes | 2.03 x 2.0, 5.63 tall: a floor candelabra cast as a bare dead tree 5.6 tall: gnarled roots for feet, a trunk of rough bark twisted with ridges, a knot and a hollow, five branches with twigs and spurs; eleven candles on the tips |
+| TorchereAlabaster | 4.6k (Main 3.8k, Glow 0.8k) | yes | 1.91 x 1.91, 5.84 tall: an uplighter 5.8 tall: a lit alabaster bowl (Glow) in a gilt cradle on a clustered gothic shaft with gilt annulets and a stiff-leaf capital, a stepped black marble foot |
+| CandleHearse | 13.6k (Main 12.4k, Glow 1.2k) | yes | 3.13 x 1.29, 6.83 tall: a triangular iron hearse of fifteen candles on prickets (a crimson plate with gilt foils inside the triangle) on a twisted shaft with a gilt knop and three clawed feet; 6.8 tall |
+| PianoLamp | 2.6k (Main 2.2k, Glow 0.4k) | no | 1.83 x 1.12, 1.41 tall: a table piece for a piano lid: a weighted brass foot with a black marble weight, a swan-neck arm, a long brass trough shade lit cream inside over three bulbs (Glow) |
+| ReadingLampSwing | 3.0k (Main 2.8k, Glow 0.2k) | no | 0.64 x 1.6, 2.03 tall: a table piece: a reading lamp on a jointed iron swing arm (a brass spring, a gilt counterweight), a cone shade pierced with gilt lancets, black marble on its iron foot |
+| DeskLampChapel | 4.0k (Main 3.8k, Glow 0.2k) | no | 0.95 x 0.95, 2.55 tall: a table piece: a desk lamp whose shade is a little chapel tower: four lit amber lancets (Glow) in iron tracery, buttresses with pinnacles, a crocketed spire with a gilt finial, on a crimson-topped plinth |
+| MantelLampBat | 9.3k (Main 8.9k, Glow 0.4k) | no | 1.76 x 0.58, 2.08 tall: a mantel piece: a sculpted bronze bat (pug nose, big ribbed ears, fangs, crimson eyes, clawed feet on a rock) on a black marble plinth with a gilt band, its membraned wings raised in a V, the thumbs holding up a crimson-amber glass tulip (Glow) |
+
+- **In Studio:** the template script makes the 32 templates in ServerStorage.NHProps (NHBuildKit `Lighting`). Fill its PK from the group's images first, as for kits 35-40. Each Glow piece becomes Neon in its glow colour with its light, as in the table above. The floor torchères, the dead-tree candelabra and the hearse collide on their hull. The ceiling, wall and table pieces don't collide.
+- **Placing them:** a classroom of about 30 x 30 wants one big chandelier (Range 26-30) or a ClassroomTriPendant over each row of desks. A corridor wants a CorridorStripLight every 8 studs (the strips tile end to end) or a CorridorUplighter every 12. A hall wants the GreatWheel or the ShipHull, plus wall sconces every 12-16 studs.
+
 ## Batch 43 (gym): the gymnasium and sports hall kit
 
 `art/props/nh_props_batch43.py`. The old gothic gymnasium of the Institution: Victorian and Edwardian apparatus with a dark academy twist, in the house look of batches 34-39 (cast iron, dark oak and ebony, crimson leather and enamel, brass and gilt, black marble, bone, hemp and canvas). The five houses (Crimson, Ravens, Rovers, Vigil, Wardens) and the Athletes' blue give the crests and colours. It has 33 props, each built around one signature idea, and none repeats the existing gym props (BallRack, Bleachers, GymMatStack, Hurdle, TackleDummy, FootballMachine, Scoreboard, VaultingHorse, WeightBench, Dumbbells, the lockers, TrophyShelf, TrophyCabinet). All names, mottoes and designs are invented.
