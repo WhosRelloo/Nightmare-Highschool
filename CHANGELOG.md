@@ -2,6 +2,19 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.67.1] - 2026-11-10: Capes sway in the Map place
+
+Owner: "Yes, port CapeSway". Record: `docs/Map-Core-Preview.md`.
+
+### Added (Map place, tagged NHCore)
+- **Capes move like cloth.** `Controllers.Character.CapeSway`, the same as NH Combat Test's (byte for byte, checksums equal). The Map's three capes (`ReplicatedStorage.NHCapes`: Vamp, Rogue and Fur) were already identical to NH Combat Test's, with the same meshes and bone rigs, but they hung still. Now a cape swings back when you run, lags against turns, flutters in the air and breathes gently at rest. Reduce Motion halves this.
+
+### Verified (Map place, local play-test)
+- The real K key, a click on the Outfit tab, a mouse-wheel scroll and a click on **Vamp Cape** put on the 17-bone cape.
+- At rest the cape breathed 0.1 to 1.5 degrees. Walking with W at 14 studs/s swung it to 18.7 degrees, and it settled within about a second of stopping. A jump (Space) fluttered it to 7.8 degrees on landing.
+- No warnings from CapeSway, HairSway or EyeBlink (checked the full log).
+- **Not tried:** a long sprint (the walk hit an obstacle after 10 studs), the Rogue and Fur capes, turning on the spot, Reduce Motion, and a second player watching.
+
 ## [1.67.0] - 2026-11-10: Living hair, blinking eyes, and "Open" only on doors in the Map place
 
 Task: port the hair rigging and its animation, the eyes and their animation, and the UI for both from NH Combat Test to the Map place, and make the "E to open" prompt show only on doors. Record: `docs/Map-Core-Preview.md`.

@@ -93,6 +93,7 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 - **Doors:** 33 archways and window frames in the Map are the Headmaster door's frame with the leaf taken out, still tagged `NHDoor`, so they showed "Open Door". The Map's `Services.Features.Doors` now skips a door-kit model with no `DoorLeaf` part. The 86 real doors are unchanged. If the builder puts a leaf back in one of those frames, it gets its prompt again on the next run.
 - **Tested (local play-test):** 86 prompts, none on the archways; E opened a classroom door; 18 studs through an archway showed nothing; 3 blinks in 10 s and a squint during a combat tag; the Barber's book picked a 40-bone hair with real clicks, and it swayed 1 to 3 degrees at rest and 11 to 14 while walking. Not tried: a second player, sprint/fall sway, Reduce Motion.
 - The two controllers are tagged `NHCore` (they also go with the Controllers folder in the removal command). `ServerStorage.NHCore.README` lists them.
+- **1.67.1, capes sway:** `Controllers.Character.CapeSway` (NH Combat Test's, byte for byte, tagged `NHCore`). The Vamp, Rogue and Fur capes were already here, rigged the same as NH Combat Test's; they now swing when you run, lag on turns, flutter in the air and breathe at rest. Tested: the Vamp Cape, put on with real clicks, breathed 0.1 to 1.5 degrees at rest, swung to 18.7 while walking and fluttered to 7.8 after a jump.
 
 ## Removing it
 Run this in the Map place's command bar, then save:
