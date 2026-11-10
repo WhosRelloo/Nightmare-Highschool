@@ -61,12 +61,34 @@ NPC students use the Human range.
 
 ## How the body is scaled
 
-- Players use the classic R6 body (`StarterPlayer.StarterCharacter`, built at model scale 0.9). R6 has no body-height sliders, so the **whole character is scaled evenly** with `Model:ScaleTo(Heights.Normal × height)`, where `Normal` is 1.0, a standard R6 body. Faces (the SurfaceGui strips), clothes, hair, held items, race looks and gear all stay in proportion, and the animations scale with the model.
+- Players use the classic R6 body (`StarterPlayer.StarterCharacter`, built at model scale 0.9). R6 has no body-height sliders.
+- **Before 1.70.0** the whole character was scaled evenly, so a tall student was a bigger copy of a normal R6 body, head included.
+- **Since 1.70.0, a height is a shape, not just a size.** The owner asked: "slightly increase your arm size, etc. but make ur arms, torso, and legs a little longer too", then "Make the legs grow a bit more than the torso".
+  - **Thickness and the head** grow with the square root of the height: `Model:ScaleTo(Heights.Normal x sqrt(height))`.
+  - **The torso, legs and arms** are then stretched along their length to make up the rest of the height (`Config.Heights.Proportions`). The legs get 1.2x the average share, the torso 0.8x and the arms the average.
+  - **The overall height and the inches are the same as before.** Average (5'9") is still exactly a standard R6 body.
+
+![Height v2: proposed (left) against the old even scale (right)](img/height-v2-proportions.jpg)
+
+| Height | Legs | Arms | Torso | Thickness and head |
+|---|---|---|---|---|
+| 4'11" (0.86, shortest) | -19% | -16% | -13% | -7% |
+| 5'4" (0.93) | -10% | -8% | -6% | -4% |
+| 5'9" (1.00) | R6 | R6 | R6 | R6 |
+| 6'4" (1.10) | +15% | +12% | +9% | +5% |
+| 7'0" (1.22, tallest) | +31% | +25% | +20% | +10% |
+
+- **How the stretch is applied:** `Config.Heights.SetStretch(model, torso, legs, arms)`.
+  - It lengthens those parts and the HumanoidRootPart.
+  - It moves every Attachment on them and every joint and weld that uses them: shoulders, hips and neck (Motor6D), weapon grips, capes and gear.
+  - `StretchOf(model)` reads the current stretch back from the parts' own size, so it is never stored and survives rebuilds.
+  - An even `ScaleTo` and the stretch commute, so the order doesn't matter.
+- **The body types and the Female body** are CharacterMeshes, and a CharacterMesh stretches with its part, clothing included (tested in game before the build).
 - **`Services.Player.Height`** (server) applies it after `EntityLoader` has rebuilt the body (it sets `NHDescribed` after `ApplyDescriptionReset`; scaling before that would be undone), after every spin, and when the race changes. It mirrors read-only `HeightScale`, `HeightBand` and `HeightText` on the player.
 - **Speed and jump are put back** right after scaling, because `ScaleTo` also multiplies `WalkSpeed` and `JumpPower`. A tall student is never faster.
-- **Looks and weapons are built at the base size.** `UI.Appearance.ApplyTo` and `EntityLoader.SetWeapon` put a scaled body back to 0.9 (`Heights.Base`, the size they're designed for) while they build (hair, marks, capes and weapons are placed in studs for that body), then restore the height. Catalog hair is loaded first, so nothing waits while the body is at the base size.
+- **Looks and weapons are built at the base, unstretched size (1.70.0: the stretch is taken off too, then put back).** `UI.Appearance.ApplyTo` and `EntityLoader.SetWeapon` put a scaled body back to 0.9 (`Heights.Base`, the size they're designed for) while they build (hair, marks, capes and weapons are placed in studs for that body), then restore the height. Catalog hair is loaded first, so nothing waits while the body is at the base size.
 - **Already height-aware:** race cosmetics (sized from the torso), 3D gear (sized from the head), and seating (the client measures the hips against the cushion).
-- **Made height-aware:** the vault's knee, waist and head heights scale with the body (for bodies from 0.85 to 1.55 times the game's build size).
+- **Made height-aware:** the vault's knee, waist and head heights scale with the body (1.70.0: and with the torso and leg stretch) (for bodies from 0.85 to 1.55 times the game's build size).
 - **Combat:** hitboxes are fixed boxes in front of the attacker's root (6 × 10 × 7), so reach never changes, and a body up to 12% bigger is barely bigger inside that box.
 
 ![Seated, shortest](img/height-seated-short.jpg) ![Seated, tall](img/height-seated-tall.jpg)
@@ -98,3 +120,31 @@ The admin panel's Student tab has **Spin height** (a free re-roll) and **Shortes
 ## The Map place (1.63)
 
 Heights are in the Map place's core add-on too, so the owner and the builder see students at different heights on the real map. The Map has no saving and no register, so its `Services.Player.Height` is its own version: every player rolls a height when they join (the same odds), kept for the session only, and the admin panel re-rolls or sets it. The rest is the same code: `Config.Heights`, the look wrapper in the Map's `UI.Appearance`, the loader's `NHDescribed` flag and the weapon wrapper in `EntityLoader`, and the vault. See [[Map-Core-Preview]].
+
+## Play-tested, 1.70.0 (NH Combat Test, slot 4 "Testy")
+
+![Height v2 play-test](img/height-v2-playtest.jpg)
+
+Both ends were set through the admin desk's `SetHeight` (Shortest, Tallest).
+
+| Check | 7'0" | 4'11" |
+|---|---|---|
+| Body | torso 2.21 x 2.41, legs 2.61, arms 2.51, head x1.10 | torso 1.85 x 1.74, legs 1.62, arms 1.68, head x0.93 |
+| Walking (real key) | yes | yes |
+| Sprinting (real Left Shift) | speed 25, Sprint track | speed 25, Sprint track |
+| Walk speed | 14.4, unchanged | 14.4, unchanged |
+| Katana | real E, a real-click M1; the handle 0.35 studs from the hand | a real-click M1; the handle 0.08 studs from the hand |
+| Vamp Cape (real click at the locker-room Wardrobe) | worn, and the stretch survived the look rebuild | still worn after the height change |
+| Sitting on a class chair (real E) | seated, hips 0.07 above the cushion | seated, hips 0.06 above the cushion |
+
+- **Other checks:**
+  - clothing and hair showed at both heights;
+  - NPC students get the same shapes;
+  - the console had only the admin log lines and the place's existing asset messages.
+- **Not tried:**
+  - the main-menu slot pedestals and the creator preview at a height;
+  - vaulting;
+  - a second player;
+  - body types and races at the two ends;
+  - transformed forms.
+- **Testy** was put back to Average and keeps the Vamp Cape.

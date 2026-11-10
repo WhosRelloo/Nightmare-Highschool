@@ -2,6 +2,40 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.70.0] - 2026-11-10: Height shapes the body, not just its size
+
+Owner: "For the height system, I think it should slightly increase your arm size, etc. but make ur arms, torso, and legs a little longer too", then "Make the legs grow a bit more than the torso". The owner approved the in-game comparison. Record: `docs/Height.md`.
+
+### Changed (NH Combat Test)
+- **A height now stretches the torso, legs and arms instead of scaling the whole body evenly.**
+  - Thickness and the head grow with the square root of the height, and the torso, legs and arms make up the rest: the legs most, then the arms, then the torso.
+  - At 7'0": legs +31%, arms +25%, torso +20%, thickness and head +10% (it was +22% everything).
+  - At 4'11": legs -19%, arms -16%, torso -13%, thickness and head -7%.
+  - **The overall height and inches are unchanged**, and Average is still a standard R6 body.
+- **The code:** new functions in `Config.Heights`: `Proportions`, `StretchOf` and `SetStretch`. `SetStretch` moves every joint, attachment and weld on the stretched parts, so hips, shoulders, weapons, capes and gear follow.
+- **Callers:**
+  - `Services.Player.Height` applies it;
+  - `UI.Appearance` (looks) and `EntityLoader.SetWeapon` take the stretch off while they build, then put it back;
+  - the main-menu students and NPC students use the same shapes;
+  - the vault measures the stretch.
+- **The tallest torso is narrower than before** (2.21 studs instead of 2.44), so doorways are easier.
+
+### Verified (NH Combat Test, slot 4 "Testy", Play, at 7'0" and 4'11")
+- **Movement:** real-key walking, sprinting at speed 25, and walk speed kept.
+- **Combat:** a real E and a real-click katana M1, with the handle in the hand.
+- **Looks:** clothing and hair, and the Vamp Cape put on at the Wardrobe with a real click (the stretch survived the rebuild).
+- **Sitting:** seated on a class chair at both ends.
+- **NPCs and console:** NPC students get the same shapes, and the console showed nothing new.
+- **CharacterMeshes:** a body-type mesh stretched with its part (tested before the build).
+
+### Not yet
+- **Not tried:**
+  - the main-menu slot pedestals and the creator preview at a height;
+  - vaulting;
+  - a second player;
+  - every body type, race and form at the ends.
+- **The Map place** still uses the even scale. It has its own `Services.Player.Height` and needs a sync.
+
 ## [1.69.2] - 2026-11-10: Moon banners in the Map place
 
 Owner: "Yes, port Moments". Record: `docs/Map-Core-Preview.md`.
