@@ -15,7 +15,8 @@ Owner: "Throw the new female body in "Map" place". Record: `docs/Map-Core-Previe
 - The real K key and a real click on Look > Body: **Female** gave the server character all five v2 `NHBodyMesh` meshes (Torso 107771235632658, the arms, Right Leg 111053847385892, Left Leg 87713593848889), with a shirt, pants and skin colours.
 - **The Map's heights:** the character had rolled 0.87 scale, and the meshes scale with the parts. The front view showed the waist, the tapered arms and the legs meeting at the hips, and the Wardrobe's preview showed the same shape.
 - During the test the owner took over the character. They put on a vest, blouse and fishnets and "Super Long Straight" hair, and walked. All of it showed on the new body (clothing mapped, skin on the hands, hair on the head), and the Walk track played.
-- **Not tried:** an M1 (the owner was driving the character), M2, blocking, capes on the new torso, the transformation outfits, and a second player.
+- **The owner checked it themselves** in the same play-test: "I checked everything. It looks good."
+- **Not tried by Claude:** an M1 (the owner was driving the character), M2, blocking, capes on the new torso, the transformation outfits, and a second player.
 
 ## [1.68.1] - 2026-11-10: Female body v2: the legs meet, a fuller bust
 

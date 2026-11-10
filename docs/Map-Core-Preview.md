@@ -100,7 +100,7 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 
 - The Map's `UI.Appearance` now has NH Combat Test's v2 Female body (`docs/Female-Body.md`): five R6 CharacterMeshes instead of the old single torso. It's NH Combat Test's live file plus the Map's one `NHAnywhereWardrobe` line, checked byte for byte. The previous Map copy is in `ServerStorage.NHCore.Backups.Appearance_pre_FemaleBody`.
 - **When `UI.Appearance` is copied again:** take NH Combat Test's live file, then put this line back as the first line of `function Appearance.AtTag(p, tag)`: `if workspace:GetAttribute("NHAnywhereWardrobe") then return true end`.
-- **Tested (local play-test):** K > Look > Body: Female (real click) gave all five meshes on a 0.87-scale character, with clothing, skin and hair showing and the Walk track playing. An M1 wasn't tried.
+- **Tested (local play-test):** K > Look > Body: Female (real click) gave all five meshes on a 0.87-scale character, with clothing, skin and hair showing and the Walk track playing. The owner then checked it in the same play-test ("I checked everything. It looks good."). Claude didn't try an M1.
 
 ## Removing it
 Run this in the Map place's command bar, then save:
