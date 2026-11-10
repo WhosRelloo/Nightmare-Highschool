@@ -2,6 +2,33 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.70.1] - 2026-11-10: Height v2 in the Map place
+
+Owner: "Sync" (NH Combat Test's 1.70.0 height shapes, into the Map place). Record: `docs/Map-Core-Preview.md` (the system: `docs/Height.md`).
+
+### Changed (Map place)
+- **Heights in the Map now stretch the body like the full game:** thickness and the head grow with the square root of the height, and the legs, arms and torso stretch to make up the rest (legs most). Average is still a standard R6 body.
+- **The files:**
+  - `Config.Heights`, `Managers.EntityLoader` and `Controllers.Character.Vault` are NH Combat Test's live files, byte for byte. The Map's copies were identical to NH Combat Test's before 1.70.0, including the loader's 1.63 `NHDescribed` edit.
+  - `UI.Appearance` is NH Combat Test's live file plus the Map's `NHAnywhereWardrobe` line (byte for byte against that). Its look wrapper takes the stretch off while a look is built.
+  - The Map's own `Services.Player.Height` (session-only heights) got the same `Apply` change: `ScaleKeep(C, Normal * W)`, then `Heights.SetStretch(C, Kt, Kl, Ka)`.
+  - The main menu isn't in the Map, so its preview change wasn't needed.
+- The Map's previous copies are in `ServerStorage.NHCore.Backups.HeightV2_pre`.
+
+### Verified (Map place, local play-test, through the admin desk with real clicks)
+- **7'0" (Tallest):**
+  - Body: torso 2.21 x 2.41, legs 2.61, arms 2.51, head x1.10. These are NH Combat Test's numbers.
+  - Movement: walk speed 14.4 kept. A real W and Left Shift walked, then sprinted at 25 (the Sprint track).
+  - Combat: a real E and clicks played Katana Equip, M1.1 and M1.2, with the handle 0.35 studs from the hand.
+  - Looks: picking "Wolfcut Ponytail" in the Wardrobe rebuilt the look, and the stretch survived (1.090 / 1.182 / 1.136), with the hair on the head.
+- **4'11" (Human Shortest; the Werewolf's Shortest is 5'6"):**
+  - Body: torso 1.85 x 1.74, legs 1.62, arms 1.68, head x0.93. These are NH Combat Test's numbers.
+  - Movement: walk speed 14.4 kept. Walk then Sprint covered 39.9 studs.
+  - Combat: M1.1 and M1.2, with the handle 0.08 studs from the hand.
+  - A shot showed the hair, clothing and katana.
+- No errors from the changed scripts.
+- **Not tried:** vaulting, sitting (the Map's seats), capes and body types at the ends, transformed forms, and a second player.
+
 ## [1.70.0] - 2026-11-10: Height shapes the body, not just its size
 
 Owner: "For the height system, I think it should slightly increase your arm size, etc. but make ur arms, torso, and legs a little longer too", then "Make the legs grow a bit more than the torso". The owner approved the in-game comparison. Record: `docs/Height.md`.

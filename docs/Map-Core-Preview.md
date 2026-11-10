@@ -118,6 +118,14 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 - It also shows the school bell and period card when the clock changes period, and the roll-call fade on a respawn after a death.
 - **Tested (local play-test):** the full-moon, new-moon and crimson-moon banners (through the `NHMoonPreview` / `NHMoonPhasePreview` test attributes) and a real period-change bell card. The "Infinite yield ... Moments" warning is gone.
 
+
+## Added 2026-11-10 (1.70.1): Height v2
+
+- Heights stretch the torso, legs and arms (NH Combat Test 1.70.0, `docs/Height.md`) instead of scaling the body evenly.
+- **Files:** `Config.Heights`, `Managers.EntityLoader`, `Character.Vault` (NH Combat Test's, byte for byte), `UI.Appearance` (NH Combat Test's + the Map line), and the Map's own `Services.Player.Height` (its `Apply` now uses `Heights.Proportions` and `SetStretch`). Before-copies in `ServerStorage.NHCore.Backups.HeightV2_pre`.
+- **Tested (local play-test):** Tallest (7'0") and a Human's Shortest (4'11") through the desk gave NH Combat Test's exact part sizes. Walking, sprinting and the katana M1 worked at both, and the stretch survived a look change.
+- **When the Map's Height is copied again:** it's a Map version (no saving), so port only `Apply` from NH Combat Test.
+
 ## Removing it
 Run this in the Map place's command bar, then save:
 
