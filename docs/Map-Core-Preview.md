@@ -111,6 +111,13 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 - **Tested (local play-test):** every Build button with real clicks gave the right body for both genders, Female carried Heavy II over to Plus, and the Strong body walked and swung the katana (M1.1, M1.2).
 - **When copying the Wardrobe again:** take NH Combat Test's live file and re-add the Map adapters: `Bloodline` in `TABS`, `Local.BloodlineTab`, it in the Render list, the `NHAnywhereWardrobe` check in `Shared.Toggle`, and the K handler at the end of `OnStart`.
 
+
+## Added 2026-11-10 (1.69.2): moon banners
+
+- `Controllers.Gui.Moments` (NH Combat Test's, byte for byte, tagged `NHCore`). `World.FullMoon` and `World.MoonPhases` had waited for it since 1.54, so the full, new, crimson and blue moon banners never showed. Now they do.
+- It also shows the school bell and period card when the clock changes period, and the roll-call fade on a respawn after a death.
+- **Tested (local play-test):** the full-moon, new-moon and crimson-moon banners (through the `NHMoonPreview` / `NHMoonPhasePreview` test attributes) and a real period-change bell card. The "Infinite yield ... Moments" warning is gone.
+
 ## Removing it
 Run this in the Map place's command bar, then save:
 

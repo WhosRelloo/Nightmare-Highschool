@@ -2,6 +2,21 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.69.2] - 2026-11-10: Moon banners in the Map place
+
+Owner: "Yes, port Moments". Record: `docs/Map-Core-Preview.md`.
+
+### Fixed (Map place)
+- **The moon banners never showed in the Map.** Its `World.FullMoon` and `World.MoonPhases` (in the add-on since 1.54) hand their banners to `Controllers.Gui.Moments`, which was never brought over. So they waited for it forever, and the console showed "Infinite yield possible on ... WaitForChild("Moments")". `Controllers.Gui.Moments` is now copied from NH Combat Test, byte for byte (tagged NHCore). Everything it uses (`UI.Components`, `Controllers.Fx`, `Config.Classes`, `Functions.SchoolTime`) was already in the Map and identical.
+- **It also brings** the full game's other Moment banners that the Map can trigger: the school bell and period card when the clock changes period, and the "roll call" fade when you respawn after a death. Quest, clue, level-up and purchase banners only fire from systems the Map doesn't have.
+
+### Verified (Map place, local play-test)
+- With the full-moon preview on (`NHMoonPreview`): the banner "Nightfall: The moon is full", the moon swelling and the moon grade.
+- With the phase preview (`NHMoonPhasePreview`): "The new moon rises" with its darker grade, then "A crimson moon: The Vampires' night" with its grade.
+- The clock changing period showed the bell card "The gates open: Before School".
+- The "Infinite yield ... Moments" warning is gone, and there were no errors.
+- **Not tried:** a natural full-moon night on the clock (the preview switches use the same code), the blue moon, and the respawn fade.
+
 ## [1.69.1] - 2026-11-10: Body types in the Map place
 
 Owner: "Do it" (sync NH Combat Test's 1.69.0 body types into the Map place). Record: `docs/Map-Core-Preview.md` (the bodies themselves: `docs/Body-Types.md`).
