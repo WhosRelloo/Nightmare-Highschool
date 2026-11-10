@@ -1791,3 +1791,140 @@ Glow colours are given in the notes (RGB 0-255); Glow is the first colour, Glow2
 ![The painting gallery](img/showpiece44-gallery.jpg)
 
 **In Studio (2026-11-10):** the same `tools/props/art_showpiece_templates.luau` makes the 27 templates (NHBuildKit `Showpiece`). Every piece takes its prop's maps; each Canvas takes `<Prop>_canvas`, `_canvasnormal` and `_canvasrough`. Glow and Glow2 are Neon in the colours above, Glass is see-through (0.45) in its colour. The lights and ParticleEmitters from the effects table are on the named pieces, using textures the game already loads (smoke, embers, fire, sparkle, dust); the lantern, the reaper's lightning, the duel's crossing and the paintings' sconces are tagged `NHCandle` to flicker. Not added yet: the Beams and Trails (they need attachment points at blade tips and batons). Statues and set-pieces collide (Main precisely); paintings don't. `tools/props/showcase_art_showpiece.luau` puts the statues in workspace.NHPropsShowcase["Showpiece Statues"] at z -760 (x -235 to -35) and the paintings and mural in ["Showpiece Paintings"] at z -790 (x -235 to -111, bottoms at 2.5, the mural at 1.5).
+
+## Batch 45 (interiors): the shop, bookshop and cafe interiors kit
+
+`art/props/nh_props_batch45.py`. Homes phase 2 (`docs/superpowers/specs/2026-11-06-homes-interiors-design.md`): the shared building interiors the builder places by hand in the Map place. A Victorian-gothic general store (**MORROW & VANE**, Purveyors of Sundries), a dark bookseller (**LANTERNLIGHT BOOKS**) and a candlelit cafe (**THE WICK & KETTLE**), in the house look of batches 34-43: cast iron, black marble, crimson enamel, brass and gilt, glass, ink and paper, with wood only for the books, crates and accents. It has 30 props, each built around one signature idea, and none repeats the existing cafe, library or shop props (CafeBooth, ChalkMenuStand, BakeryCase, ServingCounter, KitchenShelf, SpecimenJars, CuriosityCabinet, CratePile, BookCart and the rest). All names, labels, titles and authors are invented; prices are in yen.
+
+- **Printed atlas:** `art/props/interiors_atlas.py` (system Python with PIL and numpy, on `dorm_atlas.py`'s Cell and Atlas) paints `InteriorsPrint` (4096; colour, gilt and height). It is a bake source only, so it isn't uploaded. It holds:
+  - the shop board (MORROW & VANE, Purveyors of Sundries, Established 1851), the M & V monogram, the OPEN / CLOSED faces, PROPRIETOR ONLY
+  - the brass yard rule, the till's key caps, sale flags and plates (AMOUNT PURCHASED, VESPER-CROSS REGISTER CO.), the TRUE MEASURE scales dial, the crimson wrapping paper and eight price tickets
+  - 24 apothecary drawer labels and the APOTHECARY header, eight sweet-jar labels and the CONFECTIONS header, eight painted postcards and four pamphlets, the POSTCARDS sign
+  - five sack stencils, six crate stencils and seven tin labels
+  - ten new-release covers (THE LANTERN BELOW by Ottoline Marsh, RAVENS OF GREYHALLOW by Silas Wren, A GRAMMAR OF SHADOWS, THE NIGHT MATRON, SALT & BONE, THE BELL TOLLS THRICE, INK IN THE WATER, THE LAST VIGIL, WHAT THE OWLS KEPT, ONE HUNDRED CANDLES), the LANTERNLIGHT BOOKS plate, NEW THIS MOON, the handwritten STAFF PICKS card and the chalked BARGAINS slate
+  - the cafe's gilt script name board, six jar labels and the RING FOR SERVICE card
+
+  Its regions are in `art/props/interiors_atlas.json`. The old bindings on the bookshop's shelves come from the library atlas (batch 30).
+- **Run:** `E:/NH-Work/props45/`.
+  - `run45.py` runs nh_props without editing its import list (`--check` counts tris, `--quick` workbench views, `--fast` previews without baking, `--previewonly` re-renders previews on the exported FBX meshes).
+  - `bake45.sh all|<Prop>` bakes at 2048 with 64 samples on the GPU, holding a shared bake slot (`E:/NH-Work/bakeslots/slot1|slot2`).
+  - `sheet45.py`, `render45.py`, `upload45.py`, `names45.py` and `docs45.py` make the contact sheets, staged renders, upload folder and this section.
+- **Files:**
+  - FBX in `art/props/fbx/interiors-batch45/`
+  - maps in `art/props/textures/<Prop>_*.png` (2048)
+  - previews in `art/props/previews/` (`<Prop>_open.png` for the doors and the till drawer)
+  - upload copies (all at 1024) in `art/group-upload/interiors-batch45/`: 120 maps, 30 props, with the metal maps that are entirely black left out
+  - contact sheets and renders in `art/props/renders/interiors-batch45/`
+- **Pieces:** each prop is one mesh named after it, except:
+  - `ShopCounterCorner`: Main + Glass + Glow
+  - `ShopCounterEnd`: Main + Door0
+  - `CashRegister`: Main + Glass + Drawer0
+  - `DisplayCase`: Main + Glass
+  - `GlassCabinetTall`: Main + Door0 + Glass
+  - `ApothecaryDrawers`: Main + Glass
+  - `SweetJarShelf`: Main + Glass
+  - `BookshopCounter`: Main + Glass
+  - `CafeBarCounter`: Main + Glass + Glow
+  - `CafeBackShelf`: Main + Mirror
+- **Pivots:** bottom centre, front toward -Y. Wall pieces have their back on the wall plane (y = 0), with the pivot at their lowest point on that plane. ShopSignInterior's pivot is at its board's bottom. Nothing goes below the pivot.
+- **Modular counters:** ShopCounter (6.0 long) and CafeBarCounter (6.0) have flush ends and tile end to end on a 6-stud grid; all three shop counter pieces are 2.2 deep with their front on y = -1.1 (the marble nosing to -1.22). ShopCounterEnd's stub meets a ShopCounter's -X end. ShopCounterCorner is a quarter round: as built, a run along X joins its +X face and a run turned -90 (facing -X) joins its +Y face; turn the corner (and the runs) together for the other corners.
+
+### Template notes (NHBuildKit `Interiors`)
+
+- **Kit name:** `Interiors`. Every piece takes its own prop's four maps. No piece uses a shared map set.
+- **Collisions:** floor furniture collides on its precise shape (the counters and gate, cabinets, shelves, display case, island, spinner, stand, barrow, easel, table, sacks, crates, stools, umbrella stand, back bars). These don't collide: ShopScales, CounterBell, OpenClosedSign, ShopSignInterior, PriceTagRail, DoorBellBracket (the till collides as a box on the counter, so it can't be walked through; it can also be left non-colliding).
+- **Glow** (Neon):
+  - `ShopCounterCorner_Glow`: the lamp's oil flame, warm amber (255, 170, 90). Add a PointLight at the flame (1.7 above the counter top, over the lamp's foot): colour (255, 170, 95), brightness 1.2, range 14, shadows on.
+  - `CafeBarCounter_Glow`: the candle's flame, warm (255, 160, 80). Add a PointLight at the flame (about 1.0 above the bar top): colour (255, 160, 85), brightness 0.9, range 12, and give it `NHCandle` so it flickers. No ParticleEmitter.
+- **Glass** (see-through, about 0.6 transparency): the lamp's chimney and the hurricane shade (clear, 0.7), the till's sale window, the display case's panes, the tall cabinet's door pane (it swings with Door0, as on the CuriosityCabinet), the apothecary's show globes (0.5, so the coloured water reads), the sweet jars (0.55) and the bookshop counter's case doors.
+- **Mirror:** `CafeBackShelf_Mirror` is the back bar's black-silvered glass: Reflectance about 0.35, dark tint.
+- **Doors and drawers** (the locker system):
+  - `ShopCounterEnd_Door0`: the shopkeeper's gate, hinged on the newel on the RIGHT (swing +1), opens out 100 degrees to the front; prompt "Gate / Open", auto-close 6 s.
+  - `GlassCabinetTall_Door0` (+ `_Glass`, same hinge): hinged on the left, opens out; prompt "Cabinet / Open".
+  - `CashRegister_Drawer0`: the till drawer, slides out 0.7 to the front (`SlideBy`, like the FilingCabinet's drawer); prompt "Till / Open". (The owner's list allowed a Door0 here; a sliding drawer reads better on a till.)
+- **No other lights or particles.** The shops are lit by the room's own lamps (the lighting kit, batch 42).
+
+### Showcase placement notes
+
+**Wall pieces** (back on the wall; the suggested bottom height is where the pivot goes on the showcase wall):
+
+| Prop | Bottom on the wall | Notes |
+|---|---|---|
+| WallShelfStocked | 0 (stands on the floor) | 6.4 wide, 8.6 tall, 1.2 deep |
+| ApothecaryDrawers | 0 (stands on the floor) | 6.7 wide, 10.8 tall; the ledge at 3.4 |
+| SweetJarShelf | 0 (stands on the floor) | 5.0 wide, 7.4 tall |
+| CafeBackShelf | 0 (stands on the floor) | 6.3 wide, 8.2 tall; the back-bar top at 3.4 |
+| OpenClosedSign | 4.0 (on a door or its glass) | 1.3 wide, 1.6 tall; hangs 0.12 off the wall |
+| PriceTagRail | 2.0 (a shelf edge or counter front) | 4.05 long, 0.73 tall |
+| DoorBellBracket | 7.0 (over the inside of a door) | 1.3 tall, reaches 1.3 out |
+| HatUmbrellaStand | 0 (stands on the floor) | 2.5 wide, 6.3 tall |
+
+**Ceiling piece:** ShopSignInterior hangs from two ceiling roses whose tops are 4.6 above the board's bottom (its pivot). In a room with a ceiling at height C, put the pivot at C - 4.6; on the showcase, stand it on a plinth or hang it from a frame.
+
+**Small pieces for a plinth (or a counter top at 3.4):** CashRegister (2.1 x 1.5, 2.8 tall), ShopScales (3.3 x 0.9, 2.3 tall) and CounterBell (1.15 x 0.6, 0.5 tall).
+
+### Props
+
+Every piece is under 20k triangles. Every prop is baked at 2048.
+
+**Counter**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| ShopCounter | 7.2k | yes | floor | the general store's counter, 6 long, 2.2 deep, 3.4 tall: a black marble top with a brass nosing and a brass yard rule set into it along the front (the draper's measure), three crimson enamel gothic panels with gilt lancets and quatrefoils in a cast-iron frame, a brass kick plate; on the shopkeeper's side a shelf of brown paper bags, twine spools, tied parcels and a ledger. Ends flush, so runs line up end to end |
+| ShopCounterCorner | 7.5k (Main 7.2k, Glass 0.2k, Glow 60) | yes | floor | the outside corner: a quarter round 2.2 x 2.2 with its centre on the inside corner, so a ShopCounter run along X and one turned -90 (along Y, facing -X) meet its two flat ends (turn the corner with the runs). A bowed marble top and nosing, three curved crimson panels between fluted iron colonnettes; on top the shop's brass student lamp: Glass is its chimney, Glow its flame, under a crimson tole shade; 5.6 tall with the lamp |
+| ShopCounterEnd | 7.4k (Main 4.8k, Door0 2.6k) | yes (the gate too) | floor | the end of a run, 3.0 long: a 1.2 counter stub (its +X end meets a ShopCounter's -X end) closed by a crimson end panel with the gilt M & V monogram, a square iron newel with a brass ball; Door0: the shopkeeper's cast-iron swing gate with a brass top rail, scrolled infill and a PROPRIETOR ONLY plate, hinged on the newel (right-hand hinge) and opening out to the front; a slim latch post with a brass finial |
+| CashRegister | 9.8k (Main 8.9k, Glass 12, Drawer0 0.9k) | yes | plinth (counter) | counter piece: an embossed brass till 1.8 wide with scrolled side panels, three stepped rows of ivory key caps on brass stalks (1 to 500 yen and NO SALE), a crested sale window (Glass) with the YEN 4 50 flags up under an AMOUNT PURCHASED plate, the VESPER-CROSS REGISTER CO. maker's plate, a crank on the right; Drawer0: the till drawer with velvet cups and a gilt pull |
+| ShopScales | 5.8k | no | plinth (counter) | counter piece: a crimson enamel cast-iron bed on turned feet, a brass scoop pan and a platform with two bell weights, a dial tower between them (the TRUE MEASURE dial, MORROW & VANE), and a stepped marble stand of five graduated brass bell weights; 3.3 wide |
+| CounterBell | 1.1k | no | plinth (counter) | counter piece: a brass dome bell with a plunger on a black marble octagon with a crimson enamel skirt and gilt bead, and the RING FOR SERVICE (once will do) card on a little brass easel; 1.15 wide |
+| WrapStand | 6.2k | yes | floor | the wrapping stand: two cast-iron gothic A-frame ends on bun feet with gilt quatrefoils, a roll of brown kraft paper and above it the shop's crimson paper printed with gilt crescents and quatrefoils, each drawn over a serrated brass cutter; a twine cone on a spike with its string run up through a brass eyelet on a gooseneck and hanging down; shears on a hook; 2.8 wide, 4.6 tall |
+
+**Display and stock**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| DisplayCase | 9.1k (Main 9.0k, Glass 80) | yes | floor | the jeweller's case, 4 wide and 3.4 tall: turned iron legs and a stretcher shelf, a lacquered cabinet with two crimson gothic panels, a sloped-front vitrine (Glass: front, top, sides and back) over crimson velvet holding pocket watches, a roll of rings with gems, cameo brooches, fountain pens, a silver flask, spectacles, an iron key and price tickets |
+| GlassCabinetTall | 11.8k (Main 10.8k, Door0 1.0k, Glass 12) | yes | floor | a tall glazed shop cabinet, 3.2 wide and 9.0 tall: lacquered plinth, cast-iron corner posts, crimson gothic side panels, four frosted glass shelves with brass edges (scent bottles, bone china cups and saucers, silver candlesticks and a gift box, ink bottles; boxed candles below), a pointed iron gable with a gilt quatrefoil and finials; Door0 + Glass: the glazed door with a gothic arched head, brass handle and escutcheon (hinge on the left, opens out) |
+| WallShelfStocked | 17.9k | yes | wall, 0 (stands on the floor) | wall piece: the store's wall of stock, 6.4 wide, 8.6 tall, 1.2 deep: crimson enamel end frames with scrolled tops and gilt quatrefoils, five shelves with brass ticket edges and price tickets: lamp-oil cans and soap, labelled tins (BLACK TEA, BOOT BLACKING, CANDLE WAX, LAMP WICKS, BISCUITS, MUSTARD, COCOA), jars and boxes, bottles; tallow candles hung in pairs by their wicks from a brass rod; stencilled stock boxes on top and MORROW & VANE on the cornice |
+| IslandShelf | 15.0k | yes | floor | the freestanding island shelf, 5.1 long, 2.6 deep, 5.3 tall, stocked both sides: a stepped pyramid of three tiers between crimson enamel end frames edged in gilt with quatrefoils and finials; wire baskets of turnips, onions and black apples with price tickets on the bottom tier, tins, jars and bottles above, boxes and candle bundles on top, a brass ticket holder on the ridge |
+| ApothecaryDrawers | 13.0k (Main 11.6k, Glass 1.4k) | yes | wall, 0 (stands on the floor) | wall piece: the apothecary wall, 6.7 wide, 10.8 tall: a lacquered cupboard base with three crimson gothic panels under a marble ledge (3.4) with a brass mortar and pestle and stoppered bottles; 48 crimson-enamelled tin drawers (8 by 6) with brass label frames (RAD. VALER., FOL. MENTH., PULV. OSSIS, LAP. LUNAE, PULV. NOCTIS ...) and knobs, one pulled out full of dried herbs; three great show globes of red, green and violet water (Glass) and the gilt APOTHECARY header (simples, tinctures, remedies for the night). Different from SpecimenJars and the CuriosityCabinet |
+| SweetJarShelf | 12.7k (Main 9.3k, Glass 3.4k) | yes | wall, 0 (stands on the floor) | wall piece: the confectioner's shelf, 5.0 wide, 7.4 tall: a lacquered base, three stepped crimson enamel tiers of tall glass sweet jars (Glass) with black and brass lids and oval labels (BAT DROPS, HUMBUGS, SHERBET MOONS, LIQUORICE BONES, VIOLET CREAMS, ACID TEARS, CINDER TOFFEE, MINT GHOSTS), the sweets heaped inside; an open jar, a brass scoop and a rack of paper cones on the counter top; the gilt CONFECTIONS crest |
+| PostcardSpinner | 5.4k | yes | floor | the postcard spinner: a cast-iron spindle 6.8 tall on four scrolled feet, a square rack of four faces with six tiers of wire pockets holding painted postcards (the Institution by night, the bell tower, moonrise on Blackwater, a raven, the high street, the old watchers, the chapel, a full moon), a bottom tier of pamphlets (THE NIGHT OMNIBUS, A WALK THROUGH the old crypts, CURFEW, THE HARVEST FAIR), the POSTCARDS one-yen sign and a crowned finial |
+| StockSacks | 13.8k | yes (the truck and sacks) | floor | sacks of stock: a cast-iron sack truck with brass grips and rubber-tyred wheels loaded with two sacks, slumped lumpy hessian sacks tied at the neck (FINE FLOUR, BROWN SUGAR) and an open sack of COFFEE beans with its top rolled down and a brass scoop in it, beans spilt; the hessian stencilled MORROW & VANE |
+| StockCrates | 11.2k | yes | floor | stacked pine stock crates with stencilled labels, iron corner plates and rope handles: TALLOW CANDLES under INK under an open CARBOLIC SOAP crate packed with straw and candle bundles, LAMP OIL (THIS WAY UP) beside them and SAFETY MATCHES (KEEP DRY) on the floor; the lid leant against the stack, a crowbar, straw on the floor; 4.2 tall. Different from CratePile |
+
+**Bookshop**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| BookshopCounter | 5.4k (Main 5.4k, Glass 24) | yes | floor | the bookseller's counter, 5 long, 3.4 tall: a marble top and brass nosing, the gilt LANTERNLIGHT BOOKS plate on the frieze, a locked rare-books case behind two pairs of arched brass-framed glass doors (Glass) full of old bindings; on top a string-tied tower of books, a stack of new covers, an open ledger, a pen and inkwell; two shelves of stock on the bookseller's side |
+| NewReleasesTable | 3.6k | yes | floor | the new-releases table: a black marble top 4.4 x 2.6 (2.9 tall) on two cast-iron gothic trestles with gilt quatrefoils, a slatted iron shelf of boxed stock; three stacks of new books face up (THE LANTERN BELOW, RAVENS OF GREYHALLOW, THE LAST VIGIL ...), two books on brass wire stands and the double-sided NEW THIS MOON card on a brass stand |
+| BookStandAngled | 2.8k | yes | floor (or against a wall) | the angled book stand: cast-iron side frames with gilt lancet tracery carrying a sloped crimson enamel back with four brass ledges, twelve new books face out (all ten invented covers), the LANTERNLIGHT BOOKS plate on its crest; 3.9 wide, 5.6 tall |
+| BargainBinCart | 5.6k | yes | floor | the bargain barrow: a deep galvanised bin on a cast-iron frame with two big spoked iron wheels at the front and turned legs and brass-gripped handles behind, heaped with jumbled second-hand books, the chalked BARGAINS 3 for 10 yen slate (all sales final, no ghosts refunded) hung on its front; 4.3 long |
+| StaffPicksEasel | 1.4k | yes (thin) | floor | the staff-picks easel: a cast-iron tripod easel 5.5 tall with a gilt crescent finial, a gilt-framed card in the night shift's hand (STAFF PICKS: The Lantern Below, Ravens of Greyhallow, A Grammar of Shadows) and two of the books face out on its ledge, a crimson ribbon |
+
+**Cafe**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| CafeBarCounter | 13.4k (Main 13.2k, Glow 40, Glass 0.2k) | yes | floor | the cafe's high bar, 6 long, 2.2 deep, 4.0 tall: a black marble top with a round nosing, four crimson enamel gothic panels in a cast-iron frame, a brass foot rail 0.7 up on cast-iron bat-wing brackets; on top a brass candlestick in a glass hurricane shade (Glass; Glow the flame), cups of coffee, a stack of saucers, a silver sugar bowl; two shelves of cups behind. Ends flush to line up |
+| BarStool | 4.4k | yes | floor | a cafe bar stool, seat 3.0 (for the 4.0 bar): a fluted cast-iron pedestal on four clawed feet, a brass foot ring with spokes and flat gilt quatrefoils at 1.1, a brass swivel collar, a buttoned crimson leather seat and a low curved iron back hoop (at +Y: turn it to face the bar) |
+| CafeBackShelf | 14.9k (Main 14.9k, Mirror 12) | yes | wall, 0 (stands on the floor) | wall piece: the cafe's back bar, 6.3 wide, 8.2 tall: a lacquered cupboard with crimson gothic panels under a marble top (3.4) carrying six big labelled bone-china jars (COFFEE, CHOCOLATE, LOOSE TEA, SUGAR, COCOA, BISCOTTI); a black-silvered mirror (Mirror) between iron pilasters behind two shelves of cups and jars on bat-wing brackets, mugs on brass hooks, and the gilt-scripted THE WICK & KETTLE board on the cornice |
+
+**Signs and fittings**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| OpenClosedSign | 2.5k | no | wall, 4.0 (on a door or its glass) | wall piece: a brass hook plate with a crescent finial and two fine chains holding a double-sided enamel sign: OPEN (do come in) in crimson on the front, CLOSED (back at dusk) in ink on the back; turn the model 180 to change it (or flip it with a prompt); 1.3 wide, 1.6 tall |
+| ShopSignInterior | 5.4k | no | ceiling | ceiling piece: the indoor hanging sign, a double-sided crimson board 5.0 wide with MORROW & VANE, Purveyors of Sundries, Established 1851 in gilt with key-and-crescent roundels, in a cast-iron frame with a pointed-arch cresting, a gilt crescent and finials, hung from an iron rod on two chains to brass ceiling roses. The pivot is at the board's bottom; the roses' tops are 4.6 above it |
+| PriceTagRail | 1.3k | no | wall, 2.0 (a shelf edge or counter front) | wall piece: a 4-long brass ticket moulding with six clip-in bone and enamel price tickets (1 to 40 yen) and three kraft tags on twine from little hooks under it; 0.8 tall. Fits the counters' fronts and the shelf edges |
+| DoorBellBracket | 2.4k | no | wall, 7.0 (over the inside of a door) | wall piece: a cast-iron back plate in a pointed-arch outline, an S-scroll arm reaching out 1.1, and a brass bell with its clapper on a coiled steel spring; 1.3 tall |
+| ShopStool | 3.6k | yes | floor | the shopkeeper's screw stool, seat 2.5: a cast-iron tripod on claw-and-ball feet, an exposed brass screw column with its thread and a knurled lock wheel, a round crimson leather seat with a brass rim, a brass foot ring |
+| HatUmbrellaStand | 7.6k | yes | wall, 0 (stands on the floor) | wall piece: the stand by the door: a cast-iron trough with a pierced gilt quatrefoil front and three brass umbrella loops over a zinc drip tray; a back frame rising to a pointed arch with a gilt quatrefoil and a raven on top, three hat pegs with a bowler and a tall hat hung up; two furled black umbrellas (one crimson-handled) and a silver-topped cane; 6.3 tall |
+
+![Counter](img/interiors45-counter-contact.jpg)
+![Display and stock](img/interiors45-display-contact.jpg)
+![Bookshop](img/interiors45-bookshop-contact.jpg)
+![Cafe, signs and fittings](img/interiors45-cafe-fittings-contact.jpg)
+![The general store](img/interiors45-store.jpg)
+![The bookseller and its cafe corner](img/interiors45-books.jpg)
