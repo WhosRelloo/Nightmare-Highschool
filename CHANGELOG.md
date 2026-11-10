@@ -2,6 +2,41 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.68.0] - 2026-11-10: A full feminine R6 body
+
+Task: a Female body type that keeps the old Female torso but adds more feminine features. Owner: "MAKE THEM STILL RESEMBLE NORMAL R6 CHARACTER PROPORTIONS THOUGH." The owner approved the Blender design before it was built. Record: `docs/Female-Body.md`.
+
+### Changed (NH Combat Test)
+- **The Female body is now a whole body**, not one torso mesh: five R6 CharacterMeshes (torso, both arms, both legs), modelled in Blender and imported under the group. Every mesh stays inside its R6 part box, and the head, part sizes, joints and animations are unchanged.
+  - **Torso:** the old hourglass, smoothed. The waist curves in to 1.58 studs (the old torso pinched to 1.40 in a sharp V). The shoulders and hips stay at the full 2 studs, the top edge rolls over softly, and there's a soft bust and seat inside the 1-stud depth.
+  - **Arms:** full width at the shoulder, flush with the torso, tapering on the outer side to 0.85 studs at the wrist, with rounded tops.
+  - **Legs:** full width at the hip, tapering to 0.88 studs at the ankle, with the inner sides still meeting in the middle.
+- **It's the same Female choice:** the same saved id `female` and the same index, so every save, NPC look and `Body == 2` check picks it up. `UI.Appearance.Bodies.female` has a `Meshes` table, and `ApplyTo` adds one `NHBodyMesh` per part, replacing any package mesh on those parts.
+- **Clothing, skin colour, hair, faces, capes and weapons** use the same parts as before. The UVs index Roblox's R6 CharacterMesh clothing atlas (1024 x 512), measured from Roblox's own package meshes and written down in `art/characters/female/atlas.py`.
+
+### Verified (NH Combat Test, slot 4 "Testy", Play)
+- **Customisation:** real clicks through PLAY, then Slot IV, then the creator's Look tab, then Body: Female. It showed "Saved to your profile". The server character had all five meshes on standard-size parts, and got them again after Enter School.
+- **Clothing:** front, back and side shots.
+  - Blazer: lapels, tie and crest on the front, cuffs at the wrists.
+  - Jeans: back pockets on the back, shoes at the feet.
+  - Pleated Tartan Skirt, picked at the locker-room Wardrobe with a real click.
+  - Skin colour on the hands.
+- **Animations:** the Walk track. A real E equipped the katana, and real clicks played the M1 swing.
+- **Hair, eyes and console:** hair and eyes still show. There were no new console messages.
+- Each imported mesh was read back with `EditableMesh`: its size, which way is the front, the flat inner side of each limb, and the UVs.
+
+### Not yet
+- **Not tried:**
+  - NPC students in a Female look (they use the same code).
+  - A second player watching.
+  - The viewport previews.
+  - The other female outfits and the Countess and Banshee forms.
+  - Capes on the new torso.
+  - M2, aerials, blocking and being hit.
+  - A real Roblox package avatar in "Use my Roblox outfit" mode.
+- **The Map place still has the old torso-only Female body.** The hair, eyes and UI port session was told about the change.
+- **Testy:** slot 4 was left on Female with the tartan skirt (it was Standard with Uniform Trousers).
+
 ## [1.67.1] - 2026-11-10: Capes sway in the Map place
 
 Owner: "Yes, port CapeSway". Record: `docs/Map-Core-Preview.md`.
