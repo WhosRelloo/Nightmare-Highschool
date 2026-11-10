@@ -1929,6 +1929,8 @@ Every piece is under 20k triangles. Every prop is baked at 2048.
 ![The general store](img/interiors45-store.jpg)
 ![The bookseller and its cafe corner](img/interiors45-books.jpg)
 
+**In Studio (2026-11-10):** `tools/props/shop_kits_templates.luau` makes the 30 templates (NHBuildKit `Interiors`) in ServerStorage.NHProps. Each piece takes its prop's four maps. The two flames are Neon with their PointLights (the cafe candle tagged `NHCandle`), the glass is see-through at the docs' transparencies, and the back bar's mirror reflects at 0.35. The gate (swings out -100), the tall cabinet's door with its pane (100) and the till drawer (slides 0.7 to the front) run on the locker system (`NHLockerProp`: "Gate", "Cabinet" and "Till"). Floor furniture collides on its precise shape. `tools/props/showcase_shop_kits.luau` lines the kit up as the "Interiors" row at z -826, on its own floor slab (ShowcaseFloorShops, z -797 to -905).
+
 ## Batch 46 (shops): the armory and the spell shop
 
 `art/props/nh_props_batch46.py`. Homes phase 2: two shared shop interiors the builder places in the town. The **armory** is a monster-hunters' outfitter for the Vigil, built round the game's three weapon classes (katana, fist, claws) and the hunt (silver and ash against vampires, werewolves, ghouls and wraiths); it is iron, steel, silver, leather and crimson, and nothing in it glows. The **spell shop** (Hex and Hollow) is night-violet enamel, brass, black marble and velvet, and it is the one place in this kit where things glow. 29 props, each with its own silhouette and one signature idea. None repeats batch 45's general shop pieces, batch 47's witch-hut pieces, the library's ChainedBookcase / ForbiddenCage / ScrollRack, the seer set, the ArmillarySphere, CelestialGlobe, StarChartRug, SpecimenJars, CrowPerch, TackleDummy or the gym's BowRack. All names, mottoes and designs are invented; no blood or gore anywhere (the claw marks are clean grooves).
@@ -2064,3 +2066,5 @@ Every piece is under 20k triangles (the builder decimates anything over 19.5k to
 ![The spell shop props](img/shops46-spellshop-contact.jpg)
 ![The armory](img/shops46-armory-interior.jpg)
 ![The spell shop](img/shops46-spellshop-interior.jpg)
+
+**In Studio (2026-11-10):** the same `tools/props/shop_kits_templates.luau` makes the 29 templates (NHBuildKits `Armory` and `SpellShop`). The spell shop's glows are Neon in the colours above with their PointLights (the scrying orb and the waxfall altar tagged `NHCandle`), plus four particle effects: the grimoires' violet motes, the mist in the orb, the crystals' falling sparkles and the fireflies in their jar. The grindstone's optional sparks are left out. Props marked "Collides: no" don't collide, and the rest collide on their precise shape. The showcase rows are "Armory" at z -862 and "Spell Shop" at z -898, with the rune-stone table standing on its rug.
