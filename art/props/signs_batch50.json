@@ -1,0 +1,29 @@
+{
+  "_": "Batch 50 (signs): every sign base, its blank Field (the tintable enamel the icon and text sit on) and the face layout. Field w/h are the Field piece's face in studs (the SurfaceGui draws on that face of the Field's bounding box). Layout boxes are fractions of that face: [x0, y0, x1, y1] from the top left. Read by nh_props_batch50.py, faces50.py and tools/props/signs_kit_templates.luau.",
+  "ink": {"Gilt": [255, 214, 128], "Ink": [32, 26, 30], "Bone": [234, 224, 200], "Silver": [212, 214, 222]},
+  "field": {"Black": [26, 24, 28], "Crimson": [96, 14, 26], "InkBlue": [22, 30, 66], "Verdigris": [46, 92, 80], "Bone": [214, 202, 176], "Slate": [52, 56, 60]},
+  "bases": {
+    "BrassPlaque": {"field": [2.04, 0.6], "faces": ["Front"], "ink": "Gilt", "tint": "Black", "wall": true,
+      "layout": {"Icon": [0.012, 0.03, 0.19, 0.97], "Title": [0.2, 0.1, 0.97, 0.6], "Subtitle": [0.2, 0.6, 0.97, 0.9]}},
+    "EnamelPlate": {"field": [1.12, 1.76], "faces": ["Front"], "ink": "Gilt", "tint": "Crimson", "wall": true,
+      "layout": {"Icon": [0.12, 0.17, 0.88, 0.6], "Title": [0.06, 0.63, 0.94, 0.77], "Subtitle": [0.08, 0.77, 0.92, 0.88]}},
+    "LintelTablet": {"field": [5.0, 0.86], "faces": ["Front"], "ink": "Gilt", "tint": "Slate", "wall": true, "mirror": true,
+      "layout": {"Icon": [0.01, 0.05, 0.135, 0.95], "Icon2": [0.865, 0.05, 0.99, 0.95], "Title": [0.15, 0.08, 0.85, 0.64], "Subtitle": [0.15, 0.62, 0.85, 0.92]}},
+    "Roundel": {"field": [1.12, 1.12], "faces": ["Front"], "ink": "Gilt", "tint": "InkBlue", "wall": true,
+      "layout": {"Icon": [0.32, 0.1, 0.68, 0.44], "Title": [0.14, 0.42, 0.86, 0.92]}},
+    "CorridorSign": {"field": [4.24, 0.94], "faces": ["Front", "Back"], "ink": "Gilt", "tint": "Black", "ceiling": true,
+      "layout": {"Icon": [0.02, 0.1, 0.14, 0.9], "Icon2": [0.86, 0.1, 0.98, 0.9], "Title": [0.16, 0.08, 0.84, 0.62], "Subtitle": [0.16, 0.6, 0.84, 0.9]}},
+    "BracketSign": {"field": [1.42, 2.03], "faces": ["Left", "Right"], "ink": "Gilt", "tint": "Crimson", "wall": true,
+      "layout": {"Icon": [0.12, 0.2, 0.88, 0.6], "Title": [0.06, 0.63, 0.94, 0.77], "Subtitle": [0.08, 0.77, 0.92, 0.88]}},
+    "ArrowBoard": {"field": [2.6, 0.6], "faces": ["Front"], "ink": "Gilt", "tint": "Black", "wall": true,
+      "layout": {"Icon": [0.09, 0.06, 0.26, 0.94], "Title": [0.27, 0.08, 0.98, 0.62], "Subtitle": [0.27, 0.6, 0.98, 0.92]}},
+    "ArrowBoardLeft": {"field": [2.6, 0.6], "faces": ["Front"], "ink": "Gilt", "tint": "Black", "wall": true,
+      "layout": {"Icon": [0.74, 0.06, 0.91, 0.94], "Title": [0.02, 0.08, 0.73, 0.62], "Subtitle": [0.02, 0.6, 0.73, 0.92]}},
+    "FloorStand": {"field": [1.64, 2.03], "faces": ["Front", "Back"], "ink": "Gilt", "tint": "Crimson", "floor": true,
+      "layout": {"Icon": [0.12, 0.18, 0.88, 0.6], "Title": [0.06, 0.63, 0.94, 0.77], "Subtitle": [0.08, 0.77, 0.92, 0.88]}},
+    "ExitLantern": {"field": [2.0, 0.62], "faces": ["Front"], "ink": "Ink", "tint": null, "wall": true, "glass": true,
+      "layout": {"Icon": [0.04, 0.08, 0.24, 0.92], "Title": [0.26, 0.06, 0.96, 0.7], "Subtitle": [0.26, 0.66, 0.96, 0.94]}},
+    "WingDirectory": {"field": [4.4, 3.2], "faces": ["Front", "Back"], "ink": "Gilt", "tint": "Black", "ceiling": true,
+      "layout": {"Icon": [0.03, 0.03, 0.13, 0.2], "Icon2": [0.87, 0.03, 0.97, 0.2], "Title": [0.15, 0.03, 0.85, 0.2], "Rows": [0.04, 0.25, 0.96, 0.97]}, "rows": 5}
+  }
+}

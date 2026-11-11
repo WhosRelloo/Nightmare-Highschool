@@ -2,6 +2,27 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.82.0] - 2026-11-11: the misc signs kit (props batch 50)
+
+Blank sign bases and a set of icons the builder mixes and matches (`docs/Signs-Kit.md`, `docs/School-Props.md` Batch 50).
+Owner: "add a misc. kit too for class signs, bathroom signs (genders), etc. with their individual icons for builder
+customization", then "Add some ceiling signs for the wings of the building. Make it customizable so I don't have to keep
+asking you to make more".
+
+### Added
+- **Eleven sign bases** (NHBuildKit `Signs`, 2048 PBR bakes, brass, black iron, limestone, gilt): BrassPlaque, EnamelPlate,
+  LintelTablet, Roundel, CorridorSign (ceiling), BracketSign, ArrowBoard and ArrowBoardLeft, FloorStand, ExitLantern (lit
+  glass) and WingDirectory (ceiling, a header and up to five rows). Each has a blank enamel Field the icon and words sit on.
+- **59 icons** in the game's style, one per class, room and rule (Homeroom to Detention, the electives, Library, Chapel,
+  Infirmary, Boys, Girls, Restroom, Accessible, arrows, Way Out, Quiet Please, No Running, No Magic, Keep Out, Curfew,
+  Wet Floor...), uploaded under the group as separate images and tinted gilt, ink, bone or silver on the sign.
+- **SignKit** (`ServerStorage.NHProps.SignKit`): one `Preset` attribute fills a sign (79 presets, from `Config.Classes` and
+  the place list), or set `Icon`, `Icon2`, `IconRotation`, `Title`, `Subtitle`, `Field` (enamel colour or any Color3),
+  `Ink`, `Font` and, on a WingDirectory, `Row1`..`Row5` ("Library >", "< Chapel", "^ Infirmary"), then run
+  `require(game.ServerStorage.NHProps.SignKit).Apply()`. The faces are saved in the sign; nothing runs in game.
+- **Showcase** `workspace.NHPropsShowcase.Signs` (south of the Witch Hut): every base, the six class doors, the restrooms,
+  a plaque for every preset, the arrows and floor numbers, the wing directories and an icon board with every icon's name.
+
 ## [1.81.0] - 2026-11-11: Training, phase 1 (arms, torso and legs, shown live)
 
 Four gym stations where students train one area at a time; when a set steps an area up, only that area's meshes change,
