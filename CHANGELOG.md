@@ -2,6 +2,45 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.72.1] - 2026-11-10: Map place: progression, the phone, race actions and tier-up
+
+Owner: "Yes, port all three" (Group A items 5, 7 and 8 in `docs/Map-Core-Preview.md`).
+
+### Added (Map place, NH Combat Test's files byte for byte unless noted, tagged NHCore)
+- **Progression and the Student Record** (`Player.Progression`, `Gui.Progress`, `Gui.StatsPanel`):
+  - Level, EXP and stat points; Might, Grit and Wits; abilities and the record. M or the top bar's Record button, which is back.
+  - Stats now count in fights in the Map: damage, guard, max health, and regeneration out of combat.
+  - It lasts for the session (the Data stand-in).
+- **The phone** (`Features.Phone`, `Gui.Phone`, `Character.PhoneHold`, and its model `ServerStorage.NHPhoneModel`) and **the phone games** (`Features.PhoneGames`, `Gui.PhoneGames` with Wisp Flight, Hex Slash and Crypt Crush):
+  - Y, or the phone in hotbar slot 1.
+  - Yen sending works between players, but everyone's Yen is 0 in the Map unless the admin desk gives some.
+- **Race actions** (`Features.RaceAction`, `World.RaceActionFx`): the N key's race action on a downed body (heal, hunger, effects).
+- **Tier-up** (`Player.Evolution`, `Gui.Evolution`): hunger and the tier-up cutscene.
+  - **One Map adapter in `Gui.Evolution`:** the "T  Turn them" bite hint stays hidden while the Map has no `Services.Player.Turning`. Without Turning, the hint would show but T would do nothing.
+- **What can't happen in the Map yet:**
+  - A tier-up of its own. A full hunger bar opens that tier's rite, and rites are quests, which the Map doesn't have. The admin desk's Set Tier works.
+  - EXP from classes, quests, duels, factions and the hall monitor. Those systems aren't in the Map; Progression prints a "missing" line for each at start and skips them.
+
+### Verified (Map place, local play-test, real keys and clicks)
+- **Progression:**
+  - On join: Level 1, 0 / 100 EXP, and the top bar's Record button showed.
+  - The real M key opened the Record (report card, Might / Grit / Wits, abilities, the record).
+  - The admin desk's Give EXP 250 gave 270 with the +8% trait bonus: level 3, 25 / 214, 6 points. The open Record updated by itself.
+  - A real click on Grit's +1 spent a point: Grit 1, max health 100 -> 102.
+- **Phone:**
+  - It was in hotbar slot 1. The real Y key opened it with its 11 apps and the dock, and the character held it up.
+  - A click on Wisp Flight opened the game (your best, the building's board). Play ran a round to "The flame gutters" (score 0). Y closed the phone.
+- **Tier-up:**
+  - The admin desk set the race to Ghoul, then Set Tier 2: "Tier II, Grave-eater", the Record showed Ghoul tier 2.
+  - The tier-up cutscene (sent the way the server sends it) played: letterbox, the Ghoul's green effects, "Tier II  ·  Ghoul", the Skip button. It ended and gave the camera back.
+- **Race action:** the real N key with nobody downed nearby did nothing, with no error.
+- No script errors from the new scripts.
+- **Not tried:**
+  - A race action on a downed body. The admin desk's Spawn Sparring partner fails in the Map ("EntityLoader:53: attempt to index nil with 'RootPart'"). The Map's `Services.AI.AI.Rig` has only its Animate script, while NH Combat Test's has the whole body (67 parts). That's an old gap from the first core copy, not from this port.
+  - A tier-up through the server's own path.
+  - Sending Yen, phone texts and Night FM between two players.
+  - Hex Slash and Crypt Crush.
+
 ## [1.72.0] - 2026-11-10: Map place: Group A first batch, and lockers only in the locker room
 
 Owner: "Start Group A, but for the locker prompt, etc. Put it in this area and folder: "Locker Room Placeholder". Because I want students to be able to interact with the lockers ONLY in the locker room, and the builder hasnt made it yet."

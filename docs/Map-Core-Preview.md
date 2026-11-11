@@ -141,7 +141,8 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
   - `Gui.Locker`'s Map adapter only opens the locker inside the zone (the `` ` `` key, the top bar, the gamepad menu, the prompt), and closes it when you leave. Outside, you get the toast "Your locker is in the locker room."
   - The hallway lockers (`NHLockerProp`) don't open it. They're for locker hiding later (C).
   - **When the real room is built:** tag its lockers `NHLockerRoomLocker`, fit `LockerRoomZone` to the room, and delete the Stand-in.
-- Waiting for the owner's OK: progression and the Record (5), the phone (7), race actions and tier-up (8).
+- Items 5, 7 and 8 followed in 1.72.1, so Group A is done.
+- **Known gap:** the admin desk's sparring partner can't spawn. The Map's `Services.AI.AI.Rig` holds only its Animate script; NH Combat Test's holds the whole body.
 
 ## What the Map still lacks (re-sorted 2026-11-10, around how far the school is built)
 
@@ -154,10 +155,10 @@ Done so far: the core (1.54), customization, doors, admin, heights (v2), races a
 2. ~~Party and Study Group~~ (1.72.0)
 3. ~~Strangers~~ (1.72.0)
 4. ~~Skateboards~~ (1.72.0, with `ReplicatedStorage.NHSkate`)
-5. Progression and the Student Record (`Player.Progression`, `Gui.Progress`, `Gui.StatsPanel`): level, EXP and stats, for the session. The Record button comes back. *Check in: stats feed combat.*
+5. ~~Progression and the Student Record~~ (1.72.1)
 6. ~~Inventory and the locker screen~~ (1.72.0). **Owner: only in the locker room.** For now that's the "Locker Room Placeholder" folder (stand-in lockers and a `LockerRoomZone`; see the 1.72.0 section). Buying waits for the concession stand (below).
-7. The phone and phone games (`Features.Phone`, `Gui.Phone`, `PhoneGames`). *Check in: yen transfers (the Map's yen is session-only and starts at 0).*
-8. Race actions and tier-up (`Features.RaceAction`, `Player.Evolution`, `Gui.Evolution`): the N key and the evolution cutscenes. *Check in: combat.*
+7. ~~The phone and phone games~~ (1.72.1)
+8. ~~Race actions and tier-up~~ (1.72.1). Turning (the bite, `Player.Turning`) isn't in yet; its hint is hidden until it is. A tier-up of its own needs quests (rites).
 
 **B. Ready once the builder tags a few spots** (the outside and courtyards are enough; the builder adds the tag to a part)
 - Night beasts (`Features.Beasts`): `NHBeastLair` spots. Until then the admin desk can spawn one.
