@@ -2,6 +2,53 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.81.0] - 2026-11-11: Training, phase 1 (arms, torso and legs, shown live)
+
+Four gym stations where students train one area at a time; when a set steps an area up, only that area's meshes change,
+live (`docs/Training.md`, `docs/Training-Design-Note.md`). Owner: "Make sure the minigames are fun, easy to understand,
+and great for player retention (ON THEMED OFC)", "the UI/icons ... all original and on theme", "the highest quality with
+PBR textures", "Make sure its animated and cool looking".
+
+### Added
+- **Stations** (`workspace.NHTraining`, tag `NHTrainStation`, a Train prompt each): pull-ups at the gym kit's WallBars
+  with an iron chin-up bar, push-ups and sit-ups on crimson leather mats, squats on an oak platform; the owner's idle /
+  rep animations (squats' new pair included), a visible load from tier II (vest, weighted belt, sandbag, fitted per body).
+- **The minigame**: one button; a ring shrinks onto a brass gauge's mark: Perfect / Great / Good, a combo (+2% a step to
+  +50%), cracked feint rings, leather-bound HOLD rings (2x), burnout and tier IV stamina sets; five tiers by area level
+  (windows ±70 to ±38 ms Perfect, faster rings, feints, holds, burnout, guttering candles); sets of about 20-25 s; a
+  three-card first-time tutorial; keyboard, gamepad and touch prompts.
+- **Retention**: Fresh (the first set of each area each day x2), a training streak (+2% a day to +20%; 60 / 150 / 300 /
+  500 Yen at days 3, 7, 14, 30), personal bests per station with a NEW BEST stamp, soreness (rotate areas), "next change
+  in ~N reps", +1 Athletes standing a set (8 a day), a 700 XP daily cap per area; no paid boosts.
+- **The step-up moment**: a banner reveal, the flex, an ember and chalk burst and the bell, seen by everyone within 80 studs.
+- **Per-area bodies**: `Appearance.SetArea` (server-only), look field `Areas` ("torso|arms|legs"); saved builds seed the
+  three areas. **Stat bonuses** in `Config.Progression.Training`: Arms +0.4% damage, Torso +1 health and -0.3% posture
+  gain, Legs +0.3% sprint (new `SprintSpeed` effect, `NH_SprintMult`) per level.
+- **Saving and anti-cheat**: `PlayerData.Training` (`SetTraining`); the server rolls the seed and scores the press times
+  itself, refusing future, too-fast, out-of-order and machine-perfect presses.
+- **Art** (27 pieces, Blender Cycles PBR: brass, gilt, black iron, ink and crimson enamel, leather, ivory, wax, chalk, oak,
+  glass): the gauge, needle, three rings, mark glow, four rep marks, three area crests, four station medallions, streak /
+  best / Fresh badges, soreness, the HOLD gear, the set plate, key cap and bar frame (9-slice), molten brass fill and a
+  16-frame flame flipbook (`art/ui/hud/make_training_pbr.py`, `blender_training_render.py`, `finish_training_ui.py`);
+  upload folder `art/group-upload-training`.
+- **Animation**: the ring trail and needle sweep, the stamp squash with sparks and chalk, the combo flame heating and
+  shaking, the grinding gear, the molten pour, shine sweeps, the streak candle; Reduce Motion keeps fades only.
+
+### Changed (backups in `ServerStorage.NH_Backup.Training_pre`)
+- `UI.Appearance` (Areas, AreaBodies, ApplyTo per area, the look guard keeps Areas, SetBuild clears them, SetArea),
+  `PlayerData`, `Functions.UpdateState`, `Config.Progression`, `Player.Progression` (Effects, NH_SprintMult),
+  `Features.CombatSpeed` (sprint multiplier), `Studio.TestBridge` (`Training` command).
+
+### Verified (Studio Play, slot 4 "Testy")
+- All four stations by real E; sets by real Space and pad A (rated by the server); the windows; live arm, torso and
+  legs step-ups (only that area's meshes changed); saving across a rejoin (levels, path, soreness, Toned arms, best);
+  four forged results refused; the daily cap, Fresh, soreness and streak; the Athletes standing; the banner and flex;
+  gamepad and touch prompt layouts. Test settings put back (`SlotCount = 3`, `NHTestNoMenuKeys` cleared).
+
+### Not verified
+- The PBR art in game (waits for the owner's import; stand-ins show), a second player watching, burnout and stamina
+  sets and a real-key HOLD in play, Reduce Motion, a real touch screen, pad B to leave after its priority fix, the Map place.
+
 ## [1.80.1] - 2026-11-11: The everyday kit's real models, maps, art and animations
 
 The owner imported the 12 FBX, bulk-imported the maps and HUD art and published the 12 use clips.
