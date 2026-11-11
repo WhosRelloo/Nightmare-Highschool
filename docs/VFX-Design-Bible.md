@@ -197,6 +197,7 @@ Owner: **Q** = quest session (this one), **UI** = UI-kit session, **—** = no l
 | P2-5 | **Tested (1.9.0)**: Goal celebration (upright flare, net rings, post shards, light pulse, spectators within 150); GoalCam re-entrant + eases back (code-checked) | UI #12 | — / Q |
 | P2-6 | **Tested (1.9.0)**: Bloodrush aura revamp (client, from `SportRush`; embers + 2 wisp ribbons; flicker-out; Lineage colours) | UI #13 | Q |
 | P2-7 | **Tested (1.8.8)**: Teleport veil (`Fx.VeilMove`: duel ring, admin bring/go-to) + server-hop TeleportGui; `Controllers.World.Veil` | UI #11 | Q |
+| P2-7b | **Tested (1.75.0)**: Staff teleport flocks: admins leave and re-form as crows, the owner as a bat vortex over a crimson sigil; students brought by staff land in a small swirl (`Fx.TpStyle`, `Controllers.World.TpFlock`, [[Admin-Teleport-VFX]]) | owner | TP |
 | P2-8 | **Tested (1.8.7)**: "Second chance" get-up (Recover / Fated); `Controllers.World.GetUp` | UI #10 | Q |
 | P2-9 | **Tested (1.8.9)**: Sigil paint & scrub (wipe + drips, grey fade + suds; spray-hiss sound still to pick); `Controllers.World.SigilFx` | World G | Q |
 | P2-10 | **Tested (1.8.8)**: Locker POV / hide fade; `Controllers.World.LockerPOV` | World I / Quests C6 | Q |

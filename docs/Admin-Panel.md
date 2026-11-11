@@ -57,6 +57,7 @@ Other UI can open the desk by setting the player attribute `NHAdminOpen` to `tru
 - **Spawns:** a delinquent crew, a wolf pack (night only), a sparring partner of any difficulty (Easy, Normal, Hard, Nightmare; 1.23), or clear all enemies.
   - (1.56) **Beast: <name>**, one button per beast in `Config.Beasts`, by name ("Beast: Hellhound", "Beast: Grave Ghoul", "Beast: Night Stalker", "Beast: Bone Spider", "Beast: Crypt Bat"). It spawns that beast 22 studs in front of you, facing you, at any time of day, and it stays until killed or cleared (`SpawnBeast`). "Clear all enemies" removes beasts too, and the alive line counts them. See [[Beasts]].
 - **Self:** fly (WASD, Space, Ctrl, Shift for speed), noclip, ESP (names and health through walls), Ctrl+click teleport, invisibility, heal, and stop spectating.
+- **Teleport effects (1.75):** your own moves (Go to, Go to a place, Ctrl+click teleport, Cmdr `to`) play the staff flock: crows for admins, bats for the owner. Students you bring land in a small swirl of your birds. While you're invisible, moves are silent. See [[Admin-Teleport-VFX]].
 - **Server:** students, uptime, physics FPS, memory, school clock, enemy and wolf counts, and the staff log (the last 200 actions).
 
 ## Quality of life (1.18)

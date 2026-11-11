@@ -2,6 +2,56 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.75.0] - 2026-11-10: Staff teleport flocks: admin crows, the owner's bats
+
+Owner: "make it so Admins get a special TP VFX when we TP to people. Make them cool crows like Itachi. You can model the VFX to the highest quality." Then: "And make a special TP vfx for ONLY me where it's REALLYYYYY cool bats, etc." The design (`docs/img/tp-vfx-mockups.png`) was approved. It's the game's own design and copies no anime art. Full write-up: `docs/Admin-Teleport-VFX.md`.
+
+### Added (NH Combat Test)
+- **Admins travel as crows.**
+  - **Leaving:** the body breaks into 28 crows that burst up and scatter, with loose feathers and an ink wisp.
+  - **Arriving:** crows spiral in and fold back into the body as it fades in. Each crow's eyes have a faint crimson glint.
+- **The owner (WhosRello) travels as bats.**
+  - **Leaving:** a crimson sigil flares and turns underfoot (rings of runic ticks, six bats round a crescent moon, crimson light and mist), and 44 bats tear you away in a rising vortex.
+  - **Arriving:** the sigil flares where you land, bats stoop from high above into you, then a crimson ring goes out and a few peel away. No blood: crimson is only light, mist and eyes.
+- **Which moves:** your own moves (desk Go to, Go to a place, Ctrl + click teleport, Cmdr `to` / `teleport`).
+  - A student you bring (Bring, Bring all, a sent Go to a place, Cmdr `bring`) keeps the violet veil and lands inside a small swirl of your birds.
+  - A second click-teleport within 2 s plays only a puff at each end.
+  - While invisible you move silently.
+  - Every other move (duel ring, homes, non-staff) is unchanged.
+- **Who sees it:** players within 150 studs of either end, plus the mover. On your own screen a 0.14 s ink veil covers the camera cut.
+- **Sound** (Pro Sound Effects): a flock wing burst and a raven craw; bursts of bat wings and a deep swish.
+- **Settings:** Reduce Motion gives about 10 crows or 12 bats that rise or glide straight, with no vortex or swirl and a still sigil. Effects quality Low halves the birds.
+- **The birds**, modelled in headless Blender (`art/vfx/crow/nh_crow.py`, `nh_bat.py`):
+  - **NHCrow:** 1,612 tris, 11 bones. One loft from tail to beak, cambered covert wings with fingered primaries, a fanned tail.
+  - **NHBat:** 1,036 tris, 9 bones. Cupped ears, fangs, membranes between four fingers scalloped between the tips.
+  - **Maps:** each has 2048 colour, normal, roughness and emissive maps, painted per pixel from a baked feather coordinate (contour scallops, coverts, barbed vanes; fur and wrinkled membranes).
+  - **Wingbeat:** the client beats the wings through `Bone.Transform`, so nothing is published.
+  - **Sprites:** a feather and the sigil (`make_tp_sprites.py`).
+- **Code:**
+  - `Config.AdminTp` (new)
+  - `Features.Fx`: `TpStyle`, and `VeilMove(P, CFrame, Opts)` with `Admin`, `Quick` and `By`
+  - `Features.Admin`: Bring, Go to, Go to a place, Bring all and click teleport pass their options
+  - `Packages.Cmdr.BuiltInCommands.Admin.teleportServer` goes through `VeilMove`
+  - `Controllers.World.TpFlock` (new)
+  - the templates `ReplicatedStorage.NHTpFx.Crow` and `.Bat`
+- **Safety:** the server alone decides who gets a flock, and the remote stays server → client only.
+  - Studio-only test switches: `NHTestNotAdmin` (to test as a student) and `NHTestTpStyle` (to force crows or bats).
+
+### Verified (Studio Play, slot 4)
+**[PT]**
+- **Through the real desk remote:** owner bats (0.67 s), the quick puff (0.23 s), forced crows (56 birds), and the escort (8).
+- **Gates:** as a student, only the veil. Invisible, no events. A client firing the flock itself got nothing.
+- **Cmdr:** its teleport played crows.
+- **Reduce Motion:** about 20 birds.
+- **On screen:** a slowed copy caught the crows' burst and swirl, both sigils and the bat vortex (`docs/img/tp-*.jpg`).
+- **The FBX re-import:** the first import carried the bake data as rainbow vertex colours. The FBX was re-exported without them and re-imported. All birds launch with their wings beating, and there were no errors.
+
+**Not tried:** a second real player watching, desk Go to and Bring between two players, hearing the sounds, a live server, and a true non-staff student (Studio makes everyone staff).
+
+### Notes
+- **Cmdr:** its BeforeRun hook only allows the `Config.Cmdr` lists, which don't include WhosRello, so the owner can't use Cmdr teleports in a live server. The F3 desk works.
+- **Map place:** not synced. It needs `Config.AdminTp`, the Fx / Admin / Cmdr edits, `Controllers.World.TpFlock` and `ReplicatedStorage.NHTpFx`.
+
 ## [1.74.0] - 2026-11-10: The posture bar becomes a forged rail under the health bar
 
 Owner: "redesign the posture bar to something cool that fits the theme and lines up with the health bar". Three options were mocked up beside the real health bar art (`docs/img/posture-rail-options.jpg`). The owner picked **A, Twin Rail**. Full write-up: `docs/UI-Kit.md` (Posture rail).
