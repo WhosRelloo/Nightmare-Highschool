@@ -2291,3 +2291,149 @@ The room and subject list comes from the game: `Config.Classes` (Homeroom R101, 
 ![The wing directories and the ceiling signs in Studio](img/signs50-studio-wings.jpg)
 ![The class doors in Studio](img/signs50-studio-doors.jpg)
 ![The icon board in Studio](img/signs50-studio-iconboard.jpg)
+
+## Batch 53 (secret): the secret passages kit
+
+`art/props/nh_props_batch53.py`. The owner asked for "a secret passage kit with vents, etc.": 26 props of vents, crawl ducts, hidden doors, a hidden stair, brick tunnels, a stage crawlspace, a boarded passage and the triggers that open them, in the school's look (weathered limestone, sooty brick, black riveted iron, brass and gilt, crimson #600E1A, candlelight, moss). Wood only for the boards and the stage. Every name and word is invented, and none repeats an existing prop: not the BookcaseDoor, ChainedBookcase, the library shelves, the CellarHatch, StairSpiral, the Fireplace, the Boiler and PipeRun, the tapestries or the busts.
+
+### Sizing for sneaking (measured 2026-11-11)
+
+- **How:** read-only, in the Map place's Edit mode (NH Combat Test was in Play). A standard R6 rig was cloned outside the DataModel, shaped with `Config.Heights.Proportions(1.22)` and `SetStretch` (the 7'0" tallest: torso 2.21 x 2.41, legs 2.61, the play-tested numbers in [[Height]]), then every keyframe of `Crouch` (139672322709288) and `CrouchWalk` (112732055140240) from `KeyframeSequenceProvider` was posed by hand and measured from the standing ground. Log: `E:/NH-Work/props53/logs/crouch.txt`.
+- **The tallest character (7'0"):** standing 6.12 tall, 4.42 wide (arms), 1.10 deep. Crouched: at most **5.24 tall, 4.87 wide, 4.86 deep** (the stride). Its HumanoidRootPart (2.21 x 2.41 x 1.10, not animated) tops out at 5.02. An average 5'9" body crouches to 4.14.
+- **So:** every crawl way and every vent you can enter is **5.6 wide x 6.0 tall clear** (0.37 a side, 0.45 over the head with 0.35 for hair). Standing passages: tunnels 6.4 wide and 7.8 to the crown (7.7 under the ribs), the hidden doors 3.6-4.4 wide and 7.8-7.9 high, the hidden stair 7.5 headroom on 4.5-wide treads with 6.8-7.0 doorways. Floor and ceiling holes are 5.6 x 5.6 (the crouched footprint is 4.87 x 4.86).
+
+### Snapping
+
+- **Ducts** are 8-stud modules along Y: the joint planes at y = +-4 with the flanges flush on them, the origin on the INSIDE floor at the cell's centre (the outside bottom 0.30 lower, the top 6.30 up). DuctCorner turns inside one cell (out at x = +4), DuctTee branches to x = +4, DuctRiser climbs 8, VentCeiling and VentFloor are duct modules too, DuctEndCap's origin is on its joint plane, and VentWallLow, VentWallHigh and FireplacePassage end in a flange a DuctStraight bolts to (its origin 4 beyond).
+- **Tunnels** are 8-stud modules: the origin on the walking floor at the cell's centre, the shell 8 wide and 8.6 tall (the floor slab 0.4 deep). TunnelCurve fills a 2 x 2 block (origin at the block's centre), TunnelSteps drops 4, TunnelDeadEnd's grate meets a duct at y = +4.
+- **Checked numerically** (`run53.py --check` with `ext53.py`): each joint plane is rasterised at 0.025 from the faces lying in it, the clear opening flood-filled from its centre, and any geometry crossing the plane reported. Every tunnel end gives the same opening and the same coverage; every duct end the same opening (the elbow within one cell, 0.025, from its bevels). Nothing crosses a joint plane except VentCeiling's plaster rose, which lies under the ceiling in the room below. Every piece is under 20.48 on every axis.
+
+The openings are read after closing the bevels' hairline grooves (2 cells), so they sit 0.05 inside the true faces: the duct's 5.6 x 6.0 reads -2.75..2.775 x 0.05..5.975 and the tunnel's 6.2 x 7.7 (under the ribs) -3.025..3.05 x 0.075..7.65.
+
+| Prop | Joint | Clear opening (u from, to, z from, to) | Crosses the plane |
+|---|---|---|---|
+| VentCeiling | A | [-2.75, 2.775, 0.05, 5.975] | 1.52 (the rose, below the ceiling) |
+| VentCeiling | B | [-2.75, 2.775, 0.05, 5.975] | 0.05 (the rose, below the ceiling) |
+| VentFloor | A | [-2.75, 2.775, 0.05, 5.975] | no |
+| DuctStraight | A | [-2.75, 2.775, 0.05, 5.975] | no |
+| DuctStraight | B | [-2.75, 2.775, 0.05, 5.975] | no |
+| DuctCorner | A | [-2.725, 2.75, 0.075, 5.95] | no |
+| DuctCorner | B | [-2.725, 2.75, 0.075, 5.95] | no |
+| DuctTee | A | [-2.75, 2.775, 0.05, 5.975] | no |
+| DuctTee | B | [-2.75, 2.775, 0.05, 5.975] | no |
+| DuctTee | C | [-2.75, 2.775, 0.05, 5.975] | no |
+| DuctRiser | A | [-2.75, 2.775, 0.05, 5.975] | no |
+| DuctRiser | B | [-2.75, 2.775, 0.05, 5.975] | no |
+| DuctEndCap | A | [-2.75, 2.775, 0.05, 5.975] | no |
+| DuctDamaged | A | [-2.75, 2.75, 0.05, 5.975] | no |
+| DuctDamaged | B | [-2.725, 2.775, 0.05, 5.975] | no |
+| TunnelStraight | A | [-3.025, 3.05, 0.075, 7.65] | no |
+| TunnelStraight | B | [-3.025, 3.05, 0.075, 7.65] | no |
+| TunnelCurve | A | [-3.025, 3.05, 0.075, 7.65] | no |
+| TunnelCurve | B | [-3.025, 3.05, 0.075, 7.65] | no |
+| TunnelJunction | A | [-3.025, 3.05, 0.075, 7.65] | no |
+| TunnelJunction | B | [-3.025, 3.05, 0.075, 7.65] | no |
+| TunnelJunction | C | [-3.025, 3.05, 0.075, 7.65] | no |
+| TunnelSteps | A | [-3.025, 3.05, 0.05, 7.65] | no |
+| TunnelSteps | B | [-3.025, 3.05, 0.025, 7.65] | no |
+| TunnelDeadEnd | A | [-3.025, 3.05, 0.075, 7.65] | no |
+
+### Pieces and rigs
+
+- **Opening pieces** have their FBX origin on the hinge or the slide origin. `art/props/secret_batch53.json` lists each one: `kind` (swing, hatch, lever, tilt, swingcloth: turn about `axis`; slide, press, lift, board: move by `slide`; with: turns with the piece it is named after), the `hinge` (Blender coordinates), the `axis` (Blender; Roblox Y is Blender Z, Roblox Z is Blender -Y), the signed `angle` in degrees (right-handed about the axis, so the template just applies it) and the `slide` vector. Doors and grates swing OUT toward the front (-Y), or toward the tunnel.
+- **Boards** (`BoardedPassage_Board0..8`): each its own mesh, origin at its centre; with all nine on, they cover the whole opening (edge to edge, the bottom one on the floor, the top one over the crown and voussoirs), and with them off the full arch is clear.
+- **Tiled pieces** (not baked, world-scaled UVs): `*_Wall` takes NH_CastleStone (8 studs a tile), the tunnels' `*_Floor` NH_MossyPaving (8). These are the tunnels' and the stair's outer shells, VentFloor's and TrapdoorLadder's shaft shells and BoardedPassage's wall faces.
+- **Square bars** are built with the reversed profile `[(-r,-r),(-r,r),(r,r),(r,-r)]` (`sq_bar` in the builder); `--check` counted every straight bar's side faces: all point outward.
+
+### Template notes (NHBuildKit `Secret`)
+
+- **Kit name:** `Secret`. Every baked piece takes its own prop's four maps; the tiled pieces take the shared sets above.
+- **Collisions:** precise for every passage piece (ducts, tunnels, shafts, the stair, the stage), so a crouched player walks the inside; grilles and grates collide while shut (a lifted grate stops colliding). The cloth, the sconce, the Glow pieces and small clutter don't collide.
+- **Glow** (Neon, candle amber 255, 170, 90), each with a PointLight and `NHCandle`: TunnelStraight's lantern candle (brightness 1.2, range 18), TunnelCurve's three candles (0.8, 12, one light), SecretSpiralStair's niche candle (0.8, 12), SconceLever_Lever0Glow (0.6, 10, moving with the lever). No ParticleEmitter is needed; a faint dust one in the tunnels is optional (grey 200, 195, 185; rate 2; speed 0.2; lifetime 6; size 0.05).
+- **Suggested prompts** (template wiring, timing and respawn come later):
+
+| Piece | Prompt | Motion |
+|---|---|---|
+| `VentWallLow_Grate0` | Grille / Lift off | lift: moves by `slide` (out 1.2, up 0.4), set down beside the vent |
+| `VentWallHigh_Grate0` | Grille / Open | swing about Z, -110 (hinged on its left, out to the front) |
+| `VentCeiling_Grate0` | Register / Open | hatch about Blender X, -100 (drops down) |
+| `VentFloor_Grate0` | Grating / Lift | lift by `slide` (aside and up) |
+| `DuctEndCap_Door0` | Spy hatch / Open | hatch about Blender X, -95 (opens outward); only a look-through |
+| `BookcaseSecretDoor_Door0` | Crimson book / Pull | swing about Z, +80 (pivot on the right, out to the front); auto-close 10 s |
+| `FireplacePassage_Slide0` | Fireback / Push | slide by (0, 0, -6.3) into the slot under the hearth |
+| `TapestryPassage_Cloth0` | Tapestry / Lift aside | swing about Blender X, -55 (the hem out to the front); falls back after 4 s |
+| `SlidingWallPanel_Boss0` | Carved rose / Press | press by (0, 0.1, 0), then slide Slide0 |
+| `SlidingWallPanel_Slide0` | (opened by Boss0) | slide by (4.1, 0, 0) into the pocket |
+| `TrapdoorLadder_Door0` | Trapdoor / Lift | hatch about Blender X, -100 (lifts up) |
+| `TunnelDeadEnd_Grate0` | Grate / Open | swing about Z, -100 (toward the tunnel); can be Locked until a key |
+| `StageCrawlspace_Door0` | Stage trap / Lift | hatch about Blender Y, -100 (lifts up) |
+| `BoardedPassage_Board0..8` | Board / Pry off (one prompt per board) | board: remove (fade, or drop by `slide`), respawn later |
+| `SconceLever_Lever0` | Sconce / Pull | lever about Blender X, +35 (pulls down); Lever0Glow turns with it |
+| `LooseBrick_Brick0` | Loose brick / Push | press by (0, 0.45, 0) |
+| `TiltingBust_Bust0` | Bust / Tilt | tilt about Blender X, -22 (back) |
+
+- **Triggers:** SconceLever, LooseBrick and TiltingBust (and the crimson book and the rose boss on their own doors) open a linked passage piece: give the trigger an `NHSecretLink` ObjectValue to the door's model; one use opens it for 20 s.
+
+### Props
+
+Every piece is under 20k triangles and under 20.48 studs on every axis. Every baked prop is at 2048 with 64 samples. Upload copies at 1024: `art/group-upload/secret-batch53/` (101 maps).
+
+**Vents**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| VentWallLow | 8.8k (Main 6.4k, Grate0 2.4k) | yes (not the grille's blades) | wall, 0 | a floor-level wall vent you can crawl into (5.6 x 6.0 clear): a chamfered limestone architrave and sill, the heating maker's brass plate MORROW & SONS 1879, and a sheet-iron throat 1.0 into the wall ending in a duct flange (a DuctStraight bolts on at y = +1.0). Grate0: a cast-iron louvred grille (14 blades) on two brass wing bolts that lifts off |
+| VentWallHigh | 6.3k (Main 4.0k, Grate0 2.3k) | yes | wall, 7.5 | a high vent you climb into: a 5.6 x 6.0 opening under a pointed limestone hood with a sunk quatrefoil, a moulded ledge on three corbels to stand on, four iron climbing staples down the wall below, the same throat and flange. Grate0: a wrought-iron square-bar grille with a ring band, hinged on its left (swings out), its hasp hanging open beside an open brass padlock |
+| VentCeiling | 6.6k (Main 6.1k, Grate0 0.6k) | yes (the duct) | ceiling (the room's ceiling surface 0.30 under the origin) | a ceiling vent built as a duct module, so it snaps into a duct run: the duct's floor opens onto the room below through a 5.6 x 5.6 hole (2.1 of floor left to step onto), a plaster ceiling rose with a ring of beads round a cast-iron register (Grate0: concentric squares, diagonals and a brass boss) hinged on its -Y edge that drops down |
+| VentFloor | 5.1k (Main 3.0k, Wall 48, Grate0 2.1k) | yes (the grating too) | floor (origin at floor level, the shaft below) | a floor vent you drop into: a heavy cast-iron bar grating (Grate0, lift-off) in a limestone kerb flush with the floor, a brick shaft 8 deep with nine iron rungs, opening at the bottom onto a duct joint at y = +4 (that duct's inside floor 8.0 below). The shaft's outside is Wall (tiled) |
+
+**Crawl ducts**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| DuctStraight | 5.7k | yes | floor (duct) | an 8-stud crawl duct of riveted black sheet iron, 5.6 x 6.0 clear, angle-iron flanges with rivets flush on both joint planes, a lap seam, a bolted inspection plate, a DUCT 7 brass plate, dust drifts and rust flakes inside |
+| DuctCorner | 5.4k | yes | floor (duct) | a mitred 90-degree elbow in five gores (centreline radius 4) inside one cell: in at y = -4 heading +Y, out at x = +4 heading +X; riveted mitre seams, a candle stub and rust flakes |
+| DuctTee | 9.1k | yes | floor (duct) | a T: the run along Y and a branch out of the right side to x = +4, all three ends flanged on the grid; riveted gussets over the branch, two brass direction plates (CHAPEL >, < LIBRARY) |
+| DuctRiser | 5.6k | yes | floor (duct) | a riser up one storey: in at the bottom from y = -4, out at the top to y = +4 with that duct's inside floor 8.0 up; 16 iron ladder staples up the -X wall (add a TrussPart there to climb), three stiffening bands, a painted UP arrow inside; 14.3 tall |
+| DuctEndCap | 3.2k (Main 2.4k, Door0 0.8k) | yes | floor (duct; the origin is the joint plane) | a 1.4-deep blanking end for a duct run, its origin on the joint plane's centre at the inside floor: a riveted end plate with ribs; Door0: a small louvred spy hatch (1.4 x 1.0, not a way through) hinged on its top edge, opening outward |
+| DuctDamaged | 6.0k | yes | floor (duct) | a straight duct rusted through: the right side eaten away in a ragged hole the full height (5.5 wide clear, the jagged edge kept outside it), five torn flaps peeled outward from the edges, a cracked roof seam, rust scale heaped inside |
+
+**Hidden doors and the stair**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| BookcaseSecretDoor | 10.8k (Main 1.2k, Door0 9.6k) | yes (the press too) | through a 1.0 wall (origin on its centre line) | a hidden door in the library wall, 4.0 x 7.8: a black cast-iron gothic press of leather books (gilt bands, brass rails, studded sides, a gilt raven bookend) in a pointed limestone frame with pinnacles and a trefoil in the gable. The trigger is the crimson book tipped forward on the third shelf. Door0: the whole press, pivoting at its right front edge, swings out 80 degrees; its back is riveted iron with braces and a pull ring. Not the oak BookcaseDoor (batch 25) or the ChainedBookcase |
+| FireplacePassage | 11.1k (Main 8.2k, Slide0 2.9k) | yes (not the ash and logs) | wall, 0 (the firebox goes 2.2 into the wall) | a cold walk-in hearth, 11 wide: clustered limestone colonnettes, a four-centred arch under a frieze of quatrefoils and a crimson shield with a gilt key, a deep mantel and an overmantel of blind lancets, sooty brick cheeks, iron firedogs with brass balls, raked ash and charred logs to the side (the clear 5.6 x 6.0 way is free). Slide0: the cast-iron fireback (a raven over crossed keys, 1688) sinks 6.3 into a slot under the hearth, opening a brick crawl throat to a duct flange at y = +3.4. Not the batch 10 Fireplace |
+| TapestryPassage | 12.9k (Main 1.2k, Cloth0 11.7k) | the arch yes; the cloth no | through a 1.0 wall | a pointed limestone archway 4.4 x 7.9 hidden behind a woven hanging 6 x 9 on a gilt rod with finials on iron brackets: a crimson ground, a gilt diamond trellis with bone quatrefoil dots, an ink border with a gilt line, a gilt tassel fringe (procedural, baked). Cloth0: the hanging with its rings, hinged on the rod line (Blender X); it swings out from the rod like the art kit's tapestries (sway it with NHSwing too) |
+| SlidingWallPanel | 3.0k (Main 1.9k, Boss0 0.5k, Slide0 0.6k) | yes | through a 1.0 wall | a limestone wall of three blind lancet panels between shafts with colonnettes, gables over each, a plinth and a moulded head, 12.8 wide. Slide0: the centre panel (3.6 x 7.9, a sunk lancet, a gilt quatrefoil, a pull) slides 4.1 to the right into a pocket behind the right panel. Boss0: the carved rose on the left panel, the trigger, presses in 0.1 |
+| TrapdoorLadder | 3.0k (Main 1.5k, Wall 48, Door0 1.4k) | yes | floor (origin at floor level, the shaft below) | a hidden trapdoor flush with a flagstone floor patch (9.6 square): three flags set in an iron tray with a sunk ring (Door0, hinged on its +Y edge, lifts up), over a limestone ashlar shaft 9 deep with an iron ladder down the +Y wall to an arched doorway at the bottom (-Y, 4.4 x 7.2). Not the CellarHatch (batch 25, steps) |
+| SecretSpiralStair | 11.7k (Main 4.7k, Wall 0.4k, Upper 4.3k, Glow 80, UpperWall 0.1k, Head 1.6k, HeadWall 0.4k) | yes | floor | a hidden stair in a round ashlar shaft 11.2 across: a newel and 16 wedge treads to each full turn of 8 (0.5 rise, 7.5 headroom, 4.5 wide), an iron rail on brackets round the wall, a candle in a wall niche (Glow). Three pieces, each under 20.48: Main (0..8, the way in at the bottom facing -Y, 6.8 high), Upper (8..16, one more turn: repeat it 8 higher for more storeys) and Head (16..24, a landing with a balustrade on the open side and the way out facing -Y, under a ribbed ceiling); Wall, UpperWall and HeadWall are their outer shells (tiled). Not StairSpiral (batch 20) |
+
+**Tunnels**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| TunnelStraight | 2.0k (Main 1.8k, Glow 80, Floor 20, Wall 76) | yes | floor (tunnel) | an 8-stud brick barrel-vault tunnel, 6.4 wide, 7.8 to the crown: sooty brick courses that follow the vault, a limestone half-rib at each end (two modules make one full rib), moss low on the walls, an iron cage lantern on the left wall (Glow), a ring staple, a fallen brick and a puddle. Wall (outside) and Floor are tiled |
+| TunnelCurve | 2.3k (Main 1.7k, Glow 0.2k, Floor 0.1k, Wall 0.2k) | yes | floor (tunnel; 2 x 2 cells) | a quarter turn on a 12-stud centreline radius filling a 2 x 2 block of cells: in at (-4, -8) heading +Y, out at (8, 4) heading +X (origin at the block's centre so both ends sit on the grid); bricks laid true to the curve, a limestone corbel with three guttered candles on the outer wall (Glow) |
+| TunnelJunction | 2.5k (Main 2.4k, Floor 24, Wall 82) | yes | floor (tunnel) | a T: the run along Y and a branch to x = +4, the two vaults meeting in true groins on the diagonals, a carved limestone boss where they cross, half-ribs on all three ends, chalked arrows and an invented mark |
+| TunnelSteps | 2.3k (Main 2.2k, Wall 0.1k) | yes | floor (tunnel) | steps down a half-storey in one module: a level threshold flush with the module behind, eight limestone steps (0.5 rise), the vault raking down with them, an iron handrail on brackets; the far end is on the grid 4 lower (the next module's origin at z = -4) |
+| TunnelDeadEnd | 6.4k (Main 5.1k, Grate0 1.3k, Floor 20, Wall 58) | yes | floor (tunnel) | a tunnel ending in a brick wall with a limestone-framed grate at floor level, 5.6 x 6.0 clear (a DuctStraight bolts on behind at y = +4), a cast-iron floor drain, a puddle, a chain from a staple to the floor and an open padlock. Grate0: square bars and riveted flats, hinged on the left, swings toward the tunnel |
+
+**The stage crawlspace, the boarded passage and the triggers**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| StageCrawlspace | 9.7k (Main 8.3k, Door0 1.4k) | yes | floor (origin at the room's floor; the pit 3.4 below) | an 8 x 8 stage module (deck 3.2 up) over a dug crawlspace with 6.0 clear under its iron joists, open at both sides so modules chain along X: a lacquered apron with gilt mouldings and a louvred peep grille, a crimson velvet valance with a gilt fringe, brick piers and retaining walls, an iron ladder, an old trunk with a porcelain mask, a rolled backdrop and dust. Door0: the deck trap (5.6 x 5.6 of boards on battens) hinged on its -X edge, lifts up |
+| BoardedPassage | 6.5k (Main 3.6k, Wall 48, Board0 0.2k, Board1 0.2k, Board2 0.2k, Board3 0.6k, Board4 0.6k, Board5 0.2k, Board6 0.2k, Board7 0.2k, Board8 0.2k) | yes (the wall and every board) | through a 1.2 wall | a pointed arch (4.4 x 7.9) through a 10 x 10 stone wall section with dressed quoins and voussoirs, boarded up: Board0..8, nine planks edge to edge on the quoins' faces from the floor to 8.4 (the top one wide over the arch), so nothing shows through; Board6 pried loose at its right end on a bent nail, a chalked warning sigil across Board3 and Board4, a crowbar against the wall and rubble. Each board is its own piece with its origin at its centre. The wall's faces are Wall (tiled) |
+| SconceLever | 1.3k (Main 0.7k, Lever0 0.6k, Lever0Glow 80) | no | wall, 4.0 | a candle sconce that is a lever: a pointed iron backplate with a brass trim and a slotted quadrant; Lever0: its scrolled arm with the drip pan and candle pulls down 35 degrees about the brass pivot boss; Lever0Glow: the flame, on the same pivot |
+| LooseBrick | 11.5k (Main 11.4k, Brick0 0.1k) | yes | wall, 0 | a brick dado panel 4.0 x 3.0 on a limestone plinth under a coping, the bricks laid one by one in four colours with moss low down; Brick0: one loose brick in the sixth course, its mortar cracked out and scratched round, that pushes 0.45 into a dark hollow; mortar crumbs on the plinth below |
+| TiltingBust | 15.5k (Main 3.6k, Bust0 11.8k) | yes | floor | a bronze bust of an invented founding architect on a fluted black obsidian pedestal with the AEDIFICATOR plaque: the art kit's R6 head and chest, slick hair, a frock coat with lapels and gilt trim, a gilt compass medallion, a mantle on one shoulder. Bust0: the bust and its socle tilt back 22 degrees on a hinge at the socle's back bottom edge, the trigger. Not FounderBust or LibrarianBust |
+
+![Vents and ducts](img/secret53-vents-ducts-contact.jpg)
+![Hidden doors and the stair](img/secret53-doors-stair-contact.jpg)
+![Tunnels](img/secret53-tunnels-contact.jpg)
+![The crawlspace, the boarded passage and the triggers](img/secret53-other-triggers-contact.jpg)
+![Opened](img/secret53-open-contact.jpg)
+![Inside](img/secret53-inside-contact.jpg)
+![The library wall](img/secret53-library.jpg)
+![The tunnels below](img/secret53-tunnels.jpg)
