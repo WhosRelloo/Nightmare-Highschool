@@ -128,6 +128,11 @@ Ideas for going further: `docs/NPC-Immersion-Ideas.md`.
   - 0.105 s between syllables (Authority is 15% slower).
   A player attribute `NHNpcVoices = false` mutes them.
 - **Rebuilding:** run the script again to regenerate the WAVs (the same seeds give the same sounds). Re-upload, then update the ids.
+- **Proximity (1.78.5):**
+  - voices are heard from your character, not the camera (an emitter at camera + (their head - your head));
+  - full within 4 studs, then a natural falloff to 45, with a soft fade over the last 10;
+  - about a third as loud and muffled through a wall (glass only softens);
+  - about 2 dB quieter when they face away.
 - **Live since 1.78.4:** the 40 ids are in the config, read by name from the group's audio. To find them again, search Studio's group inventory for "NHVoice <Set>" (single-letter names like "A" don't match an exact search). The client preloads them on join.
 
 ## Tested (Map place, local play-test)

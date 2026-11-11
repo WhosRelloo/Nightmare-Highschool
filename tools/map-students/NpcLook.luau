@@ -8,7 +8,8 @@
 	    each client, so it's smooth at any frame rate and costs the server nothing.
 	  * Speech bubbles: NHSay + NHSayAt show a small engraved bubble over the head for NHSayFor seconds (longer lines
 	    stay up longer), and the head nods a little while they talk.
-	  * Voices (1.78.2; four synthesized voice sets since 1.78.3, ids in Config.NpcVoice, chosen by NHVoiceSet): every
+	  * Voices (1.78.2; four synthesized voice sets since 1.78.3, ids in Config.NpcVoice, chosen by NHVoiceSet; heard
+	    from your character, muffled through walls and quieter facing away since 1.78.5): every
 	    line is heard as a short burble of syllables that follow its letters ("hey" says "eh", t / k / m words start on
 	    that consonant), at most 10 per line, from at most 2 NPCs at once (the nearest),
 	    one voice per student (NHVoice, set by the server), as many syllables as the text, rising at a question, louder at "!", pausing at
@@ -98,10 +99,83 @@ local function syllables(Text: string, Slow: number): { { any } }
 	return Out
 end
 
+---| proximity (1.78.5) |---
+-- Roblox hears 3D sound from the camera, which in third person floats several studs behind your character, so a
+-- voice's distance and direction were the camera's, not yours. Each speaker's voice plays from an emitter placed at
+-- camera + (their head - your head): the same distance and direction from the camera as the speaker is from you.
+-- On top of the falloff: walls between you muffle and quiet the voice, and someone facing away is a little quieter.
+
+-- where you hear from: your character's head (the camera if you have no character)
+local function ear(): Vector3?
+	local C = Players.LocalPlayer.Character
+	local H = C and C:FindFirstChild(`Head`)
+	if H and H:IsA(`BasePart`) then return H.Position end
+	local Cam = workspace.CurrentCamera
+	return Cam and Cam.CFrame.Position
+end
+
+local OccP = RaycastParams.new()
+OccP.FilterType = Enum.RaycastFilterType.Exclude
+OccP.RespectCanCollide = false
+local OccRefresh = 0
+-- how much of a voice gets through to you: 1 in the open, about 0.3 behind a wall (and muffled), glass and
+-- see-through parts let most of it through
+local function openness(From: Vector3, To: Vector3): (number, boolean)
+	if os.clock() - OccRefresh > 1 then
+		OccRefresh = os.clock()
+		local Ex = {}
+		for _, N in { `NHStudents`, `NHSchedule`, `NHFx`, `NHNavDebug`, `School NPC Spots` } do
+			local F = workspace:FindFirstChild(N)
+			if F then table.insert(Ex, F) end
+		end
+		for _, Pl in Players:GetPlayers() do if Pl.Character then table.insert(Ex, Pl.Character) end end
+		OccP.FilterDescendantsInstances = Ex
+	end
+	local Through = 1
+	local Muffled = false
+	local Start = From
+	for _ = 1, 4 do
+		local Dir = To - Start
+		if Dir.Magnitude < 0.2 then break end
+		local Hit = workspace:Raycast(Start, Dir, OccP)
+		if not Hit then break end
+		local I = Hit.Instance
+		if I.Transparency >= 0.95 or (not I.CanCollide and I.Transparency > 0.5) then
+			-- invisible triggers and zones don't block sound
+		elseif I.Transparency > 0.45 or I.Material == Enum.Material.Glass then
+			Through *= 0.75 -- glass: quieter, still clear
+		else
+			Through *= 0.32 -- a wall, a closed door
+			Muffled = true
+		end
+		if Through < 0.1 then break end
+		Start = Hit.Position + Dir.Unit * 0.1
+	end
+	return Through, Muffled
+end
+
+-- the voice's loudness for you right now (before the engine's own distance falloff): walls, which way they face,
+-- and a soft fade over the last 10 studs so it never cuts out
+local function audibility(M: Model, Head: BasePart): (number, boolean)
+	local E = ear()
+	if not E then return 1, false end
+	local D = (Head.Position - E).Magnitude
+	local Fade = math.clamp((RANGE_V - D) / 10, 0, 1)
+	local Through, Muffled = openness(E, Head.Position)
+	local Facing = 1
+	local Rel = E - Head.Position
+	if Rel.Magnitude > 0.5 then
+		local Dot = Head.CFrame.LookVector:Dot(Rel.Unit)
+		Facing = 0.72 + 0.28 * math.clamp((Dot + 1) / 2, 0, 1) -- back turned: about 3 dB quieter
+	end
+	return Fade * Through * Facing, Muffled
+end
+
 -- may this NPC voice a line now? Not muted, near enough, and among the MAX_VOICES nearest speakers
 local function mayVoice(M: Model, Head: BasePart, Cam: Camera): boolean
 	if Players.LocalPlayer:GetAttribute(`NHNpcVoices`) == false then return false end -- a mute switch for Settings
-	local D = (Head.Position - Cam.CFrame.Position).Magnitude
+	local E = ear() or Cam.CFrame.Position
+	local D = (Head.Position - E).Magnitude
 	if D > RANGE_V + 5 then return false end
 	local Now = os.clock()
 	local Busy, Farther = 0, nil
@@ -110,7 +184,7 @@ local function mayVoice(M: Model, Head: BasePart, Cam: Camera): boolean
 		elseif Other ~= M then
 			Busy += 1
 			local OH = Other:FindFirstChild(`Head`)
-			local OD = OH and (OH.Position - Cam.CFrame.Position).Magnitude or math.huge
+			local OD = OH and (OH.Position - E).Magnitude or math.huge
 			if OD > D and (not Farther or OD > Farther[2]) then Farther = { Other, OD } end
 		end
 	end
@@ -139,7 +213,21 @@ local function voice(M: Model, Text: string)
 	if not St then return end
 	St.VoiceToken = (St.VoiceToken or 0) + 1
 	local My = St.VoiceToken
-	-- reusable sounds on the head: two of each syllable (so one can ring out while the next starts)
+	-- the emitter: an attachment the voices play from, kept at camera + (their head - your head) while they talk
+	if not (St.Emitter and St.Emitter.Parent) then
+		local A = Instance.new(`Attachment`)
+		A.Name = `NHVoiceEmitter`
+		A.Parent = workspace.Terrain
+		St.Emitter = A
+		St.Voices = nil
+		M.Destroying:Connect(function() A:Destroy() end)
+	end
+	local function place()
+		local E = ear()
+		if E and Head.Parent then St.Emitter.WorldPosition = Cam.CFrame.Position + (Head.Position - E) end
+	end
+	place()
+	-- reusable sounds on the emitter: two of each syllable (so one can ring out while the next starts)
 	St.Voices = St.Voices or {}
 	local function soundFor(Kind: string): (Sound, boolean)
 		local Id = voiceId(SetName, Kind)
@@ -151,11 +239,18 @@ local function voice(M: Model, Text: string)
 				local Snd = Instance.new(`Sound`)
 				Snd.Name = `NHVoice`
 				Snd.SoundId = Id or BLIP
+				-- a voice's natural falloff: full within 4 studs, then 1/distance, gone by the range
 				Snd.RollOffMode = Enum.RollOffMode.InverseTapered
-				Snd.RollOffMinDistance = 5
+				Snd.RollOffMinDistance = 4
 				Snd.RollOffMaxDistance = RANGE_V
 				if Group and Group:IsA(`SoundGroup`) then Snd.SoundGroup = Group end
-				Snd.Parent = Head
+				-- muffling for a voice heard through a wall (switched on per syllable)
+				local Eq = Instance.new(`EqualizerSoundEffect`)
+				Eq.Name = `NHMuffle`
+				Eq.LowGain, Eq.MidGain, Eq.HighGain = 0, -9, -24
+				Eq.Enabled = false
+				Eq.Parent = Snd
+				Snd.Parent = St.Emitter
 				Pool[J] = Snd
 			end
 			St.Voices[Key] = Pool
@@ -167,14 +262,19 @@ local function voice(M: Model, Text: string)
 	local Total = 0
 	for _, Syl in Syls do Total += Syl[1] end
 	Speaking[M] = os.clock() + Total + 0.2
+	-- keep the emitter where the voice should be heard from while they talk
+	local Follow = RunService.RenderStepped:Connect(place)
 	task.spawn(function()
 		for _, Syl in Syls do
-			if St.VoiceToken ~= My or not Head.Parent then return end
+			if St.VoiceToken ~= My or not Head.Parent then break end
 			task.wait(Syl[1])
 			if Syl[2] then
 				local Snd, Own = soundFor(Syl[4] or `Uh`)
+				local Heard, Muffled = audibility(M, Head)
+				local Eq = Snd:FindFirstChild(`NHMuffle`)
+				if Eq then Eq.Enabled = Muffled end
 				Snd.PlaybackSpeed = Pitch * Syl[2]
-				Snd.Volume = (if Own then (tonumber(VoiceCfg.Volume) or 0.34) else 0.28) * (Syl[3] or 1)
+				Snd.Volume = (if Own then (tonumber(VoiceCfg.Volume) or 0.34) else 0.28) * (Syl[3] or 1) * Heard
 				Snd.TimePosition = 0
 				Snd:Play()
 				if not Own then
@@ -184,6 +284,8 @@ local function voice(M: Model, Text: string)
 				end
 			end
 		end
+		task.wait(0.4) -- the last syllable rings out from the right place
+		Follow:Disconnect()
 		if Speaking[M] and St.VoiceToken == My then Speaking[M] = nil end
 	end)
 end

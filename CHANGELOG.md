@@ -2,6 +2,44 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.78.5] - 2026-11-10: Map place: NPC voices heard from where you stand
+
+Owner: "Good, now make them have a more accurate proximity".
+
+### Changed (Map place, `Controllers.World.NpcLook`)
+- **Heard from your character, not the camera.** Roblox hears 3D sound from the camera, which in third person sits 10 to 20 studs from your character, so voices used the camera's distance and direction.
+  - Now each speaker's voice plays from an emitter (an Attachment in Terrain) kept at camera + (their head - your head) every frame while they talk, plus 0.4 s for the last syllable to ring out.
+  - So the distance and the left / right direction match where your character stands.
+- **A voice's falloff:**
+  - full within 4 studs, then 1/distance (InverseTapered), gone at 45 studs;
+  - a soft fade over the last 10 studs, so a voice never cuts out.
+- **Walls:**
+  - a wall or closed door between your head and theirs makes the voice about a third as loud and muffled (an EqualizerSoundEffect: mids -9 dB, highs -24 dB);
+  - glass and see-through parts only soften it (x0.75);
+  - invisible triggers and zones don't count;
+  - an open door's leaves stop blocking (they stop colliding when open).
+- **Facing:** someone with their back to you is about 2 dB quieter.
+- **Who gets to talk:** the "two voices at once, nearest first" rule now measures from your character too.
+
+### Verified (Map place, local play-test, a student made to say a line on cue)
+
+| Where the player stood | Distance from the speaker | Camera's distance | Volume | Muffled |
+|---|---|---|---|---|
+| In front of them | 8 studs | 6.8 | 0.34 (full) | no |
+| Behind them (their back to you) | 8 studs | 20.5 | 0.26 | no |
+| In the open | 38 studs | 50.3 | 0.18 (the edge fade) | no |
+| Inside the building, the front wall between | 39 studs | 31.1 | 0.07 | every syllable |
+
+- The emitter was never more than 0.04 studs from where it should be.
+- **The old way would have been wrong:**
+  - at 38 studs in the open, the camera was 50 studs away, so the voice would have been silent;
+  - behind the wall, the camera was closer than the player (31 vs 39), so it would have been louder.
+- No script errors.
+- **Not tried:**
+  - hearing it (the test tools can't hear);
+  - walking through an opening door mid-line;
+  - two speakers on either side for stereo.
+
 ## [1.78.4] - 2026-11-10: Map place: the NPC voices are live
 
 Owner: "Uploaded them" (the 40 voice syllables of 1.78.3, bulk-imported into group 15981569).
