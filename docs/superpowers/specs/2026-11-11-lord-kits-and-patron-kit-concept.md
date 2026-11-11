@@ -161,7 +161,7 @@ Effects stay readable in a fight and never cover other players. On low graphics,
   - The other owner approves his kit personally.
 - **Coats and robes:** each Lord coat or robe has a matching 2D Shirt and Pants base made with the clean-edge clothing pipeline, so there are no black seams.
 - **Order (owner-approved 2026-11-11):**
-  1. The Sanguine Atelier: first, once the accessories session's kits are finished.
+  1. The Sanguine Atelier: first of these kits, after the accessories session's work is all done (Kits A, B and C and the hair tucking).
   2. The Vampire Elder: closest to it, so it shares lessons.
   3. Then the Werewolf, Priest, Human, Ghoul and Wraith kits.
 - **Roughly 50-55 pieces in all.** They'd be made in batches like the accessories kit, after that kit is finished.
