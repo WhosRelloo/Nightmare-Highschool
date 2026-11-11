@@ -2292,6 +2292,116 @@ The room and subject list comes from the game: `Config.Classes` (Homeroom R101, 
 ![The class doors in Studio](img/signs50-studio-doors.jpg)
 ![The icon board in Studio](img/signs50-studio-iconboard.jpg)
 
+## Batch 51 (gates): gates, piers, fences, walls and sneak gaps for the school's gate
+
+`art/props/nh_props_batch51.py`. The owner asked for "another kit for gate models, etc. for the school's gate ... variety and some with holes you can sneak through (make some boards that will be removeable but they also cover the whole area)". 26 props in the family of the school's current IronGate (batch 25) but none like it: black wrought iron, weathered limestone and soot-dark stone, red brick, slate, brass and gilt, crimson enamel, moss and ivy; wood only for the removable boards and a spade. No blood or gore. Every name and design is invented.
+
+![Gates](img/gates51-gates.jpg) ![Runs](img/gates51-runs.jpg) ![Sneak gaps](img/gates51-sneak.jpg) ![Rigs](img/gates51-rigs.jpg)
+
+![The school front](img/gates51-front.jpg) ![The back lane](img/gates51-lane.jpg)
+
+- **Run:** `E:/NH-Work/props51/` (`run51.py`: `--check` builds and runs the checks below, `--quick` workbench views, `--previewonly`; `bake51.sh all|<Prop>` bakes at 2048 / 64 samples on the GPU in ONE shared bake slot at a time, resumable; `sheet51.py`, `render51.py`, `upload51.py`, `docs51.py`).
+- **Files:** FBX in `art/props/fbx/gates-batch51/`, maps in `art/props/textures/<Prop>_*.png` (2048), previews in `art/props/previews/` (`<Prop>_open.png` for the gates, `<Prop>_clear.png` for the sneak gaps with their boards or bars off), contact sheets and renders in `art/props/renders/gates-batch51/`, upload copies (1024) in `art/group-upload/gates-batch51/`. The rig (hinges, axes, angles, slides) and the sneak clear boxes are in `art/props/gates_batch51.json`.
+- **Every piece is under 20.48 studs on every axis** (the import cap); the largest are GateGrand_Main (19.2 x 3.4 x 18.7) and GatehouseArch_Main (16.3 x 9.4 x 19.2).
+
+### Sizing for sneaking (measured 2026-11-11)
+
+Measured in NH Combat Test, read-only, before any gap was modelled. Crouching (`Services.Player.Crouch`) only sets the `Crouch` attribute and walk speed 7: the pose is the animation (`Crouch` 139672322709288, `CrouchWalk` 112732055140240), and the hips don't drop (the HumanoidRootPart stays put). An R6 body collides with its Head and Torso only (limbs and the HumanoidRootPart don't). Every keyframe of both animations was run through the R6 joints on the 7'0" Height v2 body (torso 2.21 x 2.41, legs 2.61, arms 2.51, head and thickness x1.10):
+
+| Pose (7'0") | Top of head | Head + Torso collision top | Collision width | Width with the limbs |
+|---|---|---|---|---|
+| Standing | 6.26 | 6.12 | 2.21 | 4.42 |
+| Crouch (idle) | 5.27 | 5.10 | 2.66 | 4.39 |
+| CrouchWalk | **5.32** | 5.16 | **2.85** | 4.87 |
+
+- **Every sneak gap is at least 3.4 wide and 5.8 tall, clear** (the crouched-walking top of head plus 0.48, the collision width plus 0.55). The builder's `--check` proves it: a box 3.36 x 5.8 (the whole depth of the piece) through each gap meets no geometry with the boards / bars off, and a grid of rays every 0.05 across each opening hits a board on every ray with them on.
+- A standing 7'0" (6.26) does not fit through them; anyone shorter than about 6'3" walks through upright. Doors and gates are standing height (the wicket door clears 6.5).
+- **The 'dug-under' gap** became SneakCulvert: since the crouch lowers the tallest head by only 1.0, a scrape under a fence at ground level would need a trench about 5 deep below the baseplate. It is instead a dug-out drain culvert under a humped stone portal in the railing line.
+- **Railing standard:** the top rail sits at 6.7 so that the gaps measured from the coping (0.8) still clear 5.85.
+
+### Snap and grid notes
+
+- **Infills** (Railing8, StoneWall8, BrickWallIron, HedgeRailing and every Sneak piece) are 8 long, x = -4 to 4, pivot at the bottom centre, front -Y. Their ends are flush: two infills butt end to end with nothing between them, and the railings' bars keep their 0.5 spacing across the joint.
+- **Posts and piers** (RailingPost, RailingCorner, RailingEnd, RailingGatePier, StoneWallPier, BrickWallPier, GatePierLantern) stand on the grid points between infills, pivot at their centre; the infills' ends tuck into them. RailingEnd's railing goes off to its +X (turn it 180 for the other end).
+- **Gates:** GateGrand, GateService and GatehouseArch span 16 between their pier centres / faces (x = -8 to 8); GatePedestrian, GateChained, GateBroken and the lychgate's front 8; GateWicket and the Sneak pieces 8; GateMoon 16. Their pier centres (or the gatehouse's side faces) sit on grid points, so runs butt straight on.
+- The stone wall pieces share one section (1.6 thick, coping to 8.05): StoneWall8, GateWicket's wall ends, GateMoon and SneakWallHole line up.
+
+### Pieces and rigs
+
+Each prop's FBX holds its pieces as separate meshes, named `<Prop>_<Piece>` (a one-piece prop is a single mesh named after it).
+
+- **Leaves and doors** (`_Leaf0`, `_Leaf1`, `_Door0`): the FBX origin is the hinge axis (it stands 0.27 off the pier so the leaf clears the pier's foot and cornice). They turn about Z, swinging OUT to the front (-Y), 90 degrees: Leaf0 (left hinge) turns -90, Leaf1 (right hinge) +90, Door0 -90. The check turned every leaf to 90 and found no contact with anything (the hinge eyes on their pins excepted).
+- **GatehouseArch_Portcullis**: slides [0, 0, -9.0] (Blender axes; in Roblox -Z is Blender's +Y and +Y is up) from its raised rest; origin at its bottom centre [0, -2.5, 9.0].
+- **GateChained_Chain**: take it off (or tween it away) before the leaves open; with it on the gate is locked.
+- **Boards** (`_Board0` ... `_BoardN`): each plank is its own piece with its origin at its centre and carries its own nails or wire ties, so a script can pull them one by one. With all of them on they cover the whole opening (two lapped layers, odd planks in front); with all off the gap is clear. In each set one plank is prised off at an end and one carries a chalk X.
+- **Loose bars** (`SneakLooseBars_Bar0-5`): lift each out upward (origin at its middle); with all six out the gap is clear.
+
+### Template notes (NHBuildKit `Gates`)
+
+- **Collisions:** everything walk-around collides on its precise shape (piers, walls, kerbs, railings, the gatehouse block, the lychgate's walls, piers, columns and roof). Leaves, doors, the portcullis, boards and loose bars collide while shut and are what the scripts move. Leaves (`_Leaves`) and Glow / Glass never collide. The hedge cores collide; their cards don't.
+- **Leaves:** every `_Leaves` piece takes `NH_GardenLeaves` (batch 40's atlas) with AlphaMode Transparency and DoubleSided on.
+- **Glow:** the lantern flames (GateGrand, GatePedestrian, GatehouseArch x2, GateLych, GatePierLantern) are Neon candle amber (255, 170, 90). Each takes a PointLight: amber (255, 170, 90), brightness 1.2, range 14 (the GatePierLantern 18), Shadows on; tag `NHCandle` for the flicker.
+- **Glass:** the lantern panes are Glass, transparency 0.55, a warm tint (220, 205, 170).
+- **Particles:** none needed; optional faint mist at the foot of GateBroken and GateChained (grey-blue, rate 2, speed 0.2, lifetime 6, size 3 to 5, transparency 0.85).
+- **Suggested prompts** (wiring comes later in the main session):
+  - Leaves and doors: "Gate / Open" (hold 0.4 s), auto-close 8 s; the wicket door "Door / Open". GateChained: "Gate / Locked" until its Chain is taken off (a key or a bolt-cutter item), then "Gate / Open".
+  - GatehouseArch_Portcullis: a winch lever elsewhere ("Portcullis / Lower" and "Raise"), tween 3 s, a heavy clank.
+  - Boards: "Boards / Pry off" (hold 1.5 s with a crowbar, 3 s without), one board per press, topmost first is easiest; boards respawn after 10 minutes, or when a staff NPC passes.
+  - Loose bars: "Bar / Lift out" (hold 1 s), the bar drops at the foot of the railing; respawn 5 minutes.
+  - Sneak gaps work with the crouch (Left Ctrl): a standing 7'0" won't fit, a crouched one will.
+
+### Showcase placement notes
+
+All pieces stand on the floor (no wall pieces). Line the runs up on one 8-stud line: e.g. RailingEnd (yaw 180), Railing8, RailingPost, SneakBentBars, RailingPost, SneakMissingBars, RailingPost, SneakLooseBars, RailingCorner; a stone line of StoneWallPier, StoneWall8, StoneWallPier, SneakWallHole, StoneWallPier, GateWicket, StoneWallPier, GateMoon; a brick line of BrickWallPier, BrickWallIron, BrickWallPier; and a hedge line of HedgeRailing, SneakHedgeGap, HedgeRailing. The gates stand in their own row with 4 studs between them.
+
+### Props
+
+**Gates**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| GateGrand | 38.6k (Main 11.5k, Glass 0.0k, Glow 0.1k, Leaf0 13.3k, Leaf1 13.4k, Leaves 0.2k) | piers, sill, leaves | floor | the grand double gate: a 13.2 opening between 2.8 square rusticated limestone piers (pier centres 16 apart, on the grid) with sunk lancet panels and gilt trefoils, crocketed pinnacles with gilt knobs; swan-neck leaves rising from 10.0 at the hinges to 11.3 at the middle, fleur finials, dog bars with spikes, a band of pointed arcading, a gilt rosette medallion in S-scrolls on each leaf; overhead a scrolled crest overthrow carrying the school shield (crimson enamel, gilt rim, a gilt crescent and key, a gilt crown of spikes and a fleur) and a hanging hexagonal lantern (Glass, Glow); ivy on the piers. 19.2 x 18.7 |
+| GatePedestrian | 14.2k (Main 9.0k, Leaf0 5.1k, Glass 0.0k, Glow 0.1k, Leaves 0.1k) | piers, sill, leaf, screen | floor | the walkers' moon gate between 1.9 limestone piers (centres 8 apart) with carved crescent roundels and obelisk finials: one 3.9 leaf with a round-arched top, crescent finials, a lattice dado and a spoked moon wheel with a gilt crescent, a brass lock and ring pull; a latch post with a gilt crescent and a fixed side screen with C-scrolls; a scrolled lamp bracket with a hanging lantern on the right pier (Glass, Glow) |
+| GateWicket | 5.8k (Main 2.4k, Door0 3.4k, Leaves 0.1k) | walls, portal, door | floor | a side wicket in an 8-long stone wall (the StoneWall8 section, so it drops into a wall run): a gabled ashlar portal proud of both faces, a pointed moulded surround, a carved quatrefoil, a finial; under a gilt half-sun grille sits an iron door (Door0, 3.4 x 6.4 clear) with strap hinges both faces, studs, a barred speaking grille with a brass frame, brass ring pulls and a keyhole; a dark stop round the opening so no light shows round it. The door clears a standing 7'0" (6.5) |
+| GatehouseArch | 25.2k (Main 8.3k, Glass 0.0k, Glow 0.1k, Portcullis 16.6k, Leaves 0.2k) | block, portcullis | floor | a crenellated gatehouse arch, 16 x 8 (x 19.2 to the merlons): an 8 x 11.6 arch through it (a pointed vault) with voussoirs, quoins and a hood mould with label stops on both faces, a string course, machicolation corbels under a projecting breastwork, merlons all round, blind cross slits, a crimson-and-gilt crescent shield and two lanterns (Glass, Glow). **Portcullis** (its own piece, 16.6k): a riveted grid of square bars with spiked feet, shown RAISED in its slot (its spikes hang 9.0 above the road, in the arch head); it slides down 9.0 to close. Its side faces are flush at x = +-8 so stone walls and railings butt on |
+| GateLych | 13.3k (Main 8.5k, Glass 0.0k, Glow 0.1k, Leaf0 2.3k, Leaf1 2.3k, Leaves 0.1k) | walls, piers, columns, roof, leaves | floor | a stone-and-iron lychgate, 10.7 x 7.7, 12.9 tall: dwarf limestone side walls with stone benches inside, four piers carrying cast-iron columns, iron eaves beams, arched iron trusses with C-scroll spandrels and king posts, a lapped cleft-slate roof with iron bargeboards, a limestone ridge with iron cresting and fleur end finials, gable pendants, a lantern hung from the middle truss (Glass, Glow); two low arched leaves at the front (3.6 tall, crescent roundels, lancet arcading), flagstones through |
+| GateService | 16.1k (Main 7.0k, Leaf0 4.4k, Leaf1 4.6k, Leaves 0.1k) | piers, sill, leaves | floor | the delivery gate: 2.4 square brick piers with limestone bands, stone pyramid caps and gilt crescent rods, chamfered granite wheel-guard stones; two 6.4 leaves (a 13.6 opening): riveted sheet-iron dado panels with a crimson enamel band, bars with spear tops, a long diagonal brace, an anti-climb comb of spikes along the top, a drop bolt and hasp; a brass bell with a pull chain on the right pier; a centre stop in the road |
+| GateChained | 13.9k (Main 2.2k, Leaf0 3.3k, Leaf1 3.6k, Chain 4.5k, Leaves 0.2k) | piers, sill, leaves | floor | a derelict gate, chained and padlocked: soot-dark cracked piers (the right one's cap stone fallen at its foot), rusted leaves with bent and missing spear heads and one snapped bar, a crimson warning plate with a white bar wired on; **Chain** (its own piece): two turns of chain round the meeting stiles and a brass padlock, so the template can take it off before the leaves open; ivy, brambles and weeds |
+| GateBroken | 9.5k (Main 5.7k, Leaf0 3.4k, Leaves 0.4k) | piers, sill, leaf, fallen leaf | floor | an overgrown broken gate: the left leaf still works (Leaf0); the right leaf has dropped off its top hinge (a snapped gudgeon stub, a bent strap) and leans out 30 degrees, tilted, its meeting corner down in the weeds (Main, static); the right pier's obelisk lies in the grass; heavy ivy, brambles, ferns. Its open half is a squeeze past the leaning leaf |
+| GateMoon | 6.2k (Main 2.7k, Leaf0 1.1k, Leaf1 2.2k, Leaves 0.2k) | wall, leaves | floor | a 16-long stone wall (the StoneWall8 section) pierced by a round moon door 7.0 across (clear 6.6 at a standing shoulder), ringed in alternating limestone voussoirs with a hood mould on the back; two half-disc iron leaves hung on the FRONT face outside the ring (so they swing clear): radial rays, an inner half ring, verticals, strap hinges; a gilt crescent on the left leaf and a gilt full moon on the right |
+| GatePierLantern | 2.3k (Main 2.2k, Glass 0.0k, Glow 0.1k) | yes | floor | a lantern-topped pier, 2.2 square to 8.6: ashlar courses, a crimson enamel plaque with a gilt rim and crescent on both faces, iron tethering rings, a plinth block and a big hexagonal iron lantern (Glass, Glow) to 11.9 |
+
+**Runs on the 8-stud grid**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| Railing8 | 7.3k (Main 7.2k, Leaves 0.0k) | yes | floor | the railing run, 8 long (x = -4 to 4, ends flush): granite base (to 0.5) and limestone coping (to 0.8), square bars every 0.5 (16; neighbouring runs continue the spacing), bottom (1.1) and dog (2.0) rails with dog bars, a band of rings between 6.05 and the top rail at 6.7, trefoil club finials to 7.6 |
+| RailingPost | 1.8k | yes | floor | a stone post for the grid points of a railing run: 1.5 square (foot 1.8), rusticated, lancet panels, a crocketed pinnacle; 11.1 tall. The railings' ends tuck into it |
+| RailingCorner | 1.6k | yes | floor | the corner post: an octagonal limestone shaft with four bands on a 1.8 square foot, an obelisk; 11.8 tall; runs along X and Y both tuck into it |
+| RailingEnd | 2.6k | yes | floor | the end of a run (the railing goes off to +X): the post plus a stub of plinth and a great S-curved iron stay with rails and C-scrolls on its free side |
+| RailingGatePier | 2.2k | yes | floor | a taller pier for hanging your own leaf in a run: 2.2 square, 12.4 tall, rusticated, lancet panels with gilt trefoils, an obelisk, two gudgeon pins on its -X face (axis 1.35 off the centre) |
+| StoneWall8 | 0.4k (Main 0.3k, Leaves 0.1k) | yes | floor | the stone wall run: 8 long, 1.6 thick, ashlar (CastleStone) on a battered granite plinth, a string course at 4.2, a saddleback coping with drips to 8.05; ivy spilling over one end, moss on the coping |
+| StoneWallPier | 2.2k | yes | floor | the wall pier for the grid points of stone walls: 2.6 square, rusticated, lancet panels, a stone urn of flames; 11.6 tall |
+| BrickWallIron | 11.0k (Main 11.0k, Leaves 0.1k) | yes | floor | the brick wall run: 8 long, red brick on a granite base with a limestone band and coping (to 4.3), iron railing on top (spears to 7.7, C-scrolls under the top rail, rings); ivy |
+| BrickWallPier | 1.0k | yes | floor | a brick pier for the brick wall: 2.2 square, three limestone bands, a limestone pyramid cap with an iron scroll rod and a gilt ball; 10.9 tall |
+| HedgeRailing | 3.3k (Main 2.8k, Leaves 0.4k) | kerb, railing, hedge core | floor | the hedge-and-railing run, 8 long: a granite kerb with a low spear railing (to 4.7) in front of a clipped yew hedge 7.2 tall (cards on NH_GardenLeaves; the hedge cores overlap 0.25 into their neighbours so a run reads as one hedge) |
+
+**Sneak gaps**
+
+| Prop | Tris | Collides | Showcase | Notes |
+|---|---|---|---|---|
+| SneakBentBars | 14.0k (Main 5.4k, Board0 0.4k, Board1 0.8k, Board2 0.8k, Board3 0.8k, Board4 0.8k, Board5 0.8k, Board6 0.8k, Board7 0.8k, Board8 0.8k, Board9 0.8k, Board10 0.8k, Leaves 0.1k) | yes (boards too) | floor | a Railing8 with a bent-bar gap: the plinth broken out (rubble pushed aside), six bars rusted off at their feet and bent aside under the top rail, the edge bars rusted short; **Board0-10**: eleven grey planks wired to the bars in two lapped layers, one prised off at its end, one chalk-marked. Clear with the boards off: 3.36 wide from the ground to 5.85 |
+| SneakMissingBars | 7.5k (Main 5.8k, Board0 0.2k, Board1 0.2k, Board2 0.2k, Board3 0.2k, Board4 0.3k, Board5 0.2k, Board6 0.2k, Leaves 0.0k) | yes (boards too) | floor | a Railing8 with six bars sawn out (flush stubs in the coping, short stubs under the top rail, two sawn bars in the grass); **Board0-6**: vertical planks standing on the coping, wired to the top rail, one kicked out at its foot, one chalked. Clear: 3.36 wide, 5.85 from the coping to the top rail |
+| SneakWallHole | 2.7k (Main 0.9k, Board0 0.2k, Board1 0.2k, Board2 0.2k, Board3 0.2k, Board4 0.2k, Board5 0.2k, Board6 0.2k, Board7 0.2k, Board8 0.2k, Board9 0.2k, Board10 0.2k, Leaves 0.1k) | yes (boards too) | floor | a StoneWall8 with a crumbled hole to the ground (ragged, 3.9 to 4.6 wide, 6.0 to 6.8 tall; no string course on this section), fallen blocks pushed aside; **Board0-10**: planks nailed across the front, the lowest on the plinth's face, one prised, one chalked. Clear: 3.36 x 5.8 |
+| SneakCulvert | 6.1k (Main 4.5k, Board0 0.2k, Board1 0.2k, Board2 0.2k, Board3 0.2k, Board4 0.2k, Board5 0.2k, Board6 0.2k, Board7 0.2k, Board8 0.2k, Board9 0.2k, Leaves 0.1k) | yes (boards too) | floor | a Railing8 whose middle rises into a stone culvert portal over an old drain (the 'dug-under' gap: see the note below): a segmental arch 3.9 wide with a keystone, rusted grate hinge stubs, the silt dug out to a muddy scrape, a spoil heap and a spade left leaning on it; **Board0-9**: planks nailed over its mouth. Clear: 3.4 x 5.8 |
+| SneakHedgeGap | 2.6k (Main 2.1k, Leaves 0.4k) | kerb, railing, hedge core | floor | a HedgeRailing with a ragged hole forced through the yew (3.9 wide, 6.0 to 6.3 tall), the kerb broken, the railing cut out (cut rail ends bent forward, a fallen bar), a trampled mud path; no boards (a hedge has nothing to nail to). Clear: 3.4 x 5.8 the whole way through |
+| SneakLooseBars | 5.8k (Main 5.0k, Bar0 0.1k, Bar1 0.1k, Bar2 0.1k, Bar3 0.1k, Bar4 0.1k, Bar5 0.1k, Leaves 0.0k) | yes (bars too) | floor | a Railing8 with a loose-bar section: the lower rails rusted through, six rusted bars standing loose in their lead sockets and through the top rail, each a little twisted; **Bar0-5** lift out one by one. Clear with all six out: 3.36 wide, 5.8 from the coping to the top rail |
+
+### Pipeline notes
+
+- **Square bars:** `nh_props.tube(square=True)` makes inside-out bars in the committed version; this kit builds every square bar with its own `sqbar()` (the profile wound `[(-r,-r), (-r,r), (r,r), (r,-r)]`). `--check` counts the closed loose parts of every piece with negative signed volume: 0 in all 26 props. Round bars from batch 24's sweep came out inside out on some scrolls; `rbar()` reverses any closed tube with negative volume.
+- Nothing goes below the ground (the leaf cards are clamped to it), and no leaf touches anything shut or open.
+
 ## Batch 53 (secret): the secret passages kit
 
 `art/props/nh_props_batch53.py`. The owner asked for "a secret passage kit with vents, etc.": 26 props of vents, crawl ducts, hidden doors, a hidden stair, brick tunnels, a stage crawlspace, a boarded passage and the triggers that open them, in the school's look (weathered limestone, sooty brick, black riveted iron, brass and gilt, crimson #600E1A, candlelight, moss). Wood only for the boards and the stage. Every name and word is invented, and none repeats an existing prop: not the BookcaseDoor, ChainedBookcase, the library shelves, the CellarHatch, StairSpiral, the Fireplace, the Boiler and PipeRun, the tapestries or the busts.
