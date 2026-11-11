@@ -1,0 +1,104 @@
+{
+ "key": "TatteredHood",
+ "name": "Tattered hood",
+ "atlas": 2048,
+ "pieces": {
+  "TatteredHood": {
+   "mount": "Head",
+   "kind": "Main",
+   "tris": 7384,
+   "fit": [
+    -0.0068160295486450195,
+    0.2977170944213867,
+    0.05765444040298462
+   ],
+   "size": [
+    1.7086526155471802,
+    1.7460154294967651,
+    1.6870489120483398
+   ],
+   "fit_body": {},
+   "hair_fit": {
+    "Females_Araya": [
+     1.04,
+     0.0
+    ],
+    "Females_Detective_Hair": null,
+    "Females_EdnaMode_lol": null,
+    "Females_Elegant_Bob_Cut": null,
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": null,
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": null,
+    "Females_Low_Ponytail": [
+     1.06,
+     0.02
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.16,
+     0.1
+    ],
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": [
+     1.04,
+     0.0
+    ],
+    "Females_Short_Mid_Part": null,
+    "Females_Side_Bun": null,
+    "Females_Side_Ponytail": null,
+    "Females_Straight_Bob": [
+     1.14,
+     0.08
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.04,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.22,
+     0.26
+    ],
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": null,
+    "Males_Baki": [
+     1.2,
+     0.18
+    ],
+    "Males_Black_Zoldyck_Hair": null,
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.22,
+     0.24
+    ],
+    "Males_Half_Up_Half_Down_Locs": null,
+    "Males_Higuruma": [
+     1.14,
+     0.16
+    ],
+    "Males_Long_Length_Messy": null,
+    "Males_Man_Bun": null,
+    "Males_Messy_Middle_Part": null,
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": [
+     1.06,
+     0.02
+    ],
+    "Males_Slicked_Back": [
+     1.16,
+     0.1
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.2,
+     0.18
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.22,
+     0.24
+    ],
+    "Males_TP_Locks": null
+   }
+  }
+ },
+ "notes": "a deep, ragged shroud hood of charcoal wool: a tall peak that leans back, the brow drooping over a rolled and frayed face opening, soft folds down to the cowl on the shoulders, a torn hem hanging behind the back; pale wisps drift off it in the game (particles)",
+ "tris": 7384
+}

@@ -20,32 +20,29 @@
    "fit_body": {},
    "alpha_tex": "NHAcc_Lace.png",
    "hair_fit": {
-    "Females_Super_Long_Japanese_Hair": null,
-    "Females_Straight_Bob": [
+    "Females_Araya": null,
+    "Males_Spiky_Anime_Hair": null,
+    "Females_Gojo_Ponytail": null,
+    "Males_Messy_Middle_Part": [
      1.02,
      0.0
     ],
-    "Females_Gojo_PonyV2": null,
-    "Males_Short": null,
-    "Females_Wolf_Cut": null,
+    "Females_Short_Mid_Part": null,
+    "Females_Side_Bun": [
+     1.02,
+     0.0
+    ],
     "Males_Man_Bun": [
      1.02,
      0.0
     ],
     "Females_Detective_Hair": null,
-    "Males_Long_Length_Messy": null,
-    "Males_Messy_Wolfcut_with_Ponytail": null,
-    "Females_Wavy_Y2k_Bob": [
+    "Males_Higuruma": [
      1.02,
      0.0
     ],
-    "Females_Messy_Flow_Braided": null,
-    "Males_Blonde_Emo_Scene_Messy": null,
-    "Males_Half_Up_Half_Down_Locs": [
-     1.02,
-     0.0
-    ],
-    "Males_Baki": [
+    "Males_TP_Locks": null,
+    "Females_Side_Ponytail": [
      1.02,
      0.0
     ],
@@ -53,53 +50,56 @@
      1.02,
      0.0
     ],
-    "Females_Araya": null,
-    "Males_TP_Locks": null,
-    "Males_Super_Messy_Long_Hair": null,
-    "Females_Natural_Trim_Pony": [
-     1.02,
-     0.0
-    ],
-    "Females_Gojo_Ponytail": null,
-    "Females_Femkuna_Pigtails": null,
-    "Females_Low_Ponytail": [
-     1.02,
-     0.0
-    ],
-    "Females_Side_Bun": [
-     1.02,
-     0.0
-    ],
-    "Males_Black_Zoldyck_Hair": null,
-    "Females_Long_Sweetheart_Pigtails": null,
     "Females_Elegant_Bob_Cut": [
      1.02,
      0.0
     ],
-    "Males_Slicked_Back": [
-     1.05,
-     0.0
-    ],
-    "Males_Higuruma": [
-     1.02,
-     0.0
-    ],
-    "Males_Messy_Middle_Part": [
-     1.02,
-     0.0
-    ],
-    "Males_Anime_Hero_Hair": null,
-    "Females_Short_Mid_Part": null,
-    "Females_Side_Ponytail": [
-     1.02,
-     0.0
-    ],
+    "Females_Wolf_Cut": null,
     "Females_EdnaMode_lol": [
      1.02,
      0.0
     ],
-    "Males_Spiky_Anime_Hair": null,
-    "Females_Femkuna": null
+    "Females_Wavy_Y2k_Bob": [
+     1.02,
+     0.0
+    ],
+    "Females_Straight_Bob": [
+     1.02,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": null,
+    "Males_Blonde_Emo_Scene_Messy": null,
+    "Females_Femkuna_Pigtails": null,
+    "Males_Long_Length_Messy": null,
+    "Females_Low_Ponytail": [
+     1.02,
+     0.0
+    ],
+    "Females_Femkuna": null,
+    "Males_Short": null,
+    "Females_Gojo_PonyV2": null,
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Baki": [
+     1.02,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": [
+     1.02,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": null,
+    "Males_Half_Up_Half_Down_Locs": [
+     1.02,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": null,
+    "Males_Super_Messy_Long_Hair": null,
+    "Females_Long_Sweetheart_Pigtails": null,
+    "Males_Anime_Hero_Hair": null,
+    "Males_Slicked_Back": [
+     1.05,
+     0.0
+    ]
    }
   },
   "LaceMaskTrim": {
@@ -118,32 +118,29 @@
    ],
    "fit_body": {},
    "hair_fit": {
-    "Females_Super_Long_Japanese_Hair": null,
-    "Females_Straight_Bob": [
+    "Females_Araya": null,
+    "Males_Spiky_Anime_Hair": null,
+    "Females_Gojo_Ponytail": null,
+    "Males_Messy_Middle_Part": [
      1.02,
      0.0
     ],
-    "Females_Gojo_PonyV2": null,
-    "Males_Short": null,
-    "Females_Wolf_Cut": null,
+    "Females_Short_Mid_Part": null,
+    "Females_Side_Bun": [
+     1.02,
+     0.0
+    ],
     "Males_Man_Bun": [
      1.02,
      0.0
     ],
     "Females_Detective_Hair": null,
-    "Males_Long_Length_Messy": null,
-    "Males_Messy_Wolfcut_with_Ponytail": null,
-    "Females_Wavy_Y2k_Bob": [
+    "Males_Higuruma": [
      1.02,
      0.0
     ],
-    "Females_Messy_Flow_Braided": null,
-    "Males_Blonde_Emo_Scene_Messy": null,
-    "Males_Half_Up_Half_Down_Locs": [
-     1.02,
-     0.0
-    ],
-    "Males_Baki": [
+    "Males_TP_Locks": null,
+    "Females_Side_Ponytail": [
      1.02,
      0.0
     ],
@@ -151,53 +148,56 @@
      1.02,
      0.0
     ],
-    "Females_Araya": null,
-    "Males_TP_Locks": null,
-    "Males_Super_Messy_Long_Hair": null,
-    "Females_Natural_Trim_Pony": [
-     1.02,
-     0.0
-    ],
-    "Females_Gojo_Ponytail": null,
-    "Females_Femkuna_Pigtails": null,
-    "Females_Low_Ponytail": [
-     1.02,
-     0.0
-    ],
-    "Females_Side_Bun": [
-     1.02,
-     0.0
-    ],
-    "Males_Black_Zoldyck_Hair": null,
-    "Females_Long_Sweetheart_Pigtails": null,
     "Females_Elegant_Bob_Cut": [
      1.02,
      0.0
     ],
-    "Males_Slicked_Back": [
-     1.05,
-     0.0
-    ],
-    "Males_Higuruma": [
-     1.02,
-     0.0
-    ],
-    "Males_Messy_Middle_Part": [
-     1.02,
-     0.0
-    ],
-    "Males_Anime_Hero_Hair": null,
-    "Females_Short_Mid_Part": null,
-    "Females_Side_Ponytail": [
-     1.02,
-     0.0
-    ],
+    "Females_Wolf_Cut": null,
     "Females_EdnaMode_lol": [
      1.02,
      0.0
     ],
-    "Males_Spiky_Anime_Hair": null,
-    "Females_Femkuna": null
+    "Females_Wavy_Y2k_Bob": [
+     1.02,
+     0.0
+    ],
+    "Females_Straight_Bob": [
+     1.02,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": null,
+    "Males_Blonde_Emo_Scene_Messy": null,
+    "Females_Femkuna_Pigtails": null,
+    "Males_Long_Length_Messy": null,
+    "Females_Low_Ponytail": [
+     1.02,
+     0.0
+    ],
+    "Females_Femkuna": null,
+    "Males_Short": null,
+    "Females_Gojo_PonyV2": null,
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Baki": [
+     1.02,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": [
+     1.02,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": null,
+    "Males_Half_Up_Half_Down_Locs": [
+     1.02,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": null,
+    "Males_Super_Messy_Long_Hair": null,
+    "Females_Long_Sweetheart_Pigtails": null,
+    "Males_Anime_Hero_Hair": null,
+    "Males_Slicked_Back": [
+     1.05,
+     0.0
+    ]
    }
   },
   "BoneMask": {

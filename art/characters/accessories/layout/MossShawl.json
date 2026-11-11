@@ -1,0 +1,366 @@
+{
+ "key": "MossShawl",
+ "name": "Grave-moss shawl",
+ "atlas": 2048,
+ "pieces": {
+  "MossShawl": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 5676,
+   "fit": [
+    -0.0,
+    0.555796205997467,
+    0.007054328918457031
+   ],
+   "size": [
+    1.9500000476837158,
+    1.013111900538206,
+    1.13187837600708
+   ],
+   "fit_body": {
+    "female": 1.073,
+    "lean": 0.847,
+    "athletic": 1.044,
+    "muscular": 1.127,
+    "stocky": 1.176,
+    "heavy": 1.161,
+    "petite": 0.94,
+    "toned": 1.052,
+    "curvy": 1.208,
+    "strong": 1.06,
+    "plus": 1.178
+   },
+   "sway": "Flutter",
+   "lock": "Z",
+   "bones": [
+    {
+     "name": "Root",
+     "head": [
+      -0.0,
+      1.0,
+      0.0
+     ],
+     "parent": null
+    },
+    {
+     "name": "H0",
+     "head": [
+      0.6200000047683716,
+      0.949999988079071,
+      0.5299999713897705
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C0_1",
+     "head": [
+      0.6200000047683716,
+      0.949999988079071,
+      0.5299999713897705
+     ],
+     "parent": "H0"
+    },
+    {
+     "name": "C0_2",
+     "head": [
+      0.6200000047683716,
+      0.7787595987319946,
+      0.5299999713897705
+     ],
+     "parent": "C0_1"
+    },
+    {
+     "name": "C0_3",
+     "head": [
+      0.6200000047683716,
+      0.6289241909980774,
+      0.5299999713897705
+     ],
+     "parent": "C0_2"
+    },
+    {
+     "name": "H1",
+     "head": [
+      0.3100000023841858,
+      0.949999988079071,
+      0.5299999713897705
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C1_1",
+     "head": [
+      0.3100000023841858,
+      0.949999988079071,
+      0.5299999713897705
+     ],
+     "parent": "H1"
+    },
+    {
+     "name": "C1_2",
+     "head": [
+      0.3100000023841858,
+      0.656693696975708,
+      0.5299999713897705
+     ],
+     "parent": "C1_1"
+    },
+    {
+     "name": "C1_3",
+     "head": [
+      0.3100000023841858,
+      0.40005064010620117,
+      0.5299999713897705
+     ],
+     "parent": "C1_2"
+    },
+    {
+     "name": "H2",
+     "head": [
+      -0.0,
+      0.949999988079071,
+      0.5299999713897705
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C2_1",
+     "head": [
+      -0.0,
+      0.949999988079071,
+      0.5299999713897705
+     ],
+     "parent": "H2"
+    },
+    {
+     "name": "C2_2",
+     "head": [
+      -0.0,
+      0.6173051595687866,
+      0.5299999713897705
+     ],
+     "parent": "C2_1"
+    },
+    {
+     "name": "C2_3",
+     "head": [
+      -0.0,
+      0.32619720697402954,
+      0.5299999713897705
+     ],
+     "parent": "C2_2"
+    },
+    {
+     "name": "H3",
+     "head": [
+      -0.3100000023841858,
+      0.949999988079071,
+      0.5299999713897705
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C3_1",
+     "head": [
+      -0.3100000023841858,
+      0.949999988079071,
+      0.5299999713897705
+     ],
+     "parent": "H3"
+    },
+    {
+     "name": "C3_2",
+     "head": [
+      -0.3100000023841858,
+      0.6622030735015869,
+      0.5299999713897705
+     ],
+     "parent": "C3_1"
+    },
+    {
+     "name": "C3_3",
+     "head": [
+      -0.3100000023841858,
+      0.4103807210922241,
+      0.5299999713897705
+     ],
+     "parent": "C3_2"
+    },
+    {
+     "name": "H4",
+     "head": [
+      -0.6200000047683716,
+      0.949999988079071,
+      0.5299999713897705
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C4_1",
+     "head": [
+      -0.6200000047683716,
+      0.949999988079071,
+      0.5299999713897705
+     ],
+     "parent": "H4"
+    },
+    {
+     "name": "C4_2",
+     "head": [
+      -0.6200000047683716,
+      0.7798521518707275,
+      0.5299999713897705
+     ],
+     "parent": "C4_1"
+    },
+    {
+     "name": "C4_3",
+     "head": [
+      -0.6200000047683716,
+      0.6309728026390076,
+      0.5299999713897705
+     ],
+     "parent": "C4_2"
+    },
+    {
+     "name": "H5",
+     "head": [
+      0.7699999809265137,
+      0.949999988079071,
+      -0.5299999713897705
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C5_1",
+     "head": [
+      0.7699999809265137,
+      0.949999988079071,
+      -0.5299999713897705
+     ],
+     "parent": "H5"
+    },
+    {
+     "name": "C5_2",
+     "head": [
+      0.7699999809265137,
+      0.7400000095367432,
+      -0.5299999713897705
+     ],
+     "parent": "C5_1"
+    },
+    {
+     "name": "H6",
+     "head": [
+      -0.7699999809265137,
+      0.949999988079071,
+      -0.5299999713897705
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C6_1",
+     "head": [
+      -0.7699999809265137,
+      0.949999988079071,
+      -0.5299999713897705
+     ],
+     "parent": "H6"
+    },
+    {
+     "name": "C6_2",
+     "head": [
+      -0.7699999809265137,
+      0.7400000095367432,
+      -0.5299999713897705
+     ],
+     "parent": "C6_1"
+    }
+   ],
+   "hair_fit": {
+    "Females_Araya": null,
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": null,
+    "Females_Elegant_Bob_Cut": null,
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": null,
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": null,
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": null,
+    "Females_Short_Mid_Part": null,
+    "Females_Side_Bun": null,
+    "Females_Side_Ponytail": null,
+    "Females_Straight_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": null,
+    "Females_Wavy_Y2k_Bob": null,
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": null,
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": null,
+    "Males_Half_Up_Half_Down_Locs": null,
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": null,
+    "Males_Man_Bun": null,
+    "Males_Messy_Middle_Part": null,
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "a coarse grey-green wool shawl over the shoulders, its point hanging down the back; moss cushions and lichen along the edges, cobwebs across the back and an orb web on the right shoulder blade, a ragged fringe; the back point and the front ends flutter flat on the body",
+ "tris": 5676
+}

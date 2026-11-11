@@ -95,6 +95,15 @@ for it in items:
             attrs.append(f"Bob = {float(x['bob']):.3f}")
         if x.get("idle"):
             attrs.append(f"Idle = {lua_str(x['idle'])}; Bones = {lua_str(json.dumps(x.get('bones', {}), separators=(',', ':')))}")
+        if x.get("particles"):
+            Q = x["particles"]
+            attrs.append("Particles = { Texture = %s; Color = Color3.fromRGB(%d, %d, %d); At = %s; Spread = %.1f; Rate = %.2f; "
+                         "Life = NumberRange.new(%.2f, %.2f); Speed = NumberRange.new(%.3f, %.3f); Dir = %s; Drag = %.2f; "
+                         "Size0 = %.3f; Size1 = %.3f; T0 = %.2f; T1 = %.2f; Light = %.2f; Rot = NumberRange.new(%.1f, %.1f) }" % (
+                lua_str(Q.get("texture", "rbxasset://textures/particles/smoke_main.dds")), *[int(c) for c in Q.get("color", (255, 255, 255))],
+                lua_v3(Q.get("at", e["fit"])), float(Q.get("spread", 20)), float(Q.get("rate", 3)), *Q.get("lifetime", (1, 2)),
+                *Q.get("speed", (0.2, 0.4)), lua_str(Q.get("direction", "Up")), float(Q.get("drag", 1)), *Q.get("size", (0.3, 0)),
+                *Q.get("transparency", (0.6, 1)), float(Q.get("light_emission", 0)), *Q.get("rotation_speed", (0, 0))))
         if x.get("flare"):
             attrs.append("Flare = true")
         if x.get("trail"):
@@ -186,6 +195,25 @@ for item, pieces in pairs(ITEMS) do
 			l.Color, l.Range, l.Brightness, l.Shadows = a.Light.Color, a.Light.Range, a.Light.Brightness, false
 			if a.Light.Flicker then l:SetAttribute("NHFlicker", true) end
 			l.Parent = at
+			at.Parent = p
+		end
+		for _, c in ipairs(p:GetChildren()) do
+			if c.Name == "NHParticles" then c:Destroy() end
+		end
+		if a.Particles then
+			local q = a.Particles
+			local at = Instance.new("Attachment")
+			at.Name = "NHParticles"
+			at.Position = q.At - a.Fit
+			local pe = Instance.new("ParticleEmitter")
+			pe.Texture, pe.Color, pe.Rate, pe.Lifetime, pe.Speed = q.Texture, ColorSequence.new(q.Color), q.Rate, q.Life, q.Speed
+			pe.EmissionDirection = Enum.NormalId[q.Dir] or Enum.NormalId.Up
+			pe.SpreadAngle = Vector2.new(q.Spread, q.Spread)
+			pe.Drag, pe.LightEmission, pe.RotSpeed, pe.Rotation = q.Drag, q.Light, q.Rot, NumberRange.new(0, 360)
+			pe.Size = NumberSequence.new(q.Size0, q.Size1)
+			pe.Transparency = NumberSequence.new(q.T0, q.T1)
+			pe.LockedToPart = false
+			pe.Parent = at
 			at.Parent = p
 		end
 		if a.Orbit then p:SetAttribute("NHOrbitAxis", a.Orbit) p:SetAttribute("NHOrbitRpm", a.Rpm) end

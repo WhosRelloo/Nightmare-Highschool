@@ -1,0 +1,104 @@
+{
+ "key": "MoonTorc",
+ "name": "Moonstone torc",
+ "atlas": 2048,
+ "pieces": {
+  "MoonTorc": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 5744,
+   "fit": [
+    -0.0007579028606414795,
+    0.9670335650444031,
+    0.0073826611042022705
+   ],
+   "size": [
+    1.2843206524848938,
+    0.25108397006988525,
+    1.163703978061676
+   ],
+   "fit_body": {
+    "female": 1.016,
+    "lean": 1.013,
+    "athletic": 1.014,
+    "muscular": 1.018,
+    "stocky": 1.063,
+    "heavy": 1.021,
+    "petite": 1.015,
+    "toned": 1.022,
+    "curvy": 1.013,
+    "strong": 1.02,
+    "plus": 1.016
+   },
+   "hair_fit": {
+    "Females_Araya": null,
+    "Females_Detective_Hair": null,
+    "Females_EdnaMode_lol": null,
+    "Females_Elegant_Bob_Cut": null,
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": null,
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": null,
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": null,
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": null,
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": null,
+    "Females_Side_Ponytail": null,
+    "Females_Straight_Bob": null,
+    "Females_Super_Long_Japanese_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": null,
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": null,
+    "Males_Baki": null,
+    "Males_Black_Zoldyck_Hair": null,
+    "Males_Blonde_Emo_Scene_Messy": null,
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": null,
+    "Males_Man_Bun": null,
+    "Males_Messy_Middle_Part": null,
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": null,
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": null,
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "an open torc of twisted black iron, heavy at the nape, silver collars and wire wraps at the terminals, a moonstone cabochon set in each knob; it rests on the shoulders and dips over the front and back edges of the R6 torso",
+ "tris": 5744
+}

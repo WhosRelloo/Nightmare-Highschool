@@ -14,3 +14,8 @@
 	{ `halo-rune`, `Hat` };              -- hats are scaled and lifted per hair; the tall ones reach up through the halo
 	{ `sigils-orbiting`, `hat-hunter` };   -- measured: under the hunter hat's hair fits (5 hairs) its brim meets the orbit
 	{ `sigils-orbiting`, `hat-witch` };    -- and the witch hat's brim (4 hairs)
+	{ `familiar-crow`, `fur-torn` };          -- (cross-batch check) the crow perches where the fur lies on the shoulder
+	{ `familiar-crow`, `shawl-grave-moss` };  -- and the shawl
+	{ `familiar-crow`, `hood-tattered` };     -- and the hood's cowl
+	{ `pendant-crystal`, `torc-moonstone` };  -- the chain runs round the neck where the torc sits
+	{ `pendant-crystal`, `clasp-opera` };     -- and through the opera clasp's chains

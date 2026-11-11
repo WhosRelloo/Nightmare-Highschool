@@ -21,22 +21,23 @@ two. The owner pre-approved every later batch "as long as they follow the standa
 |---|---|---|---|
 | 1 | A 1-6 | clique crest pins (8), Prefect and Head Student sashes, school tie, velvet bow tie, leather satchel, messenger bag, book strap, the Ink Club's chained grimoire, choir collar, falling ruff | **in the game, play-tested (1.79.0)**; satchel and Head sash rebuilt for the katana, waiting for import |
 | 2 | A 8-12 | tricorn, top hat, bowler (crimson bands), veiled mourning toque, fascinator, crooked witch hat, hunter's wide-brim, lace / bone / gilt masquerade half-masks | **built, baked, 0 fails; staged** (`batch2/`) |
-| 3 | A 13-16 | race-flavoured: opera-cape clasp, signet ring, moon-stone torc, wolf-tooth necklace, torn shoulder fur, lantern on a hook, grave-moss shawl, tattered hood, scythe pendant | being built |
+| 3 | A 13-16 | race-flavoured: opera-cape clasp, signet ring, moon-stone torc, wolf-tooth necklace, torn shoulder fur, lantern on a hook, grave-moss shawl, tattered hood, scythe pendant | **built, baked, 0 fails; staged** (`batch3/`) |
 | 4 | A 17-20 | hunter and armory: bandolier, pauldrons, gorget, bracers, gauntlets, back crossbow | **built, baked, 0 fails; staged** (`batch4/`) |
 | 5 | A 21-24 | magic: rune halo, orbiting sigils, a crow familiar, crystal pendant, potion belt | **built, baked, 0 fails; staged** (`batch5/`) |
 | 6 | A 25-28 | civilian: pocket watch, lace parasol, crook umbrella, candle lantern, knitted scarves (two colours) | **built, baked, 0 fails; staged** (`batch6/`) |
 | 7 | A 7 + B 2 | the Delinquents' long coat and the Headmaster's greatcoat (torso shell, sleeves on the arms, rigged split skirt) | being built |
 | Kit B | B 1, 3-11 | the rest of the regalia | being built |
 
-### Batches 2, 4, 5 and 6 (built 2026-11-11, waiting for the owner's import)
+### Batches 2 to 6 (built 2026-11-11, waiting for the owner's import)
 
-Checked together with batch 1: `acc_check.py` **0 fails** over all 30 models (12 bodies, motion, sway limits, every
+Checked together with batch 1: `acc_check.py` **0 fails** over all 39 models (12 bodies, motion, sway limits, every
 pair that can be worn together, the admin capes, the katana, each hair at the piece's fit). Contact sheets:
-`img/accessories/batch2_sheet_a.jpg`, `batch2_sheet_b.jpg`, `batch4_sheet.jpg`, `batch5_sheet.jpg`, `batch6_sheet.jpg`.
+`img/accessories/batch2_sheet_a.jpg`, `batch2_sheet_b.jpg`, `batch3_sheet.jpg`, `batch4_sheet.jpg`, `batch5_sheet.jpg`, `batch6_sheet.jpg`.
 
 | Batch | Items (hairs that can wear it, of 35) |
 |---|---|
 | 2 | tricorn (24), top hat (22), bowler (21), veiled mourning toque (10, Female), fascinator (24, Female), witch hat (23), hunter's wide-brim (22), lace / bone / gilt half-masks (15 / 11 / 11) |
+| 3 | opera-cape clasp (32), bat signet ring (35), moonstone torc (10), wolf-fang necklace (11), torn shoulder fur (12), ghoul's lantern on the right hip (35, a light), grave-moss shawl (15), tattered hood (14; pale wisps drift off it), scythe pendant (8). Race-flavoured, anyone may wear them |
 | 4 | bandolier (17), pauldrons (34), gorget (20), bracers (35), gauntlets (35), crossbow (21) |
 | 5 | rune halo (30; it turns slowly in its own plane), orbiting sigils (35; four plates circle the head), crow familiar (18; it looks about, blinks, flicks its tail, settles its wings), caged crystal pendant (15), potion belt (32) |
 | 6 | pocket watch (34), crook umbrella (35), lace parasol (35), candle lantern (35; a flickering light), striped / grey-violet scarves (4 each: almost every hair hangs where a scarf wraps the neck) |
@@ -49,6 +50,8 @@ What these batches added to the rules:
 - **The game's way of wearing a head piece** (scaled about the headband, lifted) is now what the checker tests for
   hair; the few hairs that cross a piece that way are ruled out (`hair_overrides.json`, applied by `acc_hairgroup.py`).
 - **Pieces worn together share one hair fit** (a hat and its veil; `acc_hairgroup.py`).
+- **A hood is a hat that reaches the shoulders**: its per-hair fits also keep it above the torso and out of the arms' swing (`acc_hoodfit.py`), which leaves 14 hairs.
+- **Shared space across batches** became exclusive pairs: the crow vs the fur, the shawl and the hood; the crystal pendant vs the torc and the opera clasp.
 - New slots: **Belt** (the potion belt) and **Watch** (the pocket watch); the bracers and gauntlets share **Arms**.
 
 ## The no-clipping rules (how "nothing clips, overlaps or hovers" is checked)

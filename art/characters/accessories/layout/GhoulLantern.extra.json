@@ -1,0 +1,2 @@
+{ "GhoulLantern": { "light": { "color": [0.62, 1.0, 0.72], "range": 7, "brightness": 0.9, "at": [1.12, -1.335, -0.03], "flicker": true,
+    "note": "at the candle flame inside the lantern (Torso mount space). The lantern swings (Pendulum, fore and aft): if the light can ride a bone, put it on C0_2 (the lantern's own bone), else leave it at this rest position" } } }
