@@ -559,15 +559,22 @@ def edges():
     W, Hh = 1024, 576
     yy, xx = grid(W, Hh)
     e = np.minimum.reduce([xx / W, yy / Hh, 1 - xx / W, 1 - yy / Hh]) * 2   # 0 at the edge, 1 at the centre
-    # frost: fern-like crystals from fbm ridges, thick at the edges, fading inward
-    n1, n2, n3 = noise((Hh, W), 2.0, 61), noise((Hh, W), 6, 62), noise((Hh, W), 18, 63)
-    ridge = 1 - np.abs(n2 * 2 - 1)
-    fern = np.clip((ridge ** 6) * 1.6 + (1 - np.abs(n1 * 2 - 1)) ** 10 * 0.8, 0, 1)
-    reach = np.clip(1 - e / (0.22 + 0.18 * n3), 0, 1) ** 1.4
-    frost = np.clip(fern * reach * 1.3 + reach ** 3 * 0.35, 0, 1)
-    sparkle = (noise((Hh, W), 0.7, 64) > 0.93) * reach
-    rgb = np.dstack([0.86 + 0.1 * frost, 0.92 + 0.06 * frost, np.ones_like(frost)])
-    save(rgb, np.clip(frost * 0.85 + sparkle * 0.6, 0, 1), "FrostEdge.png")
+    # frost: a soft cold haze hugging the edges, with fine crystal veins growing in from the border (thin, bright,
+    # branching), deepest in the corners; the middle stays clear
+    corner = np.clip(1 - np.hypot(np.minimum(xx, W - 1 - xx) / (W * 0.5), np.minimum(yy, Hh - 1 - yy) / (Hh * 0.5)), 0, 1)
+    wob = noise((Hh, W), 22, 63)
+    reach = np.clip(1 - e / (0.16 + 0.10 * wob), 0, 1)
+    haze = reach ** 2.2 * 0.55 + corner ** 3 * 0.25
+    veins = np.zeros((Hh, W), f32)
+    for k, (sig, w) in enumerate(((1.2, 1.0), (2.2, 0.7), (4.0, 0.45))):
+        n = noise((Hh, W), sig, 70 + k)
+        ridge = 1 - np.abs(n * 2 - 1)
+        veins = np.maximum(veins, np.clip((ridge - 0.93) / 0.07, 0, 1) * w)
+    veins *= np.clip(1 - e / (0.28 + 0.12 * wob), 0, 1) ** 1.2
+    sparkle = (noise((Hh, W), 0.6, 64) > 0.965) * reach
+    frost = np.clip(haze + veins * 0.85 + sparkle * 0.5, 0, 1)
+    rgb = np.dstack([0.84 + 0.14 * veins, 0.91 + 0.08 * veins, np.ones_like(frost)])
+    save(rgb, frost * 0.9, "FrostEdge.png")
     # ink: turbulent dark bleed with feathered tendrils
     t = noise((Hh, W), 10, 71) * 0.6 + noise((Hh, W), 3, 72) * 0.4
     ink = np.clip(1 - e / (0.32 + 0.22 * t), 0, 1) ** 1.6
