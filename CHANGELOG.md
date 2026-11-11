@@ -2,6 +2,31 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.71.2] - 2026-11-10: Map place: the Settings menu and the top bar
+
+Owner: "Yes, port Settings". It's item 4 on the Map's low-priority list (`docs/Map-Core-Preview.md`).
+
+### Added (Map place, tagged NHCore)
+- **The Settings menu** (`Controllers.Gui.SettingsMenu`) and **`ServerScriptService.NHSettings`**, NH Combat Test's byte for byte.
+  - Tabs: Controls (rebind keys), Audio, Camera (FOV, camera shake, Reduce Motion, Reduce Flashing), Interface and Graphics.
+  - It opens from the top bar's Menu button.
+  - The server keeps each change through the Data stand-in's `SetSettings` (the shared `Functions.UpdateState`), so in the Map settings last for the session only.
+  - The Map's FOV, Fx, Cursor and DayCycle scripts already read these settings.
+- **The top bar** (`Controllers.Gui.TopBar`): the game's slim plate in the top-left corner, in place of Roblox's top bar.
+  - Its buttons: Menu, Chat, Students (Roblox's player list until the Students screen is ported) and Cinematic.
+  - **One Map adapter:** the Record, Locker and Study Group buttons are hidden while the Map doesn't have those screens (`Gui.Progress`, `Gui.Locker`, `Gui.StudyGroup`), and the row closes up. Each comes back by itself when its screen is ported. NH Combat Test's top bar didn't hide them (its buttons do nothing when the screen is missing).
+
+### Verified (Map place, local play-test, real clicks and keys)
+- **The top bar:** it showed Menu, Chat, Students and Cinematic, with Record, Locker and Study Group hidden. Roblox's top bar was off.
+- **Menu:** a click opened Settings on the Controls tab, with every key listed.
+- **Camera tab:**
+  - A click on the FOV slider moved it to 94 degrees, and the camera's FOV became 94 straight away.
+  - Reduce Motion on set `NHReducedMotion`, which the hair sway and other effects read.
+  - The change reached the server (all 15 values, FOV 94, through `NHSettings.Save`). The session copy itself couldn't be read from the test tools, which load their own copy of the Data module.
+- **Cinematic:** the top bar's Cinematic button hid every HUD (the top bar too) and showed the bars, and the real `\` key brought them back.
+- No errors.
+- **Not tried:** rebinding a key, the Audio, Interface and Graphics tabs, the Chat and Students buttons, and touch or gamepad.
+
 ## [1.71.1] - 2026-11-10: Map place: prompts, emotes, context animations, the creaking oaks
 
 Owner: "let's start porting some more things over to the map place (low > high priority)". The list, lowest priority first, is in `docs/Map-Core-Preview.md` (What the Map still lacks). This is its first batch: four client-only pieces that save nothing and touch no combat or money.
