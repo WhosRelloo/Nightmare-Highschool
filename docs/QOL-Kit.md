@@ -169,14 +169,21 @@ Each patched line in an existing script is marked `(kit 1.79)`.
 
 - **Two players:** another student returning your keys, or handing them in at the Office or a box (¥10), needs a two-player test server.
 - **The late pass:** "Too late, you're caught out" after the 3 s grace. Each test pass was still active when the next period began, and Testy then had no Yen for another one.
-- **Real meshes and art:** nothing has been seen in game yet. The meshes, maps and HUD art wait for the owner's upload (below), and the stand-ins show until then. The compass position and the final HUD layout with the real art were not play-tested; only the stand-in layout was.
-- **Use clips:** not published, so not seen playing.
+- **Real meshes and art:** in game since 1.80.1 (the lantern in hand, the chips, the compass bezel and needle; every model's maps in an Edit lineup). The other 11 items weren't each looked at in a hand in Play, and the compass dial card waits for `KitCompassFace`.
+- **Use clips:** published. The lantern's clip was seen playing (the hold steadier stood aside); the other 11 weren't each watched.
 - **The 3D needle:** it turns on the client, but that can't be seen on a stand-in model.
 - **The Chill's guard effect:** that posture recovers 25% slower is in the code but wasn't measured.
 - **Thermos stamina:** the +35 in a live match wasn't tried.
 - **Rain and the umbrella:** the umbrella keeping you dry in the rain wasn't tried with the two together.
 - **Testy's records:** spent ¥522 at the counters and has about ¥16 left. The kit's test state stays on that slot.
 - **Phones and touch screens:** the HUD wasn't checked on them.
+
+## Imported (1.80.1)
+
+- **Models:** the 12 FBX are imported. `ReplicatedStorage.NHKit.Models` is built from them (`E:/NH-Work/qol/src/assemble_kit_models.luau`, centres from `Config.KitHolds`); the imports are kept in `ServerStorage.NHKitImports`.
+- **Maps and art:** 47 maps and 22 HUD images are on, with their ids in `art/characters/qol/qol_ids.json` and `Config.Kit.Art`. All of them were moderated Completed before use.
+- **Use clips:** the 12 clips are in `Config.Kit.Anims`. The map, compass and umbrella clips play as you take them out; the keys turn at your dorm door.
+- **Still to upload:** `KitCompassFace.png` (not in the group yet) and the redrawn `KitFrostEdge.png`, both in `art/group-upload/kit-ui/`.
 
 ## For the owner
 

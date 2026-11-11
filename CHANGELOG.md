@@ -2,6 +2,29 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.80.1] - 2026-11-11: The everyday kit's real models, maps, art and animations
+
+The owner imported the 12 FBX, bulk-imported the maps and HUD art and published the 12 use clips.
+
+### Changed
+- **Real models:** `ReplicatedStorage.NHKit.Models` is built from the imports (all 18 MeshParts match the Blender layout in
+  size and orientation; the imports are kept in `ServerStorage.NHKitImports`), with 2048 PBR SurfaceAppearances (47 maps,
+  all moderated Completed before they went on), Glass and Neon pieces. The ids are in `art/characters/qol/qol_ids.json`.
+- **The HUD art** ids are in `Config.Kit.Art` (22 of 23): the brass compass bezel, needle and crystal, the plates and chips
+  with their icons, the timetable card, the map sheet, tiles and marks, the ink edge.
+- **The use clips** play (`Config.Kit.Anims`): the map unfold, compass flip and umbrella open as you take them out, the
+  rest when used, and the key turn at your dorm door. The eating clip now plays only where an item has no clip of its own.
+- The lantern's brass and glass no longer shade its own flame; the compass dial sits above the Yen plate; a redrawn,
+  fainter frost edge (`KitFrostEdge`, to re-upload).
+
+### Verified (Studio)
+- In Play on slot 4: the real lantern in hand with its maps, lit, its clip playing; the brass chip plates and icons and the
+  compass bezel and needle drawn from the uploaded art; every model's maps loaded (an Edit lineup of all 12).
+
+### Not done
+- `KitCompassFace` isn't in the group yet (the import didn't land): the compass shows a plain dial card until it is.
+  The redrawn `KitFrostEdge.png` needs uploading again (the first version looked blotchy in game).
+
 ## [1.80.0] - 2026-11-11: The everyday-carry kit (QOL items)
 
 Twelve held items, each with one small job, and four new systems the owner approved with them (`docs/QOL-Kit.md`).
