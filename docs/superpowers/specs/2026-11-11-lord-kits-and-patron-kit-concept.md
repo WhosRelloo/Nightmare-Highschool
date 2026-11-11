@@ -121,7 +121,7 @@ Effects stay readable in a fight and never cover other players. On low graphics,
 
 ## The other owner's kit: "The Sanguine Atelier"
 
-**The idea:** a noble vampire who is also the Ink Club's master artist, a patron-painter of the night court. It's classy, aristocratic and dark, painted in crimson. It's his alone: only his account can wear it, which the server checks.
+**The idea:** a noble vampire who is also the Ink Club's master artist, a patron-painter of the night court. It's classy, aristocratic and dark, painted in crimson. It's his alone: only his account (Roblox user **ocvp**, UserId **144647439**) can wear it, which the server checks by UserId.
 
 **Moderation rule:** Roblox warned us about blood once, so this kit is **crimson paint, ink and lacquer, never blood**.
 - The "blood art" look comes from crimson brushstrokes, splatters on canvas and on his gloves and hems, wine-dark velvet, red roses and gilded frames.
@@ -167,7 +167,6 @@ Effects stay readable in a fight and never cover other players. On low graphics,
 - **Roughly 50-55 pieces in all.** They'd be made in batches like the accessories kit, after that kit is finished.
 
 ## Questions for the owners
-- What is the other owner's Roblox account (user ID or name)? His kit is locked to that account.
 - Should the Lord kits unlock at Tier III, as proposed, or be sold or earned some other way?
 - Should students see other students' Lord auras, or only their own?
 - Should Gallery Mode's portrait keepsakes be keepable dorm decorations (Homes), or just a temporary item?
