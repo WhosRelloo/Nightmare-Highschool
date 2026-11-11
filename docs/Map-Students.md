@@ -128,6 +128,7 @@ Ideas for going further: `docs/NPC-Immersion-Ideas.md`.
   - 0.105 s between syllables (Authority is 15% slower).
   A player attribute `NHNpcVoices = false` mutes them.
 - **Rebuilding:** run the script again to regenerate the WAVs (the same seeds give the same sounds). Re-upload, then update the ids.
+- **Live since 1.78.4:** the 40 ids are in the config, read by name from the group's audio. To find them again, search Studio's group inventory for "NHVoice <Set>" (single-letter names like "A" don't match an exact search). The client preloads them on join.
 
 ## Tested (Map place, local play-test)
 

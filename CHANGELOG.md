@@ -2,6 +2,33 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.78.4] - 2026-11-10: Map place: the NPC voices are live
+
+Owner: "Uploaded them" (the 40 voice syllables of 1.78.3, bulk-imported into group 15981569).
+
+### Changed (Map place)
+- **`ReplicatedStorage.Config.NpcVoice`** now holds all 40 group-owned ids, read by name (`NHVoice_<Set>_<Syllable>`) through Studio's group inventory search:
+
+| Set | A | E | I | O | U | Uh | Ma | Ta | Ka | Hum |
+|---|---|---|---|---|---|---|---|---|---|---|
+| Boy | 131237050054388 | 87156408598215 | 129096454031327 | 108395011977391 | 74143210374563 | 132570907808433 | 129282736773827 | 98047340140837 | 92277825825270 | 134852160933803 |
+| Girl | 138979039040625 | 121091546292616 | 95405231909329 | 130419765906549 | 111169301964485 | 79879312675855 | 134093241527408 | 122140835776857 | 76151155915516 | 72782138333941 |
+| Enemy | 134094803287659 | 131175326649533 | 110709477106133 | 119565651952716 | 96299871731410 | 101751178788255 | 90165448712894 | 90731378544651 | 100704094834774 | 126225310010798 |
+| Authority | 133090988385590 | 73550303135302 | 70492928392856 | 133290063699722 | 130706352610429 | 108645578518299 | 109670224144005 | 103940842004450 | 132233328121342 | 127094415133369 |
+
+- **`Controllers.World.NpcLook`** preloads all 40 when a player joins, so the first line of a session is voiced too.
+
+### Verified (Map place)
+- **In Studio:** all 40 loaded (0.12 to 0.34 s, the files' own lengths).
+- **In a play-test**, a front-yard pair (a boy and a girl) talked through three conversations:
+  - 23 syllables, all their own voices (no fallback tick), each from the student's own set (Boy / Girl);
+  - one syllable played before its sound had loaded, which is why the preload was added.
+- **On the next run**, the client had all 40 fetched 4 s after joining.
+- No script errors.
+- **Not tried:**
+  - hearing them (the test tools can't hear: your ears decide);
+  - Enemy and Authority NPCs in game (none in the Map yet).
+
 ## [1.78.3] - 2026-11-10: NPC voices: four human-like voice sets, and calmer pacing (upload pending)
 
 Owner: "Make some custom sound effects for the voice blips", then "Make it sound more human like, and make variants for boys, girls, enemies, and authority npc's" and "make sure it isn't annoying".

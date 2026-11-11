@@ -338,6 +338,21 @@ function Shared.OnStart()
 		end)
 	end)
 	RunService.RenderStepped:Connect(step)
+	-- load every voice syllable up front, so the first line of the session is voiced too
+	task.spawn(function()
+		local List = {}
+		for _, Set in VoiceCfg.Sets or {} do
+			for _, Id in Set do
+				if (typeof(Id) == `number` or (typeof(Id) == `string` and Id ~= ``)) then
+					local Snd = Instance.new(`Sound`)
+					Snd.SoundId = if typeof(Id) == `number` then `rbxassetid://{Id}` else Id
+					table.insert(List, Snd)
+				end
+			end
+		end
+		if #List > 0 then pcall(function() game:GetService(`ContentProvider`):PreloadAsync(List) end) end
+		for _, Snd in List do Snd:Destroy() end
+	end)
 end
 
 -- tests read this
