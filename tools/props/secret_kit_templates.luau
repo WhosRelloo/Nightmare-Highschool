@@ -7,7 +7,7 @@
 --   Glow: candle-amber Neon with its PointLight, tagged NHCandle (Controllers.World.Ambient flickers it).
 --   Every grate, door, hatch, slide, lever and bust runs on the door kit system (tag NHDoor; Services.Features.Doors makes
 --   the prompt on the DoorPrompt attachment, Controllers.World.Doors moves the leaves): its leaves collide while shut and stop
---   colliding while open. Hinges come from art/props/secret_batch53.json (Blender x, y, z -> Roblox x, z, y), and each
+--   colliding while open. Hinges come from art/props/secret_batch53.json (Blender x, y, z -> Roblox -x, z, y), and each
 --   leaf's swing sign is picked so it opens the way the kit means (outward, up, down). The boards of BoardedPassage stay put
 --   (tag NHBoard, each with its fall-away SlideBy) until the board-prying gameplay is designed.
 local PK = [==[PK]==]
@@ -65,7 +65,7 @@ local RIG = {
 	FireplacePassage = { obj = "Fireplace", leaves = { Slide0 = { "slide", { 0, 2, 0 }, nil, { 0, 0, -6.3 } } } },
 }
 local BOARD_SLIDE = { 0, -1.5, -0.5 }
-local function rb(v) return Vector3.new(v[1], v[3], v[2]) end -- Blender (x, y, z) -> Roblox model space (x, z, y)
+local function rb(v) return Vector3.new(-v[1], v[3], v[2]) end -- Blender (x, y, z) -> Roblox model space (-x, z, y): the front (Blender -Y) is Roblox -Z, so X mirrors
 
 local KEY = { "ColorMap", "NormalMap", "RoughnessMap", "MetalnessMap" }
 local missing, mapsSet, precise, rigs = {}, 0, 0, {}
