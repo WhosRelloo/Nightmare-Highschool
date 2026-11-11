@@ -2,6 +2,30 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.76.0] - 2026-11-10: Admin capes: five 3D PBR capes for the admin kit
+
+Owner: higher-quality admin outfits, "better shaping, texturing, etc. with PBR textures". Classic Shirt and Pants templates can only carry one colour image, so the admin kit gets real shape and real PBR from five rigged 3D capes, worn through the cape system. The list was approved ("Yes, build all 5"). Full write-up: `docs/Admin-Capes.md`.
+
+### Added (NH Combat Test)
+- **Five staff-only capes**, one for each admin outfit:
+  - **Night Warden's Mantle:** a shoulder cape to mid-back in charcoal wool twill, a brass-edged standing collar, crimson silk lining, crimson piping, a brass key over a crimson crescent on the back, a chain clasp with the Warden's key.
+  - **Reaper's Tattered Shroud:** a cloak to the calf in weathered black-grey linen, the hood down on the back, a cowl, a torn sawtooth hem with ash dust and loose threads, mends stitched in crimson, a silver crescent brooch.
+  - **Duelist's Shoulder Cape:** crimson velvet over the left shoulder, a gold-embroidered vine border, black satin lining, a brass ring brooch and a gold cord across the chest.
+  - **Council Captain's Greatcape:** long crimson wool, black velvet lining, brass epaulettes with bullion fringe, a turn-down collar, brass chevron braid, the Council crest (crossed keys, a crescent, CONCILIUM) in gold on the back.
+  - **Midnight Lord's High-Collar Cape:** knee length with a bat-wing hem, black velvet with a damask of bats and crescents, crimson satin lining, a tall quilted collar piped in silver, a silver chain clasp with a crimson gem.
+- **How they're made** (`art/characters/capes/`): headless Blender builds the cloth as a real shell with lining and folds, a rig CapeSway already knows (Root > hinges > chains, 14 to 26 bones), 5.4k to 10.8k tris; 2048 colour, normal, roughness and metalness maps painted in studs per material (wool, velvet, satin, linen, brass, silver, gold thread) with baked AO. No blood.
+- **Staff-only:** `UI.Appearance.Capes` entries carry `Admin = true`. The Wardrobe's Cape row shows them only to staff and now wraps three to a line; the server's look check turns an admin cape from anyone else into no cape, in Studio too; `WearCape` skips them on a player who isn't staff. Not sold in the Spin Shop.
+- **Templates:** `ReplicatedStorage.NHCapes` (`NH_TorsoFit`, `NHAdminCape`), built by `tools/capes/assemble_admin_capes.luau` from the owner's group import.
+
+### Verified (Studio Play, slot 4 "Testy")
+**[PT-real]**
+- All five worn by real clicks in the creator's Wardrobe as staff, each at its fit on the torso and saved.
+- Not staff: the row hid them, and the server saved a forced admin cape as no cape.
+- Sway on the female body: 1.4 degrees at rest, 16.6 walking, 8.0 after a jump. On the male body: 15.5 walking.
+- All five textured in Studio over their outfits and in Play; nothing new in the console. Testy was put back to the Vamp Cape.
+
+**Not tried:** another player watching, the other body types, running and combat with a cape on, the Map place. On the Standard body an arm's top corner can poke through the shoulder roll when it swings, as with the other capes.
+
 ## [1.75.2] - 2026-11-10: Map place: change your character live
 
 Owner: "make it so changing your character works live in the Map place. Like for gender, eyes, skin color, etc."
