@@ -38,6 +38,28 @@
 - **Adding steps 3 and 4:** new arm, torso and leg meshes for each path and gender, about 3 paths × 2 steps × 5 meshes × 2 genders = 60 new meshes. The body-types session's pipeline makes them.
 - **Rules:** every step stays inside the R6 part boxes (the owner's rule: still R6 proportions), so clothing and animations keep working.
 
+## The owner's training animations (already made)
+
+The owner has animations for sit-ups, push-ups, pull-ups, the barbell and squats. Four are already in NH Combat Test, where `Features.AmbientNpcs` (the `ANIM` table) plays them on the ambient gym students:
+
+| Exercise | Area | Animation ids | What's missing |
+|---|---|---|---|
+| Push-ups | Arms | idle 111737875654076, rep 112288220550648 | nothing |
+| Pull-ups | Arms | idle 134151351487837, rep 115584556914404 | nothing |
+| Barbell | Arms and Torso | idle (holding the bar) 136973050103731 | a lift rep, if there is one |
+| Sit-ups | Torso | 132757288791974 (one looping rep) | a split idle and rep would make reps crisper |
+| Squats | Legs | not in the game yet | the id |
+
+These five are the **main minigames**, one exercise at its own station: a mat for push-ups and sit-ups, the gym's wall bars or a pull-up bar, a weight bench or rack for the barbell, a squat rack. Each player rep plays the rep animation once, and the idle holds between reps, so the body moves with every input. The minigames below are extras that add variety on top.
+
+| Area | Main | Extras |
+|---|---|---|
+| Arms | push-ups, pull-ups, barbell curls or press | heavy bag, rope climb, bell pull |
+| Torso | sit-ups, the barbell (deadlift or bench) | plank, medicine ball, stone lift |
+| Legs | squats (with the barbell on the back at higher levels) | stair sprint, jump rope |
+
+**How a rep works in the main five:** a ring shrinks around a brass gauge, and you press when it meets the mark (good, great, perfect). Each rep plays the rep animation, and a combo counter builds. At higher levels the ring speeds up and the windows narrow. "Heavy" reps (hold to grind) and "burnout" sets (as many reps as you can before a stamina bar runs out) mix in, and the weight on the bar visibly grows (plates added).
+
 ## The minigames
 
 These are original designs, not copies of another game. Each area has three minigames at different training spots. They all use the same three inputs (tap, hold or release, and direction keys), with gamepad and touch equivalents.
@@ -112,6 +134,7 @@ These are original designs, not copies of another game. Each area has three mini
 4. **Map place sync.**
 
 ## Questions for the owner
+- What is the squat animation id, and is there a barbell lift (rep) animation to go with the barbell idle?
 - Should training replace the admin Build row for players, with the row kept for staff only? Recommended: yes.
 - How fast should a dedicated player reach level 20 in one area? Suggested: about 2-3 weeks of daily play.
 - Should Heavy and Lean be choices players can aim for, or only side effects of how they eat and train? Suggested: side effects, with the Training page showing which way each area is drifting.
