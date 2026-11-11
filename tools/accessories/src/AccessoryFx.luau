@@ -12,6 +12,7 @@
 	  NHFlare (true): the glow flares for a moment when the wearer's character gets NHAdminFlare (a time, set by the
 	    server when an admin tool is used): the crimson sigil halo.
 	  NHTrail (true): its ParticleEmitters run only while the wearer walks (the shadow trail). Off with Reduce Motion.
+	  Any other ParticleEmitter on a piece (the mantle's drifting feathers) runs all the time, off with Reduce Motion.
 	  PointLights with NHFlicker: candle flicker.
 	Reduce Motion (player attribute NHReducedMotion): orbits at a third, no bob, the familiar only blinks, no trails.
 	Characters within MAX_DIST of the camera. The welds are changed on this client only (it's cosmetic).
@@ -59,9 +60,8 @@ local function newState(P: BasePart)
 		if L:IsA(`Light`) and L:GetAttribute(`NHFlicker`) then table.insert(S.Lights, { Light = L; Base = L.Brightness }) end
 	end
 	S.Emitters = {}
-	if P:GetAttribute(`NHTrail`) then
-		for _, E in P:GetDescendants() do if E:IsA(`ParticleEmitter`) then table.insert(S.Emitters, E) end end
-	end
+	S.TrailOnly = P:GetAttribute(`NHTrail`) == true
+	for _, E in P:GetDescendants() do if E:IsA(`ParticleEmitter`) then table.insert(S.Emitters, E) end end
 	local SA = P:FindFirstChildOfClass(`SurfaceAppearance`)
 	S.Flare = P:GetAttribute(`NHFlare`) == true and SA or nil
 	S.Pulse = tonumber(P:GetAttribute(`NHPulse`))   -- seconds per slow glow pulse
@@ -156,7 +156,8 @@ local function step(Dt: number)
 				local S = States[P]
 				if not S then
 					if not (P:GetAttribute(`NHOrbitAxis`) or P:GetAttribute(`NHBob`) or P:GetAttribute(`NHIdle`)
-						or P:GetAttribute(`NHFlare`) or P:GetAttribute(`NHTrail`) or P:GetAttribute(`NHPulse`) or P:FindFirstChildWhichIsA(`Light`, true)) then
+						or P:GetAttribute(`NHFlare`) or P:GetAttribute(`NHTrail`) or P:GetAttribute(`NHPulse`) or P:FindFirstChildWhichIsA(`Light`, true)
+						or P:FindFirstChildWhichIsA(`ParticleEmitter`, true)) then
 						continue
 					end
 					S = newState(P)
@@ -177,7 +178,7 @@ local function step(Dt: number)
 					local N = math.noise(T * 6, S.Phase) * 0.6 + math.noise(T * 17, S.Phase + 3) * 0.4
 					L.Light.Brightness = L.Base * (if Reduced then 0.95 + 0.05 * N else 0.82 + 0.18 * N)
 				end
-				for _, E in S.Emitters do E.Enabled = Moving and not Reduced end
+				for _, E in S.Emitters do E.Enabled = (Moving or not S.TrailOnly) and not Reduced end
 				if S.PulseSA and not S.Flare then
 					local K = 0.5 + 0.5 * math.sin(T * math.pi * 2 / math.max(S.Pulse, 0.5) + S.Phase)
 					S.PulseSA.EmissiveStrength = S.FlareBase * (if Reduced then 0.85 + 0.15 * K else 0.55 + 0.75 * K)

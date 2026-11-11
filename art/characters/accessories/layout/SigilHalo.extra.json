@@ -1,0 +1,28 @@
+{
+ "SigilHalo": {
+  "orbit": {
+   "axis": [
+    0,
+    0,
+    1
+   ],
+   "rpm": 1.5
+  },
+  "flare": true,
+  "light": {
+   "color": [
+    255,
+    30,
+    50
+   ],
+   "range": 6,
+   "brightness": 0.6,
+   "at": [
+    -0.0,
+    0.0,
+    0.95
+   ],
+   "flicker": false
+  }
+ }
+}

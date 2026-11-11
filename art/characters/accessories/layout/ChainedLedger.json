@@ -1,0 +1,402 @@
+{
+ "key": "ChainedLedger",
+ "name": "Floating chained ledger",
+ "atlas": 2048,
+ "pieces": {
+  "Ledger": {
+   "mount": "RightArm",
+   "kind": "Main",
+   "tris": 6200,
+   "fit": [
+    0.972865104675293,
+    0.32874685525894165,
+    -0.038705527782440186
+   ],
+   "size": [
+    0.804206371307373,
+    1.472493976354599,
+    0.5156671404838562
+   ],
+   "fit_body": {},
+   "bones": [
+    {
+     "name": "Root",
+     "head": [
+      1.059485673904419,
+      0.5768319964408875,
+      -0.027187135070562363
+     ],
+     "parent": null
+    },
+    {
+     "name": "Page1",
+     "head": [
+      1.0836522579193115,
+      0.5882023572921753,
+      -0.06586143374443054
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "Page2",
+     "head": [
+      1.0836522579193115,
+      0.5882023572921753,
+      -0.06586143374443054
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "Page3",
+     "head": [
+      1.0836522579193115,
+      0.5882023572921753,
+      -0.06586143374443054
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "Page4",
+     "head": [
+      1.0836522579193115,
+      0.5882023572921753,
+      -0.06586143374443054
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "Page5",
+     "head": [
+      1.0836522579193115,
+      0.5882023572921753,
+      -0.06586143374443054
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "Page6",
+     "head": [
+      1.0836522579193115,
+      0.5882023572921753,
+      -0.06586143374443054
+     ],
+     "parent": "Root"
+    }
+   ],
+   "hair_fit": {
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Straight_Bob": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Araya": [
+     1.0,
+     0.0
+    ],
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.0,
+     0.0
+    ]
+   }
+  },
+  "LedgerChain": {
+   "mount": "RightArm",
+   "kind": "Main",
+   "tris": 1412,
+   "fit": [
+    0.2372499704360962,
+    -0.414004921913147,
+    0.00028637051582336426
+   ],
+   "size": [
+    0.874500036239624,
+    0.1844642460346222,
+    1.0570468306541443
+   ],
+   "fit_body": {
+    "female": 0.871,
+    "lean": 0.8,
+    "athletic": 0.916,
+    "muscular": 0.999,
+    "stocky": 1.061,
+    "heavy": 0.938,
+    "petite": 0.8,
+    "toned": 0.875,
+    "curvy": 0.871,
+    "strong": 0.966,
+    "plus": 0.928
+   },
+   "hair_fit": {
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Straight_Bob": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Araya": [
+     1.0,
+     0.0
+    ],
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "a heavy black ledger floating open beside the right shoulder (it rides the right arm, outboard of it): leather boards with brass corners, a banded gilt-tooled spine, crimson-edged page blocks, six loose leaves that turn by themselves (Page1..Page6, idle Ledger), a clasp strap; a short iron chain from a staple ring at its foot down through a flat ring on an iron cuff on the right wrist (LedgerChain), held by a toggle bar (a toggle-and-ring fastening: it never touches the ring as the ledger bobs)",
+ "tris": 7612
+}

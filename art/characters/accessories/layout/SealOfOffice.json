@@ -1,0 +1,101 @@
+{
+ "key": "SealOfOffice",
+ "name": "Seal of Office",
+ "atlas": 2048,
+ "pieces": {
+  "SealOfOffice": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 10204,
+   "fit": [
+    -0.004118889570236206,
+    0.49814966320991516,
+    -0.01840236783027649
+   ],
+   "size": [
+    1.6671305298805237,
+    1.105700671672821,
+    1.1381952166557312
+   ],
+   "fit_body": {
+    "female": 0.906,
+    "lean": 0.856,
+    "athletic": 1.043,
+    "muscular": 1.124,
+    "stocky": 1.184,
+    "heavy": 1.181,
+    "petite": 0.865,
+    "toned": 0.972,
+    "curvy": 0.943,
+    "strong": 1.045,
+    "plus": 0.968
+   },
+   "hair_fit": {
+    "Females_Araya": null,
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": null,
+    "Females_Elegant_Bob_Cut": null,
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": null,
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": null,
+    "Females_Short_Mid_Part": null,
+    "Females_Side_Bun": null,
+    "Females_Side_Ponytail": null,
+    "Females_Straight_Bob": null,
+    "Females_Super_Long_Japanese_Hair": null,
+    "Females_Wavy_Y2k_Bob": null,
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": null,
+    "Males_Baki": null,
+    "Males_Black_Zoldyck_Hair": null,
+    "Males_Blonde_Emo_Scene_Messy": null,
+    "Males_Half_Up_Half_Down_Locs": null,
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": null,
+    "Males_Man_Bun": null,
+    "Males_Messy_Middle_Part": null,
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": null,
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": null,
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "a heavy chain of office round the shoulders and down the chest: gilt plaques with crimson and black enamel bosses alternating with brass S-links, to a large gilt medallion with a roped rim bearing the school crest on crimson enamel (crossed gilt keys, a brass crescent moon under a gilt crown, a black crow in the crescent's hollow). A torso layer above the sashes' (it lies on the chest top)",
+ "tris": 10204
+}

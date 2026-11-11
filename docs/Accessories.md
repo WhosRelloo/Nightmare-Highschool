@@ -13,7 +13,9 @@ R6 has no layered clothing, so every piece is a MeshPart riding one R6 part: eit
 Status: **in progress.** Batch 1 (uniform and school, 10 items, 18 store items) is in NH Combat Test and play-tested
 (1.79.0); two of its pieces were rebuilt after the play-test (the satchel and the Head Student's sash, see "The
 katana") and wait for the owner's import of `art/group-upload-accessories/batch1-fix/`; until then the game hides those
-two. The owner pre-approved every later batch "as long as they follow the standards" (2026-11-11).
+two. The owner pre-approved every later batch "as long as they follow the standards" (2026-11-11). **All of both kits is
+now built** (batches 2-8: 49 more items, 2026-11-11), checked together with 0 fails, and merged into
+`Config.Accessories`; they wait for the owner's import (see "Not done yet").
 
 ## Batches
 
@@ -25,10 +27,10 @@ two. The owner pre-approved every later batch "as long as they follow the standa
 | 4 | A 17-20 | hunter and armory: bandolier, pauldrons, gorget, bracers, gauntlets, back crossbow | **built, baked, 0 fails; staged** (`batch4/`) |
 | 5 | A 21-24 | magic: rune halo, orbiting sigils, a crow familiar, crystal pendant, potion belt | **built, baked, 0 fails; staged** (`batch5/`) |
 | 6 | A 25-28 | civilian: pocket watch, lace parasol, crook umbrella, candle lantern, knitted scarves (two colours) | **built, baked, 0 fails; staged** (`batch6/`) |
-| 7 | A 7 + B 2 | the Delinquents' long coat and the Headmaster's greatcoat (torso shell, sleeves on the arms, rigged split skirt) | being built |
-| Kit B | B 1, 3-11 | the rest of the regalia | being built |
+| 7 | A 7 + B 2 | the Delinquents' long coat and the Headmaster's greatcoat (torso shell, sleeves on the arms, rigged split coattails) | **built, baked, 0 fails; staged** (`batch7/`); hairs: see below |
+| 8 (Kit B) | B 1, 3-11 | the Headmaster's Circle: crow mantle, thorned crown, raven-skull pauldron, iron keys, shadow trail, chained ledger, sigil halo, seal of office, signet, staff, observer mask | **built, baked, 0 fails; staged** (`kitb/`) |
 
-### Batches 2 to 6 (built 2026-11-11, waiting for the owner's import)
+### Batches 2 to 8 (built 2026-11-11, waiting for the owner's import)
 
 Checked together with batch 1: `acc_check.py` **0 fails** over all 39 models (12 bodies, motion, sway limits, every
 pair that can be worn together, the admin capes, the katana, each hair at the piece's fit). Contact sheets:
@@ -53,6 +55,47 @@ What these batches added to the rules:
 - **A hood is a hat that reaches the shoulders**: its per-hair fits also keep it above the torso and out of the arms' swing (`acc_hoodfit.py`), which leaves 14 hairs.
 - **Shared space across batches** became exclusive pairs: the crow vs the fur, the shawl and the hood; the crystal pendant vs the torc and the opera clasp.
 - New slots: **Belt** (the potion belt) and **Watch** (the pocket watch); the bracers and gauntlets share **Arms**.
+
+### Batch 7 (the coats) and Kit B (built 2026-11-11)
+
+Final check over every built item (90 pieces, the katana and the five capes included, `--capes --hair`):
+**`CHECK done 0 fails`**. Contact sheets: `img/accessories/batch7_sheet.jpg`, `kitb_sheet.jpg`.
+
+| Item | Pieces, mount | Hairs (of 35) | Moves |
+|---|---|---|---|
+| Delinquent's Long Coat (Kit A 7, 1100) | shell (Torso), two sleeves (arms), two rigged coattails (Tails, locked fore-and-aft) | **4** (the shell) | the tails swing |
+| Headmaster's Greatcoat (Kit B 2) | the same build in velvet, crimson lining and turnbacks, a gilt crow on the back | **4** (the shell) | the tails swing |
+| Murder of Crows Mantle | feather mantle + two ember-eyed crows (Torso) | 6 | the crows look about, blink, flick their tails, settle their wings; a feather drifts off now and then |
+| Crown of Thorned Brass | Head | 17 | the stone's glow breathes; a small crimson light |
+| Raven-Skull Pauldron | left arm | 33 | ember eyes breathe |
+| Three Iron Keys | Torso, orbiting the head | 35 | orbit 3 rpm, bob |
+| Shadow Trail | a hidden anchor under the feet | 35 | dark smoke, a few feathers and rare embers while walking |
+| Floating Chained Ledger | the book and its chain (right arm, the chain through a ring on a wrist cuff) | 35 | bobs; the pages turn over one by one, then settle |
+| Crimson Sigil Halo | Head, behind it | 31 | turns in its own plane; **flares** when its wearer uses a staff teleport |
+| Seal of Office | Torso (chest top) | 9 | |
+| Headmaster's Signet | left hand | 35 | |
+| Staff of Office | held in front of the right hand | 35 | the raven head's eyes breathe |
+| Observer Half-Mask | Head | 13 | |
+
+- **Admin only:** every Kit B item is `Admin = true`, has no price and is never sold or owned. It shows only in the
+  Wardrobe's staff-only Admin tab, and the server refuses it on a non-staff player (the look check and `AccessoryWear`).
+- **Regalia colour:** each Kit B item has `Tint` (`Ember` or `Crimson`). While regalia is worn, `AccessoryWear` sets
+  `NHRegaliaTint` (Color3) and `NHRegalia` (the deciding item id) on the character: the most visible piece decides
+  (halo, shoulders, hat, coat, held, collar, trail, familiar, face, ring). The staff teleport flock reads it to take
+  the same colour (the teleport session's part; see "Not done yet").
+- **The halo's flare:** `Features.Fx.VeilMove` stamps `NHAdminFlare` (server time) on a staff member's character when
+  they teleport as their flock or move a student; an invisible staff member's move shows nothing (`install/patch_fx_flare.luau`).
+- **The coats' hair limit (owner decision):** the coat shells fit only 4 of 35 hairs; even short cuts rest on the
+  shoulder tops and the nape, where any coat goes. As built, putting on a coat refuses those hairs (and a hair change
+  takes the coat off). Trimming the shoulders and scooping the nape gets 12-14 hairs; a full scoop gets 19 but no longer
+  reads as a coat. Tails and sleeves fit all 35.
+- **Exclusive with the coats:** every cape, sashes, bags, shoulders, arms, lapel pins, hip pieces, the belt, the watch,
+  the crow familiar, the crystal pendant, the scarves, the torc, the fang necklace, the scythe pendant, the hood; and
+  the regalia mantle, seal, ledger, pauldron and staff. The ties, bow tie, choir collar, ruff and gorget are compatible.
+- **Kit B's own exclusions:** the mantle (neck, collar, sash, back, the crow familiar, the veiled toque, the hood);
+  the seal (sashes, bags, the tie, the pendants, the furs, the crow); the halo (the brimmed and veiled hats, the hood,
+  the Midnight collar); the ledger (arms, four capes); the staff (the blackened pauldrons, the Warden's mantle);
+  the raven pauldron (the veiled toque).
 
 ## The no-clipping rules (how "nothing clips, overlaps or hovers" is checked)
 
@@ -146,7 +189,7 @@ crosses. Hair sway (HairSway bends strands as you move) isn't part of the check;
 
 | Part | What |
 |---|---|
-| `ReplicatedStorage.Config.Accessories` | the item list (Id, Name, Slot, Model / Piece, Price, Gender, Clique, Admin), `Conflicts`, `Parse` / `Join` / `Resolve` / `Clean` / `CapeClash` |
+| `ReplicatedStorage.Config.Accessories` | the item list (Id, Name, Slot, Model / Piece, Price, Gender, Clique, Admin, Tint), every batch merged in (an item stays hidden until its template is in `NHAccessories`: `Ready`), `Conflicts`, `Parse` / `Join` / `Resolve` / `Clean` / `CapeClash` |
 | `ReplicatedStorage.UI.AccessoryWear` | wears the look's accessories: each piece on its R6 part, scaled to the part, deepened for the body type, fitted to the hair; Welds (so Height v2's stretch moves them) |
 | `UI.Appearance` | look field `Acc` (comma list of ids, one per slot); `Sanitize`; `ApplyTo` calls `AccessoryWear.Wear`; the server's look check (owned or free in Studio, gender, staff for `Admin`, hair fit, cape clashes) |
 | `Services.Player.Identity` | `Identity.Accessories`: owned ids (ProfileService through `SetIdentity`) |
@@ -154,7 +197,7 @@ crosses. Hair sway (HairSway bends strands as you move) isn't part of the check;
 | `Controllers.Gui.Wardrobe` | the **Accessories** tab and the staff-only **Admin** tab (a wardrobe station shows Outfit, Accessories, Admin) |
 | `Controllers.Gui.Enrollment` | the School Store's **Accessories** tab (the old stat-gear tab is now **Gear**) |
 | `Controllers.Character.AccessorySway` | swings rigged pieces: profiles Flutter, Loops, Pendulum, BackHang, Tails; keep-out (never toward the body) and axis locks |
-| `Controllers.Character.AccessoryFx` (1.79) | pieces' own motion and light: `NHOrbitAxis` / `NHOrbitRpm` (orbit about the mount), `NHBob`, `NHIdle` (a familiar's look / blink / tail / wings, a ledger's pages; bones in `NHIdleBones`), `NHPulse`, `NHFlare` (on `NHAdminFlare`), `NHTrail` (emitters while walking), flickering lights; Reduce Motion tones it down. Not used by batch 1 |
+| `Controllers.Character.AccessoryFx` (1.79) | pieces' own motion and light: `NHOrbitAxis` / `NHOrbitRpm` (orbit about the mount), `NHBob`, `NHIdle` (a familiar's look / blink / tail / wings, a ledger's pages; bones in `NHIdleBones`), `NHPulse`, `NHFlare` (on `NHAdminFlare`), `NHTrail` (emitters while walking; any other emitter runs all the time), flickering lights; Reduce Motion tones it down and stops every emitter. Not used by batch 1 |
 | `ReplicatedStorage.NHAccessories.<Item>` | templates (`tools/accessories/assemble_<batch>.luau` builds them from the owner's imports) |
 
 Template attributes on each piece: `NHMount`, `NHFit` (on the nominal R6 part), `NHFitBody`, `NHSway`, `NHSwayKeepOut`,
@@ -225,9 +268,16 @@ the drawn katana: it's hidden while a weapon is drawn).
 - A second play-test of the fixes above (the Held hide by a real draw, the barber taking a piece off, the store's 3D
   cards), a second player watching, NPCs (they don't wear accessories), combat animations (a swing of the sword
   isn't part of the check).
-- Batches 2 onward; the coats; Kit B; the crow-teleport colour tie-in with the regalia.
+- **Owner:** import `art/group-upload-accessories/batch2/` to `batch7/` and `kitb/` (FBX and maps) into group 15981569;
+  then the IDs are read by name and `acc_assemble.py <batch> <Items> --ids` builds each batch's templates, and each
+  batch is play-tested on slot 4. Until then none of batches 2-8 shows in the game.
+- **Owner decision:** the coats' hair limit (above).
+- The teleport flock taking `NHRegaliaTint` (Controllers.World.TpFlock, the staff teleport session's code).
+- Unverified until the import: the crows' and pages' bone axes and the page-turn direction, the emitters' look (they
+  are emitted from a point in a cone; sprites: the teleport feather and the place's VFX smoke), the hidden trail
+  anchor, every pulse and the halo's flare.
 - The Vamp / Rogue / Fur capes against accessories (measure in Studio); built hairstyles and outside catalog hairs
   (a default fit, unverified).
 - The Map place: `Config.Accessories`, `UI.AccessoryWear`, `Controllers.Character.AccessorySway` / `AccessoryFx`,
   `Services.Features.Accessories`, `ReplicatedStorage.NHAccessories`, and the `UI.Appearance`, `Player.Identity`,
-  `Gui.Wardrobe`, `Gui.Enrollment` patches (`tools/accessories/`).
+  `Gui.Wardrobe`, `Gui.Enrollment` and `Features.Fx` (`patch_fx_flare`) patches (`tools/accessories/`).

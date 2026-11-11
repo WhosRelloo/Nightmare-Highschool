@@ -1,0 +1,63 @@
+{
+ "Ledger": {
+  "idle": "Ledger",
+  "bob": 0.025,
+  "bones": {
+   "Page1": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": -142
+   },
+   "Page2": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": -142
+   },
+   "Page3": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": -142
+   },
+   "Page4": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": -142
+   },
+   "Page5": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": -142
+   },
+   "Page6": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": -142
+   }
+  },
+  "note": "the pages turn over the front of the book (right to left, as the reader sees it) one after another, then settle back. The chain is part of the Ledger (it bobs with it): its end passes down through the flat ring on the cuff (LedgerChain) and a toggle bar under it holds it, with room for the bob"
+ }
+}

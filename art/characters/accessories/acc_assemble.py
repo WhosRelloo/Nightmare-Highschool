@@ -62,6 +62,53 @@ def lua_str(s):
     return "\"" + s.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 
 
+# the regalia's sprites (Config.AdminTp's teleport feather; the place's VFX smoke) by an emitter's kind
+SPRITES = {"feather": "rbxassetid://112386227679173", "smoke": "rbxassetid://8527116276",
+           "spark": "rbxasset://textures/particles/sparkles_main.dds"}
+
+
+def lua_cseq(c, default=(0.05, 0.045, 0.06)):
+    """a colour or a list of colours (0..1 floats, or 0..255 ints) -> ColorSequence, keys evenly spaced"""
+    if not c:
+        c = [default]
+    if isinstance(c[0], (int, float)):
+        c = [c]
+    c = [[v / 255 if max(col) > 1 else v for v in col] for col in c]
+    if len(c) == 1:
+        return "ColorSequence.new(Color3.new(%.3f, %.3f, %.3f))" % tuple(c[0])
+    keys = [f"ColorSequenceKeypoint.new({i / (len(c) - 1):.3f}, Color3.new({x[0]:.3f}, {x[1]:.3f}, {x[2]:.3f}))" for i, x in enumerate(c)]
+    return "ColorSequence.new({ " + ", ".join(keys) + " })"
+
+
+def lua_nseq(v, default):
+    """[start, end] or [[t, value], ...] -> NumberSequence (first key at 0, last at 1)"""
+    v = v if v is not None else default
+    if isinstance(v[0], (int, float)):
+        v = [[0, v[0]], [1, v[1]]]
+    v = sorted(v)
+    v[0][0], v[-1][0] = 0, 1
+    return "NumberSequence.new({ " + ", ".join(f"NumberSequenceKeypoint.new({t:.3f}, {x:.3f})" for t, x in v) + " })"
+
+
+def lua_emitter(q, at):
+    kind = q.get("kind", "smoke")
+    tex = q.get("texture", "")
+    tex = tex if tex.startswith("rbx") else SPRITES.get(kind, SPRITES["smoke"])
+    sp = q.get("spread", (0.5, 0.05, 0.5))
+    sp = max(sp[0], sp[2]) if isinstance(sp, (list, tuple)) else float(sp) / 60
+    ang = min(80.0, 25.0 + 30.0 * sp)   # an area spread, emitted from a point: a wider cone for a wider area
+    d = str(q.get("direction", "up")).lower()
+    acc = q.get("acceleration", (0, 0, 0))
+    rot = q.get("rotation", (0, 360)); rs = q.get("rot_speed", q.get("rotation_speed", (0, 0)))
+    return ("{ Name = %s; Texture = %s; Color = %s; At = %s; Angle = %.1f; Rate = %.3f; Life = NumberRange.new(%.2f, %.2f); "
+            "Speed = NumberRange.new(%.3f, %.3f); Dir = %s; Acc = %s; Drag = %.2f; Size = %s; Trans = %s; Light = %.2f; "
+            "Rot = NumberRange.new(%.1f, %.1f); RotSpeed = NumberRange.new(%.1f, %.1f); Lock = %s }") % (
+        lua_str(q.get("name", "Emitter")), lua_str(tex), lua_cseq(q.get("color")), lua_v3(at), ang, float(q.get("rate", 3)),
+        *q.get("lifetime", (1, 2)), *q.get("speed", (0.2, 0.4)), lua_str("Bottom" if "down" in d else "Top"), lua_v3(acc),
+        float(q.get("drag", 1)), lua_nseq(q.get("size"), (0.3, 0)), lua_nseq(q.get("transparency"), (0.4, 1)),
+        float(q.get("light_emission", 0)), *rot, *rs, "true" if q.get("lock_to_part") else "false")
+
+
 for it in items:
     lay = json.load(open(os.path.join(ROOT, "layout", f"{it}.json")))
     xp = os.path.join(ROOT, "layout", f"{it}.extra.json")   # game-side behaviour (AccessoryFx): lights, orbit, idle...
@@ -104,6 +151,15 @@ for it in items:
                 lua_v3(Q.get("at", e["fit"])), float(Q.get("spread", 20)), float(Q.get("rate", 3)), *Q.get("lifetime", (1, 2)),
                 *Q.get("speed", (0.2, 0.4)), lua_str(Q.get("direction", "Up")), float(Q.get("drag", 1)), *Q.get("size", (0.3, 0)),
                 *Q.get("transparency", (0.6, 1)), float(Q.get("light_emission", 0)), *Q.get("rotation_speed", (0, 0))))
+        if x.get("emitters"):
+            # a hidden anchor's emitters sit on the anchor itself (the shadow trail's is at the ground, under the feet)
+            ems = [lua_emitter(q, [e["fit"][0], e["fit"][1] + 0.1, e["fit"][2]] if x.get("hidden") else q.get("at", e["fit"]))
+                   for q in x["emitters"]]
+            attrs.append("Emitters = { " + ", ".join(ems) + " }")
+        if x.get("hidden"):
+            attrs.append("Hidden = true")
+        if x.get("pulse"):
+            attrs.append(f"Pulse = {float(x['pulse']):.2f}")
         if x.get("flare"):
             attrs.append("Flare = true")
         if x.get("trail"):
@@ -216,6 +272,24 @@ for item, pieces in pairs(ITEMS) do
 			pe.Parent = at
 			at.Parent = p
 		end
+		for _, q in ipairs(a.Emitters or {}) do
+			local at = Instance.new("Attachment")
+			at.Name = "NHParticles"
+			at.Position = q.At - a.Fit
+			local pe = Instance.new("ParticleEmitter")
+			pe.Name = q.Name
+			pe.Texture, pe.Color, pe.Rate, pe.Lifetime, pe.Speed = q.Texture, q.Color, q.Rate, q.Life, q.Speed
+			pe.EmissionDirection = Enum.NormalId[q.Dir] or Enum.NormalId.Top
+			pe.SpreadAngle = Vector2.new(q.Angle, q.Angle)
+			pe.Acceleration, pe.Drag, pe.LightEmission = q.Acc, q.Drag, q.Light
+			pe.Rotation, pe.RotSpeed = q.Rot, q.RotSpeed
+			pe.Size, pe.Transparency = q.Size, q.Trans
+			pe.LockedToPart = q.Lock
+			pe.Parent = at
+			at.Parent = p
+		end
+		if a.Hidden then p.Transparency = 1 p.CastShadow = false end   -- an anchor for its effects only
+		if a.Pulse then p:SetAttribute("NHPulse", a.Pulse) end
 		if a.Orbit then p:SetAttribute("NHOrbitAxis", a.Orbit) p:SetAttribute("NHOrbitRpm", a.Rpm) end
 		if a.Bob then p:SetAttribute("NHBob", a.Bob) end
 		if a.Idle then p:SetAttribute("NHIdle", a.Idle) p:SetAttribute("NHIdleBones", a.Bones) end

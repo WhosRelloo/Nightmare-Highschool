@@ -19,6 +19,9 @@
 	              head), dz = lift; other pieces are 1,0 or x. "x" = that hair can't wear it. "*" = any other hair.
 	Worn as Model "NHAcc_<Slot>" (attribute NHAcc = item id) under the character. Admin items are skipped on a player
 	who isn't staff (previews and dummies with no player still show them).
+	Regalia colour (Kit B): while the character wears any Admin item, it carries NHRegaliaTint (Color3) and NHRegalia
+	(the item id that decided it): the tint of the most visible regalia worn (REGALIA_ORDER), so the staff teleport's
+	flock (Controllers.World.TpFlock) can take the same ember or crimson. Cleared when no regalia is worn.
 ]]
 local Players = game:GetService(`Players`)
 local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
@@ -28,6 +31,9 @@ local Cfg = require(ReplicatedStorage:WaitForChild(`Config`):WaitForChild(`Acces
 local Wear = {}
 local PART = { Torso = `Torso`; Head = `Head`; RightArm = `Right Arm`; LeftArm = `Left Arm`; RightLeg = `Right Leg`; LeftLeg = `Left Leg` }
 local NOMINAL_Y = { Torso = 2; Head = 1; RightArm = 2; LeftArm = 2; RightLeg = 2; LeftLeg = 2 }
+-- Kit B's two glows (the layouts' emissive tints): the crows' ember eyes and keys, the crimson sigil, crown and staff
+local REGALIA_TINT = { Ember = Color3.new(1, 0.34, 0.07); Crimson = Color3.new(0.92, 0.06, 0.12) }
+local REGALIA_ORDER = { `Halo`, `Shoulders`, `Hat`, `Coat`, `Hand`, `Collar`, `Trail`, `Familiar`, `Face`, `Ring` }
 
 -- the wearer's hair key for NHHairFit: the catalog hair's RigSource, "Built" for the built hairstyles, "*" otherwise
 function Wear.HairKey(HairId: number?): string
@@ -80,6 +86,8 @@ function Wear.Clear(Character: Model)
 	for _, C in Character:GetChildren() do
 		if C:IsA(`Model`) and C:GetAttribute(`NHAcc`) ~= nil then C:Destroy() end
 	end
+	Character:SetAttribute(`NHRegalia`, nil)
+	Character:SetAttribute(`NHRegaliaTint`, nil)
 end
 
 -- the pieces an item wears (one named piece, or every MeshPart of its model)
@@ -179,6 +187,14 @@ function Wear.Wear(Character: Model, Acc: string?, BodyId: string?, HairId: numb
 		end
 		Holder.Parent = Character
 	end
+	local TintId = nil
+	for _, Slot in REGALIA_ORDER do
+		local H = Character:FindFirstChild(`NHAcc_{Slot}`)
+		local It = H and Cfg.ById[H:GetAttribute(`NHAcc`)]
+		if It and It.Admin and REGALIA_TINT[It.Tint] then TintId = It.Id break end
+	end
+	Character:SetAttribute(`NHRegalia`, TintId)
+	Character:SetAttribute(`NHRegaliaTint`, if TintId then REGALIA_TINT[Cfg.ById[TintId].Tint] else nil)
 end
 
 return Wear

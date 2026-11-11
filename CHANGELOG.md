@@ -2,6 +2,39 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.83.0] - 2026-11-11: 3D accessories, batches 2-8 built (both kits complete, waiting for the import)
+
+The rest of Kit A and all of Kit B, "The Headmaster's Circle" (`docs/Accessories.md`). Owner: "complete all of the
+batches for this. I approve all of them as long as they follow the standards". 49 more items, all 2048 PBR bakes at 64
+samples on the GPU, checked together with batch 1, the katana, the five admin capes and every rigged hair: 0 fails.
+
+### Added
+- **Kit A 7-28** (batches 2-7): hats (tricorn, top hat, bowler, veiled mourning toque, fascinator, witch hat, hunter's
+  wide-brim), three masquerade half-masks, the race-flavoured pieces (opera clasp, bat signet, moonstone torc, wolf-fang
+  necklace, torn fur, ghoul's hook lantern, grave-moss shawl, tattered hood, scythe pendant; cosmetic only), the hunter
+  and armory set (bandolier, pauldrons, gorget, bracers, gauntlets, back crossbow), magic (rune halo, orbiting sigils, a
+  crow familiar, caged crystal pendant, potion belt), civilian (pocket watch, crook umbrella, lace parasol, candle
+  lantern, two knitted scarves) and the Delinquent's Long Coat (shell, sleeves and rigged coattails).
+- **Kit B, staff only, never sold** (`Admin = true`, the Wardrobe's Admin tab): the Headmaster's Greatcoat, a mantle with
+  two ember-eyed crows that look about and blink, a thorned brass crown, a raven-skull pauldron, three orbiting iron
+  keys, a shadow trail (smoke and feathers while walking), a floating chained ledger whose pages turn, a crimson sigil
+  halo, the seal of office, the signet, the staff of office and the observer half-mask.
+- **Regalia colour:** a character wearing regalia carries `NHRegaliaTint` (ember or crimson, from the most visible piece)
+  for the staff teleport flock to match. **The halo's flare:** a staff teleport (as the flock, or moving a student)
+  stamps `NHAdminFlare` and the sigil halo flares.
+- `Config.Accessories` now holds all 67 items and 120 exclusive pairs (each measured). An item stays hidden until its
+  template is in `ReplicatedStorage.NHAccessories`.
+
+### Changed
+- `Controllers.Character.AccessoryFx`: every accessory emitter stops with Reduce Motion (not only the trail's).
+- `acc_assemble.py` builds emitter lists (colour, size and transparency curves), hidden anchors and glow pulses.
+
+### Not done
+- The owner's import of `art/group-upload-accessories/batch2/` to `batch7/` and `kitb/`; then each batch is assembled
+  and play-tested on slot 4. Nothing of batches 2-8 is visible in the game until then.
+- **Owner decision:** the coat shells fit 4 of 35 hairs (see the doc).
+- The teleport flock reading `NHRegaliaTint`; the Map place.
+
 ## [1.82.0] - 2026-11-11: the misc signs kit (props batch 50)
 
 Blank sign bases and a set of icons the builder mixes and matches (`docs/Signs-Kit.md`, `docs/School-Props.md` Batch 50).

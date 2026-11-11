@@ -1,0 +1,160 @@
+{
+ "key": "SigilHalo",
+ "name": "Crimson sigil halo",
+ "atlas": 2048,
+ "pieces": {
+  "SigilHalo": {
+   "mount": "Head",
+   "kind": "Main",
+   "tris": 8832,
+   "fit": [
+    -0.0,
+    0.0,
+    0.949999988079071
+   ],
+   "size": [
+    1.9140697717666626,
+    1.8042025566101074,
+    0.04160010814666748
+   ],
+   "fit_body": {},
+   "hair_fit": {
+    "Females_Araya": [
+     1.02,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.06,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.02,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.02,
+     0.0
+    ],
+    "Females_Femkuna": [
+     1.02,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": [
+     1.02,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": null,
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": [
+     1.02,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.02,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.04,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": [
+     1.02,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.06,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.02,
+     0.0
+    ],
+    "Females_Side_Ponytail": [
+     1.06,
+     0.0
+    ],
+    "Females_Straight_Bob": [
+     1.02,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.02,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.02,
+     0.0
+    ],
+    "Females_Wolf_Cut": [
+     1.06,
+     0.0
+    ],
+    "Males_Anime_Hero_Hair": [
+     1.18,
+     0.0
+    ],
+    "Males_Baki": [
+     1.06,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.08,
+     0.02
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.02,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.04,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.02,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.02,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.32,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.2,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": [
+     1.02,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.02,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.02,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.02,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.28,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "a ring of twelve blackened-brass segments carved with raised crimson glowing runes on both faces, gilt rims, studs and long and short rays; inside it, round the head, a gilt ring with an eight-pointed crimson star and a crimson eye in a gilt crescent at its heart. Floats behind the head and spins slowly about the head's forward axis; flares when an admin tool is used",
+ "tris": 8832,
+ "glow": [
+  0.92,
+  0.06,
+  0.12
+ ]
+}

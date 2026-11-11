@@ -1,0 +1,20 @@
+{
+ "ThornCrown": {
+  "pulse": 3.0,
+  "light": {
+   "color": [
+    255,
+    40,
+    60
+   ],
+   "range": 4,
+   "brightness": 0.5,
+   "at": [
+    -0.0,
+    0.364,
+    -0.658
+   ],
+   "flicker": false
+  }
+ }
+}

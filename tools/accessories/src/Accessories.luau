@@ -55,6 +55,64 @@ Accessories.Items = {
 	-- 6: choir collar and ruff
 	{ Id = `collar-choir`; Name = `Choir Collar`; Slot = `Collar`; Model = `ChoirCollar`; Price = 260; Kit = A };
 	{ Id = `collar-ruff`; Name = `Falling Ruff`; Slot = `Collar`; Model = `Ruff`; Price = 320; Kit = A };
+	-- Kit A 8: tricorn, top hat and bowler, each with a crimson band
+	{ Id = `hat-tricorn`; Name = `Crimson-Banded Tricorn`; Slot = `Hat`; Model = `Hats`; Piece = `Tricorn`; Price = 450; Kit = A };
+	{ Id = `hat-top`; Name = `Crimson-Banded Top Hat`; Slot = `Hat`; Model = `Hats`; Piece = `TopHat`; Price = 500; Kit = A };
+	{ Id = `hat-bowler`; Name = `Crimson-Banded Bowler`; Slot = `Hat`; Model = `Hats`; Piece = `Bowler`; Price = 400; Kit = A };
+	-- 9: veiled mourning hat and fascinator (feminine, by the clothing kits' gender rule)
+	{ Id = `hat-mourning`; Name = `Veiled Mourning Toque`; Slot = `Hat`; Model = `MourningHats`; Pieces = { `MourningToque`, `MourningVeil` }; Price = 550; Gender = `Female`; Kit = A };
+	{ Id = `hat-fascinator`; Name = `Crimson Fascinator`; Slot = `Hat`; Model = `MourningHats`; Pieces = { `Fascinator`, `FascVeil` }; Price = 480; Gender = `Female`; Kit = A };
+	-- 10, 11: the crooked witch hat, the hunter's wide-brim
+	{ Id = `hat-witch`; Name = `Crooked Witch Hat`; Slot = `Hat`; Model = `WitchHat`; Price = 520; Kit = A };
+	{ Id = `hat-hunter`; Name = `Hunter's Wide-Brim`; Slot = `Hat`; Model = `HunterHat`; Price = 600; Kit = A };
+	-- 12: masquerade half-masks
+	{ Id = `mask-lace`; Name = `Black Lace Half-Mask`; Slot = `Face`; Model = `Masks`; Pieces = { `LaceMask`, `LaceMaskTrim` }; Price = 380; Kit = A };
+	{ Id = `mask-bone`; Name = `Carved Bone Half-Mask`; Slot = `Face`; Model = `Masks`; Piece = `BoneMask`; Price = 420; Kit = A };
+	{ Id = `mask-gilt`; Name = `Gilt Half-Mask`; Slot = `Face`; Model = `Masks`; Piece = `GiltMask`; Price = 650; Kit = A };
+	-- Kit A 13-16: race-flavoured pieces (batch 3; cosmetic only, anyone may wear them, Race is never set from them)
+	{ Id = `clasp-opera`; Name = `Opera-Cape Clasp`; Slot = `Collar`; Model = `OperaClasp`; Price = 520; Race = `Vampire`; Kit = A };
+	{ Id = `ring-bat-signet`; Name = `Bat Signet Ring`; Slot = `Ring`; Model = `BatSignet`; Price = 380; Race = `Vampire`; Kit = A };
+	{ Id = `torc-moonstone`; Name = `Moonstone Torc`; Slot = `Collar`; Model = `MoonTorc`; Price = 480; Race = `Werewolf`; Kit = A };
+	{ Id = `necklace-wolf-fang`; Name = `Wolf-Fang Necklace`; Slot = `Neck`; Model = `FangNecklace`; Price = 260; Race = `Werewolf`; Kit = A };
+	{ Id = `fur-torn`; Name = `Torn Shoulder Fur`; Slot = `Shoulders`; Model = `TornFur`; Price = 650; Race = `Werewolf`; Kit = A };
+	{ Id = `lantern-ghoul`; Name = `Ghoul's Hook Lantern`; Slot = `Hip`; Model = `GhoulLantern`; Price = 720; Race = `Ghoul`; Kit = A };
+	{ Id = `shawl-grave-moss`; Name = `Grave-Moss Shawl`; Slot = `Shoulders`; Model = `MossShawl`; Price = 560; Race = `Ghoul`; Kit = A };
+	{ Id = `hood-tattered`; Name = `Tattered Specter Hood`; Slot = `Hat`; Model = `TatteredHood`; Price = 850; Race = `Specter`; Kit = A };
+	{ Id = `pendant-scythe`; Name = `Scythe Pendant`; Slot = `Neck`; Model = `ScythePendant`; Price = 300; Race = `Specter`; Kit = A };
+	{ Id = `bandolier-hunter`; Name = `Hunter's Bandolier`; Slot = `Sash`; Model = `Bandolier`; Price = 650; Kit = A };
+	{ Id = `pauldrons-blackened`; Name = `Blackened Steel Pauldrons`; Slot = `Shoulders`; Model = `Pauldrons`; Price = 850; Kit = A };
+	{ Id = `gorget-steel`; Name = `Riveted Steel Gorget`; Slot = `Collar`; Model = `Gorget`; Price = 550; Kit = A };
+	{ Id = `bracers-hunter`; Name = `Hunter's Bracers`; Slot = `Arms`; Model = `Bracers`; Price = 450; Kit = A };
+	{ Id = `gauntlets-hunter`; Name = `Hunter's Gauntlets`; Slot = `Arms`; Model = `Gauntlets`; Price = 600; Kit = A };
+	{ Id = `crossbow-hunter`; Name = `Hunter's Crossbow`; Slot = `Back`; Model = `Crossbow`; Price = 900; Kit = A };
+	-- batch 5: magic (Kit A 21-24)
+	{ Id = `halo-rune`; Name = `Floating Rune Halo`; Slot = `Halo`; Model = `RuneHalo`; Piece = `RuneHalo`; Price = 850; Kit = A };
+	{ Id = `sigils-orbiting`; Name = `Orbiting Sigils`; Slot = `Halo`; Model = `OrbitSigils`; Piece = `OrbitSigils`; Price = 900; Kit = A };
+	{ Id = `familiar-crow`; Name = `Crow Familiar`; Slot = `Familiar`; Model = `CrowFamiliar`; Piece = `Crow`; Price = 800; Kit = A };
+	{ Id = `pendant-crystal`; Name = `Caged Crystal Pendant`; Slot = `Neck`; Model = `CrystalPendant`; Piece = `CrystalPendant`; Price = 450; Kit = A };
+	{ Id = `belt-potion`; Name = `Potion Belt`; Slot = `Belt`; Model = `PotionBelt`; Piece = `PotionBelt`; Price = 550; Kit = A };
+	-- Kit A 25-28: civilian (batch 6)
+	{ Id = `watch-pocket`; Name = `Brass Pocket Watch`; Slot = `Watch`; Model = `PocketWatch`; Price = 480; Kit = A };
+	{ Id = `umbrella-crook`; Name = `Crook Umbrella`; Slot = `Hand`; Model = `Umbrellas`; Piece = `CrookUmbrella`; Price = 320; Kit = A };
+	{ Id = `parasol-lace`; Name = `Lace Parasol`; Slot = `Hand`; Model = `Umbrellas`; Piece = `LaceParasol`; Price = 420; Kit = A };
+	{ Id = `lantern-candle`; Name = `Candle Lantern`; Slot = `Hand`; Model = `CandleLantern`; Price = 560; Kit = A };
+	{ Id = `scarf-knit-crimson`; Name = `Crimson Striped Scarf`; Slot = `Neck`; Model = `Scarves`; Piece = `ScarfStripe`; Price = 260; Kit = A };
+	{ Id = `scarf-knit-violet`; Name = `Grey-Violet Scarf`; Slot = `Neck`; Model = `Scarves`; Piece = `ScarfViolet`; Price = 260; Kit = A };
+	-- Kit A 7 and Kit B 2: the coats (batch 7; one coat builder: shell, sleeves, rigged coattails worn together)
+	{ Id = `coat-delinquent`; Name = `Delinquent's Long Coat`; Slot = `Coat`; Model = `LongCoat`; Pieces = { `LongCoatShell`, `LongCoatTailL`, `LongCoatTailR`, `LongCoatSleeveL`, `LongCoatSleeveR` }; Price = 1100; Kit = A };
+	{ Id = `regalia-greatcoat`; Name = `Headmaster's Greatcoat`; Slot = `Coat`; Model = `Greatcoat`; Pieces = { `GreatcoatShell`, `GreatcoatTailL`, `GreatcoatTailR`, `GreatcoatSleeveL`, `GreatcoatSleeveR` }; Admin = true; Tint = `Crimson`; Kit = B };
+	-- Kit B "The Headmaster's Circle" (batch 8): the admin regalia, staff only, never sold (the greatcoat, Kit B 2, is in the coat batch)
+	{ Id = `regalia-crow-mantle`; Name = `Murder of Crows Mantle`; Slot = `Shoulders`; Model = `CrowMantle`; Pieces = { `CrowMantle`, `MantleCrows` }; Admin = true; Tint = `Ember`; Kit = B };
+	{ Id = `regalia-thorn-crown`; Name = `Crown of Thorned Brass`; Slot = `Hat`; Model = `ThornCrown`; Piece = `ThornCrown`; Admin = true; Tint = `Crimson`; Kit = B };
+	{ Id = `regalia-raven-pauldron`; Name = `Raven-Skull Pauldron`; Slot = `Shoulders`; Model = `RavenPauldron`; Piece = `RavenPauldron`; Admin = true; Tint = `Ember`; Kit = B };
+	{ Id = `regalia-iron-keys`; Name = `Three Iron Keys`; Slot = `Halo`; Model = `IronKeys`; Piece = `IronKeys`; Admin = true; Tint = `Ember`; Kit = B };
+	{ Id = `regalia-shadow-trail`; Name = `Shadow Trail`; Slot = `Trail`; Model = `ShadowTrail`; Piece = `ShadowTrail`; Admin = true; Tint = `Ember`; Kit = B };
+	{ Id = `regalia-chained-ledger`; Name = `Floating Chained Ledger`; Slot = `Familiar`; Model = `ChainedLedger`; Pieces = { `Ledger`, `LedgerChain` }; Admin = true; Tint = `Crimson`; Kit = B };
+	{ Id = `regalia-sigil-halo`; Name = `Crimson Sigil Halo`; Slot = `Halo`; Model = `SigilHalo`; Piece = `SigilHalo`; Admin = true; Tint = `Crimson`; Kit = B };
+	{ Id = `regalia-seal-of-office`; Name = `Seal of Office`; Slot = `Collar`; Model = `SealOfOffice`; Piece = `SealOfOffice`; Admin = true; Tint = `Crimson`; Kit = B };
+	{ Id = `regalia-signet`; Name = `Headmaster's Signet`; Slot = `Ring`; Model = `HeadSignet`; Piece = `HeadSignet`; Admin = true; Tint = `Crimson`; Kit = B };
+	{ Id = `regalia-staff`; Name = `Staff of Office`; Slot = `Hand`; Model = `OfficeStaff`; Piece = `OfficeStaff`; Admin = true; Tint = `Crimson`; Kit = B };
+	{ Id = `regalia-observer-mask`; Name = `Observer Half-Mask`; Slot = `Face`; Model = `ObserverMask`; Piece = `ObserverMask`; Admin = true; Tint = `Crimson`; Kit = B };
 }
 
 -- Pairs that can't be worn together because they'd pass through each other (measured by
@@ -77,6 +135,118 @@ Accessories.Conflicts = {
 	{ `cape:CapeDuelist`, `Lapel` };   -- the Duelist's cape crosses the left chest
 	{ `cape:CapeDuelist`, `tie-bow` };
 	{ `cape:CapeWardenMantle`, `Neck` };   -- the Warden's mantle closes over the throat
+	-- (items_batch2)
+	{ `cape:CapeMidnight`, `Hat` };   -- the Midnight Lord's high collar meets the brims at their hair fits (tricorn, top hat, hunter, witch, veils; acc_hatcapes.py)
+	{ `hat-mourning`, `cape:*` };     -- the mourning veil drapes to the shoulders, onto every cape's collar
+	{ `familiar-crow`, `hat-mourning` };   -- the veil drapes to the shoulders, where the crow perches (cross-batch check)
+	-- (items_batch3)
+	{ `clasp-opera`, `tie-school` };      -- the clasp's chains cross the throat where a tie's knot stands (deep chests push the knot through them)
+	{ `clasp-opera`, `tie-bow` };         -- the bow's loops fill the space between the two clasps
+	{ `necklace-wolf-fang`, `Sash` };     -- the fangs and beads hang on the chest where a sash crosses
+	{ `pendant-scythe`, `Sash` };         -- so does the scythe
+	{ `cape:*`, `necklace-wolf-fang` };   -- every cape's collar lies on the torso top round the neck, where the cords run
+	{ `cape:*`, `pendant-scythe` };
+	{ `fur-torn`, `Back` };               -- the mantles cover the shoulders and the upper back, where bag straps cross
+	{ `fur-torn`, `Sash` };
+	{ `cape:*`, `fur-torn` };
+	{ `shawl-grave-moss`, `Back` };
+	{ `shawl-grave-moss`, `Sash` };
+	{ `cape:*`, `shawl-grave-moss` };
+	{ `hood-tattered`, `fur-torn` };      -- the hood's cowl rests on the shoulders, inside the fur's pile
+	{ `cape:CapeWardenMantle`, `hood-tattered` };   -- four of the capes rise round the neck into the cowl
+	{ `cape:CapeReaperShroud`, `hood-tattered` };
+	{ `cape:CapeCaptain`, `hood-tattered` };
+	{ `cape:CapeMidnight`, `hood-tattered` };
+	-- (items_batch4)
+	{ `gorget-steel`, `Neck` };   -- the gorget's top lame covers the throat and the knot
+	{ `gorget-steel`, `Sash` };   -- its crescent lames cover the chest top where every sash and the bandolier cross
+	{ `cape:*`, `Shoulders` };    -- every cape hangs over both shoulders, where the pauldrons sit
+	{ `gauntlets-hunter`, `Ring` };   -- the back-of-hand plate and knuckle lames cover the hand where a ring is worn
+	-- (items_batch5)
+	{ `familiar-crow`, `Sash` };       -- the crow perches on the left shoulder top, where both sashes cross it
+	{ `familiar-crow`, `Back` };       -- and where the satchel's and the messenger bag's straps cross it
+	{ `familiar-crow`, `cape:*` };     -- every cape lies over both shoulder tops
+	{ `belt-potion`, `bag-messenger` };   -- the messenger bag sits on the lower back across the belt line
+	{ `belt-potion`, `tie-school` };      -- the tie's blade hangs past the belt line (fitted to the chest, it stands off the waist)
+	{ `pendant-crystal`, `cape:*` };      -- the chain lies round the neck on the shoulder tops, under every cape's collar
+	{ `halo-rune`, `Hat` };              -- hats are scaled and lifted per hair; the tall ones reach up through the halo
+	{ `sigils-orbiting`, `hat-hunter` };   -- measured: under the hunter hat's hair fits (5 hairs) its brim meets the orbit
+	{ `sigils-orbiting`, `hat-witch` };    -- and the witch hat's brim (4 hairs)
+	{ `familiar-crow`, `fur-torn` };          -- (cross-batch check) the crow perches where the fur lies on the shoulder
+	{ `familiar-crow`, `shawl-grave-moss` };  -- and the shawl
+	{ `familiar-crow`, `hood-tattered` };     -- and the hood's cowl
+	{ `pendant-crystal`, `torc-moonstone` };  -- the chain runs round the neck where the torc sits
+	{ `pendant-crystal`, `clasp-opera` };     -- and through the opera clasp's chains
+	-- (items_batch6)
+	{ `cape:*`, `scarf-knit-crimson` };   -- every cape's collar and shoulders lie where the scarf's roll goes round the neck
+	{ `cape:*`, `scarf-knit-violet` };
+	{ `scarf-knit-crimson`, `Collar` };   -- (measured against batches 3-5) the torc and the opera clasp sit round the throat in the roll
+	{ `scarf-knit-violet`, `Collar` };
+	{ `scarf-knit-crimson`, `bandolier-hunter` };   -- the bandolier's thick strap crosses the chest under both tails
+	{ `scarf-knit-violet`, `bandolier-hunter` };
+	{ `scarf-knit-crimson`, `belt-potion` };   -- the long tail hangs past the belt line
+	{ `scarf-knit-violet`, `belt-potion` };
+	{ `scarf-knit-crimson`, `hood-tattered` };   -- the hood's cowl rests on the shoulders where the roll goes
+	{ `scarf-knit-violet`, `hood-tattered` };
+	{ `scarf-knit-crimson`, `familiar-crow` };   -- the crow perches on the left shoulder top, on the roll
+	{ `scarf-knit-violet`, `familiar-crow` };
+	{ `watch-pocket`, `belt-potion` };   -- the watch hangs at the waist front across the belt line
+	-- (items_batch7)
+	{ `cape:*`, `Coat` };            -- every cape hangs over the shoulders and the back, over the coat's collar and shoulders
+	{ `Coat`, `Sash` };              -- the sashes and the bandolier cross the shoulder top and the back under the coat
+	{ `Coat`, `Back` };              -- the bag straps and the crossbow's sling cross the shoulder and the back; the satchel hangs on the right tail
+	{ `Coat`, `Shoulders` };         -- the pauldrons sit on the sleeves' shoulder caps; the furs and mantles on the collar
+	{ `Coat`, `Arms` };              -- the bracers and gauntlets wrap the forearm inside the sleeve
+	{ `Coat`, `Lapel` };             -- the clique pins sit on the left breast, under the coat's front panel
+	{ `Coat`, `Hip` };               -- the grimoire and the hook lantern hang beside the right hip, where the right tail hangs
+	{ `Coat`, `Belt` };              -- the potion belt goes round the waist under the shell
+	{ `Coat`, `Watch` };             -- the pocket watch hangs at the right front, under the front panel
+	{ `Coat`, `familiar-crow` };     -- the crow perches on the left shoulder, on the collar
+	{ `Coat`, `pendant-crystal` };   -- the chain lies round the neck on the shoulder tops, under the collar
+	{ `Coat`, `scarf-knit-crimson` };   -- the scarf's roll lies round the neck on the collar, its tails over the lapels
+	{ `Coat`, `scarf-knit-violet` };
+	{ `Coat`, `torc-moonstone` };       -- (coat helper, measured) the shell's collar sits where the torc does
+	{ `Coat`, `necklace-wolf-fang` };   -- the shell covers the cord
+	{ `Coat`, `pendant-scythe` };       -- and the chain
+	{ `Coat`, `hood-tattered` };        -- the hood's cowl lies on the shoulders under the collar
+	-- (items_kitb)
+	{ `regalia-crow-mantle`, `Neck` };      -- the mantle closes over the throat (its iron clasp) and lies round the neck where the ties, scarves and pendant chains go
+	{ `regalia-crow-mantle`, `Collar` };    -- the collars, torc and chain of office lie round the neck under its feathers
+	{ `regalia-crow-mantle`, `Sash` };      -- the sashes and the bandolier cross the left shoulder under the feathers and the crow
+	{ `regalia-crow-mantle`, `Back` };      -- the bag and crossbow straps cross the shoulders under it
+	{ `regalia-crow-mantle`, `familiar-crow` };   -- the familiar perches on the left shoulder, where crow A is
+	{ `regalia-crow-mantle`, `hat-mourning` };    -- the veil drapes onto the shoulders over the crows
+	{ `regalia-crow-mantle`, `hood-tattered` };   -- the hood's cowl rests on the shoulders where the mantle and the crows are
+	{ `regalia-seal-of-office`, `Sash` };   -- the chain crosses the chest top where every sash and the bandolier cross
+	{ `regalia-seal-of-office`, `Back` };   -- and where the bag and crossbow straps cross
+	{ `regalia-seal-of-office`, `tie-school` };          -- the medallion and the chain's U hang over the tie
+	{ `regalia-seal-of-office`, `pendant-crystal` };     -- the pendant chains lie round the neck on the same line
+	{ `regalia-seal-of-office`, `necklace-wolf-fang` };
+	{ `regalia-seal-of-office`, `pendant-scythe` };
+	{ `regalia-seal-of-office`, `fur-torn` };            -- the mantles cover the shoulders where the chain lies
+	{ `regalia-seal-of-office`, `shawl-grave-moss` };
+	{ `regalia-sigil-halo`, `hat-top` };      -- measured: the brims (scaled and lifted for the hair) reach back through the ring as it spins
+	{ `regalia-sigil-halo`, `hat-hunter` };
+	{ `regalia-sigil-halo`, `hat-witch` };
+	{ `regalia-sigil-halo`, `hat-tricorn` };
+	{ `regalia-sigil-halo`, `hat-bowler` };
+	{ `regalia-sigil-halo`, `hat-mourning` };
+	{ `regalia-sigil-halo`, `hood-tattered` };   -- the hood's back rises into the ring
+	{ `regalia-sigil-halo`, `cape:CapeMidnight` };   -- the Midnight Lord's high collar stands behind the head, in the ring
+	{ `regalia-chained-ledger`, `Arms` };     -- the iron cuff is on the right wrist, where the bracers and gauntlets go
+	{ `regalia-chained-ledger`, `cape:CapeWardenMantle` };   -- the capes hang over the right arm, where the ledger floats and its chain runs
+	{ `regalia-chained-ledger`, `cape:CapeReaperShroud` };
+	{ `regalia-chained-ledger`, `cape:CapeCaptain` };
+	{ `regalia-chained-ledger`, `cape:CapeMidnight` };
+	{ `regalia-staff`, `pauldrons-blackened` };   -- the staff stands in front of the right arm, through the right pauldron's lames
+	{ `regalia-staff`, `cape:CapeWardenMantle` };   -- the Warden's mantle drapes over the front of the right arm, where the staff stands
+	{ `regalia-raven-pauldron`, `hat-mourning` };   -- measured: as the left arm swings, the skull meets the veil at two hairs' fits
+	{ `regalia-seal-of-office`, `familiar-crow` };   -- the familiar perches on the left shoulder top, on the chain
+	{ `regalia-crow-mantle`, `Coat` };      -- (measured against the coat batch's first build) the coats' collars and shoulders lie under the mantle and the crows
+	{ `regalia-seal-of-office`, `Coat` };   -- the coats' collars stand round the neck where the chain lies
+	{ `regalia-chained-ledger`, `Coat` };   -- the right sleeve covers the wrist under the cuff
+	{ `regalia-raven-pauldron`, `Coat` };   -- the left sleeve's shoulder lies under the pauldron's lames
+	{ `regalia-staff`, `Coat` };            -- the right sleeve and the coat's right tail meet the staff in front of the arm
 }
 
 Accessories.ById = {}

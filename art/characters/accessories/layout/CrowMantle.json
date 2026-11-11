@@ -1,0 +1,314 @@
+{
+ "key": "CrowMantle",
+ "name": "Murder of Crows mantle",
+ "atlas": 2048,
+ "pieces": {
+  "CrowMantle": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 10562,
+   "fit": [
+    0.004208475351333618,
+    0.7530125379562378,
+    -0.00017830729484558105
+   ],
+   "size": [
+    1.981545865535736,
+    0.6274490058422089,
+    1.1335846781730652
+   ],
+   "fit_body": {
+    "female": 1.031,
+    "lean": 0.854,
+    "athletic": 1.045,
+    "muscular": 1.13,
+    "stocky": 1.186,
+    "heavy": 1.178,
+    "petite": 0.93,
+    "toned": 1.032,
+    "curvy": 1.142,
+    "strong": 1.061,
+    "plus": 1.103
+   },
+   "hair_fit": {
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": null,
+    "Females_Short_Mid_Part": null,
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": null,
+    "Males_TP_Locks": null,
+    "Females_Detective_Hair": null,
+    "Females_Super_Long_Japanese_Hair": null,
+    "Males_Half_Up_Half_Down_Locs": null,
+    "Females_EdnaMode_lol": null,
+    "Males_Man_Bun": null,
+    "Females_Gojo_Ponytail": null,
+    "Males_Messy_Middle_Part": null,
+    "Males_Black_Zoldyck_Hair": null,
+    "Females_Preppy_Long_Braided": null,
+    "Males_Slicked_Back": null,
+    "Females_Wolf_Cut": null,
+    "Females_Femkuna": null,
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Straight_Bob": null,
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": null,
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": null,
+    "Females_Long_Sweetheart_Pigtails": null,
+    "Females_Araya": null,
+    "Males_Anime_Hero_Hair": null,
+    "Females_Elegant_Bob_Cut": null,
+    "Males_Blonde_Emo_Scene_Messy": null,
+    "Females_Side_Ponytail": null,
+    "Females_Natural_Trim_Pony": null,
+    "Females_Side_Bun": null,
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": null
+   }
+  },
+  "MantleCrows": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 8556,
+   "fit": [
+    -0.00036132335662841797,
+    1.2240345478057861,
+    0.05699220299720764
+   ],
+   "size": [
+    1.9242428541183472,
+    0.39806950092315674,
+    0.7395352721214294
+   ],
+   "fit_body": {},
+   "bones": [
+    {
+     "name": "Root",
+     "head": [
+      -0.0,
+      1.0,
+      0.0
+     ],
+     "parent": null
+    },
+    {
+     "name": "H0",
+     "head": [
+      -0.0,
+      1.0,
+      0.0
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "BodyA",
+     "head": [
+      -0.8600000143051147,
+      1.152896761894226,
+      0.030000001192092896
+     ],
+     "parent": "H0"
+    },
+    {
+     "name": "HeadA",
+     "head": [
+      -0.8846999406814575,
+      1.284896731376648,
+      -0.08620394021272659
+     ],
+     "parent": "BodyA"
+    },
+    {
+     "name": "LidLA",
+     "head": [
+      -0.9348530769348145,
+      1.3887367248535156,
+      -0.12322551757097244
+     ],
+     "parent": "HeadA"
+    },
+    {
+     "name": "LidRA",
+     "head": [
+      -0.8539407253265381,
+      1.3887367248535156,
+      -0.140423983335495
+     ],
+     "parent": "HeadA"
+    },
+    {
+     "name": "TailA",
+     "head": [
+      -0.8316408395767212,
+      1.1458567380905151,
+      0.16341933608055115
+     ],
+     "parent": "BodyA"
+    },
+    {
+     "name": "WingLA",
+     "head": [
+      -0.9312316179275513,
+      1.3024967908859253,
+      -0.008838824927806854
+     ],
+     "parent": "BodyA"
+    },
+    {
+     "name": "WingRA",
+     "head": [
+      -0.8107238411903381,
+      1.3024967908859253,
+      -0.03445354849100113
+     ],
+     "parent": "BodyA"
+    },
+    {
+     "name": "BodyB",
+     "head": [
+      0.8600000739097595,
+      1.152896761894226,
+      -0.009999997913837433
+     ],
+     "parent": "H0"
+    },
+    {
+     "name": "HeadB",
+     "head": [
+      0.8927457928657532,
+      1.284896731376648,
+      -0.12419788539409637
+     ],
+     "parent": "BodyB"
+    },
+    {
+     "name": "LidLB",
+     "head": [
+      0.8658437132835388,
+      1.3887367248535156,
+      -0.18043150007724762
+     ],
+     "parent": "HeadB"
+    },
+    {
+     "name": "LidRB",
+     "head": [
+      0.9453592300415039,
+      1.3887367248535156,
+      -0.1576307862997055
+     ],
+     "parent": "HeadB"
+    },
+    {
+     "name": "TailB",
+     "head": [
+      0.8224031329154968,
+      1.1458567380905151,
+      0.12111610174179077
+     ],
+     "parent": "BodyB"
+    },
+    {
+     "name": "WingLB",
+     "head": [
+      0.815339982509613,
+      1.3024967908859253,
+      -0.07773387432098389
+     ],
+     "parent": "BodyB"
+    },
+    {
+     "name": "WingRB",
+     "head": [
+      0.9337674379348755,
+      1.3024967908859253,
+      -0.043775349855422974
+     ],
+     "parent": "BodyB"
+    }
+   ],
+   "hair_fit": {
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": null,
+    "Females_Short_Mid_Part": null,
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": null,
+    "Males_TP_Locks": null,
+    "Females_Detective_Hair": null,
+    "Females_Super_Long_Japanese_Hair": null,
+    "Males_Half_Up_Half_Down_Locs": null,
+    "Females_EdnaMode_lol": null,
+    "Males_Man_Bun": null,
+    "Females_Gojo_Ponytail": null,
+    "Males_Messy_Middle_Part": null,
+    "Males_Black_Zoldyck_Hair": null,
+    "Females_Preppy_Long_Braided": null,
+    "Males_Slicked_Back": null,
+    "Females_Wolf_Cut": null,
+    "Females_Femkuna": null,
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Straight_Bob": null,
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": null,
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": null,
+    "Females_Long_Sweetheart_Pigtails": null,
+    "Females_Araya": null,
+    "Males_Anime_Hero_Hair": null,
+    "Females_Elegant_Bob_Cut": null,
+    "Males_Blonde_Emo_Scene_Messy": null,
+    "Females_Side_Ponytail": null,
+    "Females_Natural_Trim_Pony": null,
+    "Females_Side_Bun": null,
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": null
+   }
+  }
+ },
+ "notes": "a feathered shoulder mantle: four shingled rows of black contour feathers (blue-violet sheen) over a leather hide, the last row a feathered fringe past the hem; a bound neck edge; an iron clasp of two domed bosses with gilt crescents at the throat. Two crows perch on the shoulders (MantleCrows): ember eyes and blackened-brass leg rings, idle bones in groups A (left) and B (right)",
+ "tris": 19118,
+ "glow": [
+  1.0,
+  0.34,
+  0.07
+ ]
+}

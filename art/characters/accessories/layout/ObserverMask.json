@@ -1,0 +1,101 @@
+{
+ "key": "ObserverMask",
+ "name": "Observer half-mask",
+ "atlas": 2048,
+ "pieces": {
+  "ObserverMask": {
+   "mount": "Head",
+   "kind": "Main",
+   "tris": 4156,
+   "fit": [
+    -0.0005322098731994629,
+    0.0634152889251709,
+    -0.555269181728363
+   ],
+   "size": [
+    0.8588723540306091,
+    0.333829402923584,
+    0.21346119046211243
+   ],
+   "fit_body": {},
+   "hair_fit": {
+    "Females_Araya": null,
+    "Females_Detective_Hair": null,
+    "Females_EdnaMode_lol": [
+     1.02,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.02,
+     0.0
+    ],
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": null,
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": null,
+    "Females_Low_Ponytail": [
+     1.02,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": null,
+    "Females_Natural_Trim_Pony": [
+     1.02,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": [
+     1.02,
+     0.0
+    ],
+    "Females_Short_Mid_Part": null,
+    "Females_Side_Bun": null,
+    "Females_Side_Ponytail": [
+     1.02,
+     0.0
+    ],
+    "Females_Straight_Bob": [
+     1.02,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": null,
+    "Females_Wavy_Y2k_Bob": [
+     1.02,
+     0.0
+    ],
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": null,
+    "Males_Baki": [
+     1.02,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": null,
+    "Males_Blonde_Emo_Scene_Messy": null,
+    "Males_Half_Up_Half_Down_Locs": null,
+    "Males_Higuruma": [
+     1.02,
+     0.0
+    ],
+    "Males_Long_Length_Messy": null,
+    "Males_Man_Bun": [
+     1.02,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.02,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": null,
+    "Males_Slicked_Back": [
+     1.02,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": null,
+    "Males_Super_Messy_Long_Hair": null,
+    "Males_TP_Locks": null
+   }
+  }
+ },
+ "notes": "'Observer': a porcelain half-mask with a sculpted brow, a gilt edge; the left eye carved open in a gilt rim with short rays, the right painted shut (a raised lid with a gilt lid line and lashes, a gilt tear below it); gilt kintsugi crackle over the porcelain",
+ "tris": 4156
+}

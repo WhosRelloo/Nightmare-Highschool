@@ -1,0 +1,171 @@
+{
+ "MantleCrows": {
+  "idle": "Familiar",
+  "pulse": 4.0,
+  "bones": {
+   "HeadA": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": -25,
+    "max": 70
+   },
+   "HeadB": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": -70,
+    "max": 25
+   },
+   "LidLA": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": 88
+   },
+   "LidRA": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": 88
+   },
+   "LidLB": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": 88
+   },
+   "LidRB": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": 88
+   },
+   "TailA": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": 16
+   },
+   "TailB": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": 16
+   },
+   "WingLA": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": 12
+   },
+   "WingRA": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": 12
+   },
+   "WingLB": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": 12
+   },
+   "WingRB": {
+    "axis": [
+     0,
+     1,
+     0
+    ],
+    "min": 0,
+    "max": 12
+   }
+  }
+ },
+ "CrowMantle": {
+  "emitters": [
+   {
+    "name": "FeatherDrift",
+    "always": true,
+    "kind": "feather",
+    "texture": "a single black crow feather (the crow VFX's feather sprite), slight blue-violet sheen",
+    "at": [
+     0,
+     1.05,
+     0.05
+    ],
+    "spread": [
+     1.7,
+     0.1,
+     1.0
+    ],
+    "rate": 0.06,
+    "lifetime": [
+     4.0,
+     6.0
+    ],
+    "speed": [
+     0.15,
+     0.35
+    ],
+    "direction": "down (-Y), drifting",
+    "acceleration": [
+     0,
+     -0.6,
+     0
+    ],
+    "drag": 1.5,
+    "rotation": [
+     0,
+     360
+    ],
+    "rot_speed": [
+     -90,
+     90
+    ],
+    "size": [
+     0.22,
+     0.2
+    ],
+    "transparency": [
+     0.0,
+     1.0
+    ],
+    "light_emission": 0,
+    "lock_to_part": false,
+    "note": "Torso mount space: the odd feather drifting off the mantle's shoulders and down, about 3-4 a minute (rate 0.06/s). Off with Reduce Motion"
+   }
+  ]
+ }
+}
