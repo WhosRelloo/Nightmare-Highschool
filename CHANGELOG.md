@@ -2,6 +2,32 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.84.0] - 2026-11-11: the icon set (the wax seal stops being the icon for everything)
+
+Owner: "I'm tired of using this icon for everything. Create unique icons for everything that uses this icon, other than
+what it was used for." The icon was the UI kit's wax seal (`Theme.Images.Seal`, 130174890638243). It keeps its own job,
+the rarity gem on item slots; every other use has its own icon now (`docs/Icon-Set.md`).
+
+### Added
+- **47 original icons** in the UI's PBR look (Blender Cycles: brass, gilt, black iron, ink and crimson enamel, parchment,
+  wax, bone, moon chalk): five notification kinds; the level-up, purchase, evolved, four quest, four moon and record
+  banners; four NPC quest markers; the arrival crest, get-up dial, discovery flag, waypoint pin and duel-ring marker;
+  15 sports touch buttons (one per move, by sport colour); the grade seal, yen coin and memory card back; the Hex Slash
+  pocket watch and altar; the Crypt Crush rune. `art/ui/hud/make_seal_icons.py`, `blender_seal_icons_render.py`,
+  `finish_seal_icons.py`; upload folder `art/group-upload-icons/` (uploaded under the group, ids read back by name).
+- `Theme.Images.Icon*` (47 keys), `Theme.Baked` (full-colour icons, shown untinted), `Components.ToastIcons`.
+
+### Changed (backups in `ServerStorage.NH_Backup.SealIcons_20261111`)
+- `UI.Components` Toast, `Gui.Moments` (+ FullMoon, MoonPhases, SchoolFx callers), `World.QuestSeals`, `World.Arrival`,
+  `World.GetUp`, `World.Regions`, `World.Waypoint`, `Gui.Compass`, `Gui.Sports` / `Soccer` / `Football`, `Gui.Phone`,
+  `Gui.Activities` + `MemoryMatch`, `Gui.PhoneGames.Hex`, `Gui.PhoneGames.Crypt`.
+- Left alone: the rarity gem, `Gui.Training` (its own icons are being drawn), the Map place (shares 7 of these uses).
+
+### Tested
+- Play on slot 4 "Testy": all 47 load in game; toasts, the level-up banner, the report card seal and coin, the Hex Slash
+  altar and the NPC markers checked live (screenshots in `docs/img/icon-set-*`). Not seen live yet: arrival, discovery,
+  the other banners, sports buttons (touch only), get-up, duel ring, card backs, the watch relic, the rune.
+
 ## [1.83.0] - 2026-11-11: 3D accessories, batches 2-8 built (both kits complete, waiting for the import)
 
 The rest of Kit A and all of Kit B, "The Headmaster's Circle" (`docs/Accessories.md`). Owner: "complete all of the

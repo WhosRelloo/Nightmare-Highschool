@@ -38,7 +38,7 @@ The textures are greyscale, so `ImageColor3` tints them. That's how the faction 
   - **1.13.0 HUD bar:** `art/ui/hud/make_health_pbr.py` bakes a one-piece iron frame (2400 x 200, engraved groove), a greyscale fill (768 x 144) and a new orb ring and glass. `KitHud` uses them at 600 x 50 (`Local.SkinHealth`).
 - **Other art:**
   - a clock-face orb ring and a glass orb
-  - wax-seal rarity gems
+  - wax-seal rarity gems (`Theme.Images.Seal`: this is the seal's only job; since 1.84.0 everything else that used it has its own icon, see [Icon-Set](Icon-Set.md))
   - diamond knobs and pips
   - a divider, a soft glow and a drop shadow
   - icons: candle (Vigil), blood drop (Court / Vampire), quill nib (Human), cross (Priest)
