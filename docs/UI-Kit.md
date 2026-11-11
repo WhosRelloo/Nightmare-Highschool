@@ -256,16 +256,49 @@ Every reskin swaps visuals only. Packets, attributes, instance names and public 
 
 ### KitHud
 The in-play HUD:
-- **Health bar** (Humanoid health) with a % orb. Recent damage shows as a delayed "ghost" segment. Since 1.13.0 it's 600 x 50 at the top of the bottom HUD (`BAR_W`, `BAR_H`, `BAR_Y`), in the PBR iron frame.
+- **Health bar** (Humanoid health) with a % orb. Recent damage shows as a delayed "ghost" segment. It's 600 x 50 at the top of the bottom HUD (`BAR_W`, `BAR_H`, `BAR_Y`). Since 1.77.0 it's dressed as **Thornrose**: see [Health bar: Thornrose](#health-bar-thornrose) below. The 1.13.0 PBR iron frame (`Local.SkinHealth`) is the fallback if the Thornrose art ids are missing.
 - **Hotbar** from your Backpack tools. Click, tap or press 1-9 to equip. Tools can set `Rarity` and `Count` attributes.
 - **Yen** from the profile.
 - **Posture rail** (1.74.0, "Twin Rail"), reading a `Posture` attribute on the character or Humanoid, out of `Config.Combat.PostureMax`. It replaced the vertical posture meter that stood left of the bar. It only draws posture: nothing in it writes the value. See [Posture rail](#posture-rail) below.
 
+### Health bar: Thornrose
+The owner asked for "a completely new and cooler and on theme design". Three all-new concepts were mocked up (Vigil, Reliquary, Thornrose: [options](img/health-thornrose-options.jpg)), and the owner picked **Thornrose**: a briar of black iron (`KitHud` `Local.SkinThorn`, over the kit's `HealthBar`).
+
+![Thornrose in Play](img/health-thornrose-states.jpg)
+- **Art** (`art/ui/hud/make_health_thornrose.py`, the same PBR shader; group 15981569):
+
+  | Piece | Size | What | In game |
+  |---|---|---|---|
+  | `ThornFrame` | 2400 x 300 | two twisted iron vines with brass-tipped thorns, a brass bead round the window, closed rosebud ends | `FramePBR`, 600 x 75 at y -15 (the thorns rise above the bar's box) |
+  | `ThornVelvet` | 512 x 96 | greyscale crimson velvet | the kit's `Texture`, tiled 107 x 20, tinted per form |
+  | `ThornRose` | 512 x 512 | the iron rose, brass petal edges, a hole for the glass | the orb's `Ring` (72.5 px) |
+  | `ThornGlass` | 256 x 256 | greyscale glass heart | the orb's `Glass` (0.6 of the orb), tinted per form |
+
+- **Layout:** the window is x 37.5..562.5, y 15..35 of the bar's 600 x 50 box (`Track` moved there; it's re-applied if the kit lays the bar out again). The bottom thorns are short, and the bar sits at `BAR_Y` 2, so they end just above the posture rail's art (which stays at y 49 of `Bottom`). On phones the Yen plate sits 16 px above the bar (`BAR_Y - 16`), clear of the top thorns.
+- **Forms** (`THORN_FORMS`, fill / glass):
+  - from the character's `Transformation` attribute: Human (blood crimson), Vampire (near-black wine, a hot crimson heart), Wolf (amber), Ghoul (bone green), Wraith (pale blue);
+  - Downed (the Humanoid's `Downed` attribute) is ash.
+  - A change crossfades over 0.5 s (`Ui.Health:SetColor`).
+- **Animation:**
+  - **Hit:** the fill eases down in 0.18 s, while the kit's ghost lags 0.25 s and drains. A hot nick flashes at the cut, the thorns flare red (`ThornFlare`, stronger on hits over 8%), and the rose shudders 3 to 9 degrees and springs back.
+  - **Heal:** the fill eases up in 0.45 s and a gold sheen runs along it.
+  - **Idle:** a soft sheen drifts along the velvet every 6 to 9 s, and the glass heart breathes on a 4 s cycle (`HeartGlow`).
+  - **Low health (under 25%):** the heart beats lub-dub with a 7% swell, once a second, or every 0.7 s under 10%.
+  - **Transformation:** the rose turns one petal (360/7 degrees) with a little overshoot.
+  - **Downed:** ash colours; no hit effects or beat.
+- **Accessibility:**
+  - `NHReducedMotion`: no shudder, petal turn, sheens, breathing or swell. Colours still change and the fill still eases.
+  - `NHReducedFlash`: no nick or flare, and a softer beat glow.
+  - Health is still read by length and the %; the form colours are extra.
+- **Code:** `Local.OnHealth(fraction, instant?)`, `Local.ApplyForm(character, humanoid, instant?)`, `Local.ThornSheen(color, time, peak)`. It only reads `Humanoid.Health`, `Transformation` and `Downed`.
+
 ### Posture rail
+Since 1.77.0 the rail wears Thornrose's briar (`PostureBriar`, 2400 x 96): a twisted-iron band with small brass-tipped thorns, rosebud ends (the warning glows moved onto them, `RAIL_GEM_X` 29) and an iron leaf cradle under the rose. Everything else below is unchanged. The Twin Rail art (`PostureFrame`) is the fallback.
+
 A slim forged rail hung under the health bar, so the two read as one piece (`KitHud` `Local.BuildPosture`, the `PostureRail` frame inside `Bottom`). The owner chose it from three options ([options sheet](img/posture-rail-options.jpg)).
 
 ![Posture rail states in Play](img/posture-rail-states.jpg)
-- **Layout:** 600 x 24 design px, the same width and left edge as the health bar, 2 px under its art (`RAIL_Y = BAR_Y + BAR_H - 5`). It lives in `Bottom`, so it scales and moves with the bar on touch screens. The health orb draws over the rail's brass saddle (`Health.ZIndex = 2`). The health bar sits 6 px higher than before (`BAR_Y` 4), so the EXP strip fits between the rail and the hotbar.
+- **Layout:** 600 x 24 design px, the same width and left edge as the health bar, just under its art (`RAIL_Y = BAR_Y + BAR_H - 3`, y 49 of `Bottom`). It lives in `Bottom`, so it scales and moves with the bar on touch screens. The health orb draws over the rail's saddle (`Health.ZIndex = 2`). The health bar sits 8 px higher than before 1.74.0 (`BAR_Y` 2), so the EXP strip fits between the rail and the hotbar.
 - **Art** (`art/ui/hud/make_posture_pbr.py`, the health bar's own PBR shader; group 15981569):
 
   | Piece | Size | What |

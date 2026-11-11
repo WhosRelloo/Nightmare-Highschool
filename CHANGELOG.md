@@ -2,6 +2,70 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.77.0] - 2026-11-10: Thornrose, the new health bar, with a matching posture rail
+
+Owner: "completely revamp the current health bar with a completely new and cooler and on theme design", then "I like option C, just make the posture bar match it and make sure its all animated". Three all-new concepts were mocked up (Vigil, Reliquary, Thornrose: `docs/img/health-thornrose-options.jpg`), and the owner picked **Thornrose**. Full write-up: `docs/UI-Kit.md` (Health bar: Thornrose).
+
+### Changed (NH Combat Test, visuals only)
+- **The health bar (`Controllers.Gui.KitHud`, `Local.SkinThorn`) is a briar of black iron:**
+  - two twisted vines with brass-tipped thorns along the bar;
+  - closed rosebud ends;
+  - crimson velvet for the fill;
+  - an iron rose with brass-edged petals holding the % in a glass heart.
+  - The 1.13.0 iron frame is the fallback if the art ids are missing.
+- **Animated:**
+  - **Hit:** the fill eases down while the ghost lags. A hot nick flashes at the cut, the thorns flare red, and the rose shudders and springs back.
+  - **Heal:** the fill eases up with a gold sheen.
+  - **Idle:** a soft sheen drifts along the velvet every 6 to 9 s, and the glass heart breathes.
+  - **Low health (under 25%):** the heart beats lub-dub, faster under 10%.
+  - **Transformation:** a 0.5 s crossfade to the form's colours (from the character's `Transformation` attribute), and the rose turns one petal.
+  - **Downed:** ash colours.
+- **Form colours:** Human blood crimson, Vampire near-black wine with a hot crimson heart, Wolf amber, Ghoul bone green, Wraith pale blue.
+- **Reduce Motion:** no shudder, turn, sheens, breathing or swell; colours still change. **Reduce Flashing:** no nick or flare, and a softer beat.
+- **The posture rail matches:** the same briar as a twisted-iron band with small thorns and rosebud ends (the warning glows moved onto them), with an iron leaf cradle under the rose. Its brass-to-ember fill, cracks, pulse and GUARD | BROKEN shatter are unchanged.
+- **Layout:**
+  - The bar sits 2 px higher (`BAR_Y` 2) and the rail stays put, so the lowest thorns clear it.
+  - On phones the Yen plate and its +/- chip sit 12 px higher, clear of the top thorns.
+- **New art** (`art/ui/hud/make_health_thornrose.py`; group 15981569):
+  - ThornFrame 70708896284357
+  - ThornVelvet 137656357969028
+  - ThornRose 123909178669597
+  - ThornGlass 88578355333318
+  - PostureBriar 90765816898791
+- Concept sheets: `art/ui/hud/make_health_v4_concepts.py`. An earlier draft round, `make_health_v3_concepts.py`, wasn't shown to the owner as options.
+- Backups: `ServerStorage.NH_Backup.Thornrose_pre` (KitHud).
+
+### Verified (NH Combat Test, Play, slot 4 "Testy")
+- **Art:** every piece loaded (`IsLoaded`). Screenshots of full, after a hit, low, Vampire, Wraith and posture 86%: `docs/img/health-thornrose-states.jpg`.
+- **A 20% hit** (the game's `Downed.ApplyDamage`, through the test bridge):
+  - the fill eased over several frames (1.00 → 0.93 → 0.89 → 0.85 → 0.80) instead of snapping;
+  - the nick flashed and the thorns flared (0.5);
+  - the rose shuddered 9 degrees and sprang back.
+- **Healing (80 → 95%):** the fill eased up with a gold sheen and no hit flash.
+- **Idle:** a drifting sheen happened unprompted, and the heart's glow breathed between 0.78 and 0.88.
+- **Low health (18%):** the rose swelled to 1.07x and the heart glowed to 0.25 on each beat.
+- **Vampire and Wraith** (the `Transformation` attribute set for the test, then cleared):
+  - the fill and glass changed colour (`760818` / `dc2234`, then pale blue), and the rose turned 51.4 degrees each time;
+  - clearing it brought back `961622` / `c8283c`.
+  - The darker Vampire colours were then checked on screen.
+- **Posture:** real blocked hits from the "Attacking" dummy took it to 86% on the briar rail, showing the cracks and the glowing buds.
+- **Reduce Motion + Reduce Flashing** (set on that client only, then put back): a hit, a heal and low health showed no nick, flare, shudder, swell or sheen, and the beat glow stayed at 0.70 or fainter.
+- **Phone (667x375, 844x390) and tablet (1024x768) previews:**
+  - the rail matched the bar's left edge and width to 0.00 px;
+  - the Yen plate cleared the thorns by 7 px on phones;
+  - the lowest thorns cleared the rail;
+  - the EXP strip cleared the hotbar by 5 px on phones and 2.6 px on tablet.
+- No errors from the HUD in the console. Test settings put back: `SlotCount = 3`, and `NHTestNoMenuKeys`, `NHTouchTest` and `NHPhonePreview` cleared.
+
+### Not verified
+- **Real phones and tablets:** only Studio's previews were used.
+- **Gamepad:** not checked.
+- **Other states:** Wolf and Ghoul colours weren't seen in game (they use the same code path). Downed ash wasn't seen in game.
+- **A guard break on the briar rail:** the shatter code is unchanged from 1.74.0.
+
+### Map place
+Not changed. Its `Gui.KitHud` needs re-copying for Thornrose and the posture rail; the "Port hair, eyes and their UI to the Map place" session does those.
+
 ## [1.76.0] - 2026-11-10: Admin capes: five 3D PBR capes for the admin kit
 
 Owner: higher-quality admin outfits, "better shaping, texturing, etc. with PBR textures". Classic Shirt and Pants templates can only carry one colour image, so the admin kit gets real shape and real PBR from five rigged 3D capes, worn through the cape system. The list was approved ("Yes, build all 5"). Full write-up: `docs/Admin-Capes.md`.
