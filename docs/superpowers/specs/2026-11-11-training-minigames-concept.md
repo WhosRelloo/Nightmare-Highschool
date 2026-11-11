@@ -46,17 +46,19 @@ The owner has animations for sit-ups, push-ups, pull-ups, the barbell and squats
 |---|---|---|---|
 | Push-ups | Arms | idle 111737875654076, rep 112288220550648 | nothing |
 | Pull-ups | Arms | idle 134151351487837, rep 115584556914404 | nothing |
-| Barbell | Arms and Torso | idle (holding the bar) 136973050103731 | a lift rep, if there is one |
+| Barbell | (on hold) | idle (holding the bar) 136973050103731 | the owner: "forget about it for now", so it's left out of the first version |
 | Sit-ups | Torso | 132757288791974 (one looping rep) | a split idle and rep would make reps crisper |
-| Squats | Legs | not in the game yet | the id |
+| Squats | Legs | idle 119121474882852, rep 88777267068656 | nothing |
 
 These five are the **main minigames**, one exercise at its own station: a mat for push-ups and sit-ups, the gym's wall bars or a pull-up bar, a weight bench or rack for the barbell, a squat rack. Each player rep plays the rep animation once, and the idle holds between reps, so the body moves with every input. The minigames below are extras that add variety on top.
 
 | Area | Main | Extras |
 |---|---|---|
-| Arms | push-ups, pull-ups, barbell curls or press | heavy bag, rope climb, bell pull |
-| Torso | sit-ups, the barbell (deadlift or bench) | plank, medicine ball, stone lift |
-| Legs | squats (with the barbell on the back at higher levels) | stair sprint, jump rope |
+| Arms | push-ups, pull-ups | heavy bag, rope climb, bell pull |
+| Torso | sit-ups | plank, medicine ball, stone lift |
+| Legs | squats | stair sprint, jump rope |
+
+The barbell is on hold, at the owner's word. It can come back later as a higher-level station for arms and torso.
 
 **How a rep works in the main five:** a ring shrinks around a brass gauge, and you press when it meets the mark (good, great, perfect). Each rep plays the rep animation, and a combo counter builds. At higher levels the ring speeds up and the windows narrow. "Heavy" reps (hold to grind) and "burnout" sets (as many reps as you can before a stamina bar runs out) mix in, and the weight on the bar visibly grows (plates added).
 
@@ -134,7 +136,6 @@ These are original designs, not copies of another game. Each area has three mini
 4. **Map place sync.**
 
 ## Questions for the owner
-- What is the squat animation id, and is there a barbell lift (rep) animation to go with the barbell idle?
 - Should training replace the admin Build row for players, with the row kept for staff only? Recommended: yes.
 - How fast should a dedicated player reach level 20 in one area? Suggested: about 2-3 weeks of daily play.
 - Should Heavy and Lean be choices players can aim for, or only side effects of how they eat and train? Suggested: side effects, with the Training page showing which way each area is drifting.
