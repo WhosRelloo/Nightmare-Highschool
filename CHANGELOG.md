@@ -2,6 +2,25 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.75.2] - 2026-11-10: Map place: change your character live
+
+Owner: "make it so changing your character works live in the Map place. Like for gender, eyes, skin color, etc."
+
+### Fixed (Map place only)
+- **The K wardrobe now changes everything live:** gender (Standard / Female), skin, eyes, brows, mouth, marks and the rest.
+  - **What was wrong:** the server only lets these change in the main menu's character creator. After your first look it quietly put them back, and only outfit and hair went through. The Map has no main menu, so the rest snapped back.
+  - **The fix:** with the Map's `NHAnywhereWardrobe` flag set, that guard is skipped (`UI.Appearance`, `Appearance.StartServer`'s Set handler: one Map-only line). Body builds still come only from training or the desk.
+  - **Unchanged:** NH Combat Test and the real game keep the creator rule.
+  - **When `UI.Appearance` is copied again:** the Map line has to be re-added (`docs/Map-Core-Preview.md`). Backup: `ServerStorage.NHCore.Backups.Appearance_preLiveLook`.
+
+### Verified (Map, Studio Play)
+**[PT]**
+- **Before the fix:** a second look change (skin 5, female body) was reverted. The head stayed #D8B492 and no female meshes appeared.
+- **After the fix:**
+  - **Through the wardrobe remote:** female body (5 meshes) with skin #5E402E, then male again; the iris went from brown (150,98,62) to blue (124,172,214).
+  - **In the real wardrobe UI:** clicking Female and the fifth skin swatch changed the character in the world at once.
+- **Not tried:** a second player watching, and a live Map server. The server applies the look to the character, which replicates as before.
+
 ## [1.75.1] - 2026-11-10: Map place: the staff teleport flocks
 
 The owner approved the Map sync of 1.75.0 ("Yes, send it"). The admin-teleport session asked the Map-port session to do it, using the checklist `tp-vfx-map-sync.md`.
