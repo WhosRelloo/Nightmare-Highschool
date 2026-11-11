@@ -132,33 +132,50 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 - `Controllers.Character.HairSway` is the fixed version (bend, never twist; capped per strand and per joint; dash and teleport spikes ignored), byte-identical to NH Combat Test's. See `docs/Clothing-and-Faces.md` (Living hair). The old one is in `ServerStorage.NHCore.Backups.HairSway_preStretchFix`.
 
 
-## What the Map still lacks (2026-11-10), lowest priority first
+## What the Map still lacks (re-sorted 2026-11-10, around how far the school is built)
 
-Owner: "let's start porting some more things over to the map place (low > high priority)". Each item is ported, play-tested in the Map and logged. The owner sees the list before anything high-priority or risky (saving, combat, economy).
+Owner: "The builder is still making the school so give me a better list". The builder has the main building's outside up (the front, both wings around their courtyards, the entrance stairs, the front yard with the dead oaks and a gate) on open baseplates. There are no sports fields, dorms or town yet, and most rooms are still being fitted. So the list is sorted by what each system needs from the map, checked in NH Combat Test's code (which tags and workspace folders it looks for).
 
-**Low: client polish (no saving, combat or money)**
-1. ~~`Gui.PromptUi`~~ (1.71.1)
-2. ~~`Character.Emotes`, `Character.ContextAnims`~~ (1.71.1)
-3. ~~`World.SpookyTree`~~ (1.71.1)
-4. ~~`Gui.SettingsMenu` + `Gui.TopBar` + `NHSettings`~~ (1.71.2). In the Map, settings last for the session. Map adapter in `TopBar`: Record, Locker and Study Group are hidden until those screens are ported.
+Done so far: the core (1.54), customization, doors, admin, heights (v2), races and faces, body types, hair and eye motion, capes, moon banners, prompts, emotes, the oaks, Settings, the top bar, the HUD, the clock and the timetable.
 
-5. ~~`Gui.KitHud` (health bar, hotbar, Yen, posture), `Gui.ClockHud`, `Gui.Timetable`~~ (1.71.3, the owner asked for them before the medium list)
+**A. Ready now: needs nothing from the map** (lowest risk first; nothing is saved in the Map)
+1. Touch and gamepad controls (`Gui.TouchControls`, `Gui.GamepadControls`): phone and controller players.
+2. Party and Study Group (`Features.Party`, `Gui.StudyGroup`): groups of students. The top bar's Study Group button comes back.
+3. Strangers (`Social.Strangers`): you only see a student's name once they've introduced themselves (G).
+4. Skateboards (`Features.Skateboard`, `World.Skateboard`, `SkateboardPose`): ride anywhere. They make their own `workspace.Skateboards`.
+5. Progression and the Student Record (`Player.Progression`, `Gui.Progress`, `Gui.StatsPanel`): level, EXP and stats, for the session. The Record button comes back. *Check in: stats feed combat.*
+6. Inventory and the locker screen (`Features.Inventory`, `Gui.Locker`): the bag works anywhere. Buying waits for the concession stand (below).
+7. The phone and phone games (`Features.Phone`, `Gui.Phone`, `PhoneGames`). *Check in: yen transfers (the Map's yen is session-only and starts at 0).*
+8. Race actions and tier-up (`Features.RaceAction`, `Player.Evolution`, `Gui.Evolution`): the N key and the evolution cutscenes. *Check in: combat.*
 
-**Medium: gameplay, or needs map data or an owner decision**
-- Regions and Compass (`Features.Regions`, `World.Regions`, `Gui.Compass`): they need region boxes and points of interest placed for the builder's map. NH Combat Test's are for its own layout.
-- Seats (`Features.Seats`, `Features.PlayerSeats`, `World.PlayerSeat`): they add "Sit" E prompts to chairs, which goes against "E only on doors" (1.67.0). This needs the owner's call.
-- Skateboards; Lost & Found; the fortune teller (Sable, `Features.Fortune` + `World.SeerIdle`); the notice board; locker hiding (`LockerProps`, `World.LockerDoors`, `LockerPOV`).
-- NPC students (`AmbientNpcs`, `NpcLooks`, `Schedules`, `Social.Npcs`, `Dialogue`).
-- Beasts and wild wolves, delinquents (AI enemies: combat).
+**B. Ready once the builder tags a few spots** (the outside and courtyards are enough; the builder adds the tag to a part)
+- Night beasts (`Features.Beasts`): `NHBeastLair` spots. Until then the admin desk can spawn one.
+- Wild wolves (`Features.WildWolves`): `NHWolfSpawn`.
+- Delinquent crews (`Features.Delinquents`): `NHDelinquentSpawn`, for the yard or the courtyards.
+- Gear chests (`Features.GearChests`): `NHChestSpot`, anywhere.
+- The notice board (`Features.NoticeBoard`): an `NHNoticeBoard` part, for example by the entrance.
+- *Check in for all of these: they're combat or loot.*
 
-**High / risky: saving, economy, progression, combat systems (owner check-in first)**
-- **Saving:** save slots, the main menu, Back to Menu (the Map has no saving at all).
-- **Progression and money:** progression and stats; purchases and the Spin Shop (Robux); inventory; the phone and its yen transfers, phone games; the concession stand; homes; gear chests.
-- **Social:** cliques (events, fights, membership, pranks, showdowns), factions, reputation, hangouts, strangers, superlatives.
-- **Quests:** quests, investigation, stealth, duels.
-- **School:** attendance, detention, discipline, enrollment, the hall monitor, report cards, substitutes, activities, the timetable and clock HUD, the class locker, study groups.
-- **Sports:** football, soccer, basketball, clubs, matches.
-- **Other:** race evolution, race actions, the anti-teleport and kill trackers, the party system, Cmdr.
+**C. Waits for the rooms inside**
+- Seats on chairs (`Features.Seats`, `PlayerSeats`): they also bring "Sit" E prompts back, which needs the owner's OK given doors-only E (1.67.0).
+- Locker hiding (`LockerProps`, `World.LockerDoors`, `LockerPOV`): hallway lockers.
+- Lost & Found (`NHLostFoundBox`), the concession stand (`NHConcessionSpot`) and the fortune teller (a region and a seat).
+- Regions and the compass (`Features.Regions`, `World.Regions`, `Gui.Compass`): region boxes per room or area, once rooms are final.
+- NPC students and staff (`AmbientNpcs`, `NpcLooks`, `Schedules`, `Social.Npcs`, `Dialogue`): seats, rooms and stations.
+- The school day (`School.*`: classes, attendance, detention, enrollment, report cards, substitutes, the hall monitor, activities, the class locker): classrooms with their doors.
+- Quests and investigations (`Quests.*`): quest objects placed in rooms.
+- Cliques and factions (`Social.*`: hangouts, turf, pranks, showdowns): hangout spots.
+
+**D. Waits for areas the builder hasn't started**
+- Sports (`Sports.*`): the fields and the gym.
+- Homes and dorms (`Features.Homes`): `NHHomeDoor` dorm rooms.
+
+**E. Keep out of the Map unless the owner says otherwise**
+- Save slots, the main menu and Back to Menu (`Player.Slots`, `Gui.MainMenu`, `Features.BackToMenu`): the Map has no saving on purpose.
+- Purchases and the Spin Shop (`Player.Purchases`): real Robux.
+- Cmdr, and the anti-teleport and kill trackers: infrastructure for the live game.
+
+**Also keep in step:** sessions are changing NH Combat Test's posture bar and adding admin teleport effects right now. When they land, `Gui.KitHud` and the admin desk in the Map need re-copying.
 
 ## Removing it
 Run this in the Map place's command bar, then save:
