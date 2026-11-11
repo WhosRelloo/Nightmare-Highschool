@@ -187,7 +187,7 @@ Done so far: the core (1.54), customization, doors, admin, heights (v2), races a
 - Purchases and the Spin Shop (`Player.Purchases`): real Robux.
 - Cmdr, and the anti-teleport and kill trackers: infrastructure for the live game.
 
-**Also keep in step:** the posture rail landed in NH Combat Test (1.74.0), so the Map's `Gui.KitHud` needs re-copying (its `Gui.Progress` already places the EXP strip under the rail). A session is still adding admin teleport effects; when that lands, the admin desk needs re-copying too.
+**Also keep in step:** the posture rail landed in NH Combat Test (1.74.0), so the Map's `Gui.KitHud` needs re-copying (its `Gui.Progress` already places the EXP strip under the rail). The admin teleport flocks are synced (1.75.1).
 
 ## Removing it
 Run this in the Map place's command bar, then save:

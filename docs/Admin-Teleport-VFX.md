@@ -118,4 +118,4 @@ The first import carried the bake's feather coordinate as vertex colours, which 
 - hearing the sounds (they loaded without errors)
 - a live server, and a true level-0 student (Studio makes everyone staff)
 
-The Map place has none of this yet.
+**Map place (1.75.1):** synced. `Config.AdminTp`, `NHTpFx` and `World.TpFlock` are copied, and `Features.Fx` and `Features.Admin` are NH Combat Test's files. The Map has no Cmdr, so the `teleportServer` edit doesn't apply there.

@@ -2,6 +2,33 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.75.1] - 2026-11-10: Map place: the staff teleport flocks
+
+The owner approved the Map sync of 1.75.0 ("Yes, send it"). The admin-teleport session asked the Map-port session to do it, using the checklist `tp-vfx-map-sync.md`.
+
+### Added (Map place, NH Combat Test's files byte for byte, tagged NHCore)
+- **`Config.AdminTp`**, **`ReplicatedStorage.NHTpFx`** (the Crow and Bat rigs, copied as they are: 26 parts, the same group-owned meshes and maps) and **`Controllers.World.TpFlock`**.
+
+### Changed (Map place)
+- **`Features.Fx` and `Features.Admin`** are now NH Combat Test's files.
+  - Before copying, I checked that the Map's copies were NH Combat Test's from before 1.75.0. The only differences were the flock changes in the checklist (`TpStyle`, `fireEnds`, `VeilMove` options, the `PlayerRemoving` cleanup, and the desk's Bring / Go to / Teleport to / Go to region / Bring all options).
+  - Admin also brings one change from another session: each player gets an `NHStaff` attribute with their staff level.
+  - The old copies are in `ServerStorage.NHCore.Backups` (`Fx_preTpFlock`, `Admin_preTpFlock`).
+- **Cmdr's `teleportServer` edit doesn't apply:** the Map has no Cmdr.
+
+### Verified (Map place, local play-test, the admin desk's Teleport to)
+- **The owner** (WhosRello, 37484441) travelled as bats: the controller made its bat pool (60 bats in `Workspace.NHFx.TpFlock`), and the character moved 60 studs.
+- **With `NHTestTpStyle = "Crow"`:** the crow pool (56 crows). Sampled during a 40-stud teleport:
+  - 28 crows gathered at the start and 28 at the landing spot (0.3 to 0.75 s).
+  - They scattered and were gone by 1.2 s.
+- **With `NHTestNotAdmin`:** no birds showed, and the plain veil moved the student 40 studs.
+- No script errors.
+- **Not tried:**
+  - Any screenshot with the birds in it: they pass too fast for Studio's capture.
+  - Bring and Go to with two players (the escort swirl).
+  - The quick puff (clicking again within 2 s).
+  - The sounds.
+
 ## [1.75.0] - 2026-11-10: Staff teleport flocks: admin crows, the owner's bats
 
 Owner: "make it so Admins get a special TP VFX when we TP to people. Make them cool crows like Itachi. You can model the VFX to the highest quality." Then: "And make a special TP vfx for ONLY me where it's REALLYYYYY cool bats, etc." The design (`docs/img/tp-vfx-mockups.png`) was approved. It's the game's own design and copies no anime art. Full write-up: `docs/Admin-Teleport-VFX.md`.
