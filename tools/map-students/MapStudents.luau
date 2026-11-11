@@ -1,0 +1,647 @@
+--[[
+	MapStudents (server). Services.Features.MapStudents  (NH core add-on for the Map place, 2026-11-10)
+
+	Owner: "Start putting a few school NPC's in the Map place, but COMPLETELY upgrade their pathfinding & awareness".
+	A few background students who live by the school clock on the builder's map. They walk with Services.AI.Nav
+	(doors, steps, smoothing, avoidance, re-planning) and notice the world through Services.AI.Senses.
+
+	Where they go: parts tagged NHNpcSpot (attribute Kind), in workspace["School NPC Spots"] for now:
+	  Gate     where they come in and leave (just outside the front gate)
+	  Yard     outside: the front yard and the courtyard (breaks, lunch, before and after school)
+	  Inside   the ground-floor halls (passing time, class time: the classrooms aren't fitted yet)
+	A spot's LookVector is the way a student faces there. Spots with the same Group attribute are close enough to
+	stand and talk together. The folder's attribute Students sets how many there are (default 6).
+
+	The day (Config.SchoolSchedule segments via School.SchoolClock):
+	  Night, Morning     off campus
+	  Before School      come in through the gate, hang out in the yard
+	  Passing            drift between the halls and the yard
+	  Class              head inside and wait in the halls
+	  Break, Lunch       the yard, in twos and threes, facing each other
+	  After School       the yard; from 14:00 a third head home; Evening: everyone home by 19:00
+
+	What they react to (most urgent first; walking stops for the first four):
+	  Danger      a fight, a transformed monster or a downed body close by: back away fast, then watch from a
+	              distance. Braver students stand their ground closer. ("Whoa!", "Not again...")
+	  Gawk        a fight they can see or hear further off: stop and turn to watch until it's been quiet 6 s
+	  Make way    a student coming straight at them: step aside, look at them
+	  Space       someone standing right on top of them: step back ("Uh... hi?")
+	  Stared at   someone facing them, close, for a while: look back; the friendly ones say hello, the shy ones move off
+	  Followed    someone keeping behind them as they walk: glance back, walk faster
+	  Glance      whoever they're most aware of (the head turns, Controllers.World.NpcLook); otherwise they look
+	              around, at the people they're talking to, or at a door that opened
+	Model attributes for clients and tests: Role = "Ambient", NHActivity, NHMood, NHLookAt (Vector3) + NHLookUntil,
+	NHSay + NHSayAt (a speech bubble), NHPersonality.
+]]
+
+local CollectionService = game:GetService(`CollectionService`)
+local PhysicsService = game:GetService(`PhysicsService`)
+local Players = game:GetService(`Players`)
+local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
+local ServerScriptService = game:GetService(`ServerScriptService`)
+local ServerStorage = game:GetService(`ServerStorage`)
+
+local Nav = require(ServerScriptService.Services.AI.Nav)
+local Senses = require(ServerScriptService.Services.AI.Senses)
+
+local Shared = {}
+local Local = {}
+
+local SPOT_TAG = `NHNpcSpot`
+local DEFAULT_COUNT = 6
+local WALK_PACE = 5.3 -- studs/s the Default walk clip covers at 1x
+local RUN_PACE = 16
+local ANIM = { Walk = 180426354; Idle = 180435571; Sprint = 0; Lean = 129824051499811 }
+do
+	local Pack = ReplicatedStorage:FindFirstChild(`Assets`)
+	Pack = Pack and Pack:FindFirstChild(`Animations`)
+	Pack = Pack and Pack:FindFirstChild(`Default`)
+	Pack = Pack and Pack:FindFirstChild(`Movement`)
+	for _, N in { `Walk`, `Idle`, `Sprint` } do
+		local A = Pack and Pack:FindFirstChild(N)
+		local Id = A and A:IsA(`Animation`) and tonumber(A.AnimationId:match(`%d+`))
+		if Id then ANIM[N] = Id end
+	end
+end
+
+local LINES = {
+	Flee = { `Whoa!`, `Not again...`, `Nope.`, `Someone get a teacher!` };
+	Monster = { `What IS that?`, `Stay back...`, `Oh no.` };
+	Space = { `Uh... hi?`, `Personal space?`, `Can I help you?` };
+	Greet = { `Hey.`, `Hi.`, `Sup.`, `Evening.`, `You new here?` };
+	Shy = { `...`, `I should go.` };
+	Followed = { `Are you following me?`, `...okay.` };
+}
+
+local Folder: Folder? = nil
+local Students = {} :: { any }
+local SpotTaken = {} :: { [BasePart]: any }
+local Plan = { Kind = `Off`; Hour = 0 }
+
+---| helpers |---
+
+local function say(S, Pool: { string }, Cooldown: number?)
+	local Now = os.clock()
+	if Now - (S.SaidAt or -1e9) < (Cooldown or 8) then return end
+	S.SaidAt = Now
+	if S.Model then
+		S.Model:SetAttribute(`NHSay`, Pool[math.random(1, #Pool)])
+		S.Model:SetAttribute(`NHSayAt`, workspace:GetServerTimeNow())
+	end
+end
+
+local function lookAt(S, P: Vector3?, Seconds: number?)
+	if not S.Model then return end
+	if P then
+		S.Model:SetAttribute(`NHLookAt`, P)
+		S.Model:SetAttribute(`NHLookUntil`, workspace:GetServerTimeNow() + (Seconds or 0.6))
+	else
+		S.Model:SetAttribute(`NHLookUntil`, nil)
+	end
+end
+
+local Studio = game:GetService(`RunService`):IsStudio()
+local function step(S, Text: string)
+	if Studio and S.Model then S.Model:SetAttribute(`NHStep`, Text) end
+end
+
+-- a reaction's mood (Scared, Uneasy, Watching) holds a few seconds before everyday glances can change it back
+local function mood(S, M: string, Hold: number?)
+	local Now = os.clock()
+	if not Hold and Now < (S.MoodHold or 0) then return end
+	if Hold then S.MoodHold = Now + Hold end
+	if S.Model and S.Model:GetAttribute(`NHMood`) ~= M then S.Model:SetAttribute(`NHMood`, M) end
+end
+
+local function headOf(Rec): Vector3?
+	local C = Rec and Rec.Player and Rec.Player.Character
+	local H = C and C:FindFirstChild(`Head`)
+	return H and H:IsA(`BasePart`) and H.Position or (Rec and Rec.Pos)
+end
+
+local function spots(Kind: string): { BasePart }
+	local Out = {}
+	for _, P in CollectionService:GetTagged(SPOT_TAG) do
+		if P:IsA(`BasePart`) and P:IsDescendantOf(workspace) and P:GetAttribute(`Kind`) == Kind then table.insert(Out, P) end
+	end
+	return Out
+end
+
+-- a free spot of that kind, preferring a talking group someone is already at (for twos and threes)
+local function playerOn(P: BasePart): boolean
+	for _, Pl in Players:GetPlayers() do
+		local R = Pl.Character and Pl.Character:FindFirstChild(`HumanoidRootPart`)
+		if R and R:IsA(`BasePart`) and (Vector3.new(R.Position.X, 0, R.Position.Z) - Vector3.new(P.Position.X, 0, P.Position.Z)).Magnitude < 3.5
+			and math.abs(R.Position.Y - P.Position.Y) < 6 then return true end
+	end
+	return false
+end
+
+local function freeSpot(S, Kind: string, Social: boolean?): BasePart?
+	local Free, Grouped = {}, {}
+	local Busy = {}
+	for Spot, Who in SpotTaken do if Who ~= S and Who.Model then Busy[Spot:GetAttribute(`Group`) or ``] = true end end
+	for _, P in spots(Kind) do
+		local Who = SpotTaken[P]
+		if (not Who or Who == S or not Who.Model) and not (S.Agent and Nav.Unreachable(P.Position, S.Agent)) and P ~= S.LastSpot and not playerOn(P) then
+			table.insert(Free, P)
+			if Social and P:GetAttribute(`Group`) and Busy[P:GetAttribute(`Group`)] then table.insert(Grouped, P) end
+		end
+	end
+	local Pool = if #Grouped > 0 and math.random() < 0.75 then Grouped else Free
+	-- everything else is taken or failed lately: the spot we just left is better than standing in the hall
+	if #Pool == 0 and S.LastSpot and (not SpotTaken[S.LastSpot] or SpotTaken[S.LastSpot] == S) and S.LastSpot:GetAttribute(`Kind`) == Kind
+		and not (S.Agent and Nav.Unreachable(S.LastSpot.Position, S.Agent)) then return S.LastSpot end
+	if #Pool == 0 then return nil end
+	return Pool[math.random(1, #Pool)]
+end
+
+local function claim(S, Spot: BasePart?)
+	for P, Who in SpotTaken do if Who == S then SpotTaken[P] = nil end end
+	if Spot then SpotTaken[Spot] = S end
+	S.Spot = Spot
+end
+
+---| bodies |---
+
+local function setupGroups()
+	pcall(function() PhysicsService:RegisterCollisionGroup(`NHWalkers`) end)
+	for _, G in { `Entity`, `NPC`, `NHWalkers`, `SportBall` } do
+		pcall(function() PhysicsService:CollisionGroupSetCollidable(`NHWalkers`, G, false) end)
+	end
+end
+
+local function rollLook(): any
+	local Appearance = require(ReplicatedStorage.UI.Appearance)
+	local Look = Appearance.Sanitize(nil)
+	Look.UseAvatar = false
+	Look.Body = math.random(1, 2)
+	Look.Skin = math.random(1, #Appearance.Skins)
+	Look.HairColor = math.random(1, #Appearance.HairColors)
+	local Female = Appearance.IsFemale and Appearance.IsFemale(Look)
+	-- school clothes only (never the admin kit): uniforms whose id says nothing about staff
+	local function pick(List, Field)
+		local Pool = {}
+		for I, It in List or {} do
+			local Id = string.lower(tostring(typeof(It) == `table` and (It.Id or It.Name) or It))
+			if not Id:find(`admin`) and not Id:find(`staff`) then table.insert(Pool, I) end
+		end
+		if #Pool > 0 then Look[Field] = Pool[math.random(1, #Pool)] end
+	end
+	pick(Appearance.Uniforms, `Uniform`)
+	pick(Appearance.BottomsList, `Bottoms`)
+	Look.EyeSet = if Female then 2 else 1
+	if Appearance.Eyes then Look.Eyes = math.random(1, #Appearance.Eyes) end
+	local Cat = ReplicatedStorage:FindFirstChild(`NHHairCatalog`)
+	if Cat then
+		local Pool = {}
+		for _, H in Cat:GetChildren() do
+			if H:GetAttribute(`Group`) == (if Female then `Female` else `Male`) then table.insert(Pool, H:GetAttribute(`AssetId`)) end
+		end
+		if #Pool > 0 then Look.HairId = Pool[math.random(1, #Pool)] end
+	end
+	Look.Created = true
+	return Look
+end
+
+local function track(S, Name: string, Looped: boolean): AnimationTrack?
+	if S.Tracks[Name] then return S.Tracks[Name] end
+	if (ANIM[Name] or 0) == 0 then return nil end
+	local Animator = S.Hum:FindFirstChildOfClass(`Animator`) or Instance.new(`Animator`, S.Hum)
+	local A = Instance.new(`Animation`)
+	A.AnimationId = `rbxassetid://{ANIM[Name]}`
+	local Ok, T = pcall(function() return Animator:LoadAnimation(A) end)
+	if not Ok then return nil end
+	T.Looped = Looped
+	T.Priority = if Name == `Walk` or Name == `Idle` or Name == `Sprint` then Enum.AnimationPriority.Movement else Enum.AnimationPriority.Action
+	S.Tracks[Name] = T
+	return T
+end
+
+local function pose(S, Name: string?)
+	for K, T in S.Tracks do
+		if K ~= `Walk` and K ~= `Idle` and K ~= `Sprint` and K ~= Name and T.IsPlaying then T:Stop(0.3) end
+	end
+	if Name then
+		local T = track(S, Name, true)
+		if T and not T.IsPlaying then T:Play(0.3) end
+	end
+end
+
+local function spawn(S, At: CFrame)
+	local Rig = ServerStorage:FindFirstChild(`NHCore`) and ServerStorage.NHCore:FindFirstChild(`NpcRig`)
+	if not (Rig and Folder) then return false end
+	local M = Rig:Clone()
+	M.Name = `Student`
+	M:SetAttribute(`Role`, `Ambient`)
+	M:SetAttribute(`NHStudent`, S.Index)
+	M:SetAttribute(`NHPersonality`, string.format(`brave %.1f, social %.1f`, S.Bravery, S.Social))
+	local Animate = M:FindFirstChild(`Animate`)
+	if Animate then Animate:Destroy() end
+	local Hum = M:FindFirstChildOfClass(`Humanoid`) :: Humanoid
+	local Root = M:FindFirstChild(`HumanoidRootPart`) :: BasePart
+	Hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+	Hum.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOff
+	Hum.BreakJointsOnDeath = false
+	Hum.UseJumpPower = true
+	Hum.JumpPower = 50 -- the Map's gravity is 210: about 6 studs, enough for the entrance steps
+	Hum.AutoRotate = true
+	for _, St in { Enum.HumanoidStateType.Dead, Enum.HumanoidStateType.FallingDown, Enum.HumanoidStateType.Ragdoll, Enum.HumanoidStateType.Climbing, Enum.HumanoidStateType.Swimming } do
+		Hum:SetStateEnabled(St, false)
+	end
+	local Up = Root.Size.Y / 2 + Hum.HipHeight + (M:FindFirstChild(`Left Leg`) and M[`Left Leg`].Size.Y or 2)
+	M:PivotTo(At * CFrame.new(0, Up, 0) * Root.CFrame:Inverse() * M:GetPivot())
+	M.Parent = Folder
+	pcall(function() require(ReplicatedStorage.UI.Appearance).ApplyTo(M, table.clone(S.Look)) end)
+	for _, D in M:GetDescendants() do
+		if D:IsA(`BasePart`) then D.CollisionGroup = `NHWalkers` D.CanQuery = false D.CanTouch = false end
+	end
+	pcall(function() Root:SetNetworkOwner(nil) end)
+	S.Model, S.Hum, S.Root, S.Tracks = M, Hum, Root, {}
+	S.Agent = Nav.Agent(M, { Speed = S.Speed; Name = `Student{S.Index}` })
+	S.Agent.Up = Up
+	S.Senses = Senses.Perceiver(M, { Bravery = S.Bravery; ViewRange = 60 + S.Social * 20 })
+	local Walk, Idle, Run = track(S, `Walk`, true), track(S, `Idle`, true), track(S, `Sprint`, true)
+	if Idle then Idle:Play() end
+	Hum.Running:Connect(function(Speed)
+		if Speed > 10 and Run then
+			if Walk and Walk.IsPlaying then Walk:Stop(0.15) end
+			if not Run.IsPlaying then Run:Play(0.15) end
+			Run:AdjustSpeed(Speed / RUN_PACE)
+		elseif Speed > 0.5 and Walk then
+			if Run and Run.IsPlaying then Run:Stop(0.15) end
+			if not Walk.IsPlaying then Walk:Play(0.2) end
+			Walk:AdjustSpeed(Speed / WALK_PACE) -- feet match the ground speed
+		else
+			if Walk and Walk.IsPlaying then Walk:Stop(0.2) end
+			if Run and Run.IsPlaying then Run:Stop(0.2) end
+		end
+	end)
+	return true
+end
+
+local function despawn(S)
+	claim(S, nil)
+	if S.Model then S.Model:Destroy() end
+	S.Model, S.Hum, S.Root, S.Tracks, S.Agent, S.Senses = nil, nil, nil, nil, nil, nil
+end
+
+---| reactions |---
+
+-- the most urgent thing to react to right now, or nil. What triggered it is kept for 0.8 s (S.Pending), so a
+-- reaction isn't lost when the moment has passed by the time the brain gets to it (someone who rushed at a
+-- student and stopped should still make them step aside)
+local function urgentNow(S, Snap): string?
+	if not Snap then return nil end
+	local T = Snap.Threat
+	if T and S.Root then
+		local Dist = (T.Pos - S.Root.Position).Magnitude
+		local Close = 10 + (1 - S.Bravery) * 12 -- brave ones let it get closer
+		if Dist < Close and T.Level > 0.15 then return `Danger` end
+		if T.Kind == `Fight` and Dist < 55 then return `Gawk` end
+	end
+	if Snap.Approaching and not S.Busy then return `MakeWay` end
+	if Snap.Crowding then return `Space` end
+	return nil
+end
+
+local function urgent(S, Snap): (string?, any)
+	local U = urgentNow(S, Snap)
+	if U then
+		S.Pending = { U = U; Snap = Snap; At = os.clock() }
+		return U, Snap
+	end
+	local P = S.Pending
+	if P and os.clock() - P.At < 0.8 then return P.U, P.Snap end
+	return nil, Snap
+end
+
+local function shouldStop(S): () -> boolean
+	return function()
+		local Snap = S.Senses and S.Senses.Last
+		local U = urgent(S, Snap)
+		return U == `Danger` or U == `Gawk` or U == `MakeWay` or U == `Space` or S.Plan ~= Plan
+	end
+end
+
+-- somewhere 20-30 studs away from a point, on the floor, that we can get to in a straight-ish line
+local function awayFrom(S, From: Vector3): Vector3?
+	local My = S.Root.Position
+	local Base = Vector3.new(My.X - From.X, 0, My.Z - From.Z)
+	if Base.Magnitude < 0.1 then Base = S.Root.CFrame.LookVector * -1 end
+	Base = Base.Unit
+	for _, A in { 0, 35, -35, 70, -70, 110, -110 } do
+		local Dir = CFrame.Angles(0, math.rad(A), 0):VectorToWorldSpace(Base)
+		for _, R in { 26, 18, 12 } do
+			local F = Nav.Floor(My + Dir * R, 6)
+			if F and (F - From).Magnitude > (My - From).Magnitude then return F end
+		end
+	end
+	return nil
+end
+
+local React = {}
+
+function React.Danger(S, Snap)
+	local T = Snap.Threat
+	mood(S, `Scared`, 6)
+	S.Model:SetAttribute(`NHActivity`, `Backing away ({T.Kind})`)
+	say(S, if T.Kind == `Monster` then LINES.Monster else LINES.Flee, 10)
+	lookAt(S, T.Pos + Vector3.new(0, 2, 0), 2)
+	local To = awayFrom(S, T.Pos)
+	if To then
+		S.Agent:GoTo(To, { Speed = 13 + S.Bravery * 2; Arrive = 2.5 })
+	else
+		S.Agent:Shuffle(S.Root.Position - T.Pos, 1.2, 11)
+	end
+	S.WatchUntil = os.clock() + 8
+	S.WatchAt = T.Pos
+end
+
+function React.Gawk(S, Snap)
+	local T = Snap.Threat
+	mood(S, `Watching`, 4)
+	S.Model:SetAttribute(`NHActivity`, `Watching a fight`)
+	S.Agent:Stop()
+	pose(S, nil)
+	S.Agent:Face(T.Pos)
+	lookAt(S, T.Pos + Vector3.new(0, 2, 0), 1.2)
+	S.WatchUntil = os.clock() + 6
+	S.WatchAt = T.Pos
+	task.wait(0.4)
+end
+
+function React.MakeWay(S, Snap)
+	local Rec = Snap.Approaching
+	if not (Rec and Rec.Pos) then return end
+	mood(S, `Wary`, 3)
+	local Rel = Rec.Pos - S.Root.Position
+	local Side = Vector3.new(-Rel.Z, 0, Rel.X)
+	-- step to whichever side they aren't heading for
+	local V = Rec.Root and Rec.Root.AssemblyLinearVelocity or Vector3.zero
+	if Side:Dot(V) > 0 then Side = -Side end
+	lookAt(S, headOf(Rec), 1.5)
+	S.Agent:Shuffle(Side, 0.55, 7)
+	S.Agent:Face(Rec.Pos)
+	task.wait(0.3)
+end
+
+function React.Space(S, Snap)
+	local Rec = Snap.Crowding
+	if not (Rec and Rec.Pos) then return end
+	mood(S, `Uneasy`, 5)
+	lookAt(S, headOf(Rec), 2.5)
+	if S.Social > 0.45 then say(S, LINES.Space, 14) end
+	S.Agent:Shuffle(S.Root.Position - Rec.Pos, 0.7, 4)
+	S.Agent:Face(Rec.Pos)
+	Rec.Near = 0
+	S.Restless = true -- find somewhere else to stand
+	task.wait(0.4)
+end
+
+-- the gentle ones (never stop walking): staring back, glancing, feeling followed
+local function glance(S, Snap)
+	local Now = os.clock()
+	if Snap and Snap.Staring then
+		local Rec = Snap.Staring
+		lookAt(S, headOf(Rec), 0.6)
+		if not S.Agent.Moving then
+			if S.Social >= 0.5 then
+				mood(S, `Friendly`)
+				say(S, LINES.Greet, 25)
+			elseif Rec.Stare > 6 and not S.Busy then
+				mood(S, `Shy`)
+				say(S, LINES.Shy, 25)
+				S.Restless = true -- move on to another spot
+			end
+		end
+		return
+	end
+	if Snap and Snap.Following then
+		mood(S, `Uneasy`)
+		if Now - (S.GlancedBack or 0) > 2.5 then
+			S.GlancedBack = Now
+			lookAt(S, headOf(Snap.Following), 0.9)
+			say(S, LINES.Followed, 30)
+		end
+		S.Hurry = Now + 6
+		return
+	end
+	if S.WatchUntil and Now < S.WatchUntil and S.WatchAt then
+		lookAt(S, S.WatchAt + Vector3.new(0, 2, 0), 0.6)
+		return
+	end
+	if Snap and Snap.Focus and Snap.Focus.Aware > 0.45 and (Snap.Focus.Dist or 99) < 30 then
+		lookAt(S, headOf(Snap.Focus), 0.6)
+		return
+	end
+	if Snap and Snap.Heard and Snap.Heard.Kind == `Door` and Now - Snap.Heard.At < 1.5 then
+		lookAt(S, Snap.Heard.Pos, 1.2)
+		return
+	end
+	-- the people we're talking to, or a look around now and then
+	if S.Partner and S.Partner.Root and not S.Agent.Moving then
+		lookAt(S, S.Partner.Root.Position + Vector3.new(0, 1.5, 0), 0.6)
+		return
+	end
+	if Now > (S.NextLookAround or 0) and S.Root then
+		S.NextLookAround = Now + math.random(25, 70) / 10
+		local Ang = math.rad(math.random(-70, 70))
+		local Dir = CFrame.Angles(0, Ang, 0):VectorToWorldSpace(S.Root.CFrame.LookVector)
+		lookAt(S, S.Root.Position + Dir * 12 + Vector3.new(0, math.random(-2, 3), 0), 1.4)
+	end
+	if S.Model and S.Model:GetAttribute(`NHMood`) ~= `Calm` and not (S.WatchUntil and Now < S.WatchUntil) then mood(S, `Calm`) end
+end
+
+---| the day |---
+
+local function activityFor(S): (string, string)
+	local K = Plan.Kind
+	if K == `Night` or K == `Morning` or K == `Off` then return `Leave`, `Going home` end
+	if K == `Evening` then
+		if Plan.Hour >= 19 or S.Index % 2 == 0 then return `Leave`, `Going home` end
+		return `Yard`, `Hanging out`
+	end
+	if K == `AfterSchool` then
+		if Plan.Hour >= 14 and S.Index % 3 == 0 then return `Leave`, `Going home` end
+		return `Yard`, `After school`
+	end
+	if K == `Class` then return `Inside`, `Waiting for class` end
+	if K == `Passing` then return (if math.random() < 0.6 then `Inside` else `Yard`), `Passing time` end
+	if K == `Break` or K == `Lunch` then return `Yard`, (if K == `Lunch` then `Lunch` else `Break`) end
+	return `Yard`, `Before school`
+end
+
+-- one leg of the student's day: get somewhere and spend a while there (returns early to react)
+local function doTask(S)
+	local Kind, Label = activityFor(S)
+	S.Plan = Plan
+	if Kind == `Leave` then
+		if not S.Model then task.wait(1) return end
+		local Gate = spots(`Gate`)[1]
+		S.Model:SetAttribute(`NHActivity`, Label)
+		claim(S, nil)
+		local Ok = Gate and S.Agent:GoTo(Gate.Position, { Speed = S.Speed; Arrive = 3; ShouldStop = shouldStop(S) })
+		if Ok or not Gate then despawn(S) end
+		return
+	end
+	if not S.Model then
+		local Gate = spots(`Gate`)[1] or spots(`Yard`)[1]
+		if not Gate then task.wait(2) return end
+		if not spawn(S, Gate.CFrame * CFrame.new((math.random() - 0.5) * 6, 0, (math.random() - 0.5) * 4)) then task.wait(2) return end
+	end
+	local Keep = not S.Restless and S.Spot and S.Spot:GetAttribute(`Kind`) == Kind and SpotTaken[S.Spot] == S and not playerOn(S.Spot)
+	local Spot = if Keep then S.Spot else freeSpot(S, Kind, Kind == `Yard`)
+	S.Restless = false
+	step(S, if Spot then `going to {Spot.Name}` else `no free {Kind} spot`)
+	if not Spot then task.wait(1.5) return end
+	claim(S, Spot)
+	S.Model:SetAttribute(`NHActivity`, `{Label}: walking`)
+	pose(S, nil)
+	S.Partner = nil
+	local Speed = S.Speed * (if S.Hurry and os.clock() < S.Hurry then 1.35 else 1)
+	local Ok, Why = S.Agent:GoTo(Spot.Position, { Speed = Speed; ShouldStop = shouldStop(S) })
+	step(S, if Ok then `at {Spot.Name}` else `{Spot.Name}: {Why}`)
+	if not Ok then
+		if Why == `unreachable` then S.LastSpot = Spot claim(S, nil) task.wait(0.5 + math.random()) end
+		return
+	end
+	S.LastSpot = Spot
+	S.Model:SetAttribute(`NHActivity`, Label)
+	-- face the way the spot says, or a friend at the same group
+	local Group = Spot:GetAttribute(`Group`)
+	for P, Who in SpotTaken do
+		if Who ~= S and Who.Model and Group and P:GetAttribute(`Group`) == Group then S.Partner = Who break end
+	end
+	if S.Partner and S.Partner.Root then S.Agent:Face(S.Partner.Root.Position)
+	else S.Agent:Face(Spot.Position + Spot.CFrame.LookVector * 5) end
+	if not S.Partner and math.random() < 0.3 then pose(S, `Lean`) end
+	local Until = os.clock() + math.random(120, 300) / 10
+	local NextFriend = 0
+	while os.clock() < Until and S.Plan == Plan and S.Model and not S.Restless do
+		local Snap = S.Senses and S.Senses.Last
+		if urgent(S, Snap) then break end
+		-- a friend turned up at the same group: turn to them
+		if Group and os.clock() >= NextFriend then
+			NextFriend = os.clock() + 1
+			if not (S.Partner and S.Partner.Model) then
+				S.Partner = nil
+				for P, Who in SpotTaken do
+					if Who ~= S and Who.Model and Who.Root and P:GetAttribute(`Group`) == Group and not Who.Agent.Moving then S.Partner = Who break end
+				end
+			end
+			local F = S.Partner and S.Partner.Root
+			if F and S.Root then
+				local To = Vector3.new(F.Position.X - S.Root.Position.X, 0, F.Position.Z - S.Root.Position.Z)
+				if To.Magnitude > 0.5 and S.Root.CFrame.LookVector:Dot(To.Unit) < 0.85 then
+					pose(S, nil)
+					S.Agent:Face(F.Position)
+				end
+			end
+		end
+		task.wait(0.25)
+	end
+	pose(S, nil)
+end
+
+---| the brain |---
+
+local function brain(S)
+	while true do
+		if S.Model and S.Senses then
+			local Snap = S.Senses:Due() and S.Senses:Tick() or S.Senses.Last
+			glance(S, Snap)
+			local U, USnap = urgent(S, Snap)
+			if U and React[U] then
+				S.Pending = nil
+				step(S, `reacting: {U}`)
+				local Ok, Err = pcall(React[U], S, USnap)
+				if not Ok then warn(`[MapStudents] {U}: {Err}`) task.wait(0.5) end
+				continue
+			end
+			if S.WatchUntil and os.clock() < S.WatchUntil then step(S, `watching`) task.wait(0.25) continue end
+		end
+		local Ok, Err = pcall(doTask, S)
+		if not Ok then warn(`[MapStudents] {Err}`) task.wait(1) end
+		task.wait()
+	end
+end
+
+-- the senses keep ticking while a student walks or waits (the brain is inside GoTo then)
+local function senseLoop()
+	while true do
+		for _, S in Students do
+			if S.Model and S.Senses and S.Senses:Due() then
+				local Snap = S.Senses:Tick()
+				pcall(glance, S, Snap)
+			end
+		end
+		task.wait(0.1)
+	end
+end
+
+---| start |---
+
+function Shared.Debug()
+	local Out = {}
+	for _, S in Students do
+		table.insert(Out, {
+			Index = S.Index; Spawned = S.Model ~= nil;
+			Activity = S.Model and S.Model:GetAttribute(`NHActivity`); Mood = S.Model and S.Model:GetAttribute(`NHMood`);
+			Pos = S.Root and S.Root.Position; Spot = S.Spot and S.Spot.Name;
+		})
+	end
+	return Out
+end
+
+function Shared.OnStart()
+	Nav.Init()
+	Senses.Init()
+	setupGroups()
+	local SpotFolder = workspace:FindFirstChild(`School NPC Spots`)
+	if SpotFolder then
+		for _, P in SpotFolder:GetDescendants() do if P:IsA(`BasePart`) then P.Transparency = 1 end end
+	end
+	if #CollectionService:GetTagged(SPOT_TAG) == 0 then return end -- nowhere to be yet
+	Folder = Instance.new(`Folder`)
+	Folder.Name = `NHStudents`
+	Folder.Parent = workspace
+	local Count = (SpotFolder and tonumber(SpotFolder:GetAttribute(`Students`))) or DEFAULT_COUNT
+	for I = 1, Count do
+		local Ok, Look = pcall(rollLook)
+		Students[I] = {
+			Index = I; Look = if Ok then Look else {};
+			Bravery = math.random(10, 85) / 100; Social = math.random(15, 95) / 100;
+			Speed = 5.4 + math.random() * 1.6;
+		}
+	end
+	task.spawn(function()
+		task.wait(4)
+		local Clock = require(ServerScriptService.Services.School.SchoolClock)
+		local function refresh()
+			local Ok, State = pcall(Clock.GetState)
+			if not (Ok and State and State.Segment) then return end
+			local Hour = State.Hour or math.floor((State.MinuteOfDay or 0) / 60)
+			local Kind = State.Segment.Kind
+			local Key = `{Kind}:{State.Segment.Name}:{Hour >= 14}:{Hour >= 19}`
+			if Key ~= Plan.Key then Plan = { Kind = Kind; Hour = Hour; Key = Key } end
+		end
+		refresh()
+		for I, S in Students do
+			task.delay(I * 1.5, brain, S) -- they don't all walk in at once
+		end
+		task.spawn(senseLoop)
+		while true do
+			task.wait(1)
+			if workspace:GetAttribute(`NHStudentsPlan`) then
+				-- tests: force a part of the day (Kind) without moving the school clock
+				local K = workspace:GetAttribute(`NHStudentsPlan`)
+				if Plan.Key ~= `test:` .. K then Plan = { Kind = K; Hour = 10; Key = `test:` .. K } end
+			else
+				refresh()
+			end
+		end
+	end)
+end
+
+return Shared

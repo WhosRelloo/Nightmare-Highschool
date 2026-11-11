@@ -2,6 +2,56 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.78.0] - 2026-11-10: Map place: school students with new pathfinding and awareness
+
+Owner: "Start putting a few school NPC's in the Map place, but COMPLETELY upgrade their pathfinding & awareness". Full write-up: `docs/Map-Students.md`. Sources: `tools/map-students/`.
+
+### Added (Map place, tagged NHCore)
+- **Six background students** (`Services.Features.MapStudents`) who live by the school clock:
+  - they come in through the front gate before school and hang out in the yard in talking pairs;
+  - they wait in the ground-floor halls at class time, and go home after school and in the evening.
+  - Each has a personality (bravery, sociability, pace) and a look rolled from school clothes.
+  - Body: NH Combat Test's NPC rig, as `ServerStorage.NHCore.NpcRig`.
+- **Spots** in `workspace["School NPC Spots"]`: a gate spot, 8 yard spots (four pairs) and 7 hall spots, each checked for floor, room and a path from the gate. The builder can move or add them (tag `NHNpcSpot`, attribute `Kind`). The courtyard has none: its only route is a drop out of a second-floor window.
+- **`Services.AI.Nav`, the new pathfinding:**
+  - it goes through doors (each leaf gets a passable PathfindingModifier while the game runs, and students open doors with `Features.Doors.Toggle`, swinging them away);
+  - it climbs steps (jump links), and refuses drops over 5 studs;
+  - it smooths paths along clear, floored lines;
+  - it avoids others by predicting where they'll be (sideways only; ignoring other students in doorways and on steps);
+  - it recovers in stages (hop, sidestep, back off and re-plan), with real-block checks and per-student memory of unreachable goals;
+  - it plans with a queue and a time limit, and matches walk and run speeds to the clips.
+- **`Services.AI.Senses`, the new awareness:**
+  - sight: a view cone with focus and peripheral, real line of sight (glass lets it through), shorter at night and against `NH_Stealth`, awareness that builds and fades;
+  - hearing: fights, screams, doors, sprinting, muffled by walls;
+  - reading players: fighting, transformed, downed, coming at me, too close, staring, following.
+- **Reactions:** back away from danger, watch a fight, make way, step back from someone too close, look back or say hello when stared at, glance back when followed, and turn their heads toward whatever they notice.
+- **`Controllers.World.NpcLook`** (client): smooth, clamped head turns (75° to the sides, 35° up or down) and speech bubbles in the game's style.
+
+### Verified (Map place, local play-test)
+- **Walking, all six:** in through the gate, up the front steps, through the entrance doors (they opened them), along the halls to all seven hall spots (both ends), and back out to the yard pairs.
+- **Pairs:** facing each other 1.00 / 1.00.
+- **Staring:** the student looked at the player's head within 0.5 s and said "Evening.".
+- **Head turn:** to a player 50° to the side, the head turned 50° and the body stayed. At 81° (outside the view) nobody noticed.
+- **Too close:** after 1.3 s the student stepped back 3 studs, then moved to another spot.
+- **Fight** (the player's combat tag, 8 studs away): "Whoa!", ran at 14.5 studs/s to 31 studs, then watched. A student about 31 studs away with a view of it watched. One out of sight stayed calm.
+- **Monster** (Transformation, 9 studs): "What IS that?", backed off.
+- **Make way:** walking straight at a student, it stepped 4 studs aside with the player about 6 studs away.
+- **Server:** 60 fps held (16.7 ms frames, worst 18 ms). No script errors.
+- **Fixed while testing:**
+  - `Path.Blocked` firing constantly (swinging doors, the oaks) made students give up: it now only counts when the way really is shut.
+  - The path smoother's long hall cuts were mistaken for being lost.
+  - Students shoved each other out of doorways.
+  - A student walked back next to the player it had just stepped away from.
+  - The planner routed out of a second-floor window into the courtyard.
+  - The head turned the wrong way.
+- **Not tried:**
+  - being followed;
+  - a real fight's hit sounds (tested with the combat tag);
+  - locked doors;
+  - two players;
+  - a whole in-game day;
+  - night vision.
+
 ## [1.77.1] - 2026-11-10: Map place: the Thornrose health bar and the posture rail
 
 Owner: "Sync the new posture bar and health stuff" (NH Combat Test 1.74.0, the posture rail, and 1.77.0, Thornrose).

@@ -174,7 +174,7 @@ Done so far: the core (1.54), customization, doors, admin, heights (v2), races a
 - Locker hiding (`LockerProps`, `World.LockerDoors`, `LockerPOV`): hallway lockers.
 - Lost & Found (`NHLostFoundBox`), the concession stand (`NHConcessionSpot`) and the fortune teller (a region and a seat).
 - Regions and the compass (`Features.Regions`, `World.Regions`, `Gui.Compass`): region boxes per room or area, once rooms are final.
-- NPC students and staff (`AmbientNpcs`, `NpcLooks`, `Schedules`, `Social.Npcs`, `Dialogue`): seats, rooms and stations.
+- NPC students and staff: **started (1.78.0)**: six background students with new pathfinding and awareness (`Features.MapStudents`, `AI.Nav`, `AI.Senses`; `docs/Map-Students.md`). Still to come once rooms are fitted: seats, classrooms, staff, talkable NPCs (`Social.Npcs`, `Dialogue`).
 - The school day (`School.*`: classes, attendance, detention, enrollment, report cards, substitutes, the hall monitor, activities, the class locker): classrooms with their doors.
 - Quests and investigations (`Quests.*`): quest objects placed in rooms.
 - Cliques and factions (`Social.*`: hangouts, turf, pranks, showdowns): hangout spots.
