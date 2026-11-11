@@ -60,7 +60,7 @@ These five are the **main minigames**, one exercise at its own station: a mat fo
 
 The barbell is on hold, at the owner's word. It can come back later as a higher-level station for arms and torso.
 
-**How a rep works in the main five:** a ring shrinks around a brass gauge, and you press when it meets the mark (good, great, perfect). Each rep plays the rep animation, and a combo counter builds. At higher levels the ring speeds up and the windows narrow. "Heavy" reps (hold to grind) and "burnout" sets (as many reps as you can before a stamina bar runs out) mix in, and the weight on the bar visibly grows (plates added).
+**How a rep works in the main four** (push-ups, pull-ups, sit-ups, squats): a ring shrinks around a brass gauge, and you press when it meets the mark (good, great, perfect). Each rep plays the rep animation, and a combo counter builds. At higher levels the ring speeds up and the windows narrow. "Heavy" reps (hold to grind) and "burnout" sets (as many reps as you can before a stamina bar runs out) mix in. The load visibly grows: a weighted vest for push-ups and pull-ups, a sandbag on the shoulders for squats, and a held plate for sit-ups.
 
 ## The minigames
 
