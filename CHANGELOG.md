@@ -21,9 +21,10 @@ The owner imported the 12 FBX, bulk-imported the maps and HUD art and published 
 - In Play on slot 4: the real lantern in hand with its maps, lit, its clip playing; the brass chip plates and icons and the
   compass bezel and needle drawn from the uploaded art; every model's maps loaded (an Edit lineup of all 12).
 
-### Not done
-- `KitCompassFace` isn't in the group yet (the import didn't land): the compass shows a plain dial card until it is.
-  The redrawn `KitFrostEdge.png` needs uploading again (the first version looked blotchy in game).
+### Added later the same day
+- `KitCompassFace` (111693582059740; Roblox's filter hashes its name, which is why it couldn't be found by name) and the
+  redrawn `KitFrostEdge` (104559232486608), both moderated Completed. Seen in Play: the full brass compass (bezel, the
+  dial card turning to north, the needle to the target, the crystal) and the frosted-glass edge.
 
 ## [1.80.0] - 2026-11-11: The everyday-carry kit (QOL items)
 
