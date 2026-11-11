@@ -82,7 +82,7 @@ Final check over every built item (90 pieces, the katana and the five capes incl
 - **Regalia colour:** each Kit B item has `Tint` (`Ember` or `Crimson`). While regalia is worn, `AccessoryWear` sets
   `NHRegaliaTint` (Color3) and `NHRegalia` (the deciding item id) on the character: the most visible piece decides
   (halo, shoulders, hat, coat, held, collar, trail, familiar, face, ring). The staff teleport flock reads it to take
-  the same colour (the teleport session's part; see "Not done yet").
+  the same colour (`Controllers.World.TpFlock`, 1.84.1: the birds' eye glints, the smoke and the motes).
 - **The halo's flare:** `Features.Fx.VeilMove` stamps `NHAdminFlare` (server time) on a staff member's character when
   they teleport as their flock or move a student; an invisible staff member's move shows nothing (`install/patch_fx_flare.luau`).
 - **The coats' hair limit (owner decision):** the coat shells fit only 4 of 35 hairs; even short cuts rest on the
@@ -272,7 +272,6 @@ the drawn katana: it's hidden while a weapon is drawn).
   then the IDs are read by name and `acc_assemble.py <batch> <Items> --ids` builds each batch's templates, and each
   batch is play-tested on slot 4. Until then none of batches 2-8 shows in the game.
 - **Owner decision:** the coats' hair limit (above).
-- The teleport flock taking `NHRegaliaTint` (Controllers.World.TpFlock, the staff teleport session's code).
 - Unverified until the import: the crows' and pages' bone axes and the page-turn direction, the emitters' look (they
   are emitted from a point in a cone; sprites: the teleport feather and the place's VFX smoke), the hidden trail
   anchor, every pulse and the halo's flare.
