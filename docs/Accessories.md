@@ -108,8 +108,9 @@ refused every hair that passed through it. Now, where it can be done cleanly, th
 vertex follows its nearest lock chain, the crown stays on HairRoot (fading out over the first 0.16 studs of the lock),
 and the weights are smoothed over the mesh's edges so each strand card bends as one piece. The bones are unchanged:
 every bone's name and rest position, and every vertex at rest, match the hairs in the game exactly (checked on all 35).
-The v2 hairs wait in `art/group-upload-hair-v2/` for the owner's import; `tools/hair-rig/swap_v2.luau` then swaps each
-catalog hair's Handle (backup: `ServerStorage.NH_Backup.Hair_v1`) and marks it `NHHairRig = 2`.
+**In the game since 1.85.1**: the owner imported `art/group-upload-hair-v2/` and `tools/hair-rig/swap_v2.luau` swapped
+each catalog hair's Handle (backup: `ServerStorage.NH_Backup.Hair_v1`) and marked it `NHHairRig = 2`. Seen in Play on
+slot 4: the straight bob lies over the falling ruff.
 
 **The solve** (`art/characters/accessories/acc_hairtuck.py`). For every hair an item refused, it looks for the gentlest
 turn of each lock's bones that clears the item, on the standard body and at the item's shallowest and deepest body

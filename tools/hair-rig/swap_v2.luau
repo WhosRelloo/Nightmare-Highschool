@@ -17,6 +17,10 @@ bk.Name = "NH_Backup"
 local keep = bk:FindFirstChild("Hair_v1") or Instance.new("Folder", bk)
 keep.Name = "Hair_v1"
 local report = {}
+-- hairs whose catalog rig differs from the source rig the tucks were solved for (same mesh, different lock bones):
+-- the swap takes the source rig, as long as every bone the two share sits where it did
+-- (Hair_9000000002 Males_Super_Messy_Long_Hair: catalog 16 bones with Lock5_3; source 17 with Lock3_3 and Lock4_3)
+local NEW_BONES_OK = { Males_Super_Messy_Long_Hair = true }
 
 local function findImport(src)
 	for _, d in ipairs(workspace:GetDescendants()) do
@@ -51,6 +55,15 @@ for _, A in ipairs(Cat:GetChildren()) do
 		table.insert(report, A.Name .. " " .. src .. ": no import found")
 		continue
 	end
+	-- Import 3D may read the FBX in centimetres (100x): scale the mesh and every bone position back (a uniform scale
+	-- keeps the rig exact: each bone's offset from its parent shrinks, its turn is unchanged)
+	local ratio = new.Size.Magnitude / old.Size.Magnitude
+	if math.abs(ratio - 100) < 0.5 then
+		new.Size = new.Size / 100
+		for _, b in ipairs(new:GetDescendants()) do
+			if b:IsA("Bone") then b.CFrame = CFrame.new(b.CFrame.Position / 100) * b.CFrame.Rotation end
+		end
+	end
 	if (new.Size - old.Size).Magnitude > 0.02 then
 		table.insert(report, string.format("%s %s: size %s, old %s: skipped", A.Name, src, tostring(new.Size), tostring(old.Size)))
 		continue
@@ -61,7 +74,7 @@ for _, A in ipairs(Cat:GetChildren()) do
 		if b:IsA("Bone") then
 			local nb = new:FindFirstChild(b.Name, true)
 			if not (nb and nb:IsA("Bone")) then
-				missing += 1
+				if not NEW_BONES_OK[src] then missing += 1 end
 			else
 				worst = math.max(worst, (restOf(nb).Position - restOf(b).Position).Magnitude)
 			end

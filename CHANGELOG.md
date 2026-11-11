@@ -2,6 +2,33 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.85.1] - 2026-11-11: the v2 hairs are in; hair tuck seen in game
+
+### Changed
+- **The 35 catalog hairs are v2 rigs** (the owner's import of `art/group-upload-hair-v2/`, then
+  `tools/hair-rig/swap_v2.luau`): each Handle swapped, checked against its old self (size, texture, position,
+  HairAttachment, every shared bone where it was), `NHHairRig = 2`. Backup `ServerStorage.NH_Backup.Hair_v1`; the
+  importer's pose records moved to `NH_Backup.Hair_v2_import_leftovers`.
+  - Import 3D read the FBX in centimetres (100x): the swap scales such a mesh and its bones back.
+  - Super Messy Long Hair's catalog rig differed from its source (16 bones, Lock5_3; the source 17 with Lock3_3 and
+    Lock4_3, the same mesh): it takes the source rig its tucks were solved for.
+- **Batch 1's templates** carry the new hair fits and tucks (`tools/accessories/refresh_hair_batch1.luau`, written by
+  `acc_refresh_hair.py`; old fits kept in `NH_Backup.Accessories_pre3.HairFit_pre_tuck`). The satchel and the Head
+  Student's sash wait for the `batch1-fix` import.
+
+### Fixed
+- `UI.AccessoryWear` decides whether a look's hair can take a tuck from the hair catalog: `UI.Appearance.ApplyTo` wears
+  the accessories before it puts the new hair on, so the tucked pieces were left off. It poses the hair again once the
+  look is on (previews).
+
+### Verified (NH Combat Test, Studio Play, slot 4 "Testy")
+- The straight bob (v2) with the falling ruff, applied through `UI.Appearance.ApplyTo` on the server (not saved): the
+  ruff was worn, the character carried the 7-bone tuck, and on the client every tucked bone matched it exactly (0.0000)
+  and held still while an untucked lock swayed. Screenshots from behind and the side: the bob lies over the ruff, the
+  frill shows in front, nothing passes through.
+- No errors from the new code. (An unrelated "no asset content" message for rbxassetid://101121777337720 appeared;
+  no part of the hair or accessory code refers to it.)
+
 ## [1.85.0] - 2026-11-11: hair that goes over, under and round accessories (hair tuck, v2 hair rigs)
 
 Owner: "For the coats and any other accessories, position the hair so that it wraps around them or under them, etc. so

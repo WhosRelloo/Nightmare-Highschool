@@ -193,7 +193,26 @@ function Wear.Tuckable(Handle: Instance?): boolean
 	return Handle ~= nil and Handle:GetAttribute(`NHHairRig`) == 2
 end
 
-local function applyTuck(Character: Model, HairKey: string)
+-- the look's hair: the catalog's (UI.Appearance.ApplyTo wears the accessories before it puts the new hair on, so
+-- the catalog says which rig it will be), else the hair the character has on
+function Wear.TuckableHair(Character: Model, HairId: number?): boolean
+	if HairId and HairId > 0 then
+		local Cat = ReplicatedStorage:FindFirstChild(`NHHairCatalog`)
+		local H = Cat and Cat:FindFirstChild(`Hair_{HairId}`)
+		return Wear.Tuckable(H and H:FindFirstChild(`Handle`))
+	end
+	return Wear.Tuckable(Wear.HairHandle(Character))
+end
+
+local function poseHair(Character: Model, Merged: { [string]: Vector3 })
+	local Handle = Wear.HairHandle(Character)
+	if not Handle then return end
+	for _, B in Handle:GetDescendants() do
+		if B:IsA(`Bone`) then B.Transform = if Merged[B.Name] then Wear.TuckCFrame(B, Merged[B.Name]) else CFrame.identity end
+	end
+end
+
+local function applyTuck(Character: Model, HairKey: string, TuckOK: boolean)
 	local Merged = {}
 	for _, H in Character:GetChildren() do
 		if not (H:IsA(`Model`) and H:GetAttribute(`NHAcc`) ~= nil) then continue end
@@ -204,19 +223,18 @@ local function applyTuck(Character: Model, HairKey: string)
 			end
 		end
 	end
-	local Handle = Wear.HairHandle(Character)
-	if not Wear.Tuckable(Handle) then Merged = {} end
+	if not TuckOK then Merged = {} end
 	local S = if next(Merged) then Wear.JoinTuck(Merged) else nil
 	Character:SetAttribute(`NHHairTuck`, S)
-	-- pose the bones too (a preview or a dummy has no HairSway; a player's HairSway takes over every frame)
-	if Handle then
-		for _, B in Handle:GetDescendants() do
-			if B:IsA(`Bone`) then B.Transform = if Merged[B.Name] then Wear.TuckCFrame(B, Merged[B.Name]) else CFrame.identity end
-		end
-	end
+	-- pose the bones too (a preview or a dummy has no HairSway; a player's HairSway takes over every frame), now and
+	-- once the look is on (ApplyTo puts the new hair on after the accessories)
+	poseHair(Character, Merged)
+	task.defer(function()
+		if Character.Parent and Character:GetAttribute(`NHHairTuck`) == S then poseHair(Character, Merged) end
+	end)
 end
 
-local function wearPiece(Character: Model, Holder: Model, Tpl: BasePart, BodyId: string?, HairKey: string)
+local function wearPiece(Character: Model, Holder: Model, Tpl: BasePart, BodyId: string?, HairKey: string, TuckOK: boolean)
 	local MountKey = Tpl:GetAttribute(`NHMount`) or `Torso`
 	local Mount = Character:FindFirstChild(PART[MountKey] or `Torso`)
 	if not (Mount and Mount:IsA(`BasePart`)) then return end
@@ -227,7 +245,7 @@ local function wearPiece(Character: Model, Holder: Model, Tpl: BasePart, BodyId:
 	local HK, HZ = Wear.HairFit(Tpl, HairKey) -- every piece: nil = this hair passes through it (not worn)
 	if not HK then return end
 	-- the fit may rely on a hair tuck, which only a v2 rig can take
-	if Wear.ParseTuck(Tpl:GetAttribute(`NHHairTuck`), HairKey) and not Wear.Tuckable(Wear.HairHandle(Character)) then return end
+	if not TuckOK and Wear.ParseTuck(Tpl:GetAttribute(`NHHairTuck`), HairKey) then return end
 	if MountKey ~= `Head` then HK, HZ = 1, 0 end
 	local Seat = tonumber(Tpl:GetAttribute(`NHSeat`)) or 0.43
 	local Pos = Vector3.new(Fit.X, Fit.Y, Fit.Z)
@@ -274,6 +292,7 @@ end
 -- look's catalog hair (0 = a built hairstyle)
 function Wear.Wear(Character: Model, Acc: string?, BodyId: string?, HairId: number?)
 	local HairKey = Wear.HairKey(HairId)
+	local TuckOK = Wear.TuckableHair(Character, HairId)
 	Wear.Clear(Character)
 	local Owner = Players:GetPlayerFromCharacter(Character)
 	local Staff = Owner ~= nil and (tonumber(Owner:GetAttribute(`NHStaff`)) or 0) >= 1
@@ -286,7 +305,7 @@ function Wear.Wear(Character: Model, Acc: string?, BodyId: string?, HairId: numb
 		Holder.Name = `NHAcc_{Slot}`
 		Holder:SetAttribute(`NHAcc`, Id)
 		for _, Tpl in Pieces do
-			local ok, err = pcall(wearPiece, Character, Holder, Tpl, BodyId, HairKey)
+			local ok, err = pcall(wearPiece, Character, Holder, Tpl, BodyId, HairKey, TuckOK)
 			if not ok then warn(`[AccessoryWear] {Id}: {err}`) end
 		end
 		if #Holder:GetChildren() == 0 then -- nothing fitted (this hair passes through it): wear nothing for the slot
@@ -295,7 +314,7 @@ function Wear.Wear(Character: Model, Acc: string?, BodyId: string?, HairId: numb
 		end
 		Holder.Parent = Character
 	end
-	applyTuck(Character, HairKey)
+	applyTuck(Character, HairKey, TuckOK)
 	local TintId = nil
 	for _, Slot in REGALIA_ORDER do
 		local H = Character:FindFirstChild(`NHAcc_{Slot}`)
