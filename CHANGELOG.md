@@ -2,6 +2,36 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.78.1] - 2026-11-10: Map place: the students talk a lot more
+
+Owner: "Give the NPC's a lot more voicelines, more variety, etc. I want them to feel as alive as possible. Then give me concepts on how I can make them feel more immersive". The concepts are in `docs/NPC-Immersion-Ideas.md`.
+
+### Added (Map place)
+- **`Features.MapStudents.Lines`** (new, tagged NHCore): about 370 lines (there were 18):
+  - **Reactions:** fleeing (brave and timid versions, and night versions), monsters (and full-moon versions), a student out cold, watching a fight (cheering or worried, by bravery), relief once it's over, making way, someone sprinting past, too close (chatty and shy), being stared at, being followed (and followed again), hearing a door or a fight.
+  - **Greetings** that fit the moment:
+    - the time of day (morning, day, evening, night) and the moon (full, new);
+    - memory: "Oh, it's you." the second time, "Are we friends now?" after four meetings;
+    - "You're the one who started that fight..." for 5 minutes after they saw you fight;
+    - now and then a comment on your race ("Nice ears.", "You walk really quietly.").
+  - **Muttering alone** for each part of the day, for the night and the full moon, and on Mondays, Fridays and weekends.
+  - **About 50 little conversations** for two students standing together, taking turns: homework, teachers, food, the game's people (Pip, Dex, Rhys, Wren, Sable, Coach Varga, the Vigil, the Crimson Court, Bruno's Ring), rumours (the vanished student, the moving oaks, the room that isn't on the map, Night FM turning itself on), night-only and full-moon-only ones. Some only fit certain parts of the day.
+- **No repeats:** a student never repeats one of their last 12 lines or 8 conversations, and avoids a line anyone said in the last 40 s.
+- **`{Day}` and `{Period}`** in a line become the day's name and the part of the day.
+- **They talk when someone can hear:** conversations and mutters start only with a player within 60 studs (as far as the bubbles show). A pair talks every 12 to 28 s, and a student alone mutters now and then.
+- **Bubbles:** each one stays up for its line's length (`NHSayFor`, 2.4 to 6 s). The speaker's head nods a little while they talk, and the listener looks at them (`Controllers.World.NpcLook`).
+- No gore in any line (the owner's account was warned once over blood).
+
+### Verified (Map place, local play-test)
+- **Conversations:** a pair in the front yard had three different ones in 75 s, taking turns with bubble times by length. For example: "Did you text me?" / "No." / "Then who keeps texting me from your number?" (4.4 s). Screenshot of a bubble in the game's style.
+- **Greeting by time and memory:** at night, staring at a chatty student got "You shouldn't be out here at night.". Coming back a minute later got "Oh, it's you.".
+- **A fight close by at night:** a timid student said "It's too dark for this." and backed off, and another said "Should we stop them?". Once it ended: "Every single week." and "Note to self: walk the long way.".
+- **Fixed while testing:** backtick strings treat `{...}` as code, so the placeholder lines now use plain quotes.
+- No script errors.
+- **Not tried:**
+  - the race comments, the full-moon lines, day-specific mutters, being followed, and doors at night;
+  - the talking distance raised from 45 to 60 studs after the test (a one-number change).
+
 ## [1.78.0] - 2026-11-10: Map place: school students with new pathfinding and awareness
 
 Owner: "Start putting a few school NPC's in the Map place, but COMPLETELY upgrade their pathfinding & awareness". Full write-up: `docs/Map-Students.md`. Sources: `tools/map-students/`.

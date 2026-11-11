@@ -6,7 +6,8 @@
 	    the head turns toward the point over a few frames (clamped like a neck: 75 degrees either side, 35 up or down),
 	    and eases back to straight ahead when it lapses. Only students within 140 studs are animated. This runs on
 	    each client, so it's smooth at any frame rate and costs the server nothing.
-	  * Speech bubbles: NHSay + NHSayAt show a small engraved bubble over the head for about 3.5 s.
+	  * Speech bubbles: NHSay + NHSayAt show a small engraved bubble over the head for NHSayFor seconds (longer lines
+	    stay up longer), and the head nods a little while they talk.
 	Reduce Motion (NHReducedMotion) keeps the head turns but makes them quicker and shorter.
 ]]
 
@@ -67,8 +68,11 @@ local function bubble(M: Model)
 	L.TextColor3 = if Theme then Theme.Colors.Text else Color3.fromRGB(235, 225, 210)
 	L.Parent = F
 	G.Parent = Head
-	-- fade out
-	task.delay(BUBBLE_TIME, function()
+	-- fade out after the line's time (NHSayFor: longer lines stay up longer)
+	local For = tonumber(M:GetAttribute(`NHSayFor`)) or BUBBLE_TIME
+	local St = State[M]
+	if St then St.TalkUntil = os.clock() + math.min(For, 2.5) end
+	task.delay(For, function()
 		if not G.Parent then return end
 		for I = 1, 10 do
 			F.BackgroundTransparency = 0.12 + I * 0.088
@@ -117,7 +121,9 @@ local function step(Dt: number)
 		S.Yaw += (WantYaw - S.Yaw) * A
 		S.Pitch += (WantPitch - S.Pitch) * A
 		-- R6 neck: its C0 is turned so the joint's Z is up and X is sideways
-		S.Neck.C0 = S.C0 * CFrame.Angles(-S.Pitch, 0, S.Yaw)
+		-- a little nod while they talk, so you can tell who's speaking
+		local Nod = if (S.TalkUntil or 0) > os.clock() and not Quick then math.sin(os.clock() * 9) * 0.045 else 0
+		S.Neck.C0 = S.C0 * CFrame.Angles(-(S.Pitch + Nod), 0, S.Yaw)
 	end
 end
 

@@ -64,30 +64,84 @@ do
 	end
 end
 
-local LINES = {
-	Flee = { `Whoa!`, `Not again...`, `Nope.`, `Someone get a teacher!` };
-	Monster = { `What IS that?`, `Stay back...`, `Oh no.` };
-	Space = { `Uh... hi?`, `Personal space?`, `Can I help you?` };
-	Greet = { `Hey.`, `Hi.`, `Sup.`, `Evening.`, `You new here?` };
-	Shy = { `...`, `I should go.` };
-	Followed = { `Are you following me?`, `...okay.` };
-}
+local Lines = require(script:WaitForChild(`Lines`)) -- every voice line (Features.MapStudents.Lines)
 
 local Folder: Folder? = nil
+local mutterPool, chat -- (defined below)
 local Students = {} :: { any }
 local SpotTaken = {} :: { [BasePart]: any }
 local Plan = { Kind = `Off`; Hour = 0 }
 
 ---| helpers |---
 
-local function say(S, Pool: { string }, Cooldown: number?)
+-- what the lines can talk about right now
+local function ctx(): { [string]: any }
+	local T = game:GetService(`Lighting`).ClockTime
+	return {
+		Kind = Plan.Kind; Day = Plan.DayName or `today`; Period = Plan.SegName or `class`;
+		Moon = workspace:GetAttribute(`NHMoonPhase`) or ``;
+		Night = T < 6 or T >= 19.5 or workspace:GetAttribute(`NHMoonNight`) == true;
+	}
+end
+
+-- say a line from a pool (not one they said lately). Force skips the "don't talk over yourself" wait (chats).
+local function say(S, Pool: { string }?, Cooldown: number?, Force: boolean?): boolean
 	local Now = os.clock()
-	if Now - (S.SaidAt or -1e9) < (Cooldown or 8) then return end
+	if not Force and Now - (S.SaidAt or -1e9) < (Cooldown or 8) then return false end
+	local Text = Pool and Lines.Pick(S, Pool, ctx())
+	if not (Text and S.Model) then return false end
 	S.SaidAt = Now
-	if S.Model then
-		S.Model:SetAttribute(`NHSay`, Pool[math.random(1, #Pool)])
-		S.Model:SetAttribute(`NHSayAt`, workspace:GetServerTimeNow())
+	S.Model:SetAttribute(`NHSay`, Text)
+	S.Model:SetAttribute(`NHSayFor`, math.clamp(1.8 + #Text * 0.06, 2.4, 6))
+	S.Model:SetAttribute(`NHSayAt`, workspace:GetServerTimeNow())
+	return true
+end
+local function sayText(S, Text: string)
+	if not S.Model then return end
+	Text = Lines.Fill(Text, ctx())
+	S.SaidAt = os.clock()
+	S.Model:SetAttribute(`NHSay`, Text)
+	S.Model:SetAttribute(`NHSayFor`, math.clamp(1.8 + #Text * 0.06, 2.4, 6))
+	S.Model:SetAttribute(`NHSayAt`, workspace:GetServerTimeNow())
+end
+
+-- what a student remembers about each player: how often they've met, when they last said hi, when they saw them fight
+local function memo(S, Pl: Player?)
+	if not Pl then return {} end
+	S.Memory = S.Memory or {}
+	local M = S.Memory[Pl.UserId]
+	if not M then M = { Met = 0; Greeted = -1e9; Fought = -1e9 } S.Memory[Pl.UserId] = M end
+	return M
+end
+
+-- the right hello for this player, now
+local function greeting(S, Rec): { string }
+	local C = ctx()
+	local M = memo(S, Rec and Rec.Player)
+	local G = Lines.Greet
+	if os.clock() - (M.Fought or -1e9) < 300 then return G.Wary end
+	local Race = Rec and Rec.Player and Rec.Player:GetAttribute(`Race`)
+	if Race and G.Race[Race] and math.random() < 0.3 then return G.Race[Race] end
+	if (M.Met or 0) >= 4 and math.random() < 0.6 then return G.Often end
+	if (M.Met or 0) >= 1 and math.random() < 0.7 then return G.Again end
+	if C.Night then
+		if C.Moon == `Full` and math.random() < 0.6 then return G.FullMoon end
+		if C.Moon == `New` and math.random() < 0.4 then return G.NewMoon end
+		return G.Night
 	end
+	local H = game:GetService(`Lighting`).ClockTime
+	return if H < 11 then G.Morning elseif H >= 16.5 then G.Evening else G.Day
+end
+
+local function greet(S, Rec): boolean
+	local M = memo(S, Rec and Rec.Player)
+	if os.clock() - (M.Greeted or -1e9) < 60 then return false end
+	if say(S, greeting(S, Rec), 6) then
+		M.Greeted = os.clock()
+		M.Met = (M.Met or 0) + 1
+		return true
+	end
+	return false
 end
 
 local function lookAt(S, P: Vector3?, Seconds: number?)
@@ -346,7 +400,14 @@ function React.Danger(S, Snap)
 	local T = Snap.Threat
 	mood(S, `Scared`, 6)
 	S.Model:SetAttribute(`NHActivity`, `Backing away ({T.Kind})`)
-	say(S, if T.Kind == `Monster` then LINES.Monster else LINES.Flee, 10)
+	local C = ctx()
+	if T.From and T.From.Player and T.Kind == `Fight` then memo(S, T.From.Player).Fought = os.clock() end
+	local Pool = if T.Kind == `Monster` then (if C.Moon == `Full` and math.random() < 0.4 then Lines.MonsterFullMoon else Lines.ByNature(S, Lines.Monster, `Brave`))
+		elseif T.Kind == `Body` then Lines.Body
+		elseif C.Night and math.random() < 0.35 then Lines.FleeNight
+		else Lines.ByNature(S, Lines.Flee, `Brave`)
+	say(S, Pool, 8)
+	S.Shaken = true -- they'll say something once it's over
 	lookAt(S, T.Pos + Vector3.new(0, 2, 0), 2)
 	local To = awayFrom(S, T.Pos)
 	if To then
@@ -366,8 +427,15 @@ function React.Gawk(S, Snap)
 	pose(S, nil)
 	S.Agent:Face(T.Pos)
 	lookAt(S, T.Pos + Vector3.new(0, 2, 0), 1.2)
+	if os.clock() > (S.WatchUntil or 0) then -- just started watching
+		if T.From and T.From.Player then memo(S, T.From.Player).Fought = os.clock() end
+		say(S, if T.Heard and math.random() < 0.5 then Lines.Heard.Fight else Lines.ByNature(S, Lines.Gawk, `Brave`), 10)
+	elseif math.random() < 0.08 then
+		say(S, Lines.ByNature(S, Lines.Gawk, `Brave`), 9) -- now and then, a comment while watching
+	end
 	S.WatchUntil = os.clock() + 6
 	S.WatchAt = T.Pos
+	S.Shaken = true
 	task.wait(0.4)
 end
 
@@ -381,6 +449,7 @@ function React.MakeWay(S, Snap)
 	local V = Rec.Root and Rec.Root.AssemblyLinearVelocity or Vector3.zero
 	if Side:Dot(V) > 0 then Side = -Side end
 	lookAt(S, headOf(Rec), 1.5)
+	if math.random() < 0.6 then say(S, if (Rec.Speed or 0) > 18 then Lines.Sprint else Lines.MakeWay, 10) end
 	S.Agent:Shuffle(Side, 0.55, 7)
 	S.Agent:Face(Rec.Pos)
 	task.wait(0.3)
@@ -391,7 +460,7 @@ function React.Space(S, Snap)
 	if not (Rec and Rec.Pos) then return end
 	mood(S, `Uneasy`, 5)
 	lookAt(S, headOf(Rec), 2.5)
-	if S.Social > 0.45 then say(S, LINES.Space, 14) end
+	say(S, Lines.ByNature(S, Lines.Space, `Social`), 10)
 	S.Agent:Shuffle(S.Root.Position - Rec.Pos, 0.7, 4)
 	S.Agent:Face(Rec.Pos)
 	Rec.Near = 0
@@ -408,10 +477,12 @@ local function glance(S, Snap)
 		if not S.Agent.Moving then
 			if S.Social >= 0.5 then
 				mood(S, `Friendly`)
-				say(S, LINES.Greet, 25)
+				if not greet(S, Rec) and Rec.Stare > 7 and not Rec.SaidStared then
+					Rec.SaidStared = say(S, Lines.Stared, 8) -- you're still staring
+				end
 			elseif Rec.Stare > 6 and not S.Busy then
 				mood(S, `Shy`)
-				say(S, LINES.Shy, 25)
+				say(S, Lines.Shy, 20)
 				S.Restless = true -- move on to another spot
 			end
 		end
@@ -422,7 +493,9 @@ local function glance(S, Snap)
 		if Now - (S.GlancedBack or 0) > 2.5 then
 			S.GlancedBack = Now
 			lookAt(S, headOf(Snap.Following), 0.9)
-			say(S, LINES.Followed, 30)
+			local M = memo(S, Snap.Following.Player)
+			M.Followed = (M.Followed or 0) + 1
+			say(S, if M.Followed > 2 then Lines.FollowedAgain else Lines.Followed, 12)
 		end
 		S.Hurry = Now + 6
 		return
@@ -431,12 +504,26 @@ local function glance(S, Snap)
 		lookAt(S, S.WatchAt + Vector3.new(0, 2, 0), 0.6)
 		return
 	end
+	-- it's over: a word to steady themselves
+	if S.Shaken and not (S.WatchUntil and Now < S.WatchUntil) and not (Snap and Snap.Threat) then
+		S.Shaken = false
+		say(S, Lines.Relief, 4)
+	end
 	if Snap and Snap.Focus and Snap.Focus.Aware > 0.45 and (Snap.Focus.Dist or 99) < 30 then
 		lookAt(S, headOf(Snap.Focus), 0.6)
+		-- a friendly hello to someone passing close by
+		local F = Snap.Focus
+		if F.Visible and (F.Dist or 99) < 7 and S.Social > 0.55 and not S.Agent.Moving and math.random() < 0.05 then greet(S, F) end
+		if F.Fighting and F.Player then memo(S, F.Player).Fought = Now end
 		return
 	end
 	if Snap and Snap.Heard and Snap.Heard.Kind == `Door` and Now - Snap.Heard.At < 1.5 then
 		lookAt(S, Snap.Heard.Pos, 1.2)
+		if Snap.Heard ~= S.LastHeard then
+			S.LastHeard = Snap.Heard
+			local C = ctx()
+			if math.random() < (if C.Night then 0.35 else 0.1) then say(S, if C.Night then Lines.Heard.DoorNight else Lines.Heard.Door, 15) end
+		end
 		return
 	end
 	-- the people we're talking to, or a look around now and then
@@ -470,6 +557,51 @@ local function activityFor(S): (string, string)
 	if K == `Passing` then return (if math.random() < 0.6 then `Inside` else `Yard`), `Passing time` end
 	if K == `Break` or K == `Lunch` then return `Yard`, (if K == `Lunch` then `Lunch` else `Break`) end
 	return `Yard`, `Before school`
+end
+
+local function playerNear(P: Vector3, R: number): boolean
+	for _, Pl in Players:GetPlayers() do
+		local Root = Pl.Character and Pl.Character:FindFirstChild(`HumanoidRootPart`)
+		if Root and Root:IsA(`BasePart`) and (Root.Position - P).Magnitude < R then return true end
+	end
+	return false
+end
+
+-- something to mutter: the day, the moon, the time, or what part of the day it is
+mutterPool = function(): { string }
+	local C = ctx()
+	local M = Lines.Mutter
+	if C.Night then
+		if C.Moon == `Full` and math.random() < 0.5 then return M.FullMoon end
+		return M.Night
+	end
+	if math.random() < 0.2 then
+		if C.Day == `Monday` then return M.Monday end
+		if C.Day == `Friday` then return M.Friday end
+		if C.Day == `Saturday` or C.Day == `Sunday` then return M.Weekend end
+	end
+	return M[C.Kind] or M.Break
+end
+
+-- a little conversation between two students standing together: they take turns, look at whoever's talking,
+-- and break off if anything needs reacting to
+chat = function(A, B)
+	local Lines2 = Lines.PickChat(A, ctx())
+	if not Lines2 then return end
+	A.Chatting, B.Chatting = true, true
+	for _, L in Lines2 do
+		if typeof(L) ~= `string` then continue end
+		local Who, Text = L:match(`^(%a):%s*(.+)$`)
+		local Speaker, Listener = if Who == `B` then B else A, if Who == `B` then A else B
+		if not (Speaker.Model and Listener.Model and Speaker.Root and Listener.Root) then break end
+		if urgent(A, A.Senses and A.Senses.Last) or urgent(B, B.Senses and B.Senses.Last) then break end
+		if A.Agent.Moving or B.Agent.Moving then break end
+		sayText(Speaker, Text or L)
+		lookAt(Listener, Speaker.Root.Position + Vector3.new(0, 1.5, 0), 3)
+		lookAt(Speaker, Listener.Root.Position + Vector3.new(0, 1.5, 0), 3)
+		task.wait(math.clamp(1.6 + #(Text or L) * 0.055, 2.2, 4.6))
+	end
+	A.Chatting, B.Chatting = false, false
 end
 
 -- one leg of the student's day: get somewhere and spend a while there (returns early to react)
@@ -516,11 +648,25 @@ local function doTask(S)
 	if S.Partner and S.Partner.Root then S.Agent:Face(S.Partner.Root.Position)
 	else S.Agent:Face(Spot.Position + Spot.CFrame.LookVector * 5) end
 	if not S.Partner and math.random() < 0.3 then pose(S, `Lean`) end
-	local Until = os.clock() + math.random(120, 300) / 10
+	local Until = os.clock() + math.random(150, 360) / 10
 	local NextFriend = 0
+	S.NextChat = math.max(S.NextChat or 0, os.clock() + math.random(30, 90) / 10)
 	while os.clock() < Until and S.Plan == Plan and S.Model and not S.Restless do
 		local Snap = S.Senses and S.Senses.Last
 		if urgent(S, Snap) then break end
+		-- talk: two together have a little conversation (the lower number starts it); alone, mutter now and then.
+		-- Only with a player near enough to hear it.
+		if os.clock() >= S.NextChat and S.Root then
+			S.NextChat = os.clock() + math.random(120, 280) / 10
+			if playerNear(S.Root.Position, 60) then -- (as far as the speech bubbles show)
+				local P = S.Partner
+				if P and P.Model and P.Root and P.Index > S.Index and not P.Agent.Moving and not P.Chatting then
+					chat(S, P)
+				elseif not P and math.random() < 0.55 then
+					say(S, mutterPool(), 10)
+				end
+			end
+		end
 		-- a friend turned up at the same group: turn to them
 		if Group and os.clock() >= NextFriend then
 			NextFriend = os.clock() + 1
@@ -624,7 +770,8 @@ function Shared.OnStart()
 			local Hour = State.Hour or math.floor((State.MinuteOfDay or 0) / 60)
 			local Kind = State.Segment.Kind
 			local Key = `{Kind}:{State.Segment.Name}:{Hour >= 14}:{Hour >= 19}`
-			if Key ~= Plan.Key then Plan = { Kind = Kind; Hour = Hour; Key = Key } end
+			if Key ~= Plan.Key then Plan = { Kind = Kind; Hour = Hour; Key = Key; DayName = State.DayName; SegName = State.Segment.Name } end
+			Plan.Hour = Hour
 		end
 		refresh()
 		for I, S in Students do
@@ -636,7 +783,7 @@ function Shared.OnStart()
 			if workspace:GetAttribute(`NHStudentsPlan`) then
 				-- tests: force a part of the day (Kind) without moving the school clock
 				local K = workspace:GetAttribute(`NHStudentsPlan`)
-				if Plan.Key ~= `test:` .. K then Plan = { Kind = K; Hour = 10; Key = `test:` .. K } end
+				if Plan.Key ~= `test:` .. K then Plan = { Kind = K; Hour = 10; Key = `test:` .. K; DayName = `Wednesday`; SegName = K } end
 			else
 				refresh()
 			end

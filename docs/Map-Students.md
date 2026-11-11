@@ -88,6 +88,26 @@ What's new compared with `Features.Schedules`' walker:
 
 Students also turn to face a friend who joins them at a spot, and never walk to a spot a player is standing on.
 
+## Voice lines (1.78.1)
+
+`Features.MapStudents.Lines` holds about 370 lines. Edit it freely: each pool is a plain list.
+- **Reactions** have personality variants: `Brave` / `Timid` (bravery 0.5 and up is brave) and `Social` / `Shy` (sociability 0.45 and up is chatty), plus night and full-moon versions.
+- **Greetings** pick by memory first:
+  - you fought in front of them in the last 5 minutes: wary;
+  - you've met 4 times or more: friends;
+  - you've met before: "you again".
+  Otherwise: a 30% chance of a comment on your race, then the moon at night, then the time of day.
+- **Mutters** are by part of the day, the night, the full moon, and Monday / Friday / the weekend.
+- **Conversations** are lists like `"A: ..."`, `"B: ..."`. Each can carry `When = { parts of the day }`, `Night = true` or `Moon = "Full"`. The student with the lower number starts.
+- **Placeholders:** `{Day}`, `{Period}` and `{Moon}` are filled in. Write those lines in plain quotes, not backticks: backticks treat `{...}` as code.
+- **Timing:**
+  - students only talk with a player within 60 studs;
+  - pairs chat every 12 to 28 s;
+  - a student never repeats one of their last 12 lines or 8 conversations, and avoids a line anyone said in the last 40 s;
+  - bubbles last 2.4 to 6 s by length (`NHSayFor`), and the speaker nods.
+
+Ideas for going further: `docs/NPC-Immersion-Ideas.md`.
+
 ## Tested (Map place, local play-test)
 
 - **Walking, all six students:**
