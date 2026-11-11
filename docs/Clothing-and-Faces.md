@@ -119,4 +119,8 @@ python tools/ui-textures/gen_menace.py menace eyes faceparts    # form faces + m
 - **How much:** each chain shares its bend by depth, and the shares add up to 1. A tip bends at most `MAX_BEND` (50 degrees) at full drag, any joint at most `MAX_JOINT` (15). Depth-1 bones (the roots on the scalp) don't move.
 - **Spikes:** the frame time is clamped to 1/20 s, and a jump of more than 6 studs in one frame (a dash or teleport) isn't read as motion.
 - **Reduce Motion** (`NHReducedMotion`): half the drag, no wind.
+- **Hair tuck (1.85.0):** while a character wears accessories the hair would pass through, `NHHairTuck` turns some
+  lock bones so the hair lies over, under or round them (`docs/Accessories.md`, "Hair tuck"). A tucked lock holds
+  still; the others sway as before. It needs the v2 rigs (`NHHairRig = 2` on the Handle; the locks carry their strands), which
+  wait for the owner's import of `art/group-upload-hair-v2/` and `tools/hair-rig/swap_v2.luau`.
 - **Before 1.71.0**, the weight grew with depth ((depth - 1) x 0.16) and the swing used fixed head axes. Bends added up to 2.4 times the target at a 6-deep tip, and strands lying along the head were twisted. The owner saw that as the hair stretching.

@@ -1,0 +1,355 @@
+{
+ "hairs": {
+  "Females_Araya": null,
+  "Females_Detective_Hair": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Females_EdnaMode_lol": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Females_Elegant_Bob_Cut": null,
+  "Females_Femkuna": null,
+  "Females_Femkuna_Pigtails": {
+   "bones": {
+    "Lock8_2": [
+     -0.2049,
+     -0.013,
+     0.1324
+    ],
+    "Lock8_3": [
+     0.6934,
+     0.0709,
+     0.0528
+    ],
+    "Lock8_4": [
+     -0.1032,
+     0.011,
+     -0.0712
+    ],
+    "Lock9_3": [
+     -0.0348,
+     0.0029,
+     -0.0008
+    ],
+    "Lock9_4": [
+     0.0369,
+     0.0014,
+     -0.0688
+    ]
+   },
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Females_Gojo_PonyV2": {
+   "bones": {
+    "Lock1_1": [
+     -0.1335,
+     0.0132,
+     0.0386
+    ],
+    "Lock1_2": [
+     0.1638,
+     -0.0145,
+     0.0584
+    ],
+    "Lock2_2": [
+     -0.0278,
+     -0.0119,
+     -0.0175
+    ],
+    "Lock3_3": [
+     -0.0242,
+     0.0027,
+     0.0251
+    ]
+   },
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Females_Gojo_Ponytail": {
+   "bones": {
+    "Lock9_1": [
+     0.0727,
+     -0.0626,
+     -0.3584
+    ],
+    "Lock9_2": [
+     -0.0405,
+     0.0356,
+     0.2762
+    ],
+    "Lock9_3": [
+     -0.186,
+     -0.0086,
+     0.1582
+    ],
+    "Lock9_4": [
+     0.2239,
+     -0.1292,
+     0.1527
+    ]
+   },
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Females_Long_Sweetheart_Pigtails": null,
+  "Females_Low_Ponytail": {
+   "bones": {
+    "Lock8_2": [
+     -0.0326,
+     -0.0052,
+     -0.0114
+    ],
+    "Lock8_3": [
+     0.1119,
+     0.0288,
+     -0.0784
+    ],
+    "Lock8_4": [
+     -0.0388,
+     -0.1422,
+     0.198
+    ]
+   },
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Females_Messy_Flow_Braided": null,
+  "Females_Natural_Trim_Pony": {
+   "bones": {
+    "Lock6_1": [
+     -0.0738,
+     -0.0411,
+     -0.2371
+    ],
+    "Lock6_2": [
+     0.1394,
+     -0.0086,
+     0.0014
+    ],
+    "Lock6_3": [
+     -0.0702,
+     0.0037,
+     0.0339
+    ],
+    "Lock6_4": [
+     0.0443,
+     0.0381,
+     -0.195
+    ]
+   },
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Females_Preppy_Long_Braided": null,
+  "Females_Short_Mid_Part": null,
+  "Females_Side_Bun": null,
+  "Females_Side_Ponytail": null,
+  "Females_Straight_Bob": null,
+  "Females_Super_Long_Japanese_Hair": null,
+  "Females_Wavy_Y2k_Bob": {
+   "bones": {
+    "Lock1_1": [
+     0.2711,
+     -0.0216,
+     -0.1511
+    ],
+    "Lock1_2": [
+     -0.5386,
+     -0.0014,
+     0.0852
+    ],
+    "Lock1_3": [
+     0.4332,
+     0.0552,
+     0.0588
+    ],
+    "Lock1_4": [
+     0.3324,
+     0.1006,
+     0.1168
+    ],
+    "Lock2_1": [
+     0.1511,
+     -0.045,
+     0.2305
+    ],
+    "Lock2_2": [
+     0.0248,
+     -0.0237,
+     -0.2771
+    ],
+    "Lock2_3": [
+     -0.2897,
+     0.0174,
+     0.1152
+    ],
+    "Lock2_4": [
+     0.1247,
+     0.0075,
+     -0.1981
+    ]
+   },
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Females_Wolf_Cut": null,
+  "Males_Anime_Hero_Hair": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Baki": null,
+  "Males_Black_Zoldyck_Hair": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Blonde_Emo_Scene_Messy": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Half_Up_Half_Down_Locs": null,
+  "Males_Higuruma": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Long_Length_Messy": {
+   "bones": {
+    "Lock2_1": [
+     0.1968,
+     0.0,
+     0.0718
+    ],
+    "Lock2_2": [
+     -0.3301,
+     0.1698,
+     -0.1348
+    ],
+    "Lock2_3": [
+     0.1397,
+     0.0043,
+     0.0344
+    ],
+    "Lock2_4": [
+     -0.0503,
+     0.0135,
+     -0.0581
+    ]
+   },
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Man_Bun": null,
+  "Males_Messy_Middle_Part": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Messy_Wolfcut_with_Ponytail": {
+   "bones": {
+    "Lock10_4": [
+     -0.0326,
+     -0.0093,
+     0.0082
+    ],
+    "Lock1_1": [
+     -0.005,
+     0.001,
+     -0.0389
+    ],
+    "Lock1_2": [
+     0.07,
+     -0.0424,
+     0.0675
+    ],
+    "Lock1_3": [
+     0.0272,
+     0.0471,
+     -0.1256
+    ],
+    "Lock1_4": [
+     -0.2825,
+     0.0065,
+     -0.0895
+    ]
+   },
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Short": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Slicked_Back": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Spiky_Anime_Hair": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Super_Messy_Long_Hair": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_TP_Locks": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  }
+ },
+ "pieces": [
+  "PrefectSash"
+ ]
+}

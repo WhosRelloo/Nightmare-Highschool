@@ -50,14 +50,20 @@
      1.0,
      0.0
     ],
-    "Females_Gojo_Ponytail": null,
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
     "Females_Long_Sweetheart_Pigtails": null,
     "Females_Low_Ponytail": [
      1.0,
      0.0
     ],
     "Females_Messy_Flow_Braided": null,
-    "Females_Natural_Trim_Pony": null,
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
     "Females_Preppy_Long_Braided": null,
     "Females_Short_Mid_Part": null,
     "Females_Side_Bun": null,
@@ -87,7 +93,10 @@
      1.0,
      0.0
     ],
-    "Males_Long_Length_Messy": null,
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
     "Males_Man_Bun": null,
     "Males_Messy_Middle_Part": [
      1.0,
@@ -203,16 +212,16 @@
      1.0,
      0.0
     ],
-    "Males_Long_Length_Messy": null,
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
     "Males_Man_Bun": null,
     "Males_Messy_Middle_Part": [
      1.0,
      0.0
     ],
-    "Males_Messy_Wolfcut_with_Ponytail": [
-     1.0,
-     0.0
-    ],
+    "Males_Messy_Wolfcut_with_Ponytail": null,
     "Males_Short": [
      1.0,
      0.0

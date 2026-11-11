@@ -1,0 +1,124 @@
+{
+ "Bandolier.Bandolier": [
+  "Females_Elegant_Bob_Cut",
+  "Females_Femkuna",
+  "Females_Gojo_Ponytail",
+  "Females_Short_Mid_Part"
+ ],
+ "BowTie.BowTie": [
+  "Females_Gojo_Ponytail",
+  "Females_Side_Ponytail"
+ ],
+ "ChoirCollar.ChoirCollar": [
+  "Females_Elegant_Bob_Cut",
+  "Females_Gojo_Ponytail",
+  "Females_Side_Ponytail"
+ ],
+ "CliquePins.PinVigil": [
+  "Females_Side_Ponytail"
+ ],
+ "Crossbow.CrossbowStrap": [
+  "Females_Natural_Trim_Pony",
+  "Females_Short_Mid_Part"
+ ],
+ "CrowMantle.CrowMantle": [
+  "Females_Low_Ponytail",
+  "Males_Super_Messy_Long_Hair"
+ ],
+ "CrystalPendant.CrystalPendant": [
+  "Females_Detective_Hair",
+  "Females_Femkuna",
+  "Females_Low_Ponytail",
+  "Females_Side_Ponytail"
+ ],
+ "FangNecklace.FangNecklace": [
+  "Females_Messy_Flow_Braided",
+  "Females_Short_Mid_Part",
+  "Females_Side_Bun",
+  "Males_Long_Length_Messy"
+ ],
+ "Gorget.Gorget": [
+  "Females_Detective_Hair",
+  "Females_Elegant_Bob_Cut",
+  "Females_Femkuna",
+  "Females_Gojo_Ponytail",
+  "Females_Low_Ponytail",
+  "Females_Messy_Flow_Braided",
+  "Females_Natural_Trim_Pony",
+  "Females_Side_Bun"
+ ],
+ "Greatcoat.GreatcoatShell": [
+  "Females_Femkuna",
+  "Females_Gojo_Ponytail",
+  "Females_Low_Ponytail"
+ ],
+ "LongCoat.LongCoatShell": [
+  "Females_Femkuna",
+  "Females_Gojo_Ponytail",
+  "Females_Low_Ponytail"
+ ],
+ "MessengerBag.MessengerStrap": [
+  "Females_Elegant_Bob_Cut",
+  "Females_Natural_Trim_Pony",
+  "Females_Short_Mid_Part",
+  "Females_Side_Bun"
+ ],
+ "MoonTorc.MoonTorc": [
+  "Females_Araya",
+  "Females_Natural_Trim_Pony",
+  "Females_Side_Ponytail",
+  "Males_Man_Bun"
+ ],
+ "MossShawl.MossShawl": [
+  "Females_Femkuna",
+  "Females_Side_Bun"
+ ],
+ "OperaClasp.OperaClasp": [
+  "Females_Araya",
+  "Females_Gojo_Ponytail",
+  "Females_Side_Ponytail"
+ ],
+ "Ruff.Ruff": [
+  "Females_Elegant_Bob_Cut",
+  "Females_Gojo_Ponytail"
+ ],
+ "Sashes.HeadSash": [
+  "Females_Femkuna",
+  "Females_Gojo_Ponytail",
+  "Females_Short_Mid_Part"
+ ],
+ "Sashes.PrefectSash": [
+  "Females_Femkuna",
+  "Females_Side_Bun"
+ ],
+ "Satchel.Satchel": [
+  "Females_Elegant_Bob_Cut",
+  "Females_Natural_Trim_Pony",
+  "Females_Short_Mid_Part"
+ ],
+ "Scarves.ScarfStripe": [
+  "Females_Femkuna",
+  "Females_Gojo_PonyV2",
+  "Females_Gojo_Ponytail"
+ ],
+ "Scarves.ScarfViolet": [
+  "Females_Femkuna",
+  "Females_Gojo_PonyV2",
+  "Females_Gojo_Ponytail"
+ ],
+ "ScythePendant.ScythePendant": [
+  "Females_Elegant_Bob_Cut",
+  "Females_Femkuna",
+  "Females_Natural_Trim_Pony",
+  "Females_Short_Mid_Part",
+  "Females_Side_Bun"
+ ],
+ "SealOfOffice.SealOfOffice": [
+  "Females_Gojo_Ponytail"
+ ],
+ "TornFur.TornFur": [
+  "Females_Detective_Hair",
+  "Females_Femkuna",
+  "Females_Messy_Flow_Braided"
+ ]
+}

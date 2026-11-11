@@ -90,7 +90,10 @@
      0.02
     ],
     "Males_Black_Zoldyck_Hair": null,
-    "Males_Blonde_Emo_Scene_Messy": null,
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.42,
+     0.08
+    ],
     "Males_Half_Up_Half_Down_Locs": [
      1.42,
      0.08

@@ -31,10 +31,7 @@
     "plus": 0.968
    },
    "hair_fit": {
-    "Females_Araya": [
-     1.0,
-     0.0
-    ],
+    "Females_Araya": null,
     "Females_Detective_Hair": [
      1.0,
      0.0
@@ -59,10 +56,7 @@
      1.0,
      0.0
     ],
-    "Females_Gojo_Ponytail": [
-     1.0,
-     0.0
-    ],
+    "Females_Gojo_Ponytail": null,
     "Females_Long_Sweetheart_Pigtails": [
      1.0,
      0.0
@@ -87,21 +81,24 @@
      1.0,
      0.0
     ],
-    "Females_Side_Bun": null,
+    "Females_Side_Bun": [
+     1.0,
+     0.0
+    ],
     "Females_Side_Ponytail": null,
     "Females_Straight_Bob": [
      1.0,
      0.0
     ],
-    "Females_Super_Long_Japanese_Hair": [
-     1.0,
-     0.0
-    ],
+    "Females_Super_Long_Japanese_Hair": null,
     "Females_Wavy_Y2k_Bob": [
      1.0,
      0.0
     ],
-    "Females_Wolf_Cut": null,
+    "Females_Wolf_Cut": [
+     1.0,
+     0.0
+    ],
     "Males_Anime_Hero_Hair": [
      1.0,
      0.0

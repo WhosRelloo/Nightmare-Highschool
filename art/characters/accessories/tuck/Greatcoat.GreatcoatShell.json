@@ -1,0 +1,153 @@
+{
+ "hairs": {
+  "Females_Araya": null,
+  "Females_Detective_Hair": null,
+  "Females_EdnaMode_lol": null,
+  "Females_Elegant_Bob_Cut": null,
+  "Females_Femkuna": null,
+  "Females_Femkuna_Pigtails": null,
+  "Females_Gojo_PonyV2": {
+   "bones": {
+    "Lock1_1": [
+     -0.2053,
+     -0.1879,
+     0.4323
+    ],
+    "Lock1_2": [
+     0.1782,
+     0.0819,
+     -0.3719
+    ],
+    "Lock1_3": [
+     0.0099,
+     0.0146,
+     0.0379
+    ],
+    "Lock1_4": [
+     0.0077,
+     -0.0135,
+     -0.0581
+    ],
+    "Lock1_5": [
+     -0.0214,
+     0.0063,
+     -0.0155
+    ],
+    "Lock3_1": [
+     0.0345,
+     -0.0052,
+     0.0008
+    ]
+   },
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Females_Gojo_Ponytail": null,
+  "Females_Long_Sweetheart_Pigtails": null,
+  "Females_Low_Ponytail": null,
+  "Females_Messy_Flow_Braided": null,
+  "Females_Natural_Trim_Pony": null,
+  "Females_Preppy_Long_Braided": null,
+  "Females_Short_Mid_Part": null,
+  "Females_Side_Bun": null,
+  "Females_Side_Ponytail": null,
+  "Females_Straight_Bob": null,
+  "Females_Super_Long_Japanese_Hair": null,
+  "Females_Wavy_Y2k_Bob": null,
+  "Females_Wolf_Cut": null,
+  "Males_Anime_Hero_Hair": null,
+  "Males_Baki": null,
+  "Males_Black_Zoldyck_Hair": null,
+  "Males_Blonde_Emo_Scene_Messy": null,
+  "Males_Half_Up_Half_Down_Locs": null,
+  "Males_Higuruma": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Long_Length_Messy": null,
+  "Males_Man_Bun": null,
+  "Males_Messy_Middle_Part": null,
+  "Males_Messy_Wolfcut_with_Ponytail": null,
+  "Males_Short": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Slicked_Back": null,
+  "Males_Spiky_Anime_Hair": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Super_Messy_Long_Hair": null,
+  "Males_TP_Locks": {
+   "bones": {
+    "Lock1_2": [
+     -0.0597,
+     -0.0358,
+     0.0054
+    ],
+    "Lock1_3": [
+     -0.1199,
+     0.1713,
+     0.0117
+    ],
+    "Lock2_1": [
+     0.0719,
+     0.144,
+     0.2675
+    ],
+    "Lock2_2": [
+     -0.1327,
+     -0.0242,
+     0.0361
+    ],
+    "Lock2_3": [
+     0.1054,
+     0.0178,
+     0.258
+    ],
+    "Lock4_1": [
+     0.0082,
+     -0.1298,
+     0.2568
+    ],
+    "Lock4_2": [
+     0.2366,
+     0.0421,
+     0.1422
+    ],
+    "Lock4_3": [
+     -0.1458,
+     0.1002,
+     -0.3009
+    ],
+    "Lock6_2": [
+     0.1251,
+     0.102,
+     0.2279
+    ]
+   },
+   "fit": [
+    1.0,
+    0.0
+   ]
+  }
+ },
+ "pieces": [
+  "GreatcoatShell",
+  "GreatcoatTailL",
+  "GreatcoatTailR",
+  "GreatcoatSleeveL",
+  "GreatcoatSleeveR"
+ ]
+}

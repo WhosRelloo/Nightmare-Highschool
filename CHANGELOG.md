@@ -2,6 +2,44 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.85.0] - 2026-11-11: hair that goes over, under and round accessories (hair tuck, v2 hair rigs)
+
+Owner: "For the coats and any other accessories, position the hair so that it wraps around them or under them, etc. so
+it doesn't look like anything is clipping into each other and looks very natural and cool." Record: `docs/Accessories.md`
+(Hair tuck), `docs/Clothing-and-Faces.md` (Living hair).
+
+### Added
+- **v2 hair rigs** (`tools/hair-rig/nh_hair_autorig.py`): the 35 catalog hairs re-skinned so each lock carries its
+  strands (they were almost all on the root bone: 8,185 of 8,292 vertices on the long messy hair). Same bones, same
+  rest shape (checked on all 35). Staged in `art/group-upload-hair-v2/`; `tools/hair-rig/swap_v2.luau` swaps them into
+  `NHHairCatalog` after the import (backup `ServerStorage.NH_Backup.Hair_v1`) and marks them `NHHairRig = 2`.
+- **Hair tuck** (`art/characters/accessories/acc_hairtuck.py`): for every hair an item refused, the gentlest bend of
+  each lock that clears it, on the standard body and the shallowest and deepest body fits, kept only if nothing crosses,
+  no strand sinks into the head or body, the cards keep their shape, the head stays covered, and no other item the hair
+  can wear with it is crossed. **148 hair x item pairs are worn tucked; 31 items gained hairs**, e.g. the ruff 22 -> 29,
+  the Seal of Office 9 -> 16, the choir collar 25 -> 30, the torc 10 -> 14, the bandolier 17 -> 21, the pauldrons, pocket
+  watch and three pins all 35. The coats only 4 -> 5.
+- `acc_tuckcheck.py`: every hair against every item it can wear, alone and in pairs with the tucks merged, on three
+  body fits: **0 fails**; `acc_check.py --capes --hair` (head pieces checked against the tucked hair): **0 fails**.
+
+### Changed
+- `UI.AccessoryWear`: merges the worn items' `NHHairTuck` into the character's, poses previews, and only tucks a v2 rig
+  (a piece that needs a tuck isn't worn or offered on an older rig, so nothing changes until the hairs are imported).
+- `Controllers.Character.HairSway`: eases the tuck in; a tucked lock holds still, the others sway as before.
+- Four items refuse hairs they crossed on some body type's depth fit (the old fit was measured on the standard body):
+  fascinator 24 -> 23, opera clasp 32 -> 31, torn fur 12 -> 10, crow mantle 6 -> 4.
+
+### Verified (NH Combat Test, Studio Play, slot 4 "Testy")
+- A tuck set on the character turned the bones to the stored angles on the client (20.0 and 17.2 degrees for 20.1 and
+  17.2) and eased back out in about a second; the server merged a worn item's tuck, refused the item on a v1 rig
+  (`FitsHair` false), and left other hairs alone. No errors from the new code.
+
+### Not done
+- The owner's import of `art/group-upload-hair-v2/` (35 FBX), then `swap_v2.luau`; the accessory batch imports (their
+  templates carry the tucks through `acc_assemble.py`). The tucked look in Roblox hasn't been seen yet.
+- Hats and masks gain little (the crown and fringe stay on the root bone); moving pieces (crows, ledger, keys, sigils,
+  halos) aren't tucked. The Map place.
+
 ## [1.84.1] - 2026-11-11: Staff flocks take the colour of your regalia
 
 Owner: "Yes, tint them". The accessories kit session asked for this: the staff teleport flocks should match the admin regalia (Kit B) the staff member wears.

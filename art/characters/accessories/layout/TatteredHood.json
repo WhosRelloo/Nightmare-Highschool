@@ -24,8 +24,14 @@
      0.0
     ],
     "Females_Detective_Hair": null,
-    "Females_EdnaMode_lol": null,
-    "Females_Elegant_Bob_Cut": null,
+    "Females_EdnaMode_lol": [
+     1.22,
+     0.24
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.22,
+     0.24
+    ],
     "Females_Femkuna": null,
     "Females_Femkuna_Pigtails": null,
     "Females_Gojo_PonyV2": null,

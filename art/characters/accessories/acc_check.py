@@ -591,6 +591,30 @@ def hair_report(pieces, report, fails):
         v, t = mesh_tris(ob)
         hair_meshes[h] = (v, t)
         bpy.data.objects.remove(ob)
+    # hairs a head piece is worn with tucked (tuck/<Model>.<Lead>.json): checked as the game wears them
+    tucked = {}
+    tdir = os.path.join(ROOT, "tuck")
+    want = []
+    for f in sorted(os.listdir(tdir)) if os.path.isdir(tdir) else []:
+        if f.endswith(".json"):
+            d = json.load(open(os.path.join(tdir, f)))
+            model = f.split(".")[0]
+            for pn in d.get("pieces", []):
+                if (model, pn) in pieces and pieces[(model, pn)]["mount"] == "Head":
+                    for h, r in d["hairs"].items():
+                        if r and r.get("bones"):
+                            want.append((model, pn, h, r["bones"]))
+    if want:
+        import numpy as np
+        import acc_hairtuck as T
+        for h in sorted({w[2] for w in want}):
+            hair = T.Hair(h)
+            for model, pn, hh, bones in want:
+                if hh != h:
+                    continue
+                rv = {hair.bi[b]: hair.Rimp @ (T.M1.T @ np.array(q)) for b, q in bones.items()}
+                P = hair.deform(rv)
+                tucked[(model, pn, h)] = ([Vector(p) for p in P], [tuple(x) for x in hair.tris])
     for (it, pn), P in pieces.items():
         if P["mount"] != "Head" or P["kind"] == "Alpha":
             continue
@@ -600,6 +624,8 @@ def hair_report(pieces, report, fails):
         for h, (v, t) in hair_meshes.items():
             if h in fits and fits[h] is None:
                 continue   # this hair can't wear the piece (the Wardrobe and the server refuse it)
+            if (it, pn, h) in tucked:
+                v, t = tucked[(it, pn, h)]   # worn with the hair tucked (acc_hairtuck.py): the tucked v2 hair
             k, dz = fits.get(h) or (1.0, 0.0)
             vv = [piv + (q - piv) * k + Vector((0, 0, dz)) for q in P["verts"]]
             n = len(tri_bvh(vv, P["tris"]).overlap(tri_bvh(v, t)))

@@ -425,7 +425,10 @@
      1.0,
      0.0
     ],
-    "Females_Side_Ponytail": null,
+    "Females_Side_Ponytail": [
+     1.0,
+     0.0
+    ],
     "Females_Straight_Bob": [
      1.0,
      0.0
@@ -759,7 +762,10 @@
      1.0,
      0.0
     ],
-    "Females_Side_Ponytail": null,
+    "Females_Side_Ponytail": [
+     1.0,
+     0.0
+    ],
     "Females_Straight_Bob": [
      1.0,
      0.0
@@ -1093,7 +1099,10 @@
      1.0,
      0.0
     ],
-    "Females_Side_Ponytail": null,
+    "Females_Side_Ponytail": [
+     1.0,
+     0.0
+    ],
     "Females_Straight_Bob": [
      1.0,
      0.0

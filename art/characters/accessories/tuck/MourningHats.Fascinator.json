@@ -1,0 +1,181 @@
+{
+ "hairs": {
+  "Females_Araya": {
+   "bones": {},
+   "fit": [
+    1.2,
+    0.12
+   ]
+  },
+  "Females_Detective_Hair": {
+   "bones": {},
+   "fit": [
+    1.42,
+    0.3
+   ]
+  },
+  "Females_EdnaMode_lol": {
+   "bones": {},
+   "fit": [
+    1.22,
+    0.18
+   ]
+  },
+  "Females_Elegant_Bob_Cut": {
+   "bones": {},
+   "fit": [
+    1.28,
+    0.2
+   ]
+  },
+  "Females_Femkuna": null,
+  "Females_Femkuna_Pigtails": null,
+  "Females_Gojo_PonyV2": {
+   "bones": {},
+   "fit": [
+    1.2,
+    0.16
+   ]
+  },
+  "Females_Gojo_Ponytail": {
+   "bones": {},
+   "fit": [
+    1.24,
+    0.22
+   ]
+  },
+  "Females_Long_Sweetheart_Pigtails": {
+   "bones": {},
+   "fit": [
+    1.16,
+    0.2
+   ]
+  },
+  "Females_Low_Ponytail": {
+   "bones": {},
+   "fit": [
+    1.16,
+    0.14
+   ]
+  },
+  "Females_Messy_Flow_Braided": {
+   "bones": {},
+   "fit": [
+    1.16,
+    0.28
+   ]
+  },
+  "Females_Natural_Trim_Pony": {
+   "bones": {},
+   "fit": [
+    1.3,
+    0.16
+   ]
+  },
+  "Females_Preppy_Long_Braided": {
+   "bones": {},
+   "fit": [
+    1.08,
+    0.18
+   ]
+  },
+  "Females_Short_Mid_Part": null,
+  "Females_Side_Bun": {
+   "bones": {},
+   "fit": [
+    1.38,
+    0.3
+   ]
+  },
+  "Females_Side_Ponytail": {
+   "bones": {},
+   "fit": [
+    1.42,
+    0.24
+   ]
+  },
+  "Females_Straight_Bob": {
+   "bones": {},
+   "fit": [
+    1.16,
+    0.12
+   ]
+  },
+  "Females_Super_Long_Japanese_Hair": {
+   "bones": {},
+   "fit": [
+    1.08,
+    0.14
+   ]
+  },
+  "Females_Wavy_Y2k_Bob": {
+   "bones": {},
+   "fit": [
+    1.14,
+    0.1
+   ]
+  },
+  "Females_Wolf_Cut": {
+   "bones": {},
+   "fit": [
+    1.36,
+    0.3
+   ]
+  },
+  "Males_Anime_Hero_Hair": null,
+  "Males_Baki": {
+   "bones": {},
+   "fit": [
+    1.34,
+    0.3
+   ]
+  },
+  "Males_Black_Zoldyck_Hair": null,
+  "Males_Blonde_Emo_Scene_Messy": null,
+  "Males_Half_Up_Half_Down_Locs": null,
+  "Males_Higuruma": {
+   "bones": {},
+   "fit": [
+    1.38,
+    0.3
+   ]
+  },
+  "Males_Long_Length_Messy": null,
+  "Males_Man_Bun": {
+   "bones": {},
+   "fit": [
+    1.28,
+    0.08
+   ]
+  },
+  "Males_Messy_Middle_Part": null,
+  "Males_Messy_Wolfcut_with_Ponytail": {
+   "bones": {},
+   "fit": [
+    1.38,
+    0.3
+   ]
+  },
+  "Males_Short": {
+   "bones": {},
+   "fit": [
+    1.3,
+    0.22
+   ]
+  },
+  "Males_Slicked_Back": {
+   "bones": {},
+   "fit": [
+    1.22,
+    0.2
+   ]
+  },
+  "Males_Spiky_Anime_Hair": null,
+  "Males_Super_Messy_Long_Hair": null,
+  "Males_TP_Locks": null
+ },
+ "pieces": [
+  "Fascinator",
+  "FascVeil"
+ ]
+}

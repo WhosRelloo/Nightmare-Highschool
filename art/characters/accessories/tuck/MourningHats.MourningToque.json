@@ -1,0 +1,125 @@
+{
+ "hairs": {
+  "Females_Araya": {
+   "bones": {},
+   "fit": [
+    1.02,
+    0.26
+   ]
+  },
+  "Females_Detective_Hair": null,
+  "Females_EdnaMode_lol": {
+   "bones": {},
+   "fit": [
+    1.38,
+    0.3
+   ]
+  },
+  "Females_Elegant_Bob_Cut": {
+   "bones": {},
+   "fit": [
+    1.26,
+    0.3
+   ]
+  },
+  "Females_Femkuna": null,
+  "Females_Femkuna_Pigtails": null,
+  "Females_Gojo_PonyV2": null,
+  "Females_Gojo_Ponytail": null,
+  "Females_Long_Sweetheart_Pigtails": null,
+  "Females_Low_Ponytail": {
+   "bones": {},
+   "fit": [
+    1.14,
+    0.3
+   ]
+  },
+  "Females_Messy_Flow_Braided": null,
+  "Females_Natural_Trim_Pony": null,
+  "Females_Preppy_Long_Braided": {
+   "bones": {},
+   "fit": [
+    1.12,
+    0.3
+   ]
+  },
+  "Females_Short_Mid_Part": {
+   "bones": {},
+   "fit": [
+    1.4,
+    0.3
+   ]
+  },
+  "Females_Side_Bun": null,
+  "Females_Side_Ponytail": null,
+  "Females_Straight_Bob": {
+   "bones": {},
+   "fit": [
+    1.02,
+    0.24
+   ]
+  },
+  "Females_Super_Long_Japanese_Hair": {
+   "bones": {},
+   "fit": [
+    1.2,
+    0.3
+   ]
+  },
+  "Females_Wavy_Y2k_Bob": {
+   "bones": {},
+   "fit": [
+    1.08,
+    0.3
+   ]
+  },
+  "Females_Wolf_Cut": null,
+  "Males_Anime_Hero_Hair": null,
+  "Males_Baki": null,
+  "Males_Black_Zoldyck_Hair": null,
+  "Males_Blonde_Emo_Scene_Messy": null,
+  "Males_Half_Up_Half_Down_Locs": {
+   "bones": {
+    "Lock7_1": [
+     -0.1527,
+     0.0087,
+     -0.1717
+    ],
+    "Lock7_2": [
+     -0.1105,
+     -0.0102,
+     0.4168
+    ],
+    "Lock7_3": [
+     -0.2654,
+     -0.0188,
+     0.4576
+    ]
+   },
+   "fit": [
+    1.38,
+    0.3
+   ]
+  },
+  "Males_Higuruma": null,
+  "Males_Long_Length_Messy": null,
+  "Males_Man_Bun": null,
+  "Males_Messy_Middle_Part": null,
+  "Males_Messy_Wolfcut_with_Ponytail": null,
+  "Males_Short": {
+   "bones": {},
+   "fit": [
+    1.08,
+    0.3
+   ]
+  },
+  "Males_Slicked_Back": null,
+  "Males_Spiky_Anime_Hair": null,
+  "Males_Super_Messy_Long_Hair": null,
+  "Males_TP_Locks": null
+ },
+ "pieces": [
+  "MourningToque",
+  "MourningVeil"
+ ]
+}

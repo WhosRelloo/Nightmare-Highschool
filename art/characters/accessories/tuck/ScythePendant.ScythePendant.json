@@ -1,0 +1,277 @@
+{
+ "hairs": {
+  "Females_Araya": null,
+  "Females_Detective_Hair": null,
+  "Females_EdnaMode_lol": null,
+  "Females_Elegant_Bob_Cut": null,
+  "Females_Femkuna": null,
+  "Females_Femkuna_Pigtails": null,
+  "Females_Gojo_PonyV2": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Females_Gojo_Ponytail": {
+   "bones": {
+    "Lock7_1": [
+     0.3002,
+     -0.0672,
+     -0.0535
+    ],
+    "Lock7_3": [
+     -0.1953,
+     0.0643,
+     0.1889
+    ],
+    "Lock7_4": [
+     -0.2503,
+     -0.069,
+     -0.1733
+    ],
+    "Lock9_1": [
+     0.043,
+     -0.0546,
+     -0.3421
+    ],
+    "Lock9_2": [
+     -0.1387,
+     -0.016,
+     -0.0007
+    ],
+    "Lock9_3": [
+     0.0968,
+     -0.077,
+     0.2714
+    ],
+    "Lock9_4": [
+     -0.0052,
+     -0.1598,
+     0.2394
+    ]
+   },
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Females_Long_Sweetheart_Pigtails": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Females_Low_Ponytail": {
+   "bones": {
+    "Lock7_1": [
+     -0.0396,
+     -0.0624,
+     0.3209
+    ],
+    "Lock7_2": [
+     0.0446,
+     -0.0032,
+     0.1323
+    ],
+    "Lock7_3": [
+     0.1106,
+     0.0287,
+     0.0802
+    ],
+    "Lock7_4": [
+     -0.003,
+     -0.3305,
+     -0.4502
+    ],
+    "Lock8_1": [
+     0.0631,
+     0.0606,
+     0.2997
+    ],
+    "Lock8_4": [
+     -0.2669,
+     0.4326,
+     -0.554
+    ]
+   },
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Females_Messy_Flow_Braided": null,
+  "Females_Natural_Trim_Pony": null,
+  "Females_Preppy_Long_Braided": null,
+  "Females_Short_Mid_Part": null,
+  "Females_Side_Bun": null,
+  "Females_Side_Ponytail": null,
+  "Females_Straight_Bob": null,
+  "Females_Super_Long_Japanese_Hair": null,
+  "Females_Wavy_Y2k_Bob": null,
+  "Females_Wolf_Cut": null,
+  "Males_Anime_Hero_Hair": {
+   "bones": {
+    "Lock5_1": [
+     -0.0709,
+     -0.0328,
+     0.2418
+    ],
+    "Lock5_2": [
+     0.0347,
+     -0.0189,
+     -0.2436
+    ],
+    "Lock5_3": [
+     -0.0289,
+     -0.028,
+     -0.0571
+    ]
+   },
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Baki": null,
+  "Males_Black_Zoldyck_Hair": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Blonde_Emo_Scene_Messy": null,
+  "Males_Half_Up_Half_Down_Locs": {
+   "bones": {
+    "Lock10_3": [
+     0.0381,
+     -0.0073,
+     -0.0677
+    ],
+    "Lock10_4": [
+     -0.0951,
+     0.0071,
+     0.0433
+    ],
+    "Lock1_1": [
+     -0.273,
+     -0.0466,
+     -0.036
+    ],
+    "Lock1_2": [
+     -0.0866,
+     0.0133,
+     0.2742
+    ],
+    "Lock1_3": [
+     0.5257,
+     0.0851,
+     -0.2243
+    ],
+    "Lock1_4": [
+     -0.3681,
+     -0.1124,
+     0.0218
+    ],
+    "Lock2_1": [
+     0.1324,
+     0.0231,
+     0.0377
+    ],
+    "Lock2_2": [
+     -0.1378,
+     -0.0218,
+     -0.0053
+    ],
+    "Lock2_3": [
+     0.1036,
+     0.0146,
+     0.004
+    ],
+    "Lock2_4": [
+     0.0514,
+     0.0108,
+     0.0906
+    ],
+    "Lock4_1": [
+     0.1957,
+     0.0344,
+     0.0662
+    ],
+    "Lock4_2": [
+     -0.3407,
+     -0.0582,
+     -0.0488
+    ],
+    "Lock4_3": [
+     0.1391,
+     0.0102,
+     0.0055
+    ],
+    "Lock4_4": [
+     -0.4886,
+     -0.0675,
+     -0.0214
+    ],
+    "Lock5_2": [
+     0.1322,
+     0.0118,
+     -0.0556
+    ],
+    "Lock5_3": [
+     -0.1153,
+     0.0136,
+     0.1672
+    ],
+    "Lock5_4": [
+     -0.0251,
+     -0.0208,
+     0.0126
+    ]
+   },
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Higuruma": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Long_Length_Messy": null,
+  "Males_Man_Bun": null,
+  "Males_Messy_Middle_Part": null,
+  "Males_Messy_Wolfcut_with_Ponytail": null,
+  "Males_Short": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Slicked_Back": null,
+  "Males_Spiky_Anime_Hair": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  },
+  "Males_Super_Messy_Long_Hair": null,
+  "Males_TP_Locks": {
+   "bones": {},
+   "fit": [
+    1.0,
+    0.0
+   ]
+  }
+ },
+ "pieces": [
+  "ScythePendant"
+ ]
+}

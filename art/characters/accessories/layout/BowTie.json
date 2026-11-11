@@ -121,7 +121,10 @@
     }
    ],
    "hair_fit": {
-    "Females_Araya": null,
+    "Females_Araya": [
+     1.0,
+     0.0
+    ],
     "Females_Detective_Hair": [
      1.0,
      0.0
@@ -188,7 +191,10 @@
      1.0,
      0.0
     ],
-    "Females_Wolf_Cut": null,
+    "Females_Wolf_Cut": [
+     1.0,
+     0.0
+    ],
     "Males_Anime_Hero_Hair": [
      1.0,
      0.0

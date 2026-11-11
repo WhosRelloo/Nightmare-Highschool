@@ -31,10 +31,7 @@
     "plus": 1.103
    },
    "hair_fit": {
-    "Females_Low_Ponytail": [
-     1.0,
-     0.0
-    ],
+    "Females_Low_Ponytail": null,
     "Females_Femkuna_Pigtails": null,
     "Females_Short_Mid_Part": null,
     "Males_Messy_Wolfcut_with_Ponytail": null,
@@ -61,10 +58,7 @@
      0.0
     ],
     "Females_Straight_Bob": null,
-    "Males_Super_Messy_Long_Hair": [
-     1.0,
-     0.0
-    ],
+    "Males_Super_Messy_Long_Hair": null,
     "Males_Long_Length_Messy": null,
     "Males_Higuruma": [
      1.0,
@@ -248,10 +242,7 @@
     }
    ],
    "hair_fit": {
-    "Females_Low_Ponytail": [
-     1.0,
-     0.0
-    ],
+    "Females_Low_Ponytail": null,
     "Females_Femkuna_Pigtails": null,
     "Females_Short_Mid_Part": null,
     "Males_Messy_Wolfcut_with_Ponytail": null,
@@ -278,10 +269,7 @@
      0.0
     ],
     "Females_Straight_Bob": null,
-    "Males_Super_Messy_Long_Hair": [
-     1.0,
-     0.0
-    ],
+    "Males_Super_Messy_Long_Hair": null,
     "Males_Long_Length_Messy": null,
     "Males_Higuruma": [
      1.0,

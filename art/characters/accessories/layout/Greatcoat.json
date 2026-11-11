@@ -40,7 +40,10 @@
      0.0
     ],
     "Males_Baki": null,
-    "Males_TP_Locks": null,
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ],
     "Females_Detective_Hair": null,
     "Females_Super_Long_Japanese_Hair": null,
     "Males_Half_Up_Half_Down_Locs": null,
@@ -258,7 +261,10 @@
      0.0
     ],
     "Males_Baki": null,
-    "Males_TP_Locks": null,
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ],
     "Females_Detective_Hair": null,
     "Females_Super_Long_Japanese_Hair": null,
     "Males_Half_Up_Half_Down_Locs": null,
@@ -476,7 +482,10 @@
      0.0
     ],
     "Males_Baki": null,
-    "Males_TP_Locks": null,
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ],
     "Females_Detective_Hair": null,
     "Females_Super_Long_Japanese_Hair": null,
     "Males_Half_Up_Half_Down_Locs": null,
@@ -553,7 +562,10 @@
      0.0
     ],
     "Males_Baki": null,
-    "Males_TP_Locks": null,
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ],
     "Females_Detective_Hair": null,
     "Females_Super_Long_Japanese_Hair": null,
     "Males_Half_Up_Half_Down_Locs": null,
@@ -630,7 +642,10 @@
      0.0
     ],
     "Males_Baki": null,
-    "Males_TP_Locks": null,
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ],
     "Females_Detective_Hair": null,
     "Females_Super_Long_Japanese_Hair": null,
     "Males_Half_Up_Half_Down_Locs": null,

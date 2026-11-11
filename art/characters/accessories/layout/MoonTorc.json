@@ -34,18 +34,27 @@
     "Females_Araya": null,
     "Females_Detective_Hair": null,
     "Females_EdnaMode_lol": null,
-    "Females_Elegant_Bob_Cut": null,
+    "Females_Elegant_Bob_Cut": [
+     1.0,
+     0.0
+    ],
     "Females_Femkuna": [
      1.0,
      0.0
     ],
     "Females_Femkuna_Pigtails": null,
-    "Females_Gojo_PonyV2": null,
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
     "Females_Gojo_Ponytail": [
      1.0,
      0.0
     ],
-    "Females_Long_Sweetheart_Pigtails": null,
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
     "Females_Low_Ponytail": [
      1.0,
      0.0
@@ -91,7 +100,10 @@
      1.0,
      0.0
     ],
-    "Males_Super_Messy_Long_Hair": null,
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
     "Males_TP_Locks": [
      1.0,
      0.0

@@ -41,12 +41,18 @@
      1.0,
      0.0
     ],
-    "Females_Gojo_Ponytail": null,
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
     "Females_Long_Sweetheart_Pigtails": [
      1.0,
      0.0
     ],
-    "Females_Low_Ponytail": null,
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
     "Females_Messy_Flow_Braided": null,
     "Females_Natural_Trim_Pony": null,
     "Females_Preppy_Long_Braided": null,
@@ -67,7 +73,10 @@
      0.0
     ],
     "Males_Blonde_Emo_Scene_Messy": null,
-    "Males_Half_Up_Half_Down_Locs": null,
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
     "Males_Higuruma": [
      1.0,
      0.0

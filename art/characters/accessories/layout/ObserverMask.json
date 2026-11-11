@@ -70,7 +70,10 @@
     ],
     "Males_Black_Zoldyck_Hair": null,
     "Males_Blonde_Emo_Scene_Messy": null,
-    "Males_Half_Up_Half_Down_Locs": null,
+    "Males_Half_Up_Half_Down_Locs": [
+     1.02,
+     0.0
+    ],
     "Males_Higuruma": [
      1.02,
      0.0

@@ -25,6 +25,27 @@ def lua_v3(v):
     return f"Vector3.new({v[0]:.4f}, {v[1]:.4f}, {v[2]:.4f})"
 
 
+def tuck_string(item, piece):
+    """the hair tuck of the game item this piece belongs to (acc_tuckmerge.py: tuck/<Model>.<LeadPiece>.json, with the
+    item's pieces) -> "<RigSource>=Bone:x,y,z|...;..." (NHHairTuck, on every piece of the item; UI.AccessoryWear merges
+    what is worn and won't wear a piece that needs a tuck on a hair that can't take one)"""
+    d = os.path.join(ROOT, "tuck")
+    if not os.path.isdir(d):
+        return None
+    for f in sorted(os.listdir(d)):
+        if not (f.startswith(item + ".") and f.endswith(".json")):
+            continue
+        t = json.load(open(os.path.join(d, f)))
+        if piece not in t.get("pieces", []):
+            continue
+        out = []
+        for h, r in sorted(t["hairs"].items()):
+            if r and r.get("bones"):
+                out.append(h + "=" + "|".join(f"{b}:{v[0]:.4f},{v[1]:.4f},{v[2]:.4f}" for b, v in sorted(r["bones"].items())))
+        return ";".join(out) or None
+    return None
+
+
 def hair_fit_string(fits):
     if not fits:
         return None
@@ -128,6 +149,9 @@ for it in items:
         hf = hair_fit_string(e.get("hair_fit"))
         if hf:
             attrs.append(f"HairFit = \"{hf}\"")
+        tk = tuck_string(it, pn)
+        if tk:
+            attrs.append(f"Tuck = {lua_str(tk)}")
         if e["kind"] == "Alpha":
             attrs.append(f"Alpha = \"{os.path.splitext(e['alpha_tex'])[0]}\"")
         x = extra.get(pn, {})
@@ -238,6 +262,7 @@ for item, pieces in pairs(ITEMS) do
 		if a.KeepOut then p:SetAttribute("NHSwayKeepOut", a.KeepOut) end
 		if a.Lock then p:SetAttribute("NHSwayLock", a.Lock) end
 		if a.HairFit then p:SetAttribute("NHHairFit", a.HairFit) end
+		p:SetAttribute("NHHairTuck", a.Tuck)   -- nil clears an old one
 		if a.Mount == "Head" then p:SetAttribute("NHSeat", ''' + f"{SEAT:.3f}" + ''') end
 		-- game-side behaviour (Controllers.Character.AccessoryFx)
 		for _, c in ipairs(p:GetChildren()) do

@@ -97,6 +97,71 @@ Final check over every built item (90 pieces, the katana and the five capes incl
   the Midnight collar); the ledger (arms, four capes); the staff (the blackened pauldrons, the Warden's mantle);
   the raven pauldron (the veiled toque).
 
+## Hair tuck (hair that goes over, under or round a piece)
+
+Owner: "For the coats and any other accessories, position the hair so that it wraps around them or under them, etc. so
+it doesn't look like anything is clipping into each other and looks very natural and cool." Until now a piece simply
+refused every hair that passed through it. Now, where it can be done cleanly, the hair moves instead.
+
+**The rigs (v2).** The 35 catalog hairs were skinned almost entirely to their root bone (on Males_Long_Length_Messy
+8,185 of 8,292 vertices): only the tips could move. `tools/hair-rig/nh_hair_autorig.py` now writes v2 weights: every
+vertex follows its nearest lock chain, the crown stays on HairRoot (fading out over the first 0.16 studs of the lock),
+and the weights are smoothed over the mesh's edges so each strand card bends as one piece. The bones are unchanged:
+every bone's name and rest position, and every vertex at rest, match the hairs in the game exactly (checked on all 35).
+The v2 hairs wait in `art/group-upload-hair-v2/` for the owner's import; `tools/hair-rig/swap_v2.luau` then swaps each
+catalog hair's Handle (backup: `ServerStorage.NH_Backup.Hair_v1`) and marks it `NHHairRig = 2`.
+
+**The solve** (`art/characters/accessories/acc_hairtuck.py`). For every hair an item refused, it looks for the gentlest
+turn of each lock's bones that clears the item, on the standard body and at the item's shallowest and deepest body
+fits. A tuck is kept only if all of these hold, else the hair stays refused:
+- no hair triangle crosses a piece triangle (the same test as `acc_check --hair`);
+- no strand sinks into the head or torso further than at rest (the nape may sink a little where a collar hides it);
+- strand cards are not stretched or crushed (the worst 0.5% of edges within 15%) or twisted against their neighbours
+  (within 30 degrees);
+- at most 3% of the head the hair covered at rest, and that the piece leaves in view, goes bare;
+- bends near the scalp cost more than bends further down a lock (at most 40 degrees per bone axis).
+Pieces that move on their own (orbits, bobs, idles: the crows, the ledger, the keys, the sigils, the halos) keep their
+refusals: their tucks were only cleared at rest. Hats and masks gain little: what crosses them is the crown and the
+fringe, which stay on the root bone.
+
+**Result.** Every hair against every item that doesn't move (2,100 pairs), then `acc_tuckcheck.py` (below) until it
+found nothing: **148 hair x item pairs are worn tucked**, and 31 items gained hairs:
+
+| Item | Hairs before -> after (of 35) |
+|---|---|
+| Falling ruff | 22 -> 29 |
+| Seal of Office | 9 -> 16 |
+| Choir collar | 25 -> 30 |
+| Moonstone torc | 10 -> 14 |
+| Hunter's bandolier | 17 -> 21 |
+| Prefect's sash | 17 -> 20 |
+| Satchel, crossbow, gorget, scythe pendant | 20, 19, 20, 8 -> 23, 22, 23, 11 |
+| Bow tie, messenger bag, fang necklace, moss shawl, tattered hood, crystal pendant, both scarves | +2 each (scarves 4 -> 6) |
+| Raven pauldron, pauldrons, pocket watch, three crest pins | -> all 35 |
+| Mourning toque, hunter's hat, bone mask, observer mask, potion belt | +1 each |
+| **Long coat / greatcoat** | **4 -> 5** |
+
+The coats gain least: the hair they cross lies on the shoulders and the nape, and a lock lifted over the collar on
+the deepest body fit leaves the head bare. The check also found hairs that four items allowed but that crossed them
+on some body type's depth fit (the old fit was measured on the standard body only). Those are refused now:
+crimson fascinator 24 -> 23, opera clasp 32 -> 31, torn fur 12 -> 10, crow mantle 6 -> 4.
+
+**Pairs and sway.** A tuck may not push hair into any other item the hair can wear with it (the solve keeps every such
+item as an obstacle). `acc_tuckprune.py` drops the tucks the check still found unsafe in pairs (74, in
+`tuck/drop.json`), so those hairs stay refused. A tucked lock holds still (`HairSway` `TUCK_SWAY = 0`): the tucks lay
+the hair just clear of the piece, and at a 35% sway 73% of them swung back in.
+
+**In the game.**
+- Each item's pieces carry `NHHairTuck` (`acc_assemble.py` writes it from `tuck/<Model>.<LeadPiece>.json`).
+- `UI.AccessoryWear` merges the tucks of everything worn (per bone, the larger turn) into the character's
+  `NHHairTuck` and poses previews.
+- `Controllers.Character.HairSway` eases the tuck in (about a quarter second); a tucked lock then holds still, the
+  others sway as before.
+- A hair that isn't a v2 rig is never turned, and a piece that needs a tuck for it isn't worn and isn't offered
+  (`Wear.FitsHair`), so nothing changes until the hairs are imported.
+- `acc_tuckcheck.py` checks it as the game wears it: each item alone, every two items worn together with their tucks
+  merged (per bone, the larger turn), on the standard body and the shallowest and deepest body fits.
+
 ## The no-clipping rules (how "nothing clips, overlaps or hovers" is checked)
 
 Every piece is measured by `art/characters/accessories/acc_check.py` (headless Blender), not judged by eye:

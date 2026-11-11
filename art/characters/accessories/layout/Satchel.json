@@ -81,9 +81,15 @@
      1.0,
      0.0
     ],
-    "Females_EdnaMode_lol": null,
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
     "Females_Elegant_Bob_Cut": null,
-    "Females_Femkuna": null,
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
     "Females_Femkuna_Pigtails": [
      1.0,
      0.0
@@ -121,7 +127,10 @@
      1.0,
      0.0
     ],
-    "Males_Baki": null,
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
     "Males_Black_Zoldyck_Hair": [
      1.0,
      0.0

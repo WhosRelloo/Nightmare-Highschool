@@ -147,10 +147,19 @@
     "Females_Femkuna_Pigtails": null,
     "Females_Gojo_PonyV2": null,
     "Females_Gojo_Ponytail": null,
-    "Females_Long_Sweetheart_Pigtails": null,
-    "Females_Low_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
     "Females_Messy_Flow_Braided": null,
-    "Females_Natural_Trim_Pony": null,
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
     "Females_Preppy_Long_Braided": null,
     "Females_Short_Mid_Part": null,
     "Females_Side_Bun": null,
@@ -182,10 +191,7 @@
      0.0
     ],
     "Males_Super_Messy_Long_Hair": null,
-    "Males_TP_Locks": [
-     1.0,
-     0.0
-    ]
+    "Males_TP_Locks": null
    }
   },
   "ScarfViolet": {
@@ -332,10 +338,19 @@
     "Females_Femkuna_Pigtails": null,
     "Females_Gojo_PonyV2": null,
     "Females_Gojo_Ponytail": null,
-    "Females_Long_Sweetheart_Pigtails": null,
-    "Females_Low_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
     "Females_Messy_Flow_Braided": null,
-    "Females_Natural_Trim_Pony": null,
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
     "Females_Preppy_Long_Braided": null,
     "Females_Short_Mid_Part": null,
     "Females_Side_Bun": null,
@@ -367,10 +382,7 @@
      0.0
     ],
     "Males_Super_Messy_Long_Hair": null,
-    "Males_TP_Locks": [
-     1.0,
-     0.0
-    ]
+    "Males_TP_Locks": null
    }
   }
  },

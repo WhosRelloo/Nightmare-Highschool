@@ -38,7 +38,10 @@
     ],
     "Females_EdnaMode_lol": null,
     "Females_Elegant_Bob_Cut": null,
-    "Females_Femkuna": null,
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
     "Females_Femkuna_Pigtails": null,
     "Females_Gojo_PonyV2": [
      1.0,
@@ -53,29 +56,44 @@
      1.0,
      0.0
     ],
-    "Females_Messy_Flow_Braided": null,
+    "Females_Messy_Flow_Braided": [
+     1.0,
+     0.0
+    ],
     "Females_Natural_Trim_Pony": [
      1.0,
      0.0
     ],
     "Females_Preppy_Long_Braided": null,
     "Females_Short_Mid_Part": null,
-    "Females_Side_Bun": null,
+    "Females_Side_Bun": [
+     1.0,
+     0.0
+    ],
     "Females_Side_Ponytail": null,
     "Females_Straight_Bob": null,
     "Females_Super_Long_Japanese_Hair": null,
     "Females_Wavy_Y2k_Bob": null,
     "Females_Wolf_Cut": null,
-    "Males_Anime_Hero_Hair": null,
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
     "Males_Baki": null,
-    "Males_Black_Zoldyck_Hair": null,
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
     "Males_Blonde_Emo_Scene_Messy": null,
     "Males_Half_Up_Half_Down_Locs": null,
     "Males_Higuruma": [
      1.0,
      0.0
     ],
-    "Males_Long_Length_Messy": null,
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
     "Males_Man_Bun": null,
     "Males_Messy_Middle_Part": null,
     "Males_Messy_Wolfcut_with_Ponytail": null,
@@ -83,7 +101,10 @@
      1.0,
      0.0
     ],
-    "Males_Slicked_Back": null,
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
     "Males_Spiky_Anime_Hair": [
      1.0,
      0.0

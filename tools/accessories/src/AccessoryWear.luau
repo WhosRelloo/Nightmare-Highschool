@@ -19,6 +19,14 @@
 	              head), dz = lift; other pieces are 1,0 or x. "x" = that hair can't wear it. "*" = any other hair.
 	Worn as Model "NHAcc_<Slot>" (attribute NHAcc = item id) under the character. Admin items are skipped on a player
 	who isn't staff (previews and dummies with no player still show them).
+	Hair tuck: an item's pieces may carry NHHairTuck, "<RigSource>=Bone:x,y,z|Bone:x,y,z;...": for each rigged hair
+	the piece would otherwise pass through, the turn of each lock bone (a rotation vector, radians, in the hair Handle's
+	own frame, about the bone's head in its rest frame) that lays the hair over, under or round the piece, solved and
+	checked offline (art/characters/accessories/acc_hairtuck.py). Wear merges the tucks of everything worn (per bone, the
+	larger turn) into the character's NHHairTuck ("Bone:x,y,z|..."), poses the hair's bones with it (previews), and
+	Controllers.Character.HairSway eases it in under the hair's sway. The turns were solved for the v2 hair rigs (the locks
+	carry their strands; tools/hair-rig/nh_hair_autorig.py), marked NHHairRig = 2 on the hair's Handle: on an older rig
+	nothing is turned, and a piece that needs a turn for that hair isn't worn (as if the hair passed through it).
 	Regalia colour (Kit B): while the character wears any Admin item, it carries NHRegaliaTint (Color3) and NHRegalia
 	(the item id that decided it): the tint of the most visible regalia worn (REGALIA_ORDER), so the staff teleport's
 	flock (Controllers.World.TpFlock) can take the same ember or crimson. Cleared when no regalia is worn.
@@ -67,8 +75,17 @@ end
 -- can this hair wear the item (every head piece has a fit for it)?
 function Wear.FitsHair(It, HairId: number?): boolean
 	local Key = Wear.HairKey(HairId)
+	local V2 = nil -- is the catalog hair a v2 rig (only looked up when a piece needs a tuck for it)?
 	for _, P in Wear.Pieces(It) do
 		if Wear.HairFit(P, Key) == nil then return false end
+		if Wear.ParseTuck(P:GetAttribute(`NHHairTuck`), Key) then
+			if V2 == nil then
+				local Cat = ReplicatedStorage:FindFirstChild(`NHHairCatalog`)
+				local H = Cat and HairId and Cat:FindFirstChild(`Hair_{HairId}`)
+				V2 = Wear.Tuckable(H and H:FindFirstChild(`Handle`))
+			end
+			if not V2 then return false end
+		end
 	end
 	return true
 end
@@ -88,6 +105,13 @@ function Wear.Clear(Character: Model)
 	end
 	Character:SetAttribute(`NHRegalia`, nil)
 	Character:SetAttribute(`NHRegaliaTint`, nil)
+	Character:SetAttribute(`NHHairTuck`, nil)
+	local Handle = Wear.HairHandle(Character)
+	if Handle then
+		for _, B in Handle:GetDescendants() do
+			if B:IsA(`Bone`) then B.Transform = CFrame.identity end
+		end
+	end
 end
 
 -- the pieces an item wears (one named piece, or every MeshPart of its model)
@@ -110,6 +134,88 @@ function Wear.Pieces(It)
 	return Out
 end
 
+-- the hair tuck: one hair's entry ("Bone:x,y,z|...", or "<RigSource>=..." entries separated by ";") -> { bone = turn }
+function Wear.ParseTuck(S: any, Key: string?): { [string]: Vector3 }?
+	if typeof(S) ~= `string` or S == `` then return nil end
+	local Body = S
+	if Key then
+		Body = nil
+		for Entry in S:gmatch(`[^;]+`) do
+			local K, B = Entry:match(`^([^=]+)=(.*)$`)
+			if K == Key then Body = B break end
+		end
+		if not Body then return nil end
+	end
+	local Out = {}
+	for Name, X, Y, Z in Body:gmatch(`([%w_]+):([%-%d%.e]+),([%-%d%.e]+),([%-%d%.e]+)`) do
+		Out[Name] = Vector3.new(tonumber(X) or 0, tonumber(Y) or 0, tonumber(Z) or 0)
+	end
+	return Out
+end
+
+function Wear.JoinTuck(T: { [string]: Vector3 }): string
+	local Parts = {}
+	for N, V in T do table.insert(Parts, string.format(`%s:%.4f,%.4f,%.4f`, N, V.X, V.Y, V.Z)) end
+	table.sort(Parts)
+	return table.concat(Parts, `|`)
+end
+
+-- a hair bone's rest frame in its Handle's space, and a tuck turn (Handle frame) as the bone's own Transform
+function Wear.RestInHandle(B: Bone): CFrame
+	local CF = B.CFrame
+	local P = B.Parent
+	while P and P:IsA(`Bone`) do
+		CF = P.CFrame * CF
+		P = P.Parent
+	end
+	return CF
+end
+
+function Wear.TuckCFrame(B: Bone, V: Vector3): CFrame
+	local A = V.Magnitude
+	if A < 1e-5 then return CFrame.identity end
+	return CFrame.fromAxisAngle(Wear.RestInHandle(B).Rotation:VectorToObjectSpace(V / A), A)
+end
+
+-- the character's rigged hair Handle (the catalog hair accessory), if any
+function Wear.HairHandle(Character: Model): BasePart?
+	for _, C in Character:GetChildren() do
+		if C:IsA(`Accessory`) or C.Name == `NHHair` then
+			local H = C:FindFirstChild(`Handle`)
+			if H and H:IsA(`BasePart`) and H:FindFirstChildWhichIsA(`Bone`) then return H end
+		end
+	end
+	return nil
+end
+
+-- can this hair take a tuck (a v2 rig)?
+function Wear.Tuckable(Handle: Instance?): boolean
+	return Handle ~= nil and Handle:GetAttribute(`NHHairRig`) == 2
+end
+
+local function applyTuck(Character: Model, HairKey: string)
+	local Merged = {}
+	for _, H in Character:GetChildren() do
+		if not (H:IsA(`Model`) and H:GetAttribute(`NHAcc`) ~= nil) then continue end
+		for _, P in H:GetChildren() do
+			local T = Wear.ParseTuck(P:GetAttribute(`NHHairTuck`), HairKey)
+			for N, V in T or {} do
+				if not Merged[N] or V.Magnitude > Merged[N].Magnitude then Merged[N] = V end
+			end
+		end
+	end
+	local Handle = Wear.HairHandle(Character)
+	if not Wear.Tuckable(Handle) then Merged = {} end
+	local S = if next(Merged) then Wear.JoinTuck(Merged) else nil
+	Character:SetAttribute(`NHHairTuck`, S)
+	-- pose the bones too (a preview or a dummy has no HairSway; a player's HairSway takes over every frame)
+	if Handle then
+		for _, B in Handle:GetDescendants() do
+			if B:IsA(`Bone`) then B.Transform = if Merged[B.Name] then Wear.TuckCFrame(B, Merged[B.Name]) else CFrame.identity end
+		end
+	end
+end
+
 local function wearPiece(Character: Model, Holder: Model, Tpl: BasePart, BodyId: string?, HairKey: string)
 	local MountKey = Tpl:GetAttribute(`NHMount`) or `Torso`
 	local Mount = Character:FindFirstChild(PART[MountKey] or `Torso`)
@@ -120,6 +226,8 @@ local function wearPiece(Character: Model, Holder: Model, Tpl: BasePart, BodyId:
 	if typeof(Fit) ~= `CFrame` then Fit = CFrame.new() end
 	local HK, HZ = Wear.HairFit(Tpl, HairKey) -- every piece: nil = this hair passes through it (not worn)
 	if not HK then return end
+	-- the fit may rely on a hair tuck, which only a v2 rig can take
+	if Wear.ParseTuck(Tpl:GetAttribute(`NHHairTuck`), HairKey) and not Wear.Tuckable(Wear.HairHandle(Character)) then return end
 	if MountKey ~= `Head` then HK, HZ = 1, 0 end
 	local Seat = tonumber(Tpl:GetAttribute(`NHSeat`)) or 0.43
 	local Pos = Vector3.new(Fit.X, Fit.Y, Fit.Z)
@@ -187,6 +295,7 @@ function Wear.Wear(Character: Model, Acc: string?, BodyId: string?, HairId: numb
 		end
 		Holder.Parent = Character
 	end
+	applyTuck(Character, HairKey)
 	local TintId = nil
 	for _, Slot in REGALIA_ORDER do
 		local H = Character:FindFirstChild(`NHAcc_{Slot}`)

@@ -309,12 +309,12 @@
     "Females_Short_Mid_Part": null,
     "Females_Side_Bun": null,
     "Females_Side_Ponytail": null,
-    "Females_Straight_Bob": [
+    "Females_Straight_Bob": null,
+    "Females_Super_Long_Japanese_Hair": null,
+    "Females_Wavy_Y2k_Bob": [
      1.0,
      0.0
     ],
-    "Females_Super_Long_Japanese_Hair": null,
-    "Females_Wavy_Y2k_Bob": null,
     "Females_Wolf_Cut": null,
     "Males_Anime_Hero_Hair": [
      1.0,
@@ -331,9 +331,15 @@
      1.0,
      0.0
     ],
-    "Males_Long_Length_Messy": null,
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
     "Males_Man_Bun": null,
-    "Males_Messy_Middle_Part": null,
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
     "Males_Messy_Wolfcut_with_Ponytail": [
      1.0,
      0.0

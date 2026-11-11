@@ -57,12 +57,18 @@
      0.0
     ],
     "Females_Messy_Flow_Braided": null,
-    "Females_Natural_Trim_Pony": null,
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
     "Females_Preppy_Long_Braided": null,
     "Females_Short_Mid_Part": null,
     "Females_Side_Bun": null,
     "Females_Side_Ponytail": null,
-    "Females_Straight_Bob": null,
+    "Females_Straight_Bob": [
+     1.0,
+     0.0
+    ],
     "Females_Super_Long_Japanese_Hair": null,
     "Females_Wavy_Y2k_Bob": [
      1.0,
@@ -87,8 +93,14 @@
      1.0,
      0.0
     ],
-    "Males_Long_Length_Messy": null,
-    "Males_Man_Bun": null,
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
     "Males_Messy_Middle_Part": [
      1.0,
      0.0

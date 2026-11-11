@@ -15,6 +15,16 @@ For every hair mesh in the OBJ:
   4. every vertex is weighted along its lock by height, blended with the neighbouring lock by angle
      (smooth deformation, no tearing between locks), crown -> HairRoot
 UVs are untouched, so the original catalog texture (TextureID) still fits after re-import.
+
+Weights v2 (2026-11-11, for the accessories' hair tuck): the locks carry their strands, so a lock can be bent to lie
+over a coat's collar, under a hat's brim or round a mask (Config.Accessories, NHHairTuck). The bones are unchanged
+(same chains, names and rest positions as v1); only the weights differ:
+  * each vertex follows its nearest lock chain (distance to the chain's bones, not its angle round the head),
+    blended with the second nearest, and along the chain by where it lies on it
+  * HairRoot holds what is above a lock's start (the crown) and fades out over the first 0.16 of the lock, and
+    what lies far from every chain
+  * the weights are smoothed over the mesh's edges, so each strand card bends as one piece
+Pass "v1" after the out folder (and before "preview") for the old weights.
 Writes <outdir>/<HairName>.fbx (armature + skinned mesh) and <outdir>/rig_report.txt.
 Controllers.Character.HairSway animates any hair whose Handle has bones.
 """
@@ -26,6 +36,9 @@ import bpy
 from mathutils import Vector
 
 argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+V1 = "v1" in argv
+if V1:
+    argv.remove("v1")
 SRC = argv[0] if argv else "hair_export.obj"
 OUT = argv[1] if len(argv) > 1 else os.path.join(os.path.dirname(SRC), "rigged")
 os.makedirs(OUT, exist_ok=True)
@@ -148,7 +161,21 @@ def rig(ob, report, head=None):
             prev = e
             L["bones"].append(e.name)
     bpy.ops.object.mode_set(mode="OBJECT")
-    # weights
+    if V1:
+        weights_v1(ob, vs, locks, crown_z, head, adist)
+    else:
+        weights_v2(ob, ao, vs, locks)
+    if not V1:
+        smooth_weights(ob, 12)
+    ob.parent = ao
+    md = ob.modifiers.new("Armature", "ARMATURE")
+    md.object = ao
+    report.append(f"{ob.name[5:]}: height {H:.2f}, {len(locks)} locks, {sum(len(L['bones']) for L in locks) + 1} bones, {len(me.vertices)} verts")
+    return ao
+
+
+def weights_v1(ob, vs, locks, crown_z, head, adist):
+    """v1: by angle round the head, pinned crown and skull"""
     vg_root = ob.vertex_groups.new(name="HairRoot")
     vgs = {}
     for L in locks:
@@ -168,11 +195,11 @@ def rig(ob, report, head=None):
         wl = [w / s for w in wl]
         # pinned roots: rigid at the root line, lock bones fade in over the first ~30% of the lock (smoothstep)
         span0 = max(near[0]["span"], 1e-3)
-        r = min(1.0, max(0.0, (crown_z - v.z) / (span0 * 0.3)))
+        r = min(1.0, max(0.0, (crown_z - v.z) / (span0 * (0.3 if V1 else 0.12))))
         blend_root = 1 - r * r * (3 - 2 * r)
         if head is not None:
             # hair lying on the skull (sides, nape) is pinned too: it only frees up once it leaves the scalp
-            hug = smooth((head_box_dist(v, head) - 0.05) / 0.22)
+            hug = smooth((head_box_dist(v, head) - 0.05) / 0.22) if V1 else smooth((head_box_dist(v, head) - 0.03) / 0.15)
             below = smooth((head.z - HEAD_HALF + 0.1 - v.z) / 0.3)      # below the jaw: nothing to lie on
             blend_root = 1 - (1 - blend_root) * max(hug, below)
         for L, w in zip(near, wl):
@@ -187,11 +214,104 @@ def rig(ob, report, head=None):
                 vgs[L["bones"][bi + 1]].add([i], w * fr * (1 - blend_root), "ADD")
         if blend_root > 0:
             vg_root.add([i], blend_root, "ADD")
-    ob.parent = ao
-    md = ob.modifiers.new("Armature", "ARMATURE")
-    md.object = ao
-    report.append(f"{ob.name[5:]}: height {H:.2f}, {len(locks)} locks, {sum(len(L['bones']) for L in locks) + 1} bones, {len(me.vertices)} verts")
-    return ao
+
+
+def weights_v2(ob, ao, vs, locks):
+    """v2: each vertex follows its nearest lock chain (by distance), the crown stays on HairRoot"""
+    vg_root = ob.vertex_groups.new(name="HairRoot")
+    vgs = {}
+    chains = []
+    for L in locks:
+        segs = []
+        for b in L["bones"]:
+            vgs[b] = ob.vertex_groups.new(name=b)
+            eb = ao.data.bones[b]
+            segs.append((b, ao.matrix_world @ eb.head_local, ao.matrix_world @ eb.tail_local))
+        chains.append(segs)
+    for i, v in enumerate(vs):
+        if not chains:
+            vg_root.add([i], 1.0, "REPLACE")
+            continue
+        best = []
+        for segs in chains:
+            dmin, arc, acc, bi_best, f_best, t0 = 9.0, 0.0, 0.0, 0, 0.0, 0.0
+            for bi, (b, h, t) in enumerate(segs):
+                ab = t - h
+                L2 = max(ab.length_squared, 1e-9)
+                tt = (v - h).dot(ab) / L2
+                if bi == 0:
+                    t0 = tt
+                f = min(1.0, max(0.0, tt))
+                d = (v - (h + ab * f)).length
+                if d < dmin:
+                    dmin, arc, bi_best, f_best = d, acc + f * ab.length, bi, f
+                acc += ab.length
+            if t0 < 0:
+                arc = 0.0
+            best.append((dmin, arc, bi_best, f_best, segs))
+        best.sort(key=lambda x: x[0])
+        near = best[:2]
+        inv = [1.0 / max(x[0], 1e-3) ** 4 for x in near]
+        tot = sum(inv)
+        root = 0.0
+        for (d, arc, bi, f, segs), w in zip(near, inv):
+            share = w / tot
+            if share < 0.15:
+                root += share
+                continue
+            r = min(1.0, max(0.0, arc / 0.16))
+            far = min(1.0, max(0.0, 1 - (d - 0.30) / 0.30))
+            lw = share * r * far
+            root += share - lw
+            if lw <= 0:
+                continue
+            names = [x[0] for x in segs]
+            if f > 0.5 and bi + 1 < len(names):
+                k = f - 0.5
+                vgs[names[bi]].add([i], lw * (1 - k), "ADD")
+                vgs[names[bi + 1]].add([i], lw * k, "ADD")
+            elif f < 0.5 and bi > 0:
+                k = 0.5 - f
+                vgs[names[bi]].add([i], lw * (1 - k), "ADD")
+                vgs[names[bi - 1]].add([i], lw * k, "ADD")
+            else:
+                vgs[names[bi]].add([i], lw, "ADD")
+        if root > 0:
+            vg_root.add([i], root, "ADD")
+
+
+def smooth_weights(ob, iters):
+    """average each vertex's weights with its edge neighbours (half its own), keep the 4 largest, normalise"""
+    me = ob.data
+    n = len(me.vertices)
+    names = {g.index: g.name for g in ob.vertex_groups}
+    W = [{names[g.group]: g.weight for g in v.groups if g.weight > 0} for v in me.vertices]
+    nb = [[] for _ in range(n)]
+    for e in me.edges:
+        a, b = e.vertices
+        nb[a].append(b)
+        nb[b].append(a)
+    for _ in range(iters):
+        new = []
+        for i in range(n):
+            if not nb[i]:
+                new.append(W[i])
+                continue
+            acc = {k: x * 0.5 for k, x in W[i].items()}
+            sh = 0.5 / len(nb[i])
+            for j in nb[i]:
+                for k, x in W[j].items():
+                    acc[k] = acc.get(k, 0) + x * sh
+            new.append(acc)
+        W = new
+    groups = {g.name: g for g in ob.vertex_groups}
+    for g in ob.vertex_groups:
+        g.remove(list(range(n)))
+    for i, w in enumerate(W):
+        top = sorted(w.items(), key=lambda t: -t[1])[:4]
+        tot = sum(t[1] for t in top) or 1.0
+        for k, x in top:
+            groups[k].add([i], x / tot, "REPLACE")
 
 
 def safe_name(n):
