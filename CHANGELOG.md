@@ -2,6 +2,47 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.73.0] - 2026-11-10: Gender clothing kits (schoolgirl, civilian, admin)
+
+Owner: "make a kit of school girl outfits and another kit for more civilian clothing. Remember to fix the edges so no black marks, etc. on them. (I want this because the clothing needs to be separate by gender)". Then an admin kit ("cool cloaks, jackets, etc. Use cool anime fits as references but IN OUR STYLE"), then "Make the admin clothing higher quality, better shaping, texturing, etc. with PBR textures". Full record: `docs/Gender-Clothing-Kits.md`.
+
+### Added (NH Combat Test)
+- **62 classic templates** under the group (15981569), from `art/clothing/tools/kit_school_f.py`, `kit_civilian.py` and `kit_admin2.py`:
+  - **Schoolgirl kit:** 12 tops and 10 bottoms (Female).
+  - **Civilian kit:** 6 tops and 6 bottoms per gender.
+  - **Admin kit:** 8 outfits, staff only. They're anime-inspired archetypes in the school's crimson, black and brass, all original.
+- **PBR-baked admin textures** (`pbr_cloth.py`). Roblox has no PBR maps for Shirt and Pants, so every pixel gets a material (wool twill, velvet, satin, leather, brass, silver, embroidery), with its own height, roughness and metalness. Each face is then lit separately, with folds, raised seams and domed hardware.
+- **Gender separation** in `UI.Appearance`:
+  - `GenderOf`, `ClothingAllows`, `OwnsTop`, `Counterparts`, `DressForGender` and `RandomPiece`.
+  - The Wardrobe, the School Store (server and client) and the server's look check show or allow only your gender's pieces, plus Unisex ones.
+  - Switching gender swaps each piece for its counterpart.
+  - Owning one version of a school top counts for both.
+- **Girls' versions** of the starter uniforms and of every clique's signature look. `Config.Cliques` has `FemaleTop` / `FemaleBottoms`, and `Social.Cliques` grants the top.
+- **Staff-only clothing:** `Features.Admin` sets the player attribute `NHStaff`, and `Admin = true` pieces are worn only by staff.
+- **NPCs:** random looks now pick clothes by gender and never use the admin kit.
+
+### Fixed
+- **Clean edges on every kit template** (no black marks), on top of the 1.37.0 seam bleed:
+  - Pleat folds, knit ribs, boning and tartan stripes are laid out per face, so none lands on a corner.
+  - The front-hip slivers left by the jeans template are gone.
+  - The upper torso of the pants is see-through.
+
+### Unisex (the owner's choice)
+Gym / PE Shirt, Varsity Jacket, Blood Moon Hoodie, "The Hollow" Band Tee, Striped Joggers, and the Dark Indigo, Black and Ripped Jeans.
+
+### Verified (slot 4 "Testy", real E presses and clicks)
+- **Wardrobe, male and female:** each lists only its own gender's pieces plus Unisex ones. The admin kit shows for staff and is hidden when `NHStaff` is 0.
+- **Gender switch:** swaps the outfit to its counterparts both ways (Crest Blazer and Charcoal Pleats, Black Blazer and Uniform Trousers).
+- **Ownership:** owning the Black Blazer also gives the Crest Blazer.
+- **School Store:** the female catalogue holds only female and Unisex school tops, with no admin pieces.
+- **Bodies and walking:** pieces were worn on the Standard, Female and Curvy bodies, and the Walk track played. The close-up showed no dark lines at the corners.
+
+### Not verified
+- **Not sent live:** a forged look request.
+- **Not run on a live server:** the non-staff lock (Studio makes everyone owner).
+- **Not checked:** most of the 62 pieces in game (all passed the edge audit), the female clique looks, the Enrollment female starter pick, and transformation versions of the new pieces (they fall back to the old form outfits).
+- **The Map place** isn't synced yet.
+
 ## [1.72.1] - 2026-11-10: Map place: progression, the phone, race actions and tier-up
 
 Owner: "Yes, port all three" (Group A items 5, 7 and 8 in `docs/Map-Core-Preview.md`).

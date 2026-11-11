@@ -1,0 +1,622 @@
+[
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Crest Blazer & Ribbon",
+  "key": "crest-blazer",
+  "file": "shirt_fs_crest_blazer.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_fs_crest_blazer",
+  "asset_id": 105376183533118
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Navy Sweater Vest",
+  "key": "navy-vest-f",
+  "file": "shirt_fs_navy_vest.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_fs_navy_vest",
+  "asset_id": 109010216363354
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Cropped Cardigan & Bow",
+  "key": "cropped-cardigan",
+  "file": "shirt_fs_cropped_cardigan.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_fs_cropped_cardigan",
+  "asset_id": 86481957958704
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Vigil Sweater Vest",
+  "key": "vigil-vest-f",
+  "file": "shirt_fs_vigil_vest.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_fs_vigil_vest",
+  "asset_id": 108749195786444
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Crimson Court Blazer",
+  "key": "crimson-court-blazer",
+  "file": "shirt_fs_crimson_court_blazer.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_fs_crimson_court_blazer",
+  "asset_id": 81449676375446
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Choir Blouse & Capelet",
+  "key": "choir-capelet",
+  "file": "shirt_fs_choir_capelet.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_fs_choir_capelet",
+  "asset_id": 92038344609400
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Ink Club Blouse",
+  "key": "ink-club-blouse",
+  "file": "shirt_fs_ink_club_blouse.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_fs_ink_club_blouse",
+  "asset_id": 130146407301064
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Mourning Pinafore",
+  "key": "mourning-pinafore",
+  "file": "shirt_fs_mourning_pinafore.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_fs_mourning_pinafore",
+  "asset_id": 125153508249005
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Summer Blouse",
+  "key": "summer-blouse",
+  "file": "shirt_fs_summer_blouse.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_fs_summer_blouse",
+  "asset_id": 71468061666418
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Forest Sweater Vest",
+  "key": "forest-vest-f",
+  "file": "shirt_fs_forest_vest.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_fs_forest_vest",
+  "asset_id": 73003580509095
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Delinquent Long Blazer",
+  "key": "delinquent-long-blazer",
+  "file": "shirt_fs_delinquent_long_blazer.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_fs_delinquent_long_blazer",
+  "asset_id": 95446318684651
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Crimson V-Neck Jumper",
+  "key": "crimson-jumper",
+  "file": "shirt_fs_crimson_jumper.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_fs_crimson_jumper",
+  "asset_id": 82267514052524
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Charcoal Pleats + Knee Socks",
+  "key": "charcoal-pleats",
+  "file": "pants_fs_charcoal_pleats.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_fs_charcoal_pleats",
+  "asset_id": 136595680779871
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Vigil Tartan + Tights",
+  "key": "vigil-tartan",
+  "file": "pants_fs_vigil_tartan_tights.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_fs_vigil_tartan_tights",
+  "asset_id": 84047896244219
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Crimson Court Pleats",
+  "key": "court-pleats",
+  "file": "pants_fs_court_pleats_overknee.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_fs_court_pleats_overknee",
+  "asset_id": 84119009662768
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Navy Pleats + Ivory Socks",
+  "key": "navy-pleats",
+  "file": "pants_fs_navy_pleats.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_fs_navy_pleats",
+  "asset_id": 129239234992657
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Forest Tartan Skirt",
+  "key": "forest-tartan",
+  "file": "pants_fs_forest_tartan.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_fs_forest_tartan",
+  "asset_id": 102514205734979
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Black Pleats + Sheer Tights",
+  "key": "black-pleats-sheer",
+  "file": "pants_fs_black_pleats_sheer.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_fs_black_pleats_sheer",
+  "asset_id": 127991026166918
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Pinafore Skirt + Stockings",
+  "key": "pinafore-stockings",
+  "file": "pants_fs_pinafore_stockings.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_fs_pinafore_stockings",
+  "asset_id": 104520896399978
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Long Delinquent Skirt + Boots",
+  "key": "delinquent-long-skirt",
+  "file": "pants_fs_delinquent_long_skirt.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_fs_delinquent_long_skirt",
+  "asset_id": 87839260098528
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Crimson Tartan + Tights",
+  "key": "crimson-tartan-tights",
+  "file": "pants_fs_crimson_tartan_tights.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_fs_crimson_tartan_tights",
+  "asset_id": 112945599527000
+ },
+ {
+  "kit": "schoolgirl",
+  "gender": "Female",
+  "label": "Chapel Midi Skirt + Tights",
+  "key": "chapel-midi",
+  "file": "pants_fs_chapel_midi.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_fs_chapel_midi",
+  "asset_id": 138828254289244
+ },
+ {
+  "kit": "civilian",
+  "gender": "Female",
+  "label": "Wine Velvet Corset",
+  "key": "velvet-corset",
+  "file": "shirt_cf_velvet_corset.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_cf_velvet_corset",
+  "asset_id": 93087343963914
+ },
+ {
+  "kit": "civilian",
+  "gender": "Female",
+  "label": "Cropped Moto Jacket & Lace Cami",
+  "key": "moto-cami",
+  "file": "shirt_cf_moto_cami.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_cf_moto_cami",
+  "asset_id": 89558072025525
+ },
+ {
+  "kit": "civilian",
+  "gender": "Female",
+  "label": "Off-Shoulder Moon Sweater",
+  "key": "moon-sweater",
+  "file": "shirt_cf_moon_sweater.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_cf_moon_sweater",
+  "asset_id": 81324792857416
+ },
+ {
+  "kit": "civilian",
+  "gender": "Female",
+  "label": "Victorian Lace Blouse",
+  "key": "lace-blouse",
+  "file": "shirt_cf_lace_blouse.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_cf_lace_blouse",
+  "asset_id": 118907107993430
+ },
+ {
+  "kit": "civilian",
+  "gender": "Female",
+  "label": "Cropped Crimson Hoodie",
+  "key": "cropped-hoodie",
+  "file": "shirt_cf_cropped_hoodie.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_cf_cropped_hoodie",
+  "asset_id": 88659118807328
+ },
+ {
+  "kit": "civilian",
+  "gender": "Female",
+  "label": "Long Duster & Slip Top",
+  "key": "duster-slip",
+  "file": "shirt_cf_duster_slip.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_cf_duster_slip",
+  "asset_id": 82474737277515
+ },
+ {
+  "kit": "civilian",
+  "gender": "Female",
+  "label": "Corset-Belt Flares + Platforms",
+  "key": "corset-flares",
+  "file": "pants_cf_flares_platforms.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_cf_flares_platforms",
+  "asset_id": 139341866928255
+ },
+ {
+  "kit": "civilian",
+  "gender": "Female",
+  "label": "Velvet Midi Skirt + Boots",
+  "key": "velvet-midi",
+  "file": "pants_cf_velvet_midi.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_cf_velvet_midi",
+  "asset_id": 82409096922756
+ },
+ {
+  "kit": "civilian",
+  "gender": "Female",
+  "label": "Leather Mini + Ripped Tights",
+  "key": "leather-mini",
+  "file": "pants_cf_leather_mini.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_cf_leather_mini",
+  "asset_id": 100960345453121
+ },
+ {
+  "kit": "civilian",
+  "gender": "Female",
+  "label": "Wide-Leg Trousers",
+  "key": "wide-leg-trousers",
+  "file": "pants_cf_wide_leg.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_cf_wide_leg",
+  "asset_id": 126689427325893
+ },
+ {
+  "kit": "civilian",
+  "gender": "Female",
+  "label": "Tartan Skater + Thigh-Highs",
+  "key": "skater-thighhighs",
+  "file": "pants_cf_skater_thighhighs.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_cf_skater_thighhighs",
+  "asset_id": 110698266380980
+ },
+ {
+  "kit": "civilian",
+  "gender": "Female",
+  "label": "Lace-Hem Maxi Skirt",
+  "key": "lace-maxi",
+  "file": "pants_cf_lace_maxi.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_cf_lace_maxi",
+  "asset_id": 131837355491642
+ },
+ {
+  "kit": "civilian",
+  "gender": "Male",
+  "label": "Wool Overcoat + Turtleneck",
+  "key": "wool-overcoat",
+  "file": "shirt_cm_wool_overcoat.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_cm_wool_overcoat",
+  "asset_id": 106739966385590
+ },
+ {
+  "kit": "civilian",
+  "gender": "Male",
+  "label": "Crimson Satin Bomber",
+  "key": "satin-bomber",
+  "file": "shirt_cm_satin_bomber.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_cm_satin_bomber",
+  "asset_id": 74398198814828
+ },
+ {
+  "kit": "civilian",
+  "gender": "Male",
+  "label": "Denim Jacket + Hoodie",
+  "key": "denim-hoodie",
+  "file": "shirt_cm_denim_hoodie.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_cm_denim_hoodie",
+  "asset_id": 109051191198254
+ },
+ {
+  "kit": "civilian",
+  "gender": "Male",
+  "label": "Henley + Brass Suspenders",
+  "key": "henley-suspenders",
+  "file": "shirt_cm_henley_suspenders.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_cm_henley_suspenders",
+  "asset_id": 117483426682275
+ },
+ {
+  "kit": "civilian",
+  "gender": "Male",
+  "label": "Shawl Cardigan + Tie",
+  "key": "shawl-cardigan",
+  "file": "shirt_cm_shawl_cardigan.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_cm_shawl_cardigan",
+  "asset_id": 115359201454289
+ },
+ {
+  "kit": "civilian",
+  "gender": "Male",
+  "label": "Track Jacket",
+  "key": "track-jacket",
+  "file": "shirt_cm_track_jacket.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_cm_track_jacket",
+  "asset_id": 71972073669268
+ },
+ {
+  "kit": "civilian",
+  "gender": "Male",
+  "label": "Wool Trousers + Chelsea Boots",
+  "key": "trousers-chelsea",
+  "file": "pants_cm_trousers_chelsea.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_cm_trousers_chelsea",
+  "asset_id": 100320593351698
+ },
+ {
+  "kit": "civilian",
+  "gender": "Male",
+  "label": "Dark Jeans + High-Tops",
+  "key": "dark-jeans-hightops",
+  "file": "pants_cm_dark_jeans_hightops.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_cm_dark_jeans_hightops",
+  "asset_id": 124413043338399
+ },
+ {
+  "kit": "civilian",
+  "gender": "Male",
+  "label": "Track Pants + Sneakers",
+  "key": "track-pants",
+  "file": "pants_cm_track_pants.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_cm_track_pants",
+  "asset_id": 89194891614405
+ },
+ {
+  "kit": "civilian",
+  "gender": "Male",
+  "label": "Chinos + Loafers",
+  "key": "chinos-loafers",
+  "file": "pants_cm_chinos_loafers.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_cm_chinos_loafers",
+  "asset_id": 80222373485230
+ },
+ {
+  "kit": "civilian",
+  "gender": "Male",
+  "label": "Ripped Black Jeans + Boots",
+  "key": "ripped-black-boots",
+  "file": "pants_cm_ripped_black_boots.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_cm_ripped_black_boots",
+  "asset_id": 76269817376489
+ },
+ {
+  "kit": "civilian",
+  "gender": "Male",
+  "label": "Cargo Shorts + Socks",
+  "key": "cargo-shorts",
+  "file": "pants_cm_cargo_shorts.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_cm_cargo_shorts",
+  "asset_id": 129085384688877
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Night Warden Greatcoat",
+  "key": "adm-night-warden",
+  "file": "shirt_adm_night_warden_coat.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_adm_night_warden_coat",
+  "asset_id": 89056529988336
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Night Warden Coat Tails + Jackboots",
+  "key": "adm-night-warden-tails",
+  "file": "pants_adm_night_warden_tails.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_adm_night_warden_tails",
+  "asset_id": 103839093067497
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Crimson Haori",
+  "key": "adm-crimson-haori",
+  "file": "shirt_adm_crimson_haori.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_adm_crimson_haori",
+  "asset_id": 105148376808676
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Hakama + Tabi Boots",
+  "key": "adm-hakama",
+  "file": "pants_adm_hakama.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_adm_hakama",
+  "asset_id": 124563755573649
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Exorcist's Coat",
+  "key": "adm-exorcist-coat",
+  "file": "shirt_adm_exorcist_coat.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_adm_exorcist_coat",
+  "asset_id": 136667186002126
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Exorcist Trousers + Buckle Boots",
+  "key": "adm-exorcist-trousers",
+  "file": "pants_adm_exorcist_trousers.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_adm_exorcist_trousers",
+  "asset_id": 82910616585092
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Reaper's Hooded Cloak",
+  "key": "adm-reaper-cloak",
+  "file": "shirt_adm_reaper_cloak.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_adm_reaper_cloak",
+  "asset_id": 113659324463163
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Tattered Cloak Hem + Wraps",
+  "key": "adm-reaper-hem",
+  "file": "pants_adm_reaper_hem.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_adm_reaper_hem",
+  "asset_id": 87142530546870
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Council Captain's Coat",
+  "key": "adm-council-captain",
+  "file": "shirt_adm_council_captain.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_adm_council_captain",
+  "asset_id": 96446121590415
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Captain's Coat Tails + Riding Boots",
+  "key": "adm-captain-riding",
+  "file": "pants_adm_captain_riding.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_adm_captain_riding",
+  "asset_id": 118424182345884
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Shadow Ops Jacket",
+  "key": "adm-shadow-ops",
+  "file": "shirt_adm_shadow_ops.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_adm_shadow_ops",
+  "asset_id": 135675322522231
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Shadow Ops Cargo + Boots",
+  "key": "adm-shadow-cargo",
+  "file": "pants_adm_shadow_cargo.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_adm_shadow_cargo",
+  "asset_id": 112823749606573
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Midnight Lord Tailcoat",
+  "key": "adm-midnight-tailcoat",
+  "file": "shirt_adm_midnight_tailcoat.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_adm_midnight_tailcoat",
+  "asset_id": 110052705054383
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Tailcoat Tails + Riding Boots",
+  "key": "adm-midnight-tails",
+  "file": "pants_adm_midnight_tails.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_adm_midnight_tails",
+  "asset_id": 100394738477575
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Duelist's Jacket & Cape",
+  "key": "adm-duelist",
+  "file": "shirt_adm_duelist.png",
+  "kind": "top",
+  "asset_name": "NHKit_shirt_adm_duelist",
+  "asset_id": 134379224025273
+ },
+ {
+  "kit": "admin",
+  "gender": "Unisex",
+  "label": "Duelist Breeches + Thigh Boots",
+  "key": "adm-duelist-breeches",
+  "file": "pants_adm_duelist_breeches.png",
+  "kind": "bottom",
+  "asset_name": "NHKit_pants_adm_duelist_breeches",
+  "asset_id": 91315441485958
+ }
+]

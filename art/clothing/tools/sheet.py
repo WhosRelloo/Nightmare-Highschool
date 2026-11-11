@@ -69,7 +69,7 @@ def build(items, path=OUT / "contact_sheet.png", title="Nightmare Highschool - c
         thumb = checker((300, 287))
         thumb.alpha_composite(img.resize((300, 287), Image.LANCZOS))
         sheet.paste(thumb, (x0 + 20, y0 + 14))
-        is_pants = fname.startswith("pants_")
+        is_pants = fname.split("/")[-1].startswith("pants_")
         other = Image.open(OUT / pair).convert("RGBA") if pair else None
         shirt = (other or default_shirt) if is_pants else img
         pants = img if is_pants else (other or default_pants)
