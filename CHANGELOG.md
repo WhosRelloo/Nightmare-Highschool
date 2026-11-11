@@ -2,6 +2,39 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.78.2] - 2026-11-10: Map place: the students have voices and fidget
+
+Owner: "Yes, do those" (voice blips and idle fidgets, the first two of `docs/NPC-Immersion-Ideas.md`).
+
+### Added (Map place)
+- **Voice blips** (`Controllers.World.NpcLook`):
+  - every line is heard as a short burble, one voice per student: `NHVoice`, set by the server (0.8 to 1.1 on the male body, 1.15 to 1.45 on the female);
+  - one syllable per few letters, with small pitch wobbles; the last two rise on a question, and it's louder for "!";
+  - pauses at commas, dashes and "..."; a hesitant hum for "...".
+  - The sound is Roblox's built-in `rbxasset://sounds/volume_slider.ogg` (it ships with every client), cut to its first 0.1 s for a crisp tick. It plays in 3D from the head (heard up to 55 studs) on the game's effects volume (`NH_Master.NH_Effects`, the Settings slider).
+  - A real blip sound could be uploaded to the group later and swapped in (`BLIP`).
+- **Fidgets** (`Features.MapStudents`): every 6 to 14 s, with a player within 60 studs, a waiting student does one of these:
+  - **Check their phone:** a real phone Tool, built like a player's (`ServerStorage.NHPhoneModel`, the same grip and arm pose as `Features.Phone`), so everyone sees it. Their eyes go to the screen, and sometimes a phone line ("Five missed calls from Mom.", "Group chat's on fire."). Less often when they're with a friend.
+  - **Stretch:** both arms up, on each client. More in the morning and at night, sometimes with a yawn ("*yawns*", "Need. Sleep.").
+  - **Glance up** at the clock tower and windows.
+  - **Look over their shoulder:** more at night, sometimes with a night mutter.
+  - **Shift their weight:** a small turn.
+  Fidgets stop for anything urgent and never happen mid-conversation.
+- **Conversations:** a new line clears the other student's older bubble, so a pair's lines never sit on top of each other.
+- New lines: `Lines.Phone` (10) and `Lines.Yawn` (5).
+
+### Verified (Map place, local play-test)
+- **Six voices:** pitches between 0.81 and 1.35.
+- **Blips:** 68 in 40 s near two pairs, every one cut to 0.1 s, on the effects sound group, all loaded.
+- **Fidgets:** in 50 s, all five kinds happened between conversations.
+- **Phone:** it equipped (RightGrip made, shoulder posed), and a student on it said "Five missed calls from Mom.".
+- **No overlapping bubbles:** 160 samples over 40 s, never two bubbles side by side.
+- No script errors.
+- **Not tried:**
+  - listening to the blips: the test tools can't hear, so how they sound needs your ears;
+  - a clean screenshot of the phone in hand (night, then the player's body in the way);
+  - Reduce Motion (it skips the stretch).
+
 ## [1.78.1] - 2026-11-10: Map place: the students talk a lot more
 
 Owner: "Give the NPC's a lot more voicelines, more variety, etc. I want them to feel as alive as possible. Then give me concepts on how I can make them feel more immersive". The concepts are in `docs/NPC-Immersion-Ideas.md`.

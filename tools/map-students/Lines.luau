@@ -91,6 +91,10 @@ Lines.Mutter = {
 	Weekend = { `Why am I at school on a weekend?`, `Nobody's here. It's kind of nice.` };
 }
 
+Lines.Phone = { `Ugh, no signal.`, `Who texts at this hour?`, `Night FM's playing that song again.`, `Five missed calls from Mom.`,
+	`The Gazette posted again.`, `Battery's dying.`, `Hah. Nice.`, `Seriously?`, `Group chat's on fire.`, `Who even is this number?` }
+Lines.Yawn = { `*yawns*`, `*yaaawn*`, `So tired...`, `Need. Sleep.`, `Five more minutes...` }
+
 ---| little conversations |---
 -- When: parts of the day it fits (any if missing). Night = true: only after dark. Moon = "Full": only at a full moon.
 

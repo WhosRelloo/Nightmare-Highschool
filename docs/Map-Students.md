@@ -108,6 +108,15 @@ Students also turn to face a friend who joins them at a spot, and never walk to 
 
 Ideas for going further: `docs/NPC-Immersion-Ideas.md`.
 
+## Voices and fidgets (1.78.2)
+
+- **Voice blips:** `Controllers.World.NpcLook` turns every line into a burble of pitched ticks at the student's own voice (`NHVoice`):
+  - one syllable per few letters;
+  - questions rise, "!" is louder, commas and "..." pause.
+  - The sound is `BLIP` at the top of the script (`rbxasset://sounds/volume_slider.ogg`, cut to 0.1 s). Swap in an uploaded blip any time.
+  - It's 3D from the head and on the effects volume.
+- **Fidgets** (`fidget` in `Features.MapStudents`): every 6 to 14 s with a player within 60 studs. Options: phone (a real Tool, built like a player's), stretch (with a yawn when sleepy), glance up, look over the shoulder, shift weight. They stop for anything urgent and never happen mid-conversation.
+
 ## Tested (Map place, local play-test)
 
 - **Walking, all six students:**

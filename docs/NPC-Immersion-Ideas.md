@@ -59,7 +59,7 @@ Players can step in or walk past, and the students remember either way.
 A hall monitor on patrol (NH Combat Test has `School.HallMonitor`), teachers in their doorways shouting "Get to class!", a janitor mopping, the nurse at her door. They make the students' behaviour make sense: they hush when a teacher walks by.
 
 ## Where I'd start
-1. Voice blips (1) and idle fidgets (2): biggest feel for the least work.
+1. ~~Voice blips (1) and idle fidgets (2)~~: done in 1.78.2 (phone, stretch, glances, weight shifts).
 2. Names through Strangers and remembering you (4).
 3. Fight rings and walking together (5).
 4. Talking to them (7), once you choose the key.

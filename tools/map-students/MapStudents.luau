@@ -290,6 +290,7 @@ local function spawn(S, At: CFrame)
 	M:SetAttribute(`Role`, `Ambient`)
 	M:SetAttribute(`NHStudent`, S.Index)
 	M:SetAttribute(`NHPersonality`, string.format(`brave %.1f, social %.1f`, S.Bravery, S.Social))
+	M:SetAttribute(`NHVoice`, S.Voice or 1) -- each student's voice pitch (Controllers.World.NpcLook's blips)
 	local Animate = M:FindFirstChild(`Animate`)
 	if Animate then Animate:Destroy() end
 	local Hum = M:FindFirstChildOfClass(`Humanoid`) :: Humanoid
@@ -312,6 +313,12 @@ local function spawn(S, At: CFrame)
 	end
 	pcall(function() Root:SetNetworkOwner(nil) end)
 	S.Model, S.Hum, S.Root, S.Tracks = M, Hum, Root, {}
+	-- the shoulders' rest pose, for the phone hold and the stretch (clients read NHBaseC0)
+	local Torso = M:FindFirstChild(`Torso`)
+	for _, J in { `Right Shoulder`, `Left Shoulder` } do
+		local Joint = Torso and Torso:FindFirstChild(J)
+		if Joint and Joint:IsA(`Motor6D`) then Joint:SetAttribute(`NHBaseC0`, Joint.C0) end
+	end
 	S.Agent = Nav.Agent(M, { Speed = S.Speed; Name = `Student{S.Index}` })
 	S.Agent.Up = Up
 	S.Senses = Senses.Perceiver(M, { Bravery = S.Bravery; ViewRange = 60 + S.Social * 20 })
@@ -604,6 +611,131 @@ chat = function(A, B)
 	A.Chatting, B.Chatting = false, false
 end
 
+---| fidgets |---
+-- Small things students do while they wait, so nobody stands frozen: check their phone, stretch (a yawn in the
+-- morning or at night), glance up at the clock tower, look over their shoulder, shift their weight.
+
+-- the handset, built the way Features.Phone builds a player's (same model, grip and arm pose)
+local PHONE_POSE = CFrame.Angles(0, math.rad(45), math.rad(105))
+local PHONE_GRIP = CFrame.new(-0.248250008, -0.0295313597, 0, -0.0342340842, 0.942064762, -0.333679318, -0.821599126, 0.16357027, 0.546094596, 0.569036543, 0.292845726, 0.768400073)
+
+local function makePhone(): Tool?
+	local Tpl = ServerStorage:FindFirstChild(`NHPhoneModel`)
+	if not Tpl then return nil end
+	local Model = Tpl:Clone()
+	local Screen = Model:FindFirstChild(`Screen`, true)
+	local CF = Model:GetBoundingBox()
+	local Basis = if Screen and Screen:IsA(`BasePart`) then Screen.CFrame.Rotation + CF.Position else CF
+	local T = Instance.new(`Tool`)
+	T.Name = `Phone`
+	T.CanBeDropped = false
+	T.RequiresHandle = true
+	T.Grip = PHONE_GRIP
+	T:SetAttribute(`NHPhone`, true) -- Controllers.Character.PhoneHold keeps the arm steady
+	T:SetAttribute(`NHNpcPhone`, true)
+	local Handle = Instance.new(`Part`)
+	Handle.Name = `Handle`
+	Handle.Size = Vector3.new(0.3, 0.3, 0.3)
+	Handle.Transparency = 1
+	Handle.CanCollide, Handle.CanQuery, Handle.CanTouch, Handle.Massless = false, false, false, true
+	Handle.CFrame = Basis
+	Handle.Parent = T
+	for _, D in Model:GetDescendants() do
+		if D:IsA(`BasePart`) then
+			D.Anchored = false
+			D.CanCollide, D.CanQuery, D.CanTouch, D.Massless = false, false, false, true
+			local W = Instance.new(`WeldConstraint`)
+			W.Part0, W.Part1 = Handle, D
+			W.Parent = D
+		elseif D:IsA(`WeldConstraint`) or D:IsA(`Weld`) then
+			D:Destroy()
+		end
+	end
+	if Screen and Screen:IsA(`BasePart`) then
+		Screen.Material = Enum.Material.Neon -- the screen glows a little
+		Screen.Color = Color3.fromRGB(60, 24, 40)
+	end
+	Model.Parent = T
+	return T
+end
+
+local function shoulder(S): Motor6D?
+	local Torso = S.Model and S.Model:FindFirstChild(`Torso`)
+	local J = Torso and Torso:FindFirstChild(`Right Shoulder`)
+	return if J and J:IsA(`Motor6D`) then J else nil
+end
+
+local function busyNow(S): boolean
+	return S.Chatting or not S.Model or (S.Agent and S.Agent.Moving) or urgent(S, S.Senses and S.Senses.Last) ~= nil
+end
+
+local function fidgetPhone(S)
+	local T = makePhone()
+	local J = shoulder(S)
+	if not (T and J and S.Hum) then if T then T:Destroy() end return end
+	T.Parent = S.Model
+	pcall(function() S.Hum:EquipTool(T) end)
+	J.C0 = (J:GetAttribute(`NHBaseC0`) or J.C0) * PHONE_POSE
+	local Was = S.Model:GetAttribute(`NHActivity`)
+	S.Model:SetAttribute(`NHActivity`, `{Was or ``} (on the phone)`)
+	if math.random() < 0.45 then say(S, Lines.Phone, 8) end
+	local Until = os.clock() + math.random(40, 90) / 10
+	while os.clock() < Until and not busyNow(S) and T.Parent do
+		-- eyes on the screen
+		local Arm = S.Model:FindFirstChild(`Right Arm`)
+		if Arm then lookAt(S, Arm.Position + Vector3.new(0, -0.4, 0), 0.6) end
+		task.wait(0.25)
+	end
+	if T.Parent then T:Destroy() end
+	if J.Parent then J.C0 = J:GetAttribute(`NHBaseC0`) or J.C0 end
+	if S.Model then S.Model:SetAttribute(`NHActivity`, Was) end
+end
+
+local function fidget(S)
+	if busyNow(S) or not S.Root then return end
+	local C = ctx()
+	local Sleepy = C.Kind == `BeforeSchool` or C.Night
+	local Pool = {
+		{ `Phone`, if S.Partner then 0.12 else 0.32 };
+		{ `Stretch`, if Sleepy then 0.28 else 0.12 };
+		{ `LookUp`, 0.14 };
+		{ `LookBehind`, if C.Night then 0.3 else 0.12 };
+		{ `Shift`, 0.25 };
+	}
+	local Total = 0
+	for _, P in Pool do Total += P[2] end
+	local R = math.random() * Total
+	local Kind = Pool[#Pool][1]
+	for _, P in Pool do R -= P[2] if R <= 0 then Kind = P[1] break end end
+	step(S, `fidget: {Kind}`)
+	if Kind == `Phone` then
+		fidgetPhone(S)
+	elseif Kind == `Stretch` then
+		S.Model:SetAttribute(`NHFidget`, `Stretch`)
+		S.Model:SetAttribute(`NHFidgetAt`, workspace:GetServerTimeNow())
+		if Sleepy and math.random() < 0.5 then say(S, Lines.Yawn, 6) end
+		lookAt(S, S.Root.Position + S.Root.CFrame.LookVector * 6 + Vector3.new(0, 9, 0), 1.4)
+		task.wait(1.6)
+	elseif Kind == `LookUp` then
+		-- the clock tower, the sky, a window
+		lookAt(S, S.Root.Position + S.Root.CFrame.LookVector * 25 + S.Root.CFrame.RightVector * math.random(-12, 12) + Vector3.new(0, 30, 0), 2.2)
+		task.wait(2.2)
+	elseif Kind == `LookBehind` then
+		local Side = if math.random() < 0.5 then 1 else -1
+		lookAt(S, S.Root.Position - S.Root.CFrame.LookVector * 4 + S.Root.CFrame.RightVector * 10 * Side + Vector3.new(0, 1.5, 0), 1.3)
+		if C.Night and math.random() < 0.25 then say(S, Lines.Mutter.Night, 10) end
+		task.wait(1.4)
+	else -- shift their weight: turn a little, ease into it
+		local From = S.Root.CFrame
+		local To = From * CFrame.Angles(0, math.rad(math.random(15, 35) * (if math.random() < 0.5 then 1 else -1)), 0)
+		for I = 1, 8 do
+			if not S.Root.Parent or busyNow(S) then break end
+			S.Root.CFrame = From:Lerp(To, I / 8)
+			task.wait(0.05)
+		end
+	end
+end
+
 -- one leg of the student's day: get somewhere and spend a while there (returns early to react)
 local function doTask(S)
 	local Kind, Label = activityFor(S)
@@ -654,6 +786,11 @@ local function doTask(S)
 	while os.clock() < Until and S.Plan == Plan and S.Model and not S.Restless do
 		local Snap = S.Senses and S.Senses.Last
 		if urgent(S, Snap) then break end
+		-- fidget now and then (with someone near enough to see it)
+		if os.clock() >= (S.NextFidget or 0) and S.Root then
+			S.NextFidget = os.clock() + math.random(60, 140) / 10
+			if not S.Chatting and playerNear(S.Root.Position, 60) then fidget(S) end
+		end
 		-- talk: two together have a little conversation (the lower number starts it); alone, mutter now and then.
 		-- Only with a player near enough to hear it.
 		if os.clock() >= S.NextChat and S.Root then
@@ -759,6 +896,8 @@ function Shared.OnStart()
 			Index = I; Look = if Ok then Look else {};
 			Bravery = math.random(10, 85) / 100; Social = math.random(15, 95) / 100;
 			Speed = 5.4 + math.random() * 1.6;
+			-- one voice each: higher on the female body, lower on the male (the blips' pitch)
+			Voice = if (Ok and Look and require(ReplicatedStorage.UI.Appearance).IsFemale(Look)) then 1.15 + math.random() * 0.3 else 0.8 + math.random() * 0.3;
 		}
 	end
 	task.spawn(function()
