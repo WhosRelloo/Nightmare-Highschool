@@ -188,7 +188,7 @@ Done so far: the core (1.54), customization, doors, admin, heights (v2), races a
 - Purchases and the Spin Shop (`Player.Purchases`): real Robux.
 - Cmdr, and the anti-teleport and kill trackers: infrastructure for the live game.
 
-**Also keep in step:** the posture rail (1.74.0) and the Thornrose health bar with its briar rail (1.77.0) landed in NH Combat Test, so the Map's `Gui.KitHud` needs re-copying (its `Gui.Progress` already places the EXP strip under the rail). The admin teleport flocks are synced (1.75.1).
+**Kept in step:** the posture rail (1.74.0) and the Thornrose health bar (1.77.0) are synced (1.77.1: `Gui.KitHud`, `Gui.Progress`). So are the admin teleport flocks (1.75.1).
 
 ## Removing it
 Run this in the Map place's command bar, then save:

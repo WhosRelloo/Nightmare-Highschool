@@ -2,6 +2,31 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.77.1] - 2026-11-10: Map place: the Thornrose health bar and the posture rail
+
+Owner: "Sync the new posture bar and health stuff" (NH Combat Test 1.74.0, the posture rail, and 1.77.0, Thornrose).
+
+### Changed (Map place, NH Combat Test's files byte for byte)
+- **`Controllers.Gui.KitHud`:** the Thornrose health bar (the iron briar, velvet fill, iron rose and glass heart, all animated), with the matching briar posture rail under it. The old upright posture meter is gone.
+- **`Controllers.Gui.Progress`:** the EXP strip sits under the rail.
+- **Checked:** these two were the only health-HUD files that differed between the places. Every other difference is one of the Map's own adapters, or clothing and shop changes.
+- The old copies are in `ServerStorage.NHCore.Backups` (`KitHud_preThornrose`, `Progress_preThornrose`).
+
+### Verified (Map place, local play-test)
+- **Art:** the Thornrose frame, velvet, rose, glass and the briar rail loaded. The rail's fill and crack images load once posture shows.
+- **A 40% hit** (server `TakeDamage`):
+  - the fill eased 1.00 → 0.75 → 0.60, and the ghost followed about 0.3 s later (0.85 → 0.62);
+  - out-of-combat regeneration then healed it with the gold sheen.
+- **Posture 86%** (the `Posture` attribute set on the server): brass filled out from the rose and the end buds glowed (screenshot).
+- **Guard break** (86% → 0): "GUARD | BROKEN" showed and 14 glass shards spawned.
+- **Vampire** (`Transformation` set for 2 s): the fill turned `54061e` and the heart `ff2448`, then went back to `961622` / `c8283c`.
+- No errors from the HUD.
+- **Not tried:**
+  - Real blocked hits: the Map's sparring partner can't spawn (see 1.72.1).
+  - Phones, tablets and gamepad.
+  - Reduce Motion / Reduce Flashing.
+  - Low-health heartbeat, downed ash, and the Wolf, Ghoul and Wraith colours.
+
 ## [1.77.0] - 2026-11-10: Thornrose, the new health bar, with a matching posture rail
 
 Owner: "completely revamp the current health bar with a completely new and cooler and on theme design", then "I like option C, just make the posture bar match it and make sure its all animated". Three all-new concepts were mocked up (Vigil, Reliquary, Thornrose: `docs/img/health-thornrose-options.jpg`), and the owner picked **Thornrose**. Full write-up: `docs/UI-Kit.md` (Health bar: Thornrose).
