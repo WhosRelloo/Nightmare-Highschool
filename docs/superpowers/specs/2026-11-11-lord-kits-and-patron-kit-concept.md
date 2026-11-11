@@ -1,6 +1,6 @@
 # Lord kits for every race, and the Sanguine Atelier kit: concept (2026-11-11)
 
-**Status:** concept, v2 (2026-11-11). The owner loved v1 and asked for it "a little cooler"; this version adds the living pieces, presence and set moments below. Nothing is built.
+**Status:** concept, v2 (2026-11-11), approved; the Sanguine Atelier is built first. The owner loved v1 and asked for it "a little cooler"; this version adds the living pieces, presence and set moments below. Nothing is built.
 
 **The ask:** "I need a Big kit for Lord Style 3D clothing and accessories for EACH race. I also want you to design a cool Kit for the other Owner. He said he wants his kit to be a noble, classy vampire style, but on some blood art type of stuff. He liked the Art Guild [the Ink Club, the artists' clique], so he wants his own custom stuff for HIS version."
 
@@ -132,7 +132,7 @@ Effects stay readable in a fight and never cover other players. On low graphics,
 1. **Atelier tailcoat:** black velvet (2D base) with crimson brushstroke embroidery climbing from the hem, and swinging 3D tails splashed with crimson paint on the inside.
 2. **The palette brooch:** a gilded artist's palette worn at the throat. Its "paints" are rubies, garnets and black onyx.
 3. **The Master's brush:** a long gilded brush held like a wand. Its trail leaves crimson brushstrokes in the air that fade. This is the kit's VFX signature.
-4. **A painted half-cape:** a canvas cape on a gilt frame bar at the shoulders, painted with a crimson portrait of a vampire lady (original art).
+4. **A painted half-cape:** a dark cape on a blackened-gilt frame bar at the shoulders. Its face is near-black velvet, with an original portrait of a vampire lady painted into it in deep shadow tones: blacks, wine and oxblood, with only the crimson highlights catching the light, like an old master's portrait in a candlelit gallery. **Owner (2026-11-11): the cape must fit the theme and still look dark for him.** It is never a bright canvas; it reads as a dark gothic cape first and a painting second.
 5. **A frame crown:** a circlet shaped like an ornate picture frame, with a single crimson stone.
 6. **Orbiting miniatures:** three tiny framed paintings that circle slowly at shoulder height.
 7. **Painter's gloves:** fine black kid gloves, fingertips stained crimson with paint.
@@ -145,7 +145,7 @@ Effects stay readable in a fight and never cover other players. On low graphics,
 **The Ink Club tie-in:** wearing the kit in the Ink Studio makes the studio's paintings glow faintly crimson.
 
 ### v2: what makes it cooler
-- **The living portrait:** the vampire lady painted on his half-cape is alive. Her eyes follow whoever stands behind him, she changes her pose at midnight, and under a crimson moon the whole canvas glows.
+- **The living portrait:** the vampire lady painted into his dark half-cape is alive. Her eyes follow whoever stands behind him, and she changes her pose at midnight. Under a crimson moon her crimson highlights smoulder a little brighter, but the cape stays dark.
 - **Gallery Mode (his signature emote):** a gilded easel unfolds in front of him. He paints a quick crimson portrait of the nearest player in a few bold strokes, then hands it to them as a small framed keepsake: a decoration for their dorm, signed with his sigil. It's social, it's fun, and it's unique to him.
 - **The brush trail spells his sigil:** idle flourishes with the Master's brush trace his personal monogram in crimson strokes that hang in the air for a moment.
 - **The orbiting miniatures become a halo:** when he stands still, the three tiny paintings slow, rise and line up into a frame-halo behind his head.
@@ -160,8 +160,8 @@ Effects stay readable in a fight and never cover other players. On low graphics,
   - Renders on an R6 body, front, side and back, go to the owners for approval before import.
   - The other owner approves his kit personally.
 - **Coats and robes:** each Lord coat or robe has a matching 2D Shirt and Pants base made with the clean-edge clothing pipeline, so there are no black seams.
-- **Order:**
-  1. The Sanguine Atelier: one owner, a clear brief.
+- **Order (owner-approved 2026-11-11):**
+  1. The Sanguine Atelier: first, once the accessories session's kits are finished.
   2. The Vampire Elder: closest to it, so it shares lessons.
   3. Then the Werewolf, Priest, Human, Ghoul and Wraith kits.
 - **Roughly 50-55 pieces in all.** They'd be made in batches like the accessories kit, after that kit is finished.
