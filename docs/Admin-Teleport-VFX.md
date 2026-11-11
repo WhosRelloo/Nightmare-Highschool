@@ -42,6 +42,14 @@ The server decides (`Features.Fx.TpStyle`). Clients only draw.
 - **Reduce Motion:** 10 crows or 12 bats that rise or glide straight in and fade. There's no scatter, vortex or swirl, the sigil stays still, and the ring is left out.
 - **Effects quality Low:** half the birds.
 
+## Regalia tint (1.84.1)
+While the mover wears admin regalia (Kit B), the character attribute `NHRegaliaTint` (a Color3 set by `UI.AccessoryWear`) colours their flock.
+- **What takes the colour:** each bird's eye glint (`SurfaceAppearance.EmissiveTint`), the smoke (30% toward it) and the motes.
+- **The two colours:** Ember (1, 0.34, 0.07) or Crimson (0.92, 0.06, 0.12).
+- **Without regalia:** the birds keep their own crimson glint.
+- **Not tinted:** the bats' sigil, and the bring-escort swirl.
+- **Related:** `Features.Fx.VeilMove` also stamps `NHAdminFlare` (a server time) on the staff member's character. The accessories session's `AccessoryFx` uses it to flare the sigil halo.
+
 ## The birds
 Both are built by headless Blender scripts in `art/vfx/crow/`. Each is one skinned mesh with one material, using Roblox's DoubleSided wings and tail.
 

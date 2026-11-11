@@ -2,6 +2,32 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.84.1] - 2026-11-11: Staff flocks take the colour of your regalia
+
+Owner: "Yes, tint them". The accessories kit session asked for this: the staff teleport flocks should match the admin regalia (Kit B) the staff member wears.
+
+### Changed (NH Combat Test)
+- **`Controllers.World.TpFlock`:** while the mover wears admin regalia, their crows' or bats' eye glints, the smoke and the crimson motes take that piece's colour.
+  - **Where the colour comes from:** the character attribute `NHRegaliaTint`, set on the server by `UI.AccessoryWear`.
+  - **The two colours:** Ember (1, 0.34, 0.07) or Crimson (0.92, 0.06, 0.12).
+  - **Without regalia:** nothing changes. The bats' sigil stays crimson either way.
+  - **How it carries through:** the tint follows the flock's delayed steps (the arrival, the peel-away). Pooled birds go back to their own glint.
+  - **Not tinted:** the bring-escort swirl, because its event doesn't carry the staff member's character.
+- **The accessories session's `NHAdminFlare` stamp in `Features.Fx.VeilMove`:** read and left as it is. It only stamps a time on the staff member's character.
+
+### Verified (Studio Play)
+**[PT]** Each case used a stand-in with the attribute set, and checked every bird's `EmissiveTint`:
+- crows with Ember: 255,87,18 on all 56
+- bats with Crimson: 235,15,31 on all 87
+- bats with Ember: 255,87,18 on all 88
+- crows with no regalia afterwards: back to 200,40,60 on all 56
+
+No warnings.
+
+**Not seen on screen:** the regalia models need the owner's import first (`art/group-upload-accessories/kitb/`).
+
+**Map place:** its `TpFlock` is now behind (1.75.1's copy). Copy NH Combat Test's file to bring it over. It doesn't need the Map to have regalia: without the attribute it behaves as before.
+
 ## [1.84.0] - 2026-11-11: the icon set (the wax seal stops being the icon for everything)
 
 Owner: "I'm tired of using this icon for everything. Create unique icons for everything that uses this icon, other than
