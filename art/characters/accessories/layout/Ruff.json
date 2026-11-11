@@ -1,0 +1,140 @@
+{
+ "key": "Ruff",
+ "name": "Falling ruff",
+ "atlas": 2048,
+ "pieces": {
+  "Ruff": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 8412,
+   "fit": [
+    2.0906329154968262e-05,
+    0.7857580184936523,
+    -0.6388189792633057
+   ],
+   "size": [
+    0.8783957064151764,
+    0.3724755644798279,
+    0.2619912624359131
+   ],
+   "fit_body": {
+    "female": 0.925,
+    "lean": 0.933,
+    "athletic": 0.999,
+    "muscular": 1.036,
+    "stocky": 1.117,
+    "heavy": 1.147,
+    "petite": 0.925,
+    "toned": 0.942,
+    "curvy": 0.942,
+    "strong": 0.984,
+    "plus": 0.968
+   },
+   "hair_fit": {
+    "Females_Araya": null,
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": null,
+    "Females_Elegant_Bob_Cut": null,
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Short_Mid_Part": null,
+    "Females_Side_Bun": null,
+    "Females_Side_Ponytail": null,
+    "Females_Straight_Bob": null,
+    "Females_Super_Long_Japanese_Hair": null,
+    "Females_Wavy_Y2k_Bob": null,
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "a starched linen falling ruff: a pleated frill across the front of the throat over a three-tier pleated lace cascade, a gold brooch with a crimson stone; clear of the nape and shoulders",
+ "tris": 8412
+}

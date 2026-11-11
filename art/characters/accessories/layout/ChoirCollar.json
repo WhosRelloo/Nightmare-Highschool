@@ -1,0 +1,149 @@
+{
+ "key": "ChoirCollar",
+ "name": "Choir collar",
+ "atlas": 2048,
+ "pieces": {
+  "ChoirCollar": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 5808,
+   "fit": [
+    -0.0,
+    0.7971082925796509,
+    -0.5468915104866028
+   ],
+   "size": [
+    0.8304338455200195,
+    0.46578359603881836,
+    0.11221691966056824
+   ],
+   "fit_body": {
+    "female": 1.015,
+    "lean": 1.008,
+    "athletic": 1.022,
+    "muscular": 1.083,
+    "stocky": 1.177,
+    "heavy": 1.171,
+    "petite": 1.015,
+    "toned": 1.01,
+    "curvy": 1.012,
+    "strong": 1.018,
+    "plus": 1.008
+   },
+   "hair_fit": {
+    "Females_Araya": null,
+    "Females_Detective_Hair": null,
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": null,
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": null,
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": null,
+    "Females_Side_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Straight_Bob": null,
+    "Females_Super_Long_Japanese_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "white linen collar lobes on the chest front with beaded lace edges and a crimson bow; nothing at the nape or shoulders (long hair falls clear)",
+ "tris": 5808
+}

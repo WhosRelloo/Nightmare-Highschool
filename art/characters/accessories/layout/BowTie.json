@@ -1,0 +1,257 @@
+{
+ "key": "BowTie",
+ "name": "Velvet bow tie",
+ "atlas": 2048,
+ "pieces": {
+  "BowTie": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 2496,
+   "fit": [
+    -0.0,
+    0.7913345694541931,
+    -0.5890333652496338
+   ],
+   "size": [
+    0.6064421534538269,
+    0.3141742944717407,
+    0.16593337059020996
+   ],
+   "fit_body": {
+    "female": 0.905,
+    "lean": 0.842,
+    "athletic": 1.006,
+    "muscular": 1.05,
+    "stocky": 1.161,
+    "heavy": 1.163,
+    "petite": 0.865,
+    "toned": 0.948,
+    "curvy": 0.942,
+    "strong": 0.994,
+    "plus": 0.968
+   },
+   "sway": "Loops",
+   "keepout": [
+    -0.0,
+    0.0,
+    1.0
+   ],
+   "lock": "Z",
+   "bones": [
+    {
+     "name": "Root",
+     "head": [
+      -0.0,
+      0.8199999928474426,
+      -0.5899999737739563
+     ],
+     "parent": null
+    },
+    {
+     "name": "H0",
+     "head": [
+      -0.05999999865889549,
+      0.8199999928474426,
+      -0.5899999737739563
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C0_1",
+     "head": [
+      -0.05999999865889549,
+      0.8199999928474426,
+      -0.5899999737739563
+     ],
+     "parent": "H0"
+    },
+    {
+     "name": "H1",
+     "head": [
+      0.05999999865889549,
+      0.8199999928474426,
+      -0.5899999737739563
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C1_1",
+     "head": [
+      0.05999999865889549,
+      0.8199999928474426,
+      -0.5899999737739563
+     ],
+     "parent": "H1"
+    },
+    {
+     "name": "H2",
+     "head": [
+      -0.029999999329447746,
+      0.7799999713897705,
+      -0.5120000243186951
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C2_1",
+     "head": [
+      -0.029999999329447746,
+      0.7799999713897705,
+      -0.5120000243186951
+     ],
+     "parent": "H2"
+    },
+    {
+     "name": "H3",
+     "head": [
+      0.029999999329447746,
+      0.7799999713897705,
+      -0.5120000243186951
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C3_1",
+     "head": [
+      0.029999999329447746,
+      0.7799999713897705,
+      -0.5120000243186951
+     ],
+     "parent": "H3"
+    }
+   ],
+   "hair_fit": {
+    "Females_Araya": null,
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Ponytail": null,
+    "Females_Straight_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "black velvet loops with a crimson satin knot; loops and tails on short chains",
+ "tris": 2496
+}

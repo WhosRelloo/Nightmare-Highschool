@@ -2,6 +2,46 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.79.0] - 2026-11-11: 3D accessories, batch 1 (uniform and school)
+
+The first batch of Kit A, the player accessories (`docs/Accessories.md`): 10 designs, 18 store items, cosmetic only.
+Owner: "Make them all. I like it.", "Make sure nothing clips or overlaps or hovers", "Approve batch 1".
+
+### Added
+- **The pieces** (2048 PBR bakes, rigged where they swing): eight clique crest pins (members only), the Prefect's and
+  Head Student's sashes with medals, the school tie and velvet bow tie (they flutter), the leather satchel and the
+  messenger bag, the book strap, the Ink Club's chained grimoire (a faint violet glow), the choir collar and the
+  falling ruff. Templates in `ReplicatedStorage.NHAccessories` (`tools/accessories/assemble_batch1.luau`).
+- **Wearing** (`UI.AccessoryWear`, look field `Acc`): each piece welded to its R6 part, deepened for each body type
+  (all 12), fitted per hair (a hair a piece would pass through can't wear it), and moved by Height v2's stretch.
+- **Swing** (`Controllers.Character.AccessorySway`): ties flutter flat on the chest, bags, books and the grimoire swing
+  fore and aft, never toward the body.
+- **The Wardrobe's Accessories tab** (a row per slot) and a staff-only **Admin** tab for Kit B; a cape takes off the
+  pieces it would pass through, and a piece takes off a clashing cape.
+- **The School Store's Accessories tab**: try a piece on the preview, buy it for Yen (`Services.Features.Accessories`,
+  saved in `Identity.Accessories`); the old stat-gear tab is now **Gear**.
+- `Controllers.Character.AccessoryFx` for the later batches (orbits, a familiar's idle, flicker, glow pulses).
+
+### Fixed after the play-test
+- The sheathed katana hangs at the left hip and went through the satchel; the new katana check also found it crossing
+  the Head Student's sash on the deep bodies. Both were rebuilt (the satchel on the right hip, the sash over the left
+  shoulder) and wait for the owner's import (`art/group-upload-accessories/batch1-fix/`); the game hides those two
+  until then. The satchel now can't be worn with held or hip pieces (they hang on the right too).
+- The book strap hides while a weapon is drawn (the katana's grip is in that hand).
+- A hair change at the barber kept a piece the new hair passes through in the saved look: the server and the Wardrobe
+  now take it off (and say so).
+- "Took off ..." messages stay up; the store's header no longer says "Uniform tops" over the accessories; store cards
+  show each piece in 3D.
+
+### Verified (NH Combat Test, slot 4 "Testy", Female body)
+- Real clicks: the Wardrobe tab, six pieces worn and saved, the sash taking off the satchel and pin; a Pack pin bought
+  at the store (Yen 718 to 538). The Female, Plus and Petite depth fits measured on the server character, exactly the
+  fit table. Real held keys: walk, turn, strafe, sprint and a jump, swings 1 to 20 degrees (inside the checked limits).
+  The store remote refused a far purchase, another clique's pin, a second buy and a bad id; with `NHStaff` 0 the
+  Admin tab was hidden. No new console errors.
+- Offline: `acc_check.py` 0 fails (12 bodies, motion, sway limits, pairs, the admin capes, the katana).
+- **Not yet:** a play-test of the post-test fixes, a second player, combat animations, the Map place.
+
 ## [1.78.6] - 2026-11-10: Map place: NPCs lean only against a wall
 
 Owner: "For NPCs, they should only have this pose when they are leaning on a wall".

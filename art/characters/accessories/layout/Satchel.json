@@ -1,0 +1,179 @@
+{
+ "key": "Satchel",
+ "name": "Leather satchel",
+ "atlas": 2048,
+ "pieces": {
+  "Satchel": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 3108,
+   "fit": [
+    0.22579649090766907,
+    -0.340999960899353,
+    0.0
+   ],
+   "size": [
+    2.3784069418907166,
+    2.7980000972747803,
+    1.1159999370574951
+   ],
+   "fit_body": {
+    "female": 0.972,
+    "lean": 0.81,
+    "athletic": 0.978,
+    "muscular": 1.039,
+    "stocky": 1.126,
+    "heavy": 1.152,
+    "petite": 0.865,
+    "toned": 0.962,
+    "curvy": 1.093,
+    "strong": 0.98,
+    "plus": 1.079
+   },
+   "sway": "Pendulum",
+   "keepout": [
+    -1.0,
+    0.0,
+    0.0
+   ],
+   "lock": "X",
+   "bones": [
+    {
+     "name": "Root",
+     "head": [
+      1.2000000476837158,
+      -0.9800000190734863,
+      0.0
+     ],
+     "parent": null
+    },
+    {
+     "name": "H0",
+     "head": [
+      1.2000000476837158,
+      -0.9800000190734863,
+      0.0
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C0_1",
+     "head": [
+      1.2000000476837158,
+      -0.9800000190734863,
+      0.0
+     ],
+     "parent": "H0"
+    },
+    {
+     "name": "C0_2",
+     "head": [
+      1.2200000286102295,
+      -1.159999966621399,
+      0.0
+     ],
+     "parent": "C0_1"
+    }
+   ],
+   "hair_fit": {
+    "Females_Araya": null,
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": null,
+    "Females_Elegant_Bob_Cut": null,
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": null,
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": null,
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": null,
+    "Females_Short_Mid_Part": null,
+    "Females_Side_Bun": null,
+    "Females_Side_Ponytail": null,
+    "Females_Straight_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": null,
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": null,
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": null,
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "oxblood leather, two brass buckles and a nameplate; hangs on the left side below the arm (clear of every limb), swings fore and aft on a 2-bone chain, never toward the leg",
+ "tris": 3108
+}

@@ -1,0 +1,226 @@
+{
+ "key": "Grimoire",
+ "name": "Chained grimoire",
+ "atlas": 2048,
+ "pieces": {
+  "Grimoire": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 2744,
+   "fit": [
+    1.1024999618530273,
+    -1.2850000858306885,
+    -0.15000000596046448
+   ],
+   "size": [
+    0.205000102519989,
+    0.8300000429153442,
+    0.550000011920929
+   ],
+   "fit_body": {},
+   "sway": "Pendulum",
+   "keepout": [
+    -1.0,
+    0.0,
+    0.0
+   ],
+   "lock": "X",
+   "bones": [
+    {
+     "name": "Root",
+     "head": [
+      1.0449999570846558,
+      -0.9700000286102295,
+      -0.23999999463558197
+     ],
+     "parent": null
+    },
+    {
+     "name": "H0",
+     "head": [
+      1.0449999570846558,
+      -0.9700000286102295,
+      -0.23999999463558197
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C0_1",
+     "head": [
+      1.0449999570846558,
+      -0.9700000286102295,
+      -0.23999999463558197
+     ],
+     "parent": "H0"
+    },
+    {
+     "name": "C0_2",
+     "head": [
+      1.1150000095367432,
+      -1.159999966621399,
+      -0.33000001311302185
+     ],
+     "parent": "C0_1"
+    },
+    {
+     "name": "C0_3",
+     "head": [
+      1.1150000095367432,
+      -1.399999976158142,
+      -0.14000000059604645
+     ],
+     "parent": "C0_2"
+    }
+   ],
+   "hair_fit": {
+    "Females_Araya": [
+     1.0,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Straight_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": [
+     1.0,
+     0.0
+    ],
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "violet-black leather, brass corners and bands, a glowing violet eye sigil (emissive mask); hangs on an iron chain from a belt hook on the left hip, swings on a 3-bone chain",
+ "tris": 2744,
+ "glow": [
+  0.62,
+  0.3,
+  1.0
+ ]
+}

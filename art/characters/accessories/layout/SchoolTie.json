@@ -1,0 +1,242 @@
+{
+ "key": "SchoolTie",
+ "name": "School tie",
+ "atlas": 2048,
+ "pieces": {
+  "SchoolTie": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 1232,
+   "fit": [
+    -0.0,
+    0.15159255266189575,
+    -0.5582350492477417
+   ],
+   "size": [
+    0.38021746277809143,
+    1.623185157775879,
+    0.10946738719940186
+   ],
+   "fit_body": {
+    "female": 1.021,
+    "lean": 0.983,
+    "athletic": 1.011,
+    "muscular": 1.062,
+    "stocky": 1.189,
+    "heavy": 1.213,
+    "petite": 0.986,
+    "toned": 1.014,
+    "curvy": 1.151,
+    "strong": 1.031,
+    "plus": 1.133
+   },
+   "sway": "Flutter",
+   "keepout": [
+    -0.0,
+    0.0,
+    1.0
+   ],
+   "lock": "Z",
+   "bones": [
+    {
+     "name": "Root",
+     "head": [
+      -0.0,
+      0.9700000286102295,
+      -0.5299999713897705
+     ],
+     "parent": null
+    },
+    {
+     "name": "H0",
+     "head": [
+      -0.0,
+      0.800000011920929,
+      -0.5120000243186951
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C0_1",
+     "head": [
+      -0.0,
+      0.800000011920929,
+      -0.5120000243186951
+     ],
+     "parent": "H0"
+    },
+    {
+     "name": "C0_2",
+     "head": [
+      -0.0,
+      0.41999998688697815,
+      -0.5120000243186951
+     ],
+     "parent": "C0_1"
+    },
+    {
+     "name": "C0_3",
+     "head": [
+      -0.0,
+      0.03999999910593033,
+      -0.5120000243186951
+     ],
+     "parent": "C0_2"
+    },
+    {
+     "name": "C0_4",
+     "head": [
+      -0.0,
+      -0.3199999928474426,
+      -0.5120000243186951
+     ],
+     "parent": "C0_3"
+    }
+   ],
+   "hair_fit": {
+    "Females_Araya": [
+     1.0,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Straight_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": [
+     1.0,
+     0.0
+    ],
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "crimson silk with black bars and a gold crest; the blade flutters on a 4-bone chain",
+ "tris": 1232
+}
