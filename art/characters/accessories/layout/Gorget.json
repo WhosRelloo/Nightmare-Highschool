@@ -1,0 +1,134 @@
+{
+ "key": "Gorget",
+ "name": "Riveted steel gorget",
+ "atlas": 2048,
+ "pieces": {
+  "Gorget": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 8364,
+   "fit": [
+    -0.0,
+    0.8084778785705566,
+    -0.5154145956039429
+   ],
+   "size": [
+    0.9599999785423279,
+    0.4330425262451172,
+    0.1510109305381775
+   ],
+   "fit_body": {
+    "female": 0.905,
+    "lean": 0.893,
+    "athletic": 1.0,
+    "muscular": 1.039,
+    "stocky": 1.118,
+    "heavy": 1.145,
+    "petite": 0.895,
+    "toned": 0.944,
+    "curvy": 0.942,
+    "strong": 0.986,
+    "plus": 0.968
+   },
+   "hair_fit": {
+    "Females_Araya": null,
+    "Females_Detective_Hair": null,
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": null,
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": null,
+    "Females_Messy_Flow_Braided": null,
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": null,
+    "Females_Side_Ponytail": null,
+    "Females_Straight_Bob": null,
+    "Females_Super_Long_Japanese_Hair": null,
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": null,
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "a blackened steel gorget of three crescent lames on the chest front, rolled edges, brass rivets and filigree, a silver sunburst boss with a brass crescent, oxblood leather lining and tabs",
+ "tris": 8364
+}

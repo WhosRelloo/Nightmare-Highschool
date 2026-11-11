@@ -1,0 +1,160 @@
+{
+ "key": "CrystalPendant",
+ "name": "Crystal pendant",
+ "atlas": 2048,
+ "pieces": {
+  "CrystalPendant": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 8442,
+   "fit": [
+    -0.0,
+    0.828942596912384,
+    -0.03496408462524414
+   ],
+   "size": [
+    1.2805935144424438,
+    0.4338620901107788,
+    1.1616753339767456
+   ],
+   "fit_body": {
+    "female": 0.945,
+    "lean": 0.953,
+    "athletic": 0.998,
+    "muscular": 1.036,
+    "stocky": 1.135,
+    "heavy": 1.156,
+    "petite": 0.952,
+    "toned": 0.952,
+    "curvy": 0.95,
+    "strong": 0.984,
+    "plus": 0.968
+   },
+   "sway": "Loops",
+   "keepout": [
+    -0.0,
+    0.0,
+    1.0
+   ],
+   "lock": "Z",
+   "bones": [
+    {
+     "name": "Root",
+     "head": [
+      -0.0,
+      0.8999999761581421,
+      -0.5270000100135803
+     ],
+     "parent": null
+    },
+    {
+     "name": "H0",
+     "head": [
+      -0.0,
+      0.8999999761581421,
+      -0.5270000100135803
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C0_1",
+     "head": [
+      -0.0,
+      0.8999999761581421,
+      -0.5270000100135803
+     ],
+     "parent": "H0"
+    }
+   ],
+   "hair_fit": {
+    "Females_Araya": null,
+    "Females_Detective_Hair": null,
+    "Females_EdnaMode_lol": null,
+    "Females_Elegant_Bob_Cut": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": null,
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": null,
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": null,
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": null,
+    "Females_Side_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Straight_Bob": null,
+    "Females_Super_Long_Japanese_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": null,
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": null,
+    "Males_Baki": null,
+    "Males_Black_Zoldyck_Hair": null,
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": null,
+    "Males_Man_Bun": null,
+    "Males_Messy_Middle_Part": null,
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": null,
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "a faceted amethyst in a silver cage (six wires, two bands, a beaded crown and a finial) on a fine silver chain round the neck; its core glows faint violet (a falling emissive gradient)",
+ "tris": 8442,
+ "glow": [
+  0.62,
+  0.26,
+  1.0
+ ]
+}

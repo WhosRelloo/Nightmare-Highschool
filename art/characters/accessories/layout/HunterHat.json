@@ -1,0 +1,128 @@
+{
+ "key": "HunterHat",
+ "name": "Hunter's wide-brim",
+ "atlas": 2048,
+ "pieces": {
+  "HunterHat": {
+   "mount": "Head",
+   "kind": "Main",
+   "tris": 8860,
+   "fit": [
+    -0.0013208985328674316,
+    0.6237378120422363,
+    0.0
+   ],
+   "size": [
+    2.7093580961227417,
+    0.73213791847229,
+    2.774231433868408
+   ],
+   "fit_body": {},
+   "hair_fit": {
+    "Females_Araya": [
+     1.14,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.4,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.16,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.24,
+     0.0
+    ],
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": null,
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": [
+     1.24,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.12,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.34,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": [
+     1.08,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.38,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.14,
+     0.1
+    ],
+    "Females_Side_Ponytail": [
+     1.42,
+     0.02
+    ],
+    "Females_Straight_Bob": [
+     1.1,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.1,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.08,
+     0.0
+    ],
+    "Females_Wolf_Cut": [
+     1.38,
+     0.0
+    ],
+    "Males_Anime_Hero_Hair": null,
+    "Males_Baki": [
+     1.38,
+     0.02
+    ],
+    "Males_Black_Zoldyck_Hair": null,
+    "Males_Blonde_Emo_Scene_Messy": null,
+    "Males_Half_Up_Half_Down_Locs": [
+     1.42,
+     0.08
+    ],
+    "Males_Higuruma": [
+     1.42,
+     0.1
+    ],
+    "Males_Long_Length_Messy": [
+     1.42,
+     0.0
+    ],
+    "Males_Man_Bun": null,
+    "Males_Messy_Middle_Part": null,
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": [
+     1.16,
+     0.04
+    ],
+    "Males_Slicked_Back": [
+     1.3,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": null,
+    "Males_Super_Messy_Long_Hair": [
+     1.36,
+     0.12
+    ],
+    "Males_TP_Locks": null
+   }
+  }
+ },
+ "notes": "weathered dark felt, a wide brim that droops at the sides; black leather band with a silver buckle and studs; a crow feather",
+ "tris": 8860
+}

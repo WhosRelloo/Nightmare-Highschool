@@ -1,0 +1,175 @@
+{
+ "key": "PotionBelt",
+ "name": "Potion belt",
+ "atlas": 2048,
+ "pieces": {
+  "PotionBelt": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 10478,
+   "fit": [
+    -0.0,
+    -0.543999969959259,
+    -0.018000006675720215
+   ],
+   "size": [
+    2.039599895477295,
+    0.22199997305870056,
+    1.2940000295639038
+   ],
+   "fit_body": {
+    "female": 1.019,
+    "lean": 0.75,
+    "athletic": 0.899,
+    "muscular": 0.941,
+    "stocky": 1.174,
+    "heavy": 1.211,
+    "petite": 0.915,
+    "toned": 1.048,
+    "curvy": 1.206,
+    "strong": 1.061,
+    "plus": 1.18
+   },
+   "hair_fit": {
+    "Females_Araya": [
+     1.0,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": null,
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Ponytail": null,
+    "Females_Straight_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": null,
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": [
+     1.0,
+     0.0
+    ],
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "a high dark leather belt, stitched, a pointed-oval silver buckle with a crescent; five corked vials (violet, green, amber, teal, magenta, faintly glowing) in loops on the front right and back right, two wax-sealed, one tagged; a pouch with a crescent clasp on the front left (clear of the katana's guard). Above the striding legs' reach (z -0.50 .. -0.635)",
+ "tris": 10478,
+ "glow": [
+  0.55,
+  0.22,
+  0.95
+ ]
+}

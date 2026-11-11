@@ -1,0 +1,325 @@
+{
+ "key": "Umbrellas",
+ "name": "Lace parasol and crook umbrella",
+ "atlas": 2048,
+ "pieces": {
+  "CrookUmbrella": {
+   "mount": "RightArm",
+   "kind": "Main",
+   "tris": 5520,
+   "fit": [
+    -0.0,
+    -1.9249200820922852,
+    0.05489831417798996
+   ],
+   "size": [
+    0.18747162818908691,
+    1.8401600122451782,
+    0.29726819694042206
+   ],
+   "fit_body": {},
+   "hair_fit": {
+    "Females_Araya": [
+     1.0,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Straight_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": [
+     1.0,
+     0.0
+    ],
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  },
+  "LaceParasol": {
+   "mount": "RightArm",
+   "kind": "Main",
+   "tris": 7752,
+   "fit": [
+    -0.0,
+    -1.750620722770691,
+    0.0033823400735855103
+   ],
+   "size": [
+    0.26717662811279297,
+    1.483858346939087,
+    0.2718989849090576
+   ],
+   "fit_body": {},
+   "hair_fit": {
+    "Females_Araya": [
+     1.0,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Straight_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": [
+     1.0,
+     0.0
+    ],
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "carried closed in the right hand like a cane (an open canopy would sweep through the head and hats as the arm swings): a black silk umbrella with a dark wood crook, silver collar, strap and steel ferrule; a black-violet silk parasol under two tiers of ivory lace, a violet satin bow, a carved bone crook with a gilt collar and a silk tassel",
+ "tris": 13272
+}

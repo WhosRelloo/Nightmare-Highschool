@@ -1,0 +1,10 @@
+{
+ "note": "Hairs that cross a piece when it's worn the game's way (scaled about the headband and lifted, AccessoryWear), or through an orbit's spin, though acc_hairfit found a fit. acc_hairgroup.py applies these after every hair-fit run.",
+ "Hats/Tricorn": ["Males_Messy_Wolfcut_with_Ponytail"],
+ "Masks/LaceMaskTrim": ["Females_Messy_Flow_Braided", "Males_Long_Length_Messy", "Males_Short"],
+ "Masks/GiltMask": ["Females_EdnaMode_lol", "Females_Side_Bun", "Females_Wavy_Y2k_Bob"],
+ "Masks/BoneMask": ["Females_EdnaMode_lol", "Females_Preppy_Long_Braided"],
+ "MourningHats/MourningToque": ["Males_Man_Bun"],
+ "MourningHats/Fascinator": ["Females_Femkuna"],
+ "RuneHalo/RuneHalo": ["Females_Femkuna", "Females_Femkuna_Pigtails", "Females_Gojo_Ponytail", "Females_Natural_Trim_Pony", "Males_Anime_Hero_Hair"]
+}

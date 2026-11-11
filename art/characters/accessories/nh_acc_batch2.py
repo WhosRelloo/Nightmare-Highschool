@@ -371,6 +371,38 @@ def wrap_mask(ob, R=0.612, nose=0.03):
     me.update()
 
 
+def mask_runs(pts2d, style, margin=0.022):
+    """split a decoration curve (x, z) on the mask into runs that stay on the mask: never across an eye hole (plus a
+    margin) and never past the outline (play-test review: the filigree crossed the eye holes)"""
+    outline, eyes = mask_outline(style)
+    n = len(outline) // 2
+    top = outline[:n]
+    bot = outline[n:][::-1]
+    def edge(curve, x):
+        for (x0, z0), (x1, z1) in zip(curve, curve[1:]):
+            if x0 <= x <= x1 or x1 <= x <= x0:
+                t = 0 if x1 == x0 else (x - x0) / (x1 - x0)
+                return z0 + (z1 - z0) * t
+        return None
+    def ok(x, z):
+        for sx in (-1, 1):
+            if ((x - sx * 0.205) / (0.105 + margin)) ** 2 + ((z - 1.605) / (0.075 + margin)) ** 2 < 1:
+                return False
+        t, b = edge(top, x), edge(bot, x)
+        return t is not None and b is not None and b + margin < z < t - margin
+    runs, cur = [], []
+    for x, z in pts2d:
+        if ok(x, z):
+            cur.append((x, z))
+        else:
+            if len(cur) >= 3:
+                runs.append(cur)
+            cur = []
+    if len(cur) >= 3:
+        runs.append(cur)
+    return runs
+
+
 @item("Masks", "Masquerade half-masks", close=((2.4, -4.6, 1.95), (0, 0, 1.62), 115),
       each={"Lace": ["LaceMask", "LaceMaskTrim"], "Bone": ["BoneMask"], "Gilt": ["GiltMask"]})
 def build_masks(M):
@@ -436,14 +468,13 @@ def build_masks(M):
         A.tube(f"BoneRim{k}", P, 0.008, stain, closed=True, res=3)
     for sx in (-1, 1):
         for k in range(3):
-            P = []
-            for i in range(9):
-                t = i / 8
-                x = sx * (0.30 + 0.12 * t)
-                z = 1.52 + 0.05 * k + 0.07 * math.sin(t * math.pi * 1.2 + k)
-                ang = x / 0.64
-                P.append((0.640 * math.sin(ang), -0.640 * math.cos(ang), z))
-            A.tube(f"BoneScroll{sx}_{k}", P, 0.006, stain, res=3)
+            P2 = []
+            for i in range(17):
+                t = i / 16
+                P2.append((sx * (0.30 + 0.12 * t), 1.52 + 0.05 * k + 0.07 * math.sin(t * math.pi * 1.2 + k)))
+            for r, run in enumerate(mask_runs(P2, "bone")):
+                P = [(0.640 * math.sin(x / 0.64), -0.640 * math.cos(x / 0.64), z) for x, z in run]
+                A.tube(f"BoneScroll{sx}_{k}_{r}", P, 0.006, stain, res=3)
     ties("BoneMask")
 
     # ---- gilt: gold with raised filigree, crimson jewels at the temples and a feather spray on the left
@@ -452,18 +483,14 @@ def build_masks(M):
     random.seed(3)
     for sx in (-1, 1):
         for k in range(4):
-            P = []
+            P2 = []
             ph = random.uniform(0, 3)
-            for i in range(12):
-                t = i / 11
-                x = sx * (0.06 + 0.36 * t)
-                z = 1.66 - 0.16 * t + 0.03 * math.sin(t * 6 + ph + k) + 0.02 * k
-                if not (1.48 < z < 1.69):
-                    continue
-                ang = x / 0.64
-                P.append((0.636 * math.sin(ang), -0.636 * math.cos(ang), z))
-            if len(P) > 3:
-                A.tube(f"GiltFil{sx}_{k}", P, 0.005, gold, res=3)
+            for i in range(23):
+                t = i / 22
+                P2.append((sx * (0.06 + 0.36 * t), 1.66 - 0.16 * t + 0.03 * math.sin(t * 6 + ph + k) + 0.02 * k))
+            for r, run in enumerate(mask_runs(P2, "gilt", 0.018)):
+                P = [(0.636 * math.sin(x / 0.64), -0.636 * math.cos(x / 0.64), z) for x, z in run]
+                A.tube(f"GiltFil{sx}_{k}_{r}", P, 0.005, gold, res=3)
         a = sx * 0.40 / 0.64
         A.sphere(f"GiltJewel{sx}", 0.04, (0.640 * math.sin(a), -0.640 * math.cos(a), 1.66), enamel, scale=(1, 0.45, 1.3), seg=14, rings=8)
     ties("GiltMask")

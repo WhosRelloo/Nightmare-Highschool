@@ -1,0 +1,221 @@
+{
+ "key": "PocketWatch",
+ "name": "Brass pocket watch",
+ "atlas": 2048,
+ "pieces": {
+  "PocketWatch": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 5828,
+   "fit": [
+    0.5011248588562012,
+    -0.44975000619888306,
+    -0.5462499856948853
+   ],
+   "size": [
+    0.2242497205734253,
+    0.5165000110864639,
+    0.09049999713897705
+   ],
+   "fit_body": {
+    "female": 1.072,
+    "lean": 0.8,
+    "athletic": 0.909,
+    "muscular": 0.965,
+    "stocky": 1.108,
+    "heavy": 1.218,
+    "petite": 0.94,
+    "toned": 1.056,
+    "curvy": 1.215,
+    "strong": 1.067,
+    "plus": 1.189
+   },
+   "sway": "Pendulum",
+   "keepout": [
+    -0.0,
+    0.0,
+    1.0
+   ],
+   "lock": "Z",
+   "bones": [
+    {
+     "name": "Root",
+     "head": [
+      0.5,
+      -0.3449999988079071,
+      -0.5254999995231628
+     ],
+     "parent": null
+    },
+    {
+     "name": "H0",
+     "head": [
+      0.5,
+      -0.3449999988079071,
+      -0.5254999995231628
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C0_1",
+     "head": [
+      0.5,
+      -0.3449999988079071,
+      -0.5254999995231628
+     ],
+     "parent": "H0"
+    },
+    {
+     "name": "C0_2",
+     "head": [
+      0.5,
+      -0.4740000069141388,
+      -0.5444999933242798
+     ],
+     "parent": "C0_1"
+    }
+   ],
+   "hair_fit": {
+    "Females_Araya": [
+     1.0,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Straight_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": null,
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": [
+     1.0,
+     0.0
+    ],
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "a brass hunter-case pocket watch: engine-turned lid round a crescent-and-star cartouche, reeded band, knurled crown and bow, on a short fob chain from a stitched oxblood fob tab at the right front of the waist; swings flat on the belly (lock Z) on a 2-bone chain",
+ "tris": 5828
+}

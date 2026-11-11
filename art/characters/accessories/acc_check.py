@@ -68,9 +68,12 @@ ID_OF = {}
 def load_conflicts():
     import re
     for n, t in enumerate(config_texts()):
-        for m in re.finditer(r"Id = `([\w-]+)`; Name = `[^`]*`; Slot = `(\w+)`; Model = `(\w+)`(?:; Piece = `(\w+)`)?", t):
-            iid, slot, model, pc = m.groups()
+        for m in re.finditer(r"Id = `([\w-]+)`; Name = `[^`]*`; Slot = `(\w+)`; Model = `(\w+)`(?:; Piece = `(\w+)`)?(?:; Pieces = \{([^}]*)\})?", t):
+            iid, slot, model, pc, many = m.groups()
             ID_OF[(model, pc)] = iid
+            for q in re.findall(r"`(\w+)`", many or ""):   # an item of several pieces (a hat and its veil)
+                ID_OF[(model, q)] = iid
+                SLOT_OF[(model, q)] = slot
         if n == 0 and "Accessories.Conflicts = {" in t:
             blk = t[t.index("Accessories.Conflicts = {"):t.index("Accessories.ById = {}")]
         else:   # a fragment: its conflict lines sit under a "-- conflicts" comment
@@ -426,7 +429,7 @@ def run():
             e = lay["pieces"][name]
             arm = objs.get(name + "Rig")
             v, t = mesh_tris(ob)
-            P = dict(verts=v, tris=t, mount=e["mount"], fit_body=e.get("fit_body", {}), kind=e["kind"])
+            P = dict(verts=v, tris=t, mount=e["mount"], fit_body=e.get("fit_body", {}), kind=e["kind"], hair_fit=e.get("hair_fit"))
             if arm is not None:
                 ko = e.get("keepout")   # Roblox mount axes -> Blender (x, y, z) = (-x, z, y)
                 kb = (-ko[0], ko[2], ko[1]) if ko else None
@@ -591,10 +594,15 @@ def hair_report(pieces, report, fails):
     for (it, pn), P in pieces.items():
         if P["mount"] != "Head" or P["kind"] == "Alpha":
             continue
-        tree = tri_bvh(P["verts"], P["tris"])
         hits = {}
+        fits = P.get("hair_fit") or {}
+        piv = Vector((0, 0, 1.93))   # the headband centre: head pieces are worn scaled about it and lifted, per hair
         for h, (v, t) in hair_meshes.items():
-            n = len(tree.overlap(tri_bvh(v, t)))
+            if h in fits and fits[h] is None:
+                continue   # this hair can't wear the piece (the Wardrobe and the server refuse it)
+            k, dz = fits.get(h) or (1.0, 0.0)
+            vv = [piv + (q - piv) * k + Vector((0, 0, dz)) for q in P["verts"]]
+            n = len(tri_bvh(vv, P["tris"]).overlap(tri_bvh(v, t)))
             if n:
                 hits[h] = n
         report[f"{it}/{pn}"]["hair"] = hits

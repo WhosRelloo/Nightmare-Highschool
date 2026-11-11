@@ -4,9 +4,11 @@
 	  NHOrbitAxis (Vector3, the mount's axes) + NHOrbitRpm: the piece turns about its mount's centre (orbiting sigils,
 	    keys). The offline check clears every angle of the orbit, so it never passes through the body, hair or a hat.
 	  NHBob (studs): a slow float up and down (halos).
-	  NHIdle "Familiar": a perched familiar's idle on its named bones (NHIdleBones, JSON: { Bone = { axis = {x,y,z},
-	    min = deg, max = deg } } in each bone's own axes): Head looks about, LidL / LidR blink, Tail flicks, WingL /
-	    WingR settle now and then. Bones without an entry stay still.
+	  NHIdle ("Familiar", "Ledger", ...): idle motion on named bones (NHIdleBones, JSON: { Bone = { axis = {x,y,z},
+	    min = deg, max = deg } } in each bone's own axes), by role: Head looks about, LidL / LidR blink, Tail flicks,
+	    WingL / WingR settle now and then, Page<n> turn over one after another. A group letter after the role
+	    (HeadA, HeadB) keeps two creatures on one piece apart. Bones without an entry stay still.
+	  NHPulse (seconds): the glow breathes slowly (the crown's stone, ember eyes).
 	  NHFlare (true): the glow flares for a moment when the wearer's character gets NHAdminFlare (a time, set by the
 	    server when an admin tool is used): the crimson sigil halo.
 	  NHTrail (true): its ParticleEmitters run only while the wearer walks (the shadow trail). Off with Reduce Motion.

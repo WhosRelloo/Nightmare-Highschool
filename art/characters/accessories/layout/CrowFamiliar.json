@@ -1,0 +1,204 @@
+{
+ "key": "CrowFamiliar",
+ "name": "Crow familiar",
+ "atlas": 2048,
+ "pieces": {
+  "Crow": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 8156,
+   "fit": [
+    -0.8500000238418579,
+    1.2308562994003296,
+    -0.03329336643218994
+   ],
+   "size": [
+    0.24790871143341064,
+    0.45238733291625977,
+    0.8094133138656616
+   ],
+   "fit_body": {},
+   "bones": [
+    {
+     "name": "Root",
+     "head": [
+      -0.8500000238418579,
+      1.0,
+      -0.07999999821186066
+     ],
+     "parent": null
+    },
+    {
+     "name": "H0",
+     "head": [
+      -0.8500000238418579,
+      1.0,
+      -0.07999999821186066
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "Body",
+     "head": [
+      -0.8500000238418579,
+      1.149999976158142,
+      -0.07999999821186066
+     ],
+     "parent": "H0"
+    },
+    {
+     "name": "Head",
+     "head": [
+      -0.8500000238418579,
+      1.2999999523162842,
+      -0.2150000035762787
+     ],
+     "parent": "Body"
+    },
+    {
+     "name": "LidL",
+     "head": [
+      -0.8970000147819519,
+      1.4179999828338623,
+      -0.2680000066757202
+     ],
+     "parent": "Head"
+    },
+    {
+     "name": "LidR",
+     "head": [
+      -0.8030000329017639,
+      1.4179999828338623,
+      -0.2680000066757202
+     ],
+     "parent": "Head"
+    },
+    {
+     "name": "Tail",
+     "head": [
+      -0.8500000238418579,
+      1.1419999599456787,
+      0.07500000298023224
+     ],
+     "parent": "Body"
+    },
+    {
+     "name": "WingL",
+     "head": [
+      -0.9200000166893005,
+      1.3199999332427979,
+      -0.14000000059604645
+     ],
+     "parent": "Body"
+    },
+    {
+     "name": "WingR",
+     "head": [
+      -0.7800000309944153,
+      1.3199999332427979,
+      -0.14000000059604645
+     ],
+     "parent": "Body"
+    }
+   ],
+   "hair_fit": {
+    "Females_Araya": [
+     1.0,
+     0.0
+    ],
+    "Females_Detective_Hair": null,
+    "Females_EdnaMode_lol": null,
+    "Females_Elegant_Bob_Cut": null,
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Short_Mid_Part": null,
+    "Females_Side_Bun": null,
+    "Females_Side_Ponytail": null,
+    "Females_Straight_Bob": null,
+    "Females_Super_Long_Japanese_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": null,
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": null,
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": null,
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": null,
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": null,
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": null
+   }
+  }
+ },
+ "notes": "a crow perched on the left shoulder top (Torso mount): iridescent black plumage, folded wings with the primaries crossing over a fanned tail, a hooked beak, violet familiar's eyes with lids, a silver leg ring; rigged Root > H0 > Body > Head (> LidL, LidR), Tail, WingL, WingR for the idle controller (no sway profile)",
+ "tris": 8156,
+ "glow": [
+  0.7,
+  0.36,
+  1.0
+ ]
+}

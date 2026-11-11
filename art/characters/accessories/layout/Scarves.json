@@ -1,0 +1,379 @@
+{
+ "key": "Scarves",
+ "name": "Long knitted scarves",
+ "atlas": 2048,
+ "pieces": {
+  "ScarfStripe": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 6800,
+   "fit": [
+    -0.011966496706008911,
+    0.23982736468315125,
+    -0.02007487416267395
+   ],
+   "size": [
+    1.5157608389854431,
+    1.8692229390144348,
+    1.357045590877533
+   ],
+   "fit_body": {
+    "female": 0.982,
+    "lean": 0.974,
+    "athletic": 0.995,
+    "muscular": 1.032,
+    "stocky": 1.072,
+    "heavy": 1.122,
+    "petite": 0.974,
+    "toned": 0.983,
+    "curvy": 1.057,
+    "strong": 0.978,
+    "plus": 1.037
+   },
+   "sway": "Tails",
+   "keepout": [
+    -0.0,
+    0.0,
+    1.0
+   ],
+   "lock": "X",
+   "bones": [
+    {
+     "name": "Root",
+     "head": [
+      -0.0,
+      1.0,
+      0.0
+     ],
+     "parent": null
+    },
+    {
+     "name": "H0",
+     "head": [
+      0.13199999928474426,
+      0.8999999761581421,
+      -0.597000002861023
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C0_1",
+     "head": [
+      0.13199999928474426,
+      0.8999999761581421,
+      -0.597000002861023
+     ],
+     "parent": "H0"
+    },
+    {
+     "name": "C0_2",
+     "head": [
+      0.13199999928474426,
+      0.4975000023841858,
+      -0.597000002861023
+     ],
+     "parent": "C0_1"
+    },
+    {
+     "name": "C0_3",
+     "head": [
+      0.13199999928474426,
+      0.0949999988079071,
+      -0.597000002861023
+     ],
+     "parent": "C0_2"
+    },
+    {
+     "name": "C0_4",
+     "head": [
+      0.13199999928474426,
+      -0.3075000047683716,
+      -0.597000002861023
+     ],
+     "parent": "C0_3"
+    },
+    {
+     "name": "H1",
+     "head": [
+      -0.0430000014603138,
+      0.8999999761581421,
+      -0.6499999761581421
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C1_1",
+     "head": [
+      -0.0430000014603138,
+      0.8999999761581421,
+      -0.6499999761581421
+     ],
+     "parent": "H1"
+    },
+    {
+     "name": "C1_2",
+     "head": [
+      -0.0430000014603138,
+      0.5762500166893005,
+      -0.6499999761581421
+     ],
+     "parent": "C1_1"
+    },
+    {
+     "name": "C1_3",
+     "head": [
+      -0.0430000014603138,
+      0.2524999976158142,
+      -0.6499999761581421
+     ],
+     "parent": "C1_2"
+    },
+    {
+     "name": "C1_4",
+     "head": [
+      -0.0430000014603138,
+      -0.07124999910593033,
+      -0.6499999761581421
+     ],
+     "parent": "C1_3"
+    }
+   ],
+   "hair_fit": {
+    "Females_Araya": null,
+    "Females_Detective_Hair": null,
+    "Females_EdnaMode_lol": null,
+    "Females_Elegant_Bob_Cut": null,
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": null,
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": null,
+    "Females_Low_Ponytail": null,
+    "Females_Messy_Flow_Braided": null,
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": null,
+    "Females_Short_Mid_Part": null,
+    "Females_Side_Bun": null,
+    "Females_Side_Ponytail": null,
+    "Females_Straight_Bob": null,
+    "Females_Super_Long_Japanese_Hair": null,
+    "Females_Wavy_Y2k_Bob": null,
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": null,
+    "Males_Baki": null,
+    "Males_Black_Zoldyck_Hair": null,
+    "Males_Blonde_Emo_Scene_Messy": null,
+    "Males_Half_Up_Half_Down_Locs": null,
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": null,
+    "Males_Man_Bun": null,
+    "Males_Messy_Middle_Part": null,
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": null,
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": null,
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  },
+  "ScarfViolet": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 6800,
+   "fit": [
+    -0.011966496706008911,
+    0.23982736468315125,
+    -0.02007487416267395
+   ],
+   "size": [
+    1.5157608389854431,
+    1.8692229390144348,
+    1.357045590877533
+   ],
+   "fit_body": {
+    "female": 0.982,
+    "lean": 0.974,
+    "athletic": 0.995,
+    "muscular": 1.032,
+    "stocky": 1.072,
+    "heavy": 1.122,
+    "petite": 0.974,
+    "toned": 0.983,
+    "curvy": 1.057,
+    "strong": 0.978,
+    "plus": 1.037
+   },
+   "sway": "Tails",
+   "keepout": [
+    -0.0,
+    0.0,
+    1.0
+   ],
+   "lock": "X",
+   "bones": [
+    {
+     "name": "Root",
+     "head": [
+      -0.0,
+      1.0,
+      0.0
+     ],
+     "parent": null
+    },
+    {
+     "name": "H0",
+     "head": [
+      0.13199999928474426,
+      0.8999999761581421,
+      -0.597000002861023
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C0_1",
+     "head": [
+      0.13199999928474426,
+      0.8999999761581421,
+      -0.597000002861023
+     ],
+     "parent": "H0"
+    },
+    {
+     "name": "C0_2",
+     "head": [
+      0.13199999928474426,
+      0.4975000023841858,
+      -0.597000002861023
+     ],
+     "parent": "C0_1"
+    },
+    {
+     "name": "C0_3",
+     "head": [
+      0.13199999928474426,
+      0.0949999988079071,
+      -0.597000002861023
+     ],
+     "parent": "C0_2"
+    },
+    {
+     "name": "C0_4",
+     "head": [
+      0.13199999928474426,
+      -0.3075000047683716,
+      -0.597000002861023
+     ],
+     "parent": "C0_3"
+    },
+    {
+     "name": "H1",
+     "head": [
+      -0.0430000014603138,
+      0.8999999761581421,
+      -0.6499999761581421
+     ],
+     "parent": "Root"
+    },
+    {
+     "name": "C1_1",
+     "head": [
+      -0.0430000014603138,
+      0.8999999761581421,
+      -0.6499999761581421
+     ],
+     "parent": "H1"
+    },
+    {
+     "name": "C1_2",
+     "head": [
+      -0.0430000014603138,
+      0.5762500166893005,
+      -0.6499999761581421
+     ],
+     "parent": "C1_1"
+    },
+    {
+     "name": "C1_3",
+     "head": [
+      -0.0430000014603138,
+      0.2524999976158142,
+      -0.6499999761581421
+     ],
+     "parent": "C1_2"
+    },
+    {
+     "name": "C1_4",
+     "head": [
+      -0.0430000014603138,
+      -0.07124999910593033,
+      -0.6499999761581421
+     ],
+     "parent": "C1_3"
+    }
+   ],
+   "hair_fit": {
+    "Females_Araya": null,
+    "Females_Detective_Hair": null,
+    "Females_EdnaMode_lol": null,
+    "Females_Elegant_Bob_Cut": null,
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": null,
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": null,
+    "Females_Low_Ponytail": null,
+    "Females_Messy_Flow_Braided": null,
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": null,
+    "Females_Short_Mid_Part": null,
+    "Females_Side_Bun": null,
+    "Females_Side_Ponytail": null,
+    "Females_Straight_Bob": null,
+    "Females_Super_Long_Japanese_Hair": null,
+    "Females_Wavy_Y2k_Bob": null,
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": null,
+    "Males_Baki": null,
+    "Males_Black_Zoldyck_Hair": null,
+    "Males_Blonde_Emo_Scene_Messy": null,
+    "Males_Half_Up_Half_Down_Locs": null,
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": null,
+    "Males_Man_Bun": null,
+    "Males_Messy_Middle_Part": null,
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": null,
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": null,
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "long chunky knitted scarves wrapped once round the neck, both tails down the front: crimson-and-black stripes, and a soft grey-violet; the tails swing fore and aft on 4-bone chains (Tails), never toward the chest; stockinette relief baked from a per-vertex stitch attribute",
+ "tris": 13600
+}

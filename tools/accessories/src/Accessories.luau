@@ -94,6 +94,9 @@ function Accessories.Ready(It): boolean
 	local M = It and Store and Store:FindFirstChild(It.Model)
 	if not M then return false end
 	if It.Piece then return M:FindFirstChild(It.Piece) ~= nil end
+	for _, N in It.Pieces or {} do -- an item of several pieces (a hat and its veil): all of them
+		if not M:FindFirstChild(N) then return false end
+	end
 	return true
 end
 

@@ -1574,7 +1574,10 @@ if __name__ == "__main__":
     sys.modules.setdefault("nh_acc", sys.modules[__name__])
     for fn in sorted(os.listdir(HERE), key=lambda f: (len(f), f)):
         if fn.startswith("nh_acc_batch") and fn.endswith(".py"):
-            importlib.import_module(fn[:-3])
+            try:   # one batch file being edited mid-run must not stop another batch's bake
+                importlib.import_module(fn[:-3])
+            except Exception as e:
+                print(f"[nh_acc] skipped {fn}: {type(e).__name__}: {e}")
     targets = [a for a in argv if not a.startswith("--") and (argv.index(a) == 0 or not argv[argv.index(a) - 1].startswith("--"))]
     want = targets[0].split(",") if targets else []
     keys = []

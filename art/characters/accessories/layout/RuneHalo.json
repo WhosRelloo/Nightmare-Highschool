@@ -1,0 +1,157 @@
+{
+ "key": "RuneHalo",
+ "name": "Floating rune halo",
+ "atlas": 2048,
+ "pieces": {
+  "RuneHalo": {
+   "mount": "Head",
+   "kind": "Main",
+   "tris": 11612,
+   "fit": [
+    -0.0,
+    1.0524022579193115,
+    0.2813466787338257
+   ],
+   "size": [
+    2.1110000610351562,
+    0.5674347877502441,
+    2.039069414138794
+   ],
+   "fit_body": {},
+   "hair_fit": {
+    "Females_Araya": [
+     1.02,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.02,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.02,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.02,
+     0.0
+    ],
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": [
+     1.02,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": [
+     1.02,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.02,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.02,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": [
+     1.02,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.02,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.02,
+     0.0
+    ],
+    "Females_Side_Ponytail": [
+     1.02,
+     0.0
+    ],
+    "Females_Straight_Bob": [
+     1.02,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.02,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.02,
+     0.0
+    ],
+    "Females_Wolf_Cut": [
+     1.02,
+     0.0
+    ],
+    "Males_Anime_Hero_Hair": null,
+    "Males_Baki": [
+     1.02,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.02,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.02,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.02,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.02,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.02,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.02,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.02,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.02,
+     0.0
+    ],
+    "Males_Short": [
+     1.02,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.02,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.02,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.02,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.02,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "a ring of blackened iron segments carved with raised violet glowing runes on both faces; silver rims, eight finialed clasps and a violet gem at the front; floats above the head tipped back and spins slowly in its own plane (orbit axis = the ring's axis through the head centre)",
+ "tris": 11612,
+ "glow": [
+  0.62,
+  0.3,
+  1.0
+ ]
+}

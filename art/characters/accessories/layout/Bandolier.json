@@ -1,0 +1,125 @@
+{
+ "key": "Bandolier",
+ "name": "Hunter's bandolier",
+ "atlas": 2048,
+ "pieces": {
+  "Bandolier": {
+   "mount": "Torso",
+   "kind": "Main",
+   "tris": 8892,
+   "fit": [
+    0.0002620220184326172,
+    0.305126428604126,
+    -0.010000050067901611
+   ],
+   "size": [
+    2.0788090229034424,
+    1.468884915113449,
+    1.2480000257492065
+   ],
+   "fit_body": {
+    "female": 1.015,
+    "lean": 0.999,
+    "athletic": 1.067,
+    "muscular": 1.105,
+    "stocky": 1.194,
+    "heavy": 1.228,
+    "petite": 0.989,
+    "toned": 1.007,
+    "curvy": 1.14,
+    "strong": 1.056,
+    "plus": 1.126
+   },
+   "hair_fit": {
+    "Females_Araya": null,
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": null,
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": null,
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": null,
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": null,
+    "Females_Short_Mid_Part": null,
+    "Females_Side_Bun": null,
+    "Females_Side_Ponytail": null,
+    "Females_Straight_Bob": null,
+    "Females_Super_Long_Japanese_Hair": null,
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": null,
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": null,
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": null,
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": null,
+    "Males_Man_Bun": null,
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "oxblood leather bandolier over the left shoulder to the right hip: six silver-capped holy-water vials and three ash stakes in loops on the front, three stakes on the back, a silver crescent medallion and buckle",
+ "tris": 8892
+}

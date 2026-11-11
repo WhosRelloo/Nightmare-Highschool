@@ -1,0 +1,349 @@
+{
+ "key": "Bracers",
+ "name": "Hunter's bracers",
+ "atlas": 2048,
+ "pieces": {
+  "BracerL": {
+   "mount": "LeftArm",
+   "kind": "Main",
+   "tris": 4572,
+   "fit": [
+    -0.10307502746582031,
+    -0.34301766753196716,
+    -0.015250056982040405
+   ],
+   "size": [
+    0.9261499643325806,
+    0.44296447932720184,
+    1.1154997944831848
+   ],
+   "fit_body": {
+    "female": 0.887,
+    "lean": 0.8,
+    "athletic": 0.917,
+    "muscular": 0.997,
+    "stocky": 1.061,
+    "heavy": 0.958,
+    "petite": 0.8,
+    "toned": 0.896,
+    "curvy": 0.891,
+    "strong": 0.965,
+    "plus": 0.949
+   },
+   "hair_fit": {
+    "Females_Araya": [
+     1.0,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Straight_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": [
+     1.0,
+     0.0
+    ],
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  },
+  "BracerR": {
+   "mount": "RightArm",
+   "kind": "Main",
+   "tris": 4572,
+   "fit": [
+    0.10307502746582031,
+    -0.34301766753196716,
+    -0.015250056982040405
+   ],
+   "size": [
+    0.9261499643325806,
+    0.44296447932720184,
+    1.1154997944831848
+   ],
+   "fit_body": {
+    "female": 0.887,
+    "lean": 0.8,
+    "athletic": 0.917,
+    "muscular": 0.997,
+    "stocky": 1.061,
+    "heavy": 0.958,
+    "petite": 0.8,
+    "toned": 0.896,
+    "curvy": 0.891,
+    "strong": 0.965,
+    "plus": 0.949
+   },
+   "hair_fit": {
+    "Females_Araya": [
+     1.0,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.0,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna": [
+     1.0,
+     0.0
+    ],
+    "Females_Femkuna_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_PonyV2": [
+     1.0,
+     0.0
+    ],
+    "Females_Gojo_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Long_Sweetheart_Pigtails": [
+     1.0,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": [
+     1.0,
+     0.0
+    ],
+    "Females_Preppy_Long_Braided": [
+     1.0,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.0,
+     0.0
+    ],
+    "Females_Side_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Females_Straight_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.0,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.0,
+     0.0
+    ],
+    "Females_Wolf_Cut": [
+     1.0,
+     0.0
+    ],
+    "Males_Anime_Hero_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Baki": [
+     1.0,
+     0.0
+    ],
+    "Males_Black_Zoldyck_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.0,
+     0.0
+    ],
+    "Males_Higuruma": [
+     1.0,
+     0.0
+    ],
+    "Males_Long_Length_Messy": [
+     1.0,
+     0.0
+    ],
+    "Males_Man_Bun": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Middle_Part": [
+     1.0,
+     0.0
+    ],
+    "Males_Messy_Wolfcut_with_Ponytail": [
+     1.0,
+     0.0
+    ],
+    "Males_Short": [
+     1.0,
+     0.0
+    ],
+    "Males_Slicked_Back": [
+     1.0,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.0,
+     0.0
+    ],
+    "Males_TP_Locks": [
+     1.0,
+     0.0
+    ]
+   }
+  }
+ },
+ "notes": "oxblood leather bracers on both forearms with a riveted blackened steel plate (brass filigree), two silver-buckled straps and a laced back seam; the right one ends above the drawn katana's grip",
+ "tris": 9144
+}

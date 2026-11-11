@@ -1,0 +1,369 @@
+{
+ "key": "Hats",
+ "name": "Tricorn, top hat and bowler",
+ "atlas": 2048,
+ "pieces": {
+  "TopHat": {
+   "mount": "Head",
+   "kind": "Main",
+   "tris": 5016,
+   "fit": [
+    -0.0019577443599700928,
+    0.9650418758392334,
+    -2.9802322387695312e-08
+   ],
+   "size": [
+    1.8920841813087463,
+    1.1299161911010742,
+    1.992994487285614
+   ],
+   "fit_body": {},
+   "hair_fit": {
+    "Females_Araya": [
+     1.16,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.36,
+     0.08
+    ],
+    "Females_EdnaMode_lol": [
+     1.1,
+     0.06
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.26,
+     0.0
+    ],
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": null,
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": [
+     1.24,
+     0.04
+    ],
+    "Females_Low_Ponytail": [
+     1.1,
+     0.02
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.32,
+     0.02
+    ],
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": [
+     1.08,
+     0.04
+    ],
+    "Females_Short_Mid_Part": [
+     1.4,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.08,
+     0.22
+    ],
+    "Females_Side_Ponytail": [
+     1.42,
+     0.04
+    ],
+    "Females_Straight_Bob": [
+     1.1,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.08,
+     0.06
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.06,
+     0.04
+    ],
+    "Females_Wolf_Cut": [
+     1.3,
+     0.12
+    ],
+    "Males_Anime_Hero_Hair": null,
+    "Males_Baki": [
+     1.42,
+     0.1
+    ],
+    "Males_Black_Zoldyck_Hair": null,
+    "Males_Blonde_Emo_Scene_Messy": null,
+    "Males_Half_Up_Half_Down_Locs": [
+     1.42,
+     0.1
+    ],
+    "Males_Higuruma": [
+     1.36,
+     0.18
+    ],
+    "Males_Long_Length_Messy": [
+     1.38,
+     0.12
+    ],
+    "Males_Man_Bun": null,
+    "Males_Messy_Middle_Part": null,
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": [
+     1.16,
+     0.04
+    ],
+    "Males_Slicked_Back": [
+     1.32,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": null,
+    "Males_Super_Messy_Long_Hair": [
+     1.34,
+     0.2
+    ],
+    "Males_TP_Locks": null
+   }
+  },
+  "Bowler": {
+   "mount": "Head",
+   "kind": "Main",
+   "tris": 4732,
+   "fit": [
+    -0.0015698075294494629,
+    0.7649998664855957,
+    2.9802322387695312e-08
+   ],
+   "size": [
+    1.7288601398468018,
+    0.6899999380111694,
+    1.8191456198692322
+   ],
+   "fit_body": {},
+   "hair_fit": {
+    "Females_Araya": [
+     1.14,
+     0.08
+    ],
+    "Females_Detective_Hair": [
+     1.18,
+     0.26
+    ],
+    "Females_EdnaMode_lol": [
+     1.02,
+     0.2
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.22,
+     0.1
+    ],
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": null,
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": [
+     1.12,
+     0.2
+    ],
+    "Females_Low_Ponytail": [
+     1.02,
+     0.16
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.28,
+     0.16
+    ],
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": [
+     1.02,
+     0.16
+    ],
+    "Females_Short_Mid_Part": [
+     1.3,
+     0.14
+    ],
+    "Females_Side_Bun": [
+     1.16,
+     0.3
+    ],
+    "Females_Side_Ponytail": [
+     1.36,
+     0.16
+    ],
+    "Females_Straight_Bob": [
+     1.04,
+     0.06
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.02,
+     0.18
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.02,
+     0.16
+    ],
+    "Females_Wolf_Cut": [
+     1.16,
+     0.3
+    ],
+    "Males_Anime_Hero_Hair": null,
+    "Males_Baki": [
+     1.22,
+     0.3
+    ],
+    "Males_Black_Zoldyck_Hair": null,
+    "Males_Blonde_Emo_Scene_Messy": null,
+    "Males_Half_Up_Half_Down_Locs": [
+     1.36,
+     0.18
+    ],
+    "Males_Higuruma": [
+     1.42,
+     0.3
+    ],
+    "Males_Long_Length_Messy": [
+     1.16,
+     0.28
+    ],
+    "Males_Man_Bun": null,
+    "Males_Messy_Middle_Part": null,
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": [
+     1.16,
+     0.08
+    ],
+    "Males_Slicked_Back": [
+     1.32,
+     0.08
+    ],
+    "Males_Spiky_Anime_Hair": null,
+    "Males_Super_Messy_Long_Hair": null,
+    "Males_TP_Locks": null
+   }
+  },
+  "Tricorn": {
+   "mount": "Head",
+   "kind": "Main",
+   "tris": 12600,
+   "fit": [
+    -0.0,
+    0.6855013370513916,
+    -0.30558744072914124
+   ],
+   "size": [
+    2.826521873474121,
+    0.5289973020553589,
+    2.4150306582450867
+   ],
+   "fit_body": {},
+   "hair_fit": {
+    "Females_Araya": [
+     1.14,
+     0.0
+    ],
+    "Females_Detective_Hair": [
+     1.38,
+     0.0
+    ],
+    "Females_EdnaMode_lol": [
+     1.14,
+     0.0
+    ],
+    "Females_Elegant_Bob_Cut": [
+     1.22,
+     0.0
+    ],
+    "Females_Femkuna": null,
+    "Females_Femkuna_Pigtails": null,
+    "Females_Gojo_PonyV2": null,
+    "Females_Gojo_Ponytail": null,
+    "Females_Long_Sweetheart_Pigtails": [
+     1.22,
+     0.0
+    ],
+    "Females_Low_Ponytail": [
+     1.1,
+     0.0
+    ],
+    "Females_Messy_Flow_Braided": [
+     1.3,
+     0.0
+    ],
+    "Females_Natural_Trim_Pony": null,
+    "Females_Preppy_Long_Braided": [
+     1.06,
+     0.0
+    ],
+    "Females_Short_Mid_Part": [
+     1.38,
+     0.0
+    ],
+    "Females_Side_Bun": [
+     1.12,
+     0.1
+    ],
+    "Females_Side_Ponytail": [
+     1.42,
+     0.02
+    ],
+    "Females_Straight_Bob": [
+     1.08,
+     0.0
+    ],
+    "Females_Super_Long_Japanese_Hair": [
+     1.08,
+     0.0
+    ],
+    "Females_Wavy_Y2k_Bob": [
+     1.06,
+     0.0
+    ],
+    "Females_Wolf_Cut": [
+     1.36,
+     0.0
+    ],
+    "Males_Anime_Hero_Hair": null,
+    "Males_Baki": [
+     1.36,
+     0.02
+    ],
+    "Males_Black_Zoldyck_Hair": null,
+    "Males_Blonde_Emo_Scene_Messy": [
+     1.42,
+     0.08
+    ],
+    "Males_Half_Up_Half_Down_Locs": [
+     1.42,
+     0.06
+    ],
+    "Males_Higuruma": [
+     1.42,
+     0.08
+    ],
+    "Males_Long_Length_Messy": [
+     1.4,
+     0.0
+    ],
+    "Males_Man_Bun": null,
+    "Males_Messy_Middle_Part": null,
+    "Males_Messy_Wolfcut_with_Ponytail": null,
+    "Males_Short": [
+     1.14,
+     0.04
+    ],
+    "Males_Slicked_Back": [
+     1.26,
+     0.0
+    ],
+    "Males_Spiky_Anime_Hair": [
+     1.4,
+     0.28
+    ],
+    "Males_Super_Messy_Long_Hair": [
+     1.34,
+     0.12
+    ],
+    "Males_TP_Locks": null
+   }
+  }
+ },
+ "notes": "black felt and silk plush; crimson bands; the tricorn has a gold braid edge and a crimson cockade",
+ "tris": 22348
+}
