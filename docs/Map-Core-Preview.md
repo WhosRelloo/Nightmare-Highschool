@@ -132,6 +132,17 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 - `Controllers.Character.HairSway` is the fixed version (bend, never twist; capped per strand and per joint; dash and teleport spikes ignored), byte-identical to NH Combat Test's. See `docs/Clothing-and-Faces.md` (Living hair). The old one is in `ServerStorage.NHCore.Backups.HairSway_preStretchFix`.
 
 
+## Added 2026-11-10 (1.72.0): Group A first batch, lockers only in the locker room
+
+- Touch and gamepad controls, study groups (U), strangers (G), skateboards (B) and the locker screen are in, copied from NH Combat Test.
+- **The locker room.** Owner: "I want students to be able to interact with the lockers ONLY in the locker room, and the builder hasnt made it yet."
+  - `workspace["Locker Room Placeholder"]` holds "Locker Room Stand-in" (six copies of the builder's `Locker`, tagged `NHLockerRoomLocker`, a bench and an invisible wall) and `LockerRoomZone` (an invisible box tagged `NHLockerRoomZone`). The builder's Part there is untouched.
+  - `ServerScriptService.NHLockerRoom` gives every `NHLockerRoomLocker` an "Open Locker" E prompt while the game runs.
+  - `Gui.Locker`'s Map adapter only opens the locker inside the zone (the `` ` `` key, the top bar, the gamepad menu, the prompt), and closes it when you leave. Outside, you get the toast "Your locker is in the locker room."
+  - The hallway lockers (`NHLockerProp`) don't open it. They're for locker hiding later (C).
+  - **When the real room is built:** tag its lockers `NHLockerRoomLocker`, fit `LockerRoomZone` to the room, and delete the Stand-in.
+- Waiting for the owner's OK: progression and the Record (5), the phone (7), race actions and tier-up (8).
+
 ## What the Map still lacks (re-sorted 2026-11-10, around how far the school is built)
 
 Owner: "The builder is still making the school so give me a better list". The builder has the main building's outside up (the front, both wings around their courtyards, the entrance stairs, the front yard with the dead oaks and a gate) on open baseplates. There are no sports fields, dorms or town yet, and most rooms are still being fitted. So the list is sorted by what each system needs from the map, checked in NH Combat Test's code (which tags and workspace folders it looks for).
@@ -139,12 +150,12 @@ Owner: "The builder is still making the school so give me a better list". The bu
 Done so far: the core (1.54), customization, doors, admin, heights (v2), races and faces, body types, hair and eye motion, capes, moon banners, prompts, emotes, the oaks, Settings, the top bar, the HUD, the clock and the timetable.
 
 **A. Ready now: needs nothing from the map** (lowest risk first; nothing is saved in the Map)
-1. Touch and gamepad controls (`Gui.TouchControls`, `Gui.GamepadControls`): phone and controller players.
-2. Party and Study Group (`Features.Party`, `Gui.StudyGroup`): groups of students. The top bar's Study Group button comes back.
-3. Strangers (`Social.Strangers`): you only see a student's name once they've introduced themselves (G).
-4. Skateboards (`Features.Skateboard`, `World.Skateboard`, `SkateboardPose`): ride anywhere. They make their own `workspace.Skateboards`.
+1. ~~Touch and gamepad controls~~ (1.72.0)
+2. ~~Party and Study Group~~ (1.72.0)
+3. ~~Strangers~~ (1.72.0)
+4. ~~Skateboards~~ (1.72.0, with `ReplicatedStorage.NHSkate`)
 5. Progression and the Student Record (`Player.Progression`, `Gui.Progress`, `Gui.StatsPanel`): level, EXP and stats, for the session. The Record button comes back. *Check in: stats feed combat.*
-6. Inventory and the locker screen (`Features.Inventory`, `Gui.Locker`): the bag works anywhere. Buying waits for the concession stand (below).
+6. ~~Inventory and the locker screen~~ (1.72.0). **Owner: only in the locker room.** For now that's the "Locker Room Placeholder" folder (stand-in lockers and a `LockerRoomZone`; see the 1.72.0 section). Buying waits for the concession stand (below).
 7. The phone and phone games (`Features.Phone`, `Gui.Phone`, `PhoneGames`). *Check in: yen transfers (the Map's yen is session-only and starts at 0).*
 8. Race actions and tier-up (`Features.RaceAction`, `Player.Evolution`, `Gui.Evolution`): the N key and the evolution cutscenes. *Check in: combat.*
 

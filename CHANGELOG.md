@@ -2,6 +2,61 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.72.0] - 2026-11-10: Map place: Group A first batch, and lockers only in the locker room
+
+Owner: "Start Group A, but for the locker prompt, etc. Put it in this area and folder: "Locker Room Placeholder". Because I want students to be able to interact with the lockers ONLY in the locker room, and the builder hasnt made it yet."
+
+This is items 1, 2, 3, 4 and 6 of Group A (`docs/Map-Core-Preview.md`). Items 5 (progression), 7 (the phone) and 8 (race actions and tier-up) wait for the owner's OK, because they touch combat or money.
+
+### Added (Map place, NH Combat Test's files byte for byte unless noted, tagged NHCore)
+- **Touch and gamepad controls** (`Gui.TouchControls`, `Gui.GamepadControls`).
+- **Study groups** (`Features.Party`, `Gui.StudyGroup`): U or the top bar's Study Group button. The button is back on the top bar.
+- **Strangers** (`Social.Strangers`, in a new `Services.Social` folder, and `Gui.Strangers`): you only see a student's name once they've introduced themselves (G).
+- **Skateboards** (`Features.Skateboard`, `World.Skateboard`, `World.SkateboardPose`) and their models, sounds and effects (`ReplicatedStorage.NHSkate`, 250 parts). B gets on your board and B again steps off. Every student has the Moonlit board; the rest cost Yen, and the Map's Yen is 0.
+- **Inventory and the locker screen** (`Features.Inventory`, `Gui.Locker`): gear, snacks, the pouch and boards.
+  - `Config.Items` and `Config.Cliques` are now NH Combat Test's (the Map's copies were older). The old ones are in `ServerStorage.NHCore.Backups` (`*_preGroupA`).
+
+### The locker room (Map only)
+- Your locker opens **only in the locker room.** For now that's the builder's `workspace["Locker Room Placeholder"]`; I didn't touch its Part. I added:
+  - **"Locker Room Stand-in":** six copies of the builder's own `Locker` (the hallway model), a copy of the gym's `LockerBench` and an invisible wall so you can't walk into the lockers.
+    - The copies carry the tag `NHLockerRoomLocker` instead of the hallway tag `NHLockerProp`.
+    - The 451 hallway lockers are unchanged and don't open your locker.
+  - **`LockerRoomZone`:** an invisible box (30 x 14 x 24 studs, tagged `NHLockerRoomZone`) that marks the room.
+- **`ServerScriptService.NHLockerRoom`** (new):
+  - While the game runs, it puts an "Open Locker" E prompt (in the game's prompt style) on the door of every `NHLockerRoomLocker`.
+  - Outside the room, it sends the game's toast: "Your locker is in the locker room."
+- **`Gui.Locker`'s Map adapter:**
+  - The `` ` `` key, the top bar's Locker button, the gamepad menu and the prompt only open the locker inside the zone.
+  - It closes by itself when you leave.
+  - This check runs on the client. The server's inventory remotes don't check where you are, so a snack pinned to the hotbar still works anywhere.
+- **When the builder makes the real room:** tag its lockers `NHLockerRoomLocker`, move and resize `LockerRoomZone` to fit it, and delete the Stand-in.
+
+### How it was copied
+- Through files on this PC instead of the chat: a small helper calls Studio's MCP with the code read from a file.
+- Each copy was checked by length and checksum against NH Combat Test.
+
+### Verified (Map place, local play-test, real keys and clicks)
+- **Away from the room** (the spawn, then a spot 20 studs outside the zone):
+  - The real `` ` `` key and a click on the top bar's Locker button kept the locker closed.
+  - The toast "Your locker is in the locker room." showed.
+- **In the room:**
+  - Facing a locker, the "Open Locker" prompt showed in the game's style, and the real E key opened the locker: character, Katana slot, every gear item, the Gear Scale and the pouch.
+  - A click on the Boards tab showed Moonlit "Riding" and the priced boards.
+  - Moved out of the zone, the open locker closed by itself within a second.
+  - Walking back in with the real W key, then pressing `` ` ``, opened it. `` ` `` again closed it.
+- **Skateboards:**
+  - The real B key put the Moonlit board under the character.
+  - Riding into the bench threw the character off (the crash ragdoll), and they got back up.
+  - In the open, holding W rode 70 studs in 2 s (speed 35). B again stepped off and put the board away.
+- **Study group:** a click on the top bar's Study Group button opened the drawer ("Invite a classmate: Nobody else is free right now"), and the real U key closed it.
+- No script errors. The only console warnings were two asset-permission ones that were there before.
+- **Not tried:**
+  - Two players: invites, the group EXP share, introducing yourself, names showing once introduced.
+  - Touch or a controller (both loaded without errors).
+  - Using, pinning or dropping a snack (the Map's students start with none).
+  - Buying or equipping another board (Yen is 0).
+- After the test I moved the stand-in bench to the end of the row, so it no longer covers four of the locker doors. The lockers, prompts and zone didn't change.
+
 ## [1.71.3] - 2026-11-10: Map place: the health bar, hotbar, clock and timetable
 
 Owner: "Before medium priority, let's throw the health bar, hotbar, and timetable in".
