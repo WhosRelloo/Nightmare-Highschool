@@ -259,7 +259,31 @@ The in-play HUD:
 - **Health bar** (Humanoid health) with a % orb. Recent damage shows as a delayed "ghost" segment. Since 1.13.0 it's 600 x 50 at the top of the bottom HUD (`BAR_W`, `BAR_H`, `BAR_Y`), in the PBR iron frame.
 - **Hotbar** from your Backpack tools. Click, tap or press 1-9 to equip. Tools can set `Rarity` and `Count` attributes.
 - **Yen** from the profile.
-- **Posture meter**, reading a `Posture` attribute on the character or Humanoid, out of `Config.Combat.PostureMax`.
+- **Posture rail** (1.74.0, "Twin Rail"), reading a `Posture` attribute on the character or Humanoid, out of `Config.Combat.PostureMax`. It replaced the vertical posture meter that stood left of the bar. It only draws posture: nothing in it writes the value. See [Posture rail](#posture-rail) below.
+
+### Posture rail
+A slim forged rail hung under the health bar, so the two read as one piece (`KitHud` `Local.BuildPosture`, the `PostureRail` frame inside `Bottom`). The owner chose it from three options ([options sheet](img/posture-rail-options.jpg)).
+
+![Posture rail states in Play](img/posture-rail-states.jpg)
+- **Layout:** 600 x 24 design px, the same width and left edge as the health bar, 2 px under its art (`RAIL_Y = BAR_Y + BAR_H - 5`). It lives in `Bottom`, so it scales and moves with the bar on touch screens. The health orb draws over the rail's brass saddle (`Health.ZIndex = 2`). The health bar sits 6 px higher than before (`BAR_Y` 4), so the EXP strip fits between the rail and the hotbar.
+- **Art** (`art/ui/hud/make_posture_pbr.py`, the health bar's own PBR shader; group 15981569):
+
+  | Piece | Size | What |
+  |---|---|---|
+  | `PostureFrame` | 2400 x 96 | iron band, brass beads, pointed ends like the health bar's, smoked amber gems, the brass saddle that cradles the orb |
+  | `PostureFill` | 512 x 64 | greyscale molten brass, tiled and tinted |
+  | `PostureCracks2` | 1024 x 240 | three crack stages for the right half (40 px rows), then the same turned 180 degrees for the left half (Roblox doesn't clip rotated GuiObjects) |
+  | `PostureShards` | 512 x 128 | four glass splinters for the shatter |
+
+- **Fill:** spreads outward from the orb in both directions (the saddle hides the middle ±44 px). It's molten brass (`BRASS` 226,168,72) that warms to ember (`EMBER`) from 30% and goes hot near 100%. A gain eases in over 0.16 s with a soft flash; recovery drains linearly, following the server's 0.2 s ticks.
+- **Cracks:** three stages at 40%, 65% and 85%, clipped to the filled part, so they spread outward with the fill. They fade back as posture drains.
+- **Warning:** from 80% the end gems pulse ember (a 0.9 s cycle).
+- **Guard break:** the fill shatters off (14 shards), a short glow flashes, and the rail reads **GUARD | BROKEN** in crimson either side of the orb. It holds while the combat's `Daze` effect is on the character (it's removed when you can move again; 1.5 s if there's none, 4 s at most), then fades.
+  - It triggers on the `Daze` child that the combat's "Posture Break" effect adds, which also catches instant breaks. Or it triggers when posture drops from 60% or more straight to 0.
+- **Accessibility:** colour isn't the only cue: brightness, cracks, the pulse and the words all change too. Gold on dark and crimson words on a dark channel stay readable for common colour blindness.
+  - `NHReducedMotion`: no shards, no pulse (a steady gem glow) and no word punch.
+  - `NHReducedFlash`: no gain flash and no break glow.
+- **Api** (`Ui.Posture`): `:Set(fraction, instant?)`, `:Get()`, `:Break(daze?)`. The root mirrors `Value` and `Broken` attributes.
 - **DOWNED alert**, driven by `Downed` + `DownedUntil`.
 
 It replaces the core health bar and backpack. The bottom HUD hides during dialogue (`InDialogue`) and lessons, and number keys are ignored then.

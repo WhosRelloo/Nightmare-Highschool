@@ -58,7 +58,7 @@ Effects from stats, your clan perk and your lineage traits are added together, t
   - Your name, level, an EXP bar, points to spend, race and tier, and takedowns.
   - The three stats, each with a **+** button and what your points give.
   - **Bonuses:** your clan perk and each trait in plain words.
-- **EXP strip:** a subtle hairline just under the health bar.
+- **EXP strip:** a subtle hairline just under the health bar's posture rail (under the health bar itself if the rail isn't there).
   - Clock-tick marks every tenth, and candle gold warming to crimson with an ember at the tip.
   - Your level as a Roman numeral by the kit's diamond knob. The knob glows crimson while you have points to spend.
   - It rests faint and wakes when you earn EXP, with "+34 Lesson" drifting up.

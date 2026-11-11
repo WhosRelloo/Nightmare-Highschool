@@ -51,7 +51,7 @@ In order of importance, only when they apply:
 ## The rest of the screen on touch
 
 - **KitHud** (`Gui.KitHud`):
-  - **Size and position:** the buttons publish how much of the right edge they use (Player attribute `NHTouchReserveRight`, px). The health bar, hotbar, Yen plate and posture meter scale to fit left of that and slide left.
+  - **Size and position:** the buttons publish how much of the right edge they use (Player attribute `NHTouchReserveRight`, px). The health bar and its posture rail, the hotbar and the Yen plate scale to fit left of that and slide left.
   - **Study Group dock:** the HUD sits on top of the dock in the bottom-left corner instead of covering it.
   - **Keyboards:** nothing changes.
 - **Skill bar** (`SkillController`): it moves to just left of the arcs at their top. Today it's empty: the Fist has no skills yet.

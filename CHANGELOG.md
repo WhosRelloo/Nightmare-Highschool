@@ -2,6 +2,55 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.74.0] - 2026-11-10: The posture bar becomes a forged rail under the health bar
+
+Owner: "redesign the posture bar to something cool that fits the theme and lines up with the health bar". Three options were mocked up beside the real health bar art (`docs/img/posture-rail-options.jpg`). The owner picked **A, Twin Rail**. Full write-up: `docs/UI-Kit.md` (Posture rail).
+
+### Changed (NH Combat Test, visuals only)
+- **`Controllers.Gui.KitHud`:** the thin vertical posture meter left of the health bar is gone. A slim forged rail now hangs under the bar:
+  - **Fit:** the same 600 px width and left edge, the same iron and brass, and pointed ends like the bar's. The health orb rests in a brass saddle at its centre.
+  - **Filling:** posture spreads outward from the orb in molten brass that warms to ember. Cracks spread through it at 40%, 65% and 85%.
+  - **Warning:** from 80% the end gems pulse ember.
+  - **Guard break:** the fill shatters off in glass shards with a short glow, and the rail reads **GUARD | BROKEN** while the Daze lasts.
+  - **Motion:** a gain eases in over 0.16 s. Recovery drains smoothly, following the server's 0.2 s ticks.
+  - **Settings:** Reduce Motion drops the shards, the pulse (a steady glow instead) and the word punch. Reduce Flashing drops the flashes.
+  - **Logic:** posture rules are unchanged. The rail only reads the server's `Posture` attribute. The break is detected from the combat's `Daze` effect or a drop from 60%+ to 0.
+- **Layout:**
+  - The health bar sits 6 px higher in the HUD (`BAR_Y` 4), and the rail lives in `Bottom`, so it scales and moves with the bar on touch screens.
+  - Touch fitting reaches 316 px left of centre (it was 380 for the old meter's label).
+- **`Controllers.Gui.Progress`:** the EXP strip sits under the rail (under the health bar if there's no rail).
+- **New art** (`art/ui/hud/make_posture_pbr.py`, the health bar's PBR shader), group 15981569:
+  - PostureFrame 84993448249120
+  - PostureFill 112325315351154
+  - PostureCracks2 120358598105240
+  - PostureShards 122486978293271
+  - The first PostureCracks upload (112832035316995) is unused: its lines were too thin to read at 10 px.
+- Backups: `ServerStorage.NH_Backup.PostureBar_pre` (KitHud, Progress).
+
+### Verified (NH Combat Test, Play, slot 4 "Testy")
+- **Real blocked hits** (the player blocking, the "Attacking" dummy swinging through the real `DamageLogic`):
+  - Posture went 14 → 29 → 43 → 58 → 72 → 86%, then broke on the next hit.
+  - The cracks appeared at 40% and 85%. The end gems pulsed at 86% (transparency cycling 0.05 to 0.85).
+  - The break showed 14 shards, the glow and GUARD | BROKEN. It cleared when the Daze ended (1.5 s), and the rail recovered to empty.
+  - Drain while blocking ran at 6/s, and the cracks faded below 40%.
+- **Screenshots** of 58%, 86%, the break and recovery: `docs/img/posture-rail-states.jpg`.
+  - For the break screenshot, a stand-in Daze added on the client held the words on screen longer.
+  - The break itself came from real hits.
+- **Reduce Motion + Reduce Flashing** (set on that client only, then put back): a real break showed no shards, no glow and no punch, and the gems held a steady glow.
+- **Alignment and spacing:** the rail's left edge and width matched the health bar to 0.00 px at 1425x683 and 1709x683, and in the phone (667x375, 844x390) and tablet (1024x768) previews.
+  - After the 6 px lift, the EXP strip clears the hotbar by 5 px on phones and 2.6 px on tablet. Before the lift it overlapped by 4 to 8 px.
+- No errors from the HUD in the console.
+- **Test settings** were put back: `SlotCount = 3`, and `NHTestNoMenuKeys`, `NHTouchTest` and `NHPhonePreview` cleared.
+
+### Not verified
+- **Real devices:** only Studio's phone and tablet previews were used, which lay the screens out for that size inside the Studio window.
+- **Gamepad:** not checked.
+- **Instant breaks** (`InstantPostureBreak` from low posture): they should trigger through the Daze hook, but none was tried.
+- **Shards in motion:** they only show for about 0.9 s, so they were counted (14) but not caught in a screenshot.
+
+### Map place
+Not changed. Its `Gui.KitHud` is the old one and needs re-copying for the rail; the "Port hair, eyes and their UI to the Map place" session does those. Its `Gui.Progress` already has the rail-aware strip placement, and falls back to the health bar without a rail.
+
 ## [1.73.0] - 2026-11-10: Gender clothing kits (schoolgirl, civilian, admin)
 
 Owner: "make a kit of school girl outfits and another kit for more civilian clothing. Remember to fix the edges so no black marks, etc. on them. (I want this because the clothing needs to be separate by gender)". Then an admin kit ("cool cloaks, jackets, etc. Use cool anime fits as references but IN OUR STYLE"), then "Make the admin clothing higher quality, better shaping, texturing, etc. with PBR textures". Full record: `docs/Gender-Clothing-Kits.md`.
