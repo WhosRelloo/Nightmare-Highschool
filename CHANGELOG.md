@@ -2,6 +2,26 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.78.6] - 2026-11-10: Map place: NPCs lean only against a wall
+
+Owner: "For NPCs, they should only have this pose when they are leaning on a wall".
+
+### Changed (Map place, `Services.Features.MapStudents`)
+- **Before:** a student at a spot without a partner had a 30% chance to play the lean pose wherever they stood, so they often leaned on nothing.
+- **Now** (a 40% chance per spot, partners still never lean), the student first looks for a wall:
+  - 12 directions, rays at waist and shoulder height; both must hit something solid, visible and upright (not a bench, a step or a slope);
+  - never a door (any part of a model tagged `NHDoor`), since it could open behind them;
+  - a wall within 4 studs: they turn their back to it and step back to about a stud off it;
+  - none within 4 but one within 9: they walk over to it first;
+  - a last check that the wall is right behind them, then the lean. No wall: no lean, they just stand.
+
+### Verified (Map place, local play-tests, Class plan, lean samples every 0.5 s)
+- **First version (4 studs only, doors allowed):** 80 s, 47 lean samples, all against a wall, 0 in the open. The one student who leaned was against an iron sliding door, which is why doors were then ruled out.
+- **Doors ruled out, 4 studs only:** 120 s, nobody leaned (most spots have no wall that close).
+- **Final (walk up to 9 studs):** 120 s, 32 lean samples, all against a wall (a brick wall 1.1 studs behind the student), 0 in the open, 0 against a door.
+- No script errors. MapStudents installed as 41392:cbf2b778 (checksum matched, parses).
+- **Not tried:** leaning in the yard (no yard students leaned in the tests); how often it looks right by eye (only one student leaned per run).
+
 ## [1.78.5] - 2026-11-10: Map place: NPC voices heard from where you stand
 
 Owner: "Good, now make them have a more accurate proximity".

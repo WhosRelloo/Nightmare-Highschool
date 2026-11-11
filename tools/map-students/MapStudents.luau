@@ -67,7 +67,7 @@ end
 local Lines = require(script:WaitForChild(`Lines`)) -- every voice line (Features.MapStudents.Lines)
 
 local Folder: Folder? = nil
-local mutterPool, chat -- (defined below)
+local mutterPool, chat, leanOnWall -- (defined below)
 local Students = {} :: { any }
 local SpotTaken = {} :: { [BasePart]: any }
 local Plan = { Kind = `Off`; Hour = 0 }
@@ -737,6 +737,87 @@ local function fidget(S)
 	end
 end
 
+---| leaning |---
+-- Owner: "they should only have this pose when they are leaning on a wall". The lean clip is a back against a wall,
+-- so a student only leans with a real wall right behind them: look around (12 directions, waist and shoulder
+-- height) for a solid, upright surface within 4 studs (or walk over to one within 9), turn their back to it, step
+-- back until they're about a stud off it, and only then lean. Never a door (it could open behind them). No wall
+-- near: no lean.
+local LeanP = RaycastParams.new()
+LeanP.FilterType = Enum.RaycastFilterType.Exclude
+LeanP.RespectCanCollide = true
+
+-- part of a door (a model tagged NHDoor)?
+local function isDoor(I: Instance): boolean
+	local M = I:FindFirstAncestorOfClass(`Model`)
+	while M do
+		if CollectionService:HasTag(M, `NHDoor`) then return true end
+		M = M:FindFirstAncestorOfClass(`Model`)
+	end
+	return false
+end
+
+local function wallNear(S, Reach: number): (Vector3?, Vector3?)
+	local R = S.Root
+	if not R then return nil, nil end
+	local Ex = { Folder }
+	for _, N in { `School NPC Spots`, `NHFx`, `NHNavDebug` } do local F = workspace:FindFirstChild(N) if F then table.insert(Ex, F) end end
+	for _, Pl in Players:GetPlayers() do if Pl.Character then table.insert(Ex, Pl.Character) end end
+	LeanP.FilterDescendantsInstances = Ex
+	local Best, BestD = nil, math.huge
+	local Look = R.CFrame.LookVector
+	for I = 0, 11 do
+		local Dir = CFrame.Angles(0, math.rad(I * 30), 0):VectorToWorldSpace(Vector3.new(Look.X, 0, Look.Z).Unit)
+		local Hits = 0
+		local First = nil
+		for _, H in { -0.4, 1.0 } do -- waist and shoulder height (the root is ~3 studs above the floor)
+			local Hit = workspace:Raycast(R.Position + Vector3.new(0, H, 0), Dir * Reach, LeanP)
+			-- a wall: solid, visible, and upright (not a bench seat, a step or a slope)
+			-- (never a door: it could open behind them)
+			if Hit and Hit.Instance.Transparency < 0.5 and math.abs(Hit.Normal.Y) < 0.25 and not isDoor(Hit.Instance) then
+				Hits += 1
+				First = First or Hit
+			end
+		end
+		if Hits == 2 and First then
+			local D = (Vector3.new(First.Position.X, 0, First.Position.Z) - Vector3.new(R.Position.X, 0, R.Position.Z)).Magnitude
+			if D < BestD then Best, BestD = First, D end
+		end
+	end
+	if not Best then return nil, nil end
+	return Best.Position, Vector3.new(Best.Normal.X, 0, Best.Normal.Z).Unit
+end
+
+leanOnWall = function(S): boolean
+	if not (S.Root and S.Agent) then return false end
+	-- a wall right here, or one a few steps away (walk over to it); none within 9 studs: no lean
+	local At, Normal = wallNear(S, 4)
+	if not At then
+		At, Normal = wallNear(S, 9)
+		if not (At and Normal) then return false end
+		local Ok = S.Agent:GoTo(At + Normal * 1.6, { Speed = S.Speed * 0.8; Arrive = 0.8; ShouldStop = shouldStop(S) })
+		if not (Ok and S.Root) then return false end
+		At, Normal = wallNear(S, 4)
+		if not (At and Normal) then return false end
+	end
+	-- back to the wall: face along its normal (out into the room), then step back to about a stud from it
+	S.Agent:Face(S.Root.Position + Normal * 5)
+	local R = S.Root
+	local Flat = Vector3.new(R.Position.X - At.X, 0, R.Position.Z - At.Z)
+	local Gap = Flat:Dot(Normal) -- how far in front of the wall we stand
+	local Back = Gap - 1.15
+	if Back > 0.15 then
+		S.Agent:Shuffle(-Normal, Back / 2.5, 2.5)
+		S.Agent:Face(S.Root.Position + Normal * 5)
+	end
+	-- still a wall right behind us? then lean
+	local Behind = workspace:Raycast(S.Root.Position, -Normal * 2.2, LeanP)
+	if not (Behind and math.abs(Behind.Normal.Y) < 0.25 and not isDoor(Behind.Instance)) then return false end
+	pose(S, `Lean`)
+	step(S, `leaning on a wall`)
+	return true
+end
+
 -- one leg of the student's day: get somewhere and spend a while there (returns early to react)
 local function doTask(S)
 	local Kind, Label = activityFor(S)
@@ -780,7 +861,7 @@ local function doTask(S)
 	end
 	if S.Partner and S.Partner.Root then S.Agent:Face(S.Partner.Root.Position)
 	else S.Agent:Face(Spot.Position + Spot.CFrame.LookVector * 5) end
-	if not S.Partner and math.random() < 0.3 then pose(S, `Lean`) end
+	if not S.Partner and math.random() < 0.4 then leanOnWall(S) end
 	local Until = os.clock() + math.random(150, 360) / 10
 	local NextFriend = 0
 	S.NextChat = math.max(S.NextChat or 0, os.clock() + math.random(30, 90) / 10)

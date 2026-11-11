@@ -128,6 +128,7 @@ Ideas for going further: `docs/NPC-Immersion-Ideas.md`.
   - 0.105 s between syllables (Authority is 15% slower).
   A player attribute `NHNpcVoices = false` mutes them.
 - **Rebuilding:** run the script again to regenerate the WAVs (the same seeds give the same sounds). Re-upload, then update the ids.
+- **Leaning (1.78.6):** the lean pose only plays with a wall right behind them (solid, upright, never a door). With no wall within 4 studs they may walk up to 9 studs to one; otherwise they don't lean.
 - **Proximity (1.78.5):**
   - voices are heard from your character, not the camera (an emitter at camera + (their head - your head));
   - full within 4 studs, then a natural falloff to 45, with a soft fade over the last 10;
