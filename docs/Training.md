@@ -102,7 +102,7 @@ The design source of the first pass, `make_training_ui.py`, made the greyscale i
 | TrainPlate (9-slice 64, 64, 704, 128), TrainKey (9-slice 40, 40, 216, 88), TrainBarFrame, TrainBarFill | 768 x 192, 256 x 128, 1200 x 72, 512 x 64 | the set plate, the key cap, the bar's iron channel, the molten brass tile |
 | TrainFlame | 1024 | a 4 x 4 flipbook of 256 frames |
 
-**Waiting on the owner:** the group bulk import of `art/group-upload-training` (27 files). After it, read the ids by name into `Config.Training.Art`. Until then, `Controllers.Gui.Training` draws kit stand-ins: the kit's orb ring, seal, pips and knob, stroke rings, a gradient bar, and the subs' candle flame.
+**The art is in (2026-11-11):** the owner imported `art/group-upload-training`. All 27 ids were read by name from the group (no duplicates), all passed Roblox's review, and they're set in `Config.Training.Art` in NH Combat Test (backup: `ServerStorage.NH_Backup.Config_Training_preArt`) and in `tools/training/Config_Training.luau`. All 27 preload in Studio. `Controllers.Gui.Training` now draws the real PBR art (`StandIn` = false) instead of the kit stand-ins, so training no longer uses the brass seal icon. Not yet seen in a Play test.
 
 ## The body (one area at a time)
 
