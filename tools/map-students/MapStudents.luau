@@ -290,7 +290,8 @@ local function spawn(S, At: CFrame)
 	M:SetAttribute(`Role`, `Ambient`)
 	M:SetAttribute(`NHStudent`, S.Index)
 	M:SetAttribute(`NHPersonality`, string.format(`brave %.1f, social %.1f`, S.Bravery, S.Social))
-	M:SetAttribute(`NHVoice`, S.Voice or 1) -- each student's voice pitch (Controllers.World.NpcLook's blips)
+	M:SetAttribute(`NHVoice`, S.Voice or 1) -- each student's pitch within their voice set (Controllers.World.NpcLook)
+	M:SetAttribute(`NHVoiceSet`, S.VoiceSet or `Boy`)
 	local Animate = M:FindFirstChild(`Animate`)
 	if Animate then Animate:Destroy() end
 	local Hum = M:FindFirstChildOfClass(`Humanoid`) :: Humanoid
@@ -896,8 +897,9 @@ function Shared.OnStart()
 			Index = I; Look = if Ok then Look else {};
 			Bravery = math.random(10, 85) / 100; Social = math.random(15, 95) / 100;
 			Speed = 5.4 + math.random() * 1.6;
-			-- one voice each: higher on the female body, lower on the male (the blips' pitch)
-			Voice = if (Ok and Look and require(ReplicatedStorage.UI.Appearance).IsFemale(Look)) then 1.15 + math.random() * 0.3 else 0.8 + math.random() * 0.3;
+			-- a voice set by body (Config.NpcVoice: Girl / Boy) and a personal pitch within it (+-8%)
+			VoiceSet = if (Ok and Look and require(ReplicatedStorage.UI.Appearance).IsFemale(Look)) then `Girl` else `Boy`;
+			Voice = 0.92 + math.random() * 0.16;
 		}
 	end
 	task.spawn(function()

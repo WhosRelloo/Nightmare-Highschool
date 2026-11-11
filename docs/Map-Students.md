@@ -117,6 +117,18 @@ Ideas for going further: `docs/NPC-Immersion-Ideas.md`.
   - It's 3D from the head and on the effects volume.
 - **Fidgets** (`fidget` in `Features.MapStudents`): every 6 to 14 s with a player within 60 studs. Options: phone (a real Tool, built like a player's), stretch (with a yawn when sleepy), glance up, look over the shoulder, shift weight. They stop for anything urgent and never happen mid-conversation.
 
+## Voice sets (1.78.3)
+
+- **Four synthesized voices** (`art/audio/npc-voice/make_npc_voice.py`): **Boy**, **Girl**, **Enemy**, **Authority**. Each has 10 syllables, and the ids go in `ReplicatedStorage.Config.NpcVoice` (Sets.<Set>.<Syllable>).
+- **Choosing a voice:** an NPC's voice is its `NHVoiceSet` attribute. Students get Girl or Boy by body. Give delinquents `Enemy` and teachers `Authority` when they arrive.
+- **Pacing** (in the config):
+  - at most 10 syllables per line;
+  - at most 2 NPCs voicing at once (the nearest);
+  - volume 0.34, silent past 45 studs;
+  - 0.105 s between syllables (Authority is 15% slower).
+  A player attribute `NHNpcVoices = false` mutes them.
+- **Rebuilding:** run the script again to regenerate the WAVs (the same seeds give the same sounds). Re-upload, then update the ids.
+
 ## Tested (Map place, local play-test)
 
 - **Walking, all six students:**

@@ -2,6 +2,50 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.78.3] - 2026-11-10: NPC voices: four human-like voice sets, and calmer pacing (upload pending)
+
+Owner: "Make some custom sound effects for the voice blips", then "Make it sound more human like, and make variants for boys, girls, enemies, and authority npc's" and "make sure it isn't annoying".
+
+### Added
+- **`art/audio/npc-voice/make_npc_voice.py`, a small formant speech synthesizer:**
+  - the voice source: a glottal pulse with jitter, shimmer and breath that puffs with each vocal cycle, a spectral tilt, and mild vocal fry for rough voices;
+  - five formants in cascade shape the vowel, gliding in from the consonant (t, k, m) the way a tongue moves;
+  - each take has a small rise and fall in pitch.
+- **Four voice sets of 10 syllables each** (ah, eh, ee, oh, oo, uh, ma, teh, koh, and an "mm..." hum), 40 WAVs in `art/audio/npc-voice/out`, with previews beside them:
+  - **Boy:** 150 Hz, a teen tract.
+  - **Girl:** 230 Hz, shorter tract, breathier.
+  - **Enemy:** 112 Hz, some gravel and a firmer edge.
+  - **Authority:** 102 Hz, a longer tract, steady and clear, speaking a little slower.
+- **Not annoying, by design:**
+  - soft attacks and releases (no clicks);
+  - nothing above about 4.2 kHz (no hiss or shrillness), and consonants kept softer than their vowels;
+  - every syllable levelled to the same loudness (within 2 dB, peaks under -4 dB).
+- **`ReplicatedStorage.Config.NpcVoice`** (Map, tagged NHCore): the ids per set (empty until uploaded; empty ids fall back to the old tick) and the pacing.
+- **`Controllers.World.NpcLook`** (Map):
+  - each NPC's set comes from its `NHVoiceSet` attribute;
+  - each syllable follows the line's letters;
+  - at most 10 syllables per line, at most 2 NPCs voicing at once (the nearest take over), quiet (0.34) and silent past 45 studs;
+  - Authority speaks 15% slower;
+  - a player attribute `NHNpcVoices = false` mutes them (ready for a Settings toggle).
+- **`Features.MapStudents`** (Map): female-bodied students use the Girl set and the rest the Boy set, each with a personal pitch of +-8%.
+
+### Verified
+- **The files** (by analysis, not by ear):
+  - pitches came out at 150 / 231 / 113 / 103 Hz as designed;
+  - no energy above 4 kHz in any syllable;
+  - loudness within 2 dB across all 40.
+  - Fixed on the way: the t burst had been louder than its vowel (hissy), and the m murmur had drowned its vowel.
+- **In the Map** (still the fallback tick, until the upload):
+  - students got Girl / Boy sets with pitches 0.92 to 1.08;
+  - "Did you see the timetable change?" played 8 syllables (under the cap);
+  - students more than 45 studs away stayed silent, and never more than one voiced at a time here.
+  - No script errors.
+- **Not yet:**
+  - uploading the 40 files to the group and putting their ids in `Config.NpcVoice`;
+  - hearing them in game;
+  - two near students speaking over each other (the "nearest takes over" rule);
+  - Enemy and Authority NPCs (the Map has none yet; the sets are ready for them).
+
 ## [1.78.2] - 2026-11-10: Map place: the students have voices and fidget
 
 Owner: "Yes, do those" (voice blips and idle fidgets, the first two of `docs/NPC-Immersion-Ideas.md`).

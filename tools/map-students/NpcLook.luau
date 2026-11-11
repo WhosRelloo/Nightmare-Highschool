@@ -8,8 +8,10 @@
 	    each client, so it's smooth at any frame rate and costs the server nothing.
 	  * Speech bubbles: NHSay + NHSayAt show a small engraved bubble over the head for NHSayFor seconds (longer lines
 	    stay up longer), and the head nods a little while they talk.
-	  * Voice blips (1.78.2): every line is heard as a short burble of pitched ticks, one voice per student
-	    (NHVoice, set by the server), as many syllables as the text, rising at a question, louder at "!", pausing at
+	  * Voices (1.78.2; four synthesized voice sets since 1.78.3, ids in Config.NpcVoice, chosen by NHVoiceSet): every
+	    line is heard as a short burble of syllables that follow its letters ("hey" says "eh", t / k / m words start on
+	    that consonant), at most 10 per line, from at most 2 NPCs at once (the nearest),
+	    one voice per student (NHVoice, set by the server), as many syllables as the text, rising at a question, louder at "!", pausing at
 	    commas and "...". 3D from the head, on the game's effects volume (SoundService.NH_Master.NH_Effects).
 	  * Fidgets (1.78.2): NHFidget = "Stretch" (+ NHFidgetAt) raises both arms for a moment. The phone fidget is a real
 	    Tool on the server; Controllers.Character.PhoneHold keeps that arm steady.
@@ -31,30 +33,63 @@ pcall(function() Theme = require(ReplicatedStorage:WaitForChild(`UI`):WaitForChi
 
 local State = {} :: { [Model]: any }
 
-local BLIP = `rbxasset://sounds/volume_slider.ogg` -- ships with every Roblox client
-local BLIP_RANGE = 55
+local BLIP = `rbxasset://sounds/volume_slider.ogg` -- the fallback tick: ships with every Roblox client
+-- the NPCs' own voices (1.78.3): four synthesized sets (Boy, Girl, Enemy, Authority), ids in ReplicatedStorage.Config.NpcVoice
+local VoiceCfg = { Sets = {} }
+pcall(function() VoiceCfg = require(ReplicatedStorage:WaitForChild(`Config`):WaitForChild(`NpcVoice`, 10)) end)
+local RANGE_V = tonumber(VoiceCfg.Range) or 45
+local MAX_SYL = tonumber(VoiceCfg.MaxSyllables) or 10
+local MAX_VOICES = tonumber(VoiceCfg.MaxVoices) or 2
+local GAP = tonumber(VoiceCfg.Gap) or 0.105
+local Speaking = {} :: { [Model]: number } -- who's voicing right now (until when)
 
--- the syllables of a line: { gap before it, pitch factor, loudness factor }
-local function syllables(Text: string): { { number } }
+local function voiceId(SetName: string, Kind: string): string?
+	local Set = VoiceCfg.Sets and (VoiceCfg.Sets[SetName] or VoiceCfg.Sets.Boy)
+	local Id = Set and Set[Kind]
+	if typeof(Id) == `number` then return `rbxassetid://{Id}` end
+	if typeof(Id) == `string` and Id ~= `` then return if Id:find(`://`) then Id else `rbxassetid://{Id}` end
+	return nil
+end
+
+-- which syllable a chunk of a word sounds like: its first vowel, or its opening consonant now and then
+local VOWEL = { a = `A`; e = `E`; i = `I`; y = `I`; o = `O`; u = `U` }
+local ONSET = { m = `Ma`; n = `Ma`; t = `Ta`; d = `Ta`; p = `Ta`; b = `Ta`; k = `Ka`; c = `Ka`; g = `Ka`; q = `Ka` }
+local function syllableOf(Chunk: string): string
+	local Low = Chunk:lower()
+	local First = Low:sub(1, 1)
+	if ONSET[First] and math.random() < 0.5 then return ONSET[First] end
+	local V = Low:match(`[aeiouy]`)
+	return V and VOWEL[V] or `Uh`
+end
+
+-- the syllables of a line: { gap before it, pitch factor, loudness factor, sound kind }. At most MAX_SYL voiced, so
+-- a long line is a short burble and then the bubble carries the rest.
+local function syllables(Text: string, Slow: number): { { any } }
 	local Out = {}
+	local Voiced = 0
 	local Question = Text:find(`%?`) ~= nil
 	local Shout = Text:find(`!`) ~= nil
 	for Word, Sep in Text:gmatch(`([%w']+)([^%w']*)`) do
-		local N = math.clamp(math.floor(#Word / 3 + 0.5), 1, 4)
-		for _ = 1, N do table.insert(Out, { 0.075 + math.random() * 0.02, 0.92 + math.random() * 0.2, if Shout then 1.4 else 1 }) end
-		if Sep:find(`%.%.`) or Sep:find(`,`) or Sep:find(`%-`) then table.insert(Out, { 0.22 }) -- a pause
-		elseif Sep:find(`[%.!?]`) then table.insert(Out, { 0.16 }) end
-		if #Out >= 22 then break end
+		local N = math.clamp(math.floor(#Word / 3.5 + 0.5), 1, 3)
+		local Size = math.max(1, math.ceil(#Word / N))
+		for I = 1, N do
+			if Voiced >= MAX_SYL then break end
+			local Chunk = Word:sub((I - 1) * Size + 1, I * Size)
+			table.insert(Out, { (GAP + math.random() * 0.02) * Slow, 0.96 + math.random() * 0.08, if Shout then 1.25 else 1, syllableOf(Chunk) })
+			Voiced += 1
+		end
+		if Voiced >= MAX_SYL then break end
+		if Sep:find(`%.%.`) or Sep:find(`,`) or Sep:find(`%-`) then table.insert(Out, { 0.2 * Slow }) -- a pause
+		elseif Sep:find(`[%.!?]`) then table.insert(Out, { 0.15 * Slow }) end
 	end
 	if #Out == 0 then -- "..." alone: a hesitant hum
-		table.insert(Out, { 0.1, 0.8, 0.6 })
-		table.insert(Out, { 0.25, 0.75, 0.5 })
+		table.insert(Out, { 0.05, 1, 0.8, `Hum` })
 	end
-	if Question then -- the last two syllables rise
+	if Question then -- the last two syllables rise (gently)
 		local K = 0
 		for I = #Out, 1, -1 do
 			if Out[I][2] then
-				Out[I][2] *= 1.18 - K * 0.08
+				Out[I][2] *= 1.1 - K * 0.05
 				K += 1
 				if K >= 2 then break end
 			end
@@ -63,49 +98,93 @@ local function syllables(Text: string): { { number } }
 	return Out
 end
 
+-- may this NPC voice a line now? Not muted, near enough, and among the MAX_VOICES nearest speakers
+local function mayVoice(M: Model, Head: BasePart, Cam: Camera): boolean
+	if Players.LocalPlayer:GetAttribute(`NHNpcVoices`) == false then return false end -- a mute switch for Settings
+	local D = (Head.Position - Cam.CFrame.Position).Magnitude
+	if D > RANGE_V + 5 then return false end
+	local Now = os.clock()
+	local Busy, Farther = 0, nil
+	for Other, Until in Speaking do
+		if Until < Now or not Other.Parent then Speaking[Other] = nil
+		elseif Other ~= M then
+			Busy += 1
+			local OH = Other:FindFirstChild(`Head`)
+			local OD = OH and (OH.Position - Cam.CFrame.Position).Magnitude or math.huge
+			if OD > D and (not Farther or OD > Farther[2]) then Farther = { Other, OD } end
+		end
+	end
+	if Busy < MAX_VOICES then return true end
+	-- full: a nearer speaker takes the place of the farthest one
+	if Farther then
+		local St = State[Farther[1]]
+		if St then St.VoiceToken = (St.VoiceToken or 0) + 1 end
+		Speaking[Farther[1]] = nil
+		return true
+	end
+	return false
+end
+
 local function voice(M: Model, Text: string)
 	local Head = M:FindFirstChild(`Head`)
 	local Cam = workspace.CurrentCamera
 	if not (Head and Head:IsA(`BasePart`) and Cam) then return end
-	if (Head.Position - Cam.CFrame.Position).Magnitude > BLIP_RANGE + 20 then return end
+	if not mayVoice(M, Head, Cam) then return end
+	local SetName = M:GetAttribute(`NHVoiceSet`) or `Boy`
 	local Pitch = tonumber(M:GetAttribute(`NHVoice`)) or 1
-	local Group = nil
+	local Slow = if SetName == `Authority` then 1.15 else 1
 	local Master = game:GetService(`SoundService`):FindFirstChild(`NH_Master`)
-	Group = Master and Master:FindFirstChild(`NH_Effects`)
+	local Group = Master and Master:FindFirstChild(`NH_Effects`)
 	local St = State[M]
 	if not St then return end
 	St.VoiceToken = (St.VoiceToken or 0) + 1
 	local My = St.VoiceToken
-	-- a few reusable sounds on the head, taken in turn
+	-- reusable sounds on the head: two of each syllable (so one can ring out while the next starts)
 	St.Voices = St.Voices or {}
-	for I = #St.Voices + 1, 3 do
-		local Snd = Instance.new(`Sound`)
-		Snd.Name = `NHVoice`
-		Snd.SoundId = BLIP
-		Snd.RollOffMode = Enum.RollOffMode.InverseTapered
-		Snd.RollOffMinDistance = 6
-		Snd.RollOffMaxDistance = BLIP_RANGE
-		if Group and Group:IsA(`SoundGroup`) then Snd.SoundGroup = Group end
-		Snd.Parent = Head
-		St.Voices[I] = Snd
+	local function soundFor(Kind: string): (Sound, boolean)
+		local Id = voiceId(SetName, Kind)
+		local Key = if Id then `{SetName}_{Kind}` else `Tick`
+		local Pool = St.Voices[Key]
+		if not Pool then
+			Pool = { I = 0 }
+			for J = 1, 2 do
+				local Snd = Instance.new(`Sound`)
+				Snd.Name = `NHVoice`
+				Snd.SoundId = Id or BLIP
+				Snd.RollOffMode = Enum.RollOffMode.InverseTapered
+				Snd.RollOffMinDistance = 5
+				Snd.RollOffMaxDistance = RANGE_V
+				if Group and Group:IsA(`SoundGroup`) then Snd.SoundGroup = Group end
+				Snd.Parent = Head
+				Pool[J] = Snd
+			end
+			St.Voices[Key] = Pool
+		end
+		Pool.I = Pool.I % 2 + 1
+		return Pool[Pool.I], Id ~= nil
 	end
+	local Syls = syllables(Text, Slow)
+	local Total = 0
+	for _, Syl in Syls do Total += Syl[1] end
+	Speaking[M] = os.clock() + Total + 0.2
 	task.spawn(function()
-		local K = 0
-		for _, Syl in syllables(Text) do
+		for _, Syl in Syls do
 			if St.VoiceToken ~= My or not Head.Parent then return end
 			task.wait(Syl[1])
 			if Syl[2] then
-				K = K % #St.Voices + 1
-				local Snd = St.Voices[K]
+				local Snd, Own = soundFor(Syl[4] or `Uh`)
 				Snd.PlaybackSpeed = Pitch * Syl[2]
-				Snd.Volume = 0.32 * (Syl[3] or 1)
+				Snd.Volume = (if Own then (tonumber(VoiceCfg.Volume) or 0.34) else 0.28) * (Syl[3] or 1)
 				Snd.TimePosition = 0
 				Snd:Play()
-				-- just the attack of the tick: a crisp syllable, not its 0.85 s tail
-				local Cut = Snd
-				task.delay(0.1, function() if Cut.IsPlaying then Cut:Stop() end end)
+				if not Own then
+					-- the fallback tick: just its attack, not its 0.85 s tail
+					local Cut = Snd
+					task.delay(0.1, function() if Cut.IsPlaying then Cut:Stop() end end)
+				end
 			end
 		end
+		if Speaking[M] and St.VoiceToken == My then Speaking[M] = nil end
 	end)
 end
 
