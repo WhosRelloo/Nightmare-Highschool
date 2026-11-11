@@ -142,6 +142,8 @@ Owner: "let's start porting some more things over to the map place (low > high p
 3. ~~`World.SpookyTree`~~ (1.71.1)
 4. ~~`Gui.SettingsMenu` + `Gui.TopBar` + `NHSettings`~~ (1.71.2). In the Map, settings last for the session. Map adapter in `TopBar`: Record, Locker and Study Group are hidden until those screens are ported.
 
+5. ~~`Gui.KitHud` (health bar, hotbar, Yen, posture), `Gui.ClockHud`, `Gui.Timetable`~~ (1.71.3, the owner asked for them before the medium list)
+
 **Medium: gameplay, or needs map data or an owner decision**
 - Regions and Compass (`Features.Regions`, `World.Regions`, `Gui.Compass`): they need region boxes and points of interest placed for the builder's map. NH Combat Test's are for its own layout.
 - Seats (`Features.Seats`, `Features.PlayerSeats`, `World.PlayerSeat`): they add "Sit" E prompts to chairs, which goes against "E only on doors" (1.67.0). This needs the owner's call.

@@ -2,6 +2,30 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.71.3] - 2026-11-10: Map place: the health bar, hotbar, clock and timetable
+
+Owner: "Before medium priority, let's throw the health bar, hotbar, and timetable in".
+
+### Added (Map place, NH Combat Test's files byte for byte, tagged NHCore)
+- **`Controllers.Gui.KitHud`**, the in-play HUD along the bottom: the health bar with its % orb, the hotbar for your Backpack tools (click, tap or 1-9), the Yen plate, the posture meter and the DOWNED alert. It replaces Roblox's own health bar and backpack.
+- **`Controllers.Gui.ClockHud`**, the top-right panel: the day and time, the current period and what's next, and the moon phase.
+  - It's also what the timetable opens from.
+  - `Gui.Moments`' school bell (1.69.2) now flashes its rim.
+- **`Controllers.Gui.Timetable`:** click the clock to see the whole school day (every segment, class subjects and rooms, where you are now), and click it again or X to close.
+- Everything they use was already in the Map and identical to NH Combat Test's: `Config.Combat`, `Config.Classes`, `Config.SchoolSchedule`, `Config.Activities`, `Functions.SchoolTime`, the StateController and the school clock.
+- **What stays empty in the Map:** attendance, detention and class-in-room lines, because the Map has no school systems yet. Yen is always 0 (the Data stand-in).
+
+### Verified (Map place, local play-test, real keys and clicks)
+- **On spawn:**
+  - The HUD showed the health orb at 100%, the Yen plate (0), hotbar slots 1 to 6 and the posture meter.
+  - Roblox's own health bar and backpack were off.
+  - The clock read "Monday 3:13 AM, Night (until 6:00 AM), waxing moon, Next: Homeroom, Room 101 at 8:00 AM".
+- **Health:** 37 damage on the server took the orb to 63%.
+- **Hotbar:** a test tool in the Backpack appeared in slot 1. The real 1 key equipped it, and 1 again put it away.
+- **Timetable:** a real click on the clock opened it, showing "Now: Night, until 6:00 AM" and "Next class: Homeroom in Room 101", then the day from Before School through Periods 1 to 4 (with subjects and rooms) to Night. A second click closed it.
+- No errors.
+- **Not tried:** the DOWNED alert, posture filling in a fight, Yen changing (there's no economy in the Map), touch or gamepad, and a class period going by with the timetable open.
+
 ## [1.71.2] - 2026-11-10: Map place: the Settings menu and the top bar
 
 Owner: "Yes, port Settings". It's item 4 on the Map's low-priority list (`docs/Map-Core-Preview.md`).
