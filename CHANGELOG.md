@@ -2,6 +2,44 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.80.0] - 2026-11-11: The everyday-carry kit (QOL items)
+
+Twelve held items, each with one small job, and four new systems the owner approved with them (`docs/QOL-Kit.md`).
+Owner: "Approve as proposed" (all twelve effects, Night Chill, Wounded, Rain nights, lost keys); "Make a completely better
+compass UI, map UI, etc. Anytime you make new UI make it from scratch at the same standard as the other UI or icons".
+
+### Added
+- **The items** (2048 PBR bakes, held in the R6 hand, fitted to all 12 body types and scaled with height):
+  - Getting around: the hand lantern (light and oil), the folding campus map (map screen, waypoint pin), the pocket compass
+    (dial and needle to your pin, quest, next class or dorm), the umbrella (keeps rain off, 28 studs/s fall cap, shuts in a fight).
+  - School life: the timetable card (Now / Next), the dorm keys (worn; your room needs them), the hall pass (3 punches,
+    60 s of peace from the hall monitor, no attendance), the library card and books (+3% class EXP, +10% on the subject).
+  - Comfort: the thermos (tea or coffee: −30 posture, +35 match stamina), the snack tin (out-of-combat biscuits), the
+    first-aid pouch (bandages, clears Wounded), the hand warmer (keeps the Chill off from your pocket).
+- **Counters:** MORROW & VANE, THE WICK & KETTLE, the Office and the Archive desk (anything tagged `NHKitShop`; stand-ins
+  in NH Combat Test). Starter kit at enrolment: the map, the timetable card and the dorm keys.
+- **Night Chill** (outdoors 21:00-06:00: slower guard recovery, no out-of-combat regen), **Wounded** (below 25%: ink edges, a
+  heartbeat, −10% walk speed), **Rain nights** (1 in 4), **lost keys** (10% when another student downs you).
+- **The Locker's Kit tab**, and the kit HUD art (`art/ui/hud/make_kit_ui.py`: the brass compass, plates, card, map sheet,
+  icons, frost and ink edges), to upload.
+- 12 use clips (KeyframeSequences in `ServerStorage.NHKitAnims`) for the owner to publish.
+
+### Changed
+- `Config.Items` (the kit's save, the flask coffee buff), `Features.Inventory` (SetKit, GiveBuff, KitEat), `Player.Progression`,
+  `Features.Posture`, `Features.CombatSpeed`, `School.HallMonitor`, `Features.Homes`, the three sports, `Gui.Locker`:
+  each patch marked `(kit 1.79)`.
+
+### Verified (Studio Play, slot 4 "Testy")
+- Starter kit, saving, the Kit tab, buying and every refusal at the counters, fake remote calls refused, the map and pin,
+  the compass to the pin, the lantern and its oil, thermos, biscuits, bandages and Wounded, the pass ending a chase in
+  class with no attendance, the library loan, effect and fine, the umbrella's fall cap (28.0) and shutting in a fight,
+  the Chill (on outdoors, off under a roof), rain and soaking, lost keys and the locked dorm door. 0 clearance fails in
+  144 item × body checks. Test settings put back (`SlotCount = 3`, `NHTestNoMenuKeys` cleared).
+
+### Not verified
+- Returning keys between two players, the late-pass refusal, the real meshes, maps and HUD art in game (they wait for the
+  owner's upload; stand-ins show until then), the use clips (not published), the thermos stamina in a live match.
+
 ## [1.79.0] - 2026-11-11: 3D accessories, batch 1 (uniform and school)
 
 The first batch of Kit A, the player accessories (`docs/Accessories.md`): 10 designs, 18 store items, cosmetic only.
