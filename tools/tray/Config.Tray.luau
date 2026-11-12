@@ -12,8 +12,8 @@
 	             Spill plays, the tray tumbles away and one is lost
 	  Return     a part tagged NHTrayReturn gets a "Return tray" prompt: Return plays and the tray is put away
 	  Grimace    items listed in Grimace (the mystery meat loaf) get a sniff and a grimace before the bite
-	Clips are R6 KeyframeSequences in ServerStorage.NHTrayAnims (tools/tray/build_tray_anims.luau). Until their ids are
-	in Anims, Studio plays them straight from there (KeyframeSequenceProvider); a live server skips any without an id.
+	Clips are R6 KeyframeSequences in ServerStorage.NHTrayAnims (tools/tray/build_tray_anims.luau), published under the
+	group; their ids are in Anims. A clip with no id (0) plays from there in Studio only; a live server skips it.
 ]]
 local Tray = {}
 
@@ -30,8 +30,10 @@ Tray.Hold = { R = { 56, 20 }; L = { 56, 20 }; Offset = Vector3.new(0, -0.33, -1.
 Tray.Lap = Vector3.new(0, -0.5, -1.2)
 Tray.TableReach = 2.6       -- how far in front of the seated torso a table top can be
 
+-- published by the owner under the group (2026-11-12)
 Tray.Anims = {
-	EatStand = 0; EatSit = 0; Spill = 0; QueueIdle = 0; SitDown = 0; StandUp = 0; Return = 0; Grimace = 0;
+	EatStand = 137993046372635; EatSit = 128651307411808; Spill = 96358550026771; QueueIdle = 106349864053721;
+	SitDown = 76779786863920; StandUp = 101237220265587; Return = 119806409148779; Grimace = 88611619309024;
 }
 
 Tray.Spill = { Damage = 3; Cooldown = 2 }

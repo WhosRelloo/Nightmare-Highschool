@@ -2,6 +2,18 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.91.1] - 2026-11-12: NH Combat Test: the lunch tray clips are published
+
+The owner published the eight tray clips from `ServerStorage.NHTrayAnims` under the group. Their ids are now in
+`Config.Tray.Anims` (`tools/tray/Config.Tray.luau`), so live servers play the eating, sitting, queue, spill, return and
+grimace clips too, not only the hold.
+- `EatStand` 137993046372635, `EatSit` 128651307411808, `SitDown` 76779786863920, `StandUp` 101237220265587,
+  `QueueIdle` 106349864053721, `Spill` 96358550026771, `Return` 119806409148779, `Grimace` 88611619309024.
+- **Checked against the local clips:** each id has the same keyframe count, length and loop setting as its
+  KeyframeSequence (so no two names are swapped). The place and the clips are both owned by the group.
+- **Checked in play:** all eight load and play on a throwaway R6 rig on the server (lengths 0.6 s to 5.0 s). No player
+  slot was used and the tray play-test was not repeated with the published ids.
+
 ## [1.91.0] - 2026-11-12: Inventory QOL batch 1: empty pins you can see, cooldown shades, the buff chip, no silent refusals
 
 Owner: "Start with batch 1" (concepts 1, 5, 9 and 30 in `docs/Inventory-QOL-Concepts.md`). The live scripts are

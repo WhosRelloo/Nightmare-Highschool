@@ -100,7 +100,7 @@ Props batch 54 ([[School-Props]]): every item the stand sells is modelled now, w
 - **Return** (`Return`): a part tagged `NHTrayReturn` gets a "Return tray" prompt; the tray is set on it (a copy rests there 30 s) and put away, not lost. There is no rack model yet: tag a counter or a shelf part.
 - **Mystery meat** (`Grimace`, `Config.Tray.Grimace`): the meat loaf is lifted to the nose, a sniff, a recoil and a head shake, then the bite.
 - **For a lunch period (NPCs):** `Features.Tray.Hold(Char, TrayPart, Id)`, `Release`, `Eat(Char, Seconds)`, `Spill`, `Return(Char, Rack)`; holders carry the tag `NHTrayHolder` and the attribute `NHTray`. The student AI isn't wired to them (another session owns it).
-- **Clip ids:** `Config.Tray.Anims` is 0 until the owner publishes the eight clips; until then Studio plays them from `ServerStorage.NHTrayAnims` and a live server plays only the hold (no clips).
+- **Clip ids:** the eight clips are published under the group (1.91.1) and their ids are in `Config.Tray.Anims`. A clip set back to 0 plays from `ServerStorage.NHTrayAnims` in Studio only.
 - **Fixed in testing:** the first table probe set the tray on the arm of the student at the next desk (people are now ignored); the chair's Sitting pose hid the seated eating (now outweighed).
 
 ## Study groups (U)
