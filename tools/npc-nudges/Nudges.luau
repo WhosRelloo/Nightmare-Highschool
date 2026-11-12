@@ -10,6 +10,7 @@
 	                            idle keeps the legs. The student slides 0.45 studs away from the passer over 0.25 s.
 	  Shove_Forward             a sprinter hitting them from behind or behind-side: fold, low stagger, rise, look back.
 	                            The walk stops and the body is carried about 3 studs along the push, fading out.
+	                            The carry and the fold stop short of walls; with no room to fold, it's the twist.
 	Players don't collide with students (NHWalkers), so "contact" is the passer's root coming within CONTACT studs.
 	MakeWay fires about a second early, so the handler waits for that contact and does nothing if it never comes.
 	Each play varies speed and weight, and a student can't be nudged again for COOLDOWN seconds.
@@ -44,7 +45,9 @@ local SIDE_STEP = 0.45
 local SIDE_TIME = 0.25
 local CARRY = 3
 local CARRY_TIME = 0.7
+local FOLD_REACH = 3       -- the shove's head comes 2.4 studs ahead of the root at the fold (frame 6), plus hair and a margin
 local COOLDOWN = 1.5
+local RAM_MEMORY = 0.6     -- seconds a player's top speed is remembered (a sprinter who rams and stops dead still shoves)
 
 local Studio = RunService:IsStudio()
 local Ids = {} :: { [string]: string }
@@ -86,6 +89,23 @@ local function flat(V: Vector3): Vector3
 	return Vector3.new(V.X, 0, V.Z)
 end
 
+-- each player's top speed (and which way they were going) over the last RAM_MEMORY seconds
+local Recent = {} :: { [Player]: { Speed: number, At: number, Dir: Vector3 } }
+RunService.Heartbeat:Connect(function()
+	local Now = os.clock()
+	for _, Pl in Players:GetPlayers() do
+		local R = Pl.Character and Pl.Character:FindFirstChild(`HumanoidRootPart`)
+		if R and R:IsA(`BasePart`) then
+			local V = flat(R.AssemblyLinearVelocity)
+			local Last = Recent[Pl]
+			if not Last or V.Magnitude >= Last.Speed or Now - Last.At > RAM_MEMORY then
+				Recent[Pl] = { Speed = V.Magnitude; At = Now; Dir = if V.Magnitude > 1 then V.Unit else Vector3.zero }
+			end
+		end
+	end
+end)
+Players.PlayerRemoving:Connect(function(Pl) Recent[Pl] = nil end)
+
 local function lookAt(S, P: Vector3, Seconds: number)
 	S.Model:SetAttribute(`NHLookAt`, P)
 	S.Model:SetAttribute(`NHLookUntil`, workspace:GetServerTimeNow() + Seconds)
@@ -100,7 +120,7 @@ end
 local Params = RaycastParams.new()
 Params.FilterType = Enum.RaycastFilterType.Exclude
 Params.RespectCanCollide = true
-local function clear(S, Dir: Vector3, Dist: number): boolean
+local function filter(S)
 	local Ex = { S.Model }
 	for _, N in { `Live`, `NHFx`, `NHStudents`, `NHSchedule`, `NHAmbient` } do
 		local F = workspace:FindFirstChild(N)
@@ -108,11 +128,27 @@ local function clear(S, Dir: Vector3, Dist: number): boolean
 	end
 	for _, P in Players:GetPlayers() do if P.Character then table.insert(Ex, P.Character) end end
 	Params.FilterDescendantsInstances = Ex
+end
+
+local function clear(S, Dir: Vector3, Dist: number): boolean
+	filter(S)
 	local From = S.Root.Position
 	if workspace:Raycast(From, Dir * (Dist + 1), Params) then return false end
 	local Feet = From - Vector3.new(0, S.Up or (S.Agent and S.Agent.Up) or 3, 0)
 	local Floor = Nav.Floor(Feet + Dir * Dist, 1.5)
 	return Floor ~= nil and math.abs(Floor.Y - Feet.Y) < 1.2
+end
+
+-- how far ahead along Dir is free at waist, chest and head height (up to Max): the shove needs room to fold
+local function room(S, Dir: Vector3, Max: number): number
+	filter(S)
+	local Free = Max
+	for _, H in { 0, 1, 1.5 } do
+		local From = S.Root.Position + Vector3.new(0, H, 0)
+		local Hit = workspace:Raycast(From, Dir * Max, Params)
+		if Hit then Free = math.min(Free, flat(Hit.Position - From).Magnitude) end
+	end
+	return Free
 end
 
 -- move the root Dist studs along Dir over Seconds, fast at first (the walk or idle carries on underneath)
@@ -147,20 +183,23 @@ local function side(S, Rec, PasserPos: Vector3)
 	local OnRight = Rel:Dot(Right) > 0
 	local T = track(S, if OnRight then `Nudge_Right` else `Nudge_Left`)
 	if not T then return end
+	-- tests read what was decided at the moment of contact (Studio only)
+	if Studio then S.Model:SetAttribute(`NHNudge`, string.format(`%s side %.2f look %s at %.2f`, if OnRight then `Right` else `Left`, Rel:Dot(Right), tostring(Right), os.clock())) end
 	T:Play(0.06, math.random(70, 100) / 100, math.random(90, 115) / 100)
 	lookAt(S, PasserPos + Vector3.new(0, 1.5, 0), 1.6)
 	slide(S, flat(if OnRight then -Right else Right).Unit, SIDE_STEP, SIDE_TIME)
 	task.wait(0.35)
 end
 
-local function shove(S, Rec, Push: Vector3)
+local function shove(S, Rec, Push: Vector3, Carry: number)
 	local T = track(S, `Shove_Forward`)
 	if not T then return end
 	if S.Agent then S.Agent:Stop() end
+	if Studio then S.Model:SetAttribute(`NHNudge`, string.format(`Shove at %.2f`, os.clock())) end
 	local Speed = math.random(95, 108) / 100
 	T:Play(0.05, 1, Speed)
 	S.Model:SetAttribute(`NHMood`, `Startled`)
-	slide(S, Push, CARRY, CARRY_TIME, Push)
+	slide(S, Push, Carry, CARRY_TIME, Push)
 	-- the look back, after the rise (the canvas's F46)
 	task.wait(math.max(0, 1.3 / Speed - CARRY_TIME))
 	local R = rootOf(Rec)
@@ -187,10 +226,22 @@ function Nudges.Handle(S, Rec, Kind: string): boolean
 	S.NudgeReady = os.clock() + COOLDOWN + 2
 	local V = flat(R.AssemblyLinearVelocity)
 	local Look = flat(S.Root.CFrame.LookVector).Unit
-	local Behind = flat(S.Root.Position - R.Position).Unit:Dot(Look) > -0.3 -- the passer is behind or beside us
-	if V.Magnitude >= SHOVE_SPEED and V.Unit:Dot(Look) > 0.35 and Behind then
-		shove(S, Rec, V.Unit)
-	else
+	local Away = flat(S.Root.Position - R.Position)
+	local Overlap = Away.Magnitude < 1 -- they ran right into us: where they stand says nothing about where they came from
+	Away = if Away.Magnitude > 0.1 then Away.Unit else Look
+	-- a sprinter who rams us and stops dead still counts: their top speed, and its direction, a moment ago
+	local Ram = Rec.Player and Recent[Rec.Player]
+	if Ram and os.clock() - Ram.At > RAM_MEMORY then Ram = nil end
+	local Speed = math.max(V.Magnitude, Rec.Speed or 0, if Ram then Ram.Speed else 0)
+	local Push = if V.Magnitude > 2 then V.Unit elseif Ram and Ram.Dir.Magnitude > 0 then Ram.Dir else Away
+	local Behind = Overlap or Away:Dot(Look) > -0.3 -- the passer is behind or beside us
+	local Room = if Speed >= SHOVE_SPEED and Push:Dot(Look) > 0.35 and Behind then room(S, Push, CARRY + FOLD_REACH + 1) else 0
+	if Studio then
+		S.Model:SetAttribute(`NHNudgeWhy`, string.format(`%s: speed %.0f, push.look %.2f, behind %s, room %.1f, dist %.1f`, Kind, Speed, Push:Dot(Look), tostring(Behind), Room, Dist))
+	end
+	if Room >= FOLD_REACH + 0.4 then
+		shove(S, Rec, Push, math.min(CARRY, Room - FOLD_REACH))
+	else -- a brush, or a shove with a wall right ahead (no room to fold forward): the twist
 		side(S, Rec, R.Position)
 		-- someone standing on top of us: still back off afterwards, as the brain did
 		if Kind == `Space` and S.Agent and R.Parent then

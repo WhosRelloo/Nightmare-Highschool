@@ -2,6 +2,41 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.86.6] - 2026-11-11: Nudges: walls, rams and the open checks
+
+Owner: "Continue nudges". This works through the checks still open from 1.86.3 to 1.86.5. `Nudges` is the same file
+in NH Combat Test (`StudentBrain.Nudges`), on the Map (`MapStudents.Nudges`) and in `tools/npc-nudges/Nudges.luau`.
+
+### Fixed
+- **The shove folded into walls.** The fold puts the head 2.4 studs ahead of the root, measured on the clip at
+  frame 6. The carry only checked the root's path, so near a wall the head went in.
+  - The shove now looks for room ahead at waist, chest and head height.
+  - The carry is cut to fit (`FOLD_REACH` = 3 studs, which covers the hair).
+  - With less than 3.4 studs of room, the student twists instead of folding.
+- **A ram that stopped dead read as a brush.** At sprint speed you can reach the student before they notice you, so
+  at contact your speed was 0.
+  - Each player's top speed and direction are now remembered for 0.6 s (`RAM_MEMORY`), so a ram that ends in a stop
+    still shoves, in the direction you were running.
+  - When you overlap the student, "from behind" is judged from that direction, not from your positions.
+
+### Added
+- Studio-only test attributes on the student: `NHNudge` (what played, and which side) and `NHNudgeWhy` (the speed,
+  push direction, behind check and room at contact). Live servers don't set them.
+
+### Tested (NH Combat Test, slot 4 "Testy", SlotCount 4 then back to 3, NHTestNoMenuKeys set then cleared)
+- **Right-shoulder brush:** `Nudge_Right` played and the student slid away from the passer. The left side mirrored
+  it. An earlier apparent mismatch was the student turning toward the player before contact; the choice is made
+  from their facing at contact.
+- **Crowding** (standing on a student's left): `Nudge_Left`, a line ("You new here?"), then they backed off to
+  4.4 studs and faced the player.
+- **Shove near walls:**
+  - 8 studs of room: a full 3-stud carry, head 2.4 studs from the wall.
+  - 4.5 studs: the carry was cut to 1.4, head 0.51 from the wall.
+  - 2.5 studs: the twist instead, nothing touching the wall.
+  - A sprint at a student who had turned to face the runner gave a twist (head-on, correctly).
+- No errors from the nudges or the brain.
+- **Not re-tested on the Map** after these changes (the file is byte-identical), and not tried with a second player.
+
 ## [1.86.5] - 2026-11-11: Map place: the students get the nudges too
 
 Owner: "Port it to Map Place". The nudges from 1.86.3 and 1.86.4 now run on the Map's own students (`MapStudents`).
