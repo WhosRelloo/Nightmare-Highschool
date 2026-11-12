@@ -2,6 +2,82 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.90.1] - 2026-11-12: Inventory audit: 17 fixes across the Locker, hotbar, snacks and everyday kit
+
+Owner: "Completely make sure the inventory system works." I read through every inventory script (the Locker, the hotbar,
+`Features.Inventory`, `Config.Items`, `Features.Kit`), fixed what was broken, and play-tested on slot 4. The live scripts
+are mirrored in `tools/inventory-audit-190/` (`patches.py` lists every edit). Each patched line is marked
+`(inventory audit 1.90)`. Backups are in `ServerStorage.NH_Backup.InventoryAudit_pre_20261112`.
+
+### Fixed
+- **Empty pins blocked the pouch.** Finishing or dropping your last pinned snack left an empty pin that still counted
+  toward the 4. "To pouch" then said "Unpin one first", new purchases stopped going to the hotbar, and the empty slot
+  couldn't be cleared.
+  - An empty pin still keeps its slot for the restock, but gives way when you pin or buy something else.
+  - Clicking an empty pouch slot clears it.
+  - You can't pin something you don't have.
+  - Old saves can't keep a pinned trophy.
+- **Silent clicks.** A Use, Pin or Drop click inside the 0.15 s limit now says "One moment...". A refused Drop or Pin
+  shows its reason under the item.
+- **The Locker:**
+  - It opens at once and fills in after the round trip; a quick second press now closes it.
+  - Dying, or going to the main menu, closes it properly. The preview's clone and its pose loop go with it, so it no longer
+    reopens to a frozen body.
+  - It won't open while you're dead.
+  - It fits a phone screen. The Pouch panel used to be pushed off the bottom.
+  - After an action, the gamepad cursor stays on the button you were on, or in the grid, instead of jumping to the
+    top-left.
+  - When a stack runs out, the selection stays where it was.
+  - The tooltip says Food, Buff, Prank kit or Trophy. It used to call every buff and the prank kit a "Drink".
+  - Each tab has its own empty message, and "Loading your locker..." shows before your record arrives.
+- **Gamepad B on the stand menu** closes the stand. It used to toggle the Locker instead.
+- **The hall pass** won't spend a punch during a chase for fighting or paint. It says "A pass won't get you out of this."
+  The hall monitor now tags why it's chasing (`MonitorReason`).
+- **Flask coffee** no longer replaces a snack buff you paid for. It gives its buff only when you have none, or when yours
+  ran out.
+- **The book's "due back in N days"** now shows when you use it from the hotbar.
+- **The `Use` kit remote** only accepts pocket items (the hand warmer). Everything else has to be used from the hand.
+- **Keys of a player who left** go with them. Handing in keys whose owner is gone says so, instead of "they had a new set
+  cut".
+- **The snack tin** plays its own clip only. It used to play the eating clip on top.
+- **The lantern and warmer fuel burn** no longer re-sanitizes the whole inventory and sends it to the client every
+  second; it updates the kit in the profile only (ProfileService still saves it).
+- **Indoors check:** an invisible, non-collidable part overhead no longer counts as a roof for the Chill.
+
+### Tested (NH Combat Test, slot 4 Testy, entered through the real slot remotes)
+- **Pins:**
+  - Testy's save already had an empty Garlic Bread pin. With the pouch full, granting Ramune replaced it.
+  - Pinning a Night Bento you don't have says "You don't have any."; pinning a trophy is refused.
+  - Drinking the last Ramune left an empty pouch slot, and clicking it in the Locker cleared the pin.
+- **Using and buying:**
+  - An onigiri heals +15; a second use at once is refused, and later it says "still full".
+  - Buying 2 onigiri at the stand cost ¥50; buying from 115 studs away is refused.
+  - Drop through the Locker (Drop, then Sure?) removes 1, and the selection moves to the next item.
+  - Two Pin calls back to back: the second says "One moment...".
+- **The Locker:**
+  - It opens, and a close followed by a quick double press ends closed.
+  - Dying with it open closes it, and the snack tools come back after respawn.
+  - The Prank Kit tooltip reads "UNCOMMON · PRANK KIT".
+- **Gamepad B** with the stand menu open closes the stand, and the Locker stays shut.
+- **Kit:**
+  - Remote `Use` on the thermos is refused.
+  - A coffee sip keeps a paid Canned Coffee buff, and gives Flask Coffee once that buff has expired.
+  - In class, the pass is refused during a Fighting chase and works during a Truancy chase.
+- **The console:** no script errors.
+- Testy's slot count and the test key attribute are restored. Testy keeps the test's purchases.
+
+### Not tested
+- **The phone layout:** checked from the code only; it wasn't seen on a phone.
+- **Real gamepad navigation:** the cursor fix wasn't tried with a gamepad.
+- **Keys:** returning keys whose owner left needs two players.
+- **Snack tin clip:** its single clip wasn't watched.
+- **Pressing the Locker key while dead:** the respawn was too quick to try.
+
+### Still open
+- **The stand menu** never lists the lunch meals (`Items.Lunch`), even when lunch is open, so they can't be bought. I left
+  this to the concession session that is still working in `Gui.Locker`.
+- **The stand menu** rebuilds all ~40 cells, each with a 3D view, on every inventory change.
+
 ## [1.90.0] - 2026-11-12: The concession kit, packaging per brand and the lunch meals
 
 Owner: "Model a complete consumable kit for the concession stand ... a BUNCH of items", then "Make the designs more DETAILED

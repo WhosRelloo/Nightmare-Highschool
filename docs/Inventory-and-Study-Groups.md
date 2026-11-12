@@ -2,7 +2,13 @@
 
 Added in 1.10.0. Code lives in Studio; this page is the design and how the pieces connect.
 
-## The Locker (G)
+## The Locker (` key)
+
+G is the introduce-yourself key; the Locker moved to the backquote on 2026-11-02. The inventory audit (1.90.1) fixed 17
+bugs; see the CHANGELOG and `docs/Inventory-QOL-Concepts.md`.
+
+- **Empty pins:** a pinned snack you've run out of keeps its pouch slot for the restock. It gives way when you pin or buy
+  something else, and clicking it clears it.
 `Controllers.Gui.Locker`. The layout follows the owner's inventory reference (2026-11-02):
 
 | Area | What it shows |
