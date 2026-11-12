@@ -167,8 +167,8 @@ hold. The text then goes through `Lines.Fill` with the new placeholders.
 **Recording what you wear**
 - In `Appearance.ApplyTo`, when the character is not an NPC and the look is not a form outfit (`FormOutfit`), the
   server sets the character attribute `NHWear`:
-  - a comma list of the top id (`Appearance.IdOf("Uniforms", Uniform)`), the bottoms id, and every accessory id in
-    `Acc`.
+  - `top|bottoms|acc,acc`: the top id (`Appearance.IdOf("Uniform", Uniform)`), a `|`, the bottoms id, a `|`, then every
+    accessory id in `Acc` joined by commas (for example `varsity-jacket|striped-joggers|hat-top,collar-ruff`).
 - A form outfit (a transformed look) leaves the last `NHWear` as it was.
 - Players never send `NHWear`. Only the server's `ApplyTo` writes it, from the profile look.
 

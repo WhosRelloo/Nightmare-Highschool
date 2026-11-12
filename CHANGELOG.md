@@ -77,6 +77,10 @@ Design: `docs/superpowers/specs/2026-11-12-line-matrix-outfits-design.md`. How t
     don't name a form.
   - Nobody goes silent: any missing line falls back to the old pools. A missing or broken `Talk` or `Config.CliqueTalk`
     module is caught too: the students just use the old pools.
+  - **The fine print:** on a full-moon night, 60% of the ordinary night greetings are full-moon lines (the rest are
+    night lines; the night lines at the extremes are always full-moon ones), and a new-moon night keeps the old pool.
+    A student who only hears a fight uses the old "heard a fight" lines half the time. If every line in a clique's
+    cell needs something it doesn't have (a name, a piece), the student uses the old pool, not the no-clique lines.
 - **Students notice your clothes.** What you wear is recorded on your character (`NHWear`, set by the server only).
   - Each clique has a taste: pieces it likes and pieces it mocks. A clique never likes what its rival likes.
   - A student remarks on your full clique look, on a rival's look (a top only the rival wears: shared tops such as the
@@ -88,8 +92,9 @@ Design: `docs/superpowers/specs/2026-11-12-line-matrix-outfits-design.md`. How t
   - **Leader quests:** a Neutral player who isn't dressed gets a "come back in our colours" line from the leader. Once
     dressed, the quest is offered. The leader's "!" marker stays so you know to talk to them. Dares (by phone) and jobs
     (members only) aren't affected.
-  - **Night Study** at the Archive is refused with a Vigil line until you wear a Vigil top, are liked, or are a member.
-    Night Study has no standing gate of its own, so a Hostile player in a Vigil top gets in (flagged for the owner).
+  - **Night Study** at the Archive is refused with a Vigil line (in a "Not dressed for the Archive" notification) until
+    you wear a Vigil top, are liked, or are a member. Night Study has no standing gate of its own, so a Hostile player
+    in a Vigil top gets in (flagged for the owner).
   - **Walking in:** if you walk into a hangout out of its colours, the nearest member within 30 studs says so, once a
     visit and at most once every 2 minutes. You can still walk in.
   - Players who wear their Roblox avatar (`UseAvatar`) have no top on record, so only standing or membership passes for

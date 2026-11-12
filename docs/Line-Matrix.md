@@ -61,11 +61,11 @@ return {
 | `Bump` | Nudges `MakeWay`: you brush past them walking (speed 18 or less) | `Lines.MakeWay`. Faster than 18 gives the old `Lines.Sprint` ("No running in the halls!") |
 | `Crowded` | Nudges `Space`: you stand too close | `Lines.Space` |
 | `Shoved` | Nudges `Shove`: you ram them. Said when the student turns to look at you | `Lines.MakeWay` |
-| `FightSeen` | they watch a fight (Gawk) | `Lines.Gawk` |
+| `FightSeen` | they watch a fight (Gawk) | `Lines.Gawk`. When they only hear the fight, half the time they use the old `Heard.Fight` pool instead of the matrix |
 | `Flee` | they run from a fight near them | `Lines.Flee` |
 | `Transformed` | you are in a beast form (`Appearance.FormOf` returns a form), in a greeting or when they run from a monster | `Lines.Monster` |
 | `Night` | a greeting after dark | `Lines.Greet.Night` |
-| `FullMoon` | a greeting on a full-moon night | `Lines.Greet.FullMoon` |
+| `FullMoon` | a greeting on a full-moon night, 60% of the time (the rest get `Night`). A new-moon night keeps the old `Lines.Greet.NewMoon` pool, with no matrix moment | `Lines.Greet.FullMoon` |
 | `Race` | a greeting that remarks on your race (`Race.<Race>.<Attitude>`: Human, Priest, Vampire, Werewolf, Ghoul, Wraith) | `Lines.Greet.Race[Race]` |
 | `Hurt` | a greeting when your health is under 35% | the time-of-day pools |
 | `Outfit` | an outfit remark (`Outfit.<Verdict>.<Attitude>`) | the time-of-day pools |
@@ -86,7 +86,9 @@ player, and 6 s on the speech bubble itself.
 4. **Transformed**: always, when you are in a beast form.
 5. **Race**: 30% of the time.
 6. **Clique `Greet`**, for a clique student. Hostile, Wary and Respected students always greet from the matrix.
-   Neutral and Friendly students do so 60% of the time.
+   Neutral and Friendly students do so 60% of the time. **The night still shows at the extremes:** after dark, 40% of
+   these greetings are `Night` (or `FullMoon` on a full-moon night) instead, with the same attitude, so a Hostile
+   student still gets a Hostile night line.
 7. The older **Often** and **Again** lines (you've met before).
 8. **FullMoon** or **Night** through the matrix, after dark.
 9. The time-of-day greeting.
@@ -120,8 +122,20 @@ The lookup tries, in order:
 
 The chosen pool goes through `Lines.Pick` (the no-repeat rules still hold) and `Lines.Fill`. A line whose `{Key}` has
 no value (no name, no piece) is skipped and another is picked from the same pool; a pool with nothing fillable returns
-`nil`. The brain wraps every call in `pcall`. `Talk.Line(Clique, Moment, Player, Opts)` does the same for a stand-in
+`nil`. `Pool` does **not** go on to `Generic` when every line in the clique's cell is unfillable: the brain uses
+today's pool instead. The brain wraps every call in `pcall`. `Talk.Line(Clique, Moment, Player, Opts)` does the same for a stand-in
 student (`{ Clique = ... }`, no memory) such as a leader in dialogue; it gets its attitude from standing alone.
+
+### Robust loading
+
+A broken module never takes the students down with it:
+
+- `StudentBrain` requires `Talk` in a `pcall` (waiting 5 s for it). If that fails, it uses a stand-in `Talk` whose
+  `Pick` and `Outfit` return `nil` and whose `Attitude` is `Neutral`, so every student talks from today's pools.
+- `Talk` requires `Config.CliqueTalk` in a `pcall`. If it is missing or broken, the matrix is empty and every `Pick`
+  returns `nil` (today's pools again). `Talk.Use` still swaps the data in for the tests.
+- In `greeting()`, `Talk.Attitude` (steps 1 and 6) and `Appearance.FormOf` (step 4) are pcalled: a failure counts as
+  `Neutral`, or as no beast form.
 
 ### Placeholders
 
@@ -169,13 +183,18 @@ Each clique in `Config.Cliques.Defs` has `Taste = { Likes = { Rule }, Mocks = { 
 
 | Verdict | When |
 |---|---|
-| `FullLook` | the top is one of this clique's tops (`Look.Tops`, `Look.FemaleTops`, or the `Civ` set) and the bottoms are one of its bottoms (`Bottoms`, `FemaleBottoms`, `FemaleMatchBottoms`, or `Civ`) |
-| `RivalLook` | the top is one of the rival clique's tops |
+| `FullLook` | the top is one of this clique's tops (`Look.Tops`, `Look.FemaleMatchTops`, or `Look.Civ.Tops`) and the bottoms are one of its bottoms (`Bottoms`, `FemaleBottoms`, `FemaleMatchBottoms`, or `Civ`) |
+| `RivalLook` | the top is one of the rival clique's tops, and **no other clique wears it**. `black-blazer` (Court and Choir) and `ivory-polo` (Ordinary and Choir) are shared, so they never count as a rival's colours |
 | `Likes` | a worn piece matches a `Likes` rule (`{Piece}` is that piece) |
 | `Mocks` | a worn piece matches a `Mocks` rule (`{Piece}` is that piece) |
 | `nil` | nothing to say |
 
 - **Within a side,** rules are checked in the order written, so earlier rules win.
+- **`Look.FemaleMatchTops`** is a new key that only the outfit check and the dress code read. It holds the girls'
+  versions of each clique's school top (for example Vigil `vigil-vest-f`, Athletes `cheer-uniform` and `track-jacket`).
+  It is separate from `Look.FemaleTops` because the NPC dressers (`Schedules`, `CliqueFights`) read `FemaleTops`: a
+  first version that set `Look.FemaleTops` changed what NPC girls wore, so it was renamed. `outfit.luau` fails if any
+  clique has a `Look.FemaleTops` again.
 - **`Look.FemaleMatchBottoms`** is a new key that only the outfit check reads. It holds the girls' bottoms that count
   towards a clique's look (Athletes `cheer-skirt`, Delinquents `delinquent-long-skirt`, Pack `forest-tartan`). It is
   separate because the NPC dressers read `FemaleBottoms`, and changing what NPC girls wear was out of scope.
@@ -187,11 +206,15 @@ Each clique in `Config.Cliques.Defs` has `Taste = { Likes = { Rule }, Mocks = { 
 
 `Social.Cliques.Dressed(Player, Clique)` is true when **any** of these holds:
 
-- you wear a top from the clique's `Look.Tops`, `Look.FemaleTops` or `Look.Civ` tops (read from `NHWear`);
+- you wear a top from the clique's `Look.Tops`, `Look.FemaleMatchTops` or `Look.Civ.Tops` (read from `NHWear`,
+  through `Config.Cliques.WearsTop`);
 - your standing tier with the clique is `Friendly` or `Respected`;
 - you are a member of the clique.
 
 An unknown clique counts as dressed.
+
+**`UseAvatar` players** (who wear their Roblox avatar) stamp an empty top and bottoms in `NHWear`, so for them only
+standing (Friendly or better) or membership passes the dress code.
 
 **Where it applies**
 
@@ -201,10 +224,13 @@ An unknown clique counts as dressed.
   the offer (`ctx.DressLine`, through `Talk.Line`). Dress up, reopen the conversation, and the offer appears. Other
   callers of `CanStart` (the phone, clique events, auto-start) never see the reason, because they only ask about dares
   or quests with no clique.
+  - **Which quests:** `CanStart` gates on `Def.Clique or Def.Requires.Clique.Id` (the leader quests only carry
+    `Requires.Clique`). So **any future quest with a clique standing requirement is dress-gated too**, unless it is a
+    `Dare`, `Job` or `Showdown`.
 - **The leader's "!" marker is kept** for a player who is not dressed. They still need to be drawn to the leader to
   hear the line, so `Why == "DressCode"` counts as an offer in the quest seals.
-- **Night Study** (the Vigil's Archive perk, `Social.Hangouts.OnStudy`) is refused with a Vigil `DressCode` line in the
-  same notification it used before, until you wear a Vigil top, are liked, or a member. The check fails open, so an
+- **Night Study** (the Vigil's Archive perk, `Social.Hangouts.OnStudy`) is refused with a Vigil `DressCode` line in a
+  notification titled "Not dressed for the Archive", until you wear a Vigil top, are liked, or a member. The check fails open, so an
   error never locks anyone out.
 - **Walking in.** When someone who isn't dressed walks into a clique's hangout, the nearest student of that clique within
   30 studs says a `DressCode` line: once per visit, and at most once every 120 s per player (`dressWatch` in
@@ -214,9 +240,13 @@ An unknown clique counts as dressed.
     studs above a floor near y 1, so a plain "inside the box" check never matched a player on the floor. The boxes were
     left where they are because turf fights and `Features.Regions` use them too.
 
-**In practice:** the gate only bites at Neutral standing. Wary and Hostile players are already refused by the clique's
-existing standing checks, and Friendly players pass. Dressing the part is how a Neutral player gets in the door before
-the clique likes them.
+**In practice:**
+
+- **Leader quests:** the gate only bites at Neutral standing. Wary and Hostile players are already refused by
+  `QuestOpen` (the quests' standing requirement), and Friendly players pass. Dressing the part is how a Neutral player
+  gets a quest before the clique likes them.
+- **Night Study has no standing gate.** The dress code is its only clique check, so a Hostile player in a Vigil top
+  gets in. This is a known consequence, flagged for the owner to rule on.
 
 ## How to add or change things
 
@@ -266,7 +296,7 @@ the file's text as `code`. Each returns a string starting `PASS`, `FAIL` or `ERR
 |---|---|
 | `tests/coverage.luau` | Every module, moment, sub-key and attitude has a pool; 3 to 5 lines per pool; 60 characters or fewer; only known placeholders; no "nil" (a backtick-interpolation sign); no banned gore words; every `Likes` and `Mocks` cell has a `{Piece}` line; no clique `Greet` uses `Any`. Set `ONLY` to a module name to check just that one. Expected: `PASS: 945 cells, 2289 lines` |
 | `tests/talk.luau` | `Talk.Attitude`, `Pool`, `Pick` and `Line`: tier only, no tier, no player, fought a step down, met often a step up (never to Respected), member is at least Friendly, fallback to Generic, placeholders filled, stand-in students |
-| `tests/outfit.luau` | `ParseWear`, and `Talk.Outfit` verdicts for each clique: full look, rival look, liked piece, mocked piece, nothing; plus no clique likes what its rival likes |
+| `tests/outfit.luau` | `ParseWear`, and `Talk.Outfit` verdicts for each clique: full look, rival look, a top the rival shares with another clique (no rival look), liked piece, mocked piece, nothing; plus no clique likes what its rival likes, no clique sets `Look.FemaleTops`, and every `FemaleMatchTops` / `FemaleMatchBottoms` id exists |
 | `tests/wear.luau` | Dresses a dummy rig with `ApplyTo` and reads `NHWear`. Expected: `PASS varsity-jacket|striped-joggers|hat-top,collar-ruff` |
 
 The tests that clone a module (`talk`, `outfit`, `wear`) require a copy, so they see the installed source, not a cached
@@ -324,12 +354,20 @@ For anyone writing new clique lines. These came out of the review rounds on the 
 ## Not done, and not tested
 
 - **The Map is not ported yet.** It needs Map cliques and the standing service first.
-- **Not tested: mutters from a student with no clique.** Every Combat Test brain student has a clique (the default is
-  "Ordinary"), so the play test cleared one student's clique to check greetings and crowd lines (they fell back to
-  today's pools and Generic as designed). Its mutter never ran, because that student was stuck on a path. Mutter is
-  unchanged by this feature.
-- **A second player.** Two players' memories and one student remarking to two players were not tried (Studio solo).
-- **The real Wardrobe UI.** Looks were applied server-side with `ApplyTo`; the Wardrobe remote shares that code.
+- **Not tested in play** (the Edit-mode tests cover their lines and pools, not the live moment):
+  - **`Transformed`, `Hurt`, `Night` and `FullMoon`** greetings.
+  - **`Race` lines for any race but Human** (the test slot is Human).
+  - **`Flee` and `FightSeen` with the test player as the fighter** they talk about.
+  - **Re-entry at floor level.** After the `hangoutOf` footprint fix, one walk-in line at floor level was seen; the
+    "no second line on a quick re-entry" rule was only proven before the fix, with the player raised into the box.
+  - **A pure `Greet.Hostile` line after the strong-attitude fix.** The Wary cells were seen in the re-test; the Hostile
+    one only in the earlier run.
+  - **A second player.** Two players' memories and one student remarking to two players were not tried (Studio solo).
+  - **Mutters from a student with no clique.** Every Combat Test brain student has a clique (the default is
+    "Ordinary"), so the play test cleared one student's clique to check greetings and crowd lines (they fell back to
+    today's pools and Generic as designed). Its mutter never ran, because that student was stuck on a path. Mutter is
+    unchanged by this feature.
+  - **The real Wardrobe UI.** Looks were applied server-side with `ApplyTo`; the Wardrobe remote shares that code.
 - **Follow-up, out of scope: `Features.Regions.Inside` has the same floating-box blind spot** that the walk-in dress
   code worked around. It checks the same `workspace.Regions` boxes with a 6-stud margin, so a player on the floor is
   never "inside" a hangout box in Combat Test. Fix by moving or resizing the boxes to reach the floor, or by matching by
