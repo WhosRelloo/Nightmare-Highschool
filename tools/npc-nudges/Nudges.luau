@@ -209,8 +209,12 @@ local function shove(S, Rec, Push: Vector3, Carry: number)
 	task.wait(math.max(0, 1.3 / Speed - CARRY_TIME))
 	local R = rootOf(Rec)
 	if R and S.Model then lookAt(S, R.Position + Vector3.new(0, 1.5, 0), 1.4) end
+	if Nudges.OnShove then task.spawn(Nudges.OnShove, S, Rec) end -- (line matrix) the brain's "Shoved" line
 	task.wait(0.45 / Speed)
 end
+
+-- set by the brain (StudentBrain): called once a shoved student has turned to look back, to say their line
+Nudges.OnShove = nil :: ((any, any) -> ())?
 
 -- Brain.OnBump: true when the nudge handled it (the brain skips its step aside)
 function Nudges.Handle(S, Rec, Kind: string): boolean

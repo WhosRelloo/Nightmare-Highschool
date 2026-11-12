@@ -36,7 +36,9 @@ local ServerStorage = game:GetService(`ServerStorage`)
 local Nav = require(ServerScriptService.Services.AI.Nav)
 local Senses = require(ServerScriptService.Services.AI.Senses)
 local Lines = require(script:WaitForChild(`Lines`))
+local Talk = require(script:WaitForChild(`Talk`)) -- (line matrix) clique x attitude x moment
 local CliqueConfig = require(ReplicatedStorage.Config.Cliques)
+local Appearance = require(ReplicatedStorage.UI.Appearance)
 
 local Brain = {}
 local Host = nil
@@ -48,7 +50,8 @@ local React = {}
 -- plays the reaction and moves the student, and return true to skip the default step aside. Kind is "MakeWay"
 -- (someone walking straight at them) or "Space" (someone standing on top of them). Rec is the Senses record of
 -- the player (Rec.Player, Rec.Root, Rec.Pos, Rec.Speed, Rec.Dist).
-Brain.OnBump = require(script:WaitForChild(`Nudges`)).Handle :: ((any, any, string) -> boolean)? -- (1.86.3) the nudges
+local NudgeMod = require(script:WaitForChild(`Nudges`))
+Brain.OnBump = NudgeMod.Handle :: ((any, any, string) -> boolean)? -- (1.86.3) the nudges
 
 ---| helpers |---
 
@@ -87,6 +90,25 @@ local function sayText(S, Text: string)
 	bubble(S, Lines.Fill(Text, ctx()))
 end
 
+-- say a line from the line matrix (StudentBrain.Talk: this student's clique, how they feel about Pl, the moment), or
+-- one from Fallback (today's pool) when the matrix has nothing. Opts: Sub (race / outfit verdict), Attitude, Piece.
+local function sayMatrix(S, Moment: string, Pl: Player?, Opts: { [string]: any }?, Cooldown: number?, Fallback: { string }?): boolean
+	if os.clock() - (S.SaidAt or -1e9) < (Cooldown or 8) or not S.Model then return false end
+	local O = table.clone(Opts or {})
+	O.Ctx = O.Ctx or ctx()
+	local Ok, Text = pcall(Talk.Pick, S, Moment, Pl, O)
+	if Ok and Text then
+		bubble(S, Text)
+		return true
+	end
+	return Fallback ~= nil and say(S, Fallback, Cooldown)
+end
+
+-- a shove (Nudges) gets its own line once the student turns to look at who did it
+NudgeMod.OnShove = function(S, Rec)
+	sayMatrix(S, `Shoved`, Rec and Rec.Player, nil, 0, Lines.MakeWay)
+end
+
 -- what a student remembers about each player: how often they've met, when they last said hi, when they saw them fight
 local function memo(S, Pl: Player?)
 	if not Pl then return {} end
@@ -96,19 +118,9 @@ local function memo(S, Pl: Player?)
 	return M
 end
 
-local function greeting(S, Rec): { string }
-	local C = ctx()
-	local M = memo(S, Rec and Rec.Player)
+-- the time-of-day hello (today's pools), the matrix's fallback
+local function daily(C): { string }
 	local G = Lines.Greet
-	if os.clock() - (M.Fought or -1e9) < 300 then return G.Wary end
-	-- (Combat Test) a clique that respects or hates you says so
-	local Def = S.Clique and CliqueConfig.Defs[S.Clique]
-	local Tier = Def and Rec and Rec.Player and Rec.Player:GetAttribute(`CliqueTier_{S.Clique}`)
-	if Def and Tier and Def.Reactions and Def.Reactions[Tier] and math.random() < 0.6 then return Def.Reactions[Tier] end
-	local Race = Rec and Rec.Player and Rec.Player:GetAttribute(`Race`)
-	if Race and G.Race[Race] and math.random() < 0.3 then return G.Race[Race] end
-	if (M.Met or 0) >= 4 and math.random() < 0.6 then return G.Often end
-	if (M.Met or 0) >= 1 and math.random() < 0.7 then return G.Again end
 	if C.Night then
 		if C.Moon == `Full` and math.random() < 0.6 then return G.FullMoon end
 		if C.Moon == `New` and math.random() < 0.4 then return G.NewMoon end
@@ -118,10 +130,54 @@ local function greeting(S, Rec): { string }
 	return if H < 11 then G.Morning elseif H >= 16.5 then G.Evening else G.Day
 end
 
+-- the right hello for this player, now: a line-matrix moment (nil = today's pool only), its options, and today's pool
+-- as the fallback. Order (the line matrix spec): saw you fight, your outfit, you're hurt, you're transformed, your race,
+-- their clique, met before, night, time of day.
+local function greeting(S, Rec): (string?, { [string]: any }?, { string })
+	local C = ctx()
+	local Pl = Rec and Rec.Player
+	local M = memo(S, Pl)
+	local G = Lines.Greet
+	if os.clock() - (M.Fought or -1e9) < 300 then
+		return `Greet`, { Attitude = if Talk.Attitude(S, Pl) == `Hostile` then `Hostile` else `Wary` }, G.Wary
+	end
+	local Ch = Pl and Pl.Character
+	if Pl and os.clock() - (M.Outfit or -1e9) > 600 then
+		local Ok, Verdict, Piece = pcall(Talk.Outfit, S, Pl)
+		if Ok and Verdict and math.random() < (if S.Clique then 0.35 else 0.15) then
+			M.Outfit = os.clock()
+			return `Outfit`, { Sub = Verdict; Piece = Piece }, daily(C)
+		end
+	end
+	local Hum = Ch and Ch:FindFirstChildWhichIsA(`Humanoid`)
+	if Hum and Hum.MaxHealth > 0 and Hum.Health / Hum.MaxHealth < 0.35 and math.random() < 0.5 then
+		return `Hurt`, nil, daily(C)
+	end
+	if Ch and Appearance.FormOf(Ch) then return `Transformed`, nil, Lines.ByNature(S, Lines.Monster, `Brave`) end
+	local Race = Pl and Pl:GetAttribute(`Race`)
+	if Race and math.random() < 0.3 then return `Race`, { Sub = Race }, G.Race[Race] or daily(C) end
+	local Def = S.Clique and CliqueConfig.Defs[S.Clique]
+	if Def and math.random() < 0.6 then
+		local Tier = Pl and Pl:GetAttribute(`CliqueTier_{S.Clique}`)
+		return `Greet`, nil, (Def.Reactions and Tier and Def.Reactions[Tier]) or daily(C)
+	end
+	if (M.Met or 0) >= 4 and math.random() < 0.6 then return nil, nil, G.Often end
+	if (M.Met or 0) >= 1 and math.random() < 0.7 then return nil, nil, G.Again end
+	if C.Night then
+		if C.Moon == `Full` and math.random() < 0.6 then return `FullMoon`, nil, G.FullMoon end
+		if C.Moon == `New` and math.random() < 0.4 then return nil, nil, G.NewMoon end
+		return `Night`, nil, G.Night
+	end
+	return nil, nil, daily(C)
+end
+
 local function greet(S, Rec): boolean
-	local M = memo(S, Rec and Rec.Player)
+	local Pl = Rec and Rec.Player
+	local M = memo(S, Pl)
 	if os.clock() - (M.Greeted or -1e9) < 60 then return false end
-	if say(S, greeting(S, Rec), 6) then
+	local Moment, Opts, Pool = greeting(S, Rec)
+	local Said = if Moment then sayMatrix(S, Moment, Pl, Opts, 6, Pool) else say(S, Pool, 6)
+	if Said then
 		M.Greeted = os.clock()
 		M.Met = (M.Met or 0) + 1
 		return true
@@ -233,7 +289,9 @@ function React.Danger(S, Snap)
 		elseif T.Kind == `Body` then Lines.Body
 		elseif C.Night and math.random() < 0.35 then Lines.FleeNight
 		else Lines.ByNature(S, Lines.Flee, `Brave`)
-	say(S, Pool, 8)
+	local Who = T.From and T.From.Player
+	local Moment = if T.Kind == `Monster` then `Transformed` elseif T.Kind == `Fight` then `Flee` else nil
+	if not (Moment and Who and sayMatrix(S, Moment, Who, nil, 8, nil)) then say(S, Pool, 8) end
 	S.Shaken = true
 	lookAt(S, T.Pos + Vector3.new(0, 2, 0), 2)
 	local To = awayFrom(S, T.Pos)
@@ -259,9 +317,13 @@ function React.Gawk(S, Snap)
 	lookAt(S, T.Pos + Vector3.new(0, 2, 0), 1.2)
 	if os.clock() > (S.WatchUntil or 0) then -- just started watching
 		if T.From and T.From.Player then memo(S, T.From.Player).Fought = os.clock() end
-		say(S, if T.Heard and math.random() < 0.5 then Lines.Heard.Fight else Lines.ByNature(S, Lines.Gawk, `Brave`), 10)
+		if T.Heard and math.random() < 0.5 then
+			say(S, Lines.Heard.Fight, 10)
+		else
+			sayMatrix(S, `FightSeen`, T.From and T.From.Player, nil, 10, Lines.ByNature(S, Lines.Gawk, `Brave`))
+		end
 	elseif math.random() < 0.08 then
-		say(S, Lines.ByNature(S, Lines.Gawk, `Brave`), 9)
+		sayMatrix(S, `FightSeen`, T.From and T.From.Player, nil, 9, Lines.ByNature(S, Lines.Gawk, `Brave`))
 	end
 	S.WatchUntil = os.clock() + 6
 	S.WatchAt = T.Pos
@@ -274,7 +336,9 @@ function React.MakeWay(S, Snap)
 	if not (Rec and Rec.Pos) then return end
 	mood(S, `Wary`, 3)
 	lookAt(S, headOf(Rec), 1.5)
-	if math.random() < 0.6 then say(S, if (Rec.Speed or 0) > 18 then Lines.Sprint else Lines.MakeWay, 10) end
+	if math.random() < 0.6 then
+		if (Rec.Speed or 0) > 18 then say(S, Lines.Sprint, 10) else sayMatrix(S, `Bump`, Rec.Player, nil, 10, Lines.MakeWay) end
+	end
 	-- the bump hook (nudges): a handler that plays its own reaction and moves the student replaces the step aside
 	if Brain.OnBump then
 		local Ok, Handled = pcall(Brain.OnBump, S, Rec, `MakeWay`)
@@ -295,7 +359,7 @@ function React.Space(S, Snap)
 	if not (Rec and Rec.Pos) then return end
 	mood(S, `Uneasy`, 5)
 	lookAt(S, headOf(Rec), 2.5)
-	say(S, Lines.ByNature(S, Lines.Space, `Social`), 10)
+	sayMatrix(S, `Crowded`, Rec.Player, nil, 10, Lines.ByNature(S, Lines.Space, `Social`))
 	if Brain.OnBump then
 		local Ok, Handled = pcall(Brain.OnBump, S, Rec, `Space`)
 		if Ok and Handled then Rec.Near = 0 return end
