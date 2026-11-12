@@ -30,6 +30,7 @@ local Ok, Err = pcall(function()
 	case("Athletes mock the grimoire", "Athletes", "navy-polo|uniform-trousers|grimoire-chained", "Mocks", "chained grimoire")
 	case("Vigil: nothing to say", "Vigil", "navy-polo|uniform-trousers|", nil, nil)
 	case("Vigil girl's full look", "Vigil", "vigil-vest-f|pleated-tartan-skirt|", "FullLook", nil)
+	case("Athletes girl's full look", "Athletes", "cheer-uniform|cheer-skirt|", "FullLook", nil)
 	case("no NHWear", "Vigil", nil, nil, nil)
 	case("clique-less student, one piece", nil, "navy-polo|uniform-trousers|hat-top", "Likes", "crimson-banded top hat")
 	local W = CC.ParseWear("a|b|x,y")
@@ -44,6 +45,36 @@ local Ok, Err = pcall(function()
 			end
 		end
 	end
+	-- data checks
+	local function fail(Msg) Bad += 1 table.insert(Results, "FAIL " .. Msg) end
+	local Acc = require(RS.Config.Accessories:Clone()).ById -- a clone: the cached module can predate the Kit C batches
+	local App = require(RS.UI.Appearance)
+	local function has(List, Id) for _, E in List do if E.Id == Id then return true end end return false end
+	local Checked = 0
+	for Id, Def in CC.Defs do
+		local Taste = Def.Taste
+		if not Taste then fail(`{Id} has no Taste`) continue end
+		local Liked = {}
+		for _, R in Taste.Likes do
+			if R.Id then Liked[R.Id] = true end
+		end
+		for _, Kind in { "Likes", "Mocks" } do
+			for _, R in Taste[Kind] do
+				Checked += 1
+				if R.Id and not Acc[R.Id] then fail(`{Id} {Kind} unknown accessory {R.Id}`) end
+			end
+		end
+		for _, R in Taste.Mocks do
+			if R.Id and Liked[R.Id] then fail(`{Id} both likes and mocks {R.Id}`) end
+		end
+		for _, T in Def.Look.FemaleTops or {} do
+			if not has(App.Uniforms, T) then fail(`{Id} FemaleTops {T} is not in Appearance.Uniforms`) end
+		end
+		for _, B in Def.Look.FemaleMatchBottoms or {} do
+			if not has(App.BottomsList, B) then fail(`{Id} FemaleMatchBottoms {B} is not in Appearance.BottomsList`) end
+		end
+	end
+	table.insert(Results, `ok   data checks ({Checked} taste rules)`)
 end)
 Tmp:Destroy()
 if not Ok then return "ERROR: " .. tostring(Err) end
