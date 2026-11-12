@@ -53,7 +53,10 @@ for it, res in sorted(by_item.items()):
             elif r is None and hf.get(h) is not None and h in hf:
                 hf[h] = None     # it crossed this hair on some body and no tuck clears it: refused now
                 closed += 1
-            if h in DROP.get(it, ()):   # a tuck the pair check found unsafe with another item: refused
+        # a hair the check found crossing this item, with or without a tuck: refused (a hair the fit passed untucked
+        # has no tuck to drop)
+        for h in DROP.get(it, ()):
+            if h in hf:
                 hf[h] = None
     ok = sum(1 for r in out.values() if r)
     print(f"TUCKMERGE {it:16s} {ok}/{len(out)} hairs cleared ({n} piece fits opened)")

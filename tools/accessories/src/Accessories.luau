@@ -1,6 +1,8 @@
 --[[
 	Config.Accessories: the 3D accessory kits (cosmetic only: no stats, never Race).
 	  Kit A "Player accessories" (28 designs): bought for Yen at the School Store (Accessories tab), worn at a wardrobe.
+	  Kit C "The Night School Wardrobe" (approved 2026-11-11, built in batches): C1 coats and jackets (11; their skirts ride
+	  the legs, Controllers.Character.BodyFollow), C2 masks (8). Sold at the School Store like Kit A.
 	  Kit B "The Headmaster's Circle" (11 designs): Admin = true. Staff only (player attribute NHStaff >= 1, set by
 	  Features.Admin), never sold, checked on the server (UI.Appearance's look check and WearAccessories).
 	Worn: the look field Acc (UI.Appearance), a comma list of item ids, at most one per slot.
@@ -29,7 +31,7 @@ Accessories.SlotNames = {
 	Halo = `Halo`; Familiar = `Familiar`; Trail = `Trail`; Coat = `Coat`; Belt = `Belt`; Watch = `Pocket watch`;
 }
 
-local A, B = `A`, `B`
+local A, B, C = `A`, `B`, `C`
 Accessories.Items = {
 	-- Kit A 1: clique crest pins (one per clique; members only)
 	{ Id = `pin-vigil`; Name = `Vigil Crest Pin`; Slot = `Lapel`; Model = `CliquePins`; Piece = `PinVigil`; Price = 180; Clique = `Vigil`; Kit = A };
@@ -113,6 +115,28 @@ Accessories.Items = {
 	{ Id = `regalia-signet`; Name = `Headmaster's Signet`; Slot = `Ring`; Model = `HeadSignet`; Piece = `HeadSignet`; Admin = true; Tint = `Crimson`; Kit = B };
 	{ Id = `regalia-staff`; Name = `Staff of Office`; Slot = `Hand`; Model = `OfficeStaff`; Piece = `OfficeStaff`; Admin = true; Tint = `Crimson`; Kit = B };
 	{ Id = `regalia-observer-mask`; Name = `Observer Half-Mask`; Slot = `Face`; Model = `ObserverMask`; Piece = `ObserverMask`; Admin = true; Tint = `Crimson`; Kit = B };
+	-- Kit C1: coats and jackets (Coat slot). Skirts ride the legs (Controllers.Character.BodyFollow); the torso and
+	-- arms are covered under each design (shirts, waistcoats, jumpers); the hip corners are their own pieces
+	{ Id = `coat-scholar`; Name = `Scholar's Frock Coat`; Slot = `Coat`; Model = `ScholarCoat`; Pieces = { `ScholarCoatShell`, `ScholarCoatHipsUp`, `ScholarCoatHipsLo`, `ScholarCoatSkirt`, `ScholarCoatSleeveL`, `ScholarCoatSleeveR` }; Price = 1050; Kit = C };
+	{ Id = `coat-inverness`; Name = `Inverness Cape-Coat`; Slot = `Coat`; Model = `InvernessCoat`; Pieces = { `InvernessCoatShell`, `InvernessCoatHipsUp`, `InvernessCoatHipsLo`, `InvernessCoatCape`, `InvernessCoatSkirt`, `InvernessCoatSleeveL`, `InvernessCoatSleeveR` }; Price = 1150; Kit = C };
+	{ Id = `coat-cadet`; Name = `Academy Cadet Coat`; Slot = `Coat`; Model = `CadetCoat`; Pieces = { `CadetCoatShell`, `CadetCoatSkirt`, `CadetCoatSleeveL`, `CadetCoatSleeveR`, `CadetCoatHipsUp`, `CadetCoatHipsLo` }; Price = 1000; Kit = C };
+	{ Id = `jacket-varsity`; Name = `Nightmare Varsity Jacket`; Slot = `Coat`; Model = `VarsityJacket`; Pieces = { `VarsityJacketShell`, `VarsityJacketInner`, `VarsityJacketSideLow`, `VarsityJacketSideMid`, `VarsityJacketSideTop`, `VarsityJacketSleeveL`, `VarsityJacketSleeveR` }; Price = 850; Kit = C };
+	{ Id = `jacket-hunting`; Name = `Waxed Hunting Jacket`; Slot = `Coat`; Model = `HuntingJacket`; Pieces = { `HuntingJacketShell`, `HuntingJacketInner`, `HuntingJacketSideLow`, `HuntingJacketSideMid`, `HuntingJacketSideTop`, `HuntingJacketSkirt`, `HuntingJacketSleeveL`, `HuntingJacketSleeveR` }; Price = 800; Kit = C };
+	{ Id = `cloak-oilskin`; Name = `Oilskin Rain Cloak`; Slot = `Coat`; Model = `RainCloak`; Pieces = { `RainCloakShell`, `RainCloakHipsUp`, `RainCloakHipsLo`, `RainCloakSkirt`, `RainCloakSleeveL`, `RainCloakSleeveR` }; Price = 900; Kit = C };
+	{ Id = `jacket-smoking`; Name = `Velvet Smoking Jacket`; Slot = `Coat`; Model = `SmokingJacket`; Pieces = { `SmokingJacketShell`, `SmokingJacketInner`, `SmokingJacketSideLow`, `SmokingJacketSideMid`, `SmokingJacketSideTop`, `SmokingJacketSkirt`, `SmokingJacketSleeveL`, `SmokingJacketSleeveR` }; Price = 950; Kit = C };
+	{ Id = `coat-lamplighter`; Name = `Lamplighter's Coat`; Slot = `Coat`; Model = `LamplighterCoat`; Pieces = { `LamplighterCoatShell`, `LamplighterCoatHipsUp`, `LamplighterCoatHipsLo`, `LamplighterCoatSkirt`, `LamplighterCoatSleeveL`, `LamplighterCoatSleeveR` }; Price = 950; Kit = C };
+	{ Id = `jacket-spencer`; Name = `Crimson Spencer`; Slot = `Coat`; Model = `CrimsonSpencer`; Pieces = { `CrimsonSpencerShell`, `CrimsonSpencerInner`, `CrimsonSpencerGown`, `CrimsonSpencerSideLow`, `CrimsonSpencerSideMid`, `CrimsonSpencerSideTop`, `CrimsonSpencerSleeveL`, `CrimsonSpencerSleeveR` }; Price = 900; Gender = `Female`; Kit = C };
+	{ Id = `coat-chesterfield`; Name = `Chesterfield Overcoat`; Slot = `Coat`; Model = `ChesterfieldCoat`; Pieces = { `ChesterfieldCoatShell`, `ChesterfieldCoatSkirt`, `ChesterfieldCoatSleeveL`, `ChesterfieldCoatSleeveR`, `ChesterfieldCoatHipsUp`, `ChesterfieldCoatHipsLo` }; Price = 1100; Gender = `Male`; Kit = C };
+	{ Id = `coat-cardigan`; Name = `Cable-Knit Cardigan Coat`; Slot = `Coat`; Model = `CardiganCoat`; Pieces = { `CardiganCoatShell`, `CardiganCoatSkirt`, `CardiganCoatSleeveL`, `CardiganCoatSleeveR`, `CardiganCoatHipsUp`, `CardiganCoatHipsLo` }; Price = 750; Kit = C };
+	-- Kit C2: the masks (Face slot; they sit on the face, no ties round the head)
+	{ Id = `mask-kintsugi`; Name = `Kintsugi Porcelain Mask`; Slot = `Face`; Model = `KintsugiMask`; Price = 700; Kit = C };
+	{ Id = `mask-watch`; Name = `Beaked Night-Watch Mask`; Slot = `Face`; Model = `WatchMask`; Price = 750; Kit = C };
+	{ Id = `mask-fox`; Name = `Fox Half-Mask`; Slot = `Face`; Model = `FoxMask`; Price = 550; Kit = C };
+	{ Id = `mask-wolf`; Name = `Wolf Half-Mask`; Slot = `Face`; Model = `WolfMask`; Price = 550; Kit = C };
+	{ Id = `mask-grille`; Name = `Iron Grille Mask`; Slot = `Face`; Model = `GrilleMask`; Price = 500; Kit = C };
+	{ Id = `mask-wax`; Name = `Wax Saint Mask`; Slot = `Face`; Model = `WaxMask`; Price = 600; Kit = C };
+	{ Id = `mask-moth`; Name = `Moth Mask`; Slot = `Face`; Model = `MothMask`; Price = 600; Kit = C };
+	{ Id = `mask-domino`; Name = `Black Silk Domino`; Slot = `Face`; Model = `DominoMask`; Price = 300; Kit = C };
 }
 
 -- Pairs that can't be worn together because they'd pass through each other (measured by
@@ -247,6 +271,55 @@ Accessories.Conflicts = {
 	{ `regalia-chained-ledger`, `Coat` };   -- the right sleeve covers the wrist under the cuff
 	{ `regalia-raven-pauldron`, `Coat` };   -- the left sleeve's shoulder lies under the pauldron's lames
 	{ `regalia-staff`, `Coat` };            -- the right sleeve and the coat's right tail meet the staff in front of the arm
+	-- Kit C (art/characters/accessories acc_check, 2026-11-12)
+	{ `coat-scholar`, `Neck` };    -- Kit C coats bring their own shirt and neckwear (a cravat, a tie, a jumper's neck)
+	{ `coat-scholar`, `Collar` };
+	{ `coat-inverness`, `Neck` };
+	{ `coat-inverness`, `Collar` };
+	{ `coat-cadet`, `Neck` };
+	{ `coat-cadet`, `Collar` };
+	{ `jacket-varsity`, `Neck` };
+	{ `jacket-varsity`, `Collar` };
+	{ `jacket-hunting`, `Neck` };
+	{ `jacket-hunting`, `Collar` };
+	{ `cloak-oilskin`, `Neck` };
+	{ `cloak-oilskin`, `Collar` };
+	{ `jacket-smoking`, `Neck` };
+	{ `jacket-smoking`, `Collar` };
+	{ `coat-lamplighter`, `Neck` };
+	{ `coat-lamplighter`, `Collar` };
+	{ `jacket-spencer`, `Neck` };
+	{ `jacket-spencer`, `Collar` };
+	{ `coat-chesterfield`, `Neck` };
+	{ `coat-chesterfield`, `Collar` };
+	{ `coat-cardigan`, `Neck` };
+	{ `coat-cardigan`, `Collar` };
+	{ `mask-grille`, `cape:CapeDuelist` };    -- the grille's lower edge meets the high collars
+	{ `mask-grille`, `cape:CapeWardenMantle` };
+	{ `mask-fox`, `cape:CapeWardenMantle` };
+	{ `mask-kintsugi`, `cape:CapeWardenMantle` };
+	{ `mask-wax`, `cape:CapeWardenMantle` };
+	{ `mask-fox`, `hat-mourning` };    -- the veil falls over the face
+	{ `mask-grille`, `hat-mourning` };
+	{ `mask-moth`, `hat-mourning` };
+	{ `mask-watch`, `hat-mourning` };
+	{ `mask-wolf`, `hat-mourning` };
+	{ `mask-grille`, `hat-fascinator` };    -- the fascinator's veil too (measured)
+	{ `mask-watch`, `hat-fascinator` };
+	{ `mask-wolf`, `hat-fascinator` };
+	{ `mask-domino`, `regalia-thorn-crown` };    -- the crown sits low on the brow at its hair fits
+	{ `mask-fox`, `regalia-thorn-crown` };
+	{ `mask-kintsugi`, `regalia-thorn-crown` };
+	{ `mask-wolf`, `regalia-thorn-crown` };
+	{ `mask-grille`, `Neck` };    -- the scarves, the pendants and the torc at the chin
+	{ `mask-kintsugi`, `scarf-knit-crimson` };
+	{ `mask-kintsugi`, `scarf-knit-violet` };
+	{ `mask-wax`, `scarf-knit-crimson` };
+	{ `mask-wax`, `scarf-knit-violet` };
+	{ `mask-grille`, `torc-moonstone` };
+	{ `mask-wax`, `torc-moonstone` };
+	{ `mask-grille`, `hood-tattered` };
+	{ `mask-wax`, `collar-choir` };
 }
 
 Accessories.ById = {}

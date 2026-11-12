@@ -2,6 +2,36 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.87.0] - 2026-11-12: Kit C coats and masks built (waiting for the import)
+
+Kit C, "The Night School Wardrobe" (`docs/Accessories.md`), C1 and C2. Owner: "Approve, start C1+C2", then "Make the
+jackets cover the torso (In their respective designs)" and "Same with the arms". 19 items, all 2048 PBR bakes, checked
+with every Kit A and B piece, the katana, the five admin capes and every rigged hair.
+
+### Added
+- **C1, 11 coats and jackets** (Slot `Coat`): the Scholar's frock coat, Inverness cape-coat, Chesterfield overcoat
+  (male), academy cadet coat, lamplighter's coat, velvet smoking jacket, oilskin rain cloak, Crimson Spencer (female),
+  Nightmare varsity jacket, waxed hunting jacket and cable-knit cardigan coat, 750-1150 Yen.
+  - Each brings its own shirt, waistcoat or jumper and neckwear, so they can't be worn with the Neck and Collar slots.
+  - Sleeves to the mid forearm (the katana leaves no room lower), hip corners as their own per-body pieces, and
+    skirts that ride the legs (`Controllers.Character.BodyFollow`).
+  - They fit 6-9 of the 35 hairs each.
+- **C2, 8 masks** (Slot `Face`): kintsugi porcelain, beaked night-watch, fox, wolf, iron grille, wax saint, moth and
+  black silk domino, 300-750 Yen. Drawn inside the brow line for hair: 8-12 of 35 hairs each.
+- `Config.Accessories` now holds 86 items and 168 exclusive pairs (Kit C's items stay hidden until their templates are
+  imported). Installed in NH Combat Test.
+
+### Fixed
+- `acc_tuckmerge.py` skipped a tuck check's drop when the item had never needed a tuck for that hair. Five long or
+  thick hairs crossed the coat shells on some body and would have been allowed. The fix also refuses 9 Kit A hair x
+  item pairs the game still allows (ruff, choir collar, pendants, torc, scarves; listed in the doc). Those reach the
+  game at the next assembly.
+
+### Not done
+- The owner's import of `art/group-upload-accessories/kitc/` (19 FBX, 70 maps), then assembly and a slot 4 play test
+  (BodyFollow and the skirts have not been seen in Play).
+- C3-C9 (next: C8 bags, C9 extras, C5 hands and feet).
+
 ## [1.86.7] - 2026-11-11: Nudges: the Map play-test, and posts and railings
 
 Owner: "Yes, test the Map". This plays the 1.86.6 nudges on the Map (`MapStudents.Nudges`), with the clock forced to

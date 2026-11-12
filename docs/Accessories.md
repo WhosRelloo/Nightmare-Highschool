@@ -13,7 +13,8 @@ R6 has no layered clothing, so every piece is a MeshPart riding one R6 part: eit
 Status: **Kits A and B are in the game** (NH Combat Test, 1.86.0): every batch imported, assembled in one pass and
 play-tested together on slot 4, the rebuilt satchel and Head Student's sash included. The owner pre-approved every later batch "as long as they follow the standards" (2026-11-11). **All of both kits is
 built** (batches 2-8: 49 more items, 2026-11-11), checked together with 0 fails, merged into `Config.Accessories`,
-and in the game since 1.86.0. Kit C is in progress (below).
+and in the game since 1.86.0. Kit C is in progress (below): C1 coats and C2 masks are built, baked and staged for
+the owner's import (1.87.0).
 
 ## Batches
 
@@ -27,6 +28,7 @@ and in the game since 1.86.0. Kit C is in progress (below).
 | 6 | A 25-28 | civilian: pocket watch, lace parasol, crook umbrella, candle lantern, knitted scarves (two colours) | **in the game (1.86.0)**; staged in (`batch6/`) |
 | 7 | A 7 + B 2 | the Delinquents' long coat and the Headmaster's greatcoat (torso shell, sleeves on the arms, rigged split coattails) | **in the game (1.86.0)**; staged in (`batch7/`); hairs: see below |
 | 8 (Kit B) | B 1, 3-11 | the Headmaster's Circle: crow mantle, thorned crown, raven-skull pauldron, iron keys, shadow trail, chained ledger, sigil halo, seal of office, signet, staff, observer mask | **in the game (1.86.0)**; staged in (`kitb/`) |
+| C1-C2 (Kit C) | C 1-19 | 11 coats and jackets (skirts ride the legs: BodyFollow), 8 masks | built, baked, checked; staged in (`kitc/`), waiting for the import (1.87.0) |
 
 ### Batches 2 to 8 (built 2026-11-11, in the game since 1.86.0)
 
@@ -199,6 +201,66 @@ of the collar. Kit C's shell (`build_shell_k`) opens the neckline wider at the s
 the back neckline to z 0.78 at the centre, with a low collar that follows it down and lies flat on the back: the frock
 coat's shell went from **4 to 15 of 35 hairs** before any hair tuck. The collar's fall stops at x 0.962: with the
 wide neckline it reached the shoulder's edge, where the swung arm's top rises.
+
+### C1 and C2: built, baked, staged (1.87.0)
+
+| Id | Item | Price | Hairs (of 35) |
+|---|---|---|---|
+| `coat-scholar` | Scholar's Frock Coat | 1050 | 6 |
+| `coat-inverness` | Inverness Cape-Coat | 1150 | 6 |
+| `coat-chesterfield` | Chesterfield Overcoat (male) | 1100 | 9 |
+| `coat-cadet` | Academy Cadet Coat | 1000 | 7 |
+| `coat-lamplighter` | Lamplighter's Coat | 950 | 6 |
+| `jacket-smoking` | Velvet Smoking Jacket | 950 | 7 |
+| `cloak-oilskin` | Oilskin Rain Cloak | 900 | 7 |
+| `jacket-spencer` | Crimson Spencer (female) | 900 | 9 |
+| `jacket-varsity` | Nightmare Varsity Jacket | 850 | 8 |
+| `jacket-hunting` | Waxed Hunting Jacket | 800 | 7 |
+| `coat-cardigan` | Cable-Knit Cardigan Coat | 750 | 8 |
+| `mask-watch` | Beaked Night-Watch Mask | 750 | 9 |
+| `mask-kintsugi` | Kintsugi Porcelain Mask | 700 | 10 |
+| `mask-wax` | Wax Saint Mask | 600 | 12 |
+| `mask-moth` | Moth Mask | 600 | 12 |
+| `mask-fox` | Fox Half-Mask | 550 | 11 |
+| `mask-wolf` | Wolf Half-Mask | 550 | 9 |
+| `mask-grille` | Iron Grille Mask | 500 | 10 |
+| `mask-domino` | Black Silk Domino | 300 | 8 |
+
+Contact sheets: `docs/img/accessories/kitc1_sheet_a.jpg`, `kitc1_sheet_b.jpg`, `kitc2_sheet.jpg`. Staged in
+`art/group-upload-accessories/kitc/` (19 FBX, 70 maps).
+
+**Covering the torso and arms** (owner: "Make the jackets cover the torso (In their respective designs)", then "Same
+with the arms"). Each coat brings what's under it in its own design: a draped shirt with a cravat or tie, a waistcoat
+clipped under the shell's opening, a jumper's neck. So the coats can't be worn with the Neck and Collar slots
+(`Config.Accessories.Conflicts`). Sleeves run to the mid forearm (cuff at z -0.56, the inner edge stepping in below
+the elbow): lower than that, the drawn katana's grip and the sheathed guard leave no room on the deep bodies. The hip
+corners under the arms are their own pieces (`<Coat>HipsUp`, `<Coat>HipsLo`), each fitted per body from the cut edge,
+because one fit for the whole corner hit the guard on the heavy and curvy bodies or hovered on the lean one. The short
+jackets (varsity, hunting, smoking, spencer) use side panels in three bands instead.
+
+**Hairs.** The hair tuck clears 3-6 more hairs per coat, but the tuck check (every body fit) found five long or
+thick hairs crossing the shells that the hair fit had passed untucked (Males_TP_Locks, Males_Super_Messy_Long_Hair,
+Males_Anime_Hero_Hair, Males_Black_Zoldyck_Hair, Females_Gojo_PonyV2), so those are refused: each coat fits **6-9 of
+35** (Kit A's coats fit 4). `acc_tuckmerge.py` now applies a drop to a hair the item never needed a tuck for; before,
+such drops were silently skipped. The masks were redesigned inside the brow line (x within 0.45, under z 1.78),
+which lets 10-17 hairs through; the measured overrides for hairs that cross at the game's own hair scaling take each to
+8-12. Masks can't be worn with the high-collared capes, the mourning toque's and the fascinator's veils, the thorned
+crown (at its low hair fits) or the pieces at the chin (scarves, torc, hood, choir collar, the grille with every Neck
+piece): 26 pairs.
+
+**Kit A hairs the game still allows.** The merge fix also refuses 9 hair x item pairs in Kit A's layouts that an
+earlier tuck check had dropped but the game's templates still allow: the ruff with the straight and wavy bobs, the
+choir collar and the crystal pendant with Females_Natural_Trim_Pony, the moonstone torc with
+Females_Long_Sweetheart_Pigtails, and the fang necklace, scythe pendant and both scarves with Females_Low_Ponytail.
+They reach the game at the next assembly (with Kit C's).
+
+**Checked:** `acc_check.py --capes --hair`, every Kit A, B and C piece together: 6 fails, all the fascinator's veil
+over the grille, night-watch and wolf masks. Those became conflict pairs, and the masks and mourning hats re-checked
+with 0 fails. `acc_tuckcheck.py` (every item alone and every
+pair, three body fits): 0 fails.
+
+**Next:** the owner's import, then assembly (`acc_assemble.py`, bones checked) and a slot 4 play test of BodyFollow and
+the skirts in Play. Then C8 bags, C9 extras, C5 hands and feet, C3, C4, C6, C7.
 
 ## The no-clipping rules (how "nothing clips, overlaps or hovers" is checked)
 
