@@ -2,6 +2,35 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.86.7] - 2026-11-11: Nudges: the Map play-test, and posts and railings
+
+Owner: "Yes, test the Map". This plays the 1.86.6 nudges on the Map (`MapStudents.Nudges`), with the clock forced to
+Break through the existing test switch `workspace.NHStudentsPlan`.
+
+### Fixed (both places, the same file)
+- **The shove's room check missed posts.** A sprint into a student 2.5 studs from the entrance stairs' newels
+  (`Entrances.Bowed.EntranceFlightBowed_Newels`, one mesh of separate posts) found room 7.0 and folded the head into
+  a post. The centre rays had passed between the posts.
+  - The room check now also sweeps a 4 × 3.5 stud box along the push (`workspace:Blockcast`). That is the body's
+    width with the arms out front.
+  - At the same spot it now finds room 2.2 and twists, with no overlap at any point.
+
+### Tested (Map, Studio play)
+- **Brushes:** four walk-pasts, two on each shoulder. Each picked the touched side (`Nudge_Right` / `Nudge_Left`)
+  and slid 0.35–0.45 studs away from the passer.
+- **Crowding:** `Nudge_Left`, then "I'll just... move." and the student went to another spot (the Map's restless
+  behaviour).
+- **Open-ground sprint from behind:** three shoves out of three (speed 26), carried 2.7–3.0 studs.
+- **Near walls:**
+  - A solid wall 6 studs ahead: a shove carried 2.75 studs, no overlap.
+  - The newels 2.5 ahead: the twist, no overlap.
+  - Two runs where the moved student turned to face the runner gave the twist (head-on, correctly).
+- No errors from MapStudents or Nudges.
+- **Not re-run in NH Combat Test** after the box sweep. The file is byte-identical, and the sweep can only find less
+  room, never more.
+- **The Map play-test** loaded the Map's own slot 1 (no slot menu). Studio can't use the Map's DataStores, so
+  nothing was saved.
+
 ## [1.86.6] - 2026-11-11: Nudges: walls, rams and the open checks
 
 Owner: "Continue nudges". This works through the checks still open from 1.86.3 to 1.86.5. `Nudges` is the same file

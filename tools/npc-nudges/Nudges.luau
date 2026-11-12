@@ -148,6 +148,11 @@ local function room(S, Dir: Vector3, Max: number): number
 		local Hit = workspace:Raycast(From, Dir * Max, Params)
 		if Hit then Free = math.min(Free, flat(Hit.Position - From).Magnitude) end
 	end
+	-- with the arms out front the body is about 4 studs wide: sweep a box that size too (posts and railings slip
+	-- between single rays)
+	local At = S.Root.Position + Vector3.new(0, 0.75, 0)
+	local Hit = workspace:Blockcast(CFrame.lookAt(At, At + Dir), Vector3.new(4, 3.5, 0.5), Dir * Max, Params)
+	if Hit then Free = math.min(Free, Hit.Distance) end
 	return Free
 end
 
