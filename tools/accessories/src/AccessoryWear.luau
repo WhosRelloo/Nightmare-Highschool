@@ -16,7 +16,8 @@
 	  NHHairFit   "<RigSource>=k,dz;...;*=k,dz" per rigged hair (ReplicatedStorage.NHHairCatalog's RigSource),
 	              measured by art/characters/accessories/acc_hairfit.py so no strand passes through it. Head pieces:
 	              k = uniform scale about the headband centre (NHSeat, studs above the head centre on the nominal
-	              head), dz = lift; other pieces are 1,0 or x. "x" = that hair can't wear it. "*" = any other hair.
+	              head), dz = lift; other pieces are 1,0 or x. "x" = no measured fit for that hair: the piece is
+	              still worn, at the "*" fit, and the hair isn't tucked round it (it may pass through). "*" = any other hair.
 	Worn as Model "NHAcc_<Slot>" (attribute NHAcc = item id) under the character. Admin items are skipped on a player
 	who isn't staff (previews and dummies with no player still show them).
 	Hair tuck: an item's pieces may carry NHHairTuck, "<RigSource>=Bone:x,y,z|Bone:x,y,z;...": for each rigged hair
@@ -26,7 +27,7 @@
 	larger turn) into the character's NHHairTuck ("Bone:x,y,z|..."), poses the hair's bones with it (previews), and
 	Controllers.Character.HairSway eases it in under the hair's sway. The turns were solved for the v2 hair rigs (the locks
 	carry their strands; tools/hair-rig/nh_hair_autorig.py), marked NHHairRig = 2 on the hair's Handle: on an older rig
-	nothing is turned, and a piece that needs a turn for that hair isn't worn (as if the hair passed through it).
+	nothing is turned, and a piece that needs a turn for that hair is still worn, untucked (1.88).
 	Regalia colour (Kit B): while the character wears any Admin item, it carries NHRegaliaTint (Color3) and NHRegalia
 	(the item id that decided it): the tint of the most visible regalia worn (REGALIA_ORDER), so the staff teleport's
 	flock (Controllers.World.TpFlock) can take the same ember or crimson. Cleared when no regalia is worn.
@@ -52,7 +53,7 @@ function Wear.HairKey(HairId: number?): string
 	return if typeof(R) == `string` then R else `*`
 end
 
--- a head piece's fit for a hair: k, dz (nil = this hair can't wear it)
+-- a head piece's fit for a hair: k, dz (nil = no measured fit for it: Wear.DefaultFit)
 function Wear.HairFit(P: Instance, Key: string): (number?, number?)
 	local S = P:GetAttribute(`NHHairFit`)
 	if typeof(S) ~= `string` then return 1, 0 end
@@ -72,7 +73,14 @@ function Wear.HairFit(P: Instance, Key: string): (number?, number?)
 	return 1, 0
 end
 
--- can this hair wear the item (every head piece has a fit for it)?
+-- a head piece's fit for a hair it has no fit for: the "*" fit (1, 0 without one)
+function Wear.DefaultFit(P: Instance): (number, number)
+	local K, Z = Wear.HairFit(P, `*`)
+	return K or 1, Z or 0
+end
+
+-- does this hair get the item's full look (every piece has a measured fit for it, and any tuck it needs can be
+-- taken)? A hair that doesn't still wears it, untucked (1.88)
 function Wear.FitsHair(It, HairId: number?): boolean
 	local Key = Wear.HairKey(HairId)
 	local V2 = nil -- is the catalog hair a v2 rig (only looked up when a piece needs a tuck for it)?
@@ -242,10 +250,10 @@ local function wearPiece(Character: Model, Holder: Model, Tpl: BasePart, BodyId:
 	local D = if MountKey == `Head` then 1 else depthFor(Tpl, BodyId)
 	local Fit = Tpl:GetAttribute(`NHFit`)
 	if typeof(Fit) ~= `CFrame` then Fit = CFrame.new() end
-	local HK, HZ = Wear.HairFit(Tpl, HairKey) -- every piece: nil = this hair passes through it (not worn)
-	if not HK then return end
-	-- the fit may rely on a hair tuck, which only a v2 rig can take
-	if not TuckOK and Wear.ParseTuck(Tpl:GetAttribute(`NHHairTuck`), HairKey) then return end
+	local HK, HZ = Wear.HairFit(Tpl, HairKey)
+	-- no measured fit for this hair: worn anyway at the default fit, the hair untucked (owner, 1.88: "It just wont
+	-- have the new look for it"). A tuck an older rig can't take is left off the same way (applyTuck)
+	if not HK then HK, HZ = Wear.DefaultFit(Tpl) end
 	if MountKey ~= `Head` then HK, HZ = 1, 0 end
 	local Seat = tonumber(Tpl:GetAttribute(`NHSeat`)) or 0.43
 	local Pos = Vector3.new(Fit.X, Fit.Y, Fit.Z)
@@ -308,7 +316,7 @@ function Wear.Wear(Character: Model, Acc: string?, BodyId: string?, HairId: numb
 			local ok, err = pcall(wearPiece, Character, Holder, Tpl, BodyId, HairKey, TuckOK)
 			if not ok then warn(`[AccessoryWear] {Id}: {err}`) end
 		end
-		if #Holder:GetChildren() == 0 then -- nothing fitted (this hair passes through it): wear nothing for the slot
+		if #Holder:GetChildren() == 0 then -- no piece could be placed (no mount part): wear nothing for the slot
 			Holder:Destroy()
 			continue
 		end
@@ -326,3 +334,4 @@ function Wear.Wear(Character: Model, Acc: string?, BodyId: string?, HairId: numb
 end
 
 return Wear
+

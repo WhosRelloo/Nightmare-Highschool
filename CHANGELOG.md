@@ -2,6 +2,32 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.88.0] - 2026-11-12: Any hair can wear any accessory
+
+Owner: "Let players wear clothing their hair doesnt tuck, etc. for. It just wont have the new look for it."
+
+### Changed
+- **Hair no longer rules a piece out.** A hair that a piece has no measured fit for, or whose tuck the hair's rig can't
+  take, still wears it (`UI.AccessoryWear`):
+  - head pieces sit at their default fit;
+  - the hair isn't tucked round the piece, so they may overlap.
+- **The server** (`UI.Appearance`) no longer refuses such a piece, and a hair change at the barber or in the creator
+  takes nothing off.
+- **The Wardrobe** lists such pieces as "(hair won't tuck)" instead of "(not with this hair)". Picking one wears it and
+  says "this hair won't tuck round it, so they may overlap".
+- Conflict pairs (pieces that pass through each other) are unchanged.
+- Patch: `tools/accessories/install/patch_hair_open.luau`; backups in `NH_Backup.HairOpen_pre`.
+
+### Tested (NH Combat Test, slot 4 Testy, whose long hair has no fit for most pieces)
+- **Worn through `ApplyTo`:** the frock coat (6 pieces), the domino and the Prefect sash. The domino sat at its default
+  fit (scale 1.06) and no tuck was set.
+- **Server save:** a look sent at the wardrobe station with the coat and the domino was saved with both. Before this
+  change, the server would have refused both.
+- **Wardrobe by real clicks:** the Accessories tab listed 40 pieces "(hair won't tuck)". A click wore one (the Choir
+  Collar) with the note, and the server saved it.
+- Testy's saved look was restored exactly afterwards. No errors from the Wardrobe, `Appearance` or `AccessoryWear`.
+- **Not tested:** a hair change at the barber, a second player, the Map place.
+
 ## [1.87.1] - 2026-11-12: Kit C coats and masks in the game
 
 Owner: "Imported, go on". The 19 Kit C templates are in `ReplicatedStorage.NHAccessories` (71 templates in all) and

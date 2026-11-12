@@ -97,6 +97,25 @@ Final check over every built item (90 pieces, the katana and the five capes incl
   the Midnight collar); the ledger (arms, four capes); the staff (the blackened pauldrons, the Warden's mantle);
   the raven pauldron (the veiled toque).
 
+## Any hair can wear any piece (1.88)
+
+Owner: "Let players wear clothing their hair doesnt tuck, etc. for. It just wont have the new look for it." The hair no
+longer rules a piece out. A hair a piece has no measured fit for (`NHHairFit` "x"), or whose tuck the hair's rig can't
+take, still wears it:
+
+- **Head pieces** sit at their default fit (the `*` entry: the generous end of the measured fits).
+- **The hair isn't tucked** round that piece, so the two may overlap. That is the owner's call for this case only. The
+  checks still measure every hair, and "fits" in the tables below means "gets the full look": a hair that fits gets the
+  piece at its own measured size and its tuck.
+- **The Wardrobe** lists such a piece as "(hair won't tuck)". Picking it wears it and says "this hair won't tuck round
+  it, so they may overlap".
+- **The server** no longer refuses the piece or takes it off on a hair change (`UI.Appearance`). The barber and the
+  creator take nothing off.
+- Conflict pairs (two pieces that pass through each other) are unchanged: still exclusive.
+
+Changed in `UI.AccessoryWear` (`Wear.DefaultFit`; `FitsHair` now means "the full look"), `UI.Appearance` and
+`Gui.Wardrobe` (`tools/accessories/install/patch_hair_open.luau`, backups in `NH_Backup.HairOpen_pre`).
+
 ## Hair tuck (hair that goes over, under or round a piece)
 
 Owner: "For the coats and any other accessories, position the hair so that it wraps around them or under them, etc. so
@@ -210,7 +229,7 @@ wide neckline it reached the shoulder's edge, where the swung arm's top rises.
 
 ### C1 and C2: built, baked, staged (1.87.0)
 
-| Id | Item | Price | Hairs (of 35) |
+| Id | Item | Price | Hairs with the full look (of 35) |
 |---|---|---|---|
 | `coat-scholar` | Scholar's Frock Coat | 1050 | 6 |
 | `coat-inverness` | Inverness Cape-Coat | 1150 | 6 |
@@ -328,10 +347,12 @@ What R6 forces, and how the kits deal with it:
   is per body, so `acc_check.py --fixlayers` raises an outer piece on a body only as far as needed to clear the inner
   pieces it crosses there (measured), and writes that back to the layout.
 - **Every piece against every hair:** pieces that can't move (torso, limbs) are either clear of a hairstyle or not; a
-  hairstyle that passes through a piece can't be worn with it (`NHHairFit` "x"), the same rule as hats.
+  hairstyle that passes through a piece gets no fit for it (`NHHairFit` "x"), the same rule as hats. Since 1.88 it can
+  still wear it, untucked (above).
 - **Hats over hair:** a hat can't fit 35 hairstyles at one size. Each head piece carries a fit per rigged hair
   (`NHHairFit`: a uniform scale about the headband and a lift), the smallest one with no strand through it. A hair
-  that would need more than the limit can't wear that piece: the Wardrobe says so and the server refuses it.
+  that would need more than the limit gets no fit. Before 1.88 it couldn't wear the piece; now it wears it at the
+  default fit.
 
 ### What can't be worn together (`Config.Accessories.Conflicts`)
 
@@ -352,7 +373,7 @@ The Vamp, Rogue and Fur capes only exist in Studio; they follow the every-cape r
 
 ### Hair compatibility (batch 1, the 35 rigged hairs, at rest)
 
-| Piece | Hairs it can be worn with |
+| Piece | Hairs with the full look (any hair can wear it since 1.88) |
 |---|---|
 | School tie, book strap, grimoire | 35 |
 | Clique pins | 34 |
@@ -363,8 +384,8 @@ The Vamp, Rogue and Fur capes only exist in Studio; they follow the every-cape r
 | Satchel (on the right since 1.79) | 20 |
 | Prefect sash / Head Student sash | 17 / 17 |
 
-A hair change (barber, creator) takes off any piece the new hair passes through and says so; the server does the same,
-whatever the client sends.
+Until 1.88 a hair change (barber, creator) took off any piece the new hair passed through. Now nothing comes off: the
+piece stays, untucked.
 
 What still stops the sashes and straps is very long hair hanging down the front of the chest, which any diagonal strap
 crosses. Hair sway (HairSway bends strands as you move) isn't part of the check; only hair at rest is.
