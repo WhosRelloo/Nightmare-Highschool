@@ -39,6 +39,7 @@ local Lines = require(script:WaitForChild(`Lines`))
 local Talk = require(script:WaitForChild(`Talk`)) -- (line matrix) clique x attitude x moment
 local CliqueConfig = require(ReplicatedStorage.Config.Cliques)
 local Appearance = require(ReplicatedStorage.UI.Appearance)
+local Cliques = require(ServerScriptService.Services.Social.Cliques) -- (line matrix) the dress code, Cliques.Dressed
 
 local Brain = {}
 local Host = nil
@@ -800,12 +801,64 @@ function Brain.Detach(S)
 	S.Agent, S.Senses = nil, nil
 end
 
+---| dress codes (line matrix) |---
+
+-- walk into a clique's hangout out of its colours and the nearest of its students (30 studs) says so: once a visit,
+-- at most every 120 s for each player
+local Visits = {} :: { [Player]: { In: string?, Told: number } }
+
+local function hangoutOf(Root: BasePart): string?
+	local Folder = workspace:FindFirstChild(`Regions`)
+	if not Folder then return nil end
+	for Id, Def in CliqueConfig.Defs do
+		local Box = Def.Hangout and Folder:FindFirstChild(Def.Hangout)
+		if Box and Box:IsA(`BasePart`) then
+			local L = Box.CFrame:PointToObjectSpace(Root.Position)
+			local H = Box.Size / 2 + Vector3.new(0, 6, 0)
+			if math.abs(L.X) <= H.X and math.abs(L.Y) <= H.Y and math.abs(L.Z) <= H.Z then return Id end
+		end
+	end
+	return nil
+end
+
+local function dressWatch()
+	while true do
+		task.wait(1)
+		for _, P in Players:GetPlayers() do
+			local Root = P.Character and P.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?
+			local V = Visits[P] or { Told = -1e9 }
+			Visits[P] = V
+			local Id = Root and hangoutOf(Root)
+			if Id == V.In then continue end
+			V.In = Id
+			if not (Id and Root) or os.clock() - V.Told < 120 then continue end
+			local Ok, Dressed = pcall(Cliques.Dressed, P, Id)
+			if not Ok or Dressed then continue end
+			local Best, BestD = nil, 30
+			for _, S in (Host and Host.Students and Host.Students()) or {} do
+				if S.Clique == Id and S.Root and S.Model and not S.Reacting then
+					local D = (S.Root.Position - Root.Position).Magnitude
+					if D < BestD then Best, BestD = S, D end
+				end
+			end
+			if Best and sayMatrix(Best, `DressCode`, P, nil, 0, nil) then
+				V.Told = os.clock()
+				lookAt(Best, Root.Position + Vector3.new(0, 1.5, 0), 2)
+			end
+		end
+		for P in Visits do
+			if not P.Parent then Visits[P] = nil end
+		end
+	end
+end
+
 function Brain.Init(H)
 	Host = H
 	if Started then return end
 	Started = true
 	Nav.Init()
 	Senses.Init()
+	task.spawn(dressWatch) -- (line matrix) hangout dress codes
 end
 
 return Brain

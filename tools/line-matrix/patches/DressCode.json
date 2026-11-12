@@ -1,0 +1,58 @@
+[
+  {
+    "file_path": "game.ServerScriptService.Services.Social.Cliques",
+    "old_string": "function Shared.Tier(Value: number): string\n\treturn Config.Tier(Value)\nend\n",
+    "new_string": "function Shared.Tier(Value: number): string\n\treturn Config.Tier(Value)\nend\n\n-- (line matrix) the dress code: a clique deals with you in person if you wear one of its tops, you're Friendly or\n-- better with it, or you're a member. Dares by phone and members' jobs never ask.\nfunction Shared.Dressed(P: Player, Id: string): boolean\n\tif not Config.Defs[Id] then return true end\n\tlocal C = Shared.Get(P)\n\tlocal Tier = C and Config.Tier(C[Id] or 0)\n\tif Tier == `Friendly` or Tier == `Respected` then return true end\n\tlocal M = svc(`Social.CliqueMembership`)\n\tif M and M.IsMember and M.IsMember(P, Id) then return true end\n\tlocal W = P.Character and Config.ParseWear(P.Character:GetAttribute(`NHWear`))\n\treturn W ~= nil and Config.WearsTop(Id, W.Top)\nend\n"
+  },
+  {
+    "file_path": "game.ServerScriptService.Services.Quests.Quests",
+    "old_string": "\t\tif Req.Clique then\n\t\t\tlocal Ok, C = pcall(function() return Cliques().Get(Player) end)\n\t\t\tif not (Ok and C) or (C[Req.Clique.Id] or 0) < (Req.Clique.Min or 0) then return false, `Locked` end\n\t\tend\n\tend\n",
+    "new_string": "\t\tif Req.Clique then\n\t\t\tlocal Ok, C = pcall(function() return Cliques().Get(Player) end)\n\t\t\tif not (Ok and C) or (C[Req.Clique.Id] or 0) < (Req.Clique.Min or 0) then return false, `Locked` end\n\t\tend\n\tend\n\t-- (line matrix) a clique's in-person quests wait until you're dressed the part, liked, or a member\n\tlocal DressFor = Def.Clique or (Req and Req.Clique and Req.Clique.Id)\n\tif DressFor and not (Def.Dare or Def.Job or Def.Showdown) then\n\t\tlocal Ok, Dressed = pcall(function() return Cliques().Dressed(Player, DressFor) end)\n\t\tif Ok and Dressed == false then return false, `DressCode` end\n\tend\n"
+  },
+  {
+    "file_path": "game.ServerScriptService.Services.Quests.Quests",
+    "old_string": "function Shared.Offers(Player: Player, NpcId: string): { { Id: string, Kind: string } }",
+    "new_string": "function Shared.Offers(Player: Player, NpcId: string, WithDressCode: boolean?): { { Id: string, Kind: string } }"
+  },
+  {
+    "file_path": "game.ServerScriptService.Services.Quests.Quests",
+    "old_string": "\t\t\tlocal Ok = Shared.CanStart(Player, Id)\n\t\t\tif Ok then table.insert(List, { Id = Id; Kind = if Q.Failed[Id] then `Retry` else `Offer` }) end\n",
+    "new_string": "\t\t\tlocal Ok, Why = Shared.CanStart(Player, Id)\n\t\t\tif Ok then\n\t\t\t\ttable.insert(List, { Id = Id; Kind = if Q.Failed[Id] then `Retry` else `Offer` })\n\t\t\telseif WithDressCode and Why == `DressCode` then -- (line matrix) the dialogue turns you away with a line\n\t\t\t\ttable.insert(List, { Id = Id; Kind = `DressCode` })\n\t\t\tend\n"
+  },
+  {
+    "file_path": "game.ServerScriptService.Services.Social.Dialogue",
+    "old_string": "\tfunction ctx.Offers() return Quests.Offers(Player, NpcId) end\n",
+    "new_string": "\tfunction ctx.Offers() return Quests.Offers(Player, NpcId, true) end\n\tfunction ctx.DressLine(Clique: string): string? -- (line matrix) a clique giver turns you away for your clothes\n\t\tlocal Ok, Line = pcall(function()\n\t\t\treturn require(game:GetService(`ServerScriptService`).Services.AI.StudentBrain.Talk).Line(Clique, `DressCode`, Player)\n\t\tend)\n\t\treturn if Ok then Line else nil\n\tend\n"
+  },
+  {
+    "file_path": "game.ServerStorage.Dialogue.QuestChoices",
+    "old_string": "\tNodes.Q_Status = {\n",
+    "new_string": "\tNodes.Q_DressCode = { -- (line matrix) the giver won't deal until you're dressed the part, liked, or a member\n\t\tText = function(ctx)\n\t\t\tlocal D = Def(ctx)\n\t\t\tlocal Clique = D.Clique or (D.Requires and D.Requires.Clique and D.Requires.Clique.Id) -- the leader quests only carry Requires.Clique\n\t\t\treturn (Clique and ctx.DressLine and ctx.DressLine(Clique)) or `Come back dressed the part.`\n\t\tend;\n\t\tChoices = { { Text = `Fair enough.`; Next = Back }, { Text = `Bye.` } };\n\t}\n\tNodes.Q_Status = {\n",
+    "note": "adapted per the brief's note: all 16 gated quests have no Def.Clique, only Requires.Clique.Id, so Q_DressCode reads both"
+  },
+  {
+    "file_path": "game.ServerStorage.Dialogue.QuestChoices",
+    "old_string": "\t\t\t\t\treturn if Offer.Kind == `Active` then `Q_Status` else `Q_Offer`\n",
+    "new_string": "\t\t\t\t\treturn if Offer.Kind == `Active` then `Q_Status` elseif Offer.Kind == `DressCode` then `Q_DressCode` else `Q_Offer`\n"
+  },
+  {
+    "file_path": "game.ServerScriptService.Services.Social.Hangouts",
+    "old_string": "\t\tNotifications.Notify(Player, { Title = `Night Study is after hours`; Text = `You should be in class right now.`; Kind = `Info`; Duration = 3 })\n\t\treturn false\n\tend\n",
+    "new_string": "\t\tNotifications.Notify(Player, { Title = `Night Study is after hours`; Text = `You should be in class right now.`; Kind = `Info`; Duration = 3 })\n\t\treturn false\n\tend\n\n\t-- (line matrix) the dress code: the Vigil study with those in its colours, its friends and its members\n\tlocal OkC, Cl = pcall(require, ServerScriptService.Services.Social.Cliques)\n\tif OkC and Cl.Dressed and not Cl.Dressed(Player, `Vigil`) then\n\t\tlocal OkT, Line = pcall(function() return require(ServerScriptService.Services.AI.StudentBrain.Talk).Line(`Vigil`, `DressCode`, Player) end)\n\t\tNotifications.Notify(Player, { Title = `Not dressed for the Archive`; Text = (OkT and Line) or `Come back in the Vigil's colours.`; Kind = `Info`; Duration = 4 })\n\t\treturn false\n\tend\n"
+  },
+  {
+    "file_path": "game.ServerScriptService.Services.AI.StudentBrain",
+    "old_string": "local Appearance = require(ReplicatedStorage.UI.Appearance)\n",
+    "new_string": "local Appearance = require(ReplicatedStorage.UI.Appearance)\nlocal Cliques = require(ServerScriptService.Services.Social.Cliques) -- (line matrix) the dress code, Cliques.Dressed\n"
+  },
+  {
+    "file_path": "game.ServerScriptService.Services.AI.StudentBrain",
+    "old_string": "function Brain.Init(H)\n",
+    "new_string": "---| dress codes (line matrix) |---\n\n-- walk into a clique's hangout out of its colours and the nearest of its students (30 studs) says so: once a visit,\n-- at most every 120 s for each player\nlocal Visits = {} :: { [Player]: { In: string?, Told: number } }\n\nlocal function hangoutOf(Root: BasePart): string?\n\tlocal Folder = workspace:FindFirstChild(`Regions`)\n\tif not Folder then return nil end\n\tfor Id, Def in CliqueConfig.Defs do\n\t\tlocal Box = Def.Hangout and Folder:FindFirstChild(Def.Hangout)\n\t\tif Box and Box:IsA(`BasePart`) then\n\t\t\tlocal L = Box.CFrame:PointToObjectSpace(Root.Position)\n\t\t\tlocal H = Box.Size / 2 + Vector3.new(0, 6, 0)\n\t\t\tif math.abs(L.X) <= H.X and math.abs(L.Y) <= H.Y and math.abs(L.Z) <= H.Z then return Id end\n\t\tend\n\tend\n\treturn nil\nend\n\nlocal function dressWatch()\n\twhile true do\n\t\ttask.wait(1)\n\t\tfor _, P in Players:GetPlayers() do\n\t\t\tlocal Root = P.Character and P.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?\n\t\t\tlocal V = Visits[P] or { Told = -1e9 }\n\t\t\tVisits[P] = V\n\t\t\tlocal Id = Root and hangoutOf(Root)\n\t\t\tif Id == V.In then continue end\n\t\t\tV.In = Id\n\t\t\tif not (Id and Root) or os.clock() - V.Told < 120 then continue end\n\t\t\tlocal Ok, Dressed = pcall(Cliques.Dressed, P, Id)\n\t\t\tif not Ok or Dressed then continue end\n\t\t\tlocal Best, BestD = nil, 30\n\t\t\tfor _, S in (Host and Host.Students and Host.Students()) or {} do\n\t\t\t\tif S.Clique == Id and S.Root and S.Model and not S.Reacting then\n\t\t\t\t\tlocal D = (S.Root.Position - Root.Position).Magnitude\n\t\t\t\t\tif D < BestD then Best, BestD = S, D end\n\t\t\t\tend\n\t\t\tend\n\t\t\tif Best and sayMatrix(Best, `DressCode`, P, nil, 0, nil) then\n\t\t\t\tV.Told = os.clock()\n\t\t\t\tlookAt(Best, Root.Position + Vector3.new(0, 1.5, 0), 2)\n\t\t\tend\n\t\tend\n\t\tfor P in Visits do\n\t\t\tif not P.Parent then Visits[P] = nil end\n\t\tend\n\tend\nend\n\nfunction Brain.Init(H)\n"
+  },
+  {
+    "file_path": "game.ServerScriptService.Services.AI.StudentBrain",
+    "old_string": "\tSenses.Init()\nend\n",
+    "new_string": "\tSenses.Init()\n\ttask.spawn(dressWatch) -- (line matrix) hangout dress codes\nend\n"
+  }
+]
