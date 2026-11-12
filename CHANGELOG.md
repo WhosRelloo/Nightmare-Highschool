@@ -2,6 +2,59 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.92.0] - 2026-11-12: Inventory QOL batch 2: the stand gets tabs, a quantity picker, Restock my pins and lunch
+
+Owner: "Yes, batch 2" (concepts 18 to 22 in `docs/Inventory-QOL-Concepts.md`). The live scripts are mirrored in
+`tools/inventory-qol-192/` (`patches.py` lists every edit). Each patched line is marked `(inventory QOL 1.92)`. Backups
+are in `ServerStorage.NH_Backup.InventoryQOL2_pre_20261112`.
+
+### Added
+- **Tabs at the stand:** All, Hot food, Snacks, Sweets, Drinks and Lunch (`Items.StandTabs`, `Items.Category`,
+  `Items.CategoryOf`). Today's special comes first.
+- **A quantity picker on every item:** −, +, and Max (as many as you can afford and carry). The Buy button shows the
+  total ("Buy 3 ¥69").
+- **What you can't buy is clear:**
+  - an item you can't afford is dimmed;
+  - one you carry 20 of reads "Full (20)";
+  - one off sale reads "Not now".
+- **"Restock my pins ¥N":** buys each pinned item up to 5, showing the total first.
+  - Prank kits and daily specials are left out, since they have daily limits.
+  - It's done on the server (`NHInventory.Restock`, `Inventory.Restock`): the stand, your Yen and the limits are checked
+    there.
+  - It says what it bought: "Restocked 3 Prank Kit, 3 Melon Bread, 5 Ramune (¥310)."
+- **Lunch from the timetable.** The lunch meals are sold during the school day's Lunch period, 11:25 to 12:00
+  (`Items.LunchInfo`). Before, nothing ever set `NHLunchOpen`, so they could never be bought.
+  - The stand shows "Lunch opens in 1 h 28 min" or "Lunch is on · 2:28 left".
+  - The meals appear under All while lunch is on.
+  - `NHLunchOpen` still forces lunch open.
+
+### Changed
+- **The stand's menu is built once per tab** and updated in place. It used to rebuild every cell and its 3D view on
+  every inventory change.
+- **The menu is a little larger** (960 x 640) to fit the tabs and the picker.
+
+### Tested (NH Combat Test, slot 4 Testy, entered through the real slot remotes)
+- The stand opened with all six tabs, today's special (Mystery Meat Loaf) first, and the restock total.
+- **Picker:** + twice made "Buy 3 ¥69". Buy said "Bought 3 Onigiri.", took ¥69, and the picker went back to 1.
+- **Restock:**
+  - It bought 3 Prank Kit, 3 Melon Bread and 5 Ramune for ¥310. That was before the fix that leaves limited items out;
+    the prank kit then hit its daily limit.
+  - After the fix: "Pins stocked" (greyed), and the remote says "Your pins are already stocked."
+- **Lunch:**
+  - At 11:30 the stand said "Lunch is on · 2:28 left", the lunch meals appeared under All, and a Miso Soup sold.
+  - At 5:43 PM it said "Lunch opens in 1 h 28 min".
+- **The console:** no script errors.
+- Testy's slot count and the test key attribute are restored.
+
+### Not tested
+- **Dimming:** "can't afford" and "Full (20)" weren't seen; Testy had enough Yen and no full stacks.
+- **Off sale:** "Not now" on a shut lunch meal wasn't seen.
+- **Gamepad and phone** at the stand.
+
+### Test note
+- **Prompts in Studio tests:** if a Studio test tool leaves the camera Scriptable, no ProximityPrompt shows, the stand's
+  included. This is a Studio test pitfall, not a game bug. Setting the camera back to Custom fixes it.
+
 ## [1.91.1] - 2026-11-12: NH Combat Test: the lunch tray clips are published
 
 The owner published the eight tray clips from `ServerStorage.NHTrayAnims` under the group. Their ids are now in

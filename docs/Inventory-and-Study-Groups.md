@@ -82,7 +82,24 @@ Props batch 54 ([[School-Props]]): every item the stand sells is modelled now, w
 | Black Cat Cola | 45 | +0.5% damage, 3 min |
 | Green Tea | 40 | +2% class EXP, 3 min |
 
-- **Lunch meals** (`Items.Lunch`, `Lunch = true`): Katsu Curry 180 (+100 over 12 s), Shoyu Ramen 170 (+95), Karaage Set 190 (+105), Grilled Mackerel Set 160 (+90), Omurice 170 (+95), Witching Hour Stew 200 (+115 over 14 s), Graveyard Shepherd's Pie 200 (+115), Pumpkin Gratin 180 (+105), Raven's Roast 220 (+125); extras Fruit Cup 40 (+22), Side Salad 35 (+18), Rice Bowl 30 (+20), Miso Soup 30 (+15), Chocolate Milk 35 (+1 max health, 3 min). They are in `Items.ById` (they save and can be granted) but not in `Items.List`, and `Items.OnSale` says no until a lunch period sets `ReplicatedStorage`'s `NHLunchOpen` attribute (`Items.LunchOpen()`). A lunch period should add them to the stand's menu (or its own counter) and set the attribute.
+- **Lunch meals** (`Items.Lunch`, `Lunch = true`): Katsu Curry 180 (+100 over 12 s), Shoyu Ramen 170 (+95), Karaage Set 190 (+105), Grilled Mackerel Set 160 (+90), Omurice 170 (+95), Witching Hour Stew 200 (+115 over 14 s), Graveyard Shepherd's Pie 200 (+115), Pumpkin Gratin 180 (+105), Raven's Roast 220 (+125); extras Fruit Cup 40 (+22), Side Salad 35 (+18), Rice Bowl 30 (+20), Miso Soup 30 (+15), Chocolate Milk 35 (+1 max health, 3 min). They are in `Items.ById` (they save and can be granted) but not in `Items.List`.
+  - **When they're sold (1.92.0):** during the school timetable's Lunch segment (11:25 to 12:00 on school days), read by
+    `Items.LunchInfo()`.
+  - **Override:** `ReplicatedStorage`'s `NHLunchOpen` attribute still forces lunch open.
+  - **The stand:** shows them under its Lunch tab, and under All while lunch is on.
+
+## The stand's menu (1.92.0)
+
+- **Tabs:** All, Hot food, Snacks, Sweets, Drinks and Lunch. `Items.StandTabs` and `Items.Category` set them; anything
+  not listed goes by kind. Today's special comes first.
+- **Each item:** a − / + / Max picker, and a Buy button with the total ("Buy 3 ¥69").
+  - It's dimmed when you can't afford one.
+  - It reads "Full (20)" when you carry 20, and "Not now" when it's off sale.
+- **The lunch line:** "Lunch opens in 1 h 28 min", or "Lunch is on · 2:28 left", in real time.
+- **"Restock my pins ¥N":** buys each pinned item up to 5. Prank kits and daily specials are left out.
+  - The remote is `NHInventory.Restock`, served by `Inventory.Restock`.
+  - It stops at the first item you can't afford.
+- **Updates:** cells are built once per tab and updated in place on every inventory change.
 - **Hand props:** the hotbar Tool's Handle and the Locker's 3D slot are `ReplicatedStorage.NHSnacks.<Id>` (a `Handle` MeshPart, glass welded under it, an `NHGrip` CFrame attribute) when it's there, the old generated part when it isn't.
 - **The stand's menu board** lists the first eight regular items and "+ N more at the counter"; the buy menu scrolls through all 40.
 - **Test hook:** `ServerStorage.NHTestBridge` `GrantItem(name, id, n)` puts items in a test student's Locker through `Inventory.Grant` (Studio only).

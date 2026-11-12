@@ -3,7 +3,9 @@
 **Date:** 2026-11-12. These are concepts for the owner to pick from.
 
 **Built:** batch 1 in 1.91.0, which is concepts 1 (empty pins shown), 5 (cooldown shades), 9 (the buff chip) and 30 (no
-silent refusals: the snack messages; the kit's messages are still to do). Everything else on this page is not built yet.
+silent refusals: the snack messages; the kit's messages are still to do). Batch 2 in 1.92.0 is concepts 18 to 22
+(the stand's tabs, Restock my pins, the quantity picker, dimming, and lunch from the timetable with its countdown).
+Everything else on this page is not built yet.
 
 **The rule behind all of them:** less clicking, fewer surprises. A player should always know what they're carrying,
 what each thing will do, and why something didn't work.
