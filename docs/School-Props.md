@@ -2615,3 +2615,13 @@ Every piece is under Roblox's 20k triangles (the heaviest, the BunTray and the s
 ![The Ramune in hand](img/concession54-pt-ramune.jpg)
 ![A lunch tray in hand](img/concession54-pt-tray.jpg)
 ![The Locker](img/concession54-pt-locker.jpg)
+
+**Lunch trays in the hand (1.90):** the nine lunch trays are scaled 1.5x in the game (1.97 x 1.45) and carried in both hands with their own clips (hold, eat standing and sitting, queue idle, spill, return, the mystery-meat grimace): see [Inventory-and-Study-Groups](Inventory-and-Study-Groups.md#lunch-trays-190). Play-tested on slot 4 Testy, 2026-11-12:
+
+![Carried](img/tray54-hold.jpg)
+![Walking with it](img/tray54-walk.jpg)
+![Eating standing](img/tray54-eat-stand.jpg)
+![Eating at a desk](img/tray54-eat-sit.jpg)
+![Spilled](img/tray54-spill.jpg)
+![Returned](img/tray54-return.jpg)
+![The mystery meat](img/tray54-grimace.jpg)

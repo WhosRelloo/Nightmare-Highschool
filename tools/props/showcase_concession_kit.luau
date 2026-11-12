@@ -119,13 +119,14 @@ for i, r in ROWS do
 	row(r.ids, x0, top, r.z, 0.25, Cat)
 end
 -- the lunch trays, on two long tables west of the crate pile
-local LUNCH = { { z = 198.5, ids = { "KatsuCurry", "ShoyuRamen", "KaraageSet", "MackerelSet", "Omurice" } },
-	{ z = 202.5, ids = { "WitchingStew", "ShepherdsPie", "PumpkinGratin", "RavensRoast", "BunTray" } } }
+-- (the trays are 1.5x, 1.97 x 1.45, so these tables are deeper and longer)
+local LUNCH = { { z = 198.0, ids = { "KatsuCurry", "ShoyuRamen", "KaraageSet", "MackerelSet", "Omurice" } },
+	{ z = 202.4, ids = { "WitchingStew", "ShepherdsPie", "PumpkinGratin", "RavensRoast", "BunTray" } } }
 for i, r in LUNCH do
 	local len = 0
 	for _, id in r.ids do len += width(id) + 0.3 end
 	local x1 = 197.4
-	local top = table_("LunchTable" .. i, x1 - len - 0.2, x1 + 0.2, r.z, 1.6)
+	local top = table_("LunchTable" .. i, x1 - len - 0.2, x1 + 0.2, r.z, 1.9)
 	row(r.ids, x1 - len, top, r.z, 0.3, Cat)
 end
 -- the bigger stock stands on the floor behind the lunch tables

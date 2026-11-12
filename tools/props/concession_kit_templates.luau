@@ -58,6 +58,9 @@ for id in ([[BarleyTea CannedCoffee RedLantern Ramune HolyLemonade BlackCatCola 
 	CupRamen GhostMints SoyBottle MustardBottle CupStack]]):gmatch("%S+") do FRONT_YAW[id] = math.rad(-90) end
 local TRAYS = { KatsuCurry = true, ShoyuRamen = true, KaraageSet = true, MackerelSet = true, Omurice = true, WitchingStew = true,
 	ShepherdsPie = true, PumpkinGratin = true, RavensRoast = true }
+-- the owner asked for bigger trays (2026-11-12): every lunch tray is scaled 1.5x in the game (1.97 x 1.45, about shoulder
+-- width on an R6 student), food and all; the FBX stays at its modelled size
+local TRAY_SCALE = 1.5
 
 local KEY = { "ColorMap", "NormalMap", "RoughnessMap", "MetalnessMap" }
 local missing, mapsSet, absent, items, snacks = {}, 0, {}, 0, 0
@@ -121,6 +124,7 @@ local function itemModel(sheet, item, main, glass)
 	local cf, size = m:GetBoundingBox()
 	a.PivotOffset = a.CFrame:ToObjectSpace(CFrame.new(cf.Position - Vector3.new(0, size.Y / 2, 0)))
 	m.PrimaryPart = a
+	if TRAYS[item] then m:ScaleTo(TRAY_SCALE) m:SetAttribute("NHTrayScale", TRAY_SCALE) end
 	m:SetAttribute("ItemId", item)
 	m:SetAttribute("Sheet", sheet)
 	m:SetAttribute("Sold", not DRESSING[sheet])
@@ -139,15 +143,22 @@ local function snack(item, main, glass)
 	h.Name = "Handle"
 	h.CanCollide, h.CanTouch, h.CanQuery, h.Massless = false, false, false, true
 	h.Parent = m
+	local k = TRAYS[item] and TRAY_SCALE or 1
 	if glass then
 		local g = glass:Clone()
 		g.Name = "Glass"
 		g.CanCollide, g.CanTouch, g.CanQuery, g.Massless = false, false, false, true
+		if k ~= 1 then
+			local rel = h.CFrame:ToObjectSpace(g.CFrame)
+			g.Size *= k
+			g.CFrame = h.CFrame * (CFrame.new(rel.Position * k) * (rel - rel.Position))
+		end
 		g.Parent = h
 		local w = Instance.new("WeldConstraint")
 		w.Part0, w.Part1 = h, g
 		w.Parent = g
 	end
+	if k ~= 1 then h.Size *= k h:SetAttribute("NHTrayScale", k) end
 	-- the grip, measured in a play test (slot 4 Testy, R6): Rx(-90) stands an item upright in the right hand with its front (-Z)
 	-- facing forward; the turned items (front on -X) need Rz(90) * Ry(90). The hand closes on the item's back face, a little
 	-- above its middle, so the item sits in front of the fist rather than inside it; a lunch tray is held flat by its near rim.

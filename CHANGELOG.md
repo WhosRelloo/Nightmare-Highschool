@@ -100,15 +100,25 @@ period". Props batch 54: 68 items in ten 2048 bakes (`docs/School-Props.md`).
 - **The stand dressed:** counterware, litter and stock (cup and lid stacks, a napkin dispenser, candy jars, a bottle
   crate, a can tray), staged at the showcase stand with a catalogue of every item (`workspace.NHPropsShowcase.Concessions`).
 - **Test hook:** `NHTestBridge` `GrantItem` (Studio only).
+- **Lunch tray animations** (owner: "make a hold and eat animation like that ... 3 animations", plus the extras they
+  approved): carried in both hands while walking or running, eating standing (one hand holds, one eats), eating sitting
+  at a desk or table, a queue idle, spilling when hit or knocked down (one meal lost), returning it at a tray rack, and a
+  sniff-and-grimace before the mystery meat loaf (`Features.Tray`, `World.TrayFx`, `Config.Tray`).
 
 ### Changed
 - The stand's menu board lists eight items and "+ N more at the counter" (it would overflow at 40).
+- The lunch trays are 1.5x in the game (owner: "Make the tray bigger").
 
 ### Tested (NH Combat Test, slot 4 Testy)
 - Every template, the counter stock, the catalogue and the lunch tables checked by screenshot.
 - Ramune, Takoyaki Boat, Green Tea and Katsu Curry on the hotbar, held, eaten and drunk (heal and buff work), shown in the
   Locker. Testy's Locker restored afterwards.
-- **Not tested:** buying at the stand, the stand's buy menu with all 40, the other 50 items in the hand, the Map place.
+- Trays: carried while walking, the queue idle, eating standing and at a classroom desk, standing back up, a spill from
+  a hit (the last meal lost), a return at a tagged rack, the meat loaf grimace. Testy's items were restored; two empty
+  pins (Melon Bread, Canned Coffee: none owned) can't be re-pinned and were left off.
+- **Not tested:** buying at the stand, the stand's buy menu with all 40, the other 50 items in the hand, running and
+  jumping with a tray, published clip ids (Studio plays them from `ServerStorage.NHTrayAnims`), students using trays,
+  the Map place.
 
 ## [1.89.1] - 2026-11-12: Kit C bags in the game
 

@@ -87,6 +87,22 @@ Props batch 54 ([[School-Props]]): every item the stand sells is modelled now, w
 - **The stand's menu board** lists the first eight regular items and "+ N more at the counter"; the buy menu scrolls through all 40.
 - **Test hook:** `ServerStorage.NHTestBridge` `GrantItem(name, id, n)` puts items in a test student's Locker through `Inventory.Grant` (Studio only).
 
+### Lunch trays (1.90)
+
+`Config.Tray`, `Services.Features.Tray` (server), `Controllers.World.TrayFx` (client); the clips are in `ServerStorage.NHTrayAnims` (`tools/tray/build_tray_anims.luau`). The owner asked to copy how Bully's students carry lunch trays and to make three animations (hold with both hands, eat standing, eat sitting), and approved five extras. The Bully longplay was searched (the school tour's cafeteria and both lunch-lady missions) but no one carries a tray on screen, so the carry follows a school-cafeteria hold.
+
+- **The trays are 1.5x** in the game (the owner: "make the tray bigger"): 1.97 x 1.45, about shoulder width, food and all.
+- **Hold (both hands):** equipping a lunch tray poses both shoulders (C0 pitch 56, yaw 20 degrees, measured so the hands sit on the rims), drops the hand grip and welds the tray to the torso in front of the waist (scaled with the torso, so every height carries it the same). `World.TrayFx` keeps the arms on it while walking, running and jumping.
+- **Eat standing** (`EatStand`, 2.4 s loop for the meal's duration): the left hand keeps the tray, the right scoops, bites and chews.
+- **Eat sitting** (`EatSit`, 3.4 s loop): sitting down with a tray (`SitDown`) sets it on the desk or table in front (a raycast that ignores people) or on the lap; the right hand eats, the head glances round; standing (`StandUp`) brings it back to the hands. Seated, the clips play over the chair's Sitting pose (Action4, weighted 8 to 1).
+- **Queue idle** (`QueueIdle`, 5 s loop): standing still with a tray for 1.5 s, a look up at the menu and down the line, a small weight shift.
+- **Spill** (`Spill`): a hit of 3 health or more, being knocked down or ragdolled, or going down: arms thrown up, the tray tumbles away (a copy, 6 s), one meal is lost, "You spilled your lunch!".
+- **Return** (`Return`): a part tagged `NHTrayReturn` gets a "Return tray" prompt; the tray is set on it (a copy rests there 30 s) and put away, not lost. There is no rack model yet: tag a counter or a shelf part.
+- **Mystery meat** (`Grimace`, `Config.Tray.Grimace`): the meat loaf is lifted to the nose, a sniff, a recoil and a head shake, then the bite.
+- **For a lunch period (NPCs):** `Features.Tray.Hold(Char, TrayPart, Id)`, `Release`, `Eat(Char, Seconds)`, `Spill`, `Return(Char, Rack)`; holders carry the tag `NHTrayHolder` and the attribute `NHTray`. The student AI isn't wired to them (another session owns it).
+- **Clip ids:** `Config.Tray.Anims` is 0 until the owner publishes the eight clips; until then Studio plays them from `ServerStorage.NHTrayAnims` and a live server plays only the hold (no clips).
+- **Fixed in testing:** the first table probe set the tray on the arm of the student at the next desk (people are now ignored); the chair's Sitting pose hid the seated eating (now outweighed).
+
 ## Study groups (U)
 `Services.Features.Party`, `Controllers.Gui.StudyGroup`.
 
