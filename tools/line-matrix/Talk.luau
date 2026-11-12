@@ -124,4 +124,50 @@ function Talk.Line(Clique: string, Moment: string, Player: Player?, Opts: { [str
 	return Talk.Pick(Stand[Clique], Moment, Player, Opts)
 end
 
+---| outfits |---
+
+function Talk.Wear(Player: Player?): { Top: string, Bottoms: string, Acc: { string } }?
+	local C = Player and Player.Character
+	return C and CliqueConfig.ParseWear(C:GetAttribute(`NHWear`)) or nil
+end
+
+-- the name of the worn piece a taste rule matches, in lower case
+local function matched(Rule: { [string]: string }, W): string?
+	if Rule.Top then return if W.Top == Rule.Top then (string.gsub(W.Top, `-`, ` `)) else nil end
+	for _, Id in W.Acc do
+		local It = Accessories.ById[Id]
+		if It and (Rule.Id == Id or (Rule.Kit ~= nil and It.Kit == Rule.Kit) or (Rule.Slot ~= nil and It.Slot == Rule.Slot)) then
+			return string.lower(It.Name)
+		end
+	end
+	return nil
+end
+
+-- what this student thinks of your outfit (first match wins): their clique's full look, their rival's top, a piece
+-- they like, a piece they mock. A student without a clique only remarks on a random accessory you wear.
+function Talk.Outfit(S, Player: Player?): (string?, string?)
+	local W = Talk.Wear(Player)
+	if not W then return nil end
+	local Id = S.Clique
+	local Def = Id and CliqueConfig.Defs[Id]
+	if not Def then
+		if #W.Acc == 0 then return nil end
+		local It = Accessories.ById[W.Acc[math.random(1, #W.Acc)]]
+		if not It then return nil end
+		return `Likes`, string.lower(It.Name)
+	end
+	if CliqueConfig.WearsTop(Id, W.Top) and CliqueConfig.WearsBottoms(Id, W.Bottoms) then return `FullLook` end
+	if Def.Rival and CliqueConfig.WearsTop(Def.Rival, W.Top) then return `RivalLook` end
+	local T = Def.Taste or {}
+	for _, R in T.Likes or {} do
+		local N = matched(R, W)
+		if N then return `Likes`, N end
+	end
+	for _, R in T.Mocks or {} do
+		local N = matched(R, W)
+		if N then return `Mocks`, N end
+	end
+	return nil
+end
+
 return Talk
