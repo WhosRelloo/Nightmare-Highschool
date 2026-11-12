@@ -48,7 +48,7 @@ local React = {}
 -- plays the reaction and moves the student, and return true to skip the default step aside. Kind is "MakeWay"
 -- (someone walking straight at them) or "Space" (someone standing on top of them). Rec is the Senses record of
 -- the player (Rec.Player, Rec.Root, Rec.Pos, Rec.Speed, Rec.Dist).
-Brain.OnBump = nil :: ((any, any, string) -> boolean)?
+Brain.OnBump = require(script:WaitForChild(`Nudges`)).Handle :: ((any, any, string) -> boolean)? -- (1.86.3) the nudges
 
 ---| helpers |---
 

@@ -2,6 +2,43 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.86.3] - 2026-11-11: NH Combat Test: students react when you bump into them
+
+Owner: "3 Nudge type animations for the NPC's. 1 for each side that gets bumped and 1 for a HUGE bump forward. Make it
+very fluid and natural looking", modelled on crowd footage the owner picked, and built after the NPC brain (1.86.2).
+The design is the canvas "NPC Nudge Animations".
+
+### Added (NH Combat Test)
+- **Three R6 clips in `ServerStorage.NHNudges`** (KeyframeSequences, built by `tools/npc-nudges/build_nudges.luau`):
+  - **`Nudge_Left` / `Nudge_Right`** (0.7 s, Action). A brush on one shoulder:
+    - the torso twists away and the bumped shoulder rolls back;
+    - the far arm swings forward and the head tilts with the hit.
+    - It snaps in within 5 frames and eases out over half a second.
+    - The hips aren't keyed, so the walk or idle keeps the legs moving underneath.
+  - **`Shove_Forward`** (1.8 s, Action2). A hard shove from behind: arch on impact, fold 38° with the head down, two
+    low stagger steps with the hands near the knees, then rise and look back. The builder plants the lowest foot on
+    the floor at every key, so the fold never sinks the feet.
+- **`Services.AI.StudentBrain.Nudges`**, set as `Brain.OnBump`.
+  - **When:** "make way" fires about a second early, so it waits for the real brush, the player within 3 studs.
+    Nothing plays if the player veers off.
+  - **Side nudge:** plays the side that was touched and slides the student 0.45 studs away over 0.25 s. The head
+    follows the passer through NpcLook.
+  - **Shove:** a player at 20+ studs/s (sprinting or dashing) hitting from behind or beside. It plays the shove,
+    stops the walk and carries the student about 3 studs along the push. The carry stops short of walls and ledges.
+  - **Variety:** each play varies speed (0.9 to 1.15) and weight (0.7 to 1.0). A student can't be nudged again for 1.5 s.
+  - **Crowding:** someone standing on top of a student gets a nudge, and then the student backs off as before.
+- **Until the clips are published,** Studio plays the local KeyframeSequences. Live servers keep the old step aside.
+  To publish: right-click each KeyframeSequence in `ServerStorage.NHNudges`, then Save to Roblox under the group.
+  Put the ids in `IDS` at the top of `StudentBrain.Nudges`.
+
+### Tested (slot 4 "Testy", SlotCount 4 then back to 3, NHTestNoMenuKeys set then cleared)
+- A walk-past 1.6 studs to a standing student's left: `Nudge` played at 1.7 studs (weight 0.77, speed 1.02), and the
+  student slid 0.45 studs to their right.
+- A sprint from behind at 26 studs/s into a walking student: `Shove_Forward` played at 2 studs (Action2), and the
+  student was carried about 2.6 studs. No script errors.
+- Edit-mode contact sheets of all three clips: the twist directions, the mirror, and the shove's feet on the floor.
+- **Not tried:** a second player, crowding (standing on a student), and the carry stopping at a wall.
+
 ## [1.86.2] - 2026-11-11: NH Combat Test: the students get the Map's NPC brain
 
 Owner (through the NH Combat Test session): bring the new NPC system from the Map place into NH Combat Test now

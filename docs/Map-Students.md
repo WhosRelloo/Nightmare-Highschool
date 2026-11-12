@@ -176,6 +176,9 @@ NH Combat Test's own students (`Features.Schedules`, 14 of them) use the same sy
   - **The nudge hook:** `Brain.OnBump(S, Rec, Kind) -> handled`, called from `React.MakeWay` and `React.Space`.
     Move a student with `S.Agent:Shuffle(Dir, Seconds, Speed)` (Humanoid:Move, wall- and ledge-safe) or a short
     `S.Root.CFrame` lerp; seated students are anchored.
+  - (1.86.3) `StudentBrain.Nudges` fills the hook: `Nudge_Left` / `Nudge_Right` on a brush and `Shove_Forward` on a
+    sprint from behind (clips in `ServerStorage.NHNudges`, sources in `tools/npc-nudges/`). Publish the clips and set
+    `IDS` in the module for live servers; until then only Studio plays them.
 - `Controllers.World.Chatter` skips students marked `NHBrain`.
 - The Map still runs `MapStudents` (unchanged). If the Map's brain changes, port the same change to `StudentBrain`.
 - Sources: `tools/ct-npc-1862/`.
