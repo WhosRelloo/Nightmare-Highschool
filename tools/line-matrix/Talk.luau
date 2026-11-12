@@ -22,7 +22,9 @@ local ServerScriptService = game:GetService(`ServerScriptService`)
 
 local Lines = require(script.Parent:WaitForChild(`Lines`))
 local CliqueConfig = require(ReplicatedStorage.Config.Cliques)
-local CliqueTalk = require(ReplicatedStorage.Config:WaitForChild(`CliqueTalk`))
+-- a missing or broken line module leaves the matrix empty (every Pick falls back to today's pools)
+local OkC, CliqueTalk = pcall(require, ReplicatedStorage.Config:FindFirstChild(`CliqueTalk`))
+if not OkC or typeof(CliqueTalk) ~= `table` then CliqueTalk = {} end
 local Accessories = require(ReplicatedStorage.Config.Accessories)
 
 local Talk = {}
@@ -143,8 +145,16 @@ local function matched(Rule: { [string]: string }, W): string?
 	return nil
 end
 
--- what this student thinks of your outfit (first match wins): their clique's full look, their rival's top, a piece
--- they like, a piece they mock. A student without a clique only remarks on a random accessory you wear.
+-- another clique besides the rival also wears this top (black-blazer: Court and Choir), so it's no rival's colours
+local function shared(Rival: string, Top: string?): boolean
+	for Other in CliqueConfig.Defs do
+		if Other ~= Rival and CliqueConfig.WearsTop(Other, Top) then return true end
+	end
+	return false
+end
+
+-- what this student thinks of your outfit (first match wins): their clique's full look, a top only their rival wears,
+-- a piece they like, a piece they mock. A student without a clique only remarks on a random accessory you wear.
 function Talk.Outfit(S, Player: Player?): (string?, string?)
 	local W = Talk.Wear(Player)
 	if not W then return nil end
@@ -157,7 +167,7 @@ function Talk.Outfit(S, Player: Player?): (string?, string?)
 		return `Likes`, string.lower(It.Name)
 	end
 	if CliqueConfig.WearsTop(Id, W.Top) and CliqueConfig.WearsBottoms(Id, W.Bottoms) then return `FullLook` end
-	if Def.Rival and CliqueConfig.WearsTop(Def.Rival, W.Top) then return `RivalLook` end
+	if Def.Rival and CliqueConfig.WearsTop(Def.Rival, W.Top) and not shared(Def.Rival, W.Top) then return `RivalLook` end
 	local T = Def.Taste or {}
 	for _, R in T.Likes or {} do
 		local N = matched(R, W)

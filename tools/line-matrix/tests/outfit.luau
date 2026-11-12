@@ -31,6 +31,8 @@ local Ok, Err = pcall(function()
 	case("Vigil: nothing to say", "Vigil", "navy-polo|uniform-trousers|", nil, nil)
 	case("Vigil girl's full look", "Vigil", "vigil-vest-f|pleated-tartan-skirt|", "FullLook", nil)
 	case("Athletes girl's full look", "Athletes", "cheer-uniform|cheer-skirt|", "FullLook", nil)
+	if not (CC.Defs.Vigil.Rival and CC.WearsTop(CC.Defs.Vigil.Rival, "black-blazer")) then Bad += 1 table.insert(Results, "FAIL the Vigil's rival should wear black-blazer (the shared-top case needs it)") end
+	case("Vigil see a top Court shares with Choir", "Vigil", "black-blazer|charcoal-slacks|", nil, nil)
 	case("no NHWear", "Vigil", nil, nil, nil)
 	case("clique-less student, one piece", nil, "navy-polo|uniform-trousers|hat-top", "Likes", "crimson-banded top hat")
 	local W = CC.ParseWear("a|b|x,y")
@@ -67,8 +69,9 @@ local Ok, Err = pcall(function()
 		for _, R in Taste.Mocks do
 			if R.Id and Liked[R.Id] then fail(`{Id} both likes and mocks {R.Id}`) end
 		end
-		for _, T in Def.Look.FemaleTops or {} do
-			if not has(App.Uniforms, T) then fail(`{Id} FemaleTops {T} is not in Appearance.Uniforms`) end
+		if Def.Look.FemaleTops ~= nil then fail(`{Id} Look.FemaleTops is set: the NPC dressers read it (use FemaleMatchTops)`) end
+		for _, T in Def.Look.FemaleMatchTops or {} do
+			if not has(App.Uniforms, T) then fail(`{Id} FemaleMatchTops {T} is not in Appearance.Uniforms`) end
 		end
 		for _, B in Def.Look.FemaleMatchBottoms or {} do
 			if not has(App.BottomsList, B) then fail(`{Id} FemaleMatchBottoms {B} is not in Appearance.BottomsList`) end

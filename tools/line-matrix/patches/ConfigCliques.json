@@ -6,5 +6,17 @@
   {
     "old_string": "\treturn listed(L.Bottoms, Bottoms) or listed(L.FemaleBottoms, Bottoms)\n\t\tor (L.Civ ~= nil and (listed(L.Civ.Bottoms, Bottoms) or listed(L.Civ.FemaleBottoms, Bottoms)))\nend\n\n-- the girls' versions of each clique's school top\nlocal FemaleTops = {\n\tVigil = { `vigil-vest-f` }; Court = { `crimson-court-blazer` }; Athletes = { `cheer-uniform`, `track-jacket` };\n\tDelinquents = { `delinquent-long-blazer` }; Pack = { `forest-vest-f` }; Ordinary = { `navy-vest-f`, `crest-blazer` };\n\tChoir = { `choir-capelet`, `chapel-corset` }; Ink = { `ink-club-blouse` };\n}\nfor Id, Tops in FemaleTops do\n\tlocal Look = Cliques.Defs[Id] and Cliques.Defs[Id].Look\n\tif Look then Look.FemaleTops = Tops end\nend\n",
     "new_string": "\treturn listed(L.Bottoms, Bottoms) or listed(L.FemaleBottoms, Bottoms) or listed(L.FemaleMatchBottoms, Bottoms)\n\t\tor (L.Civ ~= nil and (listed(L.Civ.Bottoms, Bottoms) or listed(L.Civ.FemaleBottoms, Bottoms)))\nend\n\n-- the girls' versions of each clique's school top\nlocal FemaleTops = {\n\tVigil = { `vigil-vest-f` }; Court = { `crimson-court-blazer` }; Athletes = { `cheer-uniform`, `track-jacket` };\n\tDelinquents = { `delinquent-long-blazer` }; Pack = { `forest-vest-f` }; Ordinary = { `navy-vest-f`, `crest-blazer` };\n\tChoir = { `choir-capelet`, `chapel-corset` }; Ink = { `ink-club-blouse` };\n}\nfor Id, Tops in FemaleTops do\n\tlocal Look = Cliques.Defs[Id] and Cliques.Defs[Id].Look\n\tif Look then Look.FemaleTops = Tops end\nend\n\n-- girls' bottoms that count towards a clique's look (a NEW key: the NPC dressers read FemaleBottoms and must not change)\nlocal FemaleMatchBottoms = {\n\tAthletes = { `cheer-skirt` }; Delinquents = { `delinquent-long-skirt` }; Pack = { `forest-tartan` };\n}\nfor Id, Bottoms in FemaleMatchBottoms do\n\tlocal Look = Cliques.Defs[Id] and Cliques.Defs[Id].Look\n\tif Look then Look.FemaleMatchBottoms = Bottoms end\nend\n"
+  },
+  {
+    "old_string": "\treturn listed(L.Tops, Top) or listed(L.FemaleTops, Top) or (L.Civ ~= nil and (listed(L.Civ.Tops, Top) or listed(L.Civ.FemaleTops, Top)))",
+    "new_string": "\treturn listed(L.Tops, Top) or listed(L.FemaleMatchTops, Top) or (L.Civ ~= nil and listed(L.Civ.Tops, Top))"
+  },
+  {
+    "old_string": "-- the girls' versions of each clique's school top\nlocal FemaleTops = {",
+    "new_string": "-- the girls' versions of each clique's school top that count towards its look (a NEW key, like FemaleMatchBottoms:\n-- the NPC dressers read Look.FemaleTops and must not change)\nlocal FemaleMatchTops = {"
+  },
+  {
+    "old_string": "for Id, Tops in FemaleTops do\n\tlocal Look = Cliques.Defs[Id] and Cliques.Defs[Id].Look\n\tif Look then Look.FemaleTops = Tops end\nend",
+    "new_string": "for Id, Tops in FemaleMatchTops do\n\tlocal Look = Cliques.Defs[Id] and Cliques.Defs[Id].Look\n\tif Look then Look.FemaleMatchTops = Tops end\nend"
   }
 ]

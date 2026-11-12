@@ -36,7 +36,11 @@ local ServerStorage = game:GetService(`ServerStorage`)
 local Nav = require(ServerScriptService.Services.AI.Nav)
 local Senses = require(ServerScriptService.Services.AI.Senses)
 local Lines = require(script:WaitForChild(`Lines`))
-local Talk = require(script:WaitForChild(`Talk`)) -- (line matrix) clique x attitude x moment
+-- (line matrix) clique x attitude x moment; a broken or missing Talk falls back to today's pools, never the whole brain
+local OkT, Talk = pcall(require, script:WaitForChild(`Talk`, 5))
+if not OkT or typeof(Talk) ~= `table` then
+	Talk = { Pick = function() return nil end; Attitude = function() return `Neutral` end; Outfit = function() return nil end }
+end
 local CliqueConfig = require(ReplicatedStorage.Config.Cliques)
 local Appearance = require(ReplicatedStorage.UI.Appearance)
 local Cliques = require(ServerScriptService.Services.Social.Cliques) -- (line matrix) the dress code, Cliques.Dressed
@@ -140,7 +144,8 @@ local function greeting(S, Rec): (string?, { [string]: any }?, { string })
 	local M = memo(S, Pl)
 	local G = Lines.Greet
 	if os.clock() - (M.Fought or -1e9) < 300 then
-		return `Greet`, { Attitude = if Talk.Attitude(S, Pl) == `Hostile` then `Hostile` else `Wary` }, G.Wary
+		local OkA, A = pcall(Talk.Attitude, S, Pl)
+		return `Greet`, { Attitude = if OkA and A == `Hostile` then `Hostile` else `Wary` }, G.Wary
 	end
 	local Ch = Pl and Pl.Character
 	if Pl and os.clock() - (M.Outfit or -1e9) > 600 then
@@ -154,7 +159,9 @@ local function greeting(S, Rec): (string?, { [string]: any }?, { string })
 	if Hum and Hum.MaxHealth > 0 and Hum.Health / Hum.MaxHealth < 0.35 and math.random() < 0.5 then
 		return `Hurt`, nil, daily(C)
 	end
-	if Ch and Appearance.FormOf(Ch) then return `Transformed`, nil, Lines.ByNature(S, Lines.Monster, `Brave`) end
+	local OkF, Form = false, nil
+	if Ch then OkF, Form = pcall(Appearance.FormOf, Ch) end
+	if OkF and Form then return `Transformed`, nil, Lines.ByNature(S, Lines.Monster, `Brave`) end
 	local Race = Pl and Pl:GetAttribute(`Race`)
 	if Race and math.random() < 0.3 then return `Race`, { Sub = Race }, G.Race[Race] or daily(C) end
 	local Def = S.Clique and CliqueConfig.Defs[S.Clique]
@@ -164,8 +171,13 @@ local function greeting(S, Rec): (string?, { [string]: any }?, { string })
 		if not OkA or typeof(A) ~= `string` then A = `Neutral` end
 		local Strong = A == `Hostile` or A == `Wary` or A == `Respected`
 		if Strong or math.random() < 0.6 then
+			local O = if Strong then { Attitude = A } else nil
+			if C.Night and math.random() < 0.4 then -- (line matrix) the night still shows at the extremes
+				if C.Moon == `Full` then return `FullMoon`, O, G.FullMoon end
+				return `Night`, O, G.Night
+			end
 			local Tier = Pl and Pl:GetAttribute(`CliqueTier_{S.Clique}`)
-			return `Greet`, if Strong then { Attitude = A } else nil, (Def.Reactions and Tier and Def.Reactions[Tier]) or daily(C)
+			return `Greet`, O, (Def.Reactions and Tier and Def.Reactions[Tier]) or daily(C)
 		end
 	end
 	if (M.Met or 0) >= 4 and math.random() < 0.6 then return nil, nil, G.Often end
