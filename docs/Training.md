@@ -198,6 +198,72 @@ The design source of the first pass, `make_training_ui.py`, made the greyscale i
 - **Testy** (slot 4) after 1.85.2: Arms Lv 5 (Toned arms); Torso and Legs Lv 5 in the data, but their meshes were reset to the base by a test `Set` (they change again at Lv 10); a 2-day streak. The test grant's 6000 push-up best is still in the save.
 - **The Map place** has none of this.
 
+## Audit (1.85.2)
+
+The owner asked: "Completely audit and bugfix the training system. Also add the actual situp anim in not just the idle."
+
+Read line by line:
+- `Config.Training`, `Features.Training` and `Gui.Training`;
+- the Appearance `Areas` / `AreaBodies` / `ApplyTo` / look guard / `SetBuild` / `SetArea` code;
+- `PlayerData` / `SetTraining`;
+- `Config.Progression.Training`, `Player.Progression` (Effects, `NH_SprintMult`) and `Features.CombatSpeed`;
+- the stations.
+
+Backups are in `ServerStorage.NH_Backup.Training_audit_pre` (the three modules and the stations).
+
+| Found | Fixed |
+|---|---|
+| Sit-ups had only the looping motion, paused and replayed as the "rep" | The owner's rep 88010144797396 plays once per rep. 132757288791974 is held on its first frame as the rest pose (`IdleHold`). |
+| A rep sped to the tier's gap, too slow for jittered or burnout gaps | Each rep's speed fits the real time to the next ring, and it settles back to the pose |
+| Station prompts sat on the floor Spot and didn't show from up close (the pull-up's never did from in front of the bar) | Prompts sit on `Spot.PromptAt`, at chest height |
+| You could attack or grip from the mat, or be drawn into interactions | `InActivity` state while seated (like lessons); a combat tag stands you up; busy, seated, boarding, wolf-form, tier-up and menu students can't sit |
+| Leaving to the menu or switching slots without dying left the station locked and the set open | Freed on `CharacterRemoving`. The root's network owner goes back to the player on standing. |
+| A HOLD never released kept the set open forever | The set ends with the plan, and the hold is let go there |
+| Presses in the 3-2-1 counted as strays (combo break, stamina) | Ignored |
+| Gamepad A pressed both the selected card button and the main action (tutorial pages skipped); pad B lost to the menu's back binding | No GUI selection (A and B drive the card); bindings at priority 3100 |
+| Each visit loaded new animation tracks and never freed them | Destroyed on leaving |
+| A set cut short left the HOLD bar, count, stamina, dim and combo on screen next visit | `ResetSetHud` on every start and leave |
+| Layout: the plate under the compass strip, the combo on the bar's end, NEW BEST over the streak value, the banner over the Yen, the hint over the health bar | Plate and bar moved below the compass; combo left of the gauge under the stamp; NEW BEST in the clear; banner higher; hint only for a visit's first sets; a smaller gauge on very wide, short windows; cards fit small screens |
+| The plate art showed a moment late on the first visit | All 27 pieces are fetched when the HUD builds |
+| Studio test grants wrote personal bests (Testy had a 6000 push-up best) | Grants never touch bests. The bridge's `Set` clears them when it resets a body. |
+| Stand-ins used the rarity Seal | Never the Seal |
+
+**Checked and sound (no change needed):**
+- The server clears a set on Submit, so a replay is refused.
+- Begin needs the seat, spacing and no running set, and an abandoned set expires.
+- Future, out-of-order, too-fast and machine-perfect presses are refused.
+- Death, downed, respawn and leaving the game free the station and the set.
+- The daily cap, Fresh and the streak roll over at **00:00 UTC** (tested live across the rollover: Fresh came back, and the streak went 1 → 2 days at +4%).
+- Soreness decays with real time.
+- Old saves without Training get `{}` from ProfileService Reconcile, and `Config.Training.Sanitize` fills it in.
+- `SetArea` never lowers an area. The admin `SetBuild` resets `Areas`. The sprint bonus only touches sprint speeds, and Crouch and Evolution divide it back out through `NH_SpeedMult`.
+- **What others see:** the rep animations and the load replicate. The step-up burst and the flex are drawn by each nearby client from `NHFx` `TrainStep`, and the flex follows the owner's replicated pose.
+
+**Known limits:**
+- A bot that adds ±20 ms of noise to the planned ring times would pass the timing checks. The daily cap (700 XP per area) bounds what that could earn.
+- The day boundary is UTC, so it falls mid-afternoon in the US.
+
+![Sit-ups with the real art and the new rep](img/training-pbr-situp.jpg)
+![Reduce Motion: one ring, no trail](img/training-pbr-reducedmotion.jpg)
+
+**Tested in Play (slot 4, real keys and pad buttons):**
+- the real PBR HUD art in game;
+- the new sit-up rep;
+- a live Arms step-up from a real push-up set (5 Perfect; the banner, the flex and NEW BEST; only the arms changed), saved across a rejoin;
+- the UTC rollover;
+- refused: Begin while not seated, a second Begin, a replayed Submit, and a Submit after dying;
+- death, pad B and a combat tag each free the station, unanchor the body and tear down the HUD;
+- the pull-up prompt from up close;
+- Reduce Motion;
+- the phone-size and touch layout.
+
+**Not verified:**
+- a second player watching;
+- burnout, stamina and HOLD sets by real keys;
+- a real touch screen;
+- an old save without Training in Play (code-reviewed only);
+- a real attacker hitting a seated student (the combat tag was set directly).
+
 ## Map sync (for the "Port hair, eyes and their UI to the Map place" session)
 
 The Map place needs:
