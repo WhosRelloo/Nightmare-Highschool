@@ -317,6 +317,9 @@ def ride_of(follow, n):
     return out if any(out) else None
 
 
+HUG_NEAR = 0.012
+
+
 def katana_hits_ride(verts, tris, boxes, ride, posed):
     """katana_hits, where a vertex riding a limb that itself crosses that katana part doesn't count (the limb meets
     the katana there; cloth on it can only follow)"""
@@ -324,7 +327,12 @@ def katana_hits_ride(verts, tris, boxes, ride, posed):
         return katana_hits(verts, tris, boxes)
     cross, inside, where = 0, 0, ""
     for box in boxes:
-        hit_parts = {pt for pt in set(r for r in ride if r) if pt in posed and sum(katana_hits(*posed[pt], [box])[:2])}
+        # the mount meets that part, or comes within HUG_NEAR of the (already padded) box: cloth hugging it can't avoid
+        # it (the heavy torso is 0.008 short of the padded guard in front of the left hip)
+        name_, bv_, bt_, c_b, axes_b, half_b = box
+        near = (name_, [p + sum((a_ * (HUG_NEAR if (p - c_b).dot(a_) > 0 else -HUG_NEAR) for a_ in axes_b), Vector())
+                         for p in bv_], bt_, c_b, axes_b, half_b + Vector((HUG_NEAR, HUG_NEAR, HUG_NEAR)))
+        hit_parts = {pt for pt in set(r for r in ride if r) if pt in posed and sum(katana_hits(*posed[pt], [near])[:2])}
         keep_t = [t for t in tris if not all(ride[i] in hit_parts for i in t)]
         keep_v = [verts[i] for i in range(len(verts)) if ride[i] not in hit_parts] if hit_parts else verts
         if not keep_t:
@@ -523,6 +531,8 @@ def run():
                 ko = e.get("keepout")   # Roblox mount axes -> Blender (x, y, z) = (-x, z, y)
                 kb = (-ko[0], ko[2], ko[1]) if ko else None
                 P["sway"] = sway_shapes(ob, arm, e.get("sway", "Pendulum"), kb, e.get("lock"))
+            if extra.get(name, {}).get("hug"):   # hugging its mount (Kit C sleeves, hip panels): meets the katana only where the mount does
+                P["hug"] = True
             fol = extra.get(name, {}).get("follow")
             if fol:
                 P["follow"] = follow_weights(ob, {k: float(f) for k, f in (kv.split("=") for kv in fol.split(";"))})
@@ -615,7 +625,11 @@ def run():
             for pull, sv in P.get("sway", []):
                 shapes.append((f"swung {pull}", depth_fit(sv, P["mount"], s_), None))
             ride_k = ride_of(P.get("follow"), len(P["verts"]))
+            if P.get("hug"):   # a sleeve meets the katana only where its arm does (the drawn grip runs through the hand)
+                ride_k = [P["mount"]] * len(P["verts"])
             for label, vv, posed_k in shapes:
+                if P.get("hug") and posed_k is None:
+                    posed_k = bodies[bid]
                 c_, i_, w_ = katana_hits_ride(vv, P["tris"], kb.get("sheathed", []), ride_k, posed_k)
                 if c_ + i_:
                     kb_bodies = report.setdefault(f"{it}/{pn}", {}).setdefault("katana_by", {})
@@ -623,7 +637,7 @@ def run():
                 if c_ + i_ > worst[0] + worst[1]:
                     worst = (c_, i_, f"sheathed, {bid}, {label}: {w_}")
                 if P["mount"] == "RightArm" and (label == "rest" or label.startswith("swung")):
-                    c2, i2, w2 = katana_hits(vv, P["tris"], kb.get("drawn", []))
+                    c2, i2, w2 = katana_hits_ride(vv, P["tris"], kb.get("drawn", []), ride_k if P.get("hug") else None, posed_k)
                     if c2 + i2:
                         msg = f"DRAWN {it}/{pn} on {bid}, {label}: {c2} crossings, {i2} points inside ({w2})"
                         if slot == "Hand":

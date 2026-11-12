@@ -2,14 +2,19 @@
 night-watch masks). All three are Head pieces, unisex, held on by sitting on the face (no ties round the head).
 
   FoxMask    - Fox half-mask (kitsune crossed with the gothic school): one solid shell of glossy black lacquer covering
-               the forehead, eyes and nose, a short carved muzzle with a glossy nose, pointed ears rising above the brow
-               (crimson inner ears edged in gold), crimson brush-stroke markings (an upswept liner round each eye, a
-               flame on the brow over a gold bead, strokes down the muzzle, whisker dots), a gilt line round the edge
+               the brow, eyes and nose, a short carved muzzle with a glossy nose, pointed ears formed by the mask's upper
+               corners (crimson inner ears), crimson brush-stroke markings (an upswept liner round each eye, a flame
+               between the brows over a gold bead, strokes down the muzzle, whisker dots), a gilt line round the edge
                and both eyes, and a crimson silk tassel hanging from the tip of each cheek tuft on a gold bead and collar.
-  WolfMask   - Wolf half-mask: antique silver-grey, the muzzle down to the nose (the mouth stays free). A heavy brow
-               ridge slanting down to a frown over angry eyes ringed in blackened iron, pointed ears with dark inner
-               ears, carved fur locks in relief flowing up the brow, out across the cheeks to a jagged ruff and down
-               the bridge, and a black glossy nose with nostrils.
+  WolfMask   - Wolf half-mask: antique silver-grey, the muzzle down to the nose (the mouth stays free). A sharp brow
+               ridge slanting down to a frown over angry eyes ringed in blackened iron (carved in: a deep socket under
+               the ridge), pointed ears at the mask's upper corners with dark inner ears and fur, carved fur locks in
+               relief swept out along the brows and across the cheeks to a jagged ruff, and a black glossy nose.
+
+Hair (2026-11-12): every head piece is checked against the 35 catalog hairs, and anything over the brow line, past the
+temples or over the head crosses the fringe or side locks of nearly all of them. Fox and Wolf therefore keep inside
+|x| 0.45 with the ears lying on the brow (tips z 1.85), and their relief stays low where hair lies over the mask (the
+brows and cheeks, r 0.66 .. 0.70); the muzzle, where no hair hangs, keeps its full depth.
   GrilleMask - Iron grille mask: the lower face only (nose bridge to chin), a dark oxblood leather backing under
                thirteen bevelled vertical iron bars, a riveted iron frame band round the edge, a riveted strap across
                the mouth, brass rivets, and a brass shield crest with a crimson enamel field and a brass rose.
@@ -453,29 +458,33 @@ def fox_sculpt(x, z):
     mw = 0.112 - 0.050 * t
     muzzle = (0.010 + 0.150 * t ** 1.2) * math.exp(-(x / mw) ** 2) * (1 - 0.30 * smooth(1.385, 1.335, z))
     nosebulb = 0.020 * g(x, 0, 0.045) * g(z, 1.375, 0.03)
-    brow = 0.020 * g(ax, 0.21, 0.10) * g(z, 1.68 + 0.18 * (ax - 0.2), 0.032)
-    socket = -0.010 * g(ax, 0.205, 0.085) * g(z, 1.615 + 0.32 * (ax - 0.205), 0.035)
-    fore = 0.018 * g(x, 0, 0.26) * g(z, 1.80, 0.09)
-    cheek = 0.026 * g(ax, 0.37, 0.11) * g(z, 1.50, 0.07)
-    edge = -0.008 * smooth(0.48, 0.64, ax)
-    ear = -0.008 * smooth(1.93, 2.15, z)
+    brow = 0.016 * g(ax, 0.21, 0.10) * g(z, 1.68 + 0.18 * (ax - 0.2), 0.032)
+    socket = -0.012 * g(ax, 0.205, 0.085) * g(z, 1.615 + 0.32 * (ax - 0.205), 0.035)
+    fore = 0.008 * g(x, 0, 0.12) * g(z, 1.70, 0.05)
+    cheek = 0.018 * g(ax, 0.33, 0.10) * g(z, 1.50, 0.07)
+    edge = -0.006 * smooth(0.36, 0.44, ax)
+    ear = -0.009 * smooth(1.72, 1.80, z)
     return muzzle + nosebulb + brow + socket + fore + cheek + edge + ear
 
 
 def fox_back(x, z):
-    return back_r(z, lean_from=1.90, lean=0.18)
+    return back_r(z)
 
 
 def fox_F(x, z):
     return fox_back(x, z) + FOX_D + fox_sculpt(x, z)
 
 
-FOX_HALF = [(0.0, 1.885), (0.06, 1.89), (0.105, 1.905), (0.165, 2.03), (0.235, 2.135), (0.305, 2.215),
-            (0.38, 2.10), (0.44, 1.99), (0.50, 1.895), (0.56, 1.81), (0.60, 1.70), (0.62, 1.58),
-            (0.642, 1.435),                  # 12: the outer cheek tuft (a tassel hangs here)
-            (0.58, 1.485), (0.535, 1.483),
-            (0.478, 1.378),                  # 15: the inner cheek tuft
-            (0.42, 1.44), (0.33, 1.425), (0.24, 1.40), (0.15, 1.365), (0.075, 1.345), (0.0, 1.338)]
+# Hair-friendly (2026-11-12): every catalog hair with a fringe or side hair crosses anything over the brow line or past
+# the temples, so the mask keeps inside |x| 0.44 and the ears are the mask's own upper corners, lying on the brow
+# (tips z 1.85) rather than standing over the head.
+FOX_HALF = [(0.0, 1.713), (0.05, 1.705), (0.105, 1.708),
+            (0.155, 1.750), (0.212, 1.798), (0.272, 1.846),     # 5: the ear tip
+            (0.31, 1.795), (0.345, 1.745), (0.385, 1.70), (0.418, 1.655), (0.432, 1.59), (0.436, 1.53),
+            (0.442, 1.442),                  # 12: the outer cheek tuft (a tassel hangs here)
+            (0.405, 1.468), (0.37, 1.46),
+            (0.338, 1.398),                  # 15: the inner cheek tuft
+            (0.29, 1.428), (0.22, 1.405), (0.15, 1.365), (0.075, 1.345), (0.0, 1.338)]
 FOX_CORNERS = [5, 12, 15]
 FOX_EYE = (0.205, 1.615, 0.094, 0.040, 0.32)
 
@@ -506,9 +515,10 @@ def build_fox(M):
     nose("FoxNoseTip", nc, N(0, 1.40, fox_F).lerp(Vector((0, -1, 0)), 0.5).normalized(), (0.040, 0.030, 0.026), nosemat)
     for sx in (-1, 1):
         # the inner ear: a crimson lacquer inlay edged in gold
-        ear = [(sx * x, z) for x, z in cr_open([(0.165, 1.935), (0.205, 2.02), (0.30, 2.165), (0.37, 2.06), (0.44, 1.925)], 0.028)]
-        ear += [(sx * x, z) for x, z in cr_open([(0.40, 1.915), (0.30, 1.905), (0.20, 1.92)], 0.04)][:-1]
-        ear = ccw(ear)
+        ear = cr_open([(0.180, 1.728), (0.222, 1.762), (0.267, 1.800)], 0.012)[:-1]
+        ear += cr_open([(0.267, 1.800), (0.295, 1.764), (0.323, 1.728)], 0.012)[:-1]
+        ear += cr_open([(0.323, 1.728), (0.29, 1.719), (0.232, 1.719), (0.180, 1.728)], 0.02)[:-1]
+        ear = ccw([(sx * x, z) for x, z in ear])
         layer(f"FoxInnerEar{sx}", ear, fox_F, -0.002, 0.003, paint, sf=0.032, bevel=0.0015)
         # the eye liner: from the inner corner over the lid, flicked up past the outer corner toward the temple
         lid = []
@@ -517,11 +527,11 @@ def build_fox(M):
             lx = sx * w * (-math.cos(math.pi * (0.06 + 0.9 * u)))
             q = lx / w
             lid.append((sx * cx + lx, cz + h * math.sqrt(max(0.0, 1 - q * q)) * (1 - 0.35 * q * q) + tl * sx * lx + 0.030 + 0.008 * u))
-        lid += [(sx * (cx + w + 0.045), cz + tl * w + 0.075), (sx * (cx + w + 0.095), cz + tl * w + 0.118)]
+        lid += [(sx * (cx + w + 0.023), cz + tl * w + 0.040), (sx * (cx + w + 0.046), cz + tl * w + 0.067)]
         strip(f"FoxLiner{sx}", lid, 0.026, 0.0035, fox_F, paint, step=0.012,
               taper=lambda t: (0.35 + 0.65 * smooth(0.0, 0.35, t)) * (1 - smooth(0.62, 1.0, t)) + 0.02)
         under = [(sx * (cx + 0.01), cz - h - 0.034), (sx * (cx + 0.065), cz - h - 0.022), (sx * (cx + w + 0.03), cz + tl * w - 0.006),
-                 (sx * (cx + w + 0.075), cz + tl * w + 0.040)]
+                 (sx * (cx + w + 0.063), cz + tl * w + 0.035)]
         strip(f"FoxUnder{sx}", under, 0.017, 0.003, fox_F, paint, step=0.012,
               taper=lambda t: math.sin(math.pi * min(1.0, 0.15 + 0.85 * t)) ** 0.7 * (1 - 0.5 * t) + 0.02)
         # strokes down the muzzle from the inner corner of the eye
@@ -529,20 +539,20 @@ def build_fox(M):
                                         (sx * 0.044, 1.39)], 0.020, 0.003, fox_F, paint, step=0.012,
               taper=lambda t: (0.5 + 0.5 * math.sin(math.pi * min(1, t * 1.4))) * (1 - smooth(0.7, 1.0, t)) + 0.02)
         # the side tongues of the brow flame
-        strip(f"FoxFlame{sx}", [(sx * 0.022, 1.712), (sx * 0.052, 1.748), (sx * 0.064, 1.79), (sx * 0.092, 1.83)],
-              0.026, 0.003, fox_F, paint, step=0.012, taper=lambda t: (1 - t) ** 0.8 * (0.6 + 0.4 * math.sin(math.pi * t)) + 0.02)
+        strip(f"FoxFlame{sx}", [(sx * 0.020, 1.672), (sx * 0.048, 1.684), (sx * 0.080, 1.689), (sx * 0.112, 1.692)],
+              0.020, 0.003, fox_F, paint, step=0.012, taper=lambda t: (1 - t) ** 0.8 * (0.6 + 0.4 * math.sin(math.pi * t)) + 0.02)
         # whisker dots on the muzzle
         for k, (dx, dz) in enumerate(((0.118, 1.462), (0.142, 1.488), (0.150, 1.440))):
             dome(f"FoxDot{sx}{k}", sx * dx, dz, 0.0105, 0.0035, fox_F, paint, seg=9, prof=((0, 1.0), (0.6, 0.8)))
         # the tassel: a gold eyelet on the tip of the outer cheek tuft, a silk cord, gold bead, knot, gold collar, skirt
-        tx, tz = 0.609, 1.452
+        tx, tz = 0.418, 1.458
         dome(f"FoxEyelet{sx}", sx * tx, tz, 0.018, 0.008, fox_F, gold, seg=12, prof=((0, 1.0), (0.5, 0.85), (0.85, 0.4)))
         top = P(sx * tx, tz - 0.012, 0.016, fox_F)
         tassel(f"FoxTassel{sx}", top, gold, silk)
     # the centre tongue of the flame, over a gold bead
-    strip("FoxFlame0", [(0.0, 1.705), (0.010, 1.745), (-0.006, 1.80), (0.006, 1.862)], 0.042, 0.0035, fox_F, paint,
+    strip("FoxFlame0", [(0.0, 1.668), (0.005, 1.679), (-0.003, 1.689), (0.002, 1.697)], 0.026, 0.0035, fox_F, paint,
           step=0.012, taper=lambda t: (0.55 + 0.45 * math.sin(math.pi * min(1, t * 1.8))) * (1 - t) ** 0.7 + 0.02)
-    dome("FoxJewel", 0.0, 1.692, 0.017, 0.012, fox_F, gold, seg=14)
+    dome("FoxJewel", 0.0, 1.655, 0.015, 0.011, fox_F, gold, seg=14)
     return {"notes": "Kit C2"}
 
 
@@ -582,7 +592,7 @@ def tassel(name, top, gold, silk):
 
 
 # ================================================================ 2. the wolf half-mask
-WOLF_D = 0.028
+WOLF_D = 0.022
 WOLF_EYE = (0.212, 1.606, 0.096, 0.040, 0.36)
 
 
@@ -594,7 +604,7 @@ def wolf_brow_z(ax):
 
 def wolf_mw(z):
     t = min(1.0, max(0.0, (1.645 - z) / 0.30))
-    return 0.150 - 0.035 * t, t
+    return 0.143 - 0.032 * t, t
 
 
 def wolf_sculpt(x, z):
@@ -604,41 +614,48 @@ def wolf_sculpt(x, z):
     bridge = 0.010 * g(x, 0, 0.035) * (1 - smooth(1.62, 1.66, z)) * smooth(1.36, 1.45, z)
     stop = -0.016 * g(x, 0, 0.05) * g(z, 1.652, 0.03)
     db = z - wolf_brow_z(ax)
-    brow = 0.062 * smooth(0.03, 0.12, ax) * (1 - smooth(0.34, 0.46, ax)) * \
-        (math.exp(-(db / 0.060) ** 2) if db > 0 else math.exp(-(db / 0.021) ** 2))
-    furrow = -0.010 * g(ax, 0.045, 0.018) * g(z, 1.70, 0.05)        # two frown furrows between the brows
-    socket = -0.012 * g(ax, 0.215, 0.09) * g(z, 1.60 + 0.3 * (ax - 0.215), 0.04)
-    fore = 0.022 * g(x, 0, 0.30) * g(z, 1.82, 0.10)
-    cheek = 0.045 * g(ax, 0.33, 0.13) * g(z, 1.48, 0.085)
-    edge = -0.010 * smooth(0.50, 0.68, ax)
-    ear = -0.010 * smooth(1.95, 2.15, z)
+    # the brow ridge and cheeks stay low (hair lies over them at r 0.66 .. 0.70): the frown is carved in, a deep
+    # socket under a sharp-edged ridge, rather than built out
+    brow = 0.026 * smooth(0.03, 0.12, ax) * (1 - smooth(0.34, 0.44, ax)) * \
+        (math.exp(-(db / 0.050) ** 2) if db > 0 else math.exp(-(db / 0.016) ** 2))
+    furrow = -0.008 * g(ax, 0.045, 0.018) * g(z, 1.69, 0.04)        # two frown furrows between the brows
+    socket = -0.013 * g(ax, 0.215, 0.09) * g(z, 1.60 + 0.3 * (ax - 0.215), 0.04)
+    fore = 0.006 * g(x, 0, 0.14) * g(z, 1.70, 0.04)
+    cheek = 0.020 * g(ax, 0.30, 0.11) * g(z, 1.48, 0.075)
+    edge = -0.006 * smooth(0.37, 0.45, ax)
+    ear = -0.008 * smooth(1.72, 1.80, z)
     return muzzle + bridge + stop + brow + furrow + socket + fore + cheek + edge + ear
 
 
 def wolf_back(x, z):
-    return back_r(z, lean_from=1.90, lean=0.16)
+    return back_r(z)
 
 
 def wolf_F(x, z):
     return wolf_back(x, z) + WOLF_D + wolf_sculpt(x, z)
 
 
-WOLF_HALF = [(0.0, 1.915), (0.06, 1.915), (0.11, 1.93), (0.165, 2.04), (0.215, 2.11), (0.265, 2.185),
-             (0.335, 2.11), (0.42, 2.00), (0.49, 1.91), (0.55, 1.85),
-             (0.615, 1.80), (0.685, 1.69),            # 11: upper ruff tuft
-             (0.625, 1.655), (0.69, 1.545),           # 13: middle tuft
-             (0.625, 1.53), (0.665, 1.415),           # 15: lower tuft
-             (0.585, 1.44), (0.54, 1.345),            # 17: jaw tuft
-             (0.47, 1.405), (0.36, 1.405), (0.26, 1.39), (0.17, 1.36), (0.085, 1.338), (0.0, 1.330)]
-WOLF_CORNERS = [5, 11, 12, 13, 14, 15, 16, 17]
+# Hair-friendly (2026-11-12): inside |x| 0.45 and under the brow line, the ears the mask's own upper corners lying on
+# the brow (tips z 1.85), the ruff a row of short jagged tufts down the cheek edge.
+WOLF_HALF = [(0.0, 1.712), (0.05, 1.704), (0.10, 1.708), (0.15, 1.752), (0.205, 1.80), (0.262, 1.852),
+             (0.30, 1.80), (0.338, 1.752), (0.375, 1.712),
+             (0.400, 1.69), (0.430, 1.668),           # 10: upper ruff tuft
+             (0.400, 1.625), (0.432, 1.565),          # 12: middle tuft
+             (0.398, 1.535), (0.428, 1.462),          # 14: lower tuft
+             (0.385, 1.448), (0.392, 1.372),          # 16: jaw tuft
+             (0.36, 1.40), (0.30, 1.405), (0.24, 1.39), (0.17, 1.36), (0.085, 1.338), (0.0, 1.330)]
+WOLF_CORNERS = [5, 10, 11, 12, 13, 14, 15, 16]
 
 
 def wolf_flow(x, z):
     """the way the carved fur lies (x >= 0): fanned up and out over the brow to the ears, out across the temples
     and cheeks to the ruff"""
-    if z > wolf_brow_z(x) - 0.01 and z > 1.60:
+    db = z - wolf_brow_z(x)
+    if abs(db) < 0.026 and 0.05 < x < 0.42 and z > 1.60:   # along the brow ridge, swept out and up to the ear
+        v = Vector((1.0, 0.42 + 0.6 * smooth(0.0, 0.026, db)))
+    elif db > -0.01 and z > 1.60:
         v = Vector((x * 1.5 + 0.015, z - 1.585))
-        v = v.normalized().lerp(Vector((1.0, -0.2)).normalized(), smooth(0.40, 0.56, x))
+        v = v.normalized().lerp(Vector((1.0, 0.2)).normalized(), smooth(0.36, 0.44, x))
     elif x < 0.17:
         v = Vector((0.3, -1.0))
     else:
@@ -716,43 +733,45 @@ def build_wolf(M):
                       for db in (-0.048, -0.032, -0.02, -0.01, 0.0, 0.011, 0.024, 0.042, 0.064)])
     wrap_r(sh, lambda x, z, t: wolf_back(x, z) + t * (WOLF_D + wolf_sculpt(x, z)))
     for k, e in enumerate(eyes):   # blackened iron round each eye
-        line(f"WolfEyeRim{k}", offset_poly(e, -0.008), 0.0, 0.0068, wolf_F, dark, step=0.016)
+        line(f"WolfEyeRim{k}", offset_poly(e, -0.011), 0.002, 0.0082, wolf_F, dark, step=0.014)
     nc = P(0, 1.37, -0.018, wolf_F)
     nose("WolfNoseTip", nc, N(0, 1.40, wolf_F).lerp(Vector((0, -1, 0)), 0.45).normalized(), (0.066, 0.046, 0.042), nosemat,
          seg=20, rings=12)
     inset = offset_poly(outline, 0.020)
     eyes_out = [offset_poly(e, -0.026) for e in eyes]
 
-    def ok(p):   # fur stays on the mask, clear of the edge, the eyes and the ears
-        return inside(p, inset) and not any(inside(p, e) for e in eyes_out) and p[1] < 1.93
+    def inner_ear(sx):
+        ear = cr_open([(0.153, 1.722), (0.204, 1.766), (0.260, 1.816)], 0.011)[:-1]
+        ear += cr_open([(0.260, 1.816), (0.297, 1.769), (0.336, 1.722)], 0.011)[:-1]
+        ear += cr_open([(0.336, 1.722), (0.30, 1.711), (0.21, 1.711), (0.153, 1.722)], 0.02)[:-1]
+        return ccw([(sx * x, z) for x, z in ear])
+    ears_out = [offset_poly(inner_ear(sx), -0.014) for sx in (-1, 1)]
+
+    def ok(p):   # fur stays on the mask, clear of the edge, the eyes and the inner ears
+        return inside(p, inset) and not any(inside(p, e) for e in eyes_out + ears_out)
 
     def region(x, z):   # the muzzle and the brow ridge stay smooth
         mw, t = wolf_mw(z)
         if x < mw * 0.95 and z < 1.665:
             return False
-        db = z - wolf_brow_z(x)
-        if 0.02 < x < 0.42 and -0.03 < db < 0.035:
-            return False
         return True
 
-    fur("WolfFur", wolf_F, pewter, ok, wolf_flow, region, (0.0, 0.70, 1.36, 1.93), sp=0.06, L=0.15, W=0.05)
+    fur("WolfFur", wolf_F, pewter, ok, wolf_flow, region, (0.0, 0.46, 1.36, 1.80), sp=0.036, L=0.078, W=0.032, H=0.0068)
     for sx in (-1, 1):
         # the inner ear: blackened iron, fur locks rising from its base
-        ear = [(sx * x, z) for x, z in cr_open([(0.165, 1.95), (0.205, 2.04), (0.262, 2.13), (0.32, 2.06), (0.42, 1.94)], 0.028)]
-        ear += [(sx * x, z) for x, z in cr_open([(0.38, 1.925), (0.28, 1.915), (0.20, 1.93)], 0.04)][:-1]
-        ear = ccw(ear)
-        layer(f"WolfInnerEar{sx}", ear, wolf_F, -0.002, 0.004, dark, sf=0.032, bevel=0.0015)
-        efF = lambda x, z: wolf_F(x, z) + 0.003
-        for k, c in enumerate(([(0.215, 1.94), (0.232, 1.99), (0.248, 2.05)], [(0.29, 1.93), (0.28, 1.99), (0.268, 2.07)],
-                               [(0.37, 1.93), (0.335, 1.975), (0.30, 2.03)])):
-            strip(f"WolfEarFur{sx}{k}", [(sx * x, z) for x, z in c], 0.042, 0.011, efF, pewter, step=0.02,
+        ear = inner_ear(sx)
+        layer(f"WolfInnerEar{sx}", ear, wolf_F, -0.002, 0.003, dark, sf=0.024, bevel=0.0012)
+        efF = lambda x, z: wolf_F(x, z) + 0.002
+        for k, c in enumerate(([(0.200, 1.720), (0.213, 1.746), (0.229, 1.774)], [(0.246, 1.716), (0.250, 1.748), (0.254, 1.788)],
+                               [(0.297, 1.718), (0.288, 1.744), (0.274, 1.772)])):
+            strip(f"WolfEarFur{sx}{k}", [(sx * x, z) for x, z in c], 0.026, 0.006, efF, pewter, step=0.012,
                   prof=LOCK if sx > 0 else [(-1, None), (-0.3, 1.0), (1, None)],
                   taper=lambda t: math.sin(math.pi * (0.12 + 0.88 * t)) ** 0.5, cap=0.8)
-        # the ear's front edge: two locks fanning from the temple up the outer ear
-        for k, c in enumerate(([(0.44, 1.87), (0.46, 1.92), (0.45, 1.97)], [(0.15, 1.88), (0.16, 1.93), (0.175, 1.99)])):
+        # the ear's edges: a lock up each side of the ear from the brow
+        for k, c in enumerate(([(0.372, 1.676), (0.362, 1.704), (0.345, 1.732)], [(0.112, 1.690), (0.128, 1.712), (0.15, 1.734)])):
             cc = clip_to([(sx * x, z) for x, z in c], lambda p: inside(p, inset))
             if len(cc) >= 3:
-                strip(f"WolfEarEdge{sx}{k}", cc, 0.040, 0.011, wolf_F, pewter, step=0.02,
+                strip(f"WolfEarEdge{sx}{k}", cc, 0.030, 0.0075, wolf_F, pewter, step=0.014,
                       prof=LOCK if sx > 0 else [(-1, None), (-0.3, 1.0), (1, None)],
                       taper=lambda t: math.sin(math.pi * (0.12 + 0.88 * t)) ** 0.5, cap=0.8)
     return {"notes": "Kit C2"}

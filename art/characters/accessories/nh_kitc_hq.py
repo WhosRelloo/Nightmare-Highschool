@@ -25,21 +25,39 @@ def dense(ob, longer=0.04):
     return ob
 
 
+def head_r(z):
+    """the mannequin head's radius at height z (a cylinder r 0.6, its top and bottom edges rounded r 0.25) plus the
+    masks' even gap: 0.612 on the face, following the rounding in at the brow and the chin"""
+    if 1.15 <= z <= 1.85:
+        r = 0.6
+    else:
+        d = min(0.25, (z - 1.85) if z > 1.85 else (1.15 - z))
+        r = 0.35 + math.sqrt(max(0.0, 0.0625 - d * d))
+    return r + 0.012
+
+
 def wrap_sculpt(ob, sculpt, R=HEAD_R):
-    """bend a flat front mask (x across, -y out of the face, z up) round the head cylinder, adding sculpt(x, z) outward"""
+    """bend a flat front mask (x across, -y out of the face, z up; y 0 the back) round the head: the back keeps an even
+    gap off the real (rounded) head, the front takes sculpt(x, z). (Before 2026-11-12 the whole shell rode the sculpt,
+    so the back stood off the face behind the nose and chin, and the temples' negative sculpt sank it into the head.)
+    A negative sculpt thins the shell to no less than 40% of its depth."""
     me = ob.data
     inv = ob.matrix_world.inverted()
-    for v in me.vertices:
-        co = ob.matrix_world @ v.co
+    pts = [ob.matrix_world @ v.co for v in me.vertices]
+    depth = max(0.004, max(-p.y for p in pts))
+    for v, co in zip(me.vertices, pts):
         ang = co.x / R
-        r = R - co.y + sculpt(co.x, co.z)
+        t = min(1.0, max(0.0, -co.y / depth))
+        sc = max(sculpt(co.x, co.z), -0.6 * depth)
+        r = head_r(co.z) - co.y + sc * t
         v.co = inv @ Vector((r * math.sin(ang), -r * math.cos(ang), co.z))
     me.update()
 
 
 def on_face(x, z, sculpt, off, R=HEAD_R):
+    """a point off the mask's front: off is measured from the head's surface + gap, as the shell's depth is"""
     ang = x / R
-    r = R + off + sculpt(x, z)
+    r = head_r(z) + off + max(sculpt(x, z), -0.6 * off)
     return (r * math.sin(ang), -r * math.cos(ang), z)
 
 
@@ -160,22 +178,33 @@ def build_porcelain(M, key="CPorcelain"):
 
 
 # ---------------------------------------------------------------- the beaked night-watch mask (sculpted leather, lofted beak)
+# Hair-friendly (2026-11-12): every catalog hair with a fringe or side locks crosses anything over the brow line or past
+# the temples, so the leather keeps inside |x| 0.43 and under z 1.75 (it fitted no hair at all when it rose over the
+# forehead to z 1.90 and wrapped to the temples); the beak and the lenses project forward, clear of the hair.
+WATCH_EYE = (0.205, 1.605)
+WATCH_LENS = 0.075   # the crimson glass's radius
+
+
 def beak_sculpt(x, z):
     ax = abs(x)
-    brow = 0.03 * g(z, 1.80, 0.05) * (1 - smooth(0.40, 0.62, ax))
-    return brow - 0.015 * smooth(0.40, 0.70, ax)
+    brow = 0.020 * g(z, 1.695, 0.035) * (1 - smooth(0.22, 0.34, ax))
+    return brow - 0.014 * smooth(0.26, 0.40, ax)
 
 
 def beak_outline():
+    """forehead (just over the brows) to under the cheekbones, down over the nose for the beak's root"""
     pts = []
-    n = 60
-    for i in range(n + 1):     # the top edge: up over the brow, sweeping back at the temples
-        x = lerp(-0.66, 0.66, i / n)
-        pts.append((x, 1.90 - 0.06 * (abs(x) / 0.66) ** 2))
-    for i in range(n + 1):     # the bottom edge: under the cheekbones
-        x = lerp(0.66, -0.66, i / n)
-        ax = abs(x)
-        pts.append((x, 1.30 + 0.12 * smooth(0.40, 0.66, ax) + 0.04 * g(ax, 0.30, 0.1)))
+    n = 72
+    for i in range(n):
+        a = 2 * math.pi * i / n
+        c, sn = math.cos(a), math.sin(a)
+        x = 0.425 * math.copysign(abs(c) ** (0.62 if sn >= 0 else 0.74), c)
+        if sn >= 0:   # the top edge: level over the brows, easing down to the temples
+            z = 1.585 + 0.155 * abs(sn) ** 0.45 - 0.02 * (abs(x) / 0.43) ** 3
+        else:         # the bottom edge: under the cheekbones, dipping over the nose to carry the beak
+            ax = abs(x)
+            z = 1.585 - (0.16 + 0.155 * (1 - smooth(0.08, 0.30, ax))) * abs(sn) ** 0.5
+        pts.append((x, z))
     return pts
 
 
@@ -187,50 +216,60 @@ def build_plague(M, key="CPlague"):
     thread = A.mat_flat("WaxThread", (0.70, 0.60, 0.42), rough=0.7, noise=200, bump=0.2, vary=0.1, wear=0.0)
     brass, brass_old = M["brass"], M["brassold"]
     glass = A.mat_flat("CrimsonGlass", (0.42, 0.02, 0.05), rough=0.04, coat=0.9, noise=8, bump=0.0, vary=0.02, wear=0.0)
-    # the half-mask: forehead to cheekbones, wrapping to the temples, two holes behind the lenses
+    # the half-mask: brow to cheekbones and down over the nose, two holes behind the lenses
     outline = ccw(beak_outline())
-    eyes = [ccw([(sx * 0.24 + 0.125 * math.cos(a), 1.62 + 0.125 * math.sin(a)) for a in [2 * math.pi * i / 24 for i in range(24)]])
+    ex, ez = WATCH_EYE
+    eyes = [ccw([(sx * ex + 0.083 * math.cos(a), ez + 0.083 * math.sin(a)) for a in [2 * math.pi * i / 24 for i in range(24)]])
             for sx in (-1, 1)]
     ob = A.extrude_poly("WatchMask", outline, 0.026, leather, frame((0, 0, 0)), bevel=0.008, segments=3, holes=[e[::-1] for e in eyes])
-    dense(ob); wrap_sculpt(ob, beak_sculpt); smooth_shade(ob)
-    edge = offset_poly(outline, 0.025)
-    dashes("EdgeStitch", [on_face(x, z, beak_sculpt, 0.027) for x, z in edge], 0.0042, thread)
-    # the lenses: domed crimson glass in a brass bezel with six screws, in a darker leather cup
+    dense(ob, longer=0.05); wrap_sculpt(ob, beak_sculpt); smooth_shade(ob)
+    edge = offset_poly(outline, 0.022)
+    dashes("EdgeStitch", [on_face(x, z, beak_sculpt, 0.027) for x, z in edge], 0.0040, thread, sides=3)
+    # the lenses: domed crimson glass in a brass bezel with six screws, in a darker leather cup facing out of the face
     for sx in (-1, 1):
-        cx = sx * 0.24
+        cx = sx * ex
         ang = cx / HEAD_R
         n_ = Vector((math.sin(ang), -math.cos(ang), 0))
         u = Vector((math.cos(ang), math.sin(ang), 0))
-        c = Vector(on_face(cx, 1.62, beak_sculpt, 0.026))
+        c = Vector(on_face(cx, ez, beak_sculpt, 0.024))
         rot = (HP, 0, ang)
-        A.lathe(f"LensCup{sx}", [(0.122, 0), (0.15, 0.0), (0.156, 0.03), (0.138, 0.06), (0.122, 0.06)], tuple(c), darker, seg=40,
-                rot=(-HP, 0, ang))
-        A.torus(f"LensBezel{sx}", 0.134, 0.022, tuple(c + n_ * 0.06), brass, rot=rot, major=40, minor=10)
-        A.torus(f"LensBezelIn{sx}", 0.116, 0.010, tuple(c + n_ * 0.07), brass_old, rot=rot, major=40, minor=8)
-        A.sphere(f"Lens{sx}", 0.118, tuple(c + n_ * 0.05), glass, scale=(1, 0.28, 1), rot=(0, 0, ang), seg=28, rings=12)
+        L = WATCH_LENS
+        # (low: a fringe hangs 0.03 .. 0.08 in front of the eyes, so the lenses stand no more than 0.045 off the leather)
+        A.lathe(f"LensCup{sx}", [(L + 0.004, 0), (L + 0.025, 0.0), (L + 0.029, 0.014), (L + 0.017, 0.026), (L + 0.004, 0.026)],
+                tuple(c), darker, seg=28, rot=rot)
+        A.torus(f"LensBezel{sx}", L + 0.011, 0.0135, tuple(c + n_ * 0.027), brass, rot=rot, major=28, minor=6)
+        A.torus(f"LensBezelIn{sx}", L - 0.002, 0.0070, tuple(c + n_ * 0.031), brass_old, rot=rot, major=28, minor=5)
+        A.sphere(f"Lens{sx}", L, tuple(c + n_ * 0.019), glass, scale=(1, 0.24, 1), rot=(0, 0, ang), seg=22, rings=10)
         for k in range(6):
             a = 2 * math.pi * k / 6 + 0.3
-            p = c + n_ * 0.078 + u * (0.134 * math.cos(a)) + Vector((0, 0, 0.134 * math.sin(a)))
-            A.sphere(f"Screw{sx}{k}", 0.011, tuple(p), brass_old, seg=8, rings=5)
-    # the beak: lofted from the face, an oval section with a ridge, curving down to a slight hook
-    root = Vector((0, -0.64, 1.45))
-    path = [root + Vector((0, -0.38 * t - 0.42 * t * t, -0.10 * t - 0.40 * t ** 2.4)) for t in [i / 28 for i in range(29)]]
+            p = c + n_ * 0.035 + u * ((L + 0.011) * math.cos(a)) + Vector((0, 0, (L + 0.011) * math.sin(a)))
+            A.sphere(f"Screw{sx}{k}", 0.0085, tuple(p), brass_old, seg=6, rings=4)
+    # the beak: lofted from the nose (its root sunk into the leather), an oval section with a ridge, curving down to a
+    # slight hook
+    root = Vector((0, -0.600, 1.445))
+    path = [root + Vector((0, -0.36 * t - 0.38 * t * t, -0.08 * t - 0.36 * t ** 2.4)) for t in [i / 24 for i in range(25)]]
     verts, faces = [], []
-    N = 28
+    N = 24
     for i, p in enumerate(path):
         t = i / (len(path) - 1)
-        w = 0.26 * (1 - t) ** 0.85 + 0.012
-        h = 0.22 * (1 - t) ** 0.9 + 0.012
+        w = 0.150 * (1 - t) ** 0.85 + 0.010
+        h = 0.148 * (1 - t) ** 0.9 + 0.010
         d = (path[min(i + 1, len(path) - 1)] - path[max(i - 1, 0)]).normalized()
         side = Vector((1, 0, 0))
         up = side.cross(d).normalized()
         if up.z < 0:
             up = -up
+        up = Vector((0, 0, 1)).lerp(up, smooth(0.0, 0.3, t)).normalized()   # the root rings stand upright in the leather
         for k in range(N):
             a = 2 * math.pi * k / N
             sa = math.sin(a)
-            ridge = 0.015 * max(0.0, sa) ** 8 * (1 - t)
-            verts.append(tuple(p + side * (w * math.cos(a)) + up * ((h + ridge) * sa) * (1 if sa > 0 else 0.86)))
+            ridge = 0.012 * max(0.0, sa) ** 8 * (1 - t)
+            q = p + side * (w * math.cos(a)) + up * ((h + ridge) * sa) * (1 if sa > 0 else 0.86)
+            if i == 0:   # the root ring sunk into the leather, following the face (never into the head)
+                rr = head_r(q.z) + 0.010
+                an = math.atan2(q.x, -q.y)
+                q = Vector((rr * math.sin(an), -rr * math.cos(an), q.z))
+            verts.append(tuple(q))
     for i in range(len(path) - 1):
         for k in range(N):
             a, b = i * N + k, i * N + (k + 1) % N
@@ -243,25 +282,18 @@ def build_plague(M, key="CPlague"):
     smooth_shade(beak)
     for kk, ring_k in ((0, N // 4), (1, 0), (2, N // 2)):   # stitched along the ridge and both sides
         line = []
-        for i in range(2, len(path) - 4):
+        for i in range(3, len(path) - 3):
             q = Vector(verts[i * N + ring_k])
-            line.append(tuple(q + (q - path[i]).normalized() * 0.006))
-        dashes(f"BeakStitch{kk}_", line, 0.0045, thread)
-    for k, t in enumerate((0.18, 0.46)):   # two brass bands round the beak
-        i = int(t * (len(path) - 1))
-        ring = [tuple(Vector(verts[i * N + j]) + (Vector(verts[i * N + j]) - path[i]).normalized() * 0.008) for j in range(N)]
-        A.tube(f"BeakBand{k}", ring, 0.013, brass, closed=True, res=6)
+            line.append(tuple(q + (q - path[i]).normalized() * 0.005))
+        dashes(f"BeakStitch{kk}_", line, 0.0040, thread, sides=3)
+    for k, t in enumerate((0.20, 0.48)):   # two brass bands round the beak
+        i = int(round(t * (len(path) - 1)))
+        ring = [tuple(Vector(verts[i * N + j]) + (Vector(verts[i * N + j]) - path[i]).normalized() * 0.007) for j in range(N)]
+        A.tube(f"BeakBand{k}", ring, 0.011, brass, closed=True, res=6, poly=True)
     for sx in (-1, 1):   # nostril vents with brass grommets near the root
-        q = Vector(verts[4 * N + N // 4]) + Vector((sx * 0.07, 0, -0.012))
-        A.torus(f"Vent{sx}", 0.020, 0.0065, tuple(q + Vector((0, 0, 0.006))), brass, rot=(0.6, 0, 0), major=16, minor=6)
-        A.sphere(f"VentHole{sx}", 0.018, tuple(q), darker, scale=(1, 1, 0.35), rot=(0.6, 0, 0))
-    # a brass clasp at each temple instead of ties (ties round the head would pass through the hair)
-    for sx in (-1, 1):
-        x = sx * 0.60
-        ang = x / HEAD_R
-        p = Vector(on_face(x, 1.66, beak_sculpt, 0.03))
-        A.cyl(f"Clasp{sx}", 0.04, 0.02, tuple(p), brass, rot=(HP, 0, ang), verts=20, bevel=0.005)
-        A.sphere(f"ClaspDome{sx}", 0.022, tuple(p + Vector((math.sin(ang), -math.cos(ang), 0)) * 0.012), brass_old, seg=10, rings=6)
+        q = Vector(verts[4 * N + N // 4]) + Vector((sx * 0.055, 0, -0.010))
+        A.torus(f"Vent{sx}", 0.016, 0.0055, tuple(q + Vector((0, 0, 0.005))), brass, rot=(0.6, 0, 0), major=14, minor=5)
+        A.sphere(f"VentHole{sx}", 0.0145, tuple(q), darker, scale=(1, 1, 0.35), rot=(0.6, 0, 0), seg=10, rings=6)
     return {"notes": "concept"}
 
 

@@ -2,17 +2,21 @@
 "Make the boots look wayyy cooler and better. Wayy higher quality. Same with any masks"). Unisex, no ties or straps
 (they would pass through every hairstyle): each mask holds on by sitting on the face.
 
-  WaxMask    - Wax saint mask: a serene saint's face cast in warm ivory candle wax. Closed, downcast eyes carved as lids
-               with see-through slits, a long straight nose, closed lips. The wax has run: a rolled, lumpy rim along the
-               brow edge with drips running down the forehead, the jaw edge sagging into drip tongues with pooled beads
-               hanging just off it. A faint gilt halo-line arcs over the brow (a double line with gilt beads) and a
-               small gilt cross pattee sits between the brows; wax runs over the gilt.
+  WaxMask    - Wax saint mask: a serene saint's face cast in warm ivory candle wax, brow to chin (the brow edge just
+               over the brows, the sides short of the temples). Closed, downcast eyes carved as lids with see-through
+               slits, a long straight nose, closed lips. The wax has run: a rolled, lumpy rim along the brow edge with
+               drips running down onto the brows, the jaw edge sagging into drip tongues with pooled beads hanging just
+               off it. A faint gilt halo-line arcs over the eyes and a small gilt cross pattee sits between the brows;
+               wax runs over the gilt.
   MothMask   - Moth mask: a domino band over the eyes whose two halves are velvet moth wings (dusty black-violet),
-               falcate forewing tips and rounded hindwing lobes. Each eye hole is the wing's discal cell: a raised vein
-               loop rims it and veins radiate to the margin. Crimson and bone eye-spots on the fore- and hindwings, a
-               crimson submarginal band and a bone dash line. A small furry moth body down the nose bridge (banded
+               falcate forewing tips at the brows' outer ends and rounded hindwing lobes over the cheekbones. Each eye
+               hole is the wing's discal cell: a raised vein loop rims it and veins radiate to the margin. Crimson and
+               bone eye-spots on the fore- and hindwings, a crimson submarginal band and a bone dash line. A small
+               furry moth body down the nose bridge (banded
                crimson/black abdomen, a fur-tufted thorax with a bone collar, glossy compound eyes) and two feathered
-               (bipectinate) antennae that rise from its head, curving up and back close over the brow.
+               (bipectinate) antennae that rise from its head and curl forward and out, standing clear in front of
+               the brow (over the head they crossed nearly every hairstyle; now the mask keeps inside |x| 0.45 and
+               under z 1.73, the antennae in front of any fringe).
   DominoMask - Black silk domino: the classic eye mask flush to the face, black silk with a sheen, upswept outer tips,
                almond eye holes, crimson satin piping rolled over every edge and a fine gold thread line inset from
                the outer edge. Compact and close: the most hair-friendly mask.
@@ -413,25 +417,27 @@ def wax_sculpt(x, z):
             + 0.017 * g(x, 0, 0.074) * g(z, 1.170, 0.022) - 0.007 * g(x, 0, 0.085) * g(z, 1.199, 0.009))
     philtrum = 0.006 * g(ax, 0.016, 0.010) * g(z, 1.272, 0.030)
     chin = 0.030 * g(x, 0, 0.13) * g(z, 1.100, 0.050)
-    temples = -0.012 * smooth(0.34, 0.47, ax)
+    temples = -0.012 * smooth(0.32, 0.43, ax)
     lumps = 0.0022 * (math.sin(23 * x + 1.3) * math.sin(19 * z + 0.4) + 0.6 * math.sin(41 * x - 31 * z + 2.0))
     return brow + lid + crease + under + nose + cheek + lips + philtrum + chin + temples + lumps
 
 
 WAX_JAW_DRIPS = [(-0.275, 0.060, 0.046, 0.13), (-0.125, 0.034, 0.042, 0.0), (0.020, 0.052, 0.046, 0.16),
                  (0.165, 0.040, 0.042, 0.0), (0.292, 0.066, 0.046, 0.11)]   # (x, how far the tongue sags, width, bead run)
-WAX_BROW_DRIPS = [(-0.345, 0.12), (-0.215, 0.235), (-0.085, 0.085), (0.105, 0.155), (0.235, 0.205),
-                  (0.355, 0.095)]                                           # (x, length)
+WAX_BROW_DRIPS = [(-0.330, 0.075), (-0.215, 0.118), (-0.085, 0.060), (0.105, 0.088), (0.235, 0.105),
+                  (0.335, 0.062)]                                           # (x, length)
 
 
 def wax_outline():
-    half = [(0, 1.895), (0.12, 1.888), (0.24, 1.868), (0.34, 1.828), (0.415, 1.76), (0.452, 1.66), (0.458, 1.55),
-            (0.443, 1.44), (0.412, 1.34), (0.362, 1.245), (0.292, 1.155), (0.205, 1.09), (0.105, 1.053), (0, 1.042)]
+    # hair-friendly (2026-11-12): the brow edge runs just over the brows and the sides stop short of the temples
+    # (a fringe or side lock crosses anything higher or wider)
+    half = [(0, 1.762), (0.12, 1.757), (0.24, 1.742), (0.33, 1.715), (0.395, 1.672), (0.428, 1.605), (0.436, 1.53),
+            (0.428, 1.44), (0.404, 1.34), (0.36, 1.245), (0.292, 1.155), (0.205, 1.09), (0.105, 1.053), (0, 1.042)]
     loop = resample(catmull(mirrored(half), 12), 0.005)
     out = []
     for x, z in loop:
-        if z > 1.70:   # the brow edge has softened into lumps
-            z += 0.005 * math.sin(41 * x + 0.7) * smooth(1.70, 1.80, z)
+        if z > 1.62:   # the brow edge has softened into lumps
+            z += 0.005 * math.sin(41 * x + 0.7) * smooth(1.62, 1.70, z)
         if z < 1.40:   # the jaw edge sags into drip tongues
             for x0, sag, w, _ in WAX_JAW_DRIPS:
                 u = (x - x0) / w
@@ -510,11 +516,11 @@ def build_wax(M):
               nprof=5)
     # the gilt nimbus: a fine line arched over the brow, worn faint at its ends, and a small cross pattee
     def arc(a, b, n=40):
-        return [(a * math.cos(math.radians(lerp(16, 164, i / n))), 1.585 + b * math.sin(math.radians(lerp(16, 164, i / n))))
+        return [(a * math.cos(math.radians(lerp(14, 166, i / n))), 1.565 + b * math.sin(math.radians(lerp(14, 166, i / n))))
                 for i in range(n + 1)]
     ends = lambda t: smooth(0.0, 0.05, t) * smooth(1.0, 0.95, t)
     ends = lambda t: smooth(0.0, 0.16, t) * smooth(1.0, 0.84, t)
-    ridge("Halo", arc(0.36, 0.228, 48), F, gilt, lambda t: 0.0016 + 0.0030 * ends(t), lambda t: 0.0010 + 0.0024 * ends(t),
+    ridge("Halo", arc(0.335, 0.158, 48), F, gilt, lambda t: 0.0016 + 0.0030 * ends(t), lambda t: 0.0010 + 0.0024 * ends(t),
           nprof=5)
     # order the arm outline: each arm right-flank then the flare tip then left-flank, arms ccw
     cr = []
@@ -522,10 +528,10 @@ def build_wax(M):
         rot = k * HP
         for x, z in ((0.0055, 0.0055), (0.0068, 0.020), (0.0165, 0.031), (-0.0165, 0.031), (-0.0068, 0.020), (-0.0055, 0.0055)):
             cr.append((x * math.cos(rot) - z * math.sin(rot), x * math.sin(rot) + z * math.cos(rot)))
-    cr = ccw([(x, 1.758 + z * 1.15) for x, z in cr])
+    cr = ccw([(x, 1.690 + z * 1.0) for x, z in cr])
     decal("GiltCross", cr, F, 0.0040, gilt, spacing=0.008, bevel=0.0014)
     # the wax has run: a rolled, lumpy rim along the brow edge with drips running down the forehead ...
-    rim = run_where(offset_poly(outline, 0.009), lambda x, z: z > 1.70)
+    rim = run_where(offset_poly(outline, 0.009), lambda x, z: z > 1.62)
     rim = resample(rim, 0.010, closed=False)
     ridge("BrowRim", rim, F, drip,
           lambda t: (0.0150 + 0.0040 * math.sin(37 * t) + 0.0030 * math.sin(83 * t + 1)) * smooth(0.0, 0.06, t) * smooth(1.0, 0.94, t),
@@ -567,10 +573,12 @@ MOTH_EYE = dict(cz=1.606, w=0.094, h=0.047)
 
 
 def moth_outline():
-    half = [(0, 1.848), (0.030, 1.838), (0.052, 1.800), (0.090, 1.772), (0.180, 1.790), (0.290, 1.835), (0.400, 1.885),
-            (0.490, 1.922), (0.552, 1.936), (0.578, 1.905), (0.568, 1.832), (0.548, 1.748), (0.522, 1.680),
-            (0.496, 1.648), (0.506, 1.598), (0.494, 1.530), (0.458, 1.470), (0.398, 1.425), (0.318, 1.404),
-            (0.228, 1.409), (0.152, 1.428), (0.098, 1.456), (0.062, 1.478), (0.036, 1.455), (0, 1.430)]
+    # hair-friendly (2026-11-12): the wings keep inside |x| 0.45 and under the brow line (every fringe and side lock
+    # crosses anything above or outside), the falcate forewing tips at the brow's outer ends
+    half = [(0, 1.722), (0.028, 1.716), (0.048, 1.696), (0.085, 1.678), (0.160, 1.684), (0.250, 1.694), (0.330, 1.704),
+            (0.385, 1.720), (0.418, 1.723), (0.434, 1.708), (0.436, 1.675), (0.428, 1.640), (0.414, 1.613),
+            (0.420, 1.578), (0.408, 1.528), (0.389, 1.474), (0.356, 1.424), (0.312, 1.392), (0.252, 1.388),
+            (0.192, 1.405), (0.140, 1.432), (0.100, 1.458), (0.065, 1.480), (0.038, 1.460), (0, 1.440)]
     loop = resample(catmull(mirrored(half), 12), 0.004)
     # the wing margins are softly scalloped between the vein ends
     out = []
@@ -578,7 +586,7 @@ def moth_outline():
     for i, (x, z) in enumerate(loop):
         if i:
             S += math.hypot(x - loop[i - 1][0], z - loop[i - 1][1])
-        m = max(smooth(0.47, 0.53, abs(x)) * smooth(1.44, 1.50, z), smooth(0.20, 0.30, abs(x)) * (1 - smooth(1.44, 1.47, z)))
+        m = max(smooth(0.38, 0.42, abs(x)) * smooth(1.47, 1.52, z), smooth(0.20, 0.30, abs(x)) * (1 - smooth(1.44, 1.47, z)))
         sc = 0.0055 * m * (1 - abs(math.sin(math.pi * S / 0.052))) ** 1.6
         out.append((x, z, sc))
     pts = []
@@ -643,25 +651,25 @@ def build_moth(M):
                   lambda t: 0.0032 * (1 - 0.5 * t), nprof=4)
         # a crimson submarginal band and a bone dash line along the outer margins
         band = run_where(offset_poly(outline, 0.046),
-                         lambda x, z, sx=sx: x * sx > 0 and (abs(x) > 0.42 or (z < 1.50 and abs(x) > 0.20)))
+                         lambda x, z, sx=sx: x * sx > 0 and (abs(x) > 0.36 or (z < 1.50 and abs(x) > 0.20)))
         band = resample(band, 0.012, closed=False)
         band = [(x, z) for x, z in band]
         ridge(f"MarginBand{k}", band, F, crimson, lambda t: 0.0065 * smooth(0, 0.06, t) * smooth(1, 0.94, t),
               lambda t: 0.0016, nprof=4, lift=0.0004)
         dash = run_where(offset_poly(outline, 0.024),
-                         lambda x, z, sx=sx: x * sx > 0 and (abs(x) > 0.36 or (z < 1.52 and abs(x) > 0.14)))
+                         lambda x, z, sx=sx: x * sx > 0 and (abs(x) > 0.33 or (z < 1.52 and abs(x) > 0.14)))
         dash = resample(dash, 0.0045, closed=False)
         for i in range(2, len(dash) - 4, 9):
             ridge(f"MarginDash{k}_{i}", dash[i:i + 4], F, bone, lambda t: 0.0036 * math.sin(math.pi * (0.15 + 0.7 * t)),
                   0.0020, nprof=3)
         # the eye-spots: a big one on the forewing, a small one on the hindwing (inlays over the veins)
-        for name, (x, z), rings in (("Fore", (sx * 0.405, 1.773), ((0.054, bone, 0.0060), (0.042, crimson, 0.0070),
-                                                                   (0.024, black, 0.0080), (0.0085, bone, 0.0090))),
-                                    ("Hind", (sx * 0.322, 1.488), ((0.034, crimson, 0.0060), (0.022, bone, 0.0070),
-                                                                   (0.010, black, 0.0080)))):
+        for name, (x, z), rings in (("Fore", (sx * 0.362, 1.666), ((0.036, bone, 0.0060), (0.028, crimson, 0.0070),
+                                                                   (0.016, black, 0.0080), (0.0062, bone, 0.0090))),
+                                    ("Hind", (sx * 0.292, 1.458), ((0.030, crimson, 0.0060), (0.019, bone, 0.0070),
+                                                                   (0.0088, black, 0.0080)))):
             for r_i, (rad, mat, t) in enumerate(rings):
-                cx = x + (sx * -0.006 if r_i == 3 else 0.0)
-                cz = z + (0.007 if r_i == 3 else 0.0)
+                cx = x + (sx * -0.005 if r_i == 3 else 0.0)
+                cz = z + (0.006 if r_i == 3 else 0.0)
                 nq = max(12, int(2 * math.pi * rad / 0.0095))
                 d = [(cx + rad * math.cos(2 * math.pi * q / nq), cz + rad * 0.92 * math.sin(2 * math.pi * q / nq)) for q in range(nq)]
                 decal(f"Spot{name}{k}_{r_i}", d, F, t, mat, spacing=min(0.018, rad * 0.7), bevel=0.0015, segments=1)
@@ -669,32 +677,33 @@ def build_moth(M):
     def seg(name, z, rx, ry, rz, mat, seg_=14, rings=8, lift_f=0.25):
         p = F.p(0.0, z, ry * lift_f)
         return A.sphere(name, 1.0, tuple(p), mat, scale=(rx, ry, rz), seg=seg_, rings=rings)
-    seg("MothHead", 1.818, 0.030, 0.026, 0.026, velvet, 12, 8)
+    HZ, TZ = 1.700, 1.643   # the head sits on the wings' top edge, the thorax between the brows
+    seg("MothHead", HZ, 0.028, 0.024, 0.024, velvet, 12, 8)
     for sx in (-1, 1):
-        p = F.p(sx * 0.021, 1.822, 0.019)
-        A.sphere(f"MothEye{sx}", 0.0125, tuple(p), gloss, seg=8, rings=5)
-    seg("MothThorax", 1.738, 0.052, 0.036, 0.056, velvet, 16, 10)
-    abd = [(1.668, 0.043, 0.030, 0.030), (1.626, 0.040, 0.028, 0.028), (1.586, 0.035, 0.025, 0.026),
-           (1.548, 0.029, 0.022, 0.024), (1.512, 0.023, 0.018, 0.022), (1.478, 0.016, 0.014, 0.020)]
+        p = F.p(sx * 0.020, HZ + 0.003, 0.017)
+        A.sphere(f"MothEye{sx}", 0.0115, tuple(p), gloss, seg=8, rings=5)
+    seg("MothThorax", TZ, 0.046, 0.033, 0.046, velvet, 16, 10)
+    abd = [(1.589, 0.038, 0.027, 0.024), (1.555, 0.035, 0.025, 0.022), (1.525, 0.031, 0.023, 0.020),
+           (1.499, 0.026, 0.020, 0.018), (1.477, 0.021, 0.016, 0.016), (1.460, 0.015, 0.012, 0.013)]
     for i, (z, rx, ry, rz) in enumerate(abd):
         seg(f"Abdomen{i}", z, rx, ry, rz, crimson if i % 2 == 0 else velvet, 10, 6)
     rnd = random.Random(7)
     fur, collar = [], []
-    T = F.p(0.0, 1.738, 0.036 * 0.25)
+    T = F.p(0.0, TZ, 0.033 * 0.25)
     for i in range(70):   # fur tufts all over the thorax's visible side
         u = rnd.uniform(-1, 1); v = rnd.uniform(-0.95, 0.95)
         a = math.pi * 0.5 * u * 1.15
         nrm = Vector((math.sin(a) * math.cos(v * HP), -math.cos(a) * math.cos(v * HP), math.sin(v * HP)))
         if nrm.y > 0.15:
             continue
-        base = T + Vector((nrm.x * 0.052, nrm.y * 0.036, nrm.z * 0.056)) * 0.85
-        tip = base + (nrm + Vector((rnd.uniform(-0.3, 0.3), 0, -0.35))).normalized() * rnd.uniform(0.016, 0.028)
+        base = T + Vector((nrm.x * 0.046, nrm.y * 0.033, nrm.z * 0.046)) * 0.85
+        tip = base + (nrm + Vector((rnd.uniform(-0.3, 0.3), 0, -0.35))).normalized() * rnd.uniform(0.014, 0.024)
         fur.append((base, tip, 0.0055))
     for i in range(26):   # the bone collar between the head and the thorax
         a = -HP * 1.05 + math.pi * 1.05 * i / 25
         nrm = Vector((math.sin(a), -math.cos(a), 0.25)).normalized()
-        base = T + Vector((math.sin(a) * 0.044, -math.cos(a) * 0.030, 0.044))
-        tip = base + (nrm + Vector((0, 0, 0.35)) * rnd.uniform(0.5, 1.2)).normalized() * rnd.uniform(0.018, 0.026)
+        base = T + Vector((math.sin(a) * 0.039, -math.cos(a) * 0.027, 0.036))
+        tip = base + (nrm + Vector((0, 0, 0.35)) * rnd.uniform(0.5, 1.2)).normalized() * rnd.uniform(0.015, 0.022)
         collar.append((base, tip, 0.0060))
     for i, (z, rx, ry, rz) in enumerate(abd[:-1]):   # side tufts along the abdomen
         C = F.p(0.0, z, ry * 0.25)
@@ -704,19 +713,26 @@ def build_moth(M):
             fur.append((base, tip, 0.0045))
     cones("ThoraxFur", fur, velvet)
     cones("CollarFur", collar, bone)
-    # two feathered antennae: up from the head and back over the brow, keeping 4-6 hundredths off the head
+    # two feathered antennae: they rise from the head and curl forward and out, standing well in front of the brow
+    # (a fringe lies 0.03 .. 0.10 off the forehead: over the head they would cross nearly every hairstyle)
+    def cyl(x, z, r):
+        a_ = x / HEAD_R
+        return Vector((r * math.sin(a_), -r * math.cos(a_), z))
+
+    def cr3(ctrl, n):
+        P = [ctrl[0] * 2 - ctrl[1]] + list(ctrl) + [ctrl[-1] * 2 - ctrl[-2]]
+        out = []
+        for i in range(n):
+            f = i / (n - 1) * (len(ctrl) - 1)
+            j = min(len(ctrl) - 2, int(f)); t = f - j
+            p0, p1, p2, p3 = P[j], P[j + 1], P[j + 2], P[j + 3]
+            out.append(0.5 * ((2 * p1) + (p2 - p0) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (3 * p1 - p0 - 3 * p2 + p3) * t ** 3))
+        return out
     for sx in (-1, 1):
-        sh = []
-        for i in range(25):
-            t = i / 24
-            ang = sx * (0.035 + 0.42 * t ** 1.25)
-            z = 1.836 + 0.30 * math.sin(t * HP) ** 0.95
-            clear = lerp(0.060, 0.048, t) if t > 0.12 else None
-            if clear is None:
-                p = F.p(sx * 0.012, 1.836, 0.040) .lerp(head_point(ang, z, 0.060), t / 0.12)
-            else:
-                p = head_point(ang, z, clear)
-            sh.append(p)
+        ctrl = [cyl(sx * x, z, r) for x, z, r in ((0.010, HZ + 0.014, 0.656), (0.028, 1.752, 0.692), (0.062, 1.786, 0.735),
+                                                  (0.110, 1.800, 0.772), (0.160, 1.806, 0.795), (0.204, 1.798, 0.808),
+                                                  (0.228, 1.780, 0.810), (0.226, 1.760, 0.804))]
+        sh = cr3(ctrl, 25)
         A.tube(f"AntennaShaft{sx}", [tuple(p) for p in sh], 0.0075, barb_m, res=4, poly=True,
                taper=lambda t: 1.0 - 0.6 * t)
         A.sphere(f"AntennaScape{sx}", 0.0100, tuple(sh[0]), velvet, seg=8, rings=5)
@@ -728,9 +744,9 @@ def build_moth(M):
             j = min(23, int(f))
             p = sh[j].lerp(sh[j + 1], f - j)
             tg = (sh[j + 1] - sh[j]).normalized()
-            hn = head_normal(p)
+            hn = Vector((p.x, p.y, 0)).normalized()   # outward, away from the face
             side = tg.cross(hn).normalized()
-            L = 0.052 * math.sin(math.pi * min(1.0, 0.10 + 0.95 * t)) ** 0.55 + 0.007
+            L = 0.042 * math.sin(math.pi * min(1.0, 0.10 + 0.95 * t)) ** 0.55 + 0.006
             for s in (-1, 1):
                 d = (side * s * 0.80 + tg * 0.50 + hn * 0.20).normalized()
                 barbs.append((p, p + d * L, 0.0034))

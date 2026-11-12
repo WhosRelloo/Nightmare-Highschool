@@ -1,7 +1,8 @@
 """Accessories batch C2 (Kit C, "The Night School Wardrobe"): the masks. All Head pieces, slot Mask, unisex.
 
   KintsugiMask  white porcelain mended with a gold seam, gilt rims, painted lashes, crimson lips and a tear-mark
-  WatchMask     the beaked night-watch mask: stitched leather, a long beak in brass bands, crimson-glass lenses
+  WatchMask     the beaked night-watch mask: a stitched leather band brow to cheekbones, a long beak in brass bands,
+                crimson-glass lenses
   FoxMask, WolfMask, GrilleMask      (nh_kitc_masks_a.py)
   WaxMask, MothMask, DominoMask      (nh_kitc_masks_b.py)
 
@@ -34,4 +35,4 @@ def build_kintsugi(M):
       close=((2.4, -4.6, 1.7), (0, -0.85, 1.45), 70))
 def build_watch(M):
     HQ.build_plague(M, "WatchMask")
-    return {"notes": "Kit C2: stitched leather half-mask, a long beak in brass bands, crimson-glass lenses, temple clasps"}
+    return {"notes": "Kit C2: stitched leather half-mask, a long beak in brass bands, crimson-glass lenses"}

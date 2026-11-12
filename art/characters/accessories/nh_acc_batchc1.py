@@ -211,9 +211,35 @@ def skirt_fit(obj):
 _fit_table = A.fit_table
 
 
+def hips_fit(obj):
+    """the hip panels' depth fit: as A.fit_table, but allowed down to 0.55 (the lean body's torso is 0.33 deep at the
+    lower front corner: at the toolkit's 0.8 floor the panel stood 0.04 off it)"""
+    import random
+    me = obj.evaluated_get(bpy.context.evaluated_depsgraph_get()).to_mesh()
+    pts = [obj.matrix_world @ v.co for v in me.vertices]
+    obj.evaluated_get(bpy.context.evaluated_depsgraph_get()).to_mesh_clear()
+    contact = [(p, max(0.004, min(abs(p.y) - 0.5, 0.02))) for p in pts if p.y < -0.3 and abs(p.x) < 0.985]
+    random.seed(7)
+    if len(contact) > 400:
+        contact = random.sample(contact, 400)
+    out = {}
+    for bid in A.BODY_IDS:
+        if bid == "standard":
+            continue
+        need = 0.0
+        for p, cl in contact:
+            d = A.body_depth(bid, "Torso", p.x, p.z, -1)
+            if d is not None:
+                need = max(need, (d + cl) / abs(p.y))
+        out[bid] = round(min(1.45, max(0.55, need)), 3) if need > 0 else 1.0
+    return out
+
+
 def _fit_table_kitc(obj, mount):
     if obj.name.endswith("Skirt"):
         return skirt_fit(obj)
+    if "Hips" in obj.name:
+        return hips_fit(obj)
     return _fit_table(obj, mount)
 
 
@@ -345,6 +371,213 @@ def build_shell_k(name, P, X):
          X["thread"], sides=4)
 
 
+# ================================================================== the Kit C sleeve: the whole arm (owner: "Same with the arms")
+# Kit A's sleeve ends above the drawn katana's grip (z -0.535) and leaves the inner 0.07-0.14 of the front and back
+# faces bare (the sheathed scabbard passes the left forearm's front inner corner). Kit C's covers the arm down to the
+# cuff (SLV_CUFF, the hand below it) and the front and back faces to the inner edge. Riding the arm entirely, it meets
+# the katana only where the arm itself does (acc_check: layout extra "hug"). The arm's inner face is left open: it is
+# flush on the torso's side, so cloth there would be inside the torso.
+SLV_CUFF = -0.56    # the katana leaves no room lower: the drawn guard spans the right forearm's front below z -0.61,
+                    # and the sheathed scabbard runs through the left forearm's inner side below z -0.48 (front) to
+                    # -0.70 (back), x 1.02-1.23. On most bodies the arm meets them too (allowed: "hug"), but on the
+                    # thinner and deeper arms it doesn't, and a sleeve there would show the katana through the cloth.
+SLV_XIN = -0.48     # arm-local inner edge (x 1.02): clear of the shell's band round the torso's front corner (x <= 1.01)
+SLV_XIN_LOW = -0.36 # below the elbow the inner edge steps out to x 1.14 (the scabbard's top edge)
+
+
+def slv_xin(z):
+    return lerp(SLV_XIN_LOW, SLV_XIN, smooth(-0.45, -0.28, z))
+SLEEVE_Z_K = [SLV_CUFF, SLV_CUFF + 0.03, -0.45, -0.37, -0.28, -0.18, -0.05, 0.10, 0.28, 0.46, 0.62, 0.76, 0.88, 0.96, 1.0]
+
+
+def sleeve_grid_k(d=0.020):
+    from nh_acc_batch4 import arm_wrap
+    kw = K7.wrap_kw()
+    rowsP = []
+    for z in SLEEVE_Z_K:
+        ease = 0.003 * math.sin(math.pi * smooth(-0.8, 0.9, z))
+        rowsP.append([Vector((1.5 + X, Y, z)) for X, Y in arm_wrap(d + ease, x_in=slv_xin(z), **kw)])
+    E0 = arm_wrap(0.0, x_in=SLV_XIN, **kw)
+    Ed = arm_wrap(d, x_in=SLV_XIN, **kw)
+    for a in (35, 70):
+        c, s_ = math.cos(math.radians(a)), math.sin(math.radians(a))
+        rowsP.append([Vector((1.5 + e[0] + (f[0] - e[0]) * c, e[1] + (f[1] - e[1]) * c, 1.0 + d * s_)) for e, f in zip(E0, Ed)])
+    n = len(E0)
+    T = [(SLV_XIN + 0.01, lerp(-0.40, 0.40, k / (n - 1))) for k in range(n)]   # the cap over the arm top to x 1.03
+    for f in (0.0, 0.3, 0.6, 1.0):
+        rowsP.append([Vector((1.5 + lerp(E0[k][0], T[k][0], f), lerp(E0[k][1], T[k][1], f), 1.0 + d)) for k in range(n)])
+    return [[rowsP[j][k] for j in range(len(rowsP))] for k in range(n)]
+
+
+def build_sleeve_k(name, P, X):
+    """the left sleeve, the whole arm: wool outside, lining inside, a rolled hem and a turned-back cuff at the wrist
+    (P cuff "turnback": X["cuff"] with piping and two buttons; else a plain stitched cuff)"""
+    from nh_acc_batch4 import arm_wrap
+    from nh_acc_batch7 import sleeve_hint, button
+    kw = K7.wrap_kw()
+    G = sleeve_grid_k()
+    cloth(name + "Body", G, 0.014, X["wool"], sleeve_hint, mat_in=X["lining"])
+    wire(name + "Hem", [tuple(c[0] + (c[0] - Vector((1.5, 0, c[0].z))).normalized() * 0.006) for c in G], 0.0075,
+         X["wool"], sides=5)
+    wire(name + "Seam", [tuple(Vector((1.5 + 0.10, 0.5 + 0.020 + 0.0085, z))) for z in (SLV_CUFF + 0.02, -0.2, 0.3, 0.8, 0.97)],
+         0.0032, X["thread"], sides=4)
+    zs = [SLV_CUFF + 0.002, SLV_CUFF + 0.03, SLV_CUFF + 0.07, SLV_CUFF + 0.11, SLV_CUFF + 0.15]
+    prof = [arm_wrap(0.040 + 0.004 * (j / 4), x_in=slv_xin(z) + 0.004, **kw) for j, z in enumerate(zs)]
+    Gc = [[Vector((1.5 + prof[j][k][0], prof[j][k][1], z)) for j, z in enumerate(zs)] for k in range(len(prof[0]))]
+    cloth(name + "Cuff", Gc, 0.014, X.get("cuff", X["wool"]), sleeve_hint)
+    wire(name + "CuffPipe", [tuple(c[-1] + (c[-1] - Vector((1.5, 0, c[-1].z))).normalized() * 0.006 + Vector((0, 0, 0.004)))
+                             for c in Gc], P["pipe_r"] * 0.9, X.get("cuff_pipe", X["thread"]), sides=5)
+    if P.get("cuff") == "turnback":
+        for k, z in enumerate((SLV_CUFF + 0.06, SLV_CUFF + 0.12)):
+            button(f"{name}CuffBtn{k}", Vector((2.0 + 0.049, 0.30, z)), (1, 0, 0), X, X["btn"], r=0.026)
+
+
+# ================================================================== under the coat: the torso covered (owner: "Make the
+# jackets cover the torso (In their respective designs)"). In the Shell piece, between the torso and the shell (whose
+# inner face is 0.016 off the torso): a shirt (0.002-0.007) that lies over the shoulder tops round the neck, hangs down
+# the front to the waist (in the waistcoat's V) and down the scooped back to below the neckline; a waistcoat
+# (0.0085-0.0145) over the whole front with a V neck and a pointed hem at z -0.72 (a striding leg's top corner pokes out
+# of the torso below about -0.75); a silk cravat at the throat.
+SHIRT_LIFT, SHIRT_T = 0.0045, 0.005
+VEST_D, VEST_T = 0.0115, 0.006
+
+
+def _ray_poly(theta, poly):
+    """distance from the origin along angle theta to the polygon's boundary (the nearest crossing)"""
+    d = Vector((math.cos(theta), math.sin(theta)))
+    best = None
+    for (ax, ay), (bx, by) in zip(poly, poly[1:] + poly[:1]):
+        ex, ey = bx - ax, by - ay
+        den = d.x * ey - d.y * ex
+        if abs(den) < 1e-12:
+            continue
+        t = (ax * ey - ay * ex) / den
+        u = (ax * d.y - ay * d.x) / den
+        if t > 1e-6 and -1e-9 <= u <= 1 + 1e-9:
+            best = t if best is None else min(best, t)
+    return best
+
+
+def shirt_plan(P):
+    """the shirt in plan, draped over the torso top (A.batch1.drape_point: past an edge it hangs down that face by the
+    overhang): the front hangs to the waist between x -0.5..0.5 (the waistcoat's V), the sides tuck under the shell's
+    shoulder, the back hangs below the scooped neckline"""
+    hf = 1.0 - P.get("shirt_front_z", 0.0)            # front overhang: down to shirt_front_z
+    hb = 1.0 - (P.get("nape_z", 0.78) - 0.10)         # back overhang: 0.10 below the neckline's lowest point
+    xb = P["xo_top"] + 0.06
+    half = [(0.5, -(0.5 + hf)), (0.5, -0.56), (0.96, -0.47), (0.96, 0.47), (xb, 0.53), (xb, 0.5 + hb)]
+    return half + [(-x, y) for x, y in reversed(half)]
+
+
+HIPS_TOP = -0.08   # where the coat panel's cut edge reaches the side (cut_line 1.0)
+HIPS_D, HIPS_T = 0.006, 0.004   # close and thin: on the heavy body the torso is only 0.008 short of the guard's padded box
+
+
+HIPS_SPLIT = -0.45
+
+
+def build_hips(name, P, X, part, hem=None):
+    """the waistcoat's lower front corners (x from the coat panel's cut edge to the side), in two pieces with their
+    own depth fits: part "Up" (HIPS_SPLIT to HIPS_TOP) and "Lo" (the hem to HIPS_SPLIT, a welt along its top). One
+    fit can't hug the corner on every body: the curvy body is 0.53 deep at the hem and 0.37 at the waist, and the
+    coat shell's fit (1.21 on the heavy body, set by the chest) would push the corners into the sheathed katana's
+    guard just in front of the left hip (its back face at y -0.59 padded; the heavy torso is 0.58 deep there)"""
+    hem = hem or (lambda x: -0.64 - 0.08 * smooth(0.0, 0.14, abs(x)) + 0.12 * smooth(0.20, 0.95, abs(x)))
+    y = -(0.5 + HIPS_D)
+    o = HIPS_T / 2 + 0.003
+    z0, z1 = (HIPS_SPLIT, HIPS_TOP) if part == "Up" else (-0.72, HIPS_SPLIT + 0.004)
+    for side in (1, -1):
+        sd = "L" if side > 0 else "R"
+        zs = [lerp(z0, z1, j / 6) for j in range(7)]
+        G = []
+        for i in range(7):
+            u = i / 6
+            col = []
+            for z in zs:
+                x0 = lerp(min(0.99, K7.cut_line(z) + 0.002), 0.995, u)
+                col.append(Vector((side * x0, y, max(z, hem(x0)) if part == "Lo" else z)))
+            G.append(col)
+        cloth(f"{name}{sd}", G, HIPS_T, X["vest"], lambda p: Vector((0, -1, 0)))
+        if part == "Lo":
+            wire(f"{name}Hem{sd}", [tuple(G[i][0] + Vector((0, -o + 0.0015, 0.003))) for i in range(7)], 0.0025, X["vest_pipe"], sides=5)
+            # a welt pocket's edge along the top: the seam where the two corner pieces meet
+            wire(f"{name}Welt{sd}", [tuple(G[i][-1] + Vector((0, -o + 0.0015, -0.006))) for i in range(7)], 0.0035, X["vest_pipe"], sides=5)
+
+
+def add_hips(key, P, X, mat, pipe=None):
+    """the two hip-corner pieces of a coat (<key>HipsUp, <key>HipsLo) in `mat`; returns their extra entries (hug)"""
+    Xh = dict(X, vest=mat, vest_pipe=pipe or mat)
+    for part in ("Up", "Lo"):
+        piece(f"{key}Hips{part}", "Torso")
+        build_hips(f"{key}Hips{part}", P, Xh, part)
+    return {f"{key}HipsUp": {"hug": True}, f"{key}HipsLo": {"hug": True}}
+
+
+def build_inner(name, P, X, cravat=True):
+    from nh_acc_batch1 import drape_point
+    poly = shirt_plan(P)
+    na, radii = 56, [0.0, 0.06, 0.16, 0.30, 0.48, 0.70, 1.0]
+    r0 = 0.64   # clear of the head
+    cols = []
+    for i in range(len(radii)):
+        col = []
+        for j in range(na + 1):
+            th = 2 * math.pi * (j % na) / na - math.pi / 2
+            R = _ray_poly(th, poly) or r0
+            r = lerp(r0, max(R, r0 + 0.02), radii[i])
+            col.append(drape_point(r * math.cos(th), r * math.sin(th), 1.0, SHIRT_LIFT))
+        cols.append(col)
+    A.surface(name + "Shirt", cols, SHIRT_T, X["shirt"])
+    # the waistcoat: the whole front, a V neck, a pointed hem
+    def top(x):
+        return min(0.97, P.get("vest_v", 0.30) + 1.3 * abs(x))
+
+    def hem(x):
+        ax = abs(x)
+        return -0.64 - 0.08 * smooth(0.0, 0.14, ax) + 0.12 * smooth(0.20, 0.95, ax)
+    xs = [lerp(-0.995, 0.995, k / 24) for k in range(25)]
+    nz = 9
+    y = -(0.5 + VEST_D)
+    # below the shell's cutaway (x <= 0.74 under z -0.26) the waistcoat stops under the coat's panel; the hips piece
+    # (build_hips) covers the corners with its own depth fit
+    def w(z):
+        return min(0.995, K7.cut_line(z) - 0.015)
+    G = []
+    for k in range(25):
+        u = k / 24
+        col = []
+        for j in range(nz + 1):
+            x0 = lerp(-0.995, 0.995, u)
+            z = lerp(hem(x0), top(x0), j / nz)
+            col.append(Vector((max(-w(z), min(w(z), x0)), y, z)))
+        G.append(col)
+    cloth(name + "Vest", G, VEST_T, X["vest"], lambda p: Vector((0, -1, 0)))
+    o = VEST_T / 2 + 0.003
+    wire(name + "VestEdge", [(x, y - o + 0.002, top(x) - 0.004) for x in xs if top(x) < 0.965] , 0.0045, X["vest_pipe"], sides=5)
+    wire(name + "VestHem", [(x, y - o + 0.002, hem(x) + 0.004) for x in xs], 0.0045, X["vest_pipe"], sides=5)
+    for k, z in enumerate([0.22, 0.08, -0.06, -0.20, -0.34, -0.48]):
+        A.sphere(f"{name}VestBtn{k}", 0.016, (0.0, y - o, z), X["brass"], scale=(1, 0.5, 1), seg=10, rings=6)
+    for sx in (-1, 1):   # welt pockets
+        A.box(f"{name}VestWelt{sx}", (0.16, 0.006, 0.022), (sx * 0.45, y - o, -0.38), X["vest_pipe"], bevel=0.002)
+    if cravat:   # a black silk cravat: a knot at the throat and two tails lying on the shirt
+        yc = -(0.5 + VEST_D)
+        # a full ascot: a puffed knot, a wrapped band round the collar front, two broad crossed tails with a pin
+        A.sphere(name + "CravatKnot", 0.075, (0.0, yc - 0.016, 0.855), X["cravat"], scale=(1.15, 0.42, 0.80), seg=14, rings=8)
+        for sx in (-1, 1):
+            Gt = []
+            for u in (0.0, 0.33, 0.66, 1.0):
+                col = []
+                for t in [k / 8 for k in range(9)]:
+                    w = 0.055 + 0.075 * t ** 0.8                     # broadening toward the ends
+                    cx = sx * (0.02 - 0.05 * t)                      # the tails cross at the pin
+                    col.append(Vector((cx + (u - 0.5) * w, yc - 0.004 - 0.010 * math.sin(math.pi * t) - 0.004 * (1 - t) - 0.008 * (sx > 0),
+                                       lerp(0.80, 0.42 + 0.05 * (sx > 0), t))))
+                Gt.append(col)
+            cloth(f"{name}CravatTail{sx}", Gt, 0.006, X["cravat"], lambda p: Vector((0, -1, 0)))
+        A.cyl(name + "CravatPin", 0.016, 0.012, (0.0, yc - 0.03, 0.66), X["brass"], rot=(math.pi / 2, 0, 0), verts=10)
+        A.sphere(name + "CravatPearl", 0.014, (0.0, yc - 0.04, 0.66), X.get("pearl", X["shirt"]), seg=10, rings=6)
+
+
 # ================================================================== buttons, pins
 def inkwell_button(name, at, nrm, X, r=0.034):
     """a brass button cast as a tiny inkwell: a domed brass cup, a black-enamel well in its top, a raised rim"""
@@ -378,7 +611,11 @@ def scholar_mats(M):
         thread=A.mat_cloth("InkThread", (0.02, 0.03, 0.09), weave=900, rough=0.5, sheen=0.2, bump=0.05, twill=False),
         brass=M["brass"], ink=M["black_enamel"], silver=M["brass"], strap=M["leather_black"], bone=M["bone"], btn="silver")
     X.update(collar=X["wool"], lapel=X["wool"], pipe=X["wool"], collar_pipe=X["lining"], lapel_pipe=X["thread"],
-             cuff=X["wool"], cuff_pipe=X["lining"])
+             cuff=X["wool"], cuff_pipe=X["lining"],
+             shirt=M["white_linen"], cravat=A.mat_cloth("CravatSilk", (0.012, 0.011, 0.014), weave=520, rough=0.35, sheen=0.5,
+                                                          bump=0.03, twill=False),
+             vest=A.mat_cloth("PlumBrocade", (0.055, 0.020, 0.050), weave=380, rough=0.6, sheen=0.55, bump=0.10),
+             vest_pipe=X["lining"])
     return X
 
 
@@ -398,6 +635,7 @@ def build_scholar(M):
     X, P = scholar_mats(M), scholar_params()
     piece(f"{key}Shell", "Torso")
     build_shell_k(key, P, X)
+    build_inner(key, P, X)
     for s in (1, -1):   # inkwell buttons: three a side, the wearer's right front buttoned, the left with worked holes
         for k, z in enumerate((0.10, -0.12, -0.34)):
             inkwell_button(f"{key}Btn{s}{k}", front_point(s * 0.44, z), (0, -1, 0), X)
@@ -406,14 +644,19 @@ def build_scholar(M):
     half_belt(f"{key}HalfBelt", -0.40, X, X["wool"], P, w=0.07, x1=0.60)
     for s in (-1, 1):
         inkwell_button(f"{key}BeltBtn{s}", back_point(s * 0.55, -0.40, 0.0125), (0, 1, 0), X, r=0.030)
+    for part in ("Up", "Lo"):
+        piece(f"{key}Hips{part}", "Torso")
+        build_hips(f"{key}Hips{part}", P, X, part)
+    piece(f"{key}Shell", "Torso")   # back to the shell for its details
     pen_nib(f"{key}Nib", Vector((K7.lapel_line(0.62, P) + 0.12, -(0.5 + D_F + T_SHELL / 2 + 0.0135) - 0.002, 0.60)), X)
     piece(f"{key}Skirt", "Torso", rig=skirt_rig)
     build_skirt(f"{key}Skirt", P, X)
     piece(f"{key}SleeveL", "LeftArm")
-    build_sleeve(f"{key}SleeveL", P, X)
+    build_sleeve_k(f"{key}SleeveL", P, X)
     mirror_piece(f"{key}SleeveL", f"{key}SleeveR")
     piece(f"{key}SleeveR", "RightArm")
-    write_extra(key, {f"{key}Skirt": {"follow": "LL=1;RL=1"}})
+    write_extra(key, {f"{key}Skirt": {"follow": "LL=1;RL=1"}, f"{key}SleeveL": {"hug": True}, f"{key}SleeveR": {"hug": True},
+                      f"{key}HipsUp": {"hug": True}, f"{key}HipsLo": {"hug": True}})
     return dict(notes="the Scholar's frock coat: charcoal wool, ink-blue silk lining, brass inkwell buttons, a pen-nib pin; "
                       "knee-length skirts that move with the legs (BodyFollow)")
 
