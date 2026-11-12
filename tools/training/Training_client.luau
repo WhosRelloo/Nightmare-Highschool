@@ -54,13 +54,14 @@ local function art(Name: string): string?
 end
 local STAND_IN = {
 	TrainGauge = Theme.Images.OrbRing; TrainRing = Theme.Images.OrbRing; TrainRingFake = Theme.Images.OrbRing;
-	TrainRingHeavy = Theme.Images.OrbRing; TrainMarkGlow = Theme.Images.Glow; TrainRatePerfect = Theme.Images.Seal;
+	TrainRingHeavy = Theme.Images.OrbRing; TrainMarkGlow = Theme.Images.Glow; TrainRatePerfect = Theme.Images.Glow;
 	TrainRateGreat = Theme.Images.Pip; TrainRateGood = Theme.Images.Knob; TrainRateMiss = Theme.Images.Knob;
-	TrainBadgeStreak = Theme.Images.IconCandle; TrainBadgeBest = Theme.Images.Seal; TrainBadgeDaily = Theme.Images.Knob;
+	-- (1.85.2) never the kit's wax Seal here: the seal is only the rarity gem
+	TrainBadgeStreak = Theme.Images.IconCandle; TrainBadgeBest = Theme.Images.Glow; TrainBadgeDaily = Theme.Images.Knob;
 	TrainIconSore = Theme.Images.Pip; TrainGear = Theme.Images.OrbRing; TrainNeedle = Theme.Images.Pip;
-	TrainIconArms = Theme.Images.Seal; TrainIconTorso = Theme.Images.Seal; TrainIconLegs = Theme.Images.Seal;
-	TrainStationPushUp = Theme.Images.Seal; TrainStationPullUp = Theme.Images.Seal; TrainStationSitUp = Theme.Images.Seal;
-	TrainStationSquat = Theme.Images.Seal; TrainFlame = (Theme.SubGames and Theme.SubGames.CandleFlame) or Theme.Images.Glow;
+	TrainIconArms = Theme.Images.Glow; TrainIconTorso = Theme.Images.Glow; TrainIconLegs = Theme.Images.Glow;
+	TrainStationPushUp = Theme.Images.Glow; TrainStationPullUp = Theme.Images.Glow; TrainStationSitUp = Theme.Images.Glow;
+	TrainStationSquat = Theme.Images.Glow; TrainFlame = (Theme.SubGames and Theme.SubGames.CandleFlame) or Theme.Images.Glow;
 }
 -- colour-baked art draws white-tinted; a stand-in is tinted so it still reads
 local function img(Name: string, Props: { [string]: any }, Tint: Color3?)
@@ -116,7 +117,7 @@ function Local.Build()
 	local Plate = Instance.new(`Frame`)
 	Plate.Name = `SetPlate`
 	Plate.AnchorPoint = Vector2.new(0.5, 0)
-	Plate.Position = UDim2.new(0.5, 0, 0, 28)
+	Plate.Position = UDim2.new(0.5, 0, 0, 60)   -- (audit 1.85.2) clear of the compass strip along the top
 	Plate.Size = UDim2.fromOffset(680, 104)
 	Plate.BackgroundTransparency = 1
 	Plate.Parent = Root
@@ -180,7 +181,7 @@ function Local.Build()
 	local Bar = Instance.new(`Frame`)
 	Bar.Name = `NextBar`
 	Bar.AnchorPoint = Vector2.new(0.5, 0)
-	Bar.Position = UDim2.new(0.5, 20, 0, 176)
+	Bar.Position = UDim2.new(0.5, 20, 0, 208)
 	Bar.Size = UDim2.fromOffset(600, 36)
 	Bar.BackgroundTransparency = 1
 	Bar.Parent = Root
@@ -268,7 +269,7 @@ function Local.Build()
 	local GaugeRoot = Instance.new(`Frame`)
 	GaugeRoot.Name = `Gauge`
 	GaugeRoot.AnchorPoint = Vector2.new(0.5, 0.5)
-	GaugeRoot.Position = UDim2.new(0.66, 0, 0.47, 0)
+	GaugeRoot.Position = UDim2.new(0.66, 0, 0.5, 0)
 	GaugeRoot.Size = UDim2.fromOffset(GAUGE, GAUGE)
 	GaugeRoot.BackgroundTransparency = 1
 	GaugeRoot.Parent = Root
@@ -330,8 +331,8 @@ function Local.Build()
 	-- combo (above the gauge): the number punches, a candle flame flickers behind it, hotter on long streaks
 	local Combo = Instance.new(`Frame`)
 	Combo.Name = `Combo`
-	Combo.AnchorPoint = Vector2.new(0.5, 1)
-	Combo.Position = UDim2.new(0.5, 0, 0, -6)
+	Combo.AnchorPoint = Vector2.new(1, 0.5)
+	Combo.Position = UDim2.new(0, -60, 0.68, 0)   -- (audit 1.85.2) left of the gauge, under the stamp
 	Combo.Size = UDim2.fromOffset(240, 96)
 	Combo.BackgroundTransparency = 1
 	Combo.Parent = GaugeRoot
@@ -422,7 +423,7 @@ function Local.Build()
 	text({ Name = `Label`; Text = `PRESS`; Font = Fonts.Title; TextSize = 30; TextColor3 = GOLD; TextXAlignment = Enum.TextXAlignment.Center; Size = UDim2.fromScale(1, 1); Parent = Press })
 	Ui.TouchPress = Press
 	local LeaveRoot, LeaveApi = Kit.Button({ text = `Leave`; style = `ghost`; onClick = function() Local.Leave() end;
-		AnchorPoint = Vector2.new(0, 0); Position = UDim2.new(0.5, 352, 0, 56); Size = UDim2.fromOffset(150, 48); Parent = Root })
+		AnchorPoint = Vector2.new(0, 0); Position = UDim2.new(0.5, 352, 0, 88); Size = UDim2.fromOffset(150, 48); Parent = Root })
 	Ui.LeaveButton = LeaveRoot
 	Ui.LeaveApi = LeaveApi
 
@@ -444,6 +445,12 @@ function Local.Build()
 
 	G.Parent = Player:WaitForChild(`PlayerGui`)
 	Local.Shimmers()
+	-- (audit 1.85.2) fetch every piece up front: the first station visit used to show the plate a moment late
+	task.spawn(function()
+		local List = {}
+		for _, Id in Config.Art or {} do if typeof(Id) == `number` and Id > 0 then table.insert(List, `rbxassetid://{Id}`) end end
+		pcall(function() game:GetService(`ContentProvider`):PreloadAsync(List) end)
+	end)
 end
 
 -- idle shine sweeps across the icons and badges, every few seconds
@@ -643,6 +650,7 @@ function Local.Card(W: number, H: number, Title: string?)
 		tween(S, 0.28, { Scale = 1 }, Enum.EasingStyle.Back)
 	end
 	Kit.FadeIn(Root, 0.2)
+	pcall(Kit.FitToScreen, Root, 12)   -- (audit 1.85.2) phones and short screens: the card never runs off the screen
 	return Root, Api.Content
 end
 
@@ -659,7 +667,6 @@ function Local.Buttons(Parent: Instance, Y: number, Main: string, OnMain: () -> 
 	local _, A = Kit.Button({ text = Main .. MainKey; style = `gold`; onClick = OnMain; Position = UDim2.fromOffset(0, Y); Size = UDim2.fromOffset(W + 30, 52); Parent = Parent })
 	local _, B = Kit.Button({ text = leaveText(); onClick = OnLeave; AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, 0, 0, Y); Size = UDim2.fromOffset(W - 20, 52); Parent = Parent })
 	Ui.CardButtons = { Main = OnMain; Leave = OnLeave }
-	pcall(function() if Kind == `Gamepad` then GuiService.SelectedObject = A.Root end end)
 	return A, B
 end
 
@@ -713,7 +720,7 @@ function Local.Tutorial(OnDone: () -> ())
 			onClick = function() if I < #Pages then I += 1 show() else OnDone() end end; Position = UDim2.fromOffset(0, 300); Size = UDim2.fromOffset(250, 50); Parent = Body })
 		Kit.Button({ text = `Skip`; style = `ghost`; onClick = OnDone; AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, 0, 0, 300); Size = UDim2.fromOffset(150, 50); Parent = Body })
 		Ui.CardButtons = { Main = function() if I < #Pages then I += 1 show() else OnDone() end end; Leave = OnDone }
-		pcall(function() if Kind == `Gamepad` then GuiService.SelectedObject = Next.Root end end)
+		_ = Next
 	end
 	show()
 	Local.Mode(`Card`)
@@ -761,12 +768,13 @@ function Local.ResultCard(R)
 		task.delay(0.25, function() B:Set(math.clamp(A.Xp / math.max(1, A.ToNext), 0, 1)) end)
 	end
 	if R.Streak and R.StreakUp then
-		Local.Row(Body, Y + 174, `Training streak`, `{R.Streak} day{if R.Streak == 1 then `` else `s`}` .. (if R.Yen then `  ·  +{R.Yen} Yen` else ``), GOLD)
+		Local.Row(Body, Y + 168, `Training streak`, `{R.Streak} day{if R.Streak == 1 then `` else `s`}` .. (if R.Yen then `  ·  +{R.Yen} Yen` else ``), GOLD)
 	end
 	if R.NewBest then
-		local Stamp = img(`TrainBadgeBest`, { AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.new(1, -56, 0, 318); Size = UDim2.fromOffset(92, 92); ZIndex = 12; Parent = Body }, GOLD)
-		local Word = text({ Text = `NEW BEST`; Font = Fonts.Title; TextSize = 18; TextColor3 = GOLD; TextXAlignment = Enum.TextXAlignment.Center; AnchorPoint = Vector2.new(0.5, 0);
-			Position = UDim2.new(1, -56, 0, 362); Size = UDim2.fromOffset(120, 22); ZIndex = 12; Parent = Body })
+		-- (audit 1.85.2) in the clear space between the streak row and the buttons (it sat over the streak's value)
+		local Stamp = img(`TrainBadgeBest`, { AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.new(0.5, -70, 0, 340); Size = UDim2.fromOffset(78, 78); ZIndex = 12; Parent = Body }, GOLD)
+		local Word = text({ Text = `NEW BEST`; Font = Fonts.Title; TextSize = 22; TextColor3 = GOLD; TextXAlignment = Enum.TextXAlignment.Left; AnchorPoint = Vector2.new(0, 0.5);
+			Position = UDim2.new(0.5, -22, 0, 340); Size = UDim2.fromOffset(160, 26); ZIndex = 12; Parent = Body })
 		if not reduced() then
 			local S = Instance.new(`UIScale`) S.Scale = 1.6 S.Parent = Stamp
 			task.delay(0.5, function() tween(S, 0.3, { Scale = 1 }, Enum.EasingStyle.Back) Kit.PlaySound(`Stamp`, 0.8, 1.1) end)
@@ -795,18 +803,40 @@ function Local.Mode(M: string)
 	local Set = M == `Set`
 	Ui.Gauge.Visible = Set
 	Ui.Key.Visible = Set
-	Ui.Hint.Visible = Set
 	Ui.ComboRoot.Visible = Set
 	Ui.Rate.Visible = Set
 	Ui.TouchPress.Visible = Set and inputKind() == `Touch`
+	Ui.Hint.Visible = Set and (Session.Sets or 0) < 3   -- (audit 1.85.2) a reminder for the first sets, then out of the way
 	Ui.CardLayer.Visible = M == `Card`
-	Ui.Gauge.Position = if M == `Card` then UDim2.new(0.74, 0, 0.5, 0) else UDim2.new(0.66, 0, 0.47, 0)
-	Ui.GaugeScale.Scale = if M == `Card` then 0.82 else 1
+	Ui.Gauge.Position = if M == `Card` then UDim2.new(0.74, 0, 0.5, 0) else UDim2.new(0.66, 0, 0.5, 0)
+	-- (audit 1.85.2) very wide, short windows: a smaller gauge, so it clears the bar above and the health bar below
+	local Vp = Kit.Viewport()
+	local Short = if Vp.Y > 0 and Vp.X / Vp.Y > 2 then 0.82 else 1
+	Ui.GaugeScale.Scale = (if M == `Card` then 0.82 else 1) * Short
 	Ui.LeaveApi:SetText(leaveText())
 	Ui.KeyText.Text = keysText()
 end
 
 ---| the set |---
+
+-- (audit 1.85.2) everything a set leaves on screen goes back to rest (a set cut short by Leave, death or a fight)
+function Local.ResetSetHud()
+	if not Ui.Root then return end
+	for _, C0 in Ui.RingLayer:GetChildren() do C0:Destroy() end
+	Ui.Hold.Visible = false
+	Ui.Key.Visible = true
+	Ui.Count.TextTransparency = 1
+	Ui.Dim.BackgroundTransparency = 1
+	Ui.Stamina.Root.Visible = false
+	Ui.RateWord.TextTransparency = 1
+	Ui.RateMark.ImageTransparency = 1
+	Ui.MarkGlow.ImageTransparency = 1
+	Ui.ComboNum.Text = ``
+	Ui.ComboWord.Text = ``
+	Ui.ComboHeat = 0
+	Ui.ComboFlame.ImageTransparency = 1
+	if Ui.Needle then Ui.Needle.Rotation = -120 end
+end
 
 function Local.Begin()
 	if not Session or SetRun or Session.Busy then return end
@@ -820,14 +850,12 @@ function Local.Begin()
 		return
 	end
 	local PlanT = Config.Plan(R.Seed, R.Level)
+	Session.Sets = (Session.Sets or 0) + 1
 	local Start = os.clock()
 	SetRun = { Plan = PlanT; Level = R.Level; Tier = Config.TierFor(R.Level); Start = Start; Presses = {}; Held = nil;
 		Rings = {}; Next = 1; Combo = 0; Results = {}; Stamina = 100; Done = false; Area = R.Area }
 	Local.Mode(`Set`)
-	Ui.ComboNum.Text = ``
-	Ui.ComboWord.Text = ``
-	Ui.ComboHeat = 0
-	Ui.ComboFlame.ImageTransparency = 1
+	Local.ResetSetHud()
 	Ui.PlateReps.Text = `Rep 0 / {#PlanT.Rings}`
 	Ui.Stamina.Root.Visible = PlanT.Stamina
 	Ui.Stamina:Set(1, true)
@@ -968,6 +996,8 @@ function Local.Run()
 			tween(Ui.Dim, 0.9, { BackgroundTransparency = 1 }, Enum.EasingStyle.Sine)
 		end
 		-- the set ends after the last ring's window (or when stamina runs out)
+		-- (audit 1.85.2) a HOLD never released can't keep the set open: it ends with the plan, the hold let go there
+		if Run.Held and T > Run.Plan.Duration + 1.5 then Local.Press(false) end
 		if (Run.Next > #Run.Plan.Rings and #Run.Rings == 0 and not Run.Held) or Run.Spent then
 			Conn:Disconnect()
 			Local.Finish(Run)
@@ -1021,6 +1051,7 @@ function Local.Press(Down: boolean)
 		return
 	end
 	if Run.Held then return end
+	if T < Config.CountIn - 0.05 then return end   -- (audit 1.85.2) a press during the 3-2-1 isn't a stray rep
 	if #Run.Presses > 0 and T - Run.Presses[#Run.Presses].T < Config.Check.MinPressGap then return end
 	local Entry = { T = T }
 	table.insert(Run.Presses, Entry)
@@ -1228,7 +1259,7 @@ function Local.StepUp(D, Mine: boolean)
 		local B = Instance.new(`Frame`)
 		B.Name = `StepBanner`
 		B.AnchorPoint = Vector2.new(0.5, 0.5)
-		B.Position = UDim2.fromScale(0.66, 0.72)
+		B.Position = UDim2.fromScale(0.66, 0.62)
 		B.Size = UDim2.fromOffset(760, 150)
 		B.BackgroundTransparency = 1
 		B.ZIndex = 40
@@ -1284,8 +1315,7 @@ function Local.StepUp(D, Mine: boolean)
 		if S.Rep then S.Rep:Stop(0.2) end
 		task.delay(1.9, function()
 			if Session ~= S then return end
-			if S.IdleFromRep and S.Rep then S.Rep:Play(0.25, 1, 0) S.Rep.TimePosition = 0
-			elseif S.Idle then S.Idle:Play(0.25) end
+			Local.PlayIdle(S)
 		end)
 		task.wait(0.2)
 	elseif P == Player and Def and Def.Hang then
@@ -1351,18 +1381,33 @@ function Local.Track(Id: number?, Looped: boolean, Priority: Enum.AnimationPrior
 	return T
 end
 
+-- the rest pose between reps: the idle loops, or (IdleHold: the sit-up's looping motion) is held on its first frame
+function Local.PlayIdle(S)
+	if not (S and S.Idle) then return end
+	if S.IdleHold then
+		S.Idle:Play(0.25, 1, 0)
+		S.Idle.TimePosition = 0
+		S.Idle:AdjustSpeed(0)
+	else
+		S.Idle:Play(0.25)
+	end
+end
+
+-- one rep: the rep plays once, sped up only if it wouldn't finish before the next ring; the idle (still playing under
+-- it at a lower priority) shows again as it fades out
 function Local.PlayRep()
 	local S = Session
 	if not (S and S.Rep) then return end
 	local Gap = if SetRun then SetRun.Tier.Gap else 1
-	local Speed = if S.Rep.Length > 0 then math.max(1, S.Rep.Length / (Gap * 0.92)) else 1
-	if S.IdleFromRep then
-		S.Rep.TimePosition = 0
-		S.Rep:AdjustSpeed(Speed)
-		S.RepUntil = os.clock() + S.Rep.Length / Speed
-	else
-		S.Rep:Play(0.08, 1, Speed)
+	if SetRun then   -- (audit 1.85.2) the real time to the next ring (jitter and burnout make it shorter than the tier's gap)
+		local T = os.clock() - SetRun.Start
+		for _, Ring in SetRun.Plan.Rings do
+			if Ring.T > T + 0.05 then Gap = math.clamp(Ring.T - T, 0.35, Gap) break end
+		end
 	end
+	local Speed = if S.Rep.Length > 0 then math.max(1, S.Rep.Length / (Gap * 0.92)) else 1
+	if S.Rep.IsPlaying then S.Rep:Stop(0.05) end
+	S.Rep:Play(0.08, 1, Speed)
 end
 
 function Local.Enter(D)
@@ -1370,19 +1415,14 @@ function Local.Enter(D)
 	local Def = Config.Stations[D.Station]
 	if not Def then return end
 	if not Gui then Local.Build() end
-	Session = { Station = D.Station; State = D.State; Mode = `Card`; IdleFromRep = Def.IdleFromRep == true }
+	Session = { Station = D.Station; State = D.State; Mode = `Card`; IdleHold = Def.IdleHold == true }
 	local S = Session
 	Gui.Enabled = true
 	Local.ApplyState(D.State)
 	-- animations: the idle loops; the rep plays once per rep
-	if Def.IdleFromRep then
-		S.Rep = Local.Track(Def.Rep, true, Enum.AnimationPriority.Action2)
-		if S.Rep then S.Rep:Play(0.2, 1, 0) end    -- held on its first frame between reps
-	else
-		S.Idle = Local.Track(Def.Idle, true, Enum.AnimationPriority.Action)
-		S.Rep = Local.Track(Def.Rep, false, Enum.AnimationPriority.Action2)
-		if S.Idle then S.Idle:Play(0.25) end
-	end
+	S.Idle = Local.Track(Def.Idle, true, Enum.AnimationPriority.Action)
+	S.Rep = Local.Track(Def.Rep, false, Enum.AnimationPriority.Action2)
+	Local.PlayIdle(S)
 	-- no jumping off the station by accident (Space is the press)
 	local Hum = Player.Character and Player.Character:FindFirstChildOfClass(`Humanoid`)
 	if Hum then
@@ -1413,14 +1453,6 @@ function Local.Enter(D)
 			if I.UserInputType == Enum.UserInputType.MouseButton1 or I.UserInputType == Enum.UserInputType.Touch then Local.Press(false) end
 		end))
 	end
-	-- the sit-up hold: after a rep plays out, stop it on the first frame again
-	table.insert(S.Conns, RunService.Heartbeat:Connect(function()
-		if S.IdleFromRep and S.Rep and S.RepUntil and os.clock() >= S.RepUntil then
-			S.RepUntil = nil
-			S.Rep.TimePosition = 0
-			S.Rep:AdjustSpeed(0)
-		end
-	end))
 	Local.Camera()
 	task.delay(0.9, Local.Settle)
 	task.delay(2.2, Local.Settle)
@@ -1521,13 +1553,15 @@ function Local.Teardown()
 	for _, C0 in S.Conns or {} do pcall(function() C0:Disconnect() end) end
 	ContextActionService:UnbindAction(`NHTrainPress`)
 	ContextActionService:UnbindAction(`NHTrainLeave`)
-	if S.Idle then S.Idle:Stop(0.3) end
-	if S.Rep then S.Rep:Stop(0.3) end
+	-- (audit 1.85.2) stop AND destroy the tracks: every visit loaded new ones, and an Animator keeps loaded tracks
+	for _, Tr in { S.Idle, S.Rep } do
+		if Tr then pcall(function() Tr:Stop(0.3) end) task.delay(0.35, function() pcall(function() Tr:Destroy() end) end) end
+	end
 	if S.Hum and S.Hum.Parent then S.Hum:SetStateEnabled(Enum.HumanoidStateType.Jumping, S.JumpWas ~= false) end
 	CameraLease.Release(`Training`)
 	if Gui then
 		Local.ClearCards()
-		for _, C0 in Ui.RingLayer:GetChildren() do C0:Destroy() end
+		Local.ResetSetHud()
 		Gui.Enabled = false
 	end
 end

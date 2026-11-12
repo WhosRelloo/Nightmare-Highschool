@@ -1,11 +1,11 @@
-# Training (1.81.0, phase 1)
+# Training (1.81.0, phase 1; audited 1.85.2)
 
 Students train their **Arms**, **Torso** and **Legs** one at a time at gym stations. When a set steps an area up, that area's body meshes change live: big arms on skinny legs looks like that. The concept is in [training-minigames-concept](superpowers/specs/2026-11-11-training-minigames-concept.md), and the numbers and reasons are in [Training-Design-Note](Training-Design-Note.md).
 
 The owner asked: "Make sure the minigames are fun, easy to understand, and great for player retention (ON THEMED OFC)", "make sure the UI/icons for it are all original and on theme", "the highest quality with PBR textures", and "Make sure its animated and cool looking".
 
-![A set (in-game; kit stand-ins until the art import)](img/training-play-set.jpg)
-![The final PBR art at its in-game place, beside the health bar and hotbar (composite)](img/training-hud-pbr.jpg)
+![A pull-up set with the real PBR art (1.85.2)](img/training-pbr-pullup.jpg)
+![A real push-up set stepping the arms up: banner, flex, NEW BEST, the 2-day streak (1.85.2)](img/training-pbr-stepup.jpg)
 
 ## The stations (NH Combat Test, the gym's south-west corner)
 
@@ -13,18 +13,19 @@ The owner asked: "Make sure the minigames are fun, easy to understand, and great
 |---|---|---|---|
 | Pull-ups | Arms | the gym kit's WallBars on the south wall, with an iron chin-up bar and brass collars at the grip height (floor + 7.8) | idle 134151351487837, rep 115584556914404 |
 | Push-ups | Arms | a crimson leather mat | idle 111737875654076, rep 112288220550648 |
-| Sit-ups | Torso | a crimson leather mat | 132757288791974 (one looping rep: held on its first frame between reps) |
+| Sit-ups | Torso | a crimson leather mat | rep 88010144797396 (1.85.2); 132757288791974 held on its first frame as the rest pose (`IdleHold`) |
 | Squats | Legs | an oak platform with chalked foot marks, by the west wall | idle 119121474882852, rep 88777267068656 |
 
 - **Building them:** `workspace.NHTraining`. Each station is a Model tagged `NHTrainStation`, with:
   - the attribute `Station`;
   - `FloorY` (and `GripY` for the bar);
   - a `Spot` part, where the root goes, facing the right way;
-  - a ProximityPrompt **Train** (E, or X on a pad);
+  - a ProximityPrompt **Train** (E, or X on a pad), on the `PromptAt` attachment 3.2 studs above the Spot (1.85.2: on the floor it went off-screen up close);
   - a brass floor plaque and a chalk bowl.
 - **Next to the ambient gym students:** the corner already looks busy.
 - **Sitting:** the prompt seats you, anchored on the Spot. Your client measures where its pose sits and asks the server to rest the body on the mat or hang the hands on the bar (cosmetic, clamped to −4..+1.5 studs).
-- **Getting up:** you stand up on Leave (Q, or B on a pad, or the button), on death, on respawn and on being downed.
+- **Getting up:** you stand up on Leave (Q, or B on a pad, or the button), on death, on respawn, on being downed, when your character is removed (back to the menu, a slot switch), and when you're hit (a combat tag). Your client gets the body back (network owner).
+- **Who can't sit:** anyone busy (downed, carried, gripping, stunned, in a lesson, hiding), sitting in a seat, on a skateboard, in wolf form, mid tier-up or in the main menu. While seated you carry the `InActivity` state, as in a lesson, so you can't attack or grip from the mat.
 - **Fights:** a combat-tagged student can't sit down.
 
 ## How a set plays
@@ -102,7 +103,7 @@ The design source of the first pass, `make_training_ui.py`, made the greyscale i
 | TrainPlate (9-slice 64, 64, 704, 128), TrainKey (9-slice 40, 40, 216, 88), TrainBarFrame, TrainBarFill | 768 x 192, 256 x 128, 1200 x 72, 512 x 64 | the set plate, the key cap, the bar's iron channel, the molten brass tile |
 | TrainFlame | 1024 | a 4 x 4 flipbook of 256 frames |
 
-**The art is in (2026-11-11):** the owner imported `art/group-upload-training`. All 27 ids were read by name from the group (no duplicates), all passed Roblox's review, and they're set in `Config.Training.Art` in NH Combat Test (backup: `ServerStorage.NH_Backup.Config_Training_preArt`) and in `tools/training/Config_Training.luau`. All 27 preload in Studio. `Controllers.Gui.Training` now draws the real PBR art (`StandIn` = false) instead of the kit stand-ins, so training no longer uses the brass seal icon. Not yet seen in a Play test.
+**The art is in (2026-11-11):** the owner imported `art/group-upload-training`. All 27 ids were read by name from the group (no duplicates), all passed Roblox's review, and they're set in `Config.Training.Art` in NH Combat Test (backup: `ServerStorage.NH_Backup.Config_Training_preArt`) and in `tools/training/Config_Training.luau`. All 27 preload in Studio. `Controllers.Gui.Training` now draws the real PBR art (`StandIn` = false) instead of the kit stand-ins, so training no longer uses the brass seal icon. Seen in Play in 1.85.2: all 27 load, and the client fetches them up front.
 
 ## The body (one area at a time)
 
@@ -183,7 +184,7 @@ The design source of the first pass, `make_training_ui.py`, made the greyscale i
 
 ## Known and not verified
 
-- **The art:** the PBR art in game waits for the import; until then you see stand-ins. `training-hud-pbr.jpg` is a composite.
+- **The art:** in game since 1.85.2 (see the screenshots above). `training-hud-pbr.jpg` is the pre-import composite.
 - **Not tried:**
   - a second player watching (the moment and the flex for others);
   - a burnout set and a tier IV stamina set (only the scoring code ran);
@@ -194,7 +195,7 @@ The design source of the first pass, `make_training_ui.py`, made the greyscale i
   - a real touch screen;
   - the gamepad B leave after the priority fix.
 - **Real-key timing through the test tool drifts** by about 100 ms a press, so long Perfect streaks weren't played by hand. The combo flame and the ×10 shake were seen only in the beats image.
-- **Testy** (slot 4) was left with Toned arms, torso and legs, all Lv 5, and Arms at today's cap.
+- **Testy** (slot 4) after 1.85.2: Arms Lv 5 (Toned arms); Torso and Legs Lv 5 in the data, but their meshes were reset to the base by a test `Set` (they change again at Lv 10); a 2-day streak. The test grant's 6000 push-up best is still in the save.
 - **The Map place** has none of this.
 
 ## Map sync (for the "Port hair, eyes and their UI to the Map place" session)
@@ -206,4 +207,4 @@ The Map place needs:
 - the `Config.Progression.Training` effects, the Progression `Effects` / `NH_SprintMult` lines and CombatSpeed's sprint line, if the Map has those services;
 - the ten body types' meshes (not in the Map yet: see Body-Types);
 - stations tagged `NHTrainStation` in its gym (each with `Station`, `FloorY`, `GripY` for the bar, a `Spot` and a Train prompt);
-- the art ids once imported.
+- the art ids (now in `Config.Training.Art`), the sit-up `IdleHold` and the chest-height `PromptAt` prompts (1.85.2).

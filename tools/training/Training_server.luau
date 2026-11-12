@@ -22,11 +22,14 @@ local CollectionService = game:GetService(`CollectionService`)
 local RunService = game:GetService(`RunService`)
 
 local Data = require(ServerScriptService.Services.Player.Data)
+local StateManager = require(ReplicatedStorage.Packages.Bind.StateManager)
 local Config = require(ReplicatedStorage.Config.Training)
 local Appearance = require(ReplicatedStorage.UI.Appearance)
 
 local Shared = {}
 local Local = {}
+-- (audit 1.85.2) states that keep a student off a station (the same list the seats and NPC talk use)
+local BUSY = { `Downed`, `Carried`, `Carrying`, `Gripped`, `Gripping`, `InActivity`, `Stun`, `ParryStun`, `Paralyzed` }
 
 local Seats = {} :: { [Player]: { Station: Model, Id: string, Spot: CFrame, Y: number, Loads: { Instance } } }
 local Occupant = {} :: { [Model]: Player }
@@ -152,6 +155,10 @@ function Local.Sit(P: Player, Station: Model)
 	local Hum = Char and Char:FindFirstChildOfClass(`Humanoid`)
 	if not (Root and Hum and Hum.Health > 0) then return end
 	if Char:GetAttribute(`Downed`) or Hum:GetAttribute(`Downed`) then return end
+	-- (audit 1.85.2) not while busy (carried, gripping, stunned, in a lesson or hiding), sitting in a seat, on a board,
+	-- in wolf form, mid tier-up or in the main menu
+	if StateManager.HasState(Char, BUSY) or Hum.Sit or Hum.SeatPart or Hum.PlatformStand or Char:GetAttribute(`WolfForm`)
+		or Char:GetAttribute(`NH_Evolving`) or Char:GetAttribute(`SkateboardRiding`) or Char:GetAttribute(`Mounted`) or P:GetAttribute(`InMainMenu`) == true then return end
 	local Tag = P:GetAttribute(`CombatTagUntil`)
 	if typeof(Tag) == `number` and Tag > workspace:GetServerTimeNow() then
 		pcall(function() require(ServerScriptService.Services.Features.Notifications).Notify(P, { Title = `Training`; Text = `Catch your breath first: you are in a fight.`; Kind = `Warning` }) end)
@@ -164,7 +171,9 @@ function Local.Sit(P: Player, Station: Model)
 	local Up = Local.StandHeight(Char)
 	local CF = Spot.CFrame * CFrame.new(0, Up - Spot.Size.Y / 2, 0)
 	Occupant[Station] = P
-	Seats[P] = { Station = Station; Id = Id; Spot = CF; Y = 0; Loads = {} }
+	Seats[P] = { Station = Station; Id = Id; Spot = CF; Y = 0; Loads = {}; Char = Char;
+		-- (audit 1.85.2) the combat and interaction systems read this state: no attacking or gripping from the mat
+		Freeze = StateManager.CreateState(Char, `InActivity`) }
 	Root.AssemblyLinearVelocity = Vector3.zero
 	Root.Anchored = true
 	Root.CFrame = CF
@@ -185,14 +194,18 @@ function Local.Stand(P: Player, Why: string?)
 	local Prompt = S.Station:FindFirstChildWhichIsA(`ProximityPrompt`, true)
 	if Prompt then Prompt.Enabled = true end
 	for _, L in S.Loads do pcall(function() L:Destroy() end) end
-	local Char = P.Character
-	if Char then
+	if S.Freeze then pcall(function() S.Freeze:Destroy() end) end
+	-- (audit 1.85.2) the seated character, even if it's already being replaced
+	local Char = S.Char or P.Character
+	if Char and Char.Parent then
 		Char:SetAttribute(`NHTraining`, nil)
 		local Root = Char:FindFirstChild(`HumanoidRootPart`) :: BasePart?
 		if Root and Root.Anchored then
 			-- step off the station, standing, a little in front of it
 			Root.CFrame = S.Spot * CFrame.new(0, 0, -2.5)
 			Root.Anchored = false
+			-- (audit 1.85.2) hand the body back to the player's client (anchoring took it to the server)
+			pcall(function() Root:SetNetworkOwner(P) end)
 		end
 	end
 	P:SetAttribute(`NHTraining`, nil)
@@ -411,8 +424,9 @@ function Local.Award(P: Player, A, Res)
 	-- personal best per station
 	local Score = math.floor(Res.Points * 10 + 0.5)
 	local B = T.Best[A.Station] or { Score = 0; Combo = 0 }
-	local NewBest = Counts and (Score > B.Score or Res.BestCombo > B.Combo)
-	if Counts then
+	-- (audit 1.85.2) a Studio test grant is not a set: it never writes a personal best
+	local NewBest = Counts and not A.Test and (Score > B.Score or Res.BestCombo > B.Combo)
+	if Counts and not A.Test then
 		T.Best[A.Station] = { Score = math.max(B.Score, Score); Combo = math.max(B.Combo, Res.BestCombo) }
 	end
 	-- the Athletes notice gym regulars
@@ -455,6 +469,21 @@ function Shared.TestGrant(P: Player, Area: string, Xp: number)
 	local Res = { Points = Xp; Reps = 99; BestCombo = 0; Perfect = 0; Great = 0; Good = 0; Miss = 0; Feint = 0; Stray = 0 }
 	local Station = (Seats[P] and Seats[P].Id) or `PushUp`
 	return Local.Award(P, { Area = Area; Station = Station; Plan = { Burnout = false }; Level = T[Area].Level; Test = true }, Res)
+end
+
+-- (Studio test bridge) put an area back to a level and XP for a test, and the body back to the base (SetBuild Average)
+function Shared.TestSet(P: Player, Area: string, Level: number, Xp: number?, ResetBody: boolean?)
+	if not RunService:IsStudio() then return false end
+	local T = Shared.Get(P)
+	if not T or not T[Area] then return false end
+	T[Area].Level = math.clamp(math.floor(Level), 0, Config.MaxLevel)
+	T[Area].Xp = math.max(0, math.floor(Xp or 0))
+	T[Area].Sore, T[Area].SoreAt = 0, 0
+	T.DayXp[Area] = 0
+	if ResetBody then T.Best = {} end   -- (1.85.2) clears bests a test grant wrote before grants stopped writing them
+	Local.Save(P, T)
+	if ResetBody then pcall(Appearance.SetBuild, P, `Average`, 0) end
+	return Shared.State(P)
 end
 
 ---| setup |---
@@ -505,6 +534,13 @@ function Shared.OnStart()
 	for _, P in Players:GetPlayers() do task.spawn(Local.Seed, P) end
 	-- leaving the station: death, respawn, downed, leaving the game
 	local function watch(P: Player)
+		-- (audit 1.85.2) a character removed without dying (back to the menu, a slot switch, a reload) frees the station
+		P.CharacterRemoving:Connect(function() if Seats[P] then Local.Stand(P, `Removed`) end end)
+		-- (audit 1.85.2) hit while training: up you get, so you can fight back
+		P:GetAttributeChangedSignal(`CombatTagUntil`):Connect(function()
+			local Tag = P:GetAttribute(`CombatTagUntil`)
+			if Seats[P] and typeof(Tag) == `number` and Tag > workspace:GetServerTimeNow() then Local.Stand(P, `Fight`) end
+		end)
 		P.CharacterAdded:Connect(function(Ch)
 			if Seats[P] then Local.Stand(P, `Respawn`) end
 			local Hum = Ch:WaitForChild(`Humanoid`, 10) :: Humanoid?

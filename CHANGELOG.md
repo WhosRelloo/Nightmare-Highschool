@@ -2,6 +2,49 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.85.2] - 2026-11-11: Training audit and bug fixes; the real sit-up rep
+
+The owner: "Completely audit and bugfix the training system. Also add the actual situp anim in not just the idle.
+Situp ANIM: 88010144797396". Every training script, the Appearance / save / stat patches and the stations were read
+line by line; what was found and fixed is below (`docs/Training.md#audit-1852`). Backups:
+`ServerStorage.NH_Backup.Training_audit_pre` (the three modules and the stations).
+
+### Changed
+- **Sit-ups**: the owner's rep 88010144797396 plays once per rep; 132757288791974 is the held rest pose between reps
+  (`IdleHold`), replacing the old trick of pausing one looping rep.
+- **Reps fit the real time to the next ring** (jitter and burnout gaps), so each rep finishes and settles to the pose.
+
+### Fixed
+- **Station prompts didn't show up close**: the prompt sat on the floor Spot, off-screen when you stood near (the
+  pull-up's never showed from in front of the bar). Each prompt is now at chest height (`Spot.PromptAt`).
+- **Attacking from the mat**: a seated student now carries the `InActivity` state (as lessons do), so the combat,
+  grip and interaction systems leave them out; a hit (combat tag) stands them up to fight; you can't sit down while
+  busy, in a seat, on a board, in wolf form, mid tier-up or in the menu.
+- **Leaving without dying** (back to the menu, a slot switch, a reload) left the station locked: it now frees on
+  CharacterRemoving. The body is handed back to the player's client on standing (network owner).
+- **A HOLD never let go kept the set open forever**: it now ends with the plan.
+- **Presses during the 3-2-1** counted as strays (combo break, stamina).
+- **Gamepad**: A pressed the selected button and the main button together (tutorial pages skipped); B didn't leave
+  (the menu's back binding won). Both fixed (no GUI selection; the bindings at 3100).
+- **Animation tracks leaked**: every visit loaded new ones; they're destroyed on leaving.
+- **HUD left over** after a set cut short (HOLD bar, count, stamina, dim, combo): reset on every start and leave.
+- **Layout**: the set plate sat under the compass strip; the combo sat on the bar's end; the NEW BEST stamp hid the
+  streak; the step-up banner covered the Yen; the hint covered the health bar (now only the first sets of a visit);
+  a smaller gauge on very wide, short windows; cards fit small screens; the art is fetched up front (the plate showed late).
+- **Studio test grants wrote personal bests** (a 6000 push-up best on Testy); they no longer do.
+- **Stand-ins never use the rarity Seal.**
+
+### Verified (Studio Play, slot 4 "Testy", real keys and pad buttons)
+- The real PBR HUD art in game (all 27 load); the new sit-up rep; a live Arms step-up from a real push-up set (5 Perfect,
+  banner, flex, Toned arms only) and it saved across a rejoin; the UTC day rollover (Fresh back, streak 1 -> 2 days,
+  +4%); refused: Begin while not seated, a second Begin, a replayed Submit, a Submit after dying; death, pad B and a
+  combat tag all free the station, unanchor and tear the HUD down; the pull-up prompt from up close; Reduce Motion
+  (no trail); phone-size and touch layout. Test settings put back (`SlotCount = 3`, `NHTestNoMenuKeys` cleared).
+
+### Not verified
+- A second player watching, burnout / stamina / HOLD by real keys, a real touch screen, an old save without Training
+  in Play (Reconcile + Sanitize code-reviewed), being hit by a real attacker while seated (the tag was set directly).
+
 ## [1.85.1] - 2026-11-11: the v2 hairs are in; hair tuck seen in game
 
 ### Changed

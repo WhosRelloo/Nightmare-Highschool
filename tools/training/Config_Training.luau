@@ -17,12 +17,13 @@ Training.AreaInfo = {
 }
 
 -- The stations. Anim ids are the owner's (Features.AmbientNpcs ANIM, plus the new squat pair).
--- Rep: played once per good-or-better rep. Idle: held between reps. SitUp has one looping rep, so its idle holds
--- the rep's first frame (IdleFromRep).
+-- Rep: played once per good-or-better rep. Idle: held between reps. IdleHold: the idle is a looping motion (the
+-- sit-up's old looping rep), so it's held still on its first frame as the rest pose (1.85.2: the owner's sit-up rep
+-- 88010144797396 plays on top).
 Training.Stations = {
 	PushUp = { Name = `Push-ups`; Area = `Arms`; Icon = `TrainStationPushUp`; Idle = 111737875654076; Rep = 112288220550648; Load = `Vest` };
 	PullUp = { Name = `Pull-ups`; Area = `Arms`; Icon = `TrainStationPullUp`; Idle = 134151351487837; Rep = 115584556914404; Load = `Vest`; Hang = true };
-	SitUp = { Name = `Sit-ups`; Area = `Torso`; Icon = `TrainStationSitUp`; Rep = 132757288791974; IdleFromRep = true; Load = `Belt`; CamSide = -1 };
+	SitUp = { Name = `Sit-ups`; Area = `Torso`; Icon = `TrainStationSitUp`; Idle = 132757288791974; IdleHold = true; Rep = 88010144797396; Load = `Belt`; CamSide = -1 };
 	Squat = { Name = `Squats`; Area = `Legs`; Icon = `TrainStationSquat`; Idle = 119121474882852; Rep = 88777267068656; Load = `Sandbag` };
 }
 Training.StationOrder = { `PushUp`, `PullUp`, `SitUp`, `Squat` }
