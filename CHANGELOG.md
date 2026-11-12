@@ -2,6 +2,56 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.95.0] - 2026-11-12: Lunch trays you eat down to the crumbs, and somewhere to take them back
+
+The owner asked for a tray return rack (they chose both a trolley and a wall hatch), then for "different variants of the
+lunch trays, as the player progressively eats and finishes the food", the empty tray carried until it's returned.
+Props batches 55 and 56; `Services.Features.Tray` and `Config.Tray` (`tools/tray/`).
+
+### Added
+- **The tray trolley** (`TrayTrolley`, batch 55): black wrought iron on brass castors, two columns of five slide-in runners
+  for the 1.5x trays, pointed-arch grilles with a quatrefoil on the sides, an oak top with a brass edge, gilt finials, a
+  push bar and a "RETURN TRAYS" plaque. A returned tray slides into the next empty rail and stays two minutes
+  (`Config.Tray.Rack.Keep`); when all ten are full the oldest makes way.
+- **The return hatch** (`TrayReturnHatch`, batch 55): a dark stone wall unit 6.7 x 3.3 x 8.5, a pointed arch with an iron
+  sunburst, a "TRAY RETURN" plaque, fluted pilasters, a cornice with finials and a service bell. Two trays fit on its
+  slate sill; each rolls along the brass roller conveyor, under the leather curtain, and is gone (2.2 s, `Rack.Roll`).
+- **Any rack can have slots:** `Features.Tray` reads `Slot1`, `Slot2`, ... attachments (a tray's bottom centre, its long
+  side along X) on a part tagged `NHTrayReturn`, and a `SlotNInto` beside a slot makes it a conveyor.
+- **Eaten stages** (batch 56): every lunch tray has three more, partly eaten, mostly eaten and empty: food taken bite by
+  bite, broth, curry and stew levels dropping in their bowls, sauce smeared where it was scooped, crumbs and grains left
+  behind, and at the end the dirty dishes (a fish skeleton, a clean drumstick bone, a squeezed lemon, miso dregs, the
+  cutlery laid down, a crumpled napkin). No gore. In `ReplicatedStorage.NHSnacks.<Id>.Stages`, and for the builder in
+  `ServerStorage.NHProps.ConcessionStages` (`<Id>_<2|3|4>`).
+- **Eating shows it:** the stage changes on a bite a third and two thirds of the way through the meal (about 3 s and 8 s
+  into a 12 s Katsu Curry) and the tray is empty at the end.
+- **The empty tray stays in your hands** (the meal's tool goes back in the backpack, "All done: take your tray to the
+  return hatch or a tray trolley") until you return it. Taking out any other item, or putting the meal away mid-meal,
+  sets it down on the table in front of you (else the floor), cleared after a minute (`Config.Tray.LeftTray`).
+- **Staged in NH Combat Test:** the hatch against the gym's south wall facing the lunch tables, the trolley at their
+  west end, and `Concessions.LunchStages`: a table per meal, full to empty.
+
+### Changed
+- Once eating starts, the tray in your hands is the server's own copy (the tool's handle hides): the Locker takes the
+  meal 1.1 s in, and when it was your last one the inventory takes the handle away, which used to take the tray with it.
+- A returned or set-down tray keeps its own pieces welded on (the Katsu Curry's water glass, an eaten stage); before,
+  the glass of a returned tray was left floating where it had been carried.
+- Spilling a tray you were eating (or had eaten) doesn't take another meal from the Locker.
+
+### Tested (slot 4 "Testy", NH Combat Test, Studio Play)
+- **Returns:** two at the trolley (Slot1, then Slot2, each 0.000 off its attachment) and one at the hatch (rolled from
+  the sill to behind the curtain in 2.2 s, gone at 2.7 s); the meal was put away, not lost.
+- **Eating, standing:** stages at 3.7 s, 8.3 s and 12.4 s (sampled every 0.5 s), the tool put away at the end, the
+  empty tray held in both hands; returned at the trolley with its stage and glass on.
+- **Set down:** the empty tray at a lunch table when the Onigiri was taken out (0.005 above the table top), and a partly
+  eaten one on the floor when the meal was put away mid-meal (the eating clip stopped).
+- **The last meal:** the inventory unequipped the emptied tool at 1.5 s; the tray stayed in hand, went through all three
+  stages, and was returned at the hatch (it rolled in with its stage).
+- Testy's Locker was put back exactly (items and pins). `SlotCount` 4 and `NHTestNoMenuKeys` were set for the tests and
+  restored.
+- **Not tested:** eating seated with the stages, running and jumping with a tray, NPC students eating (no lunch period
+  yet), a spill mid-meal, the Map place.
+
 ## [1.94.0] - 2026-11-12: Students talk like their clique, notice your clothes, and keep dress codes
 
 Owner: "Combat Test first", students "talk about what you wear, and hangouts have dress codes", and under a dress code
@@ -21,13 +71,16 @@ Design: `docs/superpowers/specs/2026-11-12-line-matrix-outfits-design.md`. How t
     last 5 minutes is one step cooler (this beats having met before). One who has met you 4 times or more is one step
     warmer, never above Friendly.
   - **Strong feelings always show.** Hostile, Wary and Respected students always greet in their clique's voice. Neutral
-    and Friendly ones do 60% of the time.
+    and Friendly ones do 60% of the time. After dark, 40% of those greetings are night or full-moon lines in the same
+    attitude, so the night still shows at the extremes.
   - **Race remarks are kind to friends:** digs at a race only come from Hostile or Wary students. Beast-form lines
     don't name a form.
-  - Nobody goes silent: any missing line falls back to the old pools.
+  - Nobody goes silent: any missing line falls back to the old pools. A missing or broken `Talk` or `Config.CliqueTalk`
+    module is caught too: the students just use the old pools.
 - **Students notice your clothes.** What you wear is recorded on your character (`NHWear`, set by the server only).
   - Each clique has a taste: pieces it likes and pieces it mocks. A clique never likes what its rival likes.
-  - A student remarks on your full clique look, on a rival's look, or on a piece they like or mock. This happens 35%
+  - A student remarks on your full clique look, on a rival's look (a top only the rival wears: shared tops such as the
+    black blazer, Court and Choir, don't count), or on a piece they like or mock. This happens 35%
     of the time, at most once every 10 minutes per student. Students with no clique remark on an accessory 15% of the
     time.
 - **Hangouts keep dress codes.** A clique's in-person deals go to players who wear one of its tops, are Friendly or
@@ -36,13 +89,17 @@ Design: `docs/superpowers/specs/2026-11-12-line-matrix-outfits-design.md`. How t
     dressed, the quest is offered. The leader's "!" marker stays so you know to talk to them. Dares (by phone) and jobs
     (members only) aren't affected.
   - **Night Study** at the Archive is refused with a Vigil line until you wear a Vigil top, are liked, or are a member.
+    Night Study has no standing gate of its own, so a Hostile player in a Vigil top gets in (flagged for the owner).
   - **Walking in:** if you walk into a hangout out of its colours, the nearest member within 30 studs says so, once a
     visit and at most once every 2 minutes. You can still walk in.
+  - Players who wear their Roblox avatar (`UseAvatar`) have no top on record, so only standing or membership passes for
+    them. Any future quest with a clique standing requirement is dress-gated too.
 
 ### Changed
-- **`Config.Cliques`:** each clique has a `Taste`; new helpers `ParseWear`, `WearsTop` and `WearsBottoms`; girls' tops
-  for the full-look check (`Look.FemaleTops`) and a new `Look.FemaleMatchBottoms` (Athletes cheer skirt, Delinquents long
-  skirt, Pack forest tartan). The NPC dressers still read `FemaleBottoms`, so no NPC wears anything new.
+- **`Config.Cliques`:** each clique has a `Taste`; new helpers `ParseWear`, `WearsTop` and `WearsBottoms`; two new keys
+  that only the outfit check and dress code read: `Look.FemaleMatchTops` (the girls' school tops) and
+  `Look.FemaleMatchBottoms` (Athletes cheer skirt, Delinquents long skirt, Pack forest tartan). The NPC dressers still
+  read `FemaleTops` and `FemaleBottoms`, which are unchanged, so no NPC wears anything new.
 - **`StudentBrain`:** the greeting, brush, crowd, shove, fight and flee calls go through the matrix (`StudentBrain.Talk`),
   each with today's pool as the fallback. Mutters are unchanged.
 - **`UI.Appearance` (`ApplyTo`):** writes `NHWear`. **`Quests.CanStart`:** a new "DressCode" reason.
@@ -54,8 +111,11 @@ Design: `docs/superpowers/specs/2026-11-12-line-matrix-outfits-design.md`. How t
   below it to 6 above. The boxes themselves weren't moved, because turf fights and `Features.Regions` use them.
 - **A Hostile student said "Hi."** The clique greeting ran 60% of the time, so a plain daily hello came between the
   clique lines. Hostile, Wary and Respected students now always use the matrix.
+- **NPC girls' clothes changed.** The first version put the girls' tops in `Look.FemaleTops`, which the NPC dressers
+  also read, so clique girls started wearing them (cheer uniforms with joggers). The key is now `Look.FemaleMatchTops`.
 - **Review rounds on the lines:** race digs aimed at friendly players, flirty or possessive phrasing, skin-colour
-  digs, home-invite and off-platform lines, and weapon-implying phrasing were rewritten. Placeholder lines are in double
+  digs, home-invite, overnight and walk-you-home lines, off-platform lines, beast-form lines that named one form, and
+  weapon-implying phrasing were rewritten. Placeholder lines are in double
   quotes, because a backtick string turned `{Name}` into "nil".
 
 ### Tested (NH Combat Test, slot 4 Testy, entered through the real slot remotes)
@@ -68,12 +128,17 @@ Design: `docs/superpowers/specs/2026-11-12-line-matrix-outfits-design.md`. How t
 - **Dress codes:**
   - Night Study was refused undressed with a Vigil line, and started in a vigil vest.
   - The Vigil leader sent an undressed Neutral player to a dress-code line, and offered the quest once dressed.
-  - Walking into the gym out of colours got one line from the nearest Athlete and no second line on a quick re-entry.
-- **Nudges:** brushing past, crowding and shoving Ordinary and Vigil students used their clique's lines.
+  - Walking into the gym out of colours, at floor level, got one line from the nearest Athlete. No second line on a
+    quick re-entry was checked before the floor-level fix only, with the player raised into the hangout box.
+- **Nudges:** brushing past and shoving Ordinary students, and crowding Ordinary, Vigil and Court students, used their
+  clique's lines.
 - **No regressions:** a student with no clique still greeted and fell back to Generic for crowding.
 - **The console:** no `[StudentBrain]` or `[CliqueTalk]` warnings.
 
 ### Not tested
+- **In play:** the `Transformed`, `Hurt`, `Night` and `FullMoon` greetings; race lines for any race but Human; `Flee`
+  and `FightSeen` with the test player as the fighter; re-entry at floor level after the hangout fix; a pure Hostile
+  greeting after the strong-attitude fix (Wary was seen). The Edit-mode tests cover their pools.
 - **Mutters from a student with no clique.** The one test student was stuck on a path. Mutter is unchanged.
 - **A second player,** and the real Wardrobe screen (looks were applied through the same server code).
 

@@ -1,0 +1,38 @@
+{
+ "ConcessionLunchHouse2": {
+  "color": 125659463655242,
+  "rough": 103336096221017,
+  "metal": 100211480063829,
+  "normal": 110993761535827
+ },
+ "ConcessionLunchHouse3": {
+  "normal": 105357812410680,
+  "rough": 103009858285237,
+  "color": 96922131118349,
+  "metal": 130479912455681
+ },
+ "ConcessionLunchHouse4": {
+  "color": 99360038477900,
+  "normal": 98435380569442,
+  "metal": 97932526637842,
+  "rough": 136933649323713
+ },
+ "ConcessionLunchSets2": {
+  "color": 87934276161033,
+  "normal": 101876972115796,
+  "rough": 139280959683183,
+  "metal": 120239676038046
+ },
+ "ConcessionLunchSets3": {
+  "normal": 119746969508932,
+  "rough": 117377664521646,
+  "color": 133185686813489,
+  "metal": 115072732469835
+ },
+ "ConcessionLunchSets4": {
+  "normal": 102462543373836,
+  "color": 84615650623422,
+  "metal": 117971439981948,
+  "rough": 76093983685930
+ }
+}

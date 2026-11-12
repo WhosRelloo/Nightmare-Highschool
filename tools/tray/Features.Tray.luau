@@ -11,6 +11,12 @@
 	  Standing still  after Tray.IdleAfter seconds, QueueIdle loops until the character moves, sits or eats.
 	  Spill           a hit of Tray.Spill.Damage health or more, FallingDown / Ragdoll / Physics, or Downed: Spill plays,
 	                  a copy of the tray tumbles away (6 s), one meal is taken (Inventory.Take), and the hold ends.
+	  Eaten           (props batch 56) once eating starts the tray in the hands is the server's own copy (the tool's
+	                  handle hides): a stage of ReplicatedStorage.NHSnacks.<Id>.Stages (2 partly eaten, 3 mostly eaten)
+	                  swaps in on a bite a third and two thirds of the way through, 4 (empty) at the end, and the empty
+	                  tray stays in the hands (the tool goes back in the backpack) until it's returned. Taking out any
+	                  item, or putting the meal's tool away mid-meal, sets it on the table in front (or the floor) for
+	                  Tray.LeftTray seconds.
 	  Return          parts tagged NHTrayReturn get a "Return tray" prompt: Return plays, a copy of the tray is set on
 	                  the rack, and the tray is put away (unequipped, not lost). A rack with Attachments Slot1, Slot2, ...
 	                  (a tray's bottom centre, its long side along the attachment's X) fills them in turn, the oldest
@@ -175,6 +181,11 @@ function Shared.Release(Char: Model)
 	-- the spill and the return finish on their own (they end with the arms at rest)
 	for Name, T in S.Tracks do if T.IsPlaying and Name ~= `Spill` and Name ~= `Return` then T:Stop(0.2) end end
 	if S.Weld then S.Weld:Destroy() end
+	if S.Loose then
+		-- the server's own tray goes; the tool's handle (if the tool still has it) shows again
+		Local.Unhide(S)
+		if S.Part then S.Part:Destroy() end
+	end
 	if Char.Parent then
 		Local.Pose(Char, false)
 		Char:SetAttribute(`NHTray`, nil)
@@ -188,6 +199,109 @@ function Shared.Holding(Char: Model): string?
 	return S and S.Id or nil
 end
 
+---| the loose tray |---
+
+-- (props batch 56) once a player starts eating, the tray in their hands is the server's own copy, not the tool's
+-- handle: the inventory takes the meal (and may take the handle with it) long before the last bite, and the empty tray
+-- stays in the hands afterwards. The tool's handle hides (still welded where it was) until the tray is let go.
+function Local.Loosen(Char: Model)
+	local S = State[Char]
+	if not S or S.Loose or not (S.Part and S.Part.Parent) then return end
+	local C = S.Part:Clone()       -- its NHTrayWeld comes along, still on the torso
+	C.Name = `NHHeldTray`
+	for _, D in { C, table.unpack(C:GetDescendants()) } do
+		if D:IsA(`BasePart`) then D.Anchored = false D.CanCollide = false D.CanQuery = false D.CanTouch = false D.Massless = true end
+		if D:IsA(`TouchTransmitter`) then D:Destroy() end
+	end
+	S.Hidden = {}
+	for _, D in { S.Part, table.unpack(S.Part:GetDescendants()) } do
+		if D:IsA(`BasePart`) then S.Hidden[D] = D.Transparency D.Transparency = 1 end
+	end
+	C.Parent = Char
+	S.Tool = S.Part.Parent
+	S.HandleWeld = S.Weld
+	S.Part = C
+	S.Weld = C:FindFirstChild(`NHTrayWeld`)
+	S.Loose = true
+end
+
+function Local.Unhide(S)
+	for D, Was in S.Hidden or {} do if D.Parent then D.Transparency = Was end end
+	S.Hidden = {}
+	if S.HandleWeld then S.HandleWeld:Destroy() S.HandleWeld = nil end
+end
+
+-- show eating stage N (2 partly eaten, 3 mostly eaten, 4 empty): ReplicatedStorage.NHSnacks.<Id>.Stages.<N>, welded over
+-- the tray (bottom centre to bottom centre), which hides
+function Local.ShowStage(S, N: number)
+	local Snacks = ReplicatedStorage:FindFirstChild(`NHSnacks`)
+	local Snack = Snacks and Snacks:FindFirstChild(S.Id)
+	local Stages = Snack and Snack:FindFirstChild(`Stages`)
+	local Src = Stages and Stages:FindFirstChild(tostring(N)) :: BasePart?
+	if not (Src and S.Part and S.Part.Parent) then return end
+	local Old = S.Part:FindFirstChild(`NHTrayStage`)
+	if Old then Old:Destroy() end
+	local C = Src:Clone()
+	C.Name = `NHTrayStage`
+	C.Anchored, C.CanCollide, C.CanQuery, C.CanTouch, C.Massless = false, false, false, false, true
+	local Align = Src:GetAttribute(`NHAlign`) or Vector3.zero    -- (a stage whose footprint differs: see lunch_stages_templates)
+	C.CFrame = S.Part.CFrame * CFrame.new(Align + Vector3.new(0, (C.Size.Y - S.Part.Size.Y) / 2, 0))
+	local W = Instance.new(`WeldConstraint`)
+	W.Part0, W.Part1 = S.Part, C
+	W.Parent = C
+	C.Parent = S.Part
+	S.Part.Transparency = 1
+	S.Stage = N
+end
+
+-- the finished tray stays in the hands: the tool (the next meal, or nothing) goes back in the backpack
+function Local.Keep(Char: Model)
+	local S = State[Char]
+	if not (S and S.Loose and S.Player) then return end
+	local Tool = S.Tool
+	S.Tool = nil
+	local Hum = Char:FindFirstChildOfClass(`Humanoid`)
+	if Hum and Tool and Tool.Parent == Char then
+		S.Keeping = true
+		Hum:UnequipTools()
+		task.defer(function() S.Keeping = false end)
+	end
+	Local.Unhide(S)
+	pcall(function()
+		require(ServerScriptService.Services.Features.Notifications).Notify(S.Player, { Title = `All done`;
+			Text = `Take your tray to the return hatch or a tray trolley.`; Kind = `Info`; Duration = 3 })
+	end)
+end
+
+-- let go of a loose tray: it's set on the table in front, else on the floor, and cleared after Tray.LeftTray seconds
+function Local.SetDown(Char: Model)
+	local S = State[Char]
+	local Torso = Char:FindFirstChild(`Torso`) :: BasePart?
+	if not (S and S.Loose and S.Part and Torso) then return end
+	local Off = Local.TableOffset(Char)
+	local C = S.Part:Clone()
+	for _, D in { C, table.unpack(C:GetDescendants()) } do
+		if D:IsA(`Weld`) or D:IsA(`Motor6D`) then D:Destroy() end
+		if D:IsA(`BasePart`) then D.Anchored = D == C D.CanCollide = false D.CanQuery = false end
+	end
+	C.Name = `LeftTray`
+	if Off then
+		C.CFrame = Torso.CFrame * Off * CFrame.new(0, -0.045, 0)   -- (TableOffset leaves 0.05 for a seated body to settle)
+	else
+		local Params = RaycastParams.new()
+		Params.FilterType = Enum.RaycastFilterType.Exclude
+		Params.FilterDescendantsInstances = { Char }
+		local Look = (Torso.CFrame.LookVector * Vector3.new(1, 0, 1)).Unit
+		local From = Torso.Position + Look * 1.6
+		local Hit = workspace:Raycast(From, Vector3.new(0, -8, 0), Params)
+		local At = if Hit then Hit.Position else From - Vector3.new(0, 3, 0)
+		C.CFrame = CFrame.lookAt(At, At + Look) * CFrame.new(0, C.Size.Y / 2 + 0.005, 0)
+	end
+	C.Parent = workspace
+	Debris:AddItem(C, Tray.LeftTray)
+	Shared.Release(Char)
+end
+
 ---| eating |---
 
 function Shared.Eat(Char: Model, Seconds: number)
@@ -198,8 +312,25 @@ function Shared.Eat(Char: Model, Seconds: number)
 	local T = Local.Play(Char, Name, true, 0.2)
 	if not T then return false end
 	S.Eating = true
+	-- (props batch 56) the meal goes down a stage on a bite a third and two thirds of the way through, and is empty at
+	-- the end (the bite: the fork at the mouth in the clip)
+	local From = S.Stage or 1
+	local Bite = if Name == `EatSit` then 0.85 else 0.8
+	local Loop = if T.Length > 0 then T.Length elseif Name == `EatSit` then 3.4 else 2.4
+	for N = math.max(2, From + 1), 3 do
+		local At = Seconds * (N - From) / (4 - From)
+		local K = math.max(0, math.floor((At - Bite) / Loop + 0.5))
+		task.delay(math.min(Bite + K * Loop, Seconds - 0.2), function()
+			if State[Char] == S and S.Eating then Local.ShowStage(S, N) end
+		end)
+	end
 	task.delay(Seconds, function()
-		if State[Char] == S then S.Eating = false S.Still = 0 end
+		if State[Char] == S then
+			S.Eating = false
+			S.Still = 0
+			Local.ShowStage(S, 4)
+			Local.Keep(Char)
+		end
 		if T.IsPlaying then T:Stop(0.3) end
 	end)
 	return true
@@ -210,7 +341,9 @@ function Shared.OnUse(P: Player, Hum: Humanoid, It): boolean
 	local Char = Hum.Parent
 	if not Char then return false end
 	if Tray.Grimace[It.Id] then Local.Play(Char, `Grimace`, false, 0.1) end
-	if Tray.Items[It.Id] and State[Char] and State[Char].Id == It.Id then
+	local S = State[Char]
+	if Tray.Items[It.Id] and S and S.Id == It.Id and not S.Loose then
+		Local.Loosen(Char)
 		return Shared.Eat(Char, math.max(3, It.Duration or 6))
 	end
 	return false
@@ -306,8 +439,11 @@ function Shared.Spill(Char: Model)
 		local P = S.Player
 		if P then
 			local Hum = Char:FindFirstChildOfClass(`Humanoid`)
+			local Loose = S.Loose
+			if Loose and State[Char] == S then Shared.Release(Char) end   -- (no tray left to set down)
 			if Hum then Hum:UnequipTools() end
-			pcall(function() require(ServerScriptService.Services.Features.Inventory).Take(P, S.Id, 1) end)
+			-- a tray being eaten (or eaten) was already taken from the Locker
+			if not Loose then pcall(function() require(ServerScriptService.Services.Features.Inventory).Take(P, S.Id, 1) end) end
 			pcall(function()
 				require(ServerScriptService.Services.Features.Notifications).Notify(P, { Title = `You spilled your lunch!`;
 					Text = `The tray went flying. Watch where you're going next time.`; Kind = `Info`; Duration = 3 })
@@ -378,10 +514,11 @@ function Shared.Return(Char: Model, Rack: BasePart?)
 	task.delay(0.55, function()
 		if State[Char] ~= S then return end
 		if Rack and S.Part then
+			-- the copy's own pieces (the glass, an eaten stage) stay welded to it and follow it onto the rack
 			local C = S.Part:Clone()
 			for _, D in { C, table.unpack(C:GetDescendants()) } do
-				if D:IsA(`BasePart`) then D.Anchored = true D.CanCollide = false D.CanQuery = false end
-				if D:IsA(`Weld`) or D:IsA(`Motor6D`) or D:IsA(`WeldConstraint`) then D:Destroy() end
+				if D:IsA(`BasePart`) then D.Anchored = D == C D.CanCollide = false D.CanQuery = false D.Massless = true end
+				if D:IsA(`Weld`) or D:IsA(`Motor6D`) then D:Destroy() end
 			end
 			Local.Rest(Rack, C)
 		end
@@ -394,12 +531,14 @@ function Shared.Return(Char: Model, Rack: BasePart?)
 	task.delay(if T then math.max(0.7, T.Length) else 1.0, function()
 		for D, Was in Hidden do if D.Parent then D.Transparency = Was end end
 		if State[Char] ~= S then return end
-		if S.Player then
+		if S.Player and not S.Loose then
 			local Hum = Char:FindFirstChildOfClass(`Humanoid`)
 			if Hum then Hum:UnequipTools() end
 		else
+			-- an NPC's tray, or a player's eaten one (the server's own copy): gone
+			local Part = S.Part
 			Shared.Release(Char)
-			if S.Part then S.Part:Destroy() end
+			if Part and Part.Parent then Part:Destroy() end
 		end
 	end)
 end
@@ -427,6 +566,9 @@ function Local.Watch(P: Player, Char: Model)
 	if not Hum then return end
 	local function check(T: Instance)
 		if not T:IsA(`Tool`) then return end
+		-- taking out anything else puts a loose (eaten) tray down first
+		local Cur = State[Char]
+		if Cur and Cur.Loose and T ~= Cur.Tool then Local.SetDown(Char) end
 		local Id = T:GetAttribute(`NHItem`)
 		local H = T:FindFirstChild(`Handle`) :: BasePart?
 		if Id and Tray.Items[Id] and H then
@@ -438,7 +580,19 @@ function Local.Watch(P: Player, Char: Model)
 	Char.ChildAdded:Connect(check)
 	Char.ChildRemoved:Connect(function(T)
 		local S = State[Char]
-		if S and T:IsA(`Tool`) and T:FindFirstChild(`Handle`) == S.Part then Shared.Release(Char) end
+		if not (S and T:IsA(`Tool`)) then return end
+		if S.Loose then
+			-- putting the meal's tool away mid-meal sets the tray down; the inventory taking it away (the last one eaten:
+			-- destroyed, or unequipped and marked NHEmpty) or Keep putting it away doesn't
+			if T ~= S.Tool or S.Keeping then return end
+			task.defer(function()
+				if State[Char] == S and T.Parent and T.Parent:IsA(`Backpack`) and not T:GetAttribute(`NHEmpty`) then
+					Local.SetDown(Char)
+				end
+			end)
+		elseif T:FindFirstChild(`Handle`) == S.Part then
+			Shared.Release(Char)
+		end
 	end)
 	for _, T in Char:GetChildren() do check(T) end
 	-- a new RightGrip appears on each equip; keep the tray off the hand

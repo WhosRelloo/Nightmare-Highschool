@@ -40,6 +40,9 @@ Tray.Anims = {
 -- over Roll seconds
 Tray.Rack = { Keep = 120; Roll = 2.2 }
 
+-- an eaten tray put down (taking out another item) is cleared after this many seconds (props batch 56)
+Tray.LeftTray = 60
+
 Tray.Spill = { Damage = 3; Cooldown = 2 }
 Tray.IdleAfter = 1.5
 

@@ -2625,3 +2625,48 @@ Every piece is under Roblox's 20k triangles (the heaviest, the BunTray and the s
 ![Spilled](img/tray54-spill.jpg)
 ![Returned](img/tray54-return.jpg)
 ![The mystery meat](img/tray54-grimace.jpg)
+
+## Batch 55 (tray return): the tray trolley and the return hatch
+
+`art/props/nh_props_batch55.py`. The owner asked for a lunch tray return rack and chose both kinds: a freestanding trolley the builder can put anywhere, and a hatch in a wall. Each is its own sheet (one 2048 bake, one FBX with one piece). No atlas: the plaques' raised gilt letters are Georgia Bold geometry.
+
+| Sheet | Size (studs) | Tris | What it is |
+|---|---|---|---|
+| TrayTrolley | 3.8 x 2.7 x 5.4 | 15k | black wrought iron on brass castors (rubber tyres, swivel bosses); two columns of five slide-in runners with brass lead-in lips, sized for the 1.5x trays (the runners leave 1.38 between them, a tray is 1.45 deep); back stop bars; a pointed-arch grille with a quatrefoil ring on each side; an oak top with a brass edge and four gilt finials; a push bar with brass grips; a "RETURN TRAYS" enamel plaque over the front |
+| TrayReturnHatch | 6.7 x 3.3 x 8.5 | 9.5k | a dark castle-stone wall unit: piers with fluted pilasters, a plinth and a cornice with three brass finials; a pointed arch with its archivolt, imposts and keystone over a slate sill with a rounded nose on corbels; a brass roller conveyor between iron guides; an iron sunburst in the arch's head; a leather-strip curtain inside an oak-lined chamber; a "TRAY RETURN" plaque; a service bell on a curled bracket |
+
+**In the game** (`tools/props/tray_return_templates.luau`): the templates are `ServerStorage.NHProps.TrayReturn.<Sheet>` (pivot at the bottom centre, front -Z, tag `NHPropBatch55`). Each MeshPart is tagged `NHTrayReturn` and carries the slot Attachments that `Services.Features.Tray` fills (see Inventory-and-Study-Groups, "Lunch trays"). Box collision. Staged by the batch 54 lunch tables in `workspace.NHPropsShowcase.Concessions.TrayReturn`: the hatch backed onto the gym's south wall (x 172, west of the buttress), the trolley at the tables' west end, both facing them.
+
+**Files:** FBX in `art/props/fbx/tray-return-batch55/`; maps `art/props/textures/Tray{Trolley,ReturnHatch}_*.png` (2048), upload copies at 1024 in `art/group-upload/tray-return-batch55/`; ids in `art/props/tray_return_batch55_ids.json`. Run scripts in `E:/NH-Work/props55/`.
+
+![The tray trolley (baked)](img/tray55-trolley.jpg)
+![The return hatch (baked)](img/tray55-hatch.jpg)
+![The hatch in NH Combat Test](img/tray55-studio-hatch.jpg)
+
+## Batch 56 (lunch stages): the lunch trays eaten in stages
+
+`art/props/nh_props_batch56.py`. The owner asked for "different variants of the lunch trays, as the player progressively eats and finishes the food". Each of the nine batch 54 lunch trays is built again with its own builder and eaten down three times: 2 partly eaten, 3 mostly eaten, 4 empty. Six sheets, `ConcessionLunchSets2/3/4` and `ConcessionLunchHouse2/3/4`, laid out as batch 54's (pieces `<Sheet>_<Id>`, standing on z = 0, the tray centred), sharing its materials and the ConcessionPrint liners; 2.6k-12.8k tris a piece. The katsu tray's water glass stays with the full tray's `_Glass` piece.
+
+| Meal | Partly eaten | Mostly eaten | Empty |
+|---|---|---|---|
+| Katsu Curry | two cutlet slices gone, rice and curry down, water lower | four gone, a curry smear | curry smears, rice grains and panko crumbs, the spoon on the plate, the glass empty |
+| Shoyu Ramen | a chashu, an egg, the naruto, noodles gone, broth down | the nori and most noodles gone | dregs in the bowl, chopsticks laid across it |
+| Karaage Set | two karaage gone, rice and miso down | four gone, mayo smeared | cabbage shreds, the squeezed lemon, crumbs, grains in the rice bowl, miso dregs |
+| Grilled Mackerel | the fillet a third eaten (grill marks with it) | two thirds | the fish skeleton (spine, ribs, tail), daikon and soy smears, chopsticks on the plate |
+| Omurice | the omelette cut into, ketchup rice showing | more, some salad gone | demi-glace smeared, rice crumbs, the last tomato left in the salad bowl |
+| Witching Hour Stew | stew down, the crust lid nibbled | lid gone, crumbs | the bread bowl eaten down, stew dregs, crumbs |
+| Graveyard Shepherd's Pie | two rows of mash dug out, the mince showing | five rows and two tombstones | gravy smears and mash streaks in the dish, a crumb of shortbread |
+| Pumpkin Gratin | the cheese scooped from one side | mostly scooped | the pumpkin scraped out, a gratin smear |
+| Raven's Roast | the leg smaller, a potato and two carrots gone | most gone | a clean drumstick bone, gravy smears, one carrot left, knife and fork laid together |
+
+Every empty tray has a crumpled napkin.
+
+**In the game** (`tools/props/lunch_stages_templates.luau`): each stage is a MeshPart at the tray's 1.5x in `ReplicatedStorage.NHSnacks.<Id>.Stages.<N>`, which `Services.Features.Tray` welds over the tray as it's eaten, and a builder Model `ServerStorage.NHProps.ConcessionStages.<Id>_<N>` (tag `NHPropBatch56`, attributes `ItemId`, `Stage`). A stage lines up with its full tray by the bottom centre; the empty mackerel's footprint is 0.1 narrower (its chopsticks no longer overhang the tray's front), so it carries `NHAlign` (0, 0, 0.05). Showcase: `workspace.NHPropsShowcase.Concessions.LunchStages`, a table per meal, full to empty (x 155-162, z 199-217).
+
+**Files:** FBX in `art/props/fbx/lunch-stages-batch56/`; maps `art/props/textures/ConcessionLunch{Sets,House}{2,3,4}_*.png` (2048), upload copies at 1024 in `art/group-upload/lunch-stages-batch56/`; ids in `art/props/lunch_stages_batch56_ids.json`. Run scripts in `E:/NH-Work/props56/` (`run56.py` with `--fast --close` renders a close-up of every tray).
+
+![The set meals, partly eaten, mostly eaten and empty](img/lunch56-stages-sets.jpg)
+![The house meals](img/lunch56-stages-house.jpg)
+![The showcase in NH Combat Test](img/lunch56-studio-showcase.jpg)
+![An empty tray in hand (play test)](img/lunch56-pt-empty-tray.jpg)
+![An empty tray returned to the trolley (play test)](img/lunch56-pt-trolley.jpg)
