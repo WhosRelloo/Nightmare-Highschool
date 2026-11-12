@@ -271,3 +271,37 @@ should. Wrapper removed afterwards.
 - **Quests:** no quest started (`CliqueVigil1` still `DressCode`).
 - **Play:** I stopped the Play session I had started. Edit now has `SlotCount = 3;`, no `NHTestNoMenuKeys`, and no probe
   scripts.
+
+## Play-test fixes (Task 7, fix round 2)
+
+Two `StudentBrain` fixes came out of the run above. Both were applied live in Edit (checksum 2707957, 35462 b = the repo
+file), then checked in a short Play session on slot 4 "Testy" only (`SlotCount = 4` and `NHTestNoMenuKeys` for the run,
+both restored). Nothing was chat-typed, and no other slot was loaded. A throw-away Play-only probe script gathered the
+student records and logged `NHSay`; it is gone.
+
+**1. Hangout entry at floor level (was 5.4 FAIL): PASS.** `hangoutOf` now matches the box's X/Z footprint, with a vertical
+band from 20 studs under the box's bottom face to 6 over its top face (boxes stay where they are; other systems use them).
+
+- Set-up: Athletes 0 (Neutral), own clothes (`velvet-corset|velvet-midi|`), so `Cliques.Dressed(Athletes)` = false.
+  `SchedulePlan Break`. Athletes #4 and #12 settled in the Gymnasium at about (95, 4, 160 to 177).
+- Testy was placed outside the box at (95, 4.5, 118), waited 3 s, then walked with `Humanoid:MoveTo` to (95, 4, 165). Her root stayed at y about 4.3.
+- Result: one `DressCode` line from the nearest Athletes student, #4: "Locker room's team only. Kit up."
+  (`Athletes.DressCode.Any`). No second line came after it for that visit.
+- A later walk-in at Hostile gave the Hostile cell: "Out. Team only. Bench is outside." (`Athletes.DressCode.Hostile`).
+
+**2. Strong attitudes always greet from the matrix: PASS.** In `greeting()`, step 6 now computes `Talk.Attitude(S, Pl)`
+(in a pcall, "Neutral" on failure). Hostile, Wary and Respected always return the clique `Greet` with `{ Attitude = A }`. Neutral
+and Friendly keep the 60% roll. The fallback pool is unchanged.
+
+- Athletes standing set to -50 (Hostile) on Testy. 8 staring tries on #4 and #12.
+- #12 (Wary, because it had met Testy 4 or more times, which lifts Hostile one step) greeted seven times, all from the matrix:
+  "Testy. Sign-up sheet's by the door.", "Hm. Didn't see you at practice.", "You lost? The gym's not a hallway.",
+  "Trying out, or just standing there?" (all `Athletes.Greet.Wary`), and one race line "Human. Don't get hurt on my
+  court." (`Athletes.Race.Human.Wary`). No plain daily hello ("Hi.", "Hey.") came before or between them.
+- #4 (Hostile) mostly said stare and flee lines ("Please stop looking at me.", "...", "Um. Bye."), which come from
+  the Senses stare path, not the greeting. A pure `Athletes.Greet.Hostile` line was **not** caught in this short run
+  (the Wary matrix cells were, and the Hostile one was seen in the earlier run). The code path is the same for both attitudes.
+- Console: no `[StudentBrain] dressWatch:` or `[CliqueTalk]` warning.
+
+**Restored:** Testy's Athletes standing back to -31 (Vigil 0, Court 0, Delinquents 0, Pack 62, Ordinary 0, Choir -15,
+Ink -18, as before); `SlotCount = 3;`, `NHTestNoMenuKeys` cleared, no "NH TEMP" text, probe script gone, Play stopped.

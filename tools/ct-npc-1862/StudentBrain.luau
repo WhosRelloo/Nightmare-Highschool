@@ -158,9 +158,15 @@ local function greeting(S, Rec): (string?, { [string]: any }?, { string })
 	local Race = Pl and Pl:GetAttribute(`Race`)
 	if Race and math.random() < 0.3 then return `Race`, { Sub = Race }, G.Race[Race] or daily(C) end
 	local Def = S.Clique and CliqueConfig.Defs[S.Clique]
-	if Def and math.random() < 0.6 then
-		local Tier = Pl and Pl:GetAttribute(`CliqueTier_{S.Clique}`)
-		return `Greet`, nil, (Def.Reactions and Tier and Def.Reactions[Tier]) or daily(C)
+	if Def then
+		-- strong feelings always show (a Hostile student never chirps "Hi."); the rest greet by their clique 60% of the time
+		local OkA, A = pcall(Talk.Attitude, S, Pl)
+		if not OkA or typeof(A) ~= `string` then A = `Neutral` end
+		local Strong = A == `Hostile` or A == `Wary` or A == `Respected`
+		if Strong or math.random() < 0.6 then
+			local Tier = Pl and Pl:GetAttribute(`CliqueTier_{S.Clique}`)
+			return `Greet`, if Strong then { Attitude = A } else nil, (Def.Reactions and Tier and Def.Reactions[Tier]) or daily(C)
+		end
 	end
 	if (M.Met or 0) >= 4 and math.random() < 0.6 then return nil, nil, G.Often end
 	if (M.Met or 0) >= 1 and math.random() < 0.7 then return nil, nil, G.Again end
@@ -804,7 +810,9 @@ end
 ---| dress codes (line matrix) |---
 
 -- walk into a clique's hangout out of its colours and the nearest of its students (30 studs) says so: once a visit,
--- at most every 120 s for each player
+-- at most every 120 s for each player. A hangout box is a floating marker in some places (Combat Test's sit 11 to 16
+-- studs up while the floor is near 1), so it counts by its X/Z footprint, from 20 studs under its bottom face to 6
+-- over its top face, not by its height.
 local Visits = {} :: { [Player]: { In: string?, Told: number } }
 
 local function hangoutOf(Root: BasePart): string?
@@ -814,8 +822,8 @@ local function hangoutOf(Root: BasePart): string?
 		local Box = Def.Hangout and Folder:FindFirstChild(Def.Hangout)
 		if Box and Box:IsA(`BasePart`) then
 			local L = Box.CFrame:PointToObjectSpace(Root.Position)
-			local H = Box.Size / 2 + Vector3.new(0, 6, 0)
-			if math.abs(L.X) <= H.X and math.abs(L.Y) <= H.Y and math.abs(L.Z) <= H.Z then return Id end
+			local H = Box.Size / 2
+			if math.abs(L.X) <= H.X and math.abs(L.Z) <= H.Z and L.Y >= -H.Y - 20 and L.Y <= H.Y + 6 then return Id end
 		end
 	end
 	return nil
