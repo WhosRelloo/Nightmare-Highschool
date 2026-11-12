@@ -20,7 +20,7 @@ return {
 	FightSeen = {
 		Hostile = { "And {Name} fumbles! Classic.", `Big swing, no follow-through. Sad.`, `Zero footwork. Zero. Painful to watch.` };
 		Wary = { `Keep it off the court, guys!`, `Somebody call it. Is that a foul?`, `Not in the gym! We just waxed it!` };
-		Any = { `Left hook! Ooh, right on the bell!`, `It's a brawl at midcourt, folks!`, `Keep score! Somebody keep score!`, `Two technicals. Both of them. Easy.` };
+		Any = { `Left hook! Ooh, right on the bell!`, `It's a brawl at midcourt, folks!`, `Keep score! Somebody keep score!`, `Two technicals! One each! Easy call!` };
 		Friendly = { "Go, {Name}! Keep your guard up!", `Elbows in! Elbows in! Nice!`, `That's the form! Breathe, then swing!` };
 		Respected = { "{Name} with the takedown! What a play!", `MVP! MVP! MVP!`, "The crowd's going wild for {Name}!", `That's our starter! Finish it!` };
 	};
@@ -28,7 +28,7 @@ return {
 	Transformed = {
 		Hostile = { `Grew a few feet? Still can't catch.`, `Big doesn't mean good. Ask any lineman.`, `Scary? You still run like a walk-on.` };
 		Wary = { `Uh... is that allowed in the gym?`, `Okay. Nobody tackle that.`, `Back away slow. Don't spook it.` };
-		Any = { `Whoa. What's that thing's forty time?`, `Scouts would sign that in a heartbeat.`, `Now THAT'S a defensive lineman.`, `Somebody get that thing a jersey.` };
+		Any = { `Whoa. What's its forty time?`, `Scouts would sign that in a heartbeat.`, `Now THAT'S a defensive lineman.`, `Somebody get that thing a jersey.` };
 		Respected = { "{Name}?! Dude. You're on offence.", `Beast mode. Literally. Let's go!`, `The Ravens never had a mascot this good.`, "{Name}, Coach is gonna lose his mind." };
 	};
 	Night = {
@@ -39,51 +39,51 @@ return {
 		Respected = { `Track's lit. Saved you a lane.`, "{Name}! Night scrimmage. You're starting.", `Captain wants you at night drills.` };
 	};
 	FullMoon = {
-		Hostile = { `Full moon. Hope you're fast.`, `Moon's up. Nobody's waiting for you.`, `Full moon and you're alone. Bad play.` };
-		Any = { `Full moon. Practice is cancelled.`, `Moon's full. Nobody runs the woods loop.`, `Full moon. Stretch, hydrate, stay in.`, `Moon's full. The field's not safe.` };
-		Friendly = { "Full moon, {Name}. Run with a buddy.", `Stick with the team tonight. Moon's up.`, `Full moon. Buddy system. You're mine.` };
-		Respected = { `Full moon. The team walks you home.`, "Full moon. We've got your back, {Name}.", `Moon's up. Ravens stick together.` };
+		Hostile = { `Hope you're fast. It's a full moon.`, `Moon's up. Nobody's waiting for you.`, `Full moon and you're alone. Bad play.` };
+		Any = { `Practice is cancelled. Moon's too full.`, `Moon's full. Nobody runs the woods loop.`, `Stretch, hydrate, stay in. Full moon.`, `Moon's full. The field's not safe.` };
+		Friendly = { "Full moon, {Name}. Run with a buddy.", `Stick with the team tonight. Moon's up.`, `Buddy system tonight. You're with me.` };
+		Respected = { `The team walks you home tonight.`, "We've got your back tonight, {Name}.", `Moon's up. Ravens stick together.` };
 	};
 	Race = {
 		Human = {
 			Hostile = { `Human? Then you've got no excuse. Move.`, `No fangs, no claws, no game.`, `Human. Easiest tackle of my life.` };
 			Wary = { `Human. Can you even keep up?`, `Human, huh? Bet you gas out early.`, `Human. Don't get hurt on my court.` };
-			Any = { `Human. Fair fight, at least.`, `Human? Hydrate. You need it most.`, `Human. Old-school athlete.` };
+			Any = { `Human. Fair fight, at least.`, `Human? Hydrate. Everybody should.`, `Human. Old-school athlete.` };
 			Friendly = { `Human and fast? You'd make varsity.`, `Human! No powers, all hustle. Nice.`, `Humans train harder. It shows.` };
 			Respected = { "{Name}. All human. All heart.", `No claws, no fangs, still MVP.`, `You make the rest of us look lazy.` };
 		};
 		Priest = {
 			Hostile = { `Pray all you want. Still benched.`, `Holy? Bless your terrible footwork.`, `A priest. Go chant somewhere else.` };
 			Wary = { `Priest. Don't bless the other team.`, `No praying on the free-throw line.`, `Priest, huh. Can you even run?` };
-			Any = { `A priest. Bless the game ball?`, `Priest? Say one for our season.`, `Priest. Got a prayer for my knee?` };
+			Any = { `A priest. Bless the game ball?`, `Priest? Say one for our season.`, `Got a prayer for my knee? Please?` };
 			Friendly = { `Bless the bus before the away game?`, `A priest on the team? Lucky us.`, "{Name}, pray for a win Friday?" };
 			Respected = { `Our priest! We haven't lost since.`, `Team chaplain! Bless the huddle!`, "{Name}'s blessing beats any pep talk." };
 		};
 		Vampire = {
-			Hostile = { `Vampire? Try a day game. Oh, wait.`, `Pale and slow. Bad combo.`, `Vampire. Stuck in the shade forever.` };
+			Hostile = { `Vampire? Try a day game. Oh, wait.`, `Slow and sleepy. Bad combo.`, `Vampire. Stuck in the shade forever.` };
 			Wary = { `Vampire. Keep those fangs off my water.`, `Vampire. Night scrimmages only, huh?`, `Cold hands. Don't spot me.` };
-			Any = { `Vampire. You'd be great at night games.`, `Vampire. Ever tried night hurdles?`, `Vampire? Bet you never get tired.` };
+			Any = { `Vampire. You'd be great at night games.`, `Ever tried night hurdles? You'd fly.`, `Vampire? Bet you never get tired.` };
 			Friendly = { `Vampire! Join the night league!`, `Fangs as a mouthguard? Genius.`, "{Name}, you'd own the night relay." };
 			Respected = { `Our vampire! Undefeated after dark.`, `Night games are yours. Nobody's faster.`, "{Name}. Fastest thing on the night track." };
 		};
 		Werewolf = {
-			Hostile = { `Werewolf. Don't shed on the mats.`, `Werewolf. Keep your fur off my bench.`, `Werewolf. Fetch is a sport, I guess.` };
-			Wary = { `Werewolf. Please don't chew the ball.`, `Werewolf. Full moon's not a sick day.`, `Werewolf. Claws off the court, okay?` };
-			Any = { `Werewolf. Bet your sprint time is wild.`, `Werewolf. Ever tried the long jump?`, `Werewolf. Great stamina, I bet.` };
+			Hostile = { `Werewolf. Don't shed on the mats.`, `Werewolf. Keep your fur off my bench.`, `Werewolf. Howling isn't a cheer.` };
+			Wary = { `Werewolf. Please don't chew the ball.`, `Full moon's not a sick day, wolf.`, `Werewolf. Claws off the court, okay?` };
+			Any = { `Those legs? Your sprint time must be wild.`, `Werewolf. Ever tried the long jump?`, `Werewolf. Great stamina, I bet.` };
 			Friendly = { `Werewolf! Come run the woods loop!`, `Werewolf? You'd crush the relay.`, "{Name}, tryouts are Monday. Be there." };
 			Respected = { `Our wolf! The Rovers won't come near us.`, `Werewolf on the line. Undefeated.`, "{Name}. Best mascot. Best player." };
 		};
 		Ghoul = {
-			Hostile = { `Ghoul. You look like you lost already.`, `Ghoul. Even the sub bench says no.`, `Grey and slow. Hard pass.` };
+			Hostile = { `Ghoul. You look like you lost already.`, `Ghoul. Even the sub bench says no.`, `Slow and stiff. Hard pass.` };
 			Wary = { `Ghoul. Don't sit on my towel.`, `Ghoul. You hydrating? Like, at all?`, `Ghoul. Did you skip every warm-up?` };
-			Any = { `Ghoul. Bet you never pull a muscle.`, `Ghoul. Nothing hurts you, huh?`, `Ghoul. Tough as an old goalpost.` };
+			Any = { `Ghoul. Bet you never pull a muscle.`, `Ghoul. Nothing hurts you, huh?`, `Tough as an old goalpost, you.` };
 			Friendly = { `Ghoul? You'd be a wall on defence.`, "{Name}, you never get tired. Teach me.", `Ghoul goalie. Nobody's scoring on you.` };
 			Respected = { `Our ghoul! The unbreakable wall!`, "{Name}. Hasn't missed a game in years.", `Nothing stops you. Nothing. Respect.` };
 		};
 		Wraith = {
 			Hostile = { `Wraith. Ghosting practice again?`, `Wraith. Floating isn't running.`, `Wraith. Go haunt the art kids.` };
 			Wary = { `Wraith. Don't sneak up on me mid-rep.`, `Wraith. Is that offside? Can you be?`, `Wraith. Stop drifting onto the field.` };
-			Any = { `Wraith. You'd be a ghost on the wing.`, `Wraith. Silent footsteps. Nice.`, `Wraith. Do you even sweat?` };
+			Any = { `Wraith. You'd be a ghost on the wing.`, `Wraith. Silent footsteps. Nice.`, `Do wraiths even sweat? Honest question.` };
 			Friendly = { `Wraith! Nobody can mark you. Ever.`, "{Name}, play wing. They'll never see you.", `Wraith on our side? Unfair. Love it.` };
 			Respected = { `Our wraith! Untouchable. Literally.`, "{Name}. The ghost on the wing. Legend.", `Can't block what you can't catch. Unreal.` };
 		};
@@ -97,27 +97,27 @@ return {
 	};
 	Outfit = {
 		FullLook = {
-			Hostile = { `The jacket doesn't make you varsity.`, `Nice kit. You still can't play.`, `You bought the look. Not the hustle.` };
-			Wary = { `Dressed for tryouts? We'll see.`, `Kit's right. Now show me a lap.`, `Joggers on. Can you actually run?` };
+			Hostile = { `The kit doesn't make you varsity.`, `Nice kit. You still can't play.`, `You bought the look. Not the hustle.` };
+			Wary = { `Dressed for tryouts? We'll see.`, `Kit's right. Now show me a lap.`, `Dressed to run. Can you actually run?` };
 			Any = { `Full kit. Somebody's trying out.`, "{Clique} would sign you on looks alone.", `Varsity look. Now get varsity legs.` };
 			Friendly = { `Now you look like a teammate!`, "{Name}, full kit! Suit up Friday?", `Looking game-ready. Love it.` };
-			Respected = { `Full kit, MVP. Ravens forever.`, `That's how a starter dresses.`, "{Clique} look good on you, {Name}." };
+			Respected = { `Full kit, MVP. Ravens forever.`, `That's how a starter dresses.`, "{Clique} would draft you, {Name}." };
 		};
 		RivalLook = {
-			Hostile = { "{Rival} sent you? The paint's still wet.", `All black? Off to sulk in the studio?`, "{Rival}'s errand kid. Get lost." };
-			Wary = { `Charcoal vest. You with the paint kids?`, `All black. You one of the art crowd?`, "{Rival}'s colours in my gym? Hm." };
-			Any = { `Whoa. Very... art class.`, `Black on black. Going to a poetry slam?`, "{Rival}'s look, here? Brave." };
-			Friendly = { `Undercover in the studio? Smart.`, "{Name}, no! Not the artsy kids!", `Black's not your colour. Trust me.` };
-			Respected = { `Spying on the paint kids? Legend.`, `Even in black, you're varsity to us.`, `Find out who did the gym doors.` };
+			Hostile = { "{Rival} sent you? The paint's still wet.", `Studio clothes? Off to sulk somewhere?`, "{Rival}'s errand kid. Get lost." };
+			Wary = { `Dressed dark. You with the paint kids?`, `Moody look. You one of the art crowd?`, "{Rival}'s colours in my gym? Hm." };
+			Any = { `Whoa. Very... art class.`, `Dressed for a poetry slam? Bold.`, "{Rival}'s look, here? Brave." };
+			Friendly = { `Undercover in the studio? Smart.`, "{Name}, no! Not the artsy kids!", `Moody's not your look. Trust me.` };
+			Respected = { `Spying on the paint kids? Legend.`, `Even in studio gear, you're varsity.`, `Find out who did the gym doors.` };
 		};
 		Likes = {
-			Hostile = { "Nice {Piece}. Wasted on you.", "The {Piece}'s varsity. You're not.", "Where'd you steal that {Piece}?" };
+			Hostile = { "The {Piece} is fine. You're the problem.", "That {Piece} is team gear. You're not.", "Where'd you steal that {Piece}?" };
 			Any = { "Ooh, the {Piece}! Team spirit!", "That {Piece}? Game-day ready.", "Okay, the {Piece} is solid.", "The {Piece}! Now you look like us." };
 		};
 		Mocks = {
 			Hostile = { "The {Piece}. Of course. Nerd.", "The {Piece} gets benched. So do you.", "Keep that {Piece} off my court." };
 			Friendly = { "Ditch the {Piece}. You're one of us.", "The {Piece}? Bro. No.", `I'll pretend I didn't see that.` };
-			Any = { "The {Piece}? Can you even run in that?", "Drop the {Piece}. Pick up a ball.", "Is the {Piece} for extra credit?", `Is that homework? On purpose?` };
+			Any = { "The {Piece}? Can you even run with that?", "Drop the {Piece}. Pick up a ball.", "Is the {Piece} for extra credit?", "The {Piece}? Is that for a class?" };
 		};
 	};
 	DressCode = {
