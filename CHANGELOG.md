@@ -2,6 +2,30 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.87.1] - 2026-11-12: Kit C coats and masks in the game
+
+Owner: "Imported, go on". The 19 Kit C templates are in `ReplicatedStorage.NHAccessories` (71 templates in all) and
+all 19 Kit C items now count as ready, so the Wardrobe and School Store list them (not clicked in this test).
+
+### Added
+- **Kit C C1 and C2 templates** from the owner's import (`tools/accessories/assemble_kitc_a..e.luau`). Image ids were
+  read by name from the group's creations, all 70 Completed.
+- **Skirt bones rebuilt:** the importer left the bones on a separate part again, so the 11 rigged pieces were rebuilt
+  from the builder's blends (`rebuild_bones_kitc.luau`).
+
+### Changed
+- **Kit A hair refusals:** the 9 Kit A hair x item pairs from 1.87.0 now apply in the game
+  (`refresh_hair_kita_drops.luau`). A dry run showed only those 9 fits and their tucks changing.
+
+### Tested (NH Combat Test, slot 4 Testy)
+- **All 11 coats and 8 masks** worn through `ApplyTo`, each with a hair it fits, none dropped; in-game hair counts match
+  the doc.
+- **BodyFollow in Play:** walking (legs to 53°, arms to 38°), every skirt bone and the Inverness cape's arm bones sat
+  exactly where their limb carried them (0.0000 studs, every frame). The smoking jacket's tails swing.
+- Screenshots of the frock coat with the kintsugi mask (front, side, back) and the spencer with the wax mask.
+- No console errors from accessories. Testy's saved look unchanged. SlotCount and `NHTestNoMenuKeys` restored.
+- **Not tested:** Wardrobe and Store clicks for Kit C, a second player, the Map place.
+
 ## [1.87.0] - 2026-11-12: Kit C coats and masks built (waiting for the import)
 
 Kit C, "The Night School Wardrobe" (`docs/Accessories.md`), C1 and C2. Owner: "Approve, start C1+C2", then "Make the

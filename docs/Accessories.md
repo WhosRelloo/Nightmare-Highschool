@@ -13,8 +13,8 @@ R6 has no layered clothing, so every piece is a MeshPart riding one R6 part: eit
 Status: **Kits A and B are in the game** (NH Combat Test, 1.86.0): every batch imported, assembled in one pass and
 play-tested together on slot 4, the rebuilt satchel and Head Student's sash included. The owner pre-approved every later batch "as long as they follow the standards" (2026-11-11). **All of both kits is
 built** (batches 2-8: 49 more items, 2026-11-11), checked together with 0 fails, merged into `Config.Accessories`,
-and in the game since 1.86.0. Kit C is in progress (below): C1 coats and C2 masks are built, baked and staged for
-the owner's import (1.87.0).
+and in the game since 1.86.0. Kit C is in progress (below): C1 coats and C2 masks are **in the game** (1.87.1),
+play-tested on slot 4.
 
 ## Batches
 
@@ -28,7 +28,7 @@ the owner's import (1.87.0).
 | 6 | A 25-28 | civilian: pocket watch, lace parasol, crook umbrella, candle lantern, knitted scarves (two colours) | **in the game (1.86.0)**; staged in (`batch6/`) |
 | 7 | A 7 + B 2 | the Delinquents' long coat and the Headmaster's greatcoat (torso shell, sleeves on the arms, rigged split coattails) | **in the game (1.86.0)**; staged in (`batch7/`); hairs: see below |
 | 8 (Kit B) | B 1, 3-11 | the Headmaster's Circle: crow mantle, thorned crown, raven-skull pauldron, iron keys, shadow trail, chained ledger, sigil halo, seal of office, signet, staff, observer mask | **in the game (1.86.0)**; staged in (`kitb/`) |
-| C1-C2 (Kit C) | C 1-19 | 11 coats and jackets (skirts ride the legs: BodyFollow), 8 masks | built, baked, checked; staged in (`kitc/`), waiting for the import (1.87.0) |
+| C1-C2 (Kit C) | C 1-19 | 11 coats and jackets (skirts ride the legs: BodyFollow), 8 masks | **in the game, play-tested (1.87.1)**; staged in (`kitc/`) |
 
 ### Batches 2 to 8 (built 2026-11-11, in the game since 1.86.0)
 
@@ -176,8 +176,14 @@ skirts are one skinned piece (`<Coat>Skirt`, Torso mount, `NHFollow = "LL=1;RL=1
 bone's Transform so the vertices on it move exactly as the limb does: `M = rel * C1 * C0^-1` (the limb's motion in
 the torso's space since rest, from the parts' own CFrames and the Motor6D's offsets), `Transform = B^-1 * M * B`
 (B = the weld's offset times the bone's rest frame). Checked in Studio (Edit, `TransformedWorldCFrame`): a vertex on
-the bone lands where the leg carries it to within 0.0000014 studs over five hip angles. Not yet seen in Play (no Kit C
-piece is imported yet).
+the bone lands where the leg carries it to within 0.0000014 studs over five hip angles. **In Play (1.87.1)**, every
+skirt and the Inverness cape, walking with the legs swinging to 53 degrees (the arms to 38): each follow bone sat
+exactly where its limb carried it (0.0000 studs, every frame).
+
+The character's Animator resets every bone's Transform each frame while a track plays (the walk), so BodyFollow sets
+them in `PreRender`, after the animation step and before the frame is drawn. To measure it, read at `PreAnimation`
+(the pose that was just drawn): after `Heartbeat` the Animator has already reset them, and a `PreRender:Wait()` resumes
+before BodyFollow's own handler.
 
 What the rig taught (`acc_check.py`, every body, the whole swing in 11-degree steps):
 - **Each skirt half rides its leg entirely.** A skirt blended between the torso and the leg can't work on R6: the leg
@@ -252,15 +258,28 @@ piece): 26 pairs.
 earlier tuck check had dropped but the game's templates still allow: the ruff with the straight and wavy bobs, the
 choir collar and the crystal pendant with Females_Natural_Trim_Pony, the moonstone torc with
 Females_Long_Sweetheart_Pigtails, and the fang necklace, scythe pendant and both scarves with Females_Low_Ponytail.
-They reach the game at the next assembly (with Kit C's).
+In the game since 1.87.1 (`tools/accessories/refresh_hair_kita_drops.luau`; a dry run first showed exactly these 9
+fits and their 9 tucks changing, nothing else).
 
 **Checked:** `acc_check.py --capes --hair`, every Kit A, B and C piece together: 6 fails, all the fascinator's veil
 over the grille, night-watch and wolf masks. Those became conflict pairs, and the masks and mourning hats re-checked
 with 0 fails. `acc_tuckcheck.py` (every item alone and every
 pair, three body fits): 0 fails.
 
-**Next:** the owner's import, then assembly (`acc_assemble.py`, bones checked) and a slot 4 play test of BodyFollow and
-the skirts in Play. Then C8 bags, C9 extras, C5 hands and feet, C3, C4, C6, C7.
+**In the game (1.87.1).** The owner imported `kitc/`. 70 image ids read by name (no duplicates, all thumbnails
+Completed), assembled in five parts (`tools/accessories/assemble_kitc_a..e.luau`, each under 65 KB). The importer
+again put the rigs' bones on a separate part, so all 11 rigged pieces (9 skirts, the Inverness cape, the smoking
+jacket's tails) were rebuilt from the builder's blends (`rebuild_bones_kitc.luau`): 3 bones each, 11 on the tails, all
+skinned. Every piece has its maps, mount and fit; the in-game hair counts match the table above exactly.
+
+Play test, slot 4 (Testy), through `UI.Appearance.ApplyTo`: all 11 coats and all 8 masks worn, each with a hair it
+fits, none dropped, no console errors from accessories. BodyFollow was exact for every skirt (above). The smoking
+jacket's tails swing (`Tails`, up to 10 degrees walking). Screenshots: the frock coat with the kintsugi mask (front,
+side with the sheathed katana and the slit for its guard, back with the low ponytail tucked over the coat), the spencer
+with the wax mask. Testy's saved look was unchanged afterwards. Not done: Wardrobe and Store clicks for Kit C, a
+second player watching (BodyFollow runs for every character in range), the Map place.
+
+**Next:** C8 bags, C9 extras, C5 hands and feet, C3, C4, C6, C7.
 
 ## The no-clipping rules (how "nothing clips, overlaps or hovers" is checked)
 
