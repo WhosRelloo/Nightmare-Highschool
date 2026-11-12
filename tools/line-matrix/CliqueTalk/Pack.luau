@@ -27,10 +27,10 @@ return {
 	};
 	Flee = { Any = { `Back to the Den! Go!`, `Split up! Meet at the oaks!`, `Tails down, feet fast! Move!`, `Nope! Even wolves know when to run!`, `Into the trees! Don't look back!` } };
 	Transformed = {
-		Hostile = { `Big and scary doesn't make you Pack.`, `New look? Cute. Still not Pack.`, `Big. Loud. Still a first-year underneath.` };
-		Wary = { `Easy... easy. Nobody bare their teeth.`, `Whoa. Okay. Is that still you in there?`, `Nobody move. Let it get our scent.` };
-		Any = { `Now THAT has a scent.`, `Huh. So that's what you've been hiding.`, `Heh. Look at the size of you.`, `Okay. That's a howl-worthy look.` };
-		Respected = { "{Name}?! Okay. Terrifying. Love it.", `Awooo! That's one of ours!`, `Even Dex looks nervous. Ha!`, `Run with us like that. Please.` };
+		Hostile = { `Spooky. Doesn't make you Pack.`, `New look? Cute. Still not Pack.`, `Changed? Still a first-year underneath.` };
+		Wary = { `Easy... easy. Let's all stay calm.`, `Whoa. Okay. Is that still you in there?`, `Nobody stare. Nobody move.` };
+		Any = { `Now THAT is a change.`, `Huh. So that's what you've been hiding.`, `Heh. That's a new look.`, `Those eyes. Okay. Respect.` };
+		Respected = { "{Name}?! Okay. Terrifying. Love it.", `Ha! That's one of ours!`, `Even Dex looks nervous.`, `Stay like that a while. Please.` };
 	};
 	Night = {
 		Hostile = { `Night's ours. You're just visiting.`, `Late, first-year. Every shadow's got ears.`, `Dark out. Hope you brought a lamp. Heh.` };

@@ -30,8 +30,8 @@ return {
 		Hostile = { `Begone! I have a hymnal and I'll use it!`, `Back! Back, foul thing! ...Please?`, `Begone! In the name of choir practice!` };
 		Wary = { `Begone! ...Wait, are you still you?`, `Nobody panic. Hum something soothing.`, `Stay back. I'm holding a very holy candle.` };
 		Any = { `Something unholy! I KNEW it!`, `Begone! Kindly! With respect!`, `Begone, foul... oh. Hi. Still, begone.`, `Every candle just went out. Of course.` };
-		Friendly = { `Oh! Still you. Just... larger.`, `Friend? Blink twice if it's you.`, `Easy, friend. We'll hum you calm.` };
-		Respected = { "{Name}? Even like that, you're blessed.", `A blessing in a bigger shape. Truly.`, `We'll sing you back. Gently.` };
+		Friendly = { `Oh! Still you. Just... different.`, `Friend? Blink twice if it's you.`, `Easy, friend. We'll hum you calm.` };
+		Respected = { "{Name}? Even like that, you're blessed.", `A new shape. Same blessed soul.`, `We'll sing you back. Gently.` };
 	};
 	Night = {
 		Hostile = { `Out after vespers? Of course you are.`, `The dark suits you. Not a compliment.`, `Night and you. Two things I avoid.` };
@@ -70,7 +70,7 @@ return {
 		};
 		Werewolf = {
 			Hostile = { `Werewolf. The chapel has a no-shedding rule.`, `Werewolf. Go howl at the Den.`, `Werewolf. You're tracking leaves in. Out.` };
-			Wary = { `Werewolf. Are you with the Pack?`, `Werewolf. Please don't growl during hymns.`, `Werewolf. Is it moon time already?` };
+			Wary = { `Werewolf. Are you with the Pack?`, `Werewolf. Please don't growl during hymns.`, `Werewolf. Feeling restless?` };
 			Any = { `Werewolf. Do bells hurt your ears?`, `Werewolf. Not all of you run with the Pack.`, `Werewolf. Lovely range on a howl, I bet.` };
 			Friendly = { `A werewolf who sings! Wonderful!`, "{Name}, howl the low notes for us?", `Werewolf? You'd fit right in the back row.` };
 			Respected = { `Werewolf, and our dearest friend.`, "{Name}. Proof the Pack is wrong.", `Our werewolf. Howls perfectly in tune.` };
@@ -123,7 +123,7 @@ return {
 		};
 	};
 	DressCode = {
-		Hostile = { `Ivory and black, or you wait outside.`, `Not dressed like that. Not in here.`, `Turn around. Try again in ivory.` };
+		Hostile = { `Proper colours, or you wait outside.`, `Not dressed like that. Not in here.`, `Turn around. Try again in ivory.` };
 		Wary = { `The chapel asks for proper dress.`, `Ivory and black, please. Then come in.`, `Come back dressed for practice.` };
 		Any = { `Choir dress only past the doors.`, `Choir colours in the chapel, please.`, `No choir dress, no pews. Sorry.` };
 		Friendly = { `Almost! Put on something ivory and come in.`, "{Name}, dress for choir and sit with us.", `I'd let you in. The candles wouldn't.` };
