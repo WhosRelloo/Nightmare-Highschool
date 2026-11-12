@@ -26,6 +26,7 @@ local function checkPool(Where, Pool)
 			if not KEYS[K] then fail(`{Where}: unknown placeholder {K}: {L}`) end
 		end
 		local Low = L:lower()
+		if Low:find("%f[%a]nil%f[%A]") then fail(`{Where}: contains "nil" (backtick interpolation?): {L}`) end
 		for _, W in BANNED do
 			if Low:find("%f[%a]" .. W .. "%f[%A]") then fail(`{Where}: banned word "{W}": {L}`) end
 		end
@@ -37,6 +38,17 @@ local function checkNode(Where, Node, NoAny)
 	for K, Pool in Node do
 		if K ~= "Any" and not table.find(ATTS, K) then fail(`{Where}: unknown key {K}`) end
 		checkPool(`{Where}.{K}`, Pool)
+	end
+	if Where:match("%.Outfit%.Likes$") or Where:match("%.Outfit%.Mocks$") then
+		local Has = false
+		for _, Pool in Node do
+			if typeof(Pool) == "table" then
+				for _, L in Pool do
+					if typeof(L) == "string" and L:find("{Piece}", 1, true) then Has = true end
+				end
+			end
+		end
+		if not Has then fail(Where .. ": no line contains {Piece}") end
 	end
 	if NoAny and Node.Any then fail(`{Where}: uses Any (Greet must give every attitude its own lines)`) end
 	for _, A in ATTS do

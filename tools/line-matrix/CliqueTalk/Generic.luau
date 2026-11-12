@@ -4,8 +4,8 @@ return {
 		Hostile = { `Get lost.`, `Not you.`, `Keep walking.`, `We're not friends.` };
 		Wary = { `...Hey.`, `Oh. It's you.`, `What do you want?`, `Hm. Hi, I guess.` };
 		Neutral = { `Hey.`, `Hi.`, `Sup.`, `How's it going?` };
-		Friendly = { `Hey, {Name}!`, `Oh good, it's you.`, `{Name}! What's up?`, `Hey you. Good day?` };
-		Respected = { `{Name}! Looking sharp.`, `There's the legend.`, `Always good to see you, {Name}.`, `Make way, everyone.` };
+		Friendly = { "Hey, {Name}!", `Oh good, it's you.`, "{Name}! What's up?", `Hey you. Good day?` };
+		Respected = { "{Name}! Looking sharp.", `There's the legend.`, "Always good to see you, {Name}.", `Make way, everyone.` };
 	};
 	Bump = { Any = { `Watch it!`, `Whoa, sorry.`, `Excuse you.`, `Easy!` } };
 	Crowded = { Any = { `Personal space?`, `Little room, please.`, `You're kind of close.`, `Can I help you?` } };
@@ -25,10 +25,10 @@ return {
 	};
 	Hurt = { Any = { `You okay? You look rough.`, `Go see the nurse.`, `Who did that to you?`, `Sit down before you fall down.` } };
 	Outfit = {
-		FullLook = { Any = { `Full {Clique} look, huh?`, `Dressed like one of {Clique}.`, `Matching {Clique}? Bold.` } };
-		RivalLook = { Any = { `{Rival} colours? Here?`, `Dressed like {Rival}? Brave.`, `That's a {Rival} look. People notice.` } };
-		Likes = { Any = { `Nice {Piece}.`, `Where'd you get the {Piece}?`, `Okay, the {Piece} is cool.` } };
-		Mocks = { Any = { `Is that a {Piece}? Really?`, `Bold choice, the {Piece}.`, `Hm. The {Piece}. Interesting.` } };
+		FullLook = { Any = { "Full {Clique} look, huh?", "Dressed like one of {Clique}.", "Matching {Clique}? Bold." } };
+		RivalLook = { Any = { "{Rival} colours? Here?", "Dressed like {Rival}? Brave.", "That's a {Rival} look. People notice." } };
+		Likes = { Any = { "Nice {Piece}.", "Where'd you get the {Piece}?", "Okay, the {Piece} is cool." } };
+		Mocks = { Any = { "Is that a {Piece}? Really?", "Bold choice, the {Piece}.", "Hm. The {Piece}. Interesting." } };
 	};
 	DressCode = { Any = { `Members' corner. Dress the part.`, `Come back in our colours.`, `Not dressed like that, you're not.` } };
 }

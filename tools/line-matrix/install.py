@@ -8,6 +8,8 @@ The source travels inside the snippet, so no shared install buffer is used.
 import pathlib
 import sys
 
+sys.stdout.reconfigure(encoding="utf-8", newline="\n")
+
 src = pathlib.Path(sys.argv[1]).read_bytes().replace(b"\r\n", b"\n")
 path = sys.argv[2]
 cls = sys.argv[3] if len(sys.argv) > 3 else "ModuleScript"
