@@ -274,3 +274,8 @@ The Map place needs:
 - the ten body types' meshes (not in the Map yet: see Body-Types);
 - stations tagged `NHTrainStation` in its gym (each with `Station`, `FloorY`, `GripY` for the bar, a `Spot` and a Train prompt);
 - the art ids (now in `Config.Training.Art`), the sit-up `IdleHold` and the chest-height `PromptAt` prompts (1.85.2).
+
+**Done in 1.86.1 (2026-11-11):** all of the above is in the Map place except the placed stations. They are templates in
+`ServerStorage.NHProps` (NHBuildKit `Training`) for the builder. Each carries `FloorFromSpot` / `GripFromSpot`, and the
+Map's `Features.Training` sets `FloorY` / `GripY` from the Spot when the game starts, so a moved station keeps working.
+The ten body types' meshes came with `UI.Appearance` (ids). Play-tested: one set per area with a live step-up (CHANGELOG 1.86.1).

@@ -145,6 +145,18 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 - Items 5, 7 and 8 followed in 1.72.1, so Group A is done.
 - **Known gap:** the admin desk's sparring partner can't spawn. The Map's `Services.AI.AI.Rig` holds only its Animate script; NH Combat Test's holds the whole body.
 
+## Added 2026-11-11 (1.86.1): training, the 3D accessories, the everyday kit and the prop kits
+
+- **Training:** the scripts and the HUD are in. The four stations are templates in `ServerStorage.NHProps`
+  (NHBuildKit `Training`). Place one anywhere and it works (its floor and grip heights follow its Spot).
+- **3D accessories:** Kit A and Kit B are in the Wardrobe (K): the Accessories tab, plus the Admin tab for staff.
+  Everything except the staff regalia is unlocked in the Map.
+- **The everyday kit:** the scripts, the models and the Locker's Kit tab. Counters (tag `NHKitShop`) are the builder's to place.
+- **Prop templates in `ServerStorage.NHProps`:** Interiors, Armory, SpellShop, WitchHut, Signs (+ `SignKit`), Gates and
+  Secret. The door rigs and tags are kept; nothing is placed.
+- **Icons and the crow tint:** the 1.84.0 icon set; the crow teleport takes the regalia's colour.
+- Replaced scripts are backed up as `ServerStorage.NHCore.Backups.*_pre186`.
+
 ## What the Map still lacks (re-sorted 2026-11-10, around how far the school is built)
 
 Owner: "The builder is still making the school so give me a better list". The builder has the main building's outside up (the front, both wings around their courtyards, the entrance stairs, the front yard with the dead oaks and a gate) on open baseplates. There are no sports fields, dorms or town yet, and most rooms are still being fitted. So the list is sorted by what each system needs from the map, checked in NH Combat Test's code (which tags and workspace folders it looks for).

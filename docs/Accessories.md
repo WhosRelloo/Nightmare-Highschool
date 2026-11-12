@@ -399,3 +399,5 @@ The owner imported every remaining batch at once and asked for one assembly pass
 - The Map place: `Config.Accessories`, `UI.AccessoryWear`, `Controllers.Character.AccessorySway` / `AccessoryFx`,
   `Services.Features.Accessories`, `ReplicatedStorage.NHAccessories`, and the `UI.Appearance`, `Player.Identity`,
   `Gui.Wardrobe`, `Gui.Enrollment` and `Features.Fx` (`patch_fx_flare`) patches (`tools/accessories/`).
+
+**(1.86.1) In the Map place:** Kit A and Kit B with the Wardrobe tabs, the hair tuck and the regalia effects. Kit C and BodyFollow were not ported (paused).

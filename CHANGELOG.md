@@ -2,6 +2,79 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.86.1] - 2026-11-11: Map place: training, the 3D accessories, the everyday kit and the builder's new prop kits
+
+Owner (through the NH Combat Test session): "port the training system and all the new items from NH Combat Test to the
+Map place, starting now". Every script was diffed against the Map's copy first; the Map's own changes were kept.
+
+### Ported (Map place, all tagged `NHCore`; the replaced scripts are backed up as `ServerStorage.NHCore.Backups.*_pre186`)
+- **Training (1.81.0 and the 1.85.2 audit):**
+  - `Config.Training` (the 27 PBR HUD art ids, the animation ids, the sit-up rep 88010144797396);
+  - `Features.Training` and `Gui.Training`;
+  - the `UI.Appearance` areas (Areas, AreaBodies, SetArea, the look guard);
+  - the `PlayerData.Training` default, `SetTraining` in `Functions.UpdateState`;
+  - the stat bonuses (`Config.Progression.Training`, `Player.Progression`, `CombatSpeed`'s sprint line).
+- **The four stations** are templates in `ServerStorage.NHProps` (`Station_PushUp`, `Station_PullUp`, `Station_SitUp`,
+  `Station_Squat`, NHBuildKit `Training`, tag `NHTrainStation`). They are **not placed**: the Map's map is the builder's.
+  - New for the Map: each station carries `FloorFromSpot` / `GripFromSpot`, and `Features.Training` works out the
+    world heights `FloorY` / `GripY` from its Spot when the game starts, so a station works wherever it's put.
+- **3D accessories, Kit A and Kit B (1.86.0):**
+  - `ReplicatedStorage.NHAccessories` (52 templates, bones included), `Config.Accessories` (55 Kit A, 12 Kit B);
+  - `UI.AccessoryWear`, `Features.Accessories` (School Store `Buy` / `Info`), `Character.AccessoryFx` and `AccessorySway`;
+  - the hair tuck in `HairSway`, the regalia flare in `Features.Fx`;
+  - `Gui.Wardrobe`'s Accessories and Admin tabs, merged with the Map's Bloodline tab and K-anywhere.
+  - Kit C and `BodyFollow` were left out (paused).
+  - The Map's no-save `Player.Data` now also unlocks every accessory except the staff regalia, like the uniforms and capes.
+- **The everyday kit (QOL, 1.80):** `Config.Kit`, `Config.KitHolds`, `Features.Kit`, `Gui.KitUi`, `World.KitFx`,
+  `ReplicatedStorage.NHKit`, the kit patches in `Config.Items`, `Inventory`, `Posture`, `CombatSpeed` and
+  `Player.Progression`, and the Locker's Kit tab (merged with the Map's locker-room-only rule).
+- **Prop kit templates for the builder** in `ServerStorage.NHProps` (templates only, nothing placed):
+  - batch 45 Interiors (30), batch 46 Armory (15) and SpellShop (14), batch 47 WitchHut (26);
+  - batch 50 Signs (12) and the `SignKit` module;
+  - batch 51 Gates (26) and batch 53 Secret (26).
+  - The door rigs (NHDoor attributes, DoorLeaf, the prompts) and the tags (NHBoard 48, NHLooseBar 6, NHPortcullis,
+    NHGateChain, NHCandle 18, NHSign 11, NHDoor 23) match NH Combat Test's exactly.
+- **The 1.84.0 icon set** (`UI.Theme`, `UI.Components`, `Gui.Moments`, `Gui.Phone`, `World.GetUp`, the moon banners)
+  and **the regalia crow tint** (`World.TpFlock`). The Thornrose HUD (`Gui.KitHud`) was already the same in the Map.
+
+### Kept as the Map's own
+`Player.Data` and `Player.Identity` (the no-save stand-ins), `Features.Doors` (the leaf check), `Gui.TopBar`,
+`Gui.Evolution`, `Player.Height` and `Config.Shop` (CT's Height spins aren't part of this port).
+
+### Left out, and why
+- `Features.WardrobeStations`, `World.LockerDoors`: not on the list (the Map's wardrobe opens anywhere).
+- The kit's hooks into the hall monitor, homes and sports: those services aren't in the Map (the kit's calls to them are guarded).
+- The v2 hair rigs (1.85.1) and the admin capes (1.76.0): not on the list. The hair tuck only works fully with v2 hairs.
+- `Studio.TestBridge`: NH Combat Test's test tool. The play-test used a temporary bridge script, removed afterwards.
+
+### Verified (Map place, one combined play-test)
+The Map has no save slots (its `Player.Data` keeps nothing), so the slot-4 rules and the SlotCount edit don't apply there.
+`NHTestNoMenuKeys` was set during the test and cleared after.
+- **Every script installed** through a private chunked buffer; all 36 checksums matched NH Combat Test's (or the merge)
+  and every one parses. All 7 prop kits, the stations, NHAccessories and NHKit arrived with matching instance fingerprints.
+- **Training, one set per area** at temporary stations (removed after):
+  - a real E sat the student down (anchored at the Spot), and the HUD opened (93 elements);
+  - each set ran through the real `Begin` / `Submit` remotes and was scored by the server (14 rings, tier I, 99 XP);
+  - each area stepped up live, with level 4 set just short of step I first:
+    - Arms (push-ups): the arm meshes appeared, `Areas` = standard|athletic|standard;
+    - Torso (sit-ups): the torso mesh appeared, the body followed it (Body = athletic);
+    - Legs (squats): both leg meshes appeared, `Areas` = athletic|athletic|athletic;
+  - the stat bonuses applied: damage x1.08, posture gain x0.985, sprint x1.015;
+  - Leave stood the student up.
+- **Accessories**, sent through the real appearance remote:
+  - Kit A: tricorn, school tie, satchel, pocket watch, Court pin and Hunter's bracers were worn (welded, bones on the
+    rigged pieces); the ghoul lantern was dropped by the satchel-vs-hip clash rule.
+  - Kit B with Kit A: crown, sigil halo, signet, staff, shadow trail and the steel gorget were worn; the Head sash was
+    dropped by the gorget-vs-sash rule; the halo set `NHRegaliaTint` (crimson), which the crow teleport reads.
+- **A gate and a secret door** (templates placed for the test, removed after): a real E opened GatePedestrian (the
+  leaf swung 95 degrees on the client) and BookcaseSecretDoor (84 degrees); both closed again by themselves.
+- **Console:** no errors or warnings from the ported code on the server or the client.
+
+### Not verified
+- The art and meshes by eye (no screenshot tool this session); a Wardrobe click or a School Store purchase; a kit item
+  in use; the step-up banner on screen; a second player; the stations placed by the builder.
+- The owner needs to save the Map place.
+
 ## [1.86.0] - 2026-11-11: 3D accessories batches 2-8 and Kit B in the game; the satchel and Head sash fixes
 
 The owner imported `art/group-upload-accessories/batch1-fix`, `batch2` to `batch7` and `kitb` (44 FBX, 184 images) and
