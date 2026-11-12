@@ -821,29 +821,38 @@ local function hangoutOf(Root: BasePart): string?
 	return nil
 end
 
+local function dressCheck(P: Player)
+	local Root = P.Character and P.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?
+	local V = Visits[P] or { Told = -1e9 }
+	Visits[P] = V
+	local Id = Root and hangoutOf(Root)
+	if Id == V.In then return end
+	V.In = Id
+	if not (Id and Root) or os.clock() - V.Told < 120 then return end
+	local Ok, Dressed = pcall(Cliques.Dressed, P, Id)
+	if not Ok or Dressed then return end
+	local Best, BestD = nil, 30
+	for _, S in (Host and Host.Students and Host.Students()) or {} do
+		if S.Clique == Id and S.Root and S.Model and not S.Reacting then
+			local D = (S.Root.Position - Root.Position).Magnitude
+			if D < BestD then Best, BestD = S, D end
+		end
+	end
+	if Best and sayMatrix(Best, `DressCode`, P, nil, 0, nil) then
+		V.Told = os.clock()
+		lookAt(Best, Root.Position + Vector3.new(0, 1.5, 0), 2)
+	end
+end
+
 local function dressWatch()
+	local Warned = false
 	while true do
 		task.wait(1)
 		for _, P in Players:GetPlayers() do
-			local Root = P.Character and P.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?
-			local V = Visits[P] or { Told = -1e9 }
-			Visits[P] = V
-			local Id = Root and hangoutOf(Root)
-			if Id == V.In then continue end
-			V.In = Id
-			if not (Id and Root) or os.clock() - V.Told < 120 then continue end
-			local Ok, Dressed = pcall(Cliques.Dressed, P, Id)
-			if not Ok or Dressed then continue end
-			local Best, BestD = nil, 30
-			for _, S in (Host and Host.Students and Host.Students()) or {} do
-				if S.Clique == Id and S.Root and S.Model and not S.Reacting then
-					local D = (S.Root.Position - Root.Position).Magnitude
-					if D < BestD then Best, BestD = S, D end
-				end
-			end
-			if Best and sayMatrix(Best, `DressCode`, P, nil, 0, nil) then
-				V.Told = os.clock()
-				lookAt(Best, Root.Position + Vector3.new(0, 1.5, 0), 2)
+			local Ok, Err = pcall(dressCheck, P) -- one bad player or student never stops the watch for the server
+			if not Ok and not Warned then
+				Warned = true
+				warn("[StudentBrain] dressWatch: " .. tostring(Err))
 			end
 		end
 		for P in Visits do

@@ -54,5 +54,23 @@
     "file_path": "game.ServerScriptService.Services.AI.StudentBrain",
     "old_string": "\tSenses.Init()\nend\n",
     "new_string": "\tSenses.Init()\n\ttask.spawn(dressWatch) -- (line matrix) hangout dress codes\nend\n"
+  },
+  {
+    "file_path": "game.ServerScriptService.Services.Quests.Quests",
+    "old_string": "\t\telseif Def.Giver and Shared.CanStart(Player, Id) then\n\t\t\tput(Def.Giver, if Q.Failed[Id] then `Retry` else `Offer`)\n\t\tend\n",
+    "new_string": "\t\telseif Def.Giver then\n\t\t\tlocal Can, Why = Shared.CanStart(Player, Id)\n\t\t\tif Can or Why == `DressCode` then -- (line matrix) the marker stays for the undressed: the giver turns them away with a line\n\t\t\t\tput(Def.Giver, if Q.Failed[Id] then `Retry` else `Offer`)\n\t\t\tend\n\t\tend\n",
+    "note": "fix round 1: Local.Seals keeps the Offer marker for undressed players"
+  },
+  {
+    "file_path": "game.ServerScriptService.Services.Social.Hangouts",
+    "old_string": "\tif OkC and Cl.Dressed and not Cl.Dressed(Player, `Vigil`) then\n",
+    "new_string": "\tlocal OkD, Dressed = false, true\n\tif OkC and Cl.Dressed then OkD, Dressed = pcall(Cl.Dressed, Player, `Vigil`) end -- fails open, like Quests.CanStart\n\tif OkD and Dressed == false then\n",
+    "note": "fix round 1: pcall Dressed, fail open"
+  },
+  {
+    "file_path": "game.ServerScriptService.Services.AI.StudentBrain",
+    "old_string": "local function dressWatch()\n\twhile true do\n\t\ttask.wait(1)\n\t\tfor _, P in Players:GetPlayers() do\n\t\t\tlocal Root = P.Character and P.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?\n\t\t\tlocal V = Visits[P] or { Told = -1e9 }\n\t\t\tVisits[P] = V\n\t\t\tlocal Id = Root and hangoutOf(Root)\n\t\t\tif Id == V.In then continue end\n\t\t\tV.In = Id\n\t\t\tif not (Id and Root) or os.clock() - V.Told < 120 then continue end\n\t\t\tlocal Ok, Dressed = pcall(Cliques.Dressed, P, Id)\n\t\t\tif not Ok or Dressed then continue end\n\t\t\tlocal Best, BestD = nil, 30\n\t\t\tfor _, S in (Host and Host.Students and Host.Students()) or {} do\n\t\t\t\tif S.Clique == Id and S.Root and S.Model and not S.Reacting then\n\t\t\t\t\tlocal D = (S.Root.Position - Root.Position).Magnitude\n\t\t\t\t\tif D < BestD then Best, BestD = S, D end\n\t\t\t\tend\n\t\t\tend\n\t\t\tif Best and sayMatrix(Best, `DressCode`, P, nil, 0, nil) then\n\t\t\t\tV.Told = os.clock()\n\t\t\t\tlookAt(Best, Root.Position + Vector3.new(0, 1.5, 0), 2)\n\t\t\tend\n\t\tend\n\t\tfor P in Visits do\n\t\t\tif not P.Parent then Visits[P] = nil end\n\t\tend\n\tend\nend\n\n",
+    "new_string": "local function dressCheck(P: Player)\n\tlocal Root = P.Character and P.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?\n\tlocal V = Visits[P] or { Told = -1e9 }\n\tVisits[P] = V\n\tlocal Id = Root and hangoutOf(Root)\n\tif Id == V.In then return end\n\tV.In = Id\n\tif not (Id and Root) or os.clock() - V.Told < 120 then return end\n\tlocal Ok, Dressed = pcall(Cliques.Dressed, P, Id)\n\tif not Ok or Dressed then return end\n\tlocal Best, BestD = nil, 30\n\tfor _, S in (Host and Host.Students and Host.Students()) or {} do\n\t\tif S.Clique == Id and S.Root and S.Model and not S.Reacting then\n\t\t\tlocal D = (S.Root.Position - Root.Position).Magnitude\n\t\t\tif D < BestD then Best, BestD = S, D end\n\t\tend\n\tend\n\tif Best and sayMatrix(Best, `DressCode`, P, nil, 0, nil) then\n\t\tV.Told = os.clock()\n\t\tlookAt(Best, Root.Position + Vector3.new(0, 1.5, 0), 2)\n\tend\nend\n\nlocal function dressWatch()\n\tlocal Warned = false\n\twhile true do\n\t\ttask.wait(1)\n\t\tfor _, P in Players:GetPlayers() do\n\t\t\tlocal Ok, Err = pcall(dressCheck, P) -- one bad player or student never stops the watch for the server\n\t\t\tif not Ok and not Warned then\n\t\t\t\tWarned = true\n\t\t\t\twarn(\"[StudentBrain] dressWatch: \" .. tostring(Err))\n\t\t\tend\n\t\tend\n\t\tfor P in Visits do\n\t\t\tif not P.Parent then Visits[P] = nil end\n\t\tend\n\tend\nend\n\n",
+    "note": "fix round 1: dressWatch per-player body in pcall (dressCheck), warn once"
   }
 ]
