@@ -179,10 +179,14 @@ def inside_depth(bvh, p, max_d=0.6):
     return 0.0, dist
 
 
-def check_body(verts, mount, body_parts, head):
-    """clip and gap of a piece's verts against a body (mount part, the torso and the head checked)"""
+def check_body(verts, mount, body_parts, head, ride=None):
+    """clip and gap of a piece's verts against a body (mount part, the torso and the head checked). ride: per vertex,
+    the limb a skinned piece's vertex rides entirely (BodyFollow weight 1) or None: such a vertex may go into the
+    torso as its limb swings (the R6 limb's top passes into the torso; cloth riding it goes with it, hidden inside).
+    Only in motion: at rest every vertex is checked against the torso as usual"""
     clip, gap = 0.0, 9.0
     trees = [(k, tri_bvh(*v)) for k, v in body_parts.items()] + [("Head", tri_bvh(*head))]
+    tree_of = dict(trees)
     step = max(1, len(verts) // 3000)
     where = ""
     def inside(t, p):
@@ -198,12 +202,16 @@ def check_body(verts, mount, body_parts, head):
                 o = h[0] + d * 1e-4
             votes += n % 2
         return votes >= 2
-    for p in verts[::step]:
+    for i in range(0, len(verts), step):
+        p = verts[i]
+        rp = ride[i] if ride else None
         for k, t in trees:
             hit = t.find_nearest(p, 0.6)
             if hit[0] is None:
                 continue
             loc, nrm, idx, dist = hit
+            if rp and k == "Torso":
+                continue   # rides its limb: inside the torso only where the limb's own top goes as it swings (hidden)
             if dist > 1e-4 and inside(t, p):
                 if k in ("LeftArm", "RightArm") and 1.0 <= abs(p.x) <= 1.10 and p.z <= 1.0:
                     continue   # under the arm: the R6 arm is flush on the torso's side and swings in its own plane, so a
@@ -253,6 +261,85 @@ def moved_piece(verts, mount, arm_rot):
         piv = Vector((0, 0, zc))
         return [R @ (p - piv) + piv for p in verts]
     return verts
+
+
+FOLLOW_AXIS = {"LA": ("LeftArm", 0.5), "RA": ("RightArm", 0.5), "LL": ("LeftLeg", -1.0), "RL": ("RightLeg", -1.0)}
+
+
+def follow_weights(ob, follow):
+    """Kit C skinned clothes: {key: (factor, [weight per vertex])} from the piece's F_<key> vertex groups"""
+    out = {}
+    for key, f in follow.items():
+        vg = ob.vertex_groups.get(f"F_{key}")
+        if vg is None:
+            continue
+        w = [0.0] * len(ob.data.vertices)
+        for v in ob.data.vertices:
+            for gr in v.groups:
+                if gr.group == vg.index:
+                    w[v.index] = gr.weight
+        out[key] = (f, w)
+    return out
+
+
+def follow_deform(verts, follow, deg):
+    """the skinned piece with the limbs at limb_pose(deg): each follow bone turns its share of the limb's swing about
+    the joint (as Controllers.Character.BodyFollow does), blended by the vertex weights"""
+    if not follow:
+        return verts
+    rots = []
+    for key, (f, w) in follow.items():
+        part, zc = FOLLOW_AXIS[key]
+        a = {"LeftArm": deg, "RightArm": -deg, "LeftLeg": -deg, "RightLeg": deg}[part]
+        rots.append((Matrix.Rotation(math.radians(a * f), 3, "X"), Vector((0, 0, zc)), w))
+    out = []
+    for i, p in enumerate(verts):
+        q = p.copy()
+        for R, piv, w in rots:
+            if w[i] > 0:
+                q += (R @ (p - piv) + piv - p) * w[i]
+        out.append(q)
+    return out
+
+
+FOLLOW_PART = {"LA": "LeftArm", "RA": "RightArm", "LL": "LeftLeg", "RL": "RightLeg"}
+
+
+def ride_of(follow, n):
+    """per vertex: the limb a skinned piece's vertex rides entirely, else None"""
+    out = [None] * n
+    for key, (f, w) in (follow or {}).items():
+        if f < 0.999:
+            continue
+        for i in range(n):
+            if w[i] >= 0.999:
+                out[i] = FOLLOW_PART[key]
+    return out if any(out) else None
+
+
+def katana_hits_ride(verts, tris, boxes, ride, posed):
+    """katana_hits, where a vertex riding a limb that itself crosses that katana part doesn't count (the limb meets
+    the katana there; cloth on it can only follow)"""
+    if not ride or posed is None:
+        return katana_hits(verts, tris, boxes)
+    cross, inside, where = 0, 0, ""
+    for box in boxes:
+        hit_parts = {pt for pt in set(r for r in ride if r) if pt in posed and sum(katana_hits(*posed[pt], [box])[:2])}
+        keep_t = [t for t in tris if not all(ride[i] in hit_parts for i in t)]
+        keep_v = [verts[i] for i in range(len(verts)) if ride[i] not in hit_parts] if hit_parts else verts
+        if not keep_t:
+            continue
+        c_, _, w_ = katana_hits(verts, keep_t, [box])
+        name, bv, bt, c, axes, half = box
+        i_ = 0
+        for p in keep_v:
+            d = p - c
+            if abs(d.dot(axes[0])) < half.x and abs(d.dot(axes[1])) < half.y and abs(d.dot(axes[2])) < half.z:
+                i_ += 1
+                where = where or f"{name} at ({p.x:.2f}, {p.y:.2f}, {p.z:.2f})"
+        cross += c_; inside += i_
+        where = where or w_
+    return cross, inside, where
 
 
 def sway_shapes(ob, arm, profile, keepout, lock=None):
@@ -418,6 +505,8 @@ def run():
     pieces = {}   # (item, piece) -> dict(verts, tris, mount, fit_body)
     for it in items:
         lay = json.load(open(os.path.join(ROOT, "layout", f"{it}.json")))
+        xp = os.path.join(ROOT, "layout", f"{it}.extra.json")
+        extra = json.load(open(xp)) if os.path.exists(xp) else {}
         with bpy.data.libraries.load(os.path.join(ROOT, "blend", f"{it}.blend"), link=False) as (src, dst):
             dst.objects = [n for n in src.objects if n in lay["pieces"] or (n.endswith("Rig") and n[:-3] in lay["pieces"])]
         objs = {o.name: o for o in dst.objects if o is not None}
@@ -434,6 +523,9 @@ def run():
                 ko = e.get("keepout")   # Roblox mount axes -> Blender (x, y, z) = (-x, z, y)
                 kb = (-ko[0], ko[2], ko[1]) if ko else None
                 P["sway"] = sway_shapes(ob, arm, e.get("sway", "Pendulum"), kb, e.get("lock"))
+            fol = extra.get(name, {}).get("follow")
+            if fol:
+                P["follow"] = follow_weights(ob, {k: float(f) for k, f in (kv.split("=") for kv in fol.split(";"))})
             pieces[(it, name)] = P
         for o in objs.values():
             bpy.data.objects.remove(o)
@@ -483,12 +575,14 @@ def run():
             if bid not in bodies:
                 continue
             s_ = P["fit_body"].get(bid, 1.0)
-            for deg in (LIMB_DEG, -LIMB_DEG):
+            # a skinned piece bends non-linearly across its joints: check it through the whole swing, not only the ends
+            degs = [d for d in range(-LIMB_DEG, LIMB_DEG + 1, 11) if d] if P.get("follow") else (LIMB_DEG, -LIMB_DEG)
+            for deg in degs:
                 posed, arm_rot = limb_pose(bodies[bid], deg)
-                vv = moved_piece(depth_fit(P["verts"], P["mount"], s_), P["mount"], arm_rot)
+                vv = moved_piece(follow_deform(depth_fit(P["verts"], P["mount"], s_), P.get("follow"), deg), P["mount"], arm_rot)
                 if P["mount"] in arm_rot:   # a held piece moves with its arm: check it against the rest of the body
                     posed = {k: v for k, v in posed.items() if k != P["mount"]}
-                clip, gap, where = check_body(vv, P["mount"], posed, head)
+                clip, gap, where = check_body(vv, P["mount"], posed, head, ride_of(P.get("follow"), len(vv)))
                 if clip > worst[0]:
                     worst = (clip, f"{bid}, limbs {deg:+d}: {where}")
             for pull, sv in P.get("sway", []):
@@ -512,14 +606,20 @@ def run():
             if bid not in bodies:
                 continue
             s_ = P["fit_body"].get(bid, 1.0)
-            shapes = [("rest", depth_fit(P["verts"], P["mount"], s_))]
-            for deg in (LIMB_DEG, -LIMB_DEG):
-                _, arm_rot = limb_pose(bodies[bid], deg)
-                shapes.append((f"limbs {deg:+d}", moved_piece(depth_fit(P["verts"], P["mount"], s_), P["mount"], arm_rot)))
+            shapes = [("rest", depth_fit(P["verts"], P["mount"], s_), None)]
+            degs = [d for d in range(-LIMB_DEG, LIMB_DEG + 1, 11) if d] if P.get("follow") else (LIMB_DEG, -LIMB_DEG)
+            for deg in degs:
+                posed_k, arm_rot = limb_pose(bodies[bid], deg)
+                shapes.append((f"limbs {deg:+d}", moved_piece(follow_deform(depth_fit(P["verts"], P["mount"], s_), P.get("follow"), deg),
+                                                               P["mount"], arm_rot), posed_k))
             for pull, sv in P.get("sway", []):
-                shapes.append((f"swung {pull}", depth_fit(sv, P["mount"], s_)))
-            for label, vv in shapes:
-                c_, i_, w_ = katana_hits(vv, P["tris"], kb.get("sheathed", []))
+                shapes.append((f"swung {pull}", depth_fit(sv, P["mount"], s_), None))
+            ride_k = ride_of(P.get("follow"), len(P["verts"]))
+            for label, vv, posed_k in shapes:
+                c_, i_, w_ = katana_hits_ride(vv, P["tris"], kb.get("sheathed", []), ride_k, posed_k)
+                if c_ + i_:
+                    kb_bodies = report.setdefault(f"{it}/{pn}", {}).setdefault("katana_by", {})
+                    kb_bodies[f"{bid} {label}"] = c_ + i_
                 if c_ + i_ > worst[0] + worst[1]:
                     worst = (c_, i_, f"sheathed, {bid}, {label}: {w_}")
                 if P["mount"] == "RightArm" and (label == "rest" or label.startswith("swung")):

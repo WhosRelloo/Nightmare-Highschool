@@ -52,11 +52,12 @@ def smooth_shade(ob):
     ob.data.update()
 
 
-def dashes(name, pts, r, mat, step=2, fill=0.7):
-    """running stitches: short thread segments along a poly line"""
+def dashes(name, pts, r, mat, step=2, fill=0.7, sides=4):
+    """running stitches: short thread segments along a poly line (light square cords, about 12 triangles each)"""
+    from nh_acc_batch4 import wire
     for k in range(0, len(pts) - 1, step):
         a, b = Vector(pts[k]), Vector(pts[k + 1])
-        A.tube(f"{name}{k}", [tuple(a), tuple(a.lerp(b, fill))], r, mat, res=4)
+        wire(f"{name}{k}", [tuple(a), tuple(a.lerp(b, fill))], r, mat, sides=sides)
 
 
 # ---------------------------------------------------------------- the kintsugi porcelain mask (full face, sculpted)
@@ -97,8 +98,8 @@ def almond(cx, cz, w, h, tilt, n=24):
 
 
 @item("CPorcelain", "Kintsugi porcelain mask", views=["front34", "front", "side"], close=((1.5, -3.6, 1.65), (0, -0.6, 1.45), 60))
-def build_porcelain(M):
-    piece("CPorcelain", "Head")
+def build_porcelain(M, key="CPorcelain"):
+    piece(key, "Head")
     porcelain = A.mat_flat("PorcelainGlaze", (0.93, 0.92, 0.89), rough=0.10, coat=0.8, noise=35, bump=0.006, vary=0.02, wear=0.04, dirt=0.4)
     gold = A.mat_metal("KintsugiGold", (1.0, 0.76, 0.33), rough=0.16, scratch=0.15, wear=0.15)
     ink = A.mat_flat("PaintInk", (0.012, 0.010, 0.014), rough=0.25, coat=0.4, noise=20, bump=0.0, vary=0.02, wear=0.0)
@@ -179,8 +180,8 @@ def beak_outline():
 
 
 @item("CPlague", "Beaked night-watch mask", views=["front34", "side", "front"], close=((2.4, -4.6, 1.7), (0, -0.85, 1.45), 70))
-def build_plague(M):
-    piece("CPlague", "Head")
+def build_plague(M, key="CPlague"):
+    piece(key, "Head")
     leather = A.mat_leather("WatchLeather", (0.12, 0.085, 0.065), scale=3.4, wear=0.65)
     darker = A.mat_leather("WatchLeatherDark", (0.055, 0.045, 0.04), scale=3.4, wear=0.45)
     thread = A.mat_flat("WaxThread", (0.70, 0.60, 0.42), rough=0.7, noise=200, bump=0.2, vary=0.1, wear=0.0)
