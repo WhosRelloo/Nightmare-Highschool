@@ -11,8 +11,12 @@
 	  Standing still  after Tray.IdleAfter seconds, QueueIdle loops until the character moves, sits or eats.
 	  Spill           a hit of Tray.Spill.Damage health or more, FallingDown / Ragdoll / Physics, or Downed: Spill plays,
 	                  a copy of the tray tumbles away (6 s), one meal is taken (Inventory.Take), and the hold ends.
-	  Return          parts tagged NHTrayReturn get a "Return tray" prompt: Return plays, a copy of the tray rests on
-	                  the rack for 30 s, and the tray is put away (unequipped, not lost).
+	  Return          parts tagged NHTrayReturn get a "Return tray" prompt: Return plays, a copy of the tray is set on
+	                  the rack, and the tray is put away (unequipped, not lost). A rack with Attachments Slot1, Slot2, ...
+	                  (a tray's bottom centre, its long side along the attachment's X) fills them in turn, the oldest
+	                  making way when all are full, and keeps each copy Tray.Rack.Keep seconds (the batch 55 trolley); a
+	                  slot with a SlotNInto beside it is a conveyor: the copy rolls there in Tray.Rack.Roll seconds and is
+	                  gone (the batch 55 hatch). A rack without slots gets the copy on its top for 30 s.
 	NPCs (for a lunch period): Shared.Hold(Char, TrayModelOrPart, Id), Shared.Release(Char), Shared.Eat(Char, Seconds),
 	Shared.Spill(Char), Shared.Return(Char, RackPart?). An NPC's tray is just dropped on Spill (no inventory).
 	Holders carry the CollectionService tag NHTrayHolder and the attribute NHTray (the item id); NHTrayAnim is set while
@@ -25,6 +29,7 @@ local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
 local RunService = game:GetService(`RunService`)
 local ServerScriptService = game:GetService(`ServerScriptService`)
 local ServerStorage = game:GetService(`ServerStorage`)
+local TweenService = game:GetService(`TweenService`)
 
 local Tray = require(ReplicatedStorage.Config.Tray)
 
@@ -315,6 +320,53 @@ end
 
 ---| returning |---
 
+local Racked = {}         -- [slot Attachment] = the tray copy resting in it
+
+-- the slot a returned tray goes in: the first empty one, else the one filled longest ago (its copy makes way); nil when
+-- the rack has no slots
+function Local.Slot(Rack: BasePart): Attachment?
+	local Oldest, OldestAt = nil, math.huge
+	for I = 1, 64 do
+		local A = Rack:FindFirstChild(`Slot{I}`)
+		if not (A and A:IsA(`Attachment`)) then break end
+		local C = Racked[A]
+		if not (C and C.Parent) then return A end
+		local At = C:GetAttribute(`At`) or 0
+		if At < OldestAt then Oldest, OldestAt = A, At end
+	end
+	if Oldest then
+		Racked[Oldest]:Destroy()
+		Racked[Oldest] = nil
+	end
+	return Oldest
+end
+
+-- set a copy of the tray on the rack: in a slot (rolled away on a conveyor), else on top
+function Local.Rest(Rack: BasePart, C: BasePart)
+	C.Name = `ReturnedTray`
+	local Slot = Local.Slot(Rack)
+	if not Slot then
+		C.CFrame = Rack.CFrame * CFrame.new(0, Rack.Size.Y / 2 + C.Size.Y / 2, 0)
+		C.Parent = workspace
+		Debris:AddItem(C, 30)
+		return
+	end
+	local Up = CFrame.new(0, C.Size.Y / 2, 0)
+	C.CFrame = Slot.WorldCFrame * Up
+	C:SetAttribute(`At`, os.clock())
+	C.Parent = workspace
+	Racked[Slot] = C     -- (a rolling copy keeps its slot until it's gone, so a second tray takes the next one)
+	local Into = Rack:FindFirstChild(Slot.Name .. `Into`)
+	if Into and Into:IsA(`Attachment`) then
+		local Tw = TweenService:Create(C, TweenInfo.new(Tray.Rack.Roll, Enum.EasingStyle.Linear), { CFrame = Into.WorldCFrame * Up })
+		Tw:Play()
+		Tw.Completed:Once(function() if C.Parent then C:Destroy() end end)
+		Debris:AddItem(C, Tray.Rack.Roll + 1)
+	else
+		Debris:AddItem(C, Tray.Rack.Keep)
+	end
+end
+
 function Shared.Return(Char: Model, Rack: BasePart?)
 	local S = State[Char]
 	if not S then return end
@@ -331,11 +383,7 @@ function Shared.Return(Char: Model, Rack: BasePart?)
 				if D:IsA(`BasePart`) then D.Anchored = true D.CanCollide = false D.CanQuery = false end
 				if D:IsA(`Weld`) or D:IsA(`Motor6D`) or D:IsA(`WeldConstraint`) then D:Destroy() end
 			end
-			local Top = Rack.CFrame * CFrame.new(0, Rack.Size.Y / 2 + C.Size.Y / 2, 0)
-			C.CFrame = Top
-			C.Name = `ReturnedTray`
-			C.Parent = workspace
-			Debris:AddItem(C, 30)
+			Local.Rest(Rack, C)
 		end
 		if S.Part then
 			for _, D in { S.Part, table.unpack(S.Part:GetDescendants()) } do

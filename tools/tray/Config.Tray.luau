@@ -36,6 +36,10 @@ Tray.Anims = {
 	SitDown = 76779786863920; StandUp = 101237220265587; Return = 119806409148779; Grimace = 88611619309024;
 }
 
+-- returning at a rack with slots (props batch 55): a trolley keeps each tray Keep seconds; a hatch's conveyor rolls it in
+-- over Roll seconds
+Tray.Rack = { Keep = 120; Roll = 2.2 }
+
 Tray.Spill = { Damage = 3; Cooldown = 2 }
 Tray.IdleAfter = 1.5
 
