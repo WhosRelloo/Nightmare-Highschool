@@ -2,6 +2,53 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.93.0] - 2026-11-12: Inventory QOL batch 3: sort and filter, favourites, drop how many with Undo
+
+Owner: "Yes, batch 3" (concepts 11, 13 and 15 in `docs/Inventory-QOL-Concepts.md`). The live scripts are mirrored in
+`tools/inventory-qol-193/` (`patches.py` lists every edit). Each patched line is marked `(inventory QOL 1.93)`. Backups
+are in `ServerStorage.NH_Backup.InventoryQOL3_pre_20261112`.
+
+### Added
+- **Sort and filter in the Locker.** A bar under the tabs:
+  - **Sort:** Kind, Rarity, Most owned, or A-Z.
+  - **Filter chips:** Heals, Buffs, Lunch, Specials, Trophies, and ★ (favourites only).
+  - The choice is kept while the game runs.
+- **Favourites:**
+  - A ★ button on the item card (snacks, lunch, trophies and gear). Starred items show a gold ★ on their slot and come
+    first in the Locker, and at the stand (after today's special).
+  - Up to 12, saved with your inventory (`PlayerData.Inventory.Fav`, checked by `Items.Sanitize`).
+  - The server only accepts real item or gear ids (`NHInventory.Fav`).
+- **Dropping:**
+  - One goes at once. More than one asks "Drop how many?" with 1, 5, All and Cancel; this replaces the old double-click
+    "Sure?".
+  - After a drop, a bar says "Dropped 5 Onigiri." with an Undo button counting down from 5.
+  - The server keeps the last drop for 5 s (`NHInventory.Undo`). Later, it says "Too late to undo.".
+
+### Fixed while testing
+- The new Undo and Fav remotes were first wired before the rate limiter existed, which stopped the whole inventory
+  service from starting. It was caught in the first play test and fixed before anything was committed.
+
+### Tested (NH Combat Test, slot 4 Testy, entered through the real slot remotes)
+- **Favourites:**
+  - Starring Ramune and the Ember Tooth saved both; a made-up id is refused ("Unknown item.").
+  - Both showed a ★ and came first in the grid.
+  - At the stand, Ramune came right after today's special.
+- **Filter and sort:**
+  - The Trophies filter left exactly Testy's 4 trophies.
+  - "Most owned" put the favourites first, then 7, 6, 5, 4, 3, 2...
+- **Dropping:**
+  - Drop on a stack of 7 asked "Drop how many? You carry 7." with 1, 5, All (7) and Cancel. Picking 5 dropped 5 and
+    showed "Dropped 5 Onigiri." with "Undo (4)".
+  - Dropping the last Onigiri and clicking Undo in the Locker brought it back and hid the bar.
+  - Undo after 6 s says "Too late to undo."
+- **The console:** no script errors after the fix.
+- Testy's slot count and the test key attribute are restored.
+
+### Not tested
+- **The toolbar's final widths:** the Sort button was widened to 170 after the test and not seen again on screen.
+- **Gear favourites:** starring a piece of gear wasn't tried.
+- **Gamepad and phone:** neither was tried.
+
 ## [1.92.0] - 2026-11-12: Inventory QOL batch 2: the stand gets tabs, a quantity picker, Restock my pins and lunch
 
 Owner: "Yes, batch 2" (concepts 18 to 22 in `docs/Inventory-QOL-Concepts.md`). The live scripts are mirrored in
