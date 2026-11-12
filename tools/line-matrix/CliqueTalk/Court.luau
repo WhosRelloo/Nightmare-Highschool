@@ -7,7 +7,7 @@ return {
 		Friendly = { "{Name}, darling! Come, sit.", `Oh, good. Someone with manners.`, "{Name}! You look almost expensive.", `Darling, you simply must hear this.` };
 		Respected = { "{Name}. The Parlor's been dull without you.", `Make room. Our favourite has arrived.`, `Someone fetch the good china. It's you.`, "Vesper asked after you, {Name}." };
 	};
-	Bump = { Any = { `Excuse you. This coat costs more than you.`, `Do watch where you're going, darling.`, `Ugh. You've creased me.`, `Hands off the velvet.` } };
+	Bump = { Any = { `Excuse you. This coat costs more than you.`, `Do watch where you're going, darling.`, `Oh! You've creased me.`, `Hands off the velvet.` } };
 	Crowded = {
 		Hostile = { `Back. You're breathing my air.`, `Closer and I'll have you removed.`, `Distance, please. I can smell the Commons.` };
 		Respected = { `Sit closer, darling. Gossip's better quiet.`, `Lean in. You'll want to hear this.`, `Closer. We don't shout in the Parlor.` };
@@ -15,7 +15,7 @@ return {
 	};
 	Shoved = {
 		Hostile = { `You'll pay for that. Literally.`, `Touch me again. I dare you, darling.`, `Daddy's lawyers will hear about this.` };
-		Any = { `Did you just put your hands on me?`, `How dare you. In public, too.`, `My cuffs! You've ruined my cuffs.`, `Ugh. Has nobody taught you manners?` };
+		Any = { `Did you just put your hands on me?`, `How dare you. In public, too.`, `My cuffs! You've ruined my cuffs.`, `Hands off. Were you raised in a barn?` };
 	};
 	FightSeen = {
 		Hostile = { `Oh, do lose. It would make my evening.`, `Brawling. How terribly common.`, `I do hope they ruin your shirt.` };
@@ -47,28 +47,45 @@ return {
 	Race = {
 		Human = {
 			Hostile = { `Human and rude. Truly the full set.`, `Run home, little human.`, `Human. That explains the manners.` };
-			Any = { `Human. How quaint.`, `Human? Well, someone has to be.`, `A human. Warm hands. How novel.` };
+			Wary = { `Human? Well, someone has to be.`, `Human. How quaint.`, `A human. Do mind the furniture.` };
+			Any = { `A human. Warm hands. How novel.`, `A human at the Parlor. How modern.`, `Human, are you? Do sit nearer the fire.` };
+			Friendly = { `Human, darling? It's very in this year.`, "{Name}, you make human look expensive.", `A human with manners. Simply charming.` };
+			Respected = { `Human or not, darling, you're Court.`, "{Name}. The finest human we've ever seated.", `Daddy says humans can't keep up. You do.` };
 		};
 		Priest = {
-			Hostile = { `Wave that cross at me again. Go on.`, `Pious and poor. A classic.`, `Take your hymns elsewhere.` };
-			Any = { `A priest. Please don't bless the furniture.`, `Holy types never get invited twice.`, `Priest. Put the cross away, darling.` };
+			Hostile = { `Wave that cross at me again. Go on.`, `Pious and tiresome. A classic.`, `Take your hymns elsewhere.` };
+			Wary = { `Holy types never get invited twice.`, `Priest. Put the cross away, darling.`, `A priest. Please don't bless the furniture.` };
+			Any = { `A priest at the Parlor. How daring.`, `A priest. You must have such stories.`, `Priest. Do sit. Keep the sermon short.` };
+			Friendly = { `A priest with taste? I'll allow it.`, "{Name}, darling, bless the good silver.", `Darling, you make piety look chic.` };
+			Respected = { `Our holy friend. The Court is honoured.`, "{Name}. Even the saints dress worse.", `A priest at our table. Daddy would faint.` };
 		};
 		Vampire = {
 			Hostile = { `Vampire, and still not good enough.`, `Even your fangs look cheap.`, `A vampire without manners. Shameful.` };
+			Wary = { `Vampire. Which family? Be honest.`, `Fangs, at least. That's a start.`, `A vampire. We'll check your lineage.` };
+			Any = { `Vampire. Which family, darling?`, `A vampire. You'd look divine in crimson.`, `Ah, a night person. Sensible.` };
 			Friendly = { "A fellow night owl. Do sit, {Name}.", `Fangs and manners. How rare.`, `One of the old names? Welcome, darling.` };
-			Any = { `Vampire. Which family, darling?`, `Fangs, at least. That's a start.`, `A vampire. You'd look divine in crimson.` };
+			Respected = { `Cousin, practically. Do sit.`, "{Name}. The old families speak well of you.", `The night belongs to us. Both of us.` };
 		};
 		Werewolf = {
-			Hostile = { `Off the carpet, mutt.`, `Sit. Stay. Leave.`, `Muddy paws stay outside, darling.` };
-			Any = { `Werewolf. Please don't shed.`, `Did someone let the dog in?`, `Werewolf. Is the Den missing you?` };
+			Hostile = { `Off the carpet, wolf.`, `Sit. Stay. Leave.`, `Did someone let the dog in?` };
+			Wary = { `Muddy paws stay outside, darling.`, `Werewolf. Please don't shed.`, `Werewolf. Is the Den missing you?` };
+			Any = { `A werewolf. Lovely evening for it.`, `Werewolf. You must adore a full moon.`, `Werewolf. Such presence, darling.` };
+			Friendly = { `A wolf with manners. My favourite kind.`, `Darling, the wild look really works.`, `Werewolf? It's terribly romantic, honestly.` };
+			Respected = { `Our wolf! Nobody bothers us with you near.`, "{Name}. The Court's favourite wolf.", `Run with us at moonrise, darling.` };
 		};
 		Ghoul = {
 			Hostile = { `Ghoul. Stay away from the buffet.`, `Keep your hands off the canapes.`, `You make the whole room look dated.` };
-			Any = { `Ghoul. Have you tried moisturiser?`, `Darling, you look positively vintage.`, `A ghoul. Grey is in this season.` };
+			Wary = { `Ghoul. Have you tried moisturiser?`, `Darling, you look positively vintage.`, `Ghoul. Don't touch the upholstery.` };
+			Any = { `A ghoul. Grey is in this season.`, `Ghoul. Such a still, elegant presence.`, `A ghoul at the Parlor. How gothic.` };
+			Friendly = { "{Name}, that pallor is very fashionable.", `Ghoul? Darling, you wear grey so well.`, `Sit with us. You're restful company.` };
+			Respected = { `Our ghoul! Grey has never looked richer.`, "{Name}. Vintage, and priceless.", `The Court adores a timeless face.` };
 		};
 		Wraith = {
 			Hostile = { `Drift elsewhere, darling.`, `Haunt somebody poorer.`, `There's no guest list for ghosts.` };
-			Any = { `A wraith. So mysterious. So pale.`, `Darling, you're see-through. Daring.`, `Wraith. Haunting the Parlor again?` };
+			Wary = { `Wraith. Haunting the Parlor again?`, `Wraith. Don't drift through the drapes.`, `A wraith. Did anyone invite you?` };
+			Any = { `A wraith. So mysterious. So pale.`, `Darling, you're see-through. Daring.`, `A wraith. How very understated.` };
+			Friendly = { "{Name}, you float. It's so elegant.", `A wraith with style. Rare.`, `Darling, you make sheer look effortless.` };
+			Respected = { `Our wraith! Glide in, darling.`, "{Name}. The Parlor's most elegant ghost.", `Even the mirrors miss you, darling.` };
 		};
 	};
 	Hurt = {
@@ -82,13 +99,13 @@ return {
 		FullLook = {
 			Hostile = { `Our crimson won't hide what you are.`, `Wearing our colours? The nerve.`, `Crimson doesn't buy a seat at our table.` };
 			Wary = { `Crimson. Well. It's a start.`, `The vest fits. The manners don't yet.`, `Trying very hard, aren't we?` };
-			Any = { "Dressed like {Clique}. Ambitious.", `Crimson and black. You've been studying.`, `Not bad. The cuffs need work.` };
-			Friendly = { `Crimson suits you, darling. Fully.`, "{Name}, you look like money tonight.", `Now that's dressing for the Parlor.` };
+			Any = { "{Clique}, is it? Ambitious.", `Crimson and black. You've been studying.`, `Not bad. The cuffs need work.` };
+			Friendly = { `Crimson suits you, darling. Entirely.`, "{Name}, you look like money tonight.", `Now that's dressing for the Parlor.` };
 			Respected = { `Darling, you look like old money.`, `Vesper would approve. I approve.`, "Crimson and silver, {Name}. Perfection." };
 		};
 		RivalLook = {
-			Hostile = { "Dressed like {Rival}? Pass.", `A cardigan. In my presence.`, `Back to your dusty little library.` };
-			Wary = { `Charcoal? Are you in mourning?`, "Did {Rival} dress you? It shows.", `That cardigan has seen things. Dull things.` };
+			Hostile = { "{Rival}'s cast-offs? Pass.", `A cardigan. In my presence.`, `Back to your dusty little library.` };
+			Wary = { `Charcoal? Are you in mourning?`, "{Rival} dressed you? It shows.", `That cardigan has seen things. Dull things.` };
 			Any = { `Oh dear. Library chic.`, `You smell of lamp oil and old books.`, `Is that a vest or a cry for help?` };
 			Friendly = { `Darling, no. Burn the cardigan.`, `You're too pretty to dress like a ledger.`, "Not you too, {Name}. Not the cardigan." };
 			Respected = { `Darling, spying on the bookworms? Clever.`, `Infiltrating the Archive? Report back.`, `Only you could make charcoal work.` };

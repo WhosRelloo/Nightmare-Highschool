@@ -9,30 +9,30 @@ return {
 	};
 	Bump = { Any = { `Careful! These are originals.`, `Mind the papers!`, `Watch it. I lost my place.`, `Oof. Pardon. I was reading.` } };
 	Crowded = {
-		Hostile = { `Reading over my shoulder? Back off.`, `Step back. This page isn't for you.`, `Too close. I'm writing that down.` };
+		Hostile = { `Reading over my shoulder? Back off.`, `Step back. This page isn't for you.`, `Too close. You're in my margins.` };
 		Respected = { `Lean in. You should see this page.`, `Closer is fine. Keep your voice down.`, `Here, hold the lamp for me.` };
 		Any = { `You're in my light.`, `A little room? I'm cross-referencing.`, `You're standing on my notes.`, `Mind the candle, please.` };
 	};
 	Shoved = {
-		Hostile = { `Assault. Dated, signed, filed.`, `That's going in your file.`, `Shove me again. The ink's still wet.` };
+		Hostile = { `You'll find that in your permanent record.`, `That's going in your file.`, `Shove me again. The ink's still wet.` };
 		Any = { `My notes! You scattered my notes!`, `Hey! Those were in order.`, `Was that necessary?`, `I'll remember that. I remember everything.` };
 	};
 	FightSeen = {
-		Hostile = { `Go on. Give me something to write.`, `Every swing goes in the record.`, `There it is. Exactly as filed.` };
+		Hostile = { `Go on. Give me something to write.`, `Every swing goes in the record.`, `Go on. Prove your file right.` };
 		Wary = { `Witnessed. Dated. Filed.`, `I'm noting who threw first.`, `This is why we keep records.` };
-		Any = { `Somebody note the time.`, `Not near the archive! Not near the archive!`, `Who started it? I need it for the record.`, `I've got a pencil. Make it legible.` };
+		Any = { `Somebody note the time.`, `Mind the shelves! Mind the shelves!`, `Who started it? I need it for the record.`, `I've got a pencil. Make it legible.` };
 		Friendly = { "Go on, {Name}! I'll write it up kindly.", `I'll say you were provoked. Officially.`, `Good form! Very, um, scholarly.` };
 		Respected = { `The lamps are with you, Keeper.`, "{Name}'s holding the line! Hold it!", `Keep them off the records, Keeper!` };
 	};
-	Flee = { Any = { `Save the ledgers! Grab the ledgers!`, `Not near the archive. Run!`, `Lamps out, go, go!`, `I'll finish my notes from a distance.` } };
+	Flee = { Any = { `Save the ledgers! Grab the ledgers!`, `Grab the charter and run!`, `Lamps out, go, go!`, `I'll finish my notes from a distance.` } };
 	Transformed = {
-		Hostile = { `So that's what you are. Noted.`, `I knew it. It's in the records.`, `Stay back. I have a lamp and a pen.` };
-		Wary = { `Hold still. I'm writing this down.`, `Don't come closer. Just... pose.`, `Eyes, teeth, claws... noted.` };
+		Hostile = { `So that's what you are. I knew it.`, `The 1893 sketches were right about you.`, `Stay back. I have a lamp and a pen.` };
+		Wary = { `Hold still. I'm writing this down.`, `Don't come closer. Just... pose.`, `Eyes, teeth, claws... got it.` };
 		Any = { `Is that in the bestiary? It should be.`, `Fascinating. Terrifying. Mostly fascinating.`, `There's a sketch of that in the 1893 files.`, `Nobody believes the records. Look!` };
 		Respected = { `Keeper? Is that you? Hold still. I'm sketching.`, "{Name}, that's the creature from the charter!", `Even like that, the lamps know you.` };
 	};
 	Night = {
-		Hostile = { `Out after dark? That's noted.`, `The lamps see you. So do we.`, `The night shift has your file too.` };
+		Hostile = { `Out after dark? Of course you are.`, `The lamps see you. So do we.`, `The night shift has your file too.` };
 		Wary = { `Late. What brings you to the stacks?`, `Night visitors get logged. Sign here.`, `Stay where the lamp can find you.` };
 		Any = { `Keep a lamp near you. Always.`, `The records read differently at night.`, `Trim your wick. It's a long one.`, `Quiet. The building listens at night.` };
 		Friendly = { "Night study, {Name}? Grab a lamp.", `Kettle's on. The real work starts now.`, `Stay. The best pages turn up after dark.` };
@@ -46,33 +46,51 @@ return {
 	};
 	Race = {
 		Human = {
-			Hostile = { `Human, and still trouble. Noted.`, `Being ordinary won't keep you off the list.`, `Human. The only clean line in your file.` };
-			Any = { `Human. Rarer here than the records say.`, `No marks on you. I'll write that down.`, `Human? Keep a lamp lit. Trust me.` };
+			Hostile = { `Human, and still trouble.`, `Being ordinary won't keep you off the list.`, `Human. The only clean line in your file.` };
+			Wary = { `Human. Then why are you down here?`, `Humans don't usually come to the stacks.`, `Human, are you? We'll check the rolls.` };
+			Any = { `Human. Rarer here than the records say.`, `No marks on you. Interesting.`, `Human? Keep a lamp lit. Trust me.` };
+			Friendly = { `Human and curious. Our favourite kind.`, `Humans make the best archivists. Steady.`, `A human who reads. Rare. Welcome.` };
+			Respected = { `Human, and a Keeper. The charter allows it.`, `No fangs, no fur, all nerve. Keeper.`, "{Name}. Proof a human can hold the line." };
 		};
 		Priest = {
 			Hostile = { `Holy, and still on our list.`, `Pray all you like. The file stays open.`, `Blessed? The records disagree.` };
-			Any = { `A priest. The charter mentions your kind.`, `Read old Latin? We've a page for you.`, `Priest-born. Your family's in our books.` };
+			Wary = { `A priest in the stacks. Why?`, `Priest. Don't bless the ledgers.`, `Your order kept its own records once.` };
+			Any = { `A priest. The charter mentions your order.`, `Read old Latin? We've a page for you.`, `Priest-born. Your family's in our books.` };
+			Friendly = { `A priest! Help me read this old Latin?`, `Bless the lamps? They could use it.`, "{Name}, your order's crest is in 1893." };
+			Respected = { `Keeper and priest. The archive is safe.`, `Bless the charter for us, Keeper?`, `A holy Keeper. The founders would approve.` };
 		};
 		Vampire = {
-			Hostile = { "Vampire. Run along to {Rival}.", `Vampire. Your kind tore out page forty.`, `We have files on your whole family.` };
-			Any = { `Vampire. You'd remember 1893, wouldn't you?`, `Cold hands. Don't touch the vellum.`, `Vampire. Which of the old families?` };
+			Hostile = { "Vampire. {Rival} wants you back.", `Vampire. Your kind tore out page forty.`, `We have files on your whole family.` };
+			Wary = { `Vampire. Cold hands off the vellum.`, `Vampire. Which side of 1893 were you on?`, `We know where the old families stood.` };
+			Any = { `Vampire. You'd remember 1893, wouldn't you?`, `Vampire. Which of the old families?`, `You must have seen this place built.` };
+			Friendly = { `Vampire? Tell me what 1893 was really like.`, "{Name}, your family's page is a good one.", `Not every vampire sides with the Parlor.` };
+			Respected = { `A vampire Keeper. The Parlor must hate it.`, `Keeper. Your memory beats our ledgers.`, `Keeper. You remember what the pages forgot.` };
 		};
 		Werewolf = {
-			Hostile = { `Werewolf. Your moon dates are on file.`, `Shed on these papers and you're done.`, `We know which nights you go missing.` };
-			Any = { `Werewolf. The lunar tables are for you.`, `Werewolf. Mind the paper, it tears.`, `Half the gaps in our records are your kind.` };
+			Hostile = { `Werewolf. Your moon dates are on file.`, `We know which nights you go missing.`, `Half the gaps in our records are your kind.` };
+			Wary = { `Werewolf. Shed on these papers and you're done.`, `Werewolf. Mind the paper, it tears.`, `We keep the lunar tables. We see you.` };
+			Any = { `Werewolf. The lunar tables are for you.`, `Werewolf. We chart the moon here too.`, `Werewolf. Bet you'd sniff out a lost page.` };
+			Friendly = { `Werewolf! Want to read the moon tables?`, "{Name}, good nose. Smell any old paper?", `We'll mark your full moons. Kindly.` };
+			Respected = { `Keeper. We'll keep the lamps lit at moonrise.`, `A wolf on watch. The archive sleeps easy.`, "{Name}. The charter has a page for wolves." };
 		};
 		Ghoul = {
 			Hostile = { `Ghoul. Don't chew the parchment.`, `Ghoul. Keep out of the old registers.`, `I checked. You're not on any roll call.` };
-			Any = { `Ghoul. Are you in the burial ledgers?`, `You smell like old paper. I mean it kindly.`, `You'd make a fine archivist. Very still.` };
+			Wary = { `Ghoul. Gloves on near the vellum.`, `You smell like the old crypt files.`, `Ghoul. Are you in the burial ledgers?` };
+			Any = { `You'd make a fine archivist. Very still.`, `Ghoul. The burial rolls are well kept.`, `Ghoul. You keep late hours, like us.` };
+			Friendly = { "{Name}, you'd love the burial rolls.", `Ghoul? Patient with old paper, I bet.`, `A ghoul reader. You'll outlast the dust.` };
+			Respected = { `Keeper. Nobody guards the crypt files better.`, `A ghoul Keeper. Patient as the ledgers.`, `The crypt records are yours, Keeper.` };
 		};
 		Wraith = {
 			Hostile = { `Wraith. Stop drifting through the files.`, `We know you're the one moving the pages.`, `Even ghosts get a file here.` };
-			Any = { `Wraith. Were you a student here once?`, `Your name might be in the old rolls.`, `Did you walk through the stacks again?` };
+			Wary = { `Wraith. Did you walk through the stacks again?`, `Don't drift where I can't see you.`, `Wraith. Things go missing when you're near.` };
+			Any = { `Wraith. Were you a student here once?`, `Your name might be in the old rolls.`, `Wraith. Quiet as the stacks. Fitting.` };
+			Friendly = { "{Name}, help me find your old class photo?", `A wraith who reads. You're welcome here.`, `Wraith? You'd know where the lost pages went.` };
+			Respected = { `Keeper. You've walked these halls longest.`, `A wraith Keeper. The stacks feel you.`, "{Name}. Tell us what the records got wrong." };
 		};
 	};
 	Hurt = {
-		Hostile = { `Hurt? Should've stayed out of trouble.`, `Injured. I'll add it to the file.`, `Limping? That's in the record now.` };
-		Wary = { `You look rough. Who did it? For the record.`, `Hurt? Not my business. Still. The nurse.`, `Sit. Don't touch anything, but sit.` };
+		Hostile = { `Hurt? Should've stayed out of trouble.`, `Injured. I'll add it to the file.`, `Limping. The archive isn't a hospital.` };
+		Wary = { `You look rough. Who did it? For the record.`, `Hurt? Not my business. Still, see the nurse.`, `Sit. Don't touch anything, but sit.` };
 		Any = { `You look awful. The nurse is past the archive.`, `Lean on the shelf. Carefully.`, `Who did this? I'll want it on paper.` };
 		Friendly = { "{Name}! Sit. I'll fetch the nurse.", `Easy. Lean on me, not the shelf.`, "Who did this, {Name}? I want names." };
 		Respected = { `Keeper! Someone get the kit!`, "Names, {Name}. Give me names.", `Rest in the reading room. We'll keep watch.` };
@@ -81,19 +99,19 @@ return {
 		FullLook = {
 			Hostile = { `Our colours don't make you one of us.`, `A Vigil vest won't close your file.`, `Dressed as us? We'll watch you closer.` };
 			Wary = { `Dressed like us. Let's see if it sticks.`, `The vest fits. The rest we'll see.`, `Nice try. You still sign the ledger.` };
-			Any = { "Dressed like {Clique}. Thinking of joining?", `Charcoal and khaki. Very archive.`, `You'd blend right into the stacks.` };
-			Friendly = { "Look at you. Proper {Clique}.", `Now you look like a reader.`, `Ink-stain ready. Good.` };
-			Respected = { `Keeper, in full colours. The lamps approve.`, "Spoken like {Clique}, and dressed like it.", `There's the look. The archive's own.` };
+			Any = { "{Clique}'s colours. Thinking of joining?", `Charcoal and khaki. Very archive.`, `You'd blend right into the stacks.` };
+			Friendly = { "Look at you. {Clique} would be proud.", `Now you look like a reader.`, `Ink-stain ready. Good.` };
+			Respected = { `Keeper, in full colours. The lamps approve.`, "{Clique} looks good on you, Keeper.", `There's the look. The archive's own.` };
 		};
 		RivalLook = {
-			Hostile = { "Crimson? Go back to {Rival}.", `Crimson. You've picked your side, then.`, `Crimson in the stacks. Bold, for a spy.`, `Out. The Parlor's that way.` };
-			Wary = { "Dressed for {Rival}? We'll note that.", `Crimson. Whose side are you on?`, `That vest came from the Parlor.` };
-			Any = { `Crimson? Careful who sees you in that.`, "Off to {Rival} later?", `That's Parlor crimson. We notice.` };
+			Hostile = { "Crimson? {Rival} sent you, then.", `Crimson. You've picked your side, then.`, `Crimson in the stacks. Bold, for a spy.`, `Out. The Parlor's that way.` };
+			Wary = { "{Rival}'s colours? We'll mark that.", `Crimson. Whose side are you on?`, `That vest came from the Parlor.` };
+			Any = { `Crimson? Careful who sees you in that.`, "{Rival} later, is it? Careful.", `That's Parlor crimson. We notice.` };
 			Friendly = { `You, in crimson? Undercover, I hope.`, `Crimson? Tell me you're spying for us.`, `Did they make you wear that? Blink twice.` };
 			Respected = { `Keeper, in crimson? Clever disguise.`, `Inside the Parlor? Bring us their ledgers.`, `Crimson suits a spy. Report later.` };
 		};
 		Likes = {
-			Hostile = { "Nice {Piece}. Pity about the rest of you.", "Even you can't ruin a good {Piece}.", "Where'd you get that {Piece}? It's noted." };
+			Hostile = { "Nice {Piece}. Pity about the rest of you.", "Even you can't ruin a good {Piece}.", "Where'd you get that {Piece}? Honestly." };
 			Any = { "The {Piece}. Now that's practical.", "Is that a real {Piece}? Let me look.", `A proper reader's kit. Good.`, "With that {Piece}, the stacks would have you." };
 		};
 		Mocks = {
