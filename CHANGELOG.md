@@ -2,6 +2,47 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.86.0] - 2026-11-11: 3D accessories batches 2-8 and Kit B in the game; the satchel and Head sash fixes
+
+The owner imported `art/group-upload-accessories/batch1-fix`, `batch2` to `batch7` and `kitb` (44 FBX, 184 images) and
+asked for one assembly pass and one combined play-test instead of one per batch. Kit A is now complete in the game
+(28 designs) and so is Kit B, "The Headmaster's Circle" (11, staff only). `docs/Accessories.md#batches`.
+
+### Added
+- **44 item templates** in `ReplicatedStorage.NHAccessories` (52 with batch 1, 69 pieces checked): every image id read
+  by name from the group's creations (184 of 184, every thumbnail Completed first), one assembly pass
+  (`tools/accessories/assemble_imported2a..d.luau`). The rebuilt satchel and Head Student's sash replace the hidden
+  ones (old Sashes template backed up to `ServerStorage.NH_Backup.Accessories_pre`).
+- `art/characters/accessories/acc_rebuild_bones.py`: rebuilds a template piece's bones in Studio from the builder's
+  `.blend` at the exact bind pose.
+
+### Fixed
+- **Rigged pieces of several-piece imports lost their bones** (both coats' tails, the two scarves, the ledger, the
+  mantle's crows): Roblox's importer puts their bones on a separate part of the imported model, and the assembly kept
+  only the named MeshParts. The meshes kept their skin weights, so the bones were rebuilt from the builds' rigs
+  (the convention fitted on three imported rigs to 0.0000018 studs) and all 8 pieces are skinned again. The assembly
+  now reports a rigged piece that arrives without its bones, and removes the import's own Motor6Ds (16 were left).
+- **The assembly script was too big to send** (144 KB, mostly per-hair fits): a hair whose fit equals the default is
+  left out of `NHHairFit` (`UI.AccessoryWear.HairFit` already falls back to `*`), and the pass runs in four parts.
+
+### Verified (Studio Play, slot 4 "Testy", one combined test; looks applied with `Appearance.ApplyTo`, not saved)
+- **Every piece in its template**: size as built, upright, all maps set, bones where rigged (`verify_imported2`).
+- **Six outfits across every batch and Kit B**, all kept pieces worn: tricorn, bone mask, gorget, satchel (the
+  1.79 fix), bracers, pocket watch, signet, crest pin; hood, opera clasp, crossbow, ghoul lantern, gauntlets, crook
+  umbrella, orbiting sigils, potion belt; the long coat with a tucked hair; the regalia set; the greatcoat with the
+  sigil halo, gorget, crown, signet and candle lantern; the Head sash (the 1.79 fix) over the school tie. The clash rules
+  and the hair refusals dropped exactly what they should.
+- **Moving parts on the client**: the coat tails swung up to 12.5 degrees walking by real held keys (38.6 studs, 14.4
+  speed); the hair tuck held; the crows' idle moved their bones up to 55 degrees; the ledger's pages turned (bones to
+  142 degrees); the sigils and keys orbit; the staff, keys, crows and crown pulse (emissive 1.2 to 2.9); the shadow
+  trail's 3 emitters ran only while walking; the sigil halo flared (2.2 to 7.2) on a staff teleport stamp; the
+  regalia colour came from the halo (crimson) or the keys (ember); the lanterns' lights flicker.
+- **Console**: nothing from the accessory code (client or server).
+- **Noted**: Studio ran at about 16 fps during the test (three Blender jobs on the machine); `AccessoryFx` caps a
+  frame's step at 1/15 s, so the keys turned at about a third of their 3 rpm there.
+- **Not tested**: a Wardrobe purchase or Store click for the new items, a second player watching, combat
+  animations, the Map place.
+
 ## [1.85.2] - 2026-11-11: Training audit and bug fixes; the real sit-up rep
 
 The owner: "Completely audit and bugfix the training system. Also add the actual situp anim in not just the idle.

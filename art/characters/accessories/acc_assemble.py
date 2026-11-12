@@ -60,7 +60,10 @@ def hair_fit_string(fits):
     ks.sort(); zs.sort()
     if ks:
         q = int(len(ks) * 0.9) - 1 if len(ks) > 1 else 0
-        parts.append(f"*={ks[max(0, q)]:.3f},{zs[max(0, q)]:.3f}")
+        star = f"{ks[max(0, q)]:.3f},{zs[max(0, q)]:.3f}"
+        # a hair whose fit is the same as the default is left out (UI.AccessoryWear.HairFit falls back to "*"): the
+        # strings were most of the assembly script's size
+        parts = [x for x in parts if x.split("=", 1)[1] != star] + [f"*={star}"]
     return ";".join(parts)
 
 
@@ -138,6 +141,8 @@ for it in items:
     for pn, e in lay["pieces"].items():
         fb = ";".join(f"{k}={v}" for k, v in sorted(e.get("fit_body", {}).items()) if abs(v - 1) > 1e-3)
         attrs = [f"Mount = \"{e['mount']}\"", f"Fit = {lua_v3(e['fit'])}", f"Size = {lua_v3(e['size'])}"]
+        if e.get("bones"):   # rigged: the import must bring its bones (see acc_rebuild_bones.py)
+            attrs.append(f"Bones = {len(e['bones'])}")
         if fb:
             attrs.append(f"FitBody = \"{fb}\"")
         if e.get("sway"):
@@ -188,6 +193,8 @@ for it in items:
             attrs.append("Flare = true")
         if x.get("trail"):
             attrs.append("Trail = true")
+        if x.get("follow"):   # Kit C skinned clothes: follow bones per limb (Controllers.Character.BodyFollow)
+            attrs.append(f"Follow = \"{x['follow']}\"")
         lines.append(f"\t\t{pn} = {{ {'; '.join(attrs)} }};")
     glow = lay.get("glow")
     lines.append(f"\t\t_glow = {('Color3.new(%.3f, %.3f, %.3f)' % tuple(glow)) if glow else 'nil'};")
@@ -320,6 +327,7 @@ for item, pieces in pairs(ITEMS) do
 		if a.Idle then p:SetAttribute("NHIdle", a.Idle) p:SetAttribute("NHIdleBones", a.Bones) end
 		if a.Flare then p:SetAttribute("NHFlare", true) end
 		if a.Trail then p:SetAttribute("NHTrail", true) end
+		if a.Follow then p:SetAttribute("NHFollow", a.Follow) end
 		-- the import re-centres each mesh on its bounding box: check it came in at the builder's size
 		local d = (p.Size - a.Size).Magnitude
 		if d > 0.02 then
@@ -328,6 +336,18 @@ for item, pieces in pairs(ITEMS) do
 		local rx, ry, rz = p.CFrame:ToOrientation()
 		if math.abs(rx) + math.abs(ry) + math.abs(rz) > 0.01 then
 			table.insert(report, string.format("%s.%s: imported turned %.1f %.1f %.1f deg (check: the fit assumes upright)", item, pn, math.deg(rx), math.deg(ry), math.deg(rz)))
+		end
+		-- a rigged piece of a several-piece import gets its bones on a separate part of the import, which goes with the
+		-- import model: report it (art/characters/accessories/acc_rebuild_bones.py rebuilds them exactly)
+		if a.Bones then
+			local nb = 0
+			for _, d in ipairs(p:GetDescendants()) do if d:IsA("Bone") then nb += 1 end end
+			if nb ~= a.Bones then
+				table.insert(report, string.format("%s.%s: %d bones, expected %d: run acc_rebuild_bones.py %s", item, pn, nb, a.Bones, item))
+			end
+		end
+		for _, j in ipairs(p:GetChildren()) do
+			if j:IsA("Motor6D") then j:Destroy() end   -- the import's own joints (the game welds each piece itself)
 		end
 		p.Parent = tpl
 		got += 1

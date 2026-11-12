@@ -10,27 +10,25 @@ They're cosmetic only: no stats, and nothing reads or writes Race. The race-flav
 R6 has no layered clothing, so every piece is a MeshPart riding one R6 part: either rigid, or rigged with bones that
 `Controllers.Character.AccessorySway` swings (the same maths as HairSway).
 
-Status: **in progress.** Batch 1 (uniform and school, 10 items, 18 store items) is in NH Combat Test and play-tested
-(1.79.0); two of its pieces were rebuilt after the play-test (the satchel and the Head Student's sash, see "The
-katana") and wait for the owner's import of `art/group-upload-accessories/batch1-fix/`; until then the game hides those
-two. The owner pre-approved every later batch "as long as they follow the standards" (2026-11-11). **All of both kits is
-now built** (batches 2-8: 49 more items, 2026-11-11), checked together with 0 fails, and merged into
-`Config.Accessories`; they wait for the owner's import (see "Not done yet").
+Status: **Kits A and B are in the game** (NH Combat Test, 1.86.0): every batch imported, assembled in one pass and
+play-tested together on slot 4, the rebuilt satchel and Head Student's sash included. The owner pre-approved every later batch "as long as they follow the standards" (2026-11-11). **All of both kits is
+built** (batches 2-8: 49 more items, 2026-11-11), checked together with 0 fails, merged into `Config.Accessories`,
+and in the game since 1.86.0. Kit C is in progress (below).
 
 ## Batches
 
 | Batch | Kit A / B | Items | State |
 |---|---|---|---|
-| 1 | A 1-6 | clique crest pins (8), Prefect and Head Student sashes, school tie, velvet bow tie, leather satchel, messenger bag, book strap, the Ink Club's chained grimoire, choir collar, falling ruff | **in the game, play-tested (1.79.0)**; satchel and Head sash rebuilt for the katana, waiting for import |
-| 2 | A 8-12 | tricorn, top hat, bowler (crimson bands), veiled mourning toque, fascinator, crooked witch hat, hunter's wide-brim, lace / bone / gilt masquerade half-masks | **built, baked, 0 fails; staged** (`batch2/`) |
-| 3 | A 13-16 | race-flavoured: opera-cape clasp, signet ring, moon-stone torc, wolf-tooth necklace, torn shoulder fur, lantern on a hook, grave-moss shawl, tattered hood, scythe pendant | **built, baked, 0 fails; staged** (`batch3/`) |
-| 4 | A 17-20 | hunter and armory: bandolier, pauldrons, gorget, bracers, gauntlets, back crossbow | **built, baked, 0 fails; staged** (`batch4/`) |
-| 5 | A 21-24 | magic: rune halo, orbiting sigils, a crow familiar, crystal pendant, potion belt | **built, baked, 0 fails; staged** (`batch5/`) |
-| 6 | A 25-28 | civilian: pocket watch, lace parasol, crook umbrella, candle lantern, knitted scarves (two colours) | **built, baked, 0 fails; staged** (`batch6/`) |
-| 7 | A 7 + B 2 | the Delinquents' long coat and the Headmaster's greatcoat (torso shell, sleeves on the arms, rigged split coattails) | **built, baked, 0 fails; staged** (`batch7/`); hairs: see below |
-| 8 (Kit B) | B 1, 3-11 | the Headmaster's Circle: crow mantle, thorned crown, raven-skull pauldron, iron keys, shadow trail, chained ledger, sigil halo, seal of office, signet, staff, observer mask | **built, baked, 0 fails; staged** (`kitb/`) |
+| 1 | A 1-6 | clique crest pins (8), Prefect and Head Student sashes, school tie, velvet bow tie, leather satchel, messenger bag, book strap, the Ink Club's chained grimoire, choir collar, falling ruff | **in the game, play-tested (1.79.0)**; satchel and Head sash rebuilt for the katana: **in the game (1.86.0)** |
+| 2 | A 8-12 | tricorn, top hat, bowler (crimson bands), veiled mourning toque, fascinator, crooked witch hat, hunter's wide-brim, lace / bone / gilt masquerade half-masks | **in the game (1.86.0)**; staged in (`batch2/`) |
+| 3 | A 13-16 | race-flavoured: opera-cape clasp, signet ring, moon-stone torc, wolf-tooth necklace, torn shoulder fur, lantern on a hook, grave-moss shawl, tattered hood, scythe pendant | **in the game (1.86.0)**; staged in (`batch3/`) |
+| 4 | A 17-20 | hunter and armory: bandolier, pauldrons, gorget, bracers, gauntlets, back crossbow | **in the game (1.86.0)**; staged in (`batch4/`) |
+| 5 | A 21-24 | magic: rune halo, orbiting sigils, a crow familiar, crystal pendant, potion belt | **in the game (1.86.0)**; staged in (`batch5/`) |
+| 6 | A 25-28 | civilian: pocket watch, lace parasol, crook umbrella, candle lantern, knitted scarves (two colours) | **in the game (1.86.0)**; staged in (`batch6/`) |
+| 7 | A 7 + B 2 | the Delinquents' long coat and the Headmaster's greatcoat (torso shell, sleeves on the arms, rigged split coattails) | **in the game (1.86.0)**; staged in (`batch7/`); hairs: see below |
+| 8 (Kit B) | B 1, 3-11 | the Headmaster's Circle: crow mantle, thorned crown, raven-skull pauldron, iron keys, shadow trail, chained ledger, sigil halo, seal of office, signet, staff, observer mask | **in the game (1.86.0)**; staged in (`kitb/`) |
 
-### Batches 2 to 8 (built 2026-11-11, waiting for the owner's import)
+### Batches 2 to 8 (built 2026-11-11, in the game since 1.86.0)
 
 Checked together with batch 1: `acc_check.py` **0 fails** over all 39 models (12 bodies, motion, sway limits, every
 pair that can be worn together, the admin capes, the katana, each hair at the piece's fit). Contact sheets:
@@ -162,6 +160,45 @@ the hair just clear of the piece, and at a 35% sway 73% of them swung back in.
   (`Wear.FitsHair`), so nothing changes until the hairs are imported.
 - `acc_tuckcheck.py` checks it as the game wears it: each item alone, every two items worn together with their tucks
   merged (per bone, the larger turn), on the standard body and the shallowest and deepest body fits.
+
+## Kit C, "The Night School Wardrobe" (in progress)
+
+The owner approved the list (2026-11-11; spec `docs/superpowers/specs/2026-11-11-kit-c-concept.md`) and asked to start
+with C1 (coats and jackets, 11) and C2 (masks, 8). Owner: "make sure all the 3d accessories and clothes are all rigged
+for fluent movement with the R6 character". The varsity jacket is one school colourway and prices follow Kit A's range
+(coats at the top); both were open questions the owner didn't answer, so these are defaults.
+
+**Moving with the R6 body (`Controllers.Character.BodyFollow`, new, installed in NH Combat Test).** A Kit C coat's
+skirts are one skinned piece (`<Coat>Skirt`, Torso mount, `NHFollow = "LL=1;RL=1"`) with a follow bone per leg
+(`F_LL`, `F_RL`, children of Root, so `AccessorySway` never moves them). Every frame the controller sets each follow
+bone's Transform so the vertices on it move exactly as the limb does: `M = rel * C1 * C0^-1` (the limb's motion in
+the torso's space since rest, from the parts' own CFrames and the Motor6D's offsets), `Transform = B^-1 * M * B`
+(B = the weld's offset times the bone's rest frame). Checked in Studio (Edit, `TransformedWorldCFrame`): a vertex on
+the bone lands where the leg carries it to within 0.0000014 studs over five hip angles. Not yet seen in Play (no Kit C
+piece is imported yet).
+
+What the rig taught (`acc_check.py`, every body, the whole swing in 11-degree steps):
+- **Each skirt half rides its leg entirely.** A skirt blended between the torso and the leg can't work on R6: the leg
+  turns about the hip line at the torso's bottom centre, so its front face swings further than any part-turned cloth
+  in front of it and comes through it, and cloth above the hip line turns the wrong way (into the torso). Riding the
+  leg, the skirt's top slides into the torso as the leg swings forward, exactly as the leg's own top does, and drops
+  below the coat's hem as it swings back.
+- **A slit at each leg's front-outer corner** from the waist to z -1.80, where the panels join to the hem. Cloth over
+  the left thigh's front-outer corner swings up into the sheathed katana's guard as the leg swings forward; every body
+  type hit it at +44..+55 degrees, the standard body included. Below z -1.76 nothing can rise that far.
+- **The skirt starts just below the shell's hem** (z -0.73, the shell ends at -0.72) and has its own depth fit,
+  measured on the legs and the torso's lower part (`skirt_fit`): on the deep bodies the torso's fit pushed it off the
+  legs into the guard.
+- **New checker rules:** a skinned piece is bent the way BodyFollow bends it (`follow_deform`); a vertex that rides a
+  limb entirely may go inside the torso as the limb swings (the limb's top does too; hidden), and the katana check
+  doesn't count a riding vertex where the limb itself meets that katana part in that pose.
+
+**Hair-friendly coats.** Hairs rest on the shoulder tops and the nape, where a coat goes (Kit A's coats fit 4 of 35
+hairs). On the frock coat, long hair crossed the front of the shoulders near the neck and short cuts crossed the back
+of the collar. Kit C's shell (`build_shell_k`) opens the neckline wider at the shoulders (`xo_top` 0.72) and scoops
+the back neckline to z 0.78 at the centre, with a low collar that follows it down and lies flat on the back: the frock
+coat's shell went from **4 to 15 of 35 hairs** before any hair tuck. The collar's fall stops at x 0.962: with the
+wide neckline it reached the shoulder's edge, where the swung arm's top rises.
 
 ## The no-clipping rules (how "nothing clips, overlaps or hovers" is checked)
 
@@ -327,20 +364,36 @@ the drawn katana: it's hidden while a weapon is drawn).
 - the store's header said "Uniform tops" over the accessories; each store card now shows the piece in 3D with its
   name and slot.
 
+### The combined test (1.86.0, slot 4 "Testy", Studio Play)
+
+The owner imported every remaining batch at once and asked for one assembly pass and one play-test.
+- **IDs and templates:** 184 of 184 images read by name, all thumbnails Completed before any id was set; one
+  assembly pass built 44 templates (52 with batch 1). Every piece checked in Studio against its build: size, upright,
+  all maps, bones where rigged.
+- **Bones lost on several-piece imports, rebuilt:** the importer puts a several-piece FBX's bones on a separate part
+  of the imported model, and the assembly keeps only the named MeshParts, so 8 rigged pieces arrived skinned but
+  boneless (both coats' tails, the scarves, the ledger, the mantle's crows). `acc_rebuild_bones.py` rebuilt them at
+  the bind pose from the builds' rigs: the convention fitted on three single-piece imports to 0.0000018 studs. The
+  assembly now reports any rigged piece without its bones.
+- **Six outfits across every batch and Kit B** (`Appearance.ApplyTo`, looks not saved: Testy's profile unchanged):
+  every kept piece was worn; the clash rules and hair refusals dropped exactly the expected pieces (Testy's very
+  long hair refuses most head and back pieces; the short bob and Males_Short were used for coverage).
+- **Motion on the client:** coat tails up to 12.5 degrees walking by real held keys; hair tuck held; crows' idle,
+  ledger pages, orbits, pulses, trail, halo flare, regalia colour, flickering lights. No console lines from the
+  accessory code.
+
 ## Not done yet
 
-- **Owner:** import `art/group-upload-accessories/batch1-fix/` (2 FBX, 8 images) into group 15981569, then the
-  assembly rebuilds the satchel and the Head sash; until then the game hides those two items.
 - A second play-test of the fixes above (the Held hide by a real draw, the barber taking a piece off, the store's 3D
   cards), a second player watching, NPCs (they don't wear accessories), combat animations (a swing of the sword
   isn't part of the check).
-- **Owner:** import `art/group-upload-accessories/batch2/` to `batch7/` and `kitb/` (FBX and maps) into group 15981569;
-  then the IDs are read by name and `acc_assemble.py <batch> <Items> --ids` builds each batch's templates, and each
-  batch is play-tested on slot 4. Until then none of batches 2-8 shows in the game.
+- Wardrobe and School Store clicks for the batch 2-8 items (1.86.0 wore them through `Appearance.ApplyTo`), a second
+  player watching, combat animations. The orbits run slower on a client under 15 fps (`AccessoryFx` caps a frame's
+  step at 1/15 s; seen at 16 fps in the 1.86.0 test).
 - **Owner decision:** the coats' hair limit (above).
-- Unverified until the import: the crows' and pages' bone axes and the page-turn direction, the emitters' look (they
-  are emitted from a point in a cone; sprites: the teleport feather and the place's VFX smoke), the hidden trail
-  anchor, every pulse and the halo's flare.
+- **Seen in Play (1.86.0)**: the crows' and pages' bones move (the page-turn up to 142 degrees), the emitters run
+  (the trail only while walking), the pulses, the halo's flare. **Not yet**: a real staff teleport's flare (the
+  stamp was set by hand) and the emitters' look up close.
 - The Vamp / Rogue / Fur capes against accessories (measure in Studio); built hairstyles and outside catalog hairs
   (a default fit, unverified).
 - The Map place: `Config.Accessories`, `UI.AccessoryWear`, `Controllers.Character.AccessorySway` / `AccessoryFx`,
