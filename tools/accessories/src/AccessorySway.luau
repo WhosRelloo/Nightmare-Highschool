@@ -36,15 +36,26 @@ local PROFILES = {
 	Tails = { Bend = math.rad(50); Joint = math.rad(15); Body = nil; Lift = 0; Wind = 1; Bob = 0.05; K = 60; D = 13 };
 }
 
+-- the bones AccessoryFx's idle drives on this piece (NHIdleBones' names): never swung, and not part of a chain
+local function idleBones(Handle: Instance): { [string]: boolean }
+	local Raw = Handle:GetAttribute(`NHIdleBones`)
+	local Out = {}
+	if typeof(Raw) == `string` then
+		for Name in Raw:gmatch('"([%w_]+)"%s*:%s*{') do Out[Name] = true end
+	end
+	return Out
+end
+
 local function collectBones(Handle: Instance)
 	local Out = {}
+	local Idle = idleBones(Handle)
 	local function walk(P: Instance, Depth: number, Root)
 		local Deepest = Depth - 1
 		for _, B in P:GetChildren() do
-			if B:IsA(`Bone`) then
+			if B:IsA(`Bone`) and not Idle[B.Name] then
 				local E = { Bone = B; Depth = Depth; Next = nil :: Bone? }
 				for _, C in B:GetChildren() do
-					if C:IsA(`Bone`) then E.Next = C break end
+					if C:IsA(`Bone`) and not Idle[C.Name] then E.Next = C break end
 				end
 				table.insert(Out, E)
 				local R = Root or (if Depth == 2 then E else nil)
@@ -76,8 +87,10 @@ local function piecesOf(Char: Model)
 	for _, M in Char:GetChildren() do
 		if M:IsA(`Model`) and M:GetAttribute(`NHAcc`) ~= nil then
 			for _, P in M:GetChildren() do
-				-- (a familiar's bones are driven by AccessoryFx's idle, not swung)
-				if P:IsA(`BasePart`) and P:FindFirstChildWhichIsA(`Bone`) and not P:GetAttribute(`NHIdle`) then table.insert(Out, P) end
+				-- (a familiar's bones are driven by AccessoryFx's idle, not swung; a piece with both, the birdcage purse,
+				-- swings on its chain while its idle bones stay with AccessoryFx: collectBones skips them)
+				if P:IsA(`BasePart`) and P:FindFirstChildWhichIsA(`Bone`)
+					and (not P:GetAttribute(`NHIdle`) or P:GetAttribute(`NHSway`) ~= nil) then table.insert(Out, P) end
 			end
 		end
 	end

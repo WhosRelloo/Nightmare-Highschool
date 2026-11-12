@@ -34,6 +34,30 @@ period". Props batch 54: 68 items in ten 2048 bakes (`docs/School-Props.md`).
   Locker. Testy's Locker restored afterwards.
 - **Not tested:** buying at the stand, the stand's buy menu with all 40, the other 50 items in the hand, the Map place.
 
+## [1.89.1] - 2026-11-12: Kit C bags in the game
+
+Owner: "Imported, go on". The six C8 templates are in `ReplicatedStorage.NHAccessories` (77 templates in all).
+
+### Added
+- **Kit C C8 templates** from the owner's import (`tools/accessories/assemble_kitc8.luau`). Image ids were read by
+  name, all 24 Completed.
+
+### Fixed
+- **The birdcage purse didn't swing.** AccessorySway skipped any piece with an idle. Now a piece with both an idle and
+  a sway profile swings on its chain, and AccessoryFx keeps the idle's own bones (the moth's wings). No other piece has
+  both, so nothing else changes.
+- `acc_assemble.py`: a piece's bone count and its idle bones' JSON shared the key `Bones`. The count is now
+  `BoneCount`, so the bone check works on idle pieces.
+
+### Tested (NH Combat Test, slot 4 Testy)
+- **All six worn through `ApplyTo`.** Walking, measured on the client:
+  - the bat wings sway up to 11.6°;
+  - the Gladstone bag swings up to 15.4°, the birdcage up to 16.5°;
+  - the moth opens its wings up to 32° now and then, on the swinging cage.
+- The Gladstone bag hides while a weapon is drawn and comes back after.
+- No sway or Fx errors. Testy's look restored exactly. SlotCount and `NHTestNoMenuKeys` restored.
+- **Not tested:** Wardrobe and Store clicks for C8, a second player. No in-game screenshots (night, frost).
+
 ## [1.89.0] - 2026-11-12: Kit C bags built (waiting for the import)
 
 Owner: "And yes start C8." Kit C's C8, six bags (`docs/Accessories.md`), all 2048 PBR bakes, checked with every Kit A,

@@ -142,7 +142,7 @@ for it in items:
         fb = ";".join(f"{k}={v}" for k, v in sorted(e.get("fit_body", {}).items()) if abs(v - 1) > 1e-3)
         attrs = [f"Mount = \"{e['mount']}\"", f"Fit = {lua_v3(e['fit'])}", f"Size = {lua_v3(e['size'])}"]
         if e.get("bones"):   # rigged: the import must bring its bones (see acc_rebuild_bones.py)
-            attrs.append(f"Bones = {len(e['bones'])}")
+            attrs.append(f"BoneCount = {len(e['bones'])}")   # (not "Bones": that key is the idle bones' JSON)
         if fb:
             attrs.append(f"FitBody = \"{fb}\"")
         if e.get("sway"):
@@ -339,11 +339,11 @@ for item, pieces in pairs(ITEMS) do
 		end
 		-- a rigged piece of a several-piece import gets its bones on a separate part of the import, which goes with the
 		-- import model: report it (art/characters/accessories/acc_rebuild_bones.py rebuilds them exactly)
-		if a.Bones then
+		if a.BoneCount then
 			local nb = 0
 			for _, d in ipairs(p:GetDescendants()) do if d:IsA("Bone") then nb += 1 end end
-			if nb ~= a.Bones then
-				table.insert(report, string.format("%s.%s: %d bones, expected %d: run acc_rebuild_bones.py %s", item, pn, nb, a.Bones, item))
+			if nb ~= a.BoneCount then
+				table.insert(report, string.format("%s.%s: %d bones, expected %d: run acc_rebuild_bones.py %s", item, pn, nb, a.BoneCount, item))
 			end
 		end
 		for _, j in ipairs(p:GetChildren()) do

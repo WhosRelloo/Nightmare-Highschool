@@ -14,7 +14,7 @@ Status: **Kits A and B are in the game** (NH Combat Test, 1.86.0): every batch i
 play-tested together on slot 4, the rebuilt satchel and Head Student's sash included. The owner pre-approved every later batch "as long as they follow the standards" (2026-11-11). **All of both kits is
 built** (batches 2-8: 49 more items, 2026-11-11), checked together with 0 fails, merged into `Config.Accessories`,
 and in the game since 1.86.0. Kit C is in progress (below): C1 coats and C2 masks are **in the game** (1.87.1),
-play-tested on slot 4; C8 bags are built and staged for the import (1.89.0).
+play-tested on slot 4; C8 bags are **in the game** (1.89.1), play-tested on slot 4.
 
 ## Batches
 
@@ -29,7 +29,7 @@ play-tested on slot 4; C8 bags are built and staged for the import (1.89.0).
 | 7 | A 7 + B 2 | the Delinquents' long coat and the Headmaster's greatcoat (torso shell, sleeves on the arms, rigged split coattails) | **in the game (1.86.0)**; staged in (`batch7/`); hairs: see below |
 | 8 (Kit B) | B 1, 3-11 | the Headmaster's Circle: crow mantle, thorned crown, raven-skull pauldron, iron keys, shadow trail, chained ledger, sigil halo, seal of office, signet, staff, observer mask | **in the game (1.86.0)**; staged in (`kitb/`) |
 | C1-C2 (Kit C) | C 1-19 | 11 coats and jackets (skirts ride the legs: BodyFollow), 8 masks | **in the game, play-tested (1.87.1)**; staged in (`kitc/`) |
-| C8 (Kit C) | C 20-25 | coffin, bat-wing and violin backpacks (straps wrap the torso), scroll tube, Gladstone bag and birdcage purse (held) | built, baked, checked; staged in (`kitc8/`), waiting for the import (1.89.0) |
+| C8 (Kit C) | C 20-25 | coffin, bat-wing and violin backpacks (straps wrap the torso), scroll tube, Gladstone bag and birdcage purse (held) | **in the game, play-tested (1.89.1)**; staged in (`kitc8/`) |
 
 ### Batches 2 to 8 (built 2026-11-11, in the game since 1.86.0)
 
@@ -357,8 +357,34 @@ those pieces; with them, the C8 items 0 fails (12 bodies, the stride, sway limit
 `acc_tuckcheck.py`: 0 fails. Ten Kit A and B items that tuck the same hairs (12 pieces) still match their in-game
 templates exactly (dry-run diff, 0 differences).
 
-**Next:** the owner's import of `kitc8/`, then assembly and a slot 4 play test. Then C9 extras, C5 hands and feet,
-C3, C4, C6, C7.
+**In the game (1.89.1).** The owner imported `kitc8/`. 24 image ids read by name (no duplicates, all Completed),
+assembled in one pass (`tools/accessories/assemble_kitc8.luau`). Single-piece imports keep their bones (7 on the bat,
+4 on the bag, 6 on the cage with the moth's wings). All six ready, with maps, mounts, sway, the moth's idle, hair
+fits and tucks.
+
+- **The assembly had a clash.** A piece's bone count and its idle bones' JSON were both written as `Bones`, so the
+  idle JSON overwrote the count and the bone check failed. The count is now `BoneCount` (`acc_assemble.py`).
+- **The birdcage didn't swing at first.** AccessorySway skipped every piece that has an idle (the familiars are driven
+  by AccessoryFx). Now a piece with both an idle and a sway profile swings on its chain, and the idle's own bones
+  (`NHIdleBones`) stay with AccessoryFx (`tools/accessories/install/install_sway_c8.luau`). The cage is the only such
+  piece; the crow, the crow mantle and the ledger have no sway profile and are unchanged.
+
+Play test, slot 4 (Testy), through `ApplyTo`, walking, offsets read at `PreAnimation`:
+
+| What | Result |
+|---|---|
+| All six | worn |
+| Bat wings | sway up to 11.6 degrees |
+| Gladstone bag | swings up to 15.4 degrees |
+| Birdcage | swings up to 16.5 degrees |
+| The moth's wings | open up to 32 degrees now and then, riding the swinging cage |
+| Gladstone bag with a weapon drawn (the Humanoid's `Equip`) | hidden, and back after |
+
+No AccessorySway or AccessoryFx errors, and Testy's look was restored exactly. It was night with frost in the place, so
+there are no in-game screenshots (the baked renders show the look). Not done: Wardrobe and Store clicks for C8, a second
+player.
+
+**Next:** C9 extras, C5 hands and feet, C3, C4, C6, C7.
 
 ## The no-clipping rules (how "nothing clips, overlaps or hovers" is checked)
 
