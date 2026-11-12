@@ -1,0 +1,6 @@
+[
+  {
+    "old_string": "\tif Appearance.IsNpc(character) then\n\t\tdata = Appearance.DressCode(character, data) -- NPCs only (never players, previews or the menu's posed students)\n\tend\n",
+    "new_string": "\tif Appearance.IsNpc(character) then\n\t\tdata = Appearance.DressCode(character, data) -- NPCs only (never players, previews or the menu's posed students)\n\telseif not Appearance.FormOf(character) then\n\t\t-- (line matrix) what this character wears, for students' outfit remarks and the hangout dress codes\n\t\t-- (StudentBrain.Talk, Social.Cliques.Dressed): \"top|bottoms|acc,acc\". A transformed form keeps the last one.\n\t\t-- data.Acc is already the look's comma list of Config.Accessories ids (Sanitize joins it in slot order).\n\t\tlocal avatar = data.UseAvatar == true\n\t\tcharacter:SetAttribute(\"NHWear\", string.format(\"%s|%s|%s\",\n\t\t\t(not avatar and Appearance.IdOf(\"Uniform\", data.Uniform)) or \"\",\n\t\t\t(not avatar and Appearance.IdOf(\"Bottoms\", data.Bottoms)) or \"\",\n\t\t\ttype(data.Acc) == \"string\" and data.Acc or \"\"))\n\tend\n"
+  }
+]
