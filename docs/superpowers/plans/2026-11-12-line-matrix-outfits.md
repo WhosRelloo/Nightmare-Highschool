@@ -298,8 +298,8 @@ return {
 		Hostile = { `Get lost.`, `Not you.`, `Keep walking.`, `We're not friends.` };
 		Wary = { `...Hey.`, `Oh. It's you.`, `What do you want?`, `Hm. Hi, I guess.` };
 		Neutral = { `Hey.`, `Hi.`, `Sup.`, `How's it going?` };
-		Friendly = { `Hey, {Name}!`, `Oh good, it's you.`, `{Name}! What's up?`, `Hey you. Good day?` };
-		Respected = { `{Name}! Looking sharp.`, `There's the legend.`, `Always good to see you, {Name}.`, `Make way, everyone.` };
+		Friendly = { "Hey, {Name}!", `Oh good, it's you.`, "{Name}! What's up?", `Hey you. Good day?` };
+		Respected = { "{Name}! Looking sharp.", `There's the legend.`, "Always good to see you, {Name}.", `Make way, everyone.` };
 	};
 	Bump = { Any = { `Watch it!`, `Whoa, sorry.`, `Excuse you.`, `Easy!` } };
 	Crowded = { Any = { `Personal space?`, `Little room, please.`, `You're kind of close.`, `Can I help you?` } };
@@ -319,10 +319,10 @@ return {
 	};
 	Hurt = { Any = { `You okay? You look rough.`, `Go see the nurse.`, `Who did that to you?`, `Sit down before you fall down.` } };
 	Outfit = {
-		FullLook = { Any = { `Full {Clique} look, huh?`, `Dressed like one of {Clique}.`, `Matching {Clique}? Bold.` } };
-		RivalLook = { Any = { `{Rival} colours? Here?`, `Dressed like {Rival}? Brave.`, `That's a {Rival} look. People notice.` } };
-		Likes = { Any = { `Nice {Piece}.`, `Where'd you get the {Piece}?`, `Okay, the {Piece} is cool.` } };
-		Mocks = { Any = { `Is that a {Piece}? Really?`, `Bold choice, the {Piece}.`, `Hm. The {Piece}. Interesting.` } };
+		FullLook = { Any = { "Full {Clique} look, huh?", "Dressed like one of {Clique}.", "Matching {Clique}? Bold." } };
+		RivalLook = { Any = { "{Rival} colours? Here?", "Dressed like {Rival}? Brave.", "That's a {Rival} look. People notice." } };
+		Likes = { Any = { "Nice {Piece}.", "Where'd you get the {Piece}?", "Okay, the {Piece} is cool." } };
+		Mocks = { Any = { "Is that a {Piece}? Really?", "Bold choice, the {Piece}.", "Hm. The {Piece}. Interesting." } };
 	};
 	DressCode = { Any = { `Members' corner. Dress the part.`, `Come back in our colours.`, `Not dressed like that, you're not.` } };
 }
@@ -551,7 +551,7 @@ local function fillable(Pool: { string }, Ctx: { [string]: any }): { string }
 	local Out = {}
 	for _, L in Pool do
 		local Ok = true
-		for K in L:gmatch(`{(%w+)}`) do
+		for K in L:gmatch("{(%w+)}") do
 			if Ctx[K] == nil then Ok = false break end
 		end
 		if Ok then table.insert(Out, L) end
@@ -1237,7 +1237,9 @@ git -c user.name=Rello commit -m "Line matrix: students greet, react and get sho
 - in the other moments, split by attitude wherever the attitude changes what they'd say. At least split
   `Outfit.FullLook`, `Outfit.RivalLook`, `Hurt` and `DressCode` into Hostile and Wary against Friendly and Respected,
   and use `Any` only where the attitude makes no difference (`Bump` and `Shoved` often);
-- keep the voice already set by the clique's `Lines` and `Reactions` in `Config.Cliques`. Read those first.
+- keep the voice already set by the clique's `Lines` and `Reactions` in `Config.Cliques`. Read those first;
+- write every line that holds a placeholder in **double quotes** (`"Hey, {Name}!"`), never backticks: in Luau a
+  backtick string interpolates `{Name}` at load time and stores `Hey, nil!`. Lines without placeholders may use either.
 
 **Steps (the same for each clique):**
 
