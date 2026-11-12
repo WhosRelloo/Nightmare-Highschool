@@ -1,9 +1,9 @@
 -- CliqueTalk.Pack: the Den's wolf-hearted bruisers; the moon, scent, nerves and "first-year" (the line matrix)
 return {
 	Greet = {
-		Hostile = { `Smell that? Nerves.`, `Wrong hallway, first-year.`, "{Name}. You always walk this jumpy?", `Moon's getting fat. Your luck's getting thin.`, `Heh. Somebody's heart is racing.` };
-		Wary = { `I can smell you from here. What do you want?`, `Hm. New scent. Who do you run with?`, "{Name}. Stand still. I'm deciding about you.", `You're twitchy. Why so twitchy?` };
-		Neutral = { `Hey. Moon's coming up fat this week.`, `Yo. You smell like the cafeteria.`, `'Sup. Mind the claw marks on the bench.`, `Hey. Smells like rain later.` };
+		Hostile = { `Smell that? Nerves.`, `Wrong hallway, first-year.`, "{Name}. You always walk this jumpy?", `Moon's getting fat. Your luck's getting thin.`, `Heh. Somebody's sweating.` };
+		Wary = { `I can smell you from here. What do you want?`, `Hm. New scent. Who do you run with?`, "{Name}. Hold on. I'm deciding about you.", `You're twitchy. Why so twitchy?` };
+		Neutral = { `Hey. Moon's coming up fat this week.`, `Yo. You smell like toast.`, `'Sup. Mind the claw marks on the bench.`, `Hey. Smells like rain later.` };
 		Friendly = { "{Name}! You smell like a friend.", `Hey, you. Coming out to the Den?`, "{Name}! Grab a log. Fire's going.", `There you are. Pack missed your scent.` };
 		Respected = { `Run with us tonight.`, "{Name}. Pack. Always Pack.", `Make room. Alpha coming through.`, "{Name}! Dex saved you the warm spot.", `Den's yours. Just say the word.` };
 	};
@@ -11,7 +11,7 @@ return {
 	Crowded = {
 		Hostile = { `Back up. I don't like your scent.`, `Too close. My hackles are up.`, `One more step and I start growling.` };
 		Respected = { `Get in close. Pack sticks together.`, `Shoulder to shoulder. Like a real pack.`, `Closer. This stays in the Den.` };
-		Any = { `Little room. I run warm.`, `Give me space. I'm itchy today.`, `Personal space. Wolves need it too.`, `You're crowding me. My ears hate that.` };
+		Any = { `Room, please. I run warm.`, `Give me space. I'm itchy today.`, `Personal space. Wolves need it too.`, `You're crowding me. My ears hate that.` };
 	};
 	Shoved = {
 		Hostile = { `Shove a wolf? Brave. Also dumb.`, `Do that again. I dare you.`, `Okay. Now my hackles are up.` };
@@ -21,22 +21,22 @@ return {
 	FightSeen = {
 		Hostile = { `Go on. Somebody's losing. Loudly.`, `Sloppy. A first-year swings better.`, `Keep going. You're all bark.` };
 		Wary = { `Not near the Den. Take it outside.`, `Easy. Nobody wake Dex.`, `Ears up. Teacher's coming.` };
-		Any = { `Ring! Make a ring!`, `Ooh. Somebody's tail just went down.`, `Awoo! Here we go!`, `Who's alpha here? Place your bets.`, `Loud. I like loud.` };
+		Any = { `Ring! Make a ring!`, `Ooh. Somebody just lost their nerve.`, `Awoo! Here we go!`, `Who's alpha here? Let's see.`, `Loud. I like loud.` };
 		Friendly = { "Low and fast, {Name}! Like a wolf!", `Circle 'em! Don't stand still!`, `Growl first! Swing second!` };
 		Respected = { "{Name}'s got the moon on their side!", `Pack! Howl for 'em!`, `Nobody cuts in. Alpha's working.` };
 	};
 	Flee = { Any = { `Back to the Den! Go!`, `Split up! Meet at the oaks!`, `Tails down, feet fast! Move!`, `Nope! Even wolves know when to run!`, `Into the trees! Don't look back!` } };
 	Transformed = {
-		Hostile = { `Big and furry doesn't make you Pack.`, `Grew claws? Cute. We were born with 'em.`, `Big. Loud. Still a first-year underneath.` };
+		Hostile = { `Big and scary doesn't make you Pack.`, `New look? Cute. Still not Pack.`, `Big. Loud. Still a first-year underneath.` };
 		Wary = { `Easy... easy. Nobody bare their teeth.`, `Whoa. Okay. Is that still you in there?`, `Nobody move. Let it get our scent.` };
-		Any = { `Now THAT has a scent.`, `Huh. The moon got to you too?`, `Heh. Look at the size of you.`, `Okay. That's a howl-worthy look.` };
-		Respected = { "{Name}?! Now you look like Pack!", `Awooo! That's our alpha!`, `Even the moon's impressed.`, `Run with us like that. Please.` };
+		Any = { `Now THAT has a scent.`, `Huh. So that's what you've been hiding.`, `Heh. Look at the size of you.`, `Okay. That's a howl-worthy look.` };
+		Respected = { "{Name}?! Okay. Terrifying. Love it.", `Awooo! That's one of ours!`, `Even Dex looks nervous. Ha!`, `Run with us like that. Please.` };
 	};
 	Night = {
-		Hostile = { `Night's ours. You're just visiting.`, `Late, first-year. Every shadow's got ears.`, `Dark out. You keep looking behind you. Heh.` };
+		Hostile = { `Night's ours. You're just visiting.`, `Late, first-year. Every shadow's got ears.`, `Dark out. Hope you brought a lamp. Heh.` };
 		Wary = { `Out late. What's your business?`, `Night air carries. I heard you coming.`, `Late. Keep to the lamps, stranger.` };
 		Any = { `Night air. Smell the pines?`, `Finally. The good hours.`, `Hear that? Something's out past the oaks.`, `Night. My ears work better now.` };
-		Friendly = { "{Name}! Fire's lit at the Den. Come sit.", `Pull up a log. Night's young.`, `Moon's not up yet. Wait with us.` };
+		Friendly = { "{Name}! Fire's lit at the Den. Come sit.", `Pull up a log. Night's young.`, `Moon's coming. Wait with us.` };
 		Respected = { `Night belongs to the Pack. And you.`, "{Name}, lead the run. We'll follow.", `Den fire's yours. Warmest spot.` };
 	};
 	FullMoon = {
@@ -49,7 +49,7 @@ return {
 		Human = {
 			Hostile = { `Human. All nerves, no nose.`, `Human. Blunt teeth, blunt nose.`, `Human. Your nose is just for show, huh?` };
 			Wary = { `Human. Don't stare at the moon too long.`, `Human. Don't wander off the path.`, `Human. Why are you this close to the Den?` };
-			Any = { `Human. No fur, no fangs. Weird.`, `Human, huh? How do you smell anything?`, `Human. Must be quiet in your head.` };
+			Any = { `Human. No fur, no fangs. Brave.`, `Human, huh? Smell anything useful?`, `Human. Sharp ears for a first-year.` };
 			Friendly = { `Human, and you didn't flinch. Nice.`, "{Name}. Human nose, wolf heart.", `Humans can run with us. Just keep up.` };
 			Respected = { `Human, and the Pack follows you. Ha.`, "{Name}. No fur needed. Still alpha.", `Human? You've got the heart of a wolf.` };
 		};
@@ -57,7 +57,7 @@ return {
 			Hostile = { `Priest. You smell like candle wax.`, `Priest. Save the blessing. We don't want it.`, `Priest. Chapel's the other way. Keep going.` };
 			Wary = { `Priest. Keep the incense away from my nose.`, `Priest. Don't bless me. I'll sneeze.`, `Priest. You with the choir kids?` };
 			Any = { `Priest, huh. Not all of you sing, right?`, `Priest. Your lot never comes to the Den.`, `Priest. You're calmer than you look.` };
-			Friendly = { `A priest who doesn't preach? I like you.`, "{Name}. Holy, and still fun. Rare.", `Priest! Bless the bonfire for us?` };
+			Friendly = { `A priest at the bonfire? I like you.`, "{Name}. Holy, and good company.", `Priest! Bless the bonfire for us?` };
 			Respected = { `Our priest. Even the moon's polite now.`, "{Name}. Only priest the Pack trusts.", `A priest in the Den. Dex says it's fine.` };
 		};
 		Vampire = {
@@ -90,7 +90,7 @@ return {
 		};
 	};
 	Hurt = {
-		Hostile = { `Hurt? Should've kept your head down.`, `Limping? The Den's no place for that.`, `Hurt. Should've stayed out of the woods.` };
+		Hostile = { `Hurt? Should've kept your head down.`, `Limping? Pack doesn't coddle.`, `Hurt. Should've stayed out of the woods.` };
 		Wary = { `Limping. Not Pack business.`, `Hurt? Nurse is that way. Go on.`, `Who got you? ...I'm just asking.` };
 		Any = { `You look wrecked. Sit down.`, `Easy. Shake it off like a wet wolf.`, `Hurt? Go see the nurse. Fast.` };
 		Friendly = { "{Name}! Sit. I'll get the nurse.", `Lean on me. Pack carries its own.`, `Who did it? The Pack wants to know.` };
@@ -100,7 +100,7 @@ return {
 		FullLook = {
 			Hostile = { `Forest green won't fool my nose.`, `Dressed like Pack. Smells like a first-year.`, `Clothes are easy. The howl's harder.` };
 			Wary = { `Forest green, huh. Earn it.`, `Looks Pack. Let's see you run Pack.`, `Somebody's been studying the Den.` };
-			Any = { `Forest green. You'd vanish in the trees.`, "{Clique}'s colours. Suits you.", `Green and khaki. Den-ready.` };
+			Any = { `Forest green. You'd vanish in the trees.`, "{Clique}'s colours. Suits you.", `Green from head to toe. Den-ready.` };
 			Friendly = { `Now you look like you belong in the Den.`, "{Name}! Forest green! Howl for it!", `That's the look. Now the howl.` };
 			Respected = { `Alpha in Pack green. Perfect.`, "{Clique}'s finest, {Name}. Look at you.", `Pack green on you? Den's proud.` };
 		};
@@ -109,7 +109,7 @@ return {
 			Wary = { `Ivory and black. You a choir kid?`, "{Rival}'s colours. Why?", `Choir clothes near the Den? Explain.` };
 			Any = { `Whoa. Very... hymn practice.`, `Ivory and black? You look like a candle.`, `Dressed for choir practice?` };
 			Friendly = { "{Name}, no. Not the choir look.", `Who buttoned you up? Loosen up.`, `Undercover at the chapel? Smart.` };
-			Respected = { `Undercover at choir? Learn their songs.`, `Even in ivory, you're Pack.`, `Spying on the choir? Find their schedule.` };
+			Respected = { `Undercover at choir? Learn their songs.`, `Even in ivory, you're Pack.`, `Choir disguise? Ha. Nobody'd guess.` };
 		};
 		Likes = {
 			Hostile = { "Nice {Piece}. Still smells like nerves.", "The {Piece} is Pack. You're not.", "Who gave you the {Piece}? Not us." };
@@ -125,7 +125,7 @@ return {
 		Hostile = { `Den smells like us. You don't.`, `Not in that. Not ever. Turn around.`, `Out. Come back smelling like pine.` };
 		Wary = { `Den's for the Pack. Dress like it.`, `Green first. Then we'll talk.`, `Can't come in like that. Rules.` };
 		Any = { `Forest green past the fire. Pack rule.`, `No green, no Den. Simple.`, `Pack colours, or you wait outside.` };
-		Friendly = { `Almost. Throw on some green and come in.`, "{Name}, wear the green and sit by me.", `Swap the top and I'll save you a log.` };
-		Respected = { `Even the alpha wears green. Dex's rule.`, `Rules are rules. Green, then in.`, `Throw on the green. Fire's waiting.` };
+		Friendly = { `Almost. Throw on some green and come in.`, "{Name}, wear the green and sit with us.", `Swap the top and I'll save you a log.` };
+		Respected = { `Even Dex wears the green. Pack rule.`, `Rules are rules. Green, then in.`, `Throw on the green. Fire's waiting.` };
 	};
 }
