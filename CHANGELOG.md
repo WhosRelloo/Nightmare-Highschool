@@ -2,6 +2,53 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.91.0] - 2026-11-12: Inventory QOL batch 1: empty pins you can see, cooldown shades, the buff chip, no silent refusals
+
+Owner: "Start with batch 1" (concepts 1, 5, 9 and 30 in `docs/Inventory-QOL-Concepts.md`). The live scripts are
+mirrored in `tools/inventory-qol-191/` (`patches.py` lists every edit). Each patched line is marked
+`(inventory QOL 1.91)`. Backups are in `ServerStorage.NH_Backup.InventoryQOL1_pre_20261112`.
+
+### Added
+- **Empty pins show what they're waiting for.**
+  - A pinned snack you've run out of stays on the hotbar, greyed with "00" and "Restock", with nothing in your hand.
+  - In the Locker's pouch, it shows the snack greyed with "Restock / click to unpin".
+  - Buying more brings it straight back into the hand, in the same slot.
+  - On the server, the tool keeps its place (`NHEmpty`, no Handle) instead of being destroyed. The handle code moved
+    into `Inventory.AddHandle`.
+- **Cooldown shades on the hotbar.**
+  - **Food:** after eating, every food slot drains a dark shade with the seconds left of the shared "full" wait.
+  - **Drinks:** they show the same for their one-sip wait.
+  - **How:** snack tools carry `NHReadyAt` (server time) and `NHCooldown`.
+- **The snack buff chip.** Above the hotbar: the buff's name, what it gives you (your race's twist included, for the
+  daily specials) and the time left, for example "Ramune · +0.6% guard · 2:55". It pulses red in the last 15 s.
+- **No silent refusals.** Using a snack while you're still eating says "Still eating.". Using an empty pin says "None
+  left. Restock at the stand.".
+
+### Tested (NH Combat Test, slot 4 Testy, entered through the real slot remotes)
+- **Empty pins:**
+  - Bought a Melon Bread and a Ramune, then ate and drank them. Both stayed on the hotbar as greyed "Restock" slots
+    with no handle.
+  - The pouch showed both greyed with "Restock / click to unpin".
+  - Buying 2 Melon Bread brought the handle back. Equipped, it was in the hand, and the pouch slot was no longer
+    greyed.
+- **Messages:** an onigiri during the eat said "Still eating.", and the empty Melon Bread said "None left. Restock at the
+  stand.".
+- **Cooldowns:**
+  - The Onigiri, Melon Bread and Ramune tools carried their ready times (food about 13 s, drink about 4 s).
+  - The Onigiri slot drained with "6" left on screen.
+- **The buff chip:** read "Ramune · +0.6% guard · 2:55" on screen.
+- **The console:** no script errors.
+- Testy's slot count and the test key attribute are restored.
+
+### Not tested
+- **The buff chip's red pulse** in the last 15 s.
+- **Kit item cooldowns** (thermos, tin) on the hotbar: kit items don't carry `NHReadyAt` yet.
+- **Phones** (touch): not checked.
+
+### Seen while testing (not changed)
+- **A stray tool:** an empty Tool named `Template` sits in Combat Test's `StarterPack`, so every player gets a blank
+  "Template" in hotbar slot 1.
+
 ## [1.90.1] - 2026-11-12: Inventory audit: 17 fixes across the Locker, hotbar, snacks and everyday kit
 
 Owner: "Completely make sure the inventory system works." I read through every inventory script (the Locker, the hotbar,
