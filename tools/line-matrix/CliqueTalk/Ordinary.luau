@@ -42,7 +42,7 @@ return {
 		Hostile = { `Full moon AND you? Worst night ever.`, `Full moon. Go be somewhere else.`, `Moon's up. Keep away from us. Please.` };
 		Any = { `Is it true about the full moon? Is it?`, `Full moon. Lock the doors. Twice.`, `My cousin says the oaks howl tonight.`, `Full moon. I'm sleeping in my shoes.`, `Don't look at it. Don't look at the moon.` };
 		Friendly = { "Full moon, {Name}. Walk with our group?", `Stick together tonight. Promise?`, `Full moon. Be home before midnight, okay?` };
-		Respected = { `Full moon, but you're here. We're okay.`, "{Name}, can we walk with you? Just to the lamps?", `Strength in numbers. And you. Mostly you.` };
+		Respected = { `Full moon, but you're here. We're okay.`, "{Name}, walk with us? Just to the lamps?", `Strength in numbers. And you. Mostly you.` };
 	};
 	Race = {
 		Human = {

@@ -25,8 +25,8 @@ return {
 	};
 	Hurt = { Any = { `You okay? You look rough.`, `Go see the nurse.`, `Who did that to you?`, `Sit down before you fall down.` } };
 	Outfit = {
-		FullLook = { Any = { "{Clique}'s full look, huh?", "{Clique} would claim you in that.", "{Clique}'s colours? Bold." } };
-		RivalLook = { Any = { "{Rival}'s colours? Here?", "{Rival}'s look? Brave.", "{Rival}'s look. People notice." } };
+		FullLook = { Any = { "{Clique} look, head to toe. Huh.", "{Clique} would claim you in that.", "{Clique} colours? Bold." } };
+		RivalLook = { Any = { "{Rival} colours? Here?", "{Rival} look? Brave.", "{Rival} look. People notice." } };
 		Likes = { Any = { "Nice {Piece}.", "Where'd you get the {Piece}?", "Okay, the {Piece} is cool." } };
 		Mocks = { Any = { "Is that a {Piece}? Really?", "Bold choice, the {Piece}.", "Hm. The {Piece}. Interesting." } };
 	};

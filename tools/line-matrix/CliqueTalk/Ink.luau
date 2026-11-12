@@ -20,7 +20,7 @@ return {
 	FightSeen = {
 		Hostile = { `Hold that pose. Losing suits you.`, `Lose slower. I'm still sketching.`, `Ooh, unflattering angle. Keep going.` };
 		Wary = { `Don't swing near the easels!`, `Not near the wet wall, please!`, `This is why we can't have nice murals.` };
-		Any = { `The drama! The lighting! Gorgeous.`, `Somebody get a sketch of this.`, `Finally, some movement in this school.`, `Wait, wait. Hold that pose. I'm sketching.` };
+		Any = { `The drama! The lighting! Gorgeous.`, `Somebody get a sketch of this.`, `Finally, some movement in this school.`, `Wait, wait. Don't move. I'm sketching.` };
 		Friendly = { "Go, {Name}! Very dynamic!", `Lovely form! Swing again, I missed it.`, `Chin up! It's your better angle.` };
 		Respected = { "{Name}, you're our next mural. Win!", `That's a museum piece! Finish it!`, `Give them a final act! Big finish!` };
 	};

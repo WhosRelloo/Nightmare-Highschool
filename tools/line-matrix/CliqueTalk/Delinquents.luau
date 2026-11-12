@@ -33,7 +33,7 @@ return {
 		Respected = { "{Name}?! Remind me never to cross you.", `Now THAT'S Back Lot muscle.`, `Lot just got a lot scarier. Love it.`, `Nobody's touching our turf now.` };
 	};
 	Night = {
-		Hostile = { `Lot's ours after dark. Remember that.`, `Out late? Walk faster. Way faster.`, `Streetlamp's out. Lot's ours now.` };
+		Hostile = { `Lot's ours after dark. Remember that.`, `Out late? Walk faster. Way faster.`, `Streetlamp's out. Watch your step.` };
 		Wary = { `Late. You following somebody?`, `Who's out at this hour? Oh. You.`, `Night watch. Say who you are.` };
 		Any = { `Night's when the Lot wakes up.`, `Streetlamps on. Collars up.`, `Halls are empty. Lot's open.`, `Cold night. Good jacket weather.` };
 		Friendly = { "Late one, {Name}? Walk with us.", `Grab a crate. We're out till curfew.`, `Night ride? Grab a board.` };

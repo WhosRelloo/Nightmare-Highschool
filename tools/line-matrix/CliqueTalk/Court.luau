@@ -76,7 +76,7 @@ return {
 		Ghoul = {
 			Hostile = { `Ghoul. Stay away from the buffet.`, `Keep your hands off the canapes.`, `You make the whole room look dated.` };
 			Wary = { `Ghoul. Have you tried moisturiser?`, `Darling, you look positively vintage.`, `Ghoul. Don't touch the upholstery.` };
-			Any = { `A ghoul. Gothic is in this season.`, `Ghoul. Such a still, elegant presence.`, `A ghoul at the Parlor. How gothic.` };
+			Any = { `A ghoul. Gothic is in this season.`, `Ghoul. Such a still, elegant presence.`, `A ghoul at the Parlor. How rare.` };
 			Friendly = { "{Name}, that calm is very fashionable.", `Ghoul? Darling, you wear stillness so well.`, `Sit with us. You're restful company.` };
 			Respected = { `Our ghoul! Calm has never looked richer.`, "{Name}. Vintage, and priceless.", `The Court adores a timeless face.` };
 		};
@@ -116,7 +116,7 @@ return {
 		};
 		Mocks = {
 			Hostile = { "The {Piece}. Of course. How common.", "Even the {Piece} looks embarrassed.", `Library jumble sale, was it?` };
-			Friendly = { "Darling, lose the {Piece}. Please.", "The {Piece}? We'll pretend we didn't see.", `Next time, ask me first. Hush.` };
+			Friendly = { "Darling, lose the {Piece}. Please.", "The {Piece}? We'll pretend we didn't see.", `Next time, consult me first. Hush.` };
 			Any = { "The {Piece}? Did you walk here?", "Darling, the {Piece}. Why?", `How common.`, "Is the {Piece} for work? You poor thing." };
 		};
 	};
