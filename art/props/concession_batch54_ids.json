@@ -1,0 +1,62 @@
+{
+ "ConcessionBakery": {
+  "color": 134846620647097,
+  "normal": 111022846454682,
+  "rough": 105512393958962,
+  "metal": null
+ },
+ "ConcessionCandy": {
+  "color": 103513594542506,
+  "normal": 92582499955764,
+  "rough": 75376854452113,
+  "metal": 123499972344507
+ },
+ "ConcessionCounterware": {
+  "color": 106049665671501,
+  "normal": 91253188344674,
+  "rough": 76208218498153,
+  "metal": 91143702206813
+ },
+ "ConcessionDrinks": {
+  "color": 120820823066542,
+  "normal": 114264905764281,
+  "rough": 87242076028933,
+  "metal": 80490235137829
+ },
+ "ConcessionHotFood": {
+  "color": 70969536996510,
+  "normal": 119647850663564,
+  "rough": 83120902947425,
+  "metal": 97100863903496
+ },
+ "ConcessionLunchExtras": {
+  "color": 92432756542650,
+  "normal": 75774302084478,
+  "rough": 90182776922741,
+  "metal": 129888685148019
+ },
+ "ConcessionLunchHouse": {
+  "color": 116108898077383,
+  "normal": 110612122333101,
+  "rough": 125538709158110,
+  "metal": 83283998621655
+ },
+ "ConcessionLunchSets": {
+  "color": 72617342876429,
+  "normal": 117700089504667,
+  "rough": 132414828228425,
+  "metal": 85629987442737
+ },
+ "ConcessionStock": {
+  "color": 104528189681772,
+  "normal": 91811524552007,
+  "rough": 73867801564315,
+  "metal": 126452601785581
+ },
+ "ConcessionSweets": {
+  "color": 78071748439178,
+  "normal": 91798478257810,
+  "rough": 85311422511365,
+  "metal": 78275429637809
+ }
+}

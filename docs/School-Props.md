@@ -2553,3 +2553,65 @@ Every piece is under 20k triangles and under 20.48 studs on every axis. Every ba
 ![The tunnels below](img/secret53-tunnels.jpg)
 
 **In Studio (2026-11-11):** `tools/props/secret_kit_templates.luau` makes the 26 templates (NHBuildKit `Secret`). Each piece takes its prop's maps; the `*_Wall` shells take NH_CastleStone and the tunnels' `*_Floor` takes the paving set (in the group as `MossyPaving_*`). The candle glows are amber Neon with their PointLights, tagged `NHCandle`. Every grate, door, hatch, slide, the lever, the loose brick and the tilting bust runs on the door kit system (`NHDoor`, OneWay, AutoClose 8, prompts "Vent", "Hatch", "Bookcase", "Tapestry", "Panel", "Fireplace", "Trapdoor", "Gate", "Sconce", "Brick", "Bust"). Their leaves collide while shut and stop colliding while open. Hinges come from `art/props/secret_batch53.json` (Blender x, y, z become Roblox x, z, y); each one was checked to sit on its leaf's edge, and each swing sign is picked so the leaf opens the way the kit means (outward, up or down), confirmed by posing every leaf open in Studio. BoardedPassage's boards stay put, tagged `NHBoard` with their fall-away `SlideBy`, until the board-prying gameplay is designed. The secret triggers are not yet linked to the doors they open (the docs' `NHSecretLink` idea). `tools/props/showcase_secret_kit.luau` lines the kit up as "Secret Doors and Vents" (z -1050) and "Secret Tunnels" (z -1090), standing every prop on its ground pivot so the floor vent, the trapdoor and the stage pit go below the floor, on ShowcaseFloorSecret (z -965 to -1112, which also floors the Signs showcase).
+
+## Batch 54 (concession): the concession consumables kit, lunch meals and the stand's stock
+
+`art/props/nh_props_batch54.py`, printed atlas `art/props/concession_atlas.py` (with `concession_svg.py` and `concession_motifs.py`). The owner asked for "a BUNCH of items: snacks, drinks, candy, hot food, sweets, wrappers and cups, enough to fully stock the stand", approved the list, then asked for "more DETAILED and higher quality" models, "wayyy cooler" packaging (they chose a look per brand) and "lunch meals for when we add a lunch period" (Japanese set meals, gothic house meals, lunch extras). 68 items: everything Mrs. Okada's stand sells (the 14 snacks already in `Config.Items` and 26 new ones), 14 lunch meals, and 19 pieces of counterware, litter and stock to dress the stand. Every brand, mascot and line of copy is invented; nothing gory (the red on the trays is pickles, glaze and enamel; the Grave Crisps skeleton is a cartoon).
+
+**How it's built:** ten sheet props, each one 2048 bake (64 samples, GPU) shared by its items and one FBX whose pieces are the items (`<Sheet>_<ItemId>`, the `Config.Items` Id for things that are sold). Drinks in glass, the clear cups and the candy jars also have a see-through `<Sheet>_<ItemId>_Glass` piece. Labels come from the ConcessionPrint atlas (4096, colour + gilt/foil mask + emboss height, drawn as SVG and rendered with headless Edge) through the "Spine" UV layer, like the library and interiors kits. Sizes are a little larger than life so they read in a hand (a can is 0.62 tall, a lunch tray 1.3 x 0.95); every item stands on its own bottom with its front (the label) toward -Z.
+
+| Sheet | Items | Tris |
+|---|---|---|
+| ConcessionBakery | Onigiri, MelonBread, YakisobaBun, GarlicBread, CurryBread, Nikuman, Taiyaki, CreamPuff | 33k |
+| ConcessionHotFood | Bento, MeatLoaf, TakoyakiBoat, CupRamen, RoastSweetPotato, YakitoriSkewers, PumpkinSoup | 17k |
+| ConcessionDrinks | Ramune, BarleyTea, CannedCoffee, RedLantern, HolyLemonade, BlackCatCola, GreenTea, StrawberryMilk | 17k |
+| ConcessionSweets | HotCocoa, MelonSoda, PuddingCup, EctoJelly, MoonCake, Dango, TombstoneCookie | 11k |
+| ConcessionCandy | BatGummies, CandyApple, GhostMints, KonpeitoStars, LicoriceWhips, ChocolateBar, Senbei, GraveCrisps, Popcorn, PrankKit | 21k |
+| ConcessionLunchSets | KatsuCurry, ShoyuRamen, KaraageSet, MackerelSet, Omurice (lunch trays) | 55k |
+| ConcessionLunchHouse | WitchingStew, ShepherdsPie, PumpkinGratin, RavensRoast (lunch trays) | 26k |
+| ConcessionLunchExtras | FruitCup, SideSalad, RiceBowl, MisoSoup, ChocolateMilk | 10k |
+| ConcessionCounterware | CupStack, LidStack, StrawHolder, NapkinDispenser, BoatStack, SkewerCup, SoyBottle, MustardBottle, LitterFilm, LitterChipBag, LitterWrappers, LitterCan | 15k |
+| ConcessionStock | JarGummies, JarKonpeito, JarMints, BottleCrate, CanTray, BentoStack, BunTray | 57k |
+
+Every piece is under Roblox's 20k triangles (the heaviest, the BunTray and the shoyu ramen tray, about 13-16k).
+
+**Detail:** cans have a domed foot, a stepped neck, the double-seam rim, a scored mouth and a pull tab with its rivet; the glass bottles hold their drink (the Ramune its marble in the codd neck), with crimped crown or ribbed screw caps; snack bags bulge between crimped, toothed seals with a hang hole; paper cups have rolled lips and press-on lids with a sip spout; cartons have a seam flap, a ribbed fin and a straw in its film glued to the back; the cup ramen, pudding, fruit cup and miso lids are sealed with pull tabs (a folded-back lid baked streaks). Food is displaced and textured: lumpy rice, a scored melon-bread crust, panko, takoyaki with sauce, mayo and bonito, a fish-shaped taiyaki with its batter skirt, a ghost-faced ectoplasm jelly. The lunch trays are crimson enamel with a rolled lip and a printed refectory liner (two designs: the week's menu, and the lunch bells), with lacquer bowls, plates, chopsticks on rests, spoons, a knife and fork.
+
+**Packaging (one look per brand):** Moonwell Ramune (a star-chart wrap, a marble sticker on the cap), Huskwood barley tea, Black Vigil coffee (a raven over a candlelit window), Red Lantern energy (holo flames), Black Cat Cola, Willow Leaf green tea, Holy Water Lemonade, Nightmare High Dairy strawberry and chocolate milk (the ghost cow, the crest, a lace border), Grave Crisps (a holo cartoon skeleton, a crunch-o-meter on the back), Bat Gummies (a window full of gummies, Batsy's flight guide), Konpeito Stars, Ghost Mints, Moonlight chocolate, Spooky Pop popcorn, Midnight Ramen, the Prank Kit, Okada's own cups, boats, bags and stamp.
+
+**In the game:**
+- `Config.Items` (`tools/props/concession_kit_items.luau`): the 26 new snacks join `Items.List` (40 on sale); the lunch meals are `Items.Lunch` (`Lunch = true`), in `Items.ById` so they save and can be granted, but not on the stand: `Items.OnSale` says no until a lunch period sets `ReplicatedStorage`'s `NHLunchOpen` attribute (`Items.LunchOpen()`).
+- Hand props (`tools/props/concession_kit_code.luau`): `Services.Features.Inventory` and `Controllers.Gui.Locker` use `ReplicatedStorage.NHSnacks.<Id>` (a `Handle` MeshPart with any glass welded under it, an `NHGrip` CFrame attribute) when it's there, and the old generated part when it isn't. The stand's menu board lists the first eight regular items and "+ N more at the counter" (the buy menu scrolls).
+- Templates (`tools/props/concession_kit_templates.luau`, NHBuildKit `Concession`): the sheets in `ServerStorage.NHProps.Concession`, one Model per item in `ServerStorage.NHProps.ConcessionItems` (tag `NHConcessionItem`, attributes `ItemId`, `Sold`, `Lunch`, `Sheet`), the hand props in `ReplicatedStorage.NHSnacks`. Glass pieces are Glass, Transparency 0.5, no shadow. Only the floor stock collides (box).
+- Showcase (`tools/props/showcase_concession_kit.luau`): `workspace.NHPropsShowcase.Concessions` (tag `NHPropBatch54`): a few items on the batch-14 stand's glass counter, the crate, can tray and bento stack by its east post, litter in front, and a catalogue of every item on display tables in front of the stand.
+
+**Files:** FBX in `art/props/fbx/concession-batch54/`; maps in `art/props/textures/Concession*_{color,normal,rough,metal}.png` (2048); upload copies at 1024 in `art/group-upload/concession-batch54/`; the atlas in `art/props/textures/ConcessionPrint_{color,gilt,height}.png` (bake source only). Run scripts in `E:/NH-Work/props54/` (`run54.py`, `bake54.sh`, `upload54.py`).
+
+![Every snack, drink, sweet and candy (baked)](img/concession54-snacks.jpg)
+![The lunch trays, extras, counterware and stock (baked)](img/concession54-lunch-stock.jpg)
+![The ConcessionPrint packaging atlas](img/concession54-packaging.jpg)
+
+**Wrap orientation (read before a rebake):** `band()` starts the region's u = 0 at the front, and ConcessionPrint's wraps put their front panel at u = 0.25, so on the 16 round, wrap-labelled items (the cans, glass and PET bottles, paper cups, the cup ramen, the mints tin, soy and mustard, the cup stack) the front faces Roblox -X. The template script turns them -90 degrees (`FRONT_YAW`) on display and in the hand rather than rebaking; if the kit is ever rebaked with the band starting at u = 0.25 instead, drop `FRONT_YAW`.
+
+**In Studio (2026-11-12, NH Combat Test):** the owner imported the 10 FBX and bulk-imported the 39 maps (the Bakery has no metal map); the ids were read by name from the group's images (no duplicates, all 39 "Completed" before Studio loaded them), saved in `art/props/concession_batch54_ids.json`.
+- **Templates:** 73 item templates, 54 hand props, 284 map slots; every size matched Blender (a Ramune 0.33 x 0.82, a lunch tray 1.32 x 0.97); nothing at the 20.48 import cap.
+- **Fixed on the way:** setting `WorldPivot` on a Model that already has a PrimaryPart didn't stick, so every item stood half sunk (the onigiri's nori under the table); the pivot is now the PrimaryPart's `PivotOffset`. Four sheets' normal maps came back "Failure" after a Play session (they had loaded before), which draws a SurfaceAppearance white; setting each map again made Studio refetch them (all 39 Success).
+- **Checked by screenshot:** the counter stock, the floor stock and litter, the four snack tables (every front facing out, nothing hovering or sunk) and the two lunch tables.
+
+![The stand's counter](img/concession54-studio-counter.jpg)
+![Drinks and sweets](img/concession54-studio-drinks.jpg)
+![Candy and snacks](img/concession54-studio-candy.jpg)
+![The lunch trays](img/concession54-studio-lunch.jpg)
+
+**Play-tested (slot 4 "Testy", Studio Play; `Config.MainMenu.SlotCount` 4 and `NHTestNoMenuKeys` during the test, both restored):**
+- Ramune, Takoyaki Boat, Green Tea and Katsu Curry were put in Testy's Locker through a new Studio test hook, `NHTestBridge` `GrantItem` (`Inventory.Grant`). The hotbar tools came out with the modelled handles, the glass welded on.
+- **In the hand:** the default grip held a bottle lying flat like a sword. The grips were measured on the equipped tools: `Rx(-90)` for upright items, `Rz(90) * Ry(90)` for the turned ones, the hand on the item's back face; a lunch tray is held flat by its near rim. Checked by screenshot: the Ramune upright with its label facing out, the Katsu Curry tray carried level.
+- **Using:** the Takoyaki Boat healed (52.5 to 104 over 8 s, with regen); the Ramune gave its buff (`NHSnackBuff`, "+0.6% guard" in the Locker); counts went down.
+- **The Locker** (opened by a real click on the top bar): the Backpack, the Snack buff slot and the Pouch show the modelled items.
+- **The in-game stand's menu board:** the eight regular items, "+ 27 more at the counter", today's special, inside the board.
+- Testy's Locker was put back exactly (items and pins); no Yen spent.
+- **Not tested:** buying at the stand (Testy had too little Yen), the stand's buy menu with 40 items, every item in the hand (four were), a lunch period (none exists yet), the Map place.
+
+![The Ramune in hand](img/concession54-pt-ramune.jpg)
+![A lunch tray in hand](img/concession54-pt-tray.jpg)
+![The Locker](img/concession54-pt-locker.jpg)

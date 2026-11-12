@@ -43,6 +43,44 @@ Added in 1.10.0. Code lives in Studio; this page is the design and how the piece
 - **Save data:** `PlayerData.Inventory = { Items = { [id] = count }, Pinned = { id }, Boards = { Owned = { id }, Equipped = id } }`, written with the `SetInventory` action and checked by `Config.Items.Sanitize`.
 - **Remotes:** `ReplicatedStorage.NHInventory`. Get, Use, Pin, Drop and Buy (RF), plus Changed (RE).
 
+## The concession kit (1.90)
+
+Props batch 54 ([[School-Props]]): every item the stand sells is modelled now, with its own packaging, and 26 snacks were added (40 on sale). Lunch meals wait for a lunch period.
+
+| New snack | Price | Effect |
+|---|---|---|
+| Takoyaki Boat | 55 | +35 health over 6 s |
+| Nikuman | 35 | +22 over 4 s |
+| Curry Bread | 50 | +32 over 5 s |
+| Cup Ramen | 90 | +55 over 9 s |
+| Roast Sweet Potato | 45 | +28 over 5 s |
+| Yakitori Skewers | 30 | +18 over 3 s |
+| Pumpkin Soup | 120 | +65 over 10 s |
+| Senbei | 15 | +8 over 2 s |
+| Grave Crisps | 20 | +10 over 2 s |
+| Popcorn | 25 | +14 over 3 s |
+| Dango | 30 | +18 over 3 s |
+| Taiyaki | 40 | +26 over 5 s |
+| Custard Pudding | 45 | +28 over 5 s |
+| Tombstone Cookie | 20 | +12 over 2 s |
+| Cream Puff | 35 | +20 over 4 s |
+| Bat Gummies | 20 | +0.4% stealth, 2 min |
+| Candy Apple | 30 | +0.4% guard, 2 min |
+| Ghost Mints | 25 | +1% quest EXP, 2 min |
+| Konpeito Stars | 25 | +1% class EXP, 2 min |
+| Licorice Whips | 20 | +1% combat EXP, 2 min |
+| Moonlight Chocolate | 40 | +1 max health, 3 min |
+| Strawberry Milk | 30 | +1 max health, 3 min |
+| Hot Cocoa | 40 | +0.5% toughness, 3 min |
+| Melon Soda | 35 | +1.5% quest EXP, 3 min |
+| Black Cat Cola | 45 | +0.5% damage, 3 min |
+| Green Tea | 40 | +2% class EXP, 3 min |
+
+- **Lunch meals** (`Items.Lunch`, `Lunch = true`): Katsu Curry 180 (+100 over 12 s), Shoyu Ramen 170 (+95), Karaage Set 190 (+105), Grilled Mackerel Set 160 (+90), Omurice 170 (+95), Witching Hour Stew 200 (+115 over 14 s), Graveyard Shepherd's Pie 200 (+115), Pumpkin Gratin 180 (+105), Raven's Roast 220 (+125); extras Fruit Cup 40 (+22), Side Salad 35 (+18), Rice Bowl 30 (+20), Miso Soup 30 (+15), Chocolate Milk 35 (+1 max health, 3 min). They are in `Items.ById` (they save and can be granted) but not in `Items.List`, and `Items.OnSale` says no until a lunch period sets `ReplicatedStorage`'s `NHLunchOpen` attribute (`Items.LunchOpen()`). A lunch period should add them to the stand's menu (or its own counter) and set the attribute.
+- **Hand props:** the hotbar Tool's Handle and the Locker's 3D slot are `ReplicatedStorage.NHSnacks.<Id>` (a `Handle` MeshPart, glass welded under it, an `NHGrip` CFrame attribute) when it's there, the old generated part when it isn't.
+- **The stand's menu board** lists the first eight regular items and "+ N more at the counter"; the buy menu scrolls through all 40.
+- **Test hook:** `ServerStorage.NHTestBridge` `GrantItem(name, id, n)` puts items in a test student's Locker through `Inventory.Grant` (Studio only).
+
 ## Study groups (U)
 `Services.Features.Party`, `Controllers.Gui.StudyGroup`.
 

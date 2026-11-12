@@ -2,6 +2,38 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.90.0] - 2026-11-12: The concession kit, packaging per brand and the lunch meals
+
+Owner: "Model a complete consumable kit for the concession stand ... a BUNCH of items", then "Make the designs more DETAILED
+and higher quality. And make their packaging wayyy cooler" (one look per brand) and "add lunch meals for when we add a lunch
+period". Props batch 54: 68 items in ten 2048 bakes (`docs/School-Props.md`).
+
+### Added
+- **Every item the stand sells, modelled:** the 14 snacks already sold and 26 new ones (hot food, snacks, candy, sweets,
+  drinks). Cans with rims and pull tabs, glass bottles with their drink (the Ramune's marble), crimped snack bags, lidded
+  cups, gable-top cartons, and displaced, textured food.
+- **Packaging, one brand at a time** (the ConcessionPrint atlas, SVG with foil and emboss): Moonwell Ramune, Black Vigil
+  coffee, Red Lantern, Black Cat Cola, Grave Crisps (a holo skeleton), Bat Gummies, the Nightmare High Dairy ghost cow,
+  Midnight Ramen, Okada's own cups and more. All invented; nothing gory.
+- **26 new snacks for sale** in `Config.Items` (40 on sale), priced and balanced like the old ones
+  (`docs/Inventory-and-Study-Groups.md`).
+- **Lunch meals** (`Items.Lunch`): five Japanese set meals, four gothic house meals on refectory trays, and five extras.
+  They save, but are not sold until a lunch period sets `ReplicatedStorage`'s `NHLunchOpen`.
+- **Hand props:** the hotbar and the Locker show the modelled item (`ReplicatedStorage.NHSnacks`), held upright with its
+  front out; a lunch tray is carried flat.
+- **The stand dressed:** counterware, litter and stock (cup and lid stacks, a napkin dispenser, candy jars, a bottle
+  crate, a can tray), staged at the showcase stand with a catalogue of every item (`workspace.NHPropsShowcase.Concessions`).
+- **Test hook:** `NHTestBridge` `GrantItem` (Studio only).
+
+### Changed
+- The stand's menu board lists eight items and "+ N more at the counter" (it would overflow at 40).
+
+### Tested (NH Combat Test, slot 4 Testy)
+- Every template, the counter stock, the catalogue and the lunch tables checked by screenshot.
+- Ramune, Takoyaki Boat, Green Tea and Katsu Curry on the hotbar, held, eaten and drunk (heal and buff work), shown in the
+  Locker. Testy's Locker restored afterwards.
+- **Not tested:** buying at the stand, the stand's buy menu with all 40, the other 50 items in the hand, the Map place.
+
 ## [1.89.0] - 2026-11-12: Kit C bags built (waiting for the import)
 
 Owner: "And yes start C8." Kit C's C8, six bags (`docs/Accessories.md`), all 2048 PBR bakes, checked with every Kit A,
