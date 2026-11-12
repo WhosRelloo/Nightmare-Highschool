@@ -28,9 +28,9 @@ local Nudges = {}
 
 -- the published animation ids (owner: publish ServerStorage.NHNudges under the group and put the ids here)
 local IDS = {
-	Nudge_Left = 0;
-	Nudge_Right = 0;
-	Shove_Forward = 0;
+	Nudge_Left = 130323933959810;
+	Nudge_Right = 75884392039987;
+	Shove_Forward = 102977211838873;
 }
 
 local CONTACT = 3          -- studs between roots that counts as a brush

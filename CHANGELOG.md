@@ -2,6 +2,20 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.86.4] - 2026-11-11: NH Combat Test: the nudge clips are published
+
+The owner published the three clips from `ServerStorage.NHNudges`. Their ids are now in `IDS` in
+`Services.AI.StudentBrain.Nudges`, so live servers play the nudges too.
+- `Nudge_Left` 130323933959810, `Nudge_Right` 75884392039987, `Shove_Forward` 102977211838873.
+- **Checked against the local clips:** each has the same keys, length (0.7 s / 0.7 s / 1.8 s) and priority, and the
+  joint poses differ by 0.0000. All three load on the student rig in Edit and on the server in play.
+- **Play-test** (slot 4 "Testy", SlotCount 4 then back to 3, NHTestNoMenuKeys set then cleared):
+  - A walk-past brush played `Nudge_Left` from its published id at 2.5 studs, and again at 2.7.
+  - A sprint from behind played `Shove_Forward` from its published id.
+  - No errors from these ids.
+  - **Not tried:** a brush on the right shoulder in play. `Nudge_Right` loads on the server, and the left/right
+    choice is the same code.
+
 ## [1.86.3] - 2026-11-11: NH Combat Test: students react when you bump into them
 
 Owner: "3 Nudge type animations for the NPC's. 1 for each side that gets bumped and 1 for a HUGE bump forward. Make it
