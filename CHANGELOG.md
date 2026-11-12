@@ -2,6 +2,86 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.94.0] - 2026-11-12: Students talk like their clique, notice your clothes, and keep dress codes
+
+Owner: "Combat Test first", students "talk about what you wear, and hangouts have dress codes", and under a dress code
+"members won't deal with you, but you can still walk in" (concepts 1 and 2 in `docs/Gameplay-and-NPC-Concepts.md`).
+Design: `docs/superpowers/specs/2026-11-12-line-matrix-outfits-design.md`. How to add lines, taste and cliques:
+`docs/Line-Matrix.md`. The live scripts are mirrored in `tools/line-matrix/` (the edits to existing scripts are in
+`patches/*.json`).
+
+### Added
+- **Students talk like their clique, and like how they feel about you.** What a student says now depends on three
+  things: their clique, their attitude to you (Hostile, Wary, Neutral, Friendly or Respected) and the moment.
+  - **The moments:** greetings, brushing past, crowding, a shove, watching a fight, running from one, you in a beast
+    form, night, a full moon, your race, you hurt, your outfit, and a dress-code turn-away.
+  - **The lines:** 8 cliques plus a set for students with no clique. 9 modules, 945 cells and 2289 lines, all 60
+    characters or fewer.
+  - **Attitude:** your standing with their clique. A member is at least Friendly. A student who saw you fight in the
+    last 5 minutes is one step cooler (this beats having met before). One who has met you 4 times or more is one step
+    warmer, never above Friendly.
+  - **Strong feelings always show.** Hostile, Wary and Respected students always greet in their clique's voice. Neutral
+    and Friendly ones do 60% of the time.
+  - **Race remarks are kind to friends:** digs at a race only come from Hostile or Wary students. Beast-form lines
+    don't name a form.
+  - Nobody goes silent: any missing line falls back to the old pools.
+- **Students notice your clothes.** What you wear is recorded on your character (`NHWear`, set by the server only).
+  - Each clique has a taste: pieces it likes and pieces it mocks. A clique never likes what its rival likes.
+  - A student remarks on your full clique look, on a rival's look, or on a piece they like or mock. This happens 35%
+    of the time, at most once every 10 minutes per student. Students with no clique remark on an accessory 15% of the
+    time.
+- **Hangouts keep dress codes.** A clique's in-person deals go to players who wear one of its tops, are Friendly or
+  better with it, or are members.
+  - **Leader quests:** a Neutral player who isn't dressed gets a "come back in our colours" line from the leader. Once
+    dressed, the quest is offered. The leader's "!" marker stays so you know to talk to them. Dares (by phone) and jobs
+    (members only) aren't affected.
+  - **Night Study** at the Archive is refused with a Vigil line until you wear a Vigil top, are liked, or are a member.
+  - **Walking in:** if you walk into a hangout out of its colours, the nearest member within 30 studs says so, once a
+    visit and at most once every 2 minutes. You can still walk in.
+
+### Changed
+- **`Config.Cliques`:** each clique has a `Taste`; new helpers `ParseWear`, `WearsTop` and `WearsBottoms`; girls' tops
+  for the full-look check (`Look.FemaleTops`) and a new `Look.FemaleMatchBottoms` (Athletes cheer skirt, Delinquents long
+  skirt, Pack forest tartan). The NPC dressers still read `FemaleBottoms`, so no NPC wears anything new.
+- **`StudentBrain`:** the greeting, brush, crowd, shove, fight and flee calls go through the matrix (`StudentBrain.Talk`),
+  each with today's pool as the fallback. Mutters are unchanged.
+- **`UI.Appearance` (`ApplyTo`):** writes `NHWear`. **`Quests.CanStart`:** a new "DressCode" reason.
+  **`Social.Dialogue`, `Social.Cliques` (`Dressed`), `Social.Hangouts`:** the dress code.
+
+### Fixed while testing
+- **Walking in never fired.** The hangout boxes in `workspace.Regions` float 11 to 16 studs above the floor, so a
+  player on the floor was never inside one. Hangouts are now matched by the box's footprint with a band from 20 studs
+  below it to 6 above. The boxes themselves weren't moved, because turf fights and `Features.Regions` use them.
+- **A Hostile student said "Hi."** The clique greeting ran 60% of the time, so a plain daily hello came between the
+  clique lines. Hostile, Wary and Respected students now always use the matrix.
+- **Review rounds on the lines:** race digs aimed at friendly players, flirty or possessive phrasing, skin-colour
+  digs, home-invite and off-platform lines, and weapon-implying phrasing were rewritten. Placeholder lines are in double
+  quotes, because a backtick string turned `{Name}` into "nil".
+
+### Tested (NH Combat Test, slot 4 Testy, entered through the real slot remotes)
+- **Edit-mode tests** (`tools/line-matrix/tests/`): coverage `PASS: 945 cells, 2289 lines`, plus the attitude, outfit
+  verdict and `NHWear` tests.
+- **Outfits:** the Athletes look got an Athletes full-look line from an Athletes student and a rival-look line from an
+  Ink student, and the Ink look the reverse. A chained grimoire was mocked by an Athlete.
+- **Attitude:** at standing -50, -20, 0, 30 and 70 the Athletes greeted as Hostile, Wary, Neutral, Friendly and
+  Respected.
+- **Dress codes:**
+  - Night Study was refused undressed with a Vigil line, and started in a vigil vest.
+  - The Vigil leader sent an undressed Neutral player to a dress-code line, and offered the quest once dressed.
+  - Walking into the gym out of colours got one line from the nearest Athlete and no second line on a quick re-entry.
+- **Nudges:** brushing past, crowding and shoving Ordinary and Vigil students used their clique's lines.
+- **No regressions:** a student with no clique still greeted and fell back to Generic for crowding.
+- **The console:** no `[StudentBrain]` or `[CliqueTalk]` warnings.
+
+### Not tested
+- **Mutters from a student with no clique.** The one test student was stuck on a path. Mutter is unchanged.
+- **A second player,** and the real Wardrobe screen (looks were applied through the same server code).
+
+### Not done
+- **The Map is not ported yet.** It needs Map cliques and standing first.
+- **Follow-up: `Features.Regions.Inside` has the same floating-box blind spot** as the one fixed for the walk-in line,
+  so a player on the floor of a Combat Test hangout isn't "inside" its box there. It is out of scope here.
+
 ## [1.93.0] - 2026-11-12: Inventory QOL batch 3: sort and filter, favourites, drop how many with Undo
 
 Owner: "Yes, batch 3" (concepts 11, 13 and 15 in `docs/Inventory-QOL-Concepts.md`). The live scripts are mirrored in
