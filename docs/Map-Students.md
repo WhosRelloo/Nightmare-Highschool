@@ -163,3 +163,19 @@ Ideas for going further: `docs/NPC-Immersion-Ideas.md`.
 - **Two or more players**, phones and tablets.
 - **A whole in-game day** (only Class, Break and After School / Evening were watched).
 - **Night vision range.**
+
+## In NH Combat Test (1.86.2)
+
+NH Combat Test's own students (`Features.Schedules`, 14 of them) use the same system. The routines stay in
+`Schedules`: classes and chairs, benches, clique hangouts, lunch, clubs, home. The brain is a separate module there:
+- `Services.AI.Nav`, `Services.AI.Senses`, `Controllers.World.NpcLook` and `Config.NpcVoice`: the same files as the Map's;
+  NpcLook also follows `workspace.NHSchedule`.
+- `Services.AI.StudentBrain` (+ `Lines`): the reactions, glances, greetings, chats, mutters, fidgets and wall-only
+  leaning, taken from `MapStudents` and made host-agnostic.
+  - `Brain.Init(Host)`, `Attach(S)`, `Detach(S)`, `GoTo(S, Goal, Valid)`, `Idle(S, Seconds, Valid)`, `LeanOnWall(S, Walk, Valid)`, `Urgent(S)`.
+  - **The nudge hook:** `Brain.OnBump(S, Rec, Kind) -> handled`, called from `React.MakeWay` and `React.Space`.
+    Move a student with `S.Agent:Shuffle(Dir, Seconds, Speed)` (Humanoid:Move, wall- and ledge-safe) or a short
+    `S.Root.CFrame` lerp; seated students are anchored.
+- `Controllers.World.Chatter` skips students marked `NHBrain`.
+- The Map still runs `MapStudents` (unchanged). If the Map's brain changes, port the same change to `StudentBrain`.
+- Sources: `tools/ct-npc-1862/`.

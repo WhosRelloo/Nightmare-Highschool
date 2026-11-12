@@ -2,6 +2,69 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.86.2] - 2026-11-11: NH Combat Test: the students get the Map's NPC brain
+
+Owner (through the NH Combat Test session): bring the new NPC system from the Map place into NH Combat Test now
+("Bringing the new NPC brain to NH Combat Test" had been "not yet"). The Map was not edited.
+
+### Changed (NH Combat Test)
+- **Combat Test's 14 students keep their routines.** `Features.Schedules` still decides where they go: classes and
+  chairs, benches, clique hangouts, lunch, clubs, home. Their looks keep the clique and gender dress code and the hair.
+  How they walk, notice, react and talk now comes from the Map's NPC system (1.78.0 to 1.78.6):
+  - **`Services.AI.Nav`** walks them: through doors (opened as they reach them), up steps, smoothed corners,
+    steering round people, re-planning when stuck. This replaces the old single-path walker.
+  - **`Services.AI.Senses`**: sight (a view cone with real line of sight), hearing (fights, doors), and reading
+    players (fighting, transformed, downed, coming at them, crowding, staring, following).
+  - **`Services.AI.StudentBrain`** (new, built from the Map's `MapStudents`, with its `Lines`):
+    - the reactions: back away from danger (then the routine starts again), watch fights, make way, step back;
+    - the glances, hellos and memory of each player (a clique that respects or hates you says so);
+    - two-student conversations, mutters (a clique's own lines too) and fidgets (phone, stretch, looking around);
+    - leaning **only against a real wall**, never a door (1.78.6).
+    - A seated student only turns their head for anything but danger. In class there are no chats, and mutters are rare.
+  - **`Controllers.World.NpcLook`** and **`Config.NpcVoice`**: head turns, speech bubbles and the four voice sets,
+    heard from where you stand (1.78.5). NpcLook now follows `workspace.NHSchedule` as well as the Map's `NHStudents`.
+  - **`Controllers.World.Chatter`** leaves brain students (`NHBrain`) to their own voiced lines. Teachers, coaches,
+    the hall monitor, delinquents and other NPCs keep Chatter's bubbles.
+- `Schedules` also: a run clip for backing away; every job remembered, so the brain can start it again after a scare.
+- Backups: `ServerStorage.NH_Backup.Schedules_pre1862`, `Chatter_pre1862`.
+
+### For the nudge animations (next session)
+- **The hook:** `Services.AI.StudentBrain`, `Brain.OnBump` (nil until set), called from `React.MakeWay` (someone
+  walking straight at the student) and `React.Space` (someone standing on top of them).
+  - Set it to `function(S, Rec, Kind) -> handled`. Return true to skip the default step aside.
+  - `Rec` is the Senses record: `Player`, `Root`, `Pos`, `Speed`, `Dist`.
+- **How the brain moves a student:** the Nav agent `S.Agent`. The root is server-owned (`SetNetworkOwner(nil)`).
+  - `S.Agent:Shuffle(Dir, Seconds, Speed)` walks with `Humanoid:Move` at `Speed` studs/s for `Seconds`; it won't
+    step off a ledge or into a wall, and it cancels any GoTo in progress.
+  - `S.Agent:GoTo(Goal, { Speed, Arrive, ShouldStop })` paths somewhere.
+  - `S.Agent:Face(Pos)` turns the student; `S.Agent:Stop()` stops.
+  - The fidget "shift" eases `S.Root.CFrame` by lerping, for a precise small move.
+  - So a 0.45-stud step aside is a Shuffle (for example 0.09 s at 5 studs/s) or a short root lerp, and a ~3-stud shove carry is `Shuffle(Dir, 0.3, 10)`.
+  - `S.Seated` students are anchored: leave them out.
+
+### Verified (NH Combat Test, Studio Play, slot 4 "Testy"; `SlotCount` 4 then back to 3, `NHTestNoMenuKeys` set then cleared, no chat typing)
+- All 8 scripts installed through a private buffer, checksums matched, all parse.
+- **Passing time** (TestBridge `SchedulePlan`), 120 s:
+  - all 14 students spawned with the brain and all 14 walked;
+  - students sat on hall benches;
+  - 144 lean samples, every one against a wall (0 in the open);
+  - lines said, including a two-student conversation and lines about a fight heard nearby.
+- **On the client** (the player among 9 students), 50 s:
+  - 99 voice syllables played, from 12 voice emitters;
+  - 21 speech bubbles;
+  - all 14 heads turned (up to 38 degrees).
+- **Class (Period 4):** the 6 class students all walked to chairs and sat.
+- **Combat Test's other NPCs are untouched:** the combat dummies (Inf Dummy, Parry, Blocking, Attacking,
+  PostureBreak, ParryTrade), the delinquents, the wolves, the beasts and the named NPCs were all in `workspace.Live`.
+- **Console:** no script errors. 9 sounds Combat Test isn't permitted to use logged errors as before (none are NPC voices).
+- **Seen:** about one walk in 7 seconds (across 14 students) goes to a hallway point nobody can reach. Nav says so
+  at once and the student picks somewhere else; the old walker gave up on those points too.
+
+### Not verified
+- Hearing the voices (the test tools can't hear); a real fight next to the students (the fight reactions came
+  from fights heard during the test); lunch, clubs and the clique hangouts by eye; a second player.
+- The owner needs to save NH Combat Test.
+
 ## [1.86.1] - 2026-11-11: Map place: training, the 3D accessories, the everyday kit and the builder's new prop kits
 
 Owner (through the NH Combat Test session): "port the training system and all the new items from NH Combat Test to the

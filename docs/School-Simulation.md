@@ -175,3 +175,5 @@ Every NPC is built from `ServerScriptService.Services.AI.AI.Rig`. Students, the 
   - each teacher's chair now stands at the east end of the teacher's desk, facing the class (`Studio/teacher_chairs.luau`, `NHChairWas`). It used to be half under the desk, 1.3 studs from the chalkboard, with no room for a sitter.
 
 ![A player at a desk](img/player-seat.jpg)
+
+**StudentBrain (1.86.2):** the background students (`Features.Schedules`) walk with `Services.AI.Nav`, notice with `Services.AI.Senses` and react, talk in voices and lean only against walls through `Services.AI.StudentBrain`. See [Map-Students](Map-Students.md#in-nh-combat-test-1862).
