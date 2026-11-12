@@ -16,17 +16,17 @@ return {
 	Night = { Any = { `What are you doing out this late?`, `Stay in the light.`, `Late night, huh?`, `Careful out here.` } };
 	FullMoon = { Any = { `Full moon tonight. Be careful.`, `You feel that? Full moon.`, `Don't go near the oaks tonight.` } };
 	Race = {
-		Human = { Any = { `Just a normal kid, huh? Lucky.`, `No fangs, no tail. Refreshing.`, `Human? Stick close to the lamps.` } };
+		Human = { Any = { `Just a normal kid, huh? Lucky.`, `Human, huh? Welcome to the weird school.`, `Human? Stick close to the lamps.` } };
 		Priest = { Any = { `Bless you. Or whatever you say.`, `Oh good, someone holy.`, `Keep that cross handy.` } };
-		Vampire = { Any = { `Is it colder near you?`, `Nice fangs. Real?`, `You're very pale. Eating okay?` } };
+		Vampire = { Any = { `Is it colder near you?`, `Nice fangs. Real?`, `Up all night again? You okay?` } };
 		Werewolf = { Any = { `Nice ears.`, `Is that a tail?`, `You smell like the woods.` } };
-		Ghoul = { Any = { `You look... tired.`, `Did you sleep at all?`, `You're kind of grey today.` } };
+		Ghoul = { Any = { `You look... tired.`, `Did you sleep at all?`, `You seem really calm today.` } };
 		Wraith = { Any = { `I didn't hear you come up.`, `You walk really quietly.`, `Were you always here?` } };
 	};
 	Hurt = { Any = { `You okay? You look rough.`, `Go see the nurse.`, `Who did that to you?`, `Sit down before you fall down.` } };
 	Outfit = {
-		FullLook = { Any = { "Full {Clique} look, huh?", "Dressed like one of {Clique}.", "Matching {Clique}? Bold." } };
-		RivalLook = { Any = { "{Rival} colours? Here?", "Dressed like {Rival}? Brave.", "That's a {Rival} look. People notice." } };
+		FullLook = { Any = { "{Clique}'s full look, huh?", "{Clique} would claim you in that.", "{Clique}'s colours? Bold." } };
+		RivalLook = { Any = { "{Rival}'s colours? Here?", "{Rival}'s look? Brave.", "{Rival}'s look. People notice." } };
 		Likes = { Any = { "Nice {Piece}.", "Where'd you get the {Piece}?", "Okay, the {Piece} is cool." } };
 		Mocks = { Any = { "Is that a {Piece}? Really?", "Bold choice, the {Piece}.", "Hm. The {Piece}. Interesting." } };
 	};

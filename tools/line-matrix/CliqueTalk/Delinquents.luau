@@ -27,20 +27,20 @@ return {
 	};
 	Flee = { Any = { `Cheese it! Over the fence!`, `Scatter! Meet at the bike racks!`, `Leave the boards! Leave 'em!`, `Nope! Lot's closed! Go, go, go!`, `Bruno! BRUNO! We gotta move!` } };
 	Transformed = {
-		Hostile = { `Big and ugly. Still on my lot.`, `Grow all you want. Lot's still ours.`, `Scary face. Seen worse in detention.` };
+		Hostile = { `Scary look. Still on my lot.`, `Change all you want. Lot's still ours.`, `Scary face. Seen worse in detention.` };
 		Wary = { `Okay. Nobody make any sudden moves.`, `Easy... easy. We're cool. Right?`, `Uh, Bruno? We got a situation.` };
 		Any = { `Whoa. That's a new look.`, `Okay, that's actually kinda tough.`, `Okay. Nobody's telling anyone about this.`, `Huh. Didn't know you had that in you.` };
 		Respected = { "{Name}?! Remind me never to cross you.", `Now THAT'S Back Lot muscle.`, `Lot just got a lot scarier. Love it.`, `Nobody's touching our turf now.` };
 	};
 	Night = {
-		Hostile = { `Lot's ours after dark. Remember that.`, `Out late? Walk faster. Way faster.`, `Streetlamp's out. Funny how that works.` };
+		Hostile = { `Lot's ours after dark. Remember that.`, `Out late? Walk faster. Way faster.`, `Streetlamp's out. Lot's ours now.` };
 		Wary = { `Late. You following somebody?`, `Who's out at this hour? Oh. You.`, `Night watch. Say who you are.` };
 		Any = { `Night's when the Lot wakes up.`, `Streetlamps on. Collars up.`, `Halls are empty. Lot's open.`, `Cold night. Good jacket weather.` };
 		Friendly = { "Late one, {Name}? Walk with us.", `Grab a crate. We're out till curfew.`, `Night ride? Grab a board.` };
 		Respected = { `Night's ours. You call the play.`, "{Name}, the crew's out. Lead the way.", `Whole Lot's yours till sunrise.` };
 	};
 	FullMoon = {
-		Hostile = { `Full moon. Nobody's walking you home.`, `Moon's full. Lot's not your friend tonight.`, `Full moon. Lot looks after its own. Not you.` };
+		Hostile = { `Full moon. Lot's closed to you tonight.`, `Moon's full. Lot's not your friend tonight.`, `Full moon. Lot looks after its own. Not you.` };
 		Any = { `Full moon. Even the Lot stays in early.`, `Moon's full. Keep off the back fence.`, `Full moon. Lot gets weird. Stay sharp.`, `Moon's up. Something's howling past the fence.` };
 		Friendly = { "Full moon, {Name}. Stick with us.", `Moon's up. You walk with the crew.`, `Nobody walks alone tonight. Lot rule.` };
 		Respected = { `Full moon. We got your back. All night.`, "Stay close, {Name}. Lot's watching out.", `Moon's up. Nobody gets near you.` };
@@ -108,7 +108,7 @@ return {
 			Hostile = { `Tucked-in shirt on my lot? Bold.`, "{Rival} sent you? Go back and stay.", `Picture-day clean. You're lost, pal.` };
 			Wary = { `Dressed like a Commons kid. Why?`, "{Rival} sent a spy? Cute.", `All neat and pressed. You lost?` };
 			Any = { `Whoa. Very... hall monitor.`, `Ironed creases? Out here?`, `Commons clothes, on the Lot? Huh.` };
-			Friendly = { "{Name}, no. Not the Commons look.", `Who ironed you? Untuck something.`, `Undercover with the goody-goodies?` };
+			Friendly = { "{Name}, no. Not the Commons look.", `Who ironed you? Scuff something.`, `Undercover with the goody-goodies?` };
 			Respected = { `Spying on the Commons? Smart.`, `Even neat and pressed, you're Lot.`, `Undercover? Find where Pip hides the snacks.` };
 		};
 		Likes = {

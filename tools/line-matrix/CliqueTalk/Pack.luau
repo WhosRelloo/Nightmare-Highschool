@@ -108,7 +108,7 @@ return {
 			Hostile = { "{Rival} sent you? You smell like candles.", `Ivory and black? In the Den? Out.`, `All buttoned up like a hymn book. Out.` };
 			Wary = { `Ivory and black. You a choir kid?`, "{Rival}'s colours. Why?", `Choir clothes near the Den? Explain.` };
 			Any = { `Whoa. Very... hymn practice.`, `Ivory and black? You look like a candle.`, `Dressed for choir practice?` };
-			Friendly = { "{Name}, no. Not the choir look.", `Who buttoned you up? Loosen up.`, `Undercover at the chapel? Smart.` };
+			Friendly = { "{Name}, no. Not the choir look.", `Who buttoned you up? Relax a little.`, `Undercover at the chapel? Smart.` };
 			Respected = { `Undercover at choir? Learn their songs.`, `Even in ivory, you're Pack.`, `Choir disguise? Ha. Nobody'd guess.` };
 		};
 		Likes = {

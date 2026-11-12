@@ -26,9 +26,9 @@ return {
 	};
 	Flee = { Any = { `Coach! COACH!`, `Everybody to the locker room!`, `Sprint drill! This is NOT a drill!`, `Leave the gear! Just run!`, `Good thing I do cardio. Bye!` } };
 	Transformed = {
-		Hostile = { `Grew a few feet? Still can't catch.`, `Big doesn't mean good. Ask any lineman.`, `Scary? You still run like a walk-on.` };
+		Hostile = { `New look? Still can't catch.`, `Scary doesn't mean good. Ask any coach.`, `Scary? You still run like a walk-on.` };
 		Wary = { `Uh... is that allowed in the gym?`, `Okay. Nobody tackle that.`, `Back away slow. Don't spook it.` };
-		Any = { `Whoa. What's its forty time?`, `Scouts would sign that in a heartbeat.`, `Now THAT'S a defensive lineman.`, `Somebody get that thing a jersey.` };
+		Any = { `Whoa. What's its forty time?`, `Scouts would sign that in a heartbeat.`, `Now THAT'S a defensive nightmare.`, `Somebody get that thing a jersey.` };
 		Respected = { "{Name}?! Dude. You're on offence.", `Beast mode. Literally. Let's go!`, `The Ravens never had a mascot this good.`, "{Name}, Coach is gonna lose his mind." };
 	};
 	Night = {
@@ -39,10 +39,10 @@ return {
 		Respected = { `Track's lit. Saved you a lane.`, "{Name}! Night scrimmage. You're starting.", `Captain wants you at night drills.` };
 	};
 	FullMoon = {
-		Hostile = { `Hope you're fast. It's a full moon.`, `Moon's up. Nobody's waiting for you.`, `Full moon and you're alone. Bad play.` };
+		Hostile = { `Hope you're fast. It's a full moon.`, `Moon's up. Nobody's waiting for you.`, `Full moon and no team. Bad play.` };
 		Any = { `Practice is cancelled. Moon's too full.`, `Moon's full. Nobody runs the woods loop.`, `Stretch, hydrate, stay in. Full moon.`, `Moon's full. The field's not safe.` };
 		Friendly = { "Full moon, {Name}. Run with a buddy.", `Stick with the team tonight. Moon's up.`, `Buddy system tonight. You're with me.` };
-		Respected = { `The team walks you home tonight.`, "We've got your back tonight, {Name}.", `Moon's up. Ravens stick together.` };
+		Respected = { `The team's got you tonight. Huddle up.`, "We've got your back tonight, {Name}.", `Moon's up. Ravens stick together.` };
 	};
 	Race = {
 		Human = {
@@ -69,9 +69,9 @@ return {
 		Werewolf = {
 			Hostile = { `Werewolf. Don't shed on the mats.`, `Werewolf. Keep your fur off my bench.`, `Werewolf. Howling isn't a cheer.` };
 			Wary = { `Werewolf. Please don't chew the ball.`, `Full moon's not a sick day, wolf.`, `Werewolf. Claws off the court, okay?` };
-			Any = { `Those legs? Your sprint time must be wild.`, `Werewolf. Ever tried the long jump?`, `Werewolf. Great stamina, I bet.` };
+			Any = { `Werewolf? Your sprint time must be wild.`, `Werewolf. Ever tried the long jump?`, `Werewolf. Great stamina, I bet.` };
 			Friendly = { `Werewolf! Come run the woods loop!`, `Werewolf? You'd crush the relay.`, "{Name}, tryouts are Monday. Be there." };
-			Respected = { `Our wolf! The Rovers won't come near us.`, `Werewolf on the line. Undefeated.`, "{Name}. Best mascot. Best player." };
+			Respected = { `Our wolf! The Rovers won't come near us.`, `Werewolf on the line. Undefeated.`, "{Name}. Best wolf. Best player." };
 		};
 		Ghoul = {
 			Hostile = { `Ghoul. You look like you lost already.`, `Ghoul. Even the sub bench says no.`, `Slow and stiff. Hard pass.` };

@@ -29,7 +29,7 @@ return {
 	Transformed = {
 		Hostile = { `Begone! I have a hymnal and I'll use it!`, `Back! Back, foul thing! ...Please?`, `Begone! In the name of choir practice!` };
 		Wary = { `Begone! ...Wait, are you still you?`, `Nobody panic. Hum something soothing.`, `Stay back. I'm holding a very holy candle.` };
-		Any = { `Something unholy! I KNEW it!`, `Begone! Kindly! With respect!`, `Begone, foul... oh. Hi. Still, begone.`, `Every candle just went out. Of course.` };
+		Any = { `Something uncanny! I KNEW it!`, `Begone! Kindly! With respect!`, `Begone, foul... oh. Hi. Still, begone.`, `Every candle just went out. Of course.` };
 		Friendly = { `Oh! Still you. Just... different.`, `Friend? Blink twice if it's you.`, `Easy, friend. We'll hum you calm.` };
 		Respected = { "{Name}? Even like that, you're blessed.", `A new shape. Same blessed soul.`, `We'll sing you back. Gently.` };
 	};
@@ -43,7 +43,7 @@ return {
 	FullMoon = {
 		Hostile = { `Moon's full. I'll pray for you twice.`, `Stay far from the chapel tonight.`, `Big moon, and here you are. Of course.` };
 		Any = { `Bolt the chapel doors. It's that moon.`, `Full moon. The Pack will be howling all night.`, `Hymns at double volume tonight.`, `Every candle lit. It's that night.` };
-		Friendly = { "Full moon, {Name}. Shelter in the chapel?", `Stay with us. We'll sing till dawn.`, `Hum with us. It helps. Truly.` };
+		Friendly = { "Full moon, {Name}. Shelter in the chapel?", `Sing with us at evensong. Candles lit.`, `Hum with us. It helps. Truly.` };
 		Respected = { `Stand with us at the doors tonight.`, "{Name}, the chapel's safest with you.", `Full moon, but you're here. We're blessed.` };
 	};
 	Race = {
@@ -65,14 +65,14 @@ return {
 			Hostile = { `Vampire. The chapel's off limits.`, `Vampire. Garlic's in the soup. Fair warning.`, `Vampire. Step out of my candlelight.` };
 			Wary = { `Vampire. Do the hymns bother you?`, `Vampire. Keep a polite distance.`, `Vampire. Why are you hovering by the door?` };
 			Any = { `Vampire. You must know very old hymns.`, `Vampire. Do you mind the bells?`, `Vampire. Up late? So are we.` };
-			Friendly = { `Vampire! You can sit in the back pew.`, "{Name}, you'd make a lovely bass.", `A gentle vampire. How lovely.` };
+			Friendly = { `Vampire! There's room in the choir loft.`, "{Name}, you'd make a lovely bass.", `A gentle vampire. How lovely.` };
 			Respected = { `A vampire, blessed by the Choir. Unheard of.`, "{Name}. Even the bells approve of you.", `Our vampire. We've moved the garlic.` };
 		};
 		Werewolf = {
 			Hostile = { `Werewolf. The chapel has a no-shedding rule.`, `Werewolf. Go howl at the Den.`, `Werewolf. You're tracking leaves in. Out.` };
 			Wary = { `Werewolf. Are you with the Pack?`, `Werewolf. Please don't growl during hymns.`, `Werewolf. Feeling restless?` };
 			Any = { `Werewolf. Do bells hurt your ears?`, `Werewolf. Not all of you run with the Pack.`, `Werewolf. Lovely range on a howl, I bet.` };
-			Friendly = { `A werewolf who sings! Wonderful!`, "{Name}, howl the low notes for us?", `Werewolf? You'd fit right in the back row.` };
+			Friendly = { `A werewolf who sings! Wonderful!`, "{Name}, howl the low notes for us?", `Werewolf? You'd anchor the bass section.` };
 			Respected = { `Werewolf, and our dearest friend.`, "{Name}. Proof the Pack is wrong.", `Our werewolf. Howls perfectly in tune.` };
 		};
 		Ghoul = {

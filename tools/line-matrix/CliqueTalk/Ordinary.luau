@@ -28,21 +28,21 @@ return {
 	Transformed = {
 		Hostile = { `Nope. Nope. Absolutely not. Bye.`, `Please don't. Please don't. Please don't.`, `Stay back! We taste awful! Ask anyone!` };
 		Wary = { `Okay. Nobody scream. I'm screaming.`, `Was that... always in there?`, `Back away slowly. Is slowly right?` };
-		Any = { `The rumours were TRUE?!`, `I told you! I TOLD you about the moon!`, `Is it bad if I faint? I'm fainting.`, `Okay. That's it. I'm transferring.`, `Mom said this school was normal!` };
-		Respected = { "{Name}? Okay. Okay. Still our friend.", `You're still you in there? Blink twice?`, `Big and scary, but OUR big and scary.` };
+		Any = { `The rumours were TRUE?!`, `I told you! I TOLD you about this place!`, `Is it bad if I faint? I'm fainting.`, `Okay. That's it. I'm transferring.`, `Mom said this school was normal!` };
+		Respected = { "{Name}? Okay. Okay. Still our friend.", `You're still you in there? Blink twice?`, `Scary, sure, but OUR kind of scary.` };
 	};
 	Night = {
 		Hostile = { `It's dark. Go home. Far, far away.`, `You, out here? Great. Even worse night.`, `Don't follow us. We're walking in a group.` };
 		Wary = { `Why are you out after dark?`, `It's late. You heard the stories, right?`, `Are you... following us? Please say no.` };
 		Any = { `It's getting dark. I should be home.`, `Walk in groups after dark. Always.`, `Did you hear that? Tell me you heard that.`, `Stay under the lamps. Mom's rule.` };
 		Friendly = { "{Name}! Walk with our group tonight?", `It's dark! Let's go together. Safer.`, `Got a torch? I've got two. Here.` };
-		Respected = { `You're staying with us? Really? Thank you!`, "With {Name} here, the dark's fine. Mostly.", `Okay, I feel braver now. Slightly.` };
+		Respected = { `You're walking with us? Really? Thank you!`, "With {Name} here, the dark's fine. Mostly.", `Okay, I feel braver now. Slightly.` };
 	};
 	FullMoon = {
 		Hostile = { `Full moon AND you? Worst night ever.`, `Full moon. Go be somewhere else.`, `Moon's up. Keep away from us. Please.` };
 		Any = { `Is it true about the full moon? Is it?`, `Full moon. Lock the doors. Twice.`, `My cousin says the oaks howl tonight.`, `Full moon. I'm sleeping in my shoes.`, `Don't look at it. Don't look at the moon.` };
-		Friendly = { "Full moon, {Name}. Stay with us tonight?", `Stick together tonight. Promise?`, `Full moon. Be home before midnight, okay?` };
-		Respected = { `Full moon, but you're here. We're okay.`, "{Name}, can we stick with you tonight?", `Strength in numbers. And you. Mostly you.` };
+		Friendly = { "Full moon, {Name}. Walk with our group?", `Stick together tonight. Promise?`, `Full moon. Be home before midnight, okay?` };
+		Respected = { `Full moon, but you're here. We're okay.`, "{Name}, can we walk with you? Just to the lamps?", `Strength in numbers. And you. Mostly you.` };
 	};
 	Race = {
 		Human = {
@@ -81,7 +81,7 @@ return {
 			Respected = { `Our ghoul! Steadiest friend we have.`, "{Name}. Nothing scares you. Inspiring.", `Stand with us? We feel braver.` };
 		};
 		Wraith = {
-			Hostile = { `Wraith. Please stop appearing like that.`, `Wraith. Go haunt someone else.`, `Wraith. I can feel you. Go away.` };
+			Hostile = { `Wraith. Please stop appearing like that.`, `Wraith. Go haunt someone else.`, `Wraith. I know you're there. Go away.` };
 			Wary = { `Wraith! Don't DO that! My heart!`, `Wraith. How long were you standing there?`, `Wraith. Are you... in the wall right now?` };
 			Any = { `A wraith! Can you go through doors?`, `Wraith. You're so quiet. How?`, `Wraith. Is it cold, floating around?` };
 			Friendly = { `Wraith friend! Warn me before you appear?`, "{Name}, scout the dark hall for us?", `Wraith? Best friend for a haunted school.` };

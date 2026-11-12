@@ -2,10 +2,10 @@
 return {
 	Greet = {
 		Hostile = { `Your file is getting thick.`, `Noted. Move along.`, `Don't touch anything on your way past.`, `The archive remembers what you did.`, "We wrote you down, {Name}. In ink." };
-		Wary = { `Keep your hands where I can see them.`, `You're on a list. Not a good one yet.`, `We're still deciding about you.`, "{Name}. Signed the ledger, I hope?" };
+		Wary = { `Don't touch the shelves. I'm watching.`, `You're on a list. Not a good one yet.`, `We're still deciding about you.`, "{Name}. Signed the ledger, I hope?" };
 		Neutral = { `Quiet, please. People are reading.`, `Seen any loose pages lying about?`, `Sign the ledger if you're staying.`, `Hello. Don't mind the lamp oil.` };
 		Friendly = { "{Name}! Found anything odd lately?", `Ah, good. A reader. Come look at this.`, "Pull up a chair, {Name}. Bring a lamp.", `You're in the ledger. The good column.` };
-		Respected = { "Keeper {Name}. The stacks are yours.", `There you are. We saved you the good lamp.`, `We found something. You'll want to see it.`, "{Name}. Close the door. We need to talk.", `Ezra's been asking for you, Keeper.` };
+		Respected = { "Keeper {Name}. The stacks are yours.", `There you are. We saved you the good lamp.`, `We found something. You'll want to see it.`, "{Name}. Over here. We need to talk.", `Ezra's been asking for you, Keeper.` };
 	};
 	Bump = { Any = { `Careful! These are originals.`, `Mind the papers!`, `Watch it. I lost my place.`, `Oof. Pardon. I was reading.` } };
 	Crowded = {
@@ -27,8 +27,8 @@ return {
 	Flee = { Any = { `Save the ledgers! Grab the ledgers!`, `Grab the charter and run!`, `Lamps out, go, go!`, `I'll finish my notes from a distance.` } };
 	Transformed = {
 		Hostile = { `So that's what you are. I knew it.`, `The 1893 sketches were right about you.`, `Stay back. I have a lamp and a pen.` };
-		Wary = { `Hold still. I'm writing this down.`, `Don't come closer. Just... pose.`, `Eyes, teeth, claws... got it.` };
-		Any = { `Is that in the bestiary? It should be.`, `Fascinating. Terrifying. Mostly fascinating.`, `There's a sketch of that in the 1893 files.`, `Nobody believes the records. Look!` };
+		Wary = { `Hold still. I'm writing this down.`, `Don't come closer. Just... pose.`, `Shape, eyes, posture... got it.` };
+		Any = { `Is that in the records? It should be.`, `Fascinating. Terrifying. Mostly fascinating.`, `There's a sketch of that in the 1893 files.`, `Nobody believes the records. Look!` };
 		Respected = { `Keeper? Is that you? Hold still. I'm sketching.`, "{Name}, that's the creature from the charter!", `Even like that, the lamps know you.` };
 	};
 	Night = {
@@ -41,7 +41,7 @@ return {
 	FullMoon = {
 		Hostile = { `Full moon. Your record's about to grow.`, `Full moon. Try not to make the papers.`, `Moonlight won't hide you from us.` };
 		Any = { `Full moon. Check the 1893 entries.`, `Every gap in the records? Full moon.`, `Moon's full. Lock the archive.`, `Full moon. I'm counting heads tonight.` };
-		Friendly = { "Full moon, {Name}. Stay inside with us.", `Bring a lamp. Moonlight lies.`, `We're logging every howl. Join us?` };
+		Friendly = { "Full moon, {Name}. Keep to the lamps tonight.", `Bring a lamp. Moonlight lies.`, `We're logging every howl. Join us?` };
 		Respected = { `Keeper. We stand watch with you tonight.`, `The charter says hold the line tonight.`, `Full moon. The lamps are yours to light.` };
 	};
 	Race = {
@@ -69,7 +69,7 @@ return {
 		Werewolf = {
 			Hostile = { `Werewolf. Your moon dates are on file.`, `We know which nights you go missing.`, `Half the gaps in our records are your kind.` };
 			Wary = { `Werewolf. Shed on these papers and you're done.`, `Werewolf. Mind the paper, it tears.`, `We keep the lunar tables. We see you.` };
-			Any = { `Werewolf. The lunar tables are for you.`, `Werewolf. We chart the moon here too.`, `Werewolf. Bet you'd sniff out a lost page.` };
+			Any = { `Werewolf. The lunar tables are for you.`, `Werewolf. We chart the moon here too.`, `Werewolf. Bet you'd track down a lost page.` };
 			Friendly = { `Werewolf! Want to read the moon tables?`, "{Name}, good nose. Smell any old paper?", `We'll mark your full moons. Kindly.` };
 			Respected = { `Keeper. We'll keep the lamps lit at moonrise.`, `A wolf on watch. The archive sleeps easy.`, "{Name}. The charter has a page for wolves." };
 		};

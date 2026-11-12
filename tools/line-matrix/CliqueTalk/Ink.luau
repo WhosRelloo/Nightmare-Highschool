@@ -10,7 +10,7 @@ return {
 	Bump = { Any = { `Careful! Wet sketchbook!`, `Whoa! You smudged my line.`, `The palette! Ugh, now it's all mud.`, `Oof. A happy accident. For you.` } };
 	Crowded = {
 		Hostile = { `Back up. You're blocking my light.`, `Too close. I can smell your deodorant.`, `You're in my composition. Leave it.` };
-		Respected = { `Come closer. See the brushwork?`, `Lean in. This part's a secret.`, `Closer. You get the first look.` };
+		Respected = { `Come closer. See the brushwork?`, `Lean in. This part's not finished yet.`, `Closer. You get the first look.` };
 		Any = { `Negative space, please.`, `You're standing in my shot.`, `A little room. I'm mid-stroke.`, `You're casting a shadow on my page.` };
 	};
 	Shoved = {
@@ -20,19 +20,19 @@ return {
 	FightSeen = {
 		Hostile = { `Hold that pose. Losing suits you.`, `Lose slower. I'm still sketching.`, `Ooh, unflattering angle. Keep going.` };
 		Wary = { `Don't swing near the easels!`, `Not near the wet wall, please!`, `This is why we can't have nice murals.` };
-		Any = { `The drama! The lighting! Gorgeous.`, `Somebody get a sketch of this.`, `Finally, some movement in this school.`, `Wait, wait. Do that again, slower.` };
+		Any = { `The drama! The lighting! Gorgeous.`, `Somebody get a sketch of this.`, `Finally, some movement in this school.`, `Wait, wait. Hold that pose. I'm sketching.` };
 		Friendly = { "Go, {Name}! Very dynamic!", `Lovely form! Swing again, I missed it.`, `Chin up! It's your better angle.` };
 		Respected = { "{Name}, you're our next mural. Win!", `That's a museum piece! Finish it!`, `Give them a final act! Big finish!` };
 	};
 	Flee = { Any = { `Save the canvases! Leave the people!`, `Grab the good brushes and go!`, `Not the mural! Run!`, `I'm a painter, not a sprinter!` } };
 	Transformed = {
-		Hostile = { `Finally, a version of you I'd paint.`, `Scary. Still dull, somehow.`, `Big and loud. So, an athlete.` };
+		Hostile = { `Finally, a version of you I'd paint.`, `Scary. Still dull, somehow.`, `Loud and scary. So, an athlete.` };
 		Wary = { `Don't. Move. I'm sketching from afar.`, `Please don't eat the easels.`, `Um. Is that permanent? Asking for a piece.` };
 		Any = { `The silhouette! The menace! Stunning.`, `I need charcoal. All the charcoal.`, `That's an album cover. That's a cover.`, `I'm calling this one "Study in Panic".` };
 		Respected = { "{Name}! You're the mural now.", `Muse! Don't move! I need this!`, `Even monstrous, you've got bone structure.` };
 	};
 	Night = {
-		Hostile = { `Out late? So are we. And our ladder.`, `Night's when we work. Don't be the canvas.`, `Walk fast. The studio's watching tonight.` };
+		Hostile = { `Out late? So are we. And our ladder.`, `Night's when we work. Don't be the canvas.`, `Walk fast. Wet paint everywhere tonight.` };
 		Wary = { `Late. You're not a snitch, are you?`, `What are you doing near the gym doors?`, `If you saw nothing, keep seeing nothing.` };
 		Any = { `Night shift. Best time for walls.`, `Moonlight makes everything look painted.`, `Bring a torch. The good walls are dark.`, `Night is just a big black canvas.` };
 		Friendly = { "Coming out tonight, {Name}? Bring tape.", `Grab a roller. We're going out.`, `Lookout duty? You'd be perfect.` };
@@ -49,11 +49,11 @@ return {
 			Hostile = { `Human. Plain canvas. No primer.`, `Human. How very... unvarnished.`, `Human, and boring on top of it.` };
 			Wary = { `Human? Prove you're interesting.`, `A human. Bit of a blank page.`, `Human. Don't touch the turpentine.` };
 			Any = { `Classic subject, humans. Hard to draw.`, `Human. Every art class starts with you.`, `Human hands are the hardest part.` };
-			Friendly = { `Human? Hands like yours were made to draw.`, "{Name}, model for hand studies? Please?", `Human and creative. Rarer than fangs.` };
+			Friendly = { `Human? You'd be a natural at drawing.`, "{Name}, join the sketch club? Please?", `Human and creative. Rarer than fangs.` };
 			Respected = { `Human muse. The classics would weep.`, "{Name}. Proof humans can be art.", `No fangs needed. You're our masterpiece.` };
 		};
 		Priest = {
-			Hostile = { `A priest. Here to paint over our murals?`, `Holy and dull. Like a pamphlet.`, `Priest. You'd whitewash everything.` };
+			Hostile = { `A priest. Here to paint over our murals?`, `Holy and dull. Like a pamphlet.`, `Priest. You'd censor every sketch.` };
 			Wary = { `Priest. Don't bless the graffiti.`, `Priest. Some walls are art, not sins.`, `A priest in the studio. Hm.` };
 			Any = { `Stained glass was art too, you know.`, `Your chapel has great ceilings, priest.`, `A priest. You'd anchor a whole fresco.` };
 			Friendly = { `Priest! Help me paint a halo right?`, "{Name}, show me those chapel windows.", `Holy subjects are my favourite to paint.` };
@@ -62,22 +62,22 @@ return {
 		Vampire = {
 			Hostile = { `Vampire. No reflection, no portrait.`, `Even mirrors pass on you, vampire.`, `Vampire. Very last-century, isn't it?` };
 			Wary = { `Vampire. Mirrors in here. Awkward.`, `Vampire. Don't loom over my easel.`, `Vampire. Are you judging my shading?` };
-			Any = { `You'd pose all night, right? Vampire perk.`, `Vampire. Made for a candlelit portrait.`, `A vampire. Pure chiaroscuro.` };
-			Friendly = { `Vampire? I'll paint you. Mirrors can't.`, "{Name}, those cheekbones! Sit for a portrait?", `Night owl! Come to the midnight sessions.` };
+			Any = { `Vampire. You'd outlast any night class.`, `Vampire. Made for a candlelit portrait.`, `A vampire. Pure chiaroscuro.` };
+			Friendly = { `Vampire? I'll paint you. Mirrors can't.`, "{Name}, pose for the portrait class?", `Night owl! Come to the midnight sessions.` };
 			Respected = { `Our vampire! The only portrait that matters.`, "{Name}. Centuries of style. Teach us.", `You've seen every art movement. Spill.` };
 		};
 		Werewolf = {
 			Hostile = { `Werewolf. Don't shed in my paint tray.`, `Werewolf. So, basically an athlete.`, `Werewolf. Loud, hairy, no technique.` };
 			Wary = { `Werewolf. No sniffing the turpentine.`, `Werewolf. Claws away from the canvas.`, `Werewolf. Wipe your feet. Please.` };
 			Any = { `Werewolf. What a silhouette.`, `Do werewolves howl in key? Asking.`, `Werewolf. Great texture. All that fur.` };
-			Friendly = { `Werewolf! Model for the night class?`, "{Name}, your fur is a whole palette.", `Werewolf? Best study for movement ever.` };
+			Friendly = { `Werewolf! Come sketch the moon with us?`, "{Name}, your fur is a whole palette.", `Werewolf? Best study for movement ever.` };
 			Respected = { `Our wolf! The moon mural's about you.`, "{Name}. Wild, untamed, art. Literally.", `Our moonlit legend. The studio's honoured.` };
 		};
 		Ghoul = {
 			Hostile = { `Ghoul. Stiff as an unwashed brush.`, `Keep your hands off my palette, ghoul.`, `Ghoul. A still life, but worse.` };
 			Wary = { `Ghoul. Don't snack on the clay.`, `Ghoul. Gloves, please. Near the paper.`, `Ghoul. You're... very still. Stop.` };
-			Any = { `Ghoul. You'd suit a museum. Seriously.`, `Ghouls are perfect for a long sitting.`, `Ghoul. You'd make a great sculpture.` };
-			Friendly = { "{Name}, you'd outlast every art fad.", `Ghoul? Best life-drawing model ever.`, `Ghoul. Never fidgets. I love that.` };
+			Any = { `Ghoul. You'd hold a pose for hours.`, `Ghouls are perfect for a long sitting.`, `Ghoul. You'd make a great sculpture.` };
+			Friendly = { "{Name}, you'd outlast every art fad.", `Ghoul? Calmest subject in the studio.`, `Ghoul. Never fidgets. I love that.` };
 			Respected = { `Our ghoul! Patron of the long pose.`, "{Name}. Timeless. Gallery-ready.", `The studio's best model, back at last.` };
 		};
 		Wraith = {
@@ -123,7 +123,7 @@ return {
 	DressCode = {
 		Hostile = { `Studio's for the Ink. You're very... clean.`, `No black, no entry. You especially.`, `Out. You'd ruin a wall just standing there.` };
 		Wary = { `Studio rules. Black or charcoal.`, `Come back with some paint on you.`, `Not in those colours. Try black.` };
-		Any = { `Members only. Dress like you've suffered.`, `Studio dress code: black, and stained.`, `Wear something black. Then knock.` };
+		Any = { `Members only. Dress like an artist.`, `Studio dress code: black, and stained.`, `Wear something black. Then knock.` };
 		Friendly = { `Almost! Swap in some black and come in.`, "{Name}, wear a vest. Then grab a brush.", `I'd let you in. Wren wouldn't.` };
 		Respected = { `Even muses dress the part. Black, please.`, `Wren says even you. Black, then in.`, `Throw on a vest. We'll wait for you.` };
 	};
