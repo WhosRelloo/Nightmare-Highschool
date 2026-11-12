@@ -13,6 +13,7 @@ The sources are copied into `tools/map-students/`.
 | `ServerScriptService.Services.AI.Nav` | The navigator: planning, doors, steps, smoothing, avoidance, recovery |
 | `ServerScriptService.Services.AI.Senses` | Sight, hearing and reading players |
 | `ServerScriptService.Services.Features.MapStudents` | The students: bodies, looks, the school day, reactions |
+| `ServerScriptService.Services.Features.MapStudents.Nudges` | (1.86.5) Bump reactions: `Nudge_Left` / `Nudge_Right` on a brush, `Shove_Forward` on a sprint from behind. Same file as NH Combat Test's (`tools/npc-nudges/Nudges.luau`) |
 | `StarterPlayerScripts.Controllers.World.NpcLook` | Client: smooth head turns and speech bubbles |
 | `ServerStorage.NHCore.NpcRig` | The students' body (NH Combat Test's NPC rig, 67 parts) |
 | `workspace["School NPC Spots"]` | Where students go (see below) |

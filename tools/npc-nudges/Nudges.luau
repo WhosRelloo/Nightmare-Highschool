@@ -1,8 +1,10 @@
 --[[
-	Nudges (server). Services.AI.StudentBrain.Nudges  (1.86.3)
+	Nudges (server). NH Combat Test: Services.AI.StudentBrain.Nudges (1.86.3); Map: Services.Features.MapStudents.Nudges
+	(1.86.5). The same file in both places.
 
 	What a student does when a player actually brushes past or barges into them, after the crowd footage the owner
-	picked (design canvas "NPC Nudge Animations"). StudentBrain sets Brain.OnBump to Nudges.Handle.
+	picked (design canvas "NPC Nudge Animations"). StudentBrain sets Brain.OnBump to Nudges.Handle; MapStudents calls
+	it from React.MakeWay and React.Space.
 	  Nudge_Left / Nudge_Right  a brush on that shoulder: the torso twists away, the bumped shoulder rolls back, the head
 	                            stays on the passer (NpcLook, from the brain's NHLookAt). Hips are unkeyed, so the walk or
 	                            idle keeps the legs. The student slides 0.45 studs away from the passer over 0.25 s.
@@ -12,8 +14,9 @@
 	MakeWay fires about a second early, so the handler waits for that contact and does nothing if it never comes.
 	Each play varies speed and weight, and a student can't be nudged again for COOLDOWN seconds.
 
-	The clips: ServerStorage.NHNudges (built by tools/npc-nudges/build_nudges.luau). Until the owner publishes them
-	and fills IDS, Studio plays the local KeyframeSequences and live servers keep the brain's old step aside.
+	The clips are published under the group (IDS, 1.86.4). Their source is NH Combat Test's ServerStorage.NHNudges,
+	built by tools/npc-nudges/build_nudges.luau. With an id of 0, Studio plays that local KeyframeSequence instead, and
+	live servers keep the brain's old step aside.
 ]]
 
 local KeyframeSequenceProvider = game:GetService(`KeyframeSequenceProvider`)
@@ -26,7 +29,7 @@ local Nav = require(ServerScriptService.Services.AI.Nav)
 
 local Nudges = {}
 
--- the published animation ids (owner: publish ServerStorage.NHNudges under the group and put the ids here)
+-- the published animation ids (group 15981569)
 local IDS = {
 	Nudge_Left = 130323933959810;
 	Nudge_Right = 75884392039987;
@@ -107,7 +110,7 @@ local function clear(S, Dir: Vector3, Dist: number): boolean
 	Params.FilterDescendantsInstances = Ex
 	local From = S.Root.Position
 	if workspace:Raycast(From, Dir * (Dist + 1), Params) then return false end
-	local Feet = From - Vector3.new(0, S.Up or 3, 0)
+	local Feet = From - Vector3.new(0, S.Up or (S.Agent and S.Agent.Up) or 3, 0)
 	local Floor = Nav.Floor(Feet + Dir * Dist, 1.5)
 	return Floor ~= nil and math.abs(Floor.Y - Feet.Y) < 1.2
 end

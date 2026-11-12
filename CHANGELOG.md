@@ -2,6 +2,31 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.86.5] - 2026-11-11: Map place: the students get the nudges too
+
+Owner: "Port it to Map Place". The nudges from 1.86.3 and 1.86.4 now run on the Map's own students (`MapStudents`).
+Nothing else on the Map changed.
+
+### Added (Map)
+- **`Services.Features.MapStudents.Nudges`**, tagged NHCore. It is byte-for-byte the same file as NH Combat Test's
+  `StudentBrain.Nudges` (`tools/npc-nudges/Nudges.luau`) and uses the same published group clips.
+- **`MapStudents`:** `React.MakeWay` and `React.Space` call `Nudges.Handle` first. When it handles the bump, the old
+  step aside is skipped, and Space still marks the student restless, so they find another spot afterwards.
+
+### Changed (both places)
+- `Nudges` reads a student's standing height from `S.Up` (Combat Test) or `S.Agent.Up` (the Map). This height is
+  used for the floor check before a slide.
+
+### Tested (Map, Studio play)
+- The three clips load on the Map's `NHCore.NpcRig`.
+- A walk-past brush played `Nudge_Left` from its published id at 2.8 studs, and the student slid aside.
+- A sprint from behind at 26 studs/s played `Shove_Forward` at 1.5 studs.
+- No errors from MapStudents or Nudges. The repo copies are checksum-identical to both places.
+- **The Map has no slot menu.** It loads its own slot 1, a fresh Level 1 profile in the Map's separate universe.
+  Studio can't use its DataStores, so nothing was read or saved.
+- **A known limit:** one sprint from 16 studs away went past before the student noticed (Senses ticks every 0.2 s).
+  The repeat from 18 studs shoved. A very fast pass can occasionally miss.
+
 ## [1.86.4] - 2026-11-11: NH Combat Test: the nudge clips are published
 
 The owner published the three clips from `ServerStorage.NHNudges`. Their ids are now in `IDS` in

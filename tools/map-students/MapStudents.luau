@@ -26,6 +26,8 @@
 	  Gawk        a fight they can see or hear further off: stop and turn to watch until it's been quiet 6 s
 	  Make way    a student coming straight at them: step aside, look at them
 	  Space       someone standing right on top of them: step back ("Uh... hi?")
+	              (1.86.5) Both go through Nudges first: a real brush plays Nudge_Left / Nudge_Right and a sprinter
+	              from behind plays Shove_Forward, in place of the step aside (Features.MapStudents.Nudges)
 	  Stared at   someone facing them, close, for a while: look back; the friendly ones say hello, the shy ones move off
 	  Followed    someone keeping behind them as they walk: glance back, walk faster
 	  Glance      whoever they're most aware of (the head turns, Controllers.World.NpcLook); otherwise they look
@@ -65,6 +67,7 @@ do
 end
 
 local Lines = require(script:WaitForChild(`Lines`)) -- every voice line (Features.MapStudents.Lines)
+local Nudges = require(script:WaitForChild(`Nudges`)) -- (1.86.5) the brush and shove reactions (Features.MapStudents.Nudges)
 
 local Folder: Folder? = nil
 local mutterPool, chat, leanOnWall -- (defined below)
@@ -458,6 +461,9 @@ function React.MakeWay(S, Snap)
 	if Side:Dot(V) > 0 then Side = -Side end
 	lookAt(S, headOf(Rec), 1.5)
 	if math.random() < 0.6 then say(S, if (Rec.Speed or 0) > 18 then Lines.Sprint else Lines.MakeWay, 10) end
+	-- (1.86.5) a nudge waits for the real brush and moves the student itself, in place of the step aside
+	local Ok, Handled = pcall(Nudges.Handle, S, Rec, `MakeWay`)
+	if Ok and Handled then return end
 	S.Agent:Shuffle(Side, 0.55, 7)
 	S.Agent:Face(Rec.Pos)
 	task.wait(0.3)
@@ -469,6 +475,12 @@ function React.Space(S, Snap)
 	mood(S, `Uneasy`, 5)
 	lookAt(S, headOf(Rec), 2.5)
 	say(S, Lines.ByNature(S, Lines.Space, `Social`), 10)
+	local Ok, Handled = pcall(Nudges.Handle, S, Rec, `Space`)
+	if Ok and Handled then
+		Rec.Near = 0
+		S.Restless = true
+		return
+	end
 	S.Agent:Shuffle(S.Root.Position - Rec.Pos, 0.7, 4)
 	S.Agent:Face(Rec.Pos)
 	Rec.Near = 0
