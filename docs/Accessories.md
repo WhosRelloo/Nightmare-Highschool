@@ -14,7 +14,7 @@ Status: **Kits A and B are in the game** (NH Combat Test, 1.86.0): every batch i
 play-tested together on slot 4, the rebuilt satchel and Head Student's sash included. The owner pre-approved every later batch "as long as they follow the standards" (2026-11-11). **All of both kits is
 built** (batches 2-8: 49 more items, 2026-11-11), checked together with 0 fails, merged into `Config.Accessories`,
 and in the game since 1.86.0. Kit C is in progress (below): C1 coats and C2 masks are **in the game** (1.87.1),
-play-tested on slot 4.
+play-tested on slot 4; C8 bags are built and staged for the import (1.89.0).
 
 ## Batches
 
@@ -29,6 +29,7 @@ play-tested on slot 4.
 | 7 | A 7 + B 2 | the Delinquents' long coat and the Headmaster's greatcoat (torso shell, sleeves on the arms, rigged split coattails) | **in the game (1.86.0)**; staged in (`batch7/`); hairs: see below |
 | 8 (Kit B) | B 1, 3-11 | the Headmaster's Circle: crow mantle, thorned crown, raven-skull pauldron, iron keys, shadow trail, chained ledger, sigil halo, seal of office, signet, staff, observer mask | **in the game (1.86.0)**; staged in (`kitb/`) |
 | C1-C2 (Kit C) | C 1-19 | 11 coats and jackets (skirts ride the legs: BodyFollow), 8 masks | **in the game, play-tested (1.87.1)**; staged in (`kitc/`) |
+| C8 (Kit C) | C 20-25 | coffin, bat-wing and violin backpacks (straps wrap the torso), scroll tube, Gladstone bag and birdcage purse (held) | built, baked, checked; staged in (`kitc8/`), waiting for the import (1.89.0) |
 
 ### Batches 2 to 8 (built 2026-11-11, in the game since 1.86.0)
 
@@ -298,7 +299,66 @@ side with the sheathed katana and the slit for its guard, back with the low pony
 with the wax mask. Testy's saved look was unchanged afterwards. Not done: Wardrobe and Store clicks for Kit C, a
 second player watching (BodyFollow runs for every character in range), the Map place.
 
-**Next:** C8 bags, C9 extras, C5 hands and feet, C3, C4, C6, C7.
+### C8 bags: built, baked, staged (1.89.0)
+
+Owner: "And yes start C8."
+
+| Id | Item | Slot | Price | Hairs with the full look (of 35) |
+|---|---|---|---|---|
+| `backpack-coffin` | Coffin Backpack | Back | 850 | 8 |
+| `backpack-batwing` | Bat-Wing Backpack | Back | 800 | 10 |
+| `case-violin` | Violin Case | Back | 900 | 7 |
+| `tube-scroll` | Scroll Tube | Back | 450 | 11 |
+| `bag-gladstone` | Alchemist's Gladstone Bag | Held | 650 | 35 |
+| `purse-birdcage` | Birdcage Purse (female) | Held | 600 | 35 |
+
+`art/characters/accessories/nh_acc_batchc8.py`. Contact sheets: `docs/img/accessories/kitc8_sheet_a.jpg`,
+`kitc8_sheet_b.jpg`. Staged in `art/group-upload-accessories/kitc8/` (6 FBX, 24 maps).
+
+- **The coffin backpack:** a black-lacquer coffin (1.0 x 1.6 studs) with a crimson velvet lid panel in brass beading,
+  studs, corner plates, side hinges, a carry handle and the school's crescent and stars.
+- **The bat-wing backpack:** a black leather bat (pug face, tall ears, crimson glass eyes, little fangs) on a pack with
+  a scalloped flap and a crescent clasp. Its membrane wings lie flat behind the pack, on three-finger bones, and sway
+  back as you run (`BackHang`, a chain per wing).
+- **The violin case:** shaped (lower bout, waist, upper bout, neck), pebbled black leather with crimson piping, brass
+  end caps, latches, studs, a side handle and an N.H name plate.
+- **The scroll tube:** tan leather with brass end caps (a screw cap with a ring), tooled bands and a gold crescent,
+  tied with two loops onto a sling over the left shoulder to the right hip (the sword is at the left).
+- **The Gladstone bag:** an oxblood doctor's bag on a hinged brass frame, girth straps with buckles, brass feet and an
+  alchemist's sigil plate. Held in the right hand like the book strap: it swings from the grip (`Pendulum`) and is
+  hidden while a weapon is drawn.
+- **The birdcage purse:** a domed brass cage (18 bars, a door, a perch) on a crimson velvet drum, held by its ring.
+  The paper moth inside opens and closes its wings now and then (`NHIdle` Familiar, `WingL` / `WingR` up to 32
+  degrees, on the cage's swinging bone). Its wings stay within 0.10 of the cage's axis, inside the bars at any angle.
+
+**The straps (owner's rule for every backpack).** `wrap_straps` gives the coffin, bat-wing and violin each two
+shoulder straps that wrap the torso: over the shoulder top, down the chest to the armpit, round under the arm and up
+the back. A horizontal strap crosses both on the chest with a brass buckle and runs into the pack's sides behind.
+Tabs tie the pack to the straps. Measured limits:
+
+- The loops come back at the armpit (z 0.05). Lower, a loop's plane leaves the torso through its bottom corner,
+  into the legs' tops and a striding leg's corner, and the front-left run crosses the sheathed katana's guard.
+- The chest strap sits at z 0.20, above the guard (it reaches z -0.31 at the front-left hip).
+- The violin case's bottom stays above z -0.79, clear of a striding leg's top corner behind the hips.
+
+**Can't be worn with** (measured, `Config.Accessories.Conflicts`): the three strapped backpacks with the Lapel pins and
+the Shoulders pieces, the moonstone torc, the scythe pendant and both knitted scarves (the straps run where they lie).
+The bat-wing backpack and the violin case also can't be worn with the potion belt, and the bat-wing with the school
+tie (on the female body its swing meets the chest strap). The existing rules already keep every Back item off coats,
+capes, sashes and the choir collar.
+
+**Hairs.** Long hair lies over the back, so the back pieces fit 4-13 hairs before the hair tuck. The tuck brings
+them to the table's counts. The tuck check found some hairs crossing a C8 bag when worn with a Kit A piece that tucks the same
+hair (the fang necklace, crystal pendant, gorget and left pauldron). In each case the C8 bag gives up the tuck, so
+the Kit A pieces keep theirs. Any hair can still wear any of them (1.88), untucked.
+
+**Checked:** `acc_check.py --capes --hair`, every kit: before the pairs above, 151 fails, all between a C8 backpack and
+those pieces; with them, the C8 items 0 fails (12 bodies, the stride, sway limits, the katana, every pair, the capes).
+`acc_tuckcheck.py`: 0 fails. Ten Kit A and B items that tuck the same hairs (12 pieces) still match their in-game
+templates exactly (dry-run diff, 0 differences).
+
+**Next:** the owner's import of `kitc8/`, then assembly and a slot 4 play test. Then C9 extras, C5 hands and feet,
+C3, C4, C6, C7.
 
 ## The no-clipping rules (how "nothing clips, overlaps or hovers" is checked)
 

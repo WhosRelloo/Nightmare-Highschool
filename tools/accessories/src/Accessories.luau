@@ -2,7 +2,8 @@
 	Config.Accessories: the 3D accessory kits (cosmetic only: no stats, never Race).
 	  Kit A "Player accessories" (28 designs): bought for Yen at the School Store (Accessories tab), worn at a wardrobe.
 	  Kit C "The Night School Wardrobe" (approved 2026-11-11, built in batches): C1 coats and jackets (11; their skirts ride
-	  the legs, Controllers.Character.BodyFollow), C2 masks (8). Sold at the School Store like Kit A.
+	  the legs, Controllers.Character.BodyFollow), C2 masks (8), C8 bags (6: three backpacks whose straps wrap the
+	  torso, a scroll tube, two held). Sold at the School Store like Kit A.
 	  Kit B "The Headmaster's Circle" (11 designs): Admin = true. Staff only (player attribute NHStaff >= 1, set by
 	  Features.Admin), never sold, checked on the server (UI.Appearance's look check and WearAccessories).
 	Worn: the look field Acc (UI.Appearance), a comma list of item ids, at most one per slot.
@@ -137,6 +138,12 @@ Accessories.Items = {
 	{ Id = `mask-wax`; Name = `Wax Saint Mask`; Slot = `Face`; Model = `WaxMask`; Price = 600; Kit = C };
 	{ Id = `mask-moth`; Name = `Moth Mask`; Slot = `Face`; Model = `MothMask`; Price = 600; Kit = C };
 	{ Id = `mask-domino`; Name = `Black Silk Domino`; Slot = `Face`; Model = `DominoMask`; Price = 300; Kit = C };
+	{ Id = `backpack-coffin`; Name = `Coffin Backpack`; Slot = `Back`; Model = `CoffinBackpack`; Price = 850; Kit = C };
+	{ Id = `backpack-batwing`; Name = `Bat-Wing Backpack`; Slot = `Back`; Model = `BatWingBackpack`; Price = 800; Kit = C };
+	{ Id = `case-violin`; Name = `Violin Case`; Slot = `Back`; Model = `ViolinCase`; Price = 900; Kit = C };
+	{ Id = `bag-gladstone`; Name = `Alchemist's Gladstone Bag`; Slot = `Hand`; Model = `GladstoneBag`; Price = 650; Kit = C };
+	{ Id = `tube-scroll`; Name = `Scroll Tube`; Slot = `Back`; Model = `ScrollTube`; Price = 450; Kit = C };
+	{ Id = `purse-birdcage`; Name = `Birdcage Purse`; Slot = `Hand`; Model = `BirdcagePurse`; Price = 600; Gender = `Female`; Kit = C };
 }
 
 -- Pairs that can't be worn together because they'd pass through each other (measured by
@@ -320,6 +327,27 @@ Accessories.Conflicts = {
 	{ `mask-wax`, `torc-moonstone` };
 	{ `mask-grille`, `hood-tattered` };
 	{ `mask-wax`, `collar-choir` };
+	{ `backpack-coffin`, `Lapel` };    -- Kit C backpacks: the shoulder straps run down the chest where the pins sit
+	{ `backpack-coffin`, `Shoulders` };    -- and over the shoulder tops under the pauldrons
+	{ `backpack-coffin`, `torc-moonstone` };    -- the torc, the scythe pendant and the scarves lie where the straps cross
+	{ `backpack-coffin`, `pendant-scythe` };
+	{ `backpack-coffin`, `scarf-knit-crimson` };
+	{ `backpack-coffin`, `scarf-knit-violet` };
+	{ `backpack-batwing`, `Lapel` };
+	{ `backpack-batwing`, `Shoulders` };
+	{ `backpack-batwing`, `torc-moonstone` };
+	{ `backpack-batwing`, `pendant-scythe` };
+	{ `backpack-batwing`, `scarf-knit-crimson` };
+	{ `backpack-batwing`, `scarf-knit-violet` };
+	{ `backpack-batwing`, `belt-potion` };    -- the wings swing down over the belt's vials
+	{ `backpack-batwing`, `tie-school` };    -- measured on the female body: the tie's swing meets the chest strap
+	{ `case-violin`, `Lapel` };
+	{ `case-violin`, `Shoulders` };
+	{ `case-violin`, `torc-moonstone` };
+	{ `case-violin`, `pendant-scythe` };
+	{ `case-violin`, `scarf-knit-crimson` };
+	{ `case-violin`, `scarf-knit-violet` };
+	{ `case-violin`, `belt-potion` };    -- the case's lower bout reaches the belt's back
 }
 
 Accessories.ById = {}

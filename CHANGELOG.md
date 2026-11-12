@@ -2,6 +2,36 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.89.0] - 2026-11-12: Kit C bags built (waiting for the import)
+
+Owner: "And yes start C8." Kit C's C8, six bags (`docs/Accessories.md`), all 2048 PBR bakes, checked with every Kit A,
+B and C piece, the katana, the capes and every rigged hair.
+
+### Added
+- **Three backpacks**, their straps wrapping the torso (the owner's backpack rule, `wrap_straps`): shoulder straps
+  over the shoulders to the armpits and up the back, a horizontal chest strap with a buckle, tabs to the pack.
+  - **Coffin backpack**, 850: black lacquer, a crimson velvet lid panel, brass beading, the school's crescent.
+  - **Bat-wing backpack**, 800: a leather bat whose wings sway back as you run.
+  - **Violin case**, 900: shaped, black leather, crimson piping, brass caps and latches.
+- **Scroll tube**, 450: tan leather and brass, slung over the left shoulder to the right hip.
+- **Held (right hand, hidden while a weapon is drawn):**
+  - **Alchemist's Gladstone bag**, 650: oxblood leather, a brass frame, an alchemist's sigil.
+  - **Birdcage purse**, 600 (female): a brass cage with a paper moth that opens and closes its wings.
+- `Config.Accessories`: 92 items, 189 exclusive pairs. The C8 items stay hidden until the import. Installed in NH
+  Combat Test.
+- **New conflict pairs.** The strapped backpacks can't be worn with:
+  - the lapel pins, the Shoulders pieces, the moonstone torc, the scythe pendant and the knitted scarves;
+  - the potion belt (the bat-wing and the violin case);
+  - the school tie (the bat-wing).
+
+### Tested (offline)
+- `acc_check --capes --hair`: 0 fails for the six items (12 bodies, the stride, sway limits, the katana, every pair).
+- `acc_tuckcheck`: 0 fails. Where a C8 bag and a Kit A piece crossed over the same hair, the bag gave up its tuck. The
+  Kit A pieces' hair data still matches the game (dry run, 0 differences).
+
+### Not done
+- The owner's import of `art/group-upload-accessories/kitc8/` (6 FBX, 24 maps), then assembly and a slot 4 play test.
+
 ## [1.88.0] - 2026-11-12: Any hair can wear any accessory
 
 Owner: "Let players wear clothing their hair doesnt tuck, etc. for. It just wont have the new look for it."
