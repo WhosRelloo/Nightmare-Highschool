@@ -247,6 +247,7 @@ Every reskin swaps visuals only. Packets, attributes, instance names and public 
 |---|---|
 | `Dialogue` | A compact ornate box, low on screen, tinted in the speaker's faction colour, with `ChoiceRow` replies and an AutoScale floor of 0.8 |
 | `Notifications` | `Toast` rows that fade with `FadeOut` |
+| `Chat` (2.1.0, new) | The NH chat window in place of Roblox's: a thin-frame `Panel`, the "HALLWAY" header, an inked log and a quill bar; see [Chat](Chat.md) |
 | `ClockHud` | An ornate auto-height chip, plus an engraved class-waypoint plate |
 | `DownedHud` | An engraved prompt plate above the health bar. It turns red when you're downed or gripped. |
 | `FactionsPanel` | An ornate panel with a plaque, bracket-cornered cards, `Bar`s and kit buttons |

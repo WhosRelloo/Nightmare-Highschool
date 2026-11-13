@@ -157,6 +157,16 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 - **Icons and the crow tint:** the 1.84.0 icon set; the crow teleport takes the regalia's colour.
 - Replaced scripts are backed up as `ServerStorage.NHCore.Backups.*_pre186`.
 
+## Added 2026-11-12 (2.1.0): the new chat, and no keys while typing
+
+- **The NH chat window** (`Controllers.Gui.Chat`) in place of Roblox's, and the top bar's Chat button switches it
+  (`Gui.TopBar`). See Chat.md.
+- **The typing guard** (`Packages.Bind.Typing`), checked by `Bind.Keybinds` and the 13 Map controllers that asked
+  `GetFocusedTextBox()` (Wardrobe's NHAnywhereWardrobe K key included).
+- **Bubbles:** the Map's bubble settings had no image, so the chat gives them NH Combat Test's rim.
+- **Backups:** `NHCore.Backups.*_pre210`. New items carry the `NHCore` attribute.
+- **The keep-out list (E)** is unchanged.
+
 ## Added 2026-11-12 (2.0.0): faces that talk
 
 - **Faces talk** when a player chats or a student says a line (`Controllers.Character.FaceTalk`, `UI.FaceTalkArt`;

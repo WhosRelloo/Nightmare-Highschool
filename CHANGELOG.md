@@ -2,6 +2,83 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.1.0] - 2026-11-12: A new chat, and no keys while you type
+
+Owner: "completely change the chat ui and fix it so it doesn't activate any UI or anything while typing", then, on the
+mockup: "Yes, build it".
+
+![the new chat](docs/img/chat-ingame.jpg)
+
+### Added (NH Combat Test and the Map)
+- **The NH chat window** (`Controllers.Gui.Chat`) replaces Roblox's chat window and input bar.
+  - **Look:** the UI kit's thin iron frame on slate, titled "HALLWAY" in the title font, top left under the top bar.
+    - Each line starts with a small diamond in the speaker's ink.
+    - You are candle gold. Other players each get one of seven inks (chalk, rose, ink blue, ink green, violet, amber,
+      verdigris), the same one every time.
+    - Whispers say "whispers:" or "to Name:". System lines are italic and dim.
+  - **The bar:** a quill, a gold rim while you type, and a SEND button.
+    - The header shows the letter count out of 200 while you type (gold from 170, red at 200).
+  - **Keys:** / opens the bar, Enter sends, Esc leaves the bar and keeps your draft. Up and Down bring back what you
+    sent before (the last 30).
+  - **Touch:** "Tap to talk...".
+  - **Long notes** wrap, and the bar grows up to two more lines.
+  - **Quiet:** after 10 seconds with no message, mouse or typing, the window fades to a faint log. A new message, the
+    mouse or / brings it back.
+  - **Hidden:** in the main menu and the cinematic view. The top bar's Chat button shows and hides it.
+  - **Sending:** messages still go through TextChatService (`TextChannel:SendAsync`, shown from
+    `TextChatService.MessageReceived`), so filtering, the talking faces and the top bar's unread pip work as before. If
+    a note doesn't send, it says why (too fast, too long, the filter).
+- **Player bubbles** look like the students' (`NpcLook`): a dark ink body, a gold rim and bone Garamond.
+- **No game keys while typing.** `ReplicatedStorage.Packages.Bind.Typing` answers "is the player typing?" for every key.
+  - It counts any text box with focus, and Roblox's own chat bar (`ChatInputBarConfiguration.IsFocused`), which
+    `UserInputService:GetFocusedTextBox()` can't see.
+  - `Bind.Keybinds` checks it first, so every combat key (E equip, F, Q, R, mouse) does nothing while you type. Key
+    releases still go through, so a key held down when you start typing lets go.
+
+### Changed
+- **Every panel and action key asks `Typing.Active()`** instead of `GetFocusedTextBox()` (19 controllers in NH Combat
+  Test, 13 in the Map). That covers M (Report Card), Tab, ` (Locker), U, Y (Phone), \ (Cinematic), T, N, H, G (snack
+  wheel), L, J, P, the hotbar 1-9 and the sports keys.
+  - The likely cause of the bug: the M, Tab, `, U, Y and \ keys only asked `GetFocusedTextBox()`, which doesn't see
+    Roblox's chat bar. (Not reproduced: the test rule is no chat typing.)
+  - The evolution cutscene's "Space skips" listener now ignores a typed space.
+- **`Gui.TopBar`:** the Chat button shows and hides the NH window. Roblox's chat stays off.
+- **Backups:** NH Combat Test `ServerStorage.NH_Backup.*_pre210`. The Map: `ServerStorage.NHCore.Backups.*_pre210`.
+- **Source:** `tools/chat-210/`.
+
+### Tested
+- **NH Combat Test, Studio Play, slot 4 "Testy"** (`SlotCount` 4 then back to 3, `NHTestNoMenuKeys` set then cleared;
+  no chat typing: text boxes were focused from code and keys sent with Studio's key tool):
+  - **Typing guard, plain text box:** 25 keys typed with focus reached the game as "processed", and nothing opened or
+    fired: no panel, no equip, no action. These included M, J, L, P, `, U, Y, G, E, K, 1-3, T, N, H, ".", "\", Q, F, R,
+    V, B, Space and Tab. With nothing focused, M opened the Report Card.
+  - **ContextActionService binds** don't fire while a text box has focus, and do once it lets go. So the skateboard,
+    training and sports binds needed nothing.
+  - **The chat:** / focused the bar with no stray slash, and the same 25 keys did nothing.
+    - A note sent with the bar's own Enter path went through TextChatService, showed as "Rello", and Testy's face
+      talked it (FaceTalk's mouth layers showed). That covers 2.0.0's untested chat hookup.
+    - The Chat button hid it and showed it again. Roblox's window stayed off. It was hidden in the main menu.
+    - It sits clear of the HUD.
+  - **Console:** no errors from the new scripts.
+- **The Map, Studio Play** (no save slots; `NHTestNoMenuKeys` set then cleared):
+  - **Typing guard:** 24 keys with a text box focused did nothing; M unfocused opened the Report Card.
+  - **The chat:** the same checks passed: /, the 23 keys, sending, the Chat button.
+    - "<b>there</b> & you" showed as typed (TextChatService escapes it).
+    - The log stays on the newest line, it faded after 10 seconds, and the bubble shows the dark body and gold rim.
+- **Fixed during the test:**
+  - Roblox puts a coloured "Name:" in front of each message; the window now shows the plain name in its own ink.
+  - A bottom-aligned log scrolled the newest line out of view; it's top-aligned now.
+  - The kit's frame image left the bubble without a body; the bubble now tints the place's own rim image. The Map's
+    bubble settings had no image, so it gets NH Combat Test's.
+
+### Not tested
+- **Your own bubble over your head** after a sent message didn't show in Studio solo, even with Roblox's chat switched
+  back on. A bubble from `TextChatService:DisplayBubble` shows with the new look, so this isn't the new chat.
+- Real typing in the chat bar (the rule is no chat typing); another player's messages and whispers; a phone or a
+  controller.
+- Gamepad typing.
+- The owner needs to save both places.
+
 ## [2.0.0] - 2026-11-12: Faces that talk
 
 Owner: "I want you also to so create some talking facial expressions so the faces are super animated and talk when
