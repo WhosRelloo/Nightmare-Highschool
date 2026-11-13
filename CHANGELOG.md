@@ -2,6 +2,51 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.7.0] - 2026-11-13: Inventory QOL batch 7: move pouch slots, and Day / Fight / Night loadouts
+
+Owner: "Yes, batch 7" (concepts 2 and 6 in `docs/Inventory-QOL-Concepts.md`). The live scripts are mirrored in
+`tools/inventory-qol-batch7/`. Studio backup: `ServerStorage.NH_Backup.InventoryQOL7_pre_20261113`, which holds the
+four scripts as they were before.
+
+### Added
+- **Move pouch slots.** In the Locker, drag a pouch slot onto another to move it. With a gamepad or touch, pick a pinned
+  snack and press the `<` `>` buttons beside the pouch. The card says which slot it's in. The server keeps the order
+  (`Inventory.MovePin`, remote `NHInventory.MovePin`).
+- **Loadouts.** The Day, Fight and Night chips left of the pouch are three saved pouches. Switching keeps the one you
+  had and brings the other back, empty pins included, so "Restock my pins" refills them. A loadout you've never used
+  starts as a copy of your pouch. Saved as `PlayerData.Inventory.Loadouts = { Active, Sets }` (`Inventory.Loadout`,
+  remote `NHInventory.Loadout`).
+
+### Changed
+- **Hotbar order.** Your pouch snacks now lead the hotbar in pouch order, so keys 1-4 are always pouch slots 1-4 (each
+  snack tool carries `NHPinIndex`; `Gui.KitHud` sorts by it). Before, a re-pinned snack went to the end of the bar, behind
+  the kit items. The first test of this batch showed loadout switches doing exactly that, which is why this changed.
+  Other tools (the kit items, `Template`) keep their order after the snacks.
+
+### Tested (NH Combat Test, slot 4 Testy, entered through the real slot remotes)
+- **Moving through the remote:** moving Ramune from pouch slot 4 to slot 1 reordered the pouch and the hotbar. A snack
+  that isn't pinned, and a NaN slot number, were refused with a reason.
+- **Loadouts through the remote:**
+  - Fight started as a copy of Day. Unpinning two snacks and pinning Miso Soup and Hot Cocoa changed only Fight.
+  - Switching to Day brought back Ramune, Prank Kit, Onigiri and Melon Bread; switching to Fight brought back its own set.
+  - Night started as a copy. "Night" again said it was already on, and "Brunch" was refused.
+- **Saving:** after stopping and restarting Play, Testy came back on Day with the same pin order, and keys 1-4 were the pouch.
+- **In the Locker, with the real mouse:**
+  - Clicking the Fight chip switched the loadout, and hotbar 1-4 became the Fight set.
+  - Dragging pouch slot 1 onto slot 3 dimmed the dragged slot, put a gold edge on the target, and moved Ramune to slot
+    3, with the hotbar following. No drag marks were left behind.
+  - Clicking `>` moved it on to slot 4.
+- **Console:** no script errors.
+- **Restored:** `SlotCount` back to 3 and the `NHTestNoMenuKeys` attribute cleared.
+
+### Not tested
+- **Gamepad and touch:** a real gamepad on the chips and the `<` `>` buttons, and a touch drag.
+- **The Map:** not ported (nor are batches 5 and 6).
+
+### Owner's call
+- **Switching outside the Locker:** the concept also had "hold the hotbar's first key" to switch loadouts. It isn't
+  built, because holding 1 already equips slot 1. Name a key if you want one.
+
 ## [2.6.2] - 2026-11-13: Racial grips reworked: scarier, smoother, and kneels taken from the game's crouch
 
 Owner, on the 2.6.0 grips: "I like them, but make the animations look more menacing, scary, and smoother. Also make

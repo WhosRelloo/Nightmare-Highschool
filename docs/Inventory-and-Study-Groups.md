@@ -106,6 +106,20 @@ Props batch 54 ([[School-Props]]): every item the stand sells is modelled now, w
   - **The line:** the student says a line from `Config.CliqueTalk` `Fed.<Verdict>`.
   - **Standing:** a loved food gives +2 with that clique once a day per clique (`Inventory.Fed = { Day, [clique] = true }`).
 
+## Moving pouch slots and loadouts (2.7.0)
+
+- **Hotbar order:** `Inventory.SyncTools` sets `NHPinIndex` (the pouch slot) on each snack tool. `Gui.KitHud`'s
+  `CollectTools` puts those tools first, sorted by it, and keeps every other tool's order after them. So keys 1-4 are
+  pouch slots 1-4.
+- **Moving:** `NHInventory.MovePin(id, slot)` moves a pinned snack, clamped to the pouch. In the Locker you drag a pouch
+  slot (`Local.HookDrag`, which hit-tests the slots' absolute rectangles), or pick a pinned snack and press `<` `>`
+  (`Move.MoveLeft` / `MoveRight`).
+- **Loadouts:** `Items.Loadouts = { Day, Fight, Night }`. `PlayerData.Inventory.Loadouts = { Active = name, Sets = { [name]
+  = { id } } }`; the active set is `Pinned` itself and isn't stored in `Sets`.
+  - **Switching:** `NHInventory.Loadout(name)` saves `Pinned` under the old name, then loads the new set, empty pins
+    included. A set never used starts as a copy of the pouch.
+  - **The state:** `State.Loadout` is the active name. The Locker draws the chips (`Pouch.Content.Loadouts`).
+
 ## Replace-buff check, "new" dots and the trophy case (2.4.0)
 
 - **Replace-buff check:** in `Inventory.Use`, a buff used while a different one has more than 60 s left returns

@@ -11,8 +11,10 @@ wheel (held on G or D-pad Right, since Q and LB were taken) with the baked, anim
 its middle. Batch 5 in 2.2.0 is concepts 28 and 25: the taste book (a Tastes tab, milestone titles and +1 max
 health each) and feeding students (an Offer prompt, clique favourite foods, +2 standing once a day per clique). Batch 6
 in 2.4.0 is concepts 8, 14 and 29: the replace-buff check (a second use within 3 s swaps), "new" dots on snacks and
-trophies (they clear when you pick the item, not on hover, and don't show on the tab yet) and the trophy case. Everything
-else on this page is not built yet.
+trophies (they clear when you pick the item, not on hover, and don't show on the tab yet) and the trophy case. Batch 7
+in 2.7.0 is concepts 2 and 6: moving pouch slots (drag in the Locker, or the < > buttons; the hotbar now leads with your
+pouch, so keys 1-4 are always pouch 1-4) and the Day, Fight and Night loadouts (switched from the Locker; the "hold the
+first key" switch is left for the owner). Everything else on this page is not built yet.
 
 **The rule behind all of them:** less clicking, fewer surprises. A player should always know what they're carrying,
 what each thing will do, and why something didn't work.
@@ -201,6 +203,7 @@ Each concept has a size: **S** is about a day, **M** a few days, **L** a week or
 | 4 | 4, 7 | The wheel and smart eat, the big feel upgrade. |
 | 5 | 28, 25 | The taste book and feeding students, which tie into the line matrix. |
 | 6 | 8, 14, 29 | Small fixes that need no decisions from you. |
+| 7 | 2, 6 | Moving pouch slots and loadouts. |
 
 ## Your calls
 
