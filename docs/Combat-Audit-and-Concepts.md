@@ -116,6 +116,29 @@ armory, cliques, duels and the hall monitors.
 
 ### B. The fist moveset
 
+**Built in 2.10.0 (the owner picked "Fist moveset 6, 8, 9"):** concepts 6, 8 and 9, fists only, with these details:
+- **String enders:** M2 within 0.8 s of a string hit landing replaces the plain heavy, and cancels that swing's recovery
+  once its hit frame has passed. All share M2's cooldown (2.5 s). The string resets afterwards.
+  - **After hit 1, the shove** (Fist M1.4): it knocks them about 20 studs back, with a short stun.
+  - **After hit 2, the launcher:** the existing Uppercut, into the air combo.
+  - **After hit 3, the body blow** (Fist M1.3): it plays the heavy tell. Clean, it doubles them over (1 s stun, a
+    heavy hit-stop); into a guard it's +35 posture.
+
+  "Hold back + M2" for the shove was tried first and dropped: the character turns to walk away, so the shove swung at
+  nothing.
+- **The clinch:** M1 while holding block (F, or L2 + R2 on a pad); 3 s cooldown.
+  - **Goes through:** a guard and a parry window.
+  - **Loses to an attack:** a target winding up a swing isn't caught.
+  - **Caught:** a knee (Fist M2) for 4 damage and +25 posture, which breaks posture if that fills it, and they double
+    over.
+  - **Dodge:** a dodge's i-frames still slip it.
+- **Riposte:** a landed parry gives you 0.9 s in which your next M1 is a riposte: 1.5x damage, a stagger and a heavy
+  hit-stop.
+- **The readout** names the move over the combo count (SHOVE, BODY BLOW, CLINCH, RIPOSTE), in gold or in crimson for
+  RIPOSTE and COUNTER.
+- **Stand-in clips:** existing Fist clips are used until bespoke ones are made: M1.4 for the shove, M1.3 for the body
+  blow, M2 for the knee.
+
 6. **String enders (M).** M2 pressed after hit 2 or 3 of the string replaces the 4th hit with a different ender:
    - after 2: a **launcher** (into the existing air combo);
    - after 3: a **body blow** (big posture damage);
@@ -180,7 +203,7 @@ armory, cliques, duels and the hall monitors.
 | Order | Concepts | Why |
 |---|---|---|
 | 1 | 1, 2, 3, 4 | Read the fight better; all small. **Built in 2.9.0.** |
-| 2 | 6, 9, 8 | The fist moveset gets depth with what exists. |
+| 2 | 6, 9, 8 | The fist moveset gets depth with what exists. **Built in 2.10.0.** |
 | 3 | 12 | The biggest smoothness gain left, but large. |
 | 4 | 15, 16 | Fists become a path, not a starter. |
 

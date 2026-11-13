@@ -2,6 +2,66 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.10.0] - 2026-11-13: The fist moveset: string enders, the clinch, and riposte
+
+Owner: "Fist moveset 6, 8, 9", concepts 6, 8 and 9 in `docs/Combat-Audit-and-Concepts.md`. The live scripts are mirrored
+in `tools/fist-moveset-2100/` (`pre/` holds the two scripts the Studio backup doesn't). The rest are in
+`ServerStorage.NH_Backup.FistMoveset_pre_20261113`.
+
+### Added (Fists)
+- **String enders.** Press M2 right after a hit of your string lands (within 0.8 s) to finish it with a special instead
+  of the plain heavy. It cancels the swing's recovery once its hit has landed, and shares M2's cooldown.
+  - **After hit 1, the Shove:** knocks them about 20 studs back.
+  - **After hit 2, the Launcher:** the uppercut, into the air combo.
+  - **After hit 3, the Body Blow:** a hook to the ribs with the heavy tell. Clean, it doubles them over (1 s stun); into
+    a guard it's +35 posture.
+
+  (`ActionManager` `Local.TryEnder`; new `ActionManager.Combat.Ender`.)
+- **The Clinch.** M1 while holding block grabs and knees (new `ActionManager.Combat.Clinch`). It has a 3 s cooldown.
+  - **What beats what:** it goes through a guard and a parry window, but loses to a swing that's winding up. A dodge
+    still slips it.
+  - **Caught:** 4 damage and +25 posture (a posture break if that fills it), and they double over.
+- **Riposte.** Land a parry and your next M1 within 0.9 s is a riposte: 1.5x damage, a stagger and a heavy hit-stop
+  (`DamageLogic.Parry` opens the window, `Combat.M1` spends it).
+- **The readout** names the move over your combo count: SHOVE, BODY BLOW, CLINCH, or RIPOSTE in crimson like COUNTER.
+- **Supporting changes:**
+  - **`DamageLogic`:** a move can ask for its own hit reaction (`React`), name itself (`Tag`), mark itself heavy
+    (`Heavy`), and go through a parry window (`IgnoreStates.Parry`, for the grab).
+- **Stand-in clips:** until bespoke ones exist, the moves use the existing Fist clips: M1.4 (both arms drive forward)
+  for the shove, M1.3 (the hook) for the body blow, and M2 (the leg drives up) for the knee.
+
+### Fixed
+- **One click is one swing, for real (2.8.0 follow-up).** 2.8.0 told a new click from a hold-repeat by timing (a gap over
+  0.09 s). But the network batches the repeats about 0.1 s apart, so a click could still queue a second swing (seen
+  here: 2 clicks, 3 swings).
+  - **Now:** the M1 packet carries a flags byte (`UnPackets.M1` is `NumberU8`: 1 = aerial, 2 = a new press), and only a
+    flagged press is buffered (`InputController.Combat.M1`, `ActionManager`).
+  - **Checked:** 1, 2 and 3 clicks gave exactly 1, 2 and 3 swings afterwards.
+
+### Tested (NH Combat Test, slot 4 Testy on Fists, 11 PM, real mouse and keyboard)
+- **Launcher:** 2 clicks then R. M2 arrived 0.05 s after hit 2 landed; Testy played the uppercut and the Inf Dummy
+  went up from Y 3.9 to 15.9.
+- **Body Blow:** 3 hits then R played the hook, the dummy doubled over (clip 1), and the readout said BODY BLOW.
+- **Shove:** 1 click then R played the double push, the dummy took the knockback reaction 20 studs away, and the readout
+  said SHOVE.
+  - The first version ("hold back + R") swung at nothing: holding S turns the character away. It was changed to "after
+    hit 1".
+- **Clinch:**
+  - Holding F and clicking against the Blocking dummy (guard up): it took 4.1 damage (100 to 95.9) and +25 posture (0 to
+    25), and doubled over. The readout said CLINCH.
+- **Riposte:**
+  - Testy parried the Attacking dummy's swing (the window opened), and the M1 0.45 s later spent it.
+  - With the window set directly, the hit showed RIPOSTE.
+- **Console:** no script errors.
+- **Restored:** `SlotCount` back to 3 and `NHTestNoMenuKeys` cleared.
+
+### Not tested
+- **The clinch losing to a swing:** that case wasn't produced in a test.
+- **Riposte damage:** the 1.5x wasn't read directly (the dummies have infinite health or regenerate).
+- **The moves in motion:** how they look and feel at full speed, by eye.
+- **Input devices:** gamepad and touch.
+- **The Map:** not ported.
+
 ## [2.9.0] - 2026-11-13: Combat feel: counter-hits, hits that react to where they land, heavy tells, and a combo counter
 
 Owner: "Feel set 1-4", concepts 1 to 4 in `docs/Combat-Audit-and-Concepts.md`. The live scripts are mirrored in
