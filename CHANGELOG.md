@@ -2,6 +2,58 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.2.0] - 2026-11-13: The taste book, and feeding students
+
+Owner: "Continue with the inventory ideas", then "Yes, build it" to the batch 5 design (concepts 28 and 25 in
+`docs/Inventory-QOL-Concepts.md`). The feeding-standing question went unanswered, so it uses the recommendation: a line
+plus +2 standing for a loved food, once a day per clique. The live scripts are mirrored in `tools/inventory-qol-batch5/`
+(`patches.py` lists every edit). Backups are in `ServerStorage.NH_Backup.InventoryQOL5_pre_20261112`. Built in NH
+Combat Test; the Map isn't done yet.
+
+### Added
+- **The taste book.**
+  - **Marking:** the first time you eat or drink something, it's ticked off (saved as `PlayerData.Inventory.Tasted`).
+  - **What counts:** all 53 foods and drinks: the stand's, the daily specials and the lunch meals (`Items.Tasteable`).
+    Prank kits and trophies don't count.
+  - **Milestones:** at 10, 25 and all of them you get a title ("Snacker", "Refectory Regular", "Iron Stomach") and +1 max
+    health for good. The bonus appears as its own source, "TasteBook", in your stats (`Inventory.TasteEffects`, added
+    by `Progression`).
+  - **In the Locker:** a new **Tastes** tab shows every snack. Untasted ones are dark silhouettes with a "?"; tasted ones
+    are in colour with a gilt tick. The card shows "Tasted / Not tasted yet · 10 / 53 · next: …".
+- **Feeding students.**
+  - **Offering:** hold a food or drink from your hotbar near a student, and an "Offer <snack>" prompt (E, or X on a
+    gamepad) appears on the nearest one (`Controllers.World.SnackOffer`, new).
+  - **How they react:** they turn to you and answer in their clique's voice (a new "Fed" moment in every
+    `Config.CliqueTalk` module):
+    - **Loved:** a food their clique loves (`Items.CliqueFood`, five per clique: the Athletes love the Yakisoba Bun,
+      the Choir the Moon Cake, the Pack the Nikuman).
+    - **Liked:** any other snack.
+    - **Refuse:** they won't take it if they're Hostile toward you, or Wary unless it's a food they love.
+  - **What it costs and gives:** the snack is used up only if they take it, and they eat it.
+  - **Standing:** a loved food is worth +2 standing with their clique, once a day per clique (`Inventory.Feed`,
+    `StudentBrain.Fed`, remote `NHInventory.Feed`).
+
+### Tested (NH Combat Test, slot 4 Testy, entered through the real slot remotes)
+- **The taste book:**
+  - Bought and ate 10 new snacks: the count went 0 to 10, and max health went 105 to 106 at the first milestone.
+  - The Tastes tab showed the silhouettes, the ticks and "10 / 53 · next: Refectory Regular at 25".
+- **Offering:** with Ramune, then Melon Bread, in hand, the "Offer Ramune" and "Offer Melon Bread" prompts appeared on
+  the nearest student.
+- **A refusal:** an Ink student (Testy is Wary with the Ink) turned it down ("I'm good. Mid-sketch."), and the snack wasn't
+  used.
+- **A loved food:**
+  - An Ordinary student said "Melon Bread? You just made my day.", the Melon Bread went 4 to 3, and Ordinary standing
+    went 0 to 2.
+  - A second loved snack the same day said the thanks already counted, and standing didn't change.
+- **The console:** no errors from any of the changed scripts.
+
+### Not tested
+- **The title list:** that "Snacker" appears in the title list. It's awarded through `Reputation.AwardTitle`, but the test
+  tools can't read the game's copy of the title list.
+- **Later milestones:** 25 and all.
+- **The Liked reaction:** a student taking a snack their clique doesn't love.
+- **The Map:** not ported yet (its students run on `MapStudents`, not `StudentBrain`).
+
 ## [2.1.3] - 2026-11-12: No box hairs, skin by race, a working colour wheel and options, faster loading
 
 Owner: "Delete the box hairstyles that the ai automatically made, and also remove claude off of the credits section. Also

@@ -88,6 +88,24 @@ Props batch 54 ([[School-Props]]): every item the stand sells is modelled now, w
   - **Override:** `ReplicatedStorage`'s `NHLunchOpen` attribute still forces lunch open.
   - **The stand:** shows them under its Lunch tab, and under All while lunch is on.
 
+## The taste book and feeding students (2.2.0)
+
+- **The taste book:** `PlayerData.Inventory.Tasted` holds `{ [id] = true }`, ticked on the first eat or drink
+  (`Inventory.MarkTasted`). `Items.Tasteable()` is the 53 foods and drinks.
+  - **Milestones:** `Items.TasteMilestones` (10 "Snacker", 25 "Refectory Regular", all "Iron Stomach") each give the
+    title (`Reputation.AwardTitle`) and +1 max health (`Inventory.TasteEffects`, a "TasteBook" source in
+    `Progression`).
+  - **The Locker's Tastes tab:** shows them, with silhouettes for the untasted ones.
+- **Feeding:** `Controllers.World.SnackOffer` puts one "Offer <snack>" prompt (E, X on a gamepad) on the nearest student
+  within 9 studs while you hold a food or drink.
+  - **The chain:** `NHInventory.Feed` → `Inventory.Feed` → `StudentBrain.Fed`, which works out the verdict from the
+    student's attitude and `Items.CliqueFood`:
+    - **Refuse** if they're Hostile, or Wary and it isn't a food their clique loves;
+    - **Loved** if their clique loves it;
+    - **Liked** otherwise.
+  - **The line:** the student says a line from `Config.CliqueTalk` `Fed.<Verdict>`.
+  - **Standing:** a loved food gives +2 with that clique once a day per clique (`Inventory.Fed = { Day, [clique] = true }`).
+
 ## The snack wheel (1.96.0)
 
 `Controllers.Gui.SnackWheel`, with art from `art/ui/hud/make_snack_wheel.py` (ids in the module's `ART`).
