@@ -2,6 +2,48 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.6.1] - 2026-11-13: Students stop hopping in the hallway crowd
+
+Found while testing 2.3.0: in the Before School and Passing crowds, every scheduled student jumped about 8 times a
+minute, and some landed on lockers. It predates 2.3.0 (115 jumps in 75 s before it, 100 after). `Services.AI.Nav` (the
+same file in both places) and `Features.Schedules` (Combat Test). Source and the exact edits: `tools/nav-jumps-261/`.
+
+### Fixed
+- **The real trigger: the path smoother.** It skips ahead to a further waypoint along a clear line. The "stuck" check
+  still compared against the best distance to the old, nearer waypoint, so 1.1 s later a student walking freely down a
+  straight hall counted as stuck and hopped. Progress is now measured afresh whenever the smoother skips ahead. This was
+  106 of the 144 jumps logged in one 75 s run.
+- **Blocked on the flat, they sidestep.** Being really stuck used to jump first, onto whatever was in the way: another
+  student, a locker, a sofa, a pillar's plinth. Now it jumps only where the path itself goes up (the waypoint ahead is
+  higher than the feet) and a real step is at the feet: something whose top, just past its front edge, is 0.3 to 1.8
+  studs up, with 4 studs of room above it. A desk, a locker or a wall is taller than that, so it never counts, and
+  other students and players are never in those rays. Otherwise it slides along whatever is in the way.
+- **Jump waypoints on flat floor are walked.** Waypoints sit about 0.9 studs above the floor (1.00 over the Map's
+  planks at 0.05), so the old ledge check (a Jump waypoint "over 0.8 studs above the feet") read every flat floor as a
+  ledge. The rise is now measured to the ground under the waypoint. A Jump waypoint is jumped only when the ground
+  there, or at the next waypoint, is over 0.8 studs up, or 0.3 to 0.8 with a real step at the feet. The planner's
+  own ledges are still jumped, which is how the Map's students get onto the bowed entrance flight (a jump onto its
+  side).
+- **Class students don't climb onto desks.** A class student walked to the floor 2.5 studs behind their chair.
+  Rows are 5 studs apart, so in the back rows that point was the top of the desk behind (6 of R103's 9 seats), and the
+  planner jumped them onto it. When that point isn't at the chair's floor, they now walk to the aisle beside the chair
+  (`Features.Schedules`, `Local.Class`). They sit the same way as before.
+
+### Tested (NH Combat Test and the Map, server play-tests, no save slot loaded)
+- **The same 75 s test** (`SchedulePlan("BeforeSchool", "Before School", 8)`, 14 students): **0 jumps**, from 85 and
+  131 in two runs before the fix. All 14 students reached their spots (`ok`).
+- **Passing, then class:** 0 jumps in 25 s of Passing (14 students), then 0 in the 60 s walk to R103. All 6 sat in
+  their chairs, through the room's door. Before the desk fix, the same walk had 3 to 5 jumps by the desks.
+- **The Map's entrance steps:** all 6 students went from the yard (Y -8) up the front flight
+  (`EntranceFlightBowed`), through the entrance doors and to their spots in the halls (Y 0), all `ok`. That was 6
+  jumps, one per student at the foot of the flight, and none in the halls or the yard. Going back out: 0 jumps.
+- **Logged before fixing:** a Studio-only counter on each `Hum.Jump` branch (since removed) split the 144 jump requests
+  into the smoother (106), real crowd blocks (22) and Jump waypoints (16).
+- **Not tried:** a player walking into students (the nudges' `Shuffle` code is unchanged), a full in-game day, and
+  a second player.
+- **Backups:** `ServerStorage.NH_Backup.NavJump_pre` (`Nav` in both places, `Schedules` in Combat Test).
+- **Both places need a save** (File > Save to Roblox); nothing was published.
+
 ## [2.6.0] - 2026-11-13: Racial grips: every race's own finisher, victims that fight, new effects and sounds
 
 Owner: "/design the racial grip animations that dont have any. And make animations for the victims of the racial
