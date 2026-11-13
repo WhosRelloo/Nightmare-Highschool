@@ -152,18 +152,27 @@ clip with no victim clip and no weld; effects use the existing `nh_*` and tier-u
   wraith's palm on the chest within 0.01; the ghoul victim's hand on the ghoul's head within 0.3; most attacker holds
   within 0.4; the werewolf's haul and the priest's head hold slip up to about 0.8 studs on the fastest jolts.
 
-## Verified for 2.6.2 (Edit only)
-- All 11 sequences were rebuilt in NH Combat Test.
-- A rig posed from GripHuman at 1.3 s stood beside one posed from the game's Crouch. Both lowest points were 0.41 under
-  the floor top, and the side views match.
-- The Vampire bite and the Priest exorcism were posed from the installed clips, victims at their offsets, and
-  screenshotted.
-- Not played in a session: Play was reserved by other sessions.
+## Verified for 2.6.2
+- **Edit:**
+  - All 11 sequences were rebuilt in NH Combat Test.
+  - A rig posed from GripHuman at 1.3 s stood beside one posed from the game's Crouch. Both lowest points were 0.41
+    under the floor top, and the side views match.
+  - The Vampire bite and the Priest exorcism were posed from the installed clips, victims at their offsets, and
+    screenshotted.
+- **Play, slot 4 "Testy", the real N key:** Human, Priest and Vampire grips on downed dummies (`NHTestBridge`).
+  - Both clips played every time, and each victim died and was removed at the end.
+  - Sampled on the client mid-grip, the player's torso dropped 0.93-1.13 (1.31 on the Priest's palm strike).
+  - The lowest point was always the back knee, 0.40-0.42 into the real floor. The HRP stayed at standing height.
+  - The hip transforms carried the slide; for example, the Human's Right Hip was (0.59, 1.37, 0.12) at 1.3 s, the
+    pack's value.
+  - The Vampire stood back up by 2.9 s.
+  - The client played the test mirror's copies of the clips (see the 2.6.0 note below).
+  - Testy is back to Human / Human, and the slot flags are restored.
 
 ## Not verified / known limits
-- **2.6.2 has not been play-tested.** The reworked clips haven't run through the N key or replicated to a client.
-  Roblox plays limb Pose positions, and the in-game Crouch relies on them, but these clips haven't been seen in motion
-  in Studio.
+- **2.6.2:**
+  - The Werewolf, Wraith and Ghoul-victim clips have not been play-tested.
+  - No side-on screenshot of the player mid-grip: the grip camera stays behind the player.
 - **The client view used a test mirror.** Studio's temporary preview ids registered on the server don't load on the
   client, so the screenshots came from a test-only script that played the client's own registered copy of each clip in
   step with the server's. Published ids don't have this problem, but the real replicated playback is untested until the

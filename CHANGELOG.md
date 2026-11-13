@@ -36,7 +36,7 @@ and "Don't be afraid to use other animations we already have". Details: `docs/Ra
   - The Human's victim strains its chest up off the floor, twisting toward the stake arm.
   - The possessed body no longer lies flat while it grabs the priest's wrist.
 
-### Tested (Edit only, NH Combat Test and the Map place)
+### Tested (NH Combat Test: Edit, then Play on slot 4 "Testy")
 - All 11 KeyframeSequences rebuilt in `ServerStorage.NH_GripAnims`. The Studio Builder already applies a position on
   any part.
 - **Crouch match:**
@@ -50,9 +50,20 @@ and "Don't be afraid to use other animations we already have". Details: `docs/Ra
   - Hand contact, worst frame: attackers 0.25-0.38 studs, victims 0.00-0.31. The Wraith's palm floats over the chest
     by design.
   - No part under the floor beyond the crouch knee.
-- **Not tested:** live play. NH Combat Test's Play was reserved by other sessions, so the reworked clips have not been
-  seen through the N key or on the client. The KeyframeSequences need publishing again, and NH Combat Test needs a
-  save. The Map place only held a temporary preview stage, which has been removed.
+- **Play on slot 4 "Testy", through the real N key:** Human (on a Vampire dummy), Priest (on a Vampire dummy) and
+  Vampire (on a Human dummy). The dummies were downed with `NHTestBridge`.
+  - Both clips played every time, and each victim died and was removed at the end.
+  - Sampled on the client mid-grip, the player's torso dropped 0.93-1.13. It sank to 1.31 on the Priest's palm strike.
+  - The lowest point was always the back knee, 0.40-0.42 into the real floor. The HRP stayed at standing height.
+  - The hips carried the slide; for example, the Human's Right Hip was (0.59, 1.37, 0.12) at 1.3 s, the pack's value.
+  - The Vampire rose to standing by 2.9 s, with no slide left.
+  - The client played its own registered copies of the clips (the test mirror), because Studio's temporary ids don't
+    load on the client.
+- **Not tested:**
+  - The Werewolf, Wraith and Ghoul-victim clips in Play.
+  - A side-on screenshot of the player mid-grip: the grip camera held the view behind the player.
+- **Still to do:** the KeyframeSequences need publishing again, and NH Combat Test needs a save. Testy's race is back to
+  Human / Human, the slot flags are restored, and the Map place only held a temporary preview stage, now removed.
 
 ## [2.6.1] - 2026-11-13: Students stop hopping in the hallway crowd
 
