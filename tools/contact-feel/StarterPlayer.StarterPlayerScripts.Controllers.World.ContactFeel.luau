@@ -10,7 +10,8 @@
 	frame of your own movement is undone at once (that is the solid stop: your humanoid keeps walking into them and
 	gets put back, so you never sink in); a bigger one (they walked into you, or spawned on you) is eased out at
 	PUSH_RATE. What's left of your movement along their side carries on, so you slide round them; walking straight at
-	them, you're steered to the side you're already a little on. A push that would go into a wall isn't made, and if
+	them, you're steered to the side you're already a little on (the other side if that one is walled; the push and the
+	steer are checked for walls apart, with sphere casts). A push that would go into a wall isn't made, and if
 	you're stuck against them (trying to walk but getting nowhere: between two students, or a student and a wall), or
 	standing still with one walking into you, for PIN_TIME, they let you through for GHOST_TIME. (Not while an
 	impact's slow is on: then being stopped is the point.)
@@ -56,6 +57,8 @@ local BODY = 1.1         -- studs from your root to your side: the push stops sh
 local PIN_TIME = 0.4     -- s stuck before you're let through
 local STUCK = 2          -- studs/s: trying to walk but moving slower than this, in contact, is stuck
 local GHOST_TIME = 1.2   -- s a student lets you through after that
+local MAX_DT = 1 / 20    -- s: steering, the step back and the stuck timer never take a bigger frame than this
+local CAST = 1           -- studs: radius of the wall check's sphere casts (about half your shoulders)
 
 local IMPACTS = true      -- false: the slide only
 local MIN_IMPACT = 4
@@ -64,6 +67,7 @@ local COOLDOWN = 0.6
 local BRUSH_SLOW, BRUSH_TIME = 0.65, 0.25 -- WalkSpeed x this, for this long
 local HARD_SLOW, HARD_TIME = 0.08, 0.3
 local FLOOR = 5          -- WalkSpeeds at or below this (stuns, a crawl) are never slowed or restored
+local TAIL = 0.3         -- s after a slow ends that an echo of a slowed value is still put right
 local ROCK_SPEED, ROCK_TIME = 8, 0.3 -- the hard hit's step back: studs/s at the start, easing to 0 (1.2 studs)
 local LEAN, LEAN_IN, LEAN_OUT = math.rad(13), 0.07, 0.33 -- the hard hit's lean back
 local REPORT = 4         -- reports a second, at most (the server allows 4)
@@ -131,6 +135,9 @@ function Local.Scan(C: Model, Root: BasePart)
 		local F = workspace:FindFirstChild(N)
 		if F then table.insert(Ex, F) end
 	end
+	for _, Pl in Players:GetPlayers() do
+		if Pl.Character and Pl.Character ~= C then table.insert(Ex, Pl.Character) end -- other players aren't walls
+	end
 	Params.FilterDescendantsInstances = Ex
 	local Now = os.clock()
 	for M in Touch do if not Cands[M] then Touch[M] = nil end end
@@ -138,12 +145,13 @@ function Local.Scan(C: Model, Root: BasePart)
 	for M, T in Ghost do if T < Now or not M.Parent then Ghost[M] = nil end end
 end
 
--- nothing solid within BODY of your side along Dir (waist, knee and shin height). The rays start a little behind you:
--- a ray that starts inside a wall you're already touching doesn't see it.
+-- nothing solid within BODY of your side along Dir: two sphere casts (CAST wide, at the waist and at the knee, so
+-- shallow angles and low rims are caught). They start a little behind you, because a cast that starts inside a wall
+-- you're already touching doesn't see it.
 local function roomFor(Root: BasePart, Dir: Vector3, Dist: number): boolean
 	local P = Root.Position - Dir * 0.6
-	for _, H in { 0, -1.4, -2.3 } do
-		if workspace:Raycast(P + Vector3.new(0, H, 0), Dir * (Dist + BODY + 0.6), Params) then return false end
+	for _, H in { 0, -1.6 } do
+		if workspace:Spherecast(P + Vector3.new(0, H, 0), CAST, Dir * (Dist + BODY - CAST + 0.6), Params) then return false end
 	end
 	return true
 end
@@ -157,9 +165,12 @@ end
 	  * A change we didn't make, above FLOOR, is the game's new speed (a sprint starting or ending): it becomes Raw and
 	    is slowed in turn. A value we wrote coming back is an echo (Equip and AnimationController zero WalkSpeed for a
 	    frame and put back what they read): ignored. FLOOR and below (a stun, a crawl) is left alone.
-	  * At the end Raw goes back, but only if WalkSpeed is still what we wrote; anything else is the game's.
+	  * At the end Raw goes back, but only if WalkSpeed is still what we wrote; anything else is the game's. For TAIL
+	    seconds after that, a value we wrote that comes back (Equip read our slowed value just before the end and puts
+	    it back 0.01 s later) is replaced with Raw; a new game speed in that time becomes Raw.
 ]]
 local Slow = nil :: any
+local Tail = nil :: RBXScriptConnection?
 
 local function key(V: number): string
 	return string.format(`%.3f`, V)
@@ -185,14 +196,34 @@ function Local.OnSpeed()
 	Local.ApplySlow()
 end
 
+function Local.EndTail()
+	if Tail then Tail:Disconnect() Tail = nil end
+end
+
 function Local.EndSlow()
 	local S = Slow
 	Slow = nil
 	if not S then return end
 	S.Conn:Disconnect()
-	if S.Applied and S.Hum.Parent and math.abs(S.Hum.WalkSpeed - S.Applied) < 1e-3 then
-		S.Hum.WalkSpeed = S.Raw
-	end
+	local Hum = S.Hum
+	if not Hum.Parent then return end
+	if S.Applied and math.abs(Hum.WalkSpeed - S.Applied) < 1e-3 then Hum.WalkSpeed = S.Raw end
+	Local.EndTail()
+	local Raw = S.Raw
+	local Conn
+	Conn = Hum:GetPropertyChangedSignal(`WalkSpeed`):Connect(function()
+		local W = Hum.WalkSpeed
+		if S.Wrote[key(W)] and key(W) ~= key(Raw) then
+			Hum.WalkSpeed = Raw -- our slowed value put back by someone who read it during the slow
+		elseif W > FLOOR then
+			Raw = W -- the game's own new speed
+		end
+	end)
+	Tail = Conn
+	task.delay(TAIL, function()
+		Conn:Disconnect()
+		if Tail == Conn then Tail = nil end
+	end)
 end
 
 function Local.Slow(Hum: Humanoid, Factor: number, Seconds: number)
@@ -202,6 +233,7 @@ function Local.Slow(Hum: Humanoid, Factor: number, Seconds: number)
 		Slow.Factor = math.min(Slow.Factor, Factor) -- a hard hit during a brush wins
 		Slow.Until = math.max(Slow.Until, Now + Seconds)
 	else
+		Local.EndTail() -- a new slow takes over from the last one's tail
 		if Hum.WalkSpeed <= FLOOR then return end
 		Slow = { Hum = Hum; Raw = Hum.WalkSpeed; Factor = Factor; Until = Now + Seconds; Wrote = {} }
 		Slow.Conn = Hum:GetPropertyChangedSignal(`WalkSpeed`):Connect(Local.OnSpeed)
@@ -305,7 +337,7 @@ function Local.Rock(Dt: number, Root: BasePart)
 	if A >= 1 then
 		Rock = nil
 	else
-		local Step = ROCK_SPEED * (1 - A) * Dt
+		local Step = ROCK_SPEED * (1 - A) * math.min(Dt, MAX_DT)
 		if roomFor(Root, Rock.Dir, Step) then Root.CFrame += Rock.Dir * Step end
 	end
 end
@@ -359,6 +391,7 @@ function Local.Step(Dt: number)
 	local Push, Steer = Vector3.zero, Vector3.zero
 	local Depth = 0
 	local Hits = {} :: { Model }
+	local Steering = {} :: { any }
 	local Frame = VH.Magnitude * Dt * 1.25 + 0.05 -- an overlap this small is this frame's own step in: undone at once
 	-- a teleport (or a respawn) that lands you on a student isn't a bump: no impact, just the push out
 	local Jumped = LastPos ~= nil and flat(P - LastPos).Magnitude > math.max(4, Frame * 3)
@@ -387,25 +420,38 @@ function Local.Step(Dt: number)
 			if not T.Side then
 				local Lateral = D - Move.Unit * D:Dot(Move.Unit)
 				T.Side = if Lateral.Magnitude > 0.05 then Lateral.Unit else flat(Root.CFrame.RightVector).Unit
+				T.Flips = 0
 			end
-			Steer += T.Side * Hum.WalkSpeed * STEER
+			if T.Flips <= 2 then
+				Steer += T.Side * Hum.WalkSpeed * STEER
+				table.insert(Steering, T)
+			end
 		end
 	end
 	if #Hits > 0 then
-		local Disp = Push + Steer * Dt
+		-- the push out and the steer are checked for walls apart: a walled steer must not cancel the push
 		local Blocked = false
-		if Disp.Magnitude > 1e-4 then
-			if roomFor(Root, Disp.Unit, Disp.Magnitude) then
-				Root.CFrame += Disp
+		if Push.Magnitude > 1e-4 then
+			if roomFor(Root, Push.Unit, Push.Magnitude) then
+				Root.CFrame += Push
 			else
 				Blocked = true
+			end
+		end
+		local Step = Steer * math.min(Dt, MAX_DT)
+		if Step.Magnitude > 1e-4 then
+			if roomFor(Root, Step.Unit, Step.Magnitude) then
+				Root.CFrame += Step
+			else
+				-- that side is walled: go round the other way (twice at most, then the stuck rule lets you through)
+				for _, T in Steering do T.Side = -T.Side T.Flips += 1 end
 			end
 		end
 		-- pinned: the push can't be made (a wall), you're walking but getting nowhere (two students, a student and a
 		-- wall), or one keeps walking into you while you stand there (they'd shove you along their whole path)
 		local Progress = if LastPos then flat(Root.Position - LastPos).Magnitude / math.max(Dt, 1e-3) else math.huge
 		local Pinned = Blocked or (Move.Magnitude > 0.1 and Progress < STUCK) or (Move.Magnitude < 0.1 and Depth > Frame)
-		PinnedFor = if Pinned and not Slow then PinnedFor + Dt else 0
+		PinnedFor = if Pinned and not Slow then PinnedFor + math.min(Dt, MAX_DT) else 0
 		if PinnedFor > PIN_TIME then
 			for _, M in Hits do Ghost[M] = Now + GHOST_TIME Touch[M] = nil end
 			PinnedFor = 0
@@ -432,8 +478,10 @@ function Shared.OnStart()
 	RunService.PostSimulation:Connect(guard(Local.Step))
 	Player.CharacterRemoving:Connect(function()
 		Local.EndSlow()
+		Local.EndTail()
 		table.clear(Touch)
 		Rock, Lean = nil, nil
+		NextScan, LastPos, PinnedFor = 0, nil, 0 -- the new character gets a fresh look and ray filter at once
 	end)
 end
 

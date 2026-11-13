@@ -67,3 +67,53 @@
 - The probe ModuleScript, `NHProbeOut`, `NHServerLog`, `NHServerLog2` and the workspace `NHContactTestLoop` attribute.
 - Testy's health and status changed: Clique wardens and the night hurt her, so she was Wounded and Chilled. The game did
   that, not the test, and nothing was written to the profile by the test.
+
+## Fix round 1 (2026-11-12, code review items 1-8)
+
+### What changed
+
+1. **WalkSpeed after Equip.** When a slow ends there's now a 0.3 s tail. If a value we wrote comes back in that window,
+   it is replaced with the raw speed. This covers Equip or AnimationController reading the slowed value and putting it
+   back after the end. A new game speed in that window becomes the raw speed. A new slow cancels the tail.
+2. **NudgeWaiting can't stick.** The MakeWay wait now runs under pcall, keeps hold of the root it started with, and clears
+   `NudgeWaiting` and `NudgeHit` on every way out. `Brain.Attach` and `Brain.Detach` clear both flags too.
+3. **Wall checks.** The push out and the steer are now checked and applied separately. A walled steer side flips (at
+   most twice, then the stuck rule takes over). The wall check is two sphere casts (radius 1, at the waist and the knee)
+   instead of three rays.
+4. **Server reach.** The lag allowance uses the server-seen speed, capped at the server humanoid's WalkSpeed x 1.1 + 2.
+   LAG is now 0.35 s plus the player's ping (up to 0.4).
+5. **Big frames.** Steering, the step back and the stuck timer clamp Dt to 1/20 s.
+6. **Respawn.** On respawn, `NextScan`, `LastPos` and `PinnedFor` are reset. Other players' characters are excluded
+   from the wall check.
+7. **Brain.Contact.** It now does the loop's set-up: clears `S.Pending`, drops the lean pose and sets
+   `NHStep = reacting: Contact`. It returns false, without setting `Reacting`, when `Nudges.Ready` says Handle wouldn't
+   take the student.
+8. **Direction check.** The server refuses a Direction longer than 2.
+
+Item 9 is skipped. Taking the velocity into the student off fights the humanoid: in the first build it was set every
+frame (PreSimulation) and the probe still read 14.4 studs/s on every frame while Testy was held at d 1.4 to 2.2. The
+humanoid's walk controller puts it back within the same step. Correcting the position after physics is what holds you.
+
+### Results
+
+| Check | Result | Numbers |
+|---|---|---|
+| Item 1: Equip's zero-and-restore right as a brush slow ends | **PASS** | I did exactly what Equip does (WalkSpeed 0, then the value it read put back 0.01 s later) at 0.236 to 0.246 s into the 0.25 s slow, 5 times. Each time WalkSpeed went 9.36, then 0, then 14.40, and stayed at 14.40. |
+| Item 1: the same with a slower put-back, which certainly lands after the end | **PASS** | Brush: zero at +0.215 s, 9.36 put back at +0.317 s (after the slow ended at +0.25). The tail turned it into 14.40. Hard hit (client WalkSpeed 26): zero at +0.265 s, 2.08 put back at +0.367 s (after the 0.3 s slow). The tail turned it into 26.00. The old code would have left 9.36 and 2.08. |
+| Item 1: the real E key while walking | **see note** | One run with E pressed while the probe was walking (no contact happened) left the client WalkSpeed at 0, with the server at 14.4. ContactFeel had no slow or tail running then. Equip (`Misc.Equip` lines 77-81) and AnimationController (lines 103-107) both do the zero trick when you toggle equip while moving. If the second one reads the first one's 0, it puts back 0. This is a bug in the game, not ContactFeel. Standing still, E changed nothing. |
+| Item 3: walking along the fountain rim into a student 1.9 studs from it | **PASS** | Root y stayed at 4.30 to 4.31 (before: climbed to 6.49). Max x 129.88, with the rim at 130.5 at knee height (before: 131.14, onto the rim). Two small sideways reversals in 0.4 s of contact, and no frame-to-frame jitter. Testy was let through and walked on. |
+| Item 3: a student walking into Testy, who stands with her back to the rim | **PASS** | The student moved at 6.25 studs/s from 4.8 studs away. The push toward the rim was blocked: Testy's x went 129.30 to 129.36 at most (rim 130.5), y stayed at 4.30, and there was one reversal. The student was let through about 0.4 s after contact. After the 1.2 s ghost, Testy was eased out to d 2.20. |
+| Regression: brush | **PASS** | WalkSpeed 14.4 to 9.36 for 0.25 s, then 14.40. Twist Nudge_Left at weight 0.50 to 0.53 (7 brushes). |
+| Regression: sprint hit (real LeftShift, 25.4 studs/s) | **PASS** | WalkSpeed 25.38 to 2.03 for 0.317 s, then 25.38. Then 41.11 (the full sprint), then 12.00 when Shift was let go. Rocked back d 2.38 to 3.25. Twist at weight 1.00. The server accepted the report at a server distance of 9.35 (server WalkSpeed 25.38, allowance 12.8). The student reacted 2 ms later and said "Late for something?" at contact. |
+| Item 2: NudgeWaiting cleared on despawn | **NOT PLAY-TESTED** | Code change only. No student despawned mid-wait during the run. |
+| Console | **PASS** | No `[ContactFeel]` or `[StudentBrain]` warnings. |
+
+Afterwards Edit shows `SlotCount = 3;`, no "NH TEMP" text, `NHTestNoMenuKeys` nil, and no probe instances. The live
+checksums match the repo:
+
+| Script | Checksum |
+|---|---|
+| ContactFeel client | 126542631 |
+| ContactFeel server | 632163846 |
+| StudentBrain | 221750915 |
+| Nudges | 737499781 |

@@ -247,26 +247,39 @@ Nudges.OnShove = nil :: ((any, any) -> ())?
 -- it's a shove (to say the bump line then, not on the approach)
 Nudges.OnContact = nil :: ((any, any, string, number, boolean) -> ())?
 
--- Brain.OnBump: true when the nudge handled it (the brain skips its step aside). Kind: "MakeWay", "Space", or
--- "Contact" (a bump the player's client reported: react now)
-function Nudges.Handle(S, Rec, Kind: string): boolean
+-- (contact feel) whether Handle would take this student now (the checks it makes before it waits or plays anything)
+function Nudges.Ready(S, Rec): boolean
 	if S.Seated or not (S.Model and S.Hum and S.Root and Rec) then return false end
 	if os.clock() < (S.NudgeReady or 0) or S.NudgeWaiting then return false end
 	if not (idOf(`Nudge_Left`) and idOf(`Nudge_Right`) and idOf(`Shove_Forward`)) then return false end
-	local R = rootOf(Rec)
-	if not R then return false end
+	return rootOf(Rec) ~= nil
+end
+
+-- Brain.OnBump: true when the nudge handled it (the brain skips its step aside). Kind: "MakeWay", "Space", or
+-- "Contact" (a bump the player's client reported: react now)
+function Nudges.Handle(S, Rec, Kind: string): boolean
+	if not Nudges.Ready(S, Rec) then return false end
+	local R = rootOf(Rec) :: BasePart
 	-- wait for the brush itself (Space: they're already on top of us; Contact: it happened)
 	local Until = os.clock() + (if Kind == `MakeWay` then WAIT_CONTACT else 0)
 	local Reach = if Kind == `Space` then CROWD_CONTACT elseif Kind == `Contact` then math.huge else CONTACT
-	local Dist = flat(R.Position - S.Root.Position).Magnitude
+	local Root0 = S.Root
+	local Dist = flat(R.Position - Root0.Position).Magnitude
 	S.NudgeWaiting = true
 	S.NudgeHit = nil
-	while Dist > Reach and not S.NudgeHit do
-		if os.clock() > Until or not (R.Parent and S.Root.Parent) then S.NudgeWaiting = nil return true end -- no brush: carry on walking
-		RunService.Heartbeat:Wait()
-		Dist = flat(R.Position - S.Root.Position).Magnitude
-	end
+	-- (contact feel) the wait can't throw (the host may despawn the student and reuse S meanwhile), and the flag is
+	-- cleared on every way out: a stuck NudgeWaiting would end this student's nudges for good
+	local Ok, Brushed = pcall(function()
+		while Dist > Reach and not S.NudgeHit do
+			if os.clock() > Until or not (R.Parent and S.Root == Root0 and Root0.Parent) then return false end
+			RunService.Heartbeat:Wait()
+			if not (R.Parent and S.Root == Root0 and Root0.Parent) then return false end
+			Dist = flat(R.Position - Root0.Position).Magnitude
+		end
+		return true
+	end)
 	S.NudgeWaiting = nil
+	if not (Ok and Brushed) or S.Root ~= Root0 then S.NudgeHit = nil return true end -- no brush: carry on walking
 	-- a reported bump ended the wait (Brain.Contact): it's who actually hit us
 	local Hit = S.NudgeHit
 	S.NudgeHit = nil

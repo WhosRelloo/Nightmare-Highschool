@@ -6,10 +6,11 @@
 	  * the model is a live brain student (NHBrain, in the workspace, alive, not down);
 	  * the player is alive, not down, and their root is within REACH of the student (flat). Their position here lags
 	    what their client saw (replication: measured 3.5 studs behind at 13 studs/s in Studio), so a moving player
-	    gets LAG seconds of the speed the server itself saw on top, as long as the student is ahead of them along the
-	    way they were going;
+	    gets LAG seconds (plus their ping) of the speed the server itself saw on top, as long as the student is ahead
+	    of them along the way they were going. That speed comes from the client's replicated velocity, so it is
+	    capped by the server's own WalkSpeed for them (x 1.1 + 2);
 	  * they've sent no more than RATE reports in the last second;
-	  * Speed and Direction are sane numbers. Speed is cut to what the server itself saw them move at lately
+	  * Speed and Direction are sane numbers (Direction is a unit vector: longer than 2 is refused). Speed is cut to what the server itself saw them move at lately
 	    (StudentBrain.Nudges.TopSpeed, over its 0.6 s ram memory) plus SLACK.
 	Anything else is dropped without a word. A good report goes to StudentBrain.Contact, which remembers the hit and
 	makes the student react to how hard it was.
@@ -26,7 +27,8 @@ local Shared = {}
 local Local = {}
 
 local REACH = 4        -- studs (flat) between the roots
-local LAG = 0.4        -- s of the server-seen speed added to REACH for a moving player (13 studs/s: 9.2 in all)
+local LAG = 0.35       -- s of the server-seen speed added to REACH, plus the player's ping (up to MAX_PING)
+local MAX_PING = 0.4   -- s
 local AHEAD = 0.3      -- past REACH, the student must be this far ahead (dot) along the reported direction
 local RATE = 4         -- reports a second
 local SLACK = 2        -- studs/s over the server's own top speed
@@ -51,7 +53,7 @@ function Local.OnImpact(P: Player, Model: any, Speed: any, Dir: any)
 	if typeof(Model) ~= `Instance` or not Model:IsA(`Model`) or Model:GetAttribute(`NHBrain`) ~= true then return end
 	if not Model:IsDescendantOf(workspace) then return end
 	if typeof(Speed) ~= `number` or not finite(Speed) or typeof(Dir) ~= `Vector3` then return end
-	if not (finite(Dir.X) and finite(Dir.Y) and finite(Dir.Z)) then return end
+	if not (finite(Dir.X) and finite(Dir.Y) and finite(Dir.Z)) or Dir.Magnitude > 2 then return end
 
 	local Now = os.clock()
 	local List = Sent[P] or {}
@@ -68,10 +70,14 @@ function Local.OnImpact(P: Player, Model: any, Speed: any, Dir: any)
 	if not (SRoot and SRoot:IsA(`BasePart`)) or down(Model, Model:FindFirstChildOfClass(`Humanoid`)) then return end
 
 	Speed = math.clamp(Speed, 0, MAX_SPEED)
-	local Seen = math.min(math.max(Nudges.TopSpeed(P), flat(Root.AssemblyLinearVelocity).Magnitude), MAX_SPEED)
+	-- the replicated velocity is the client's word: no faster than the server lets them walk
+	local Allowed = (if Hum then Hum.WalkSpeed else 16) * 1.1 + 2
+	local Seen = math.min(math.max(Nudges.TopSpeed(P), flat(Root.AssemblyLinearVelocity).Magnitude), Allowed, MAX_SPEED)
 	Speed = math.min(Speed, Seen + SLACK)
+	local Ping = 0
+	pcall(function() Ping = math.clamp(P:GetNetworkPing(), 0, MAX_PING) end)
 	local Rel = flat(SRoot.Position - Root.Position)
-	if Rel.Magnitude > REACH + Seen * LAG then return end
+	if Rel.Magnitude > REACH + Seen * (LAG + Ping) then return end
 	local Way = flat(Dir)
 	if Rel.Magnitude > REACH and (Way.Magnitude < 0.1 or Rel.Unit:Dot(Way.Unit) < AHEAD) then return end
 	if math.abs(Root.Position.Y - SRoot.Position.Y) > 5 then return end

@@ -822,6 +822,7 @@ function Brain.Attach(S)
 	S.Agent.Up = S.Up or 3
 	S.Senses = Senses.Perceiver(M, { Bravery = S.Bravery or 0.5; ViewRange = 60 + (S.Social or 0.5) * 20 })
 	S.Reacting, S.Chatting, S.Idling, S.Leaning, S.Replan, S.Pending = false, false, false, false, false, nil
+	S.NudgeWaiting, S.NudgeHit = nil, nil -- (contact feel) a record reused after a despawn starts clean
 	task.spawn(loop, S, M)
 end
 
@@ -842,8 +843,12 @@ function Brain.Contact(Pl: Player, Model: Model, Speed: number, Dir: Vector3): b
 		Dist = (Root.Position - S.Root.Position).Magnitude }
 	if S.Seated then return false end
 	if S.NudgeWaiting then S.NudgeHit = Rec return true end
-	if S.Reacting or os.clock() < (S.NudgeReady or 0) then return false end
-	S.Reacting = true -- the walk (Brain.GoTo) and the loop's reactions wait, as for MakeWay
+	if S.Reacting or not NudgeMod.Ready(S, Rec) then return false end
+	-- the loop's own set-up for a reaction (the walk, Brain.GoTo, and the loop's reactions wait while Reacting)
+	S.Pending = nil
+	S.Reacting = true
+	if S.Leaning then pose(S, nil) S.Leaning = false end
+	step(S, `reacting: Contact`)
 	task.spawn(function()
 		mood(S, `Wary`, 3)
 		local Ok, Err = pcall(NudgeMod.Handle, S, Rec, `Contact`)
@@ -857,6 +862,7 @@ function Brain.Detach(S)
 	if S.Agent then pcall(function() S.Agent:Stop() end) end
 	if S.Senses and S.Senses.Destroy then pcall(function() S.Senses:Destroy() end) end
 	S.Agent, S.Senses = nil, nil
+	S.NudgeWaiting, S.NudgeHit = nil, nil
 end
 
 ---| dress codes (line matrix) |---
