@@ -2,6 +2,58 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.6.2] - 2026-11-13: Racial grips reworked: scarier, smoother, and kneels taken from the game's crouch
+
+Owner, on the 2.6.0 grips: "I like them, but make the animations look more menacing, scary, and smoother. Also make
+sure the legs don't look weird during the animation." Then, with reference shots and a "Kneel Example" model: "Kneels
+should look like this", "Just use the crouching > get up animation as reference that we already have in the game",
+and "Don't be afraid to use other animations we already have". Details: `docs/Racial-Grips.md`.
+
+### Changed
+- **Every kneel is now the game's own crouch** (Crouch, rbxassetid://139672322709288, the 171-key "Crouch idle"),
+  copied pose for pose for the Human, Priest and Vampire grips. The torso drops about a stud and leans in, the front
+  shin stands upright a stud ahead, and the back leg slants back and out with its knee resting on the floor. As in the
+  crouch, the legs slide up into the torso to fold the knee (a Pose translation), and the HRP stays at standing height.
+  The legs stay planted on the floor while the body leans, turns and strikes over them.
+  - The old kneels pivoted rigid legs at the hip under a torso pitched up to 57 deg and read as a lunge or a split.
+- **Menace:**
+  - Slow creeping starts with the head cocked and hands curled like claws.
+  - Heavier leans over the victim.
+  - The stake and the palm strike drive the hips down into the hit.
+  - The Werewolf snarls with its claws out before the pounce and howls from a planted stance.
+  - The Wraith dives with its legs trailing back.
+  - The Priest stays over the emptied body, palm down, head bowed.
+- **Smoother:**
+  - Every clip is spline-interpolated and smoothed after the contacts are solved.
+  - Fixed: a velocity spike in the Ghoul victim's overhead claw, and a 179 deg twist flip in a reach.
+  - Fewer, longer heel drums on the possessed body.
+- **Legs never look wrong:**
+  - Nothing passes through the floor any more; victim limbs used to dip up to 1.4 studs under it. The only exception is
+    the crouch's back knee, 0.41 down, exactly as the game's crouch plays.
+  - Arching victims keep their heels planted, so their legs no longer hang.
+  - Stand-to-kneel transitions take a step.
+- **Victims fight harder:**
+  - The Human's victim strains its chest up off the floor, twisting toward the stake arm.
+  - The possessed body no longer lies flat while it grabs the priest's wrist.
+
+### Tested (Edit only, NH Combat Test and the Map place)
+- All 11 KeyframeSequences rebuilt in `ServerStorage.NH_GripAnims`. The Studio Builder already applies a position on
+  any part.
+- **Crouch match:**
+  - A rig posed from GripHuman's 1.3 s keyframe stood next to one posed from the game's Crouch. Both lowest points
+    were 0.41 under the floor top.
+  - The Vampire bite and the Priest exorcism, posed from the installed clips with their victims at the grip offsets,
+    looked right in screenshots.
+  - The legs' Pose positions match the crouch asset's (0.84, 0.75, 0.04) and (-0.57, 1.18, 0.32).
+- **Generator checks:** animpro passes on both bodies of every grip.
+  - groundContact is waived on the three crouching attackers because animpro can't see the leg slide.
+  - Hand contact, worst frame: attackers 0.25-0.38 studs, victims 0.00-0.31. The Wraith's palm floats over the chest
+    by design.
+  - No part under the floor beyond the crouch knee.
+- **Not tested:** live play. NH Combat Test's Play was reserved by other sessions, so the reworked clips have not been
+  seen through the N key or on the client. The KeyframeSequences need publishing again, and NH Combat Test needs a
+  save. The Map place only held a temporary preview stage, which has been removed.
+
 ## [2.6.1] - 2026-11-13: Students stop hopping in the hallway crowd
 
 Found while testing 2.3.0: in the Before School and Passing crowds, every scheduled student jumped about 8 times a

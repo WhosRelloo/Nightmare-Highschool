@@ -14,8 +14,8 @@ OFFSET = {"p": [0, 0, -2.6], "yaw": -90}
 LIE = {"p": [0, -2.38, 0], "r": [90, 0, 0]}
 CHEST = [0, 0.1, -0.5]
 COLLAR = [0, 0.75, -0.5]
-PUSH = {"reach": ("attacker", "Torso", [0, -0.2, -0.5]), "slide": [0.9, 1.0, 0]}
-STAKE_ARM = {"reach": ("attacker", "Right Arm", [0, 0, 0]), "slide": [0, 1.0, 0]}
+PUSH = {"reach": ("attacker", "Left Arm", [0, 0, 0]), "slide": [0, 1.0, 0]}  # claws at the arm pinning its throat
+STAKE_ARM = {"reach": ("attacker", "Right Arm", [0, 0, 0]), "slide": [0.5, 1.0, 0.5]}  # anywhere on the arm's surface
 
 victim = [
     {"t": 0.0, "Root": LIE, "Neck": [-5, 0, -15], "RightShoulder": [12, 0, 25], "LeftShoulder": [12, 0, -25],
@@ -26,12 +26,12 @@ victim = [
      "LeftShoulder": [90, 0, -35], "RightHip": [30, 0, 8], "LeftHip": [25, 0, -8], "stop": ["Root"]},
     {"t": 0.45, "Root": {"p": [0, -2.4, 0], "r": [89, 0, 0]}, "Neck": [10, 0, 0], "RightHip": [5, 0, 6], "LeftHip": [0, 0, -6]},
     {"t": 0.65, "RightShoulder": [110, 0, 10], "LeftShoulder": [105, 0, -12], "Neck": [-10, 0, 0]},
-    # both hands on the stake arm, pushing back
+    # both hands on the stake arm, pushing back: the chest strains up off the floor, twisting toward the stake
     {"t": 0.85, "RightShoulder": STAKE_ARM, "LeftShoulder": PUSH, "RightHip": [35, 0, 8]},
-    {"t": 1.0, "Root": {"p": [0, -2.34, 0], "r": [86, 0, 4]}, "LeftHip": [30, 0, -8], "RightHip": [5, 0, 8]},
-    {"t": 1.2, "Root": {"p": [0, -2.36, 0], "r": [87, 0, -4]}, "RightHip": [40, 0, 6], "LeftHip": [0, 0, -6]},
-    {"t": 1.45, "Root": {"p": [0, -2.34, 0], "r": [86, 0, 3]}, "LeftHip": [35, 0, -6], "RightHip": [8, 0, 6]},
-    {"t": 1.65, "RightShoulder": STAKE_ARM, "LeftShoulder": PUSH, "Root": {"p": [0, -2.38, 0], "r": [89, 0, 0]}},
+    {"t": 1.0, "Root": {"p": [0, -2.04, 0], "r": [61, 0, -16]}, "LeftHip": [30, 0, -8], "RightHip": [5, 0, 8]},
+    {"t": 1.2, "Root": {"p": [0, -2.06, 0], "r": [62, 0, -24]}, "RightHip": [40, 0, 6], "LeftHip": [0, 0, -6]},
+    {"t": 1.45, "Root": {"p": [0, -2.04, 0], "r": [61, 0, -17]}, "LeftHip": [35, 0, -6], "RightHip": [8, 0, 6]},
+    {"t": 1.65, "RightShoulder": STAKE_ARM, "LeftShoulder": PUSH, "Root": {"p": [0, -2.08, 0], "r": [64, 0, -20]}},
     # the arms give way
     {"t": 1.78, "RightShoulder": [30, 0, 55], "LeftShoulder": [40, 0, -50], "Neck": [15, 0, 0], "RightHip": [4, 0, 6],
      "LeftHip": [2, 0, -6]},
@@ -66,43 +66,71 @@ def knee_root(t, rr, y=-0.9):
     return fit({"p": [0.2, y, -1.2], "r": rr}, STANCE, "RightHip", knee, vary="z", lo=-2.6, hi=-0.3)
 
 
-KNEE = {"reach": ("victim", "Torso", CHEST), "slide": [0, 0.6, 0]}
+from _util import kneel_legs, kneel_root, kneel_fit, stand_legs, root_for_legs
+
+# the game's crouch (mirrored: right foot ahead) at the victim's side, the front shin standing just short of the body
+KX, KZ, KYAW, KTURN, KFRONT = -0.6, -0.9, -10.0, -10.0, "RightHip"
+KNEEL = kneel_legs(KX, KZ, KYAW, front=KFRONT, kid="human")
+STAND = stand_legs(0.0, 0.0, stance=0.55, spread=0.25)
+THROAT = [0, 0.95, -0.5]   # the pinning hand: the collar / throat
+
+
+def pin_root(t, lean, roll=0.0, yaw=0.0):
+    """Kneeling; leans (within limits, about the hips) just enough that the left hand pins the throat at time t.
+    `lean` is the extra lean the beat asks for on top of that."""
+    tgt = body_point(victim, OFFSET, t, "Torso", THROAT)
+    base = kneel_fit(KX, KZ, KYAW, "LeftShoulder", tgt, turn=KTURN + yaw, roll=roll, rng=(-25, 12), front=KFRONT)
+    extra = base["_lean"] + (lean + 30) * 0.35
+    return kneel_root(KX, KZ, KYAW, max(-28, min(15, extra)), KTURN + yaw, roll, KFRONT)
+
+
+def strike_root(t, roll=0.0, sink=0.3):
+    """The stake hand lands on the chest: the whole body drives down, hips sinking onto the planted legs."""
+    hit = body_point(victim, OFFSET, t, "Torso", [0.4, 0.1, -0.5])
+    return kneel_fit(KX, KZ, KYAW, "RightShoulder", hit, turn=KTURN, roll=roll, rng=(-32, 0), front=KFRONT, sink=sink)
+
+
+PIN = {"reach": ("victim", "Torso", THROAT), "slide": [0, 0.35, 0]}
+KF = KNEEL[KFRONT]["plant"][:3, 3]
+STEP = {"reach": ("world", None, [float(KF[0]) * 0.8, -2.55, float(KF[2]) * 0.8]), "slide": [0.3, 0, 0.3]}  # foot in the air on its way
 
 attacker = [
-    {"t": 0.0, "Root": {"p": [0, 0, 0], "r": [0, 0, 0]}, "Neck": [-15, 0, 0], "RightShoulder": [-30, 0, 12],
-     "LeftShoulder": [10, 0, -10], "stop": True},
-    {"t": 0.15, "Root": {"p": [0, 0.08, 0.05], "r": [4, 0, 0]}, "RightHip": [55, 0, 6], "Neck": [-25, 0, 0],
-     "RightShoulder": [-40, 0, 15]},
-    # knee drop (0.3): right knee onto the chest
-    {"t": 0.3, "Root": knee_root(0.3, [-22, 0, 0]), "RightHip": KNEE, "LeftHip": FOOT, "Neck": [-30, 0, 0], "LeftShoulder": [40, 0, -15], "stop": ["Root"]},
-    {"t": 0.38, "Root": knee_root(0.38, [-26, 0, 0]), "RightHip": KNEE},
-    # collar
-    {"t": 0.52, "LeftShoulder": {"reach": ("victim", "Torso", COLLAR), "slide": [0, 0.4, 0]}, "RightHip": KNEE},
-    # the stake appears, held up and out
-    {"t": 0.65, "RightShoulder": [125, 0, 28], "Neck": [-20, 0, 0]},
-    # the struggle: the stake inches down against two hands
-    {"t": 0.85, "RightShoulder": {"reach": ("victim", "Torso", [0.3, 0.1, -2.0])}, "Root": collar_root(0.85, -0.8, [-30, 0, 3])},
-    {"t": 1.0, "RightShoulder": {"reach": ("victim", "Torso", [0.3, 0.1, -1.7])}},
-    {"t": 1.15, "RightShoulder": {"reach": ("victim", "Torso", [0.3, 0.1, -1.9])}, "Root": collar_root(1.15, -0.8, [-27, 0, -3])},
-    {"t": 1.35, "RightShoulder": {"reach": ("victim", "Torso", [0.3, 0.1, -1.5])}},
-    {"t": 1.5, "RightShoulder": {"reach": ("victim", "Torso", [0.3, 0.1, -1.65])}, "Root": collar_root(1.5, -0.8, [-31, 0, 2])},
-    {"t": 1.65, "RightShoulder": {"reach": ("victim", "Torso", [0.3, 0.1, -1.3])}, "RightHip": KNEE,
-     "LeftShoulder": {"reach": ("victim", "Torso", COLLAR), "slide": [0, 0.4, 0]}},
-    # raise high (1.8 - 1.95, creeping)
-    {"t": 1.82, "RightShoulder": [172, 0, 18], "Root": knee_root(1.82, [-14, 0, 0]),
-     "Neck": [-10, 0, 0], "stop": ["RightShoulder"]},
-    {"t": 1.95, "RightShoulder": [178, 0, 22], "Root": knee_root(1.95, [-10, 0, 0]),
-     "RightHip": KNEE, "stop": ["Root", "RightShoulder"]},
-    # STRIKE (2.0)
-    {"t": 2.03, "RightShoulder": {"reach": ("victim", "Torso", CHEST), "slide": [0.4, 0.3, 0]},
-     "Root": strike_root(2.03, [-38, 0, 0]), "Neck": [-35, 0, 0],
-     "stop": ["Root"]},
-    {"t": 2.2, "RightShoulder": {"reach": ("victim", "Torso", CHEST), "slide": [0.4, 0.3, 0]},
-     "Root": strike_root(2.2, [-36, 0, 0]), "RightHip": KNEE},
-    {"t": 2.45, "RightShoulder": [60, 0, 15], "LeftShoulder": [20, 0, -15], "Neck": [-25, 0, 0],
-     "Root": knee_root(2.45, [-26, 0, 0])},
-    {"t": 2.6, "RightShoulder": [45, 0, 15], "LeftShoulder": [15, 0, -12], "Neck": [-20, 0, 0], "LeftHip": FOOT,
-     "Root": knee_root(2.6, [-24, 0, 0]), "stop": True},
+    # stands over the prey, head cocked, stake hand hidden behind the back
+    {"t": 0.0, "Root": root_for_legs({"p": [0, 0, 0], "r": [-6, 0, 0]}, STAND), **STAND, "Neck": [-28, 8, -10],
+     "RightShoulder": [-35, 0, 12], "LeftShoulder": [12, 0, -14], "stop": True},
+    {"t": 0.16, "Root": root_for_legs({"p": [0.1, 0, -0.1], "r": [-12, 0, 0]}, STAND), "Neck": [-34, 14, -14],
+     "LeftShoulder": [55, 0, -20]},
+    {"t": 0.23, "Root": root_for_legs({"p": [0.1, 0, -0.55], "r": [-16, KYAW / 2, 0]}, {"RightHip": STEP}),
+     "RightHip": STEP, "LeftHip": [-30, 0, -6], "Neck": [-34, 10, -10]},
+    # drops into the kneel and pins the throat (0.3), weight onto the hand
+    {"t": 0.3, "Root": pin_root(0.3, -30), **KNEEL, "LeftShoulder": PIN, "Neck": [-30, 10, -8], "stop": ["Root"]},
+    {"t": 0.4, "Root": pin_root(0.4, -34, 2), "LeftShoulder": PIN},
+    # the stake comes out behind the head: a slow, creeping raise while he stares down
+    {"t": 0.65, "Root": pin_root(0.65, -26, -3, 6), "RightShoulder": [150, 0, 38], "Neck": [-22, 16, -12], "LeftShoulder": PIN},
+    {"t": 0.85, "Root": pin_root(0.85, -28, 3, 4), "LeftShoulder": PIN,
+     "RightShoulder": {"reach": ("victim", "Torso", [-0.3, 0.1, -2.0])}, "Neck": [-34, 6, -6]},
+    # the struggle: the stake inches down against two hands, his weight leaning in
+    {"t": 1.0, "RightShoulder": {"reach": ("victim", "Torso", [-0.3, 0.1, -1.7])}, "Root": pin_root(1.0, -32, -3, 3)},
+    {"t": 1.15, "RightShoulder": {"reach": ("victim", "Torso", [-0.3, 0.1, -1.9])}, "Root": pin_root(1.15, -29, 3, 2)},
+    {"t": 1.35, "RightShoulder": {"reach": ("victim", "Torso", [-0.3, 0.1, -1.5])}, "Root": pin_root(1.35, -34, -2, 3)},
+    {"t": 1.5, "RightShoulder": {"reach": ("victim", "Torso", [-0.3, 0.1, -1.65])}, "Root": pin_root(1.5, -31, 2, 2)},
+    {"t": 1.65, "RightShoulder": {"reach": ("victim", "Torso", [-0.3, 0.1, -1.3])}, "LeftShoulder": PIN,
+     "Root": pin_root(1.65, -35, 0, 2), "Neck": [-38, 0, 0]},
+    # rises up on the knee and lifts the stake high: a held, trembling beat
+    {"t": 1.82, "RightShoulder": [176, 0, 16], "Root": pin_root(1.82, -12, 0, 0), "Neck": [-18, 0, 4],
+     "stop": ["RightShoulder"]},
+    {"t": 1.95, "RightShoulder": [179, 0, 22], "Root": pin_root(1.95, -8, 0, 0), "LeftShoulder": PIN,
+     "stop": ["Root", "RightShoulder"]},
+    # STRIKE (2.03): the whole body drives down
+    {"t": 2.03, "RightShoulder": {"reach": ("victim", "Torso", [0.4, 0.1, -0.5]), "slide": [0.4, 0.3, 0]},
+     "Root": strike_root(2.03), "Neck": [-40, 0, 0], "stop": ["Root"]},
+    {"t": 2.2, "RightShoulder": {"reach": ("victim", "Torso", [0.4, 0.1, -0.5]), "slide": [0.4, 0.3, 0]},
+     "Root": strike_root(2.2, 2, 0.18)},
+    # stays over the body, breathing, head tilting as he watches it go still
+    {"t": 2.45, "RightShoulder": [70, 0, 20], "LeftShoulder": [30, 0, -18], "Neck": [-34, 12, -14],
+     "Root": pin_root(2.45, -22, 0, 0)},
+    {"t": 2.6, "RightShoulder": [55, 0, 18], "LeftShoulder": [24, 0, -16], "Neck": [-30, 18, -18],
+     "Root": pin_root(2.6, -18, 0, 0), "stop": True},
 ]
 
 CLIP = {

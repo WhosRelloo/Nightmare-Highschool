@@ -6,7 +6,7 @@ silver claw streaks, fur tufts and dust in the VFX.
 Victim HRP: 2.6 studs in front, turned 90 deg (lying across in front of the wolf, head on the wolf's right).
 Victim-local axes after the turn: local +x points AWAY from the wolf, local -z points to the wolf's left.
 """
-from _util import plant, fit, body_point
+from _util import plant, fit, body_point, stand_legs, root_for_legs
 
 OFFSET = {"p": [0, 0, -2.6], "yaw": 90}
 
@@ -86,10 +86,12 @@ def haul(t, rr):
                 a_vary="z", b_vary="lean", a_rng=(-2.6, 0.5), b_rng=(-85, -20), plant_parts=("Right Leg", "Left Leg"))
 
 
+HOWL_LEGS = stand_legs(0.0, -0.55, stance=0.75, spread=0.45)
+
 attacker = [
     {"t": 0.0, "Root": plant({"p": [0, 0, 0], "r": [-18, 0, 0]}, {"RightHip": [15, 0, 6], "LeftHip": [-10, 0, -6]}), "Neck": [20, 0, 0], "RightShoulder": [-20, 0, 35],
      "LeftShoulder": [-20, 0, -35], "RightHip": [15, 0, 6], "LeftHip": [-10, 0, -6], "stop": True},
-    {"t": 0.1, "Neck": [32, 12, 0], "RightShoulder": [-35, 0, 60], "LeftShoulder": [-30, 0, -62]},
+    {"t": 0.1, "Neck": [34, 14, 6], "RightShoulder": [-10, 0, 70], "LeftShoulder": [-8, 0, -72]},
     {"t": 0.16, "Neck": [30, -12, 0]},
     {"t": 0.22, "Neck": [28, 8, 0]},
     # load the pounce
@@ -130,14 +132,13 @@ attacker = [
     {"t": 1.98, "Root": haul(1.98, [-54, 0, -10]), **FOURS_HIPS, "stop": ["RightHip", "LeftHip"],
      "RightShoulder": {"reach": ("victim", "Torso", SHOULDER_R), "slide": [0.3, 0.3, 0]},
      "LeftShoulder": {"reach": ("victim", "Torso", SHOULDER_L), "slide": [0.3, 0.3, 0]}},
-    # rear up and howl
-    {"t": 2.12, "Root": plant({"p": [0, 0, -0.5], "r": [12, 0, 0]}, {"RightHip": [70, 0, 8], "LeftHip": [-35, 0, -8]}),
-     "RightHip": [70, 0, 8], "LeftHip": [-35, 0, -8], "RightShoulder": [-15, 0, 70], "LeftShoulder": [-15, 0, -70],
-     "Neck": [45, 0, 0], "stop": ["Root"]},
-    {"t": 2.45, "Root": plant({"p": [0, 0, -0.5], "r": [16, 0, 0]}, {"RightHip": [70, 0, 8], "LeftHip": [-35, 0, -8]}),
-     "RightShoulder": [-25, 0, 78], "LeftShoulder": [-22, 0, -80], "Neck": [55, 4, 0]},
-    {"t": 2.8, "Root": plant({"p": [0, 0, -0.5], "r": [14, 0, 0]}, {"RightHip": [70, 0, 8], "LeftHip": [-35, 0, -8]}),
-     "RightShoulder": [-20, 0, 72], "LeftShoulder": [-18, 0, -74], "Neck": [50, -3, 0], "stop": True},
+    # rears up onto planted feet and howls: chest out, arms flung wide, head thrown back
+    {"t": 2.12, "Root": root_for_legs({"p": [0, 0, -0.55], "r": [12, 0, 0]}, HOWL_LEGS), **HOWL_LEGS,
+     "RightShoulder": [-15, 0, 74], "LeftShoulder": [-15, 0, -74], "Neck": [48, 0, 0], "stop": ["Root"]},
+    {"t": 2.45, "Root": root_for_legs({"p": [0, 0, -0.5], "r": [17, 0, 2]}, HOWL_LEGS),
+     "RightShoulder": [-26, 0, 82], "LeftShoulder": [-24, 0, -84], "Neck": [58, 5, 0]},
+    {"t": 2.8, "Root": root_for_legs({"p": [0, 0, -0.5], "r": [15, 0, -2]}, HOWL_LEGS),
+     "RightShoulder": [-20, 0, 76], "LeftShoulder": [-18, 0, -78], "Neck": [54, -4, 0], "stop": True},
 ]
 
 CLIP = {

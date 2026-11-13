@@ -5,7 +5,7 @@ The soul itself is VFX (a translucent copy of the victim stretched between the c
 
 Victim HRP: 2.5 studs in front, turned 90 deg (lying across, head on the wraith's right).
 """
-from _util import plant, fit, body_point
+from _util import plant, fit, body_point, heels
 
 OFFSET = {"p": [0, 0, -2.5], "yaw": 90}
 LIE = {"p": [0, -2.38, 0], "r": [90, 0, 0]}
@@ -39,6 +39,11 @@ victim = [
     {"t": 3.0, "Root": {"p": [0, -2.38, 0.05], "r": [90, 0, 0]}, "Neck": [8, 0, 48], "stop": True},
 ]
 
+HEELS = heels(OFFSET, LIE, (1, 0, 0))
+for k in victim:
+    if 1.05 <= k["t"] <= 2.22:  # drawn up by the chest: heels stay on the floor
+        k.update(HEELS)
+
 FLOAT_HIPS = {"RightHip": [-22, 0, 6], "LeftHip": [-30, 0, -6]}
 
 
@@ -48,25 +53,25 @@ def hover(y, z, rr):
 
 _chest06 = body_point(victim, OFFSET, 0.6, "Torso", CHEST)
 _chest072 = body_point(victim, OFFSET, 0.72, "Torso", CHEST)
-DIVE = fit(hover(0, -0.8, [-50, 0, 0]), {}, "RightShoulder", _chest06, vary="y", lo=-2, hi=1.5)
-DIVE2 = fit(hover(0, -0.85, [-52, 0, 0]), {}, "RightShoulder", _chest072, vary="y", lo=-2, hi=1.5)
+DIVE = fit(hover(0, -0.8, [-42, 0, 0]), {}, "RightShoulder", _chest06, vary="y", lo=-1.2, hi=1.5)
+DIVE2 = fit(hover(0, -0.85, [-44, 0, 0]), {}, "RightShoulder", _chest072, vary="y", lo=-1.2, hi=1.5)
 
 attacker = [
-    {"t": 0.0, "Root": hover(0.35, 0, [4, 0, 0]), **FLOAT_HIPS, "Neck": [-15, 0, 8], "RightShoulder": [15, 0, 10],
-     "LeftShoulder": [15, 0, -10], "stop": True},
+    {"t": 0.0, "Root": hover(0.35, 0, [4, 0, 0]), **FLOAT_HIPS, "Neck": [-22, 0, 30], "RightShoulder": [10, 0, 6],
+     "LeftShoulder": [10, 0, -6], "stop": True},
     {"t": 0.22, "Root": hover(0.6, 0.05, [8, 0, 0]), "RightShoulder": [-5, 0, 45], "LeftShoulder": [-5, 0, -45],
      "Neck": [5, 0, 0]},
     {"t": 0.45, "Root": hover(0.95, 0.1, [12, 0, 0]), "RightShoulder": [-12, 0, 80], "LeftShoulder": [-10, 0, -82],
-     "Neck": [25, 0, 0], "stop": ["Root"]},
+     "Neck": [22, 0, -24], "stop": ["Root"]},
     # the dive: palm onto the chest at 0.6
     {"t": 0.6, "Root": DIVE, "Neck": [-10, 0, 0],
      "RightShoulder": {"reach": ("victim", "Torso", CHEST), "slide": [0, 0.3, 0]}, "LeftShoulder": [-30, 0, -70],
-     "RightHip": [-45, 0, 6], "LeftHip": [-55, 0, -6]},
+     "RightHip": [-62, 0, 10], "LeftHip": [-72, 0, -10], "Neck": [-18, 0, 28]},
     {"t": 0.72, "Root": DIVE2,
      "RightShoulder": {"reach": ("victim", "Torso", CHEST), "slide": [0, 0.3, 0]}},
     # the slow pull: the wraith rises and leans back, the hand climbing above the chest
     {"t": 1.1, "Root": hover(0.55, -0.65, [-36, 0, 0]), "RightShoulder": {"reach": ("victim", "Torso", [0, 0.2, -1.1])}, "LeftShoulder": [-25, 0, -75],
-     "Neck": [-18, 0, 4]},
+     "Neck": [-24, 0, 26], "RightHip": [-12, 0, 6], "LeftHip": [-22, 0, -6]},
     {"t": 1.6, "Root": hover(0.9, -0.5, [-24, 0, 0]), "RightShoulder": {"reach": ("victim", "Torso", [0, 0.2, -1.6])}, "Neck": [-12, 0, -4]},
     {"t": 2.1, "Root": hover(1.25, -0.35, [-12, 0, 0]), "RightShoulder": {"reach": ("victim", "Torso", [0, 0.2, -2.0])}, "LeftShoulder": [-30, 0, -80],
      "Neck": [-8, 0, 0], "RightHip": [-30, 0, 6], "LeftHip": [-40, 0, -6]},

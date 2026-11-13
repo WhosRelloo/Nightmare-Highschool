@@ -1,4 +1,4 @@
-# Racial Grips (2.6.0)
+# Racial Grips (2.6.0, reworked in 2.6.2)
 
 Up: [[Combat-System]] · Related: [[Races-and-Bloodlines]], [[VFX-Design-Bible]]
 
@@ -32,16 +32,72 @@ their base race's grip with a richer effect (more particles; the top sub-races a
 
 | Race (sub-races) | Grip | Length | Victim (eaten alive / exorcised) |
 |---|---|---|---|
-| Vampire (Nobleblood, Royal Vamp) | **The Kiss**: hauls the body up by the collar, bites the neck from behind, three drinks, lets go, wipes the mouth | 3.0 s | shoves and claws at the arm across its chest, weakening each drink, then slumps back to the floor |
+| Vampire (Nobleblood, Royal Vamp) | **The Kiss**: creeps in, crouches, hauls the body up by the collar, bites the neck from behind, three drinks, lets go, wipes the mouth | 3.0 s | shoves and claws at the arm across its chest, weakening each drink, then slumps back to the floor |
 | Ghoul (Ghast, Crypt Lord) | **Eat Body** (owner's clip) | 3.5 s | pinned, shoves at the ghoul's head, kicks, rolls away clawing the floor, is dragged back, jerks at the last rip; the outstretched hand trembles and drops |
 | Werewolf (Bloodmoon, Alpha) | **Maul**: snarl, pounce onto all fours, three raking swipes, a shake by the shoulders, a howl | 2.8 s | shields its face, the guard is knocked open on each swipe, tries to crawl away and is hauled back |
 | Wraith (Revenant, Hollow King) | **Soul Siphon**: floats, palm to the chest, draws the hand up, yanks | 3.0 s | the chest arches after the hand as if on a string, then slams down limp |
-| Priest (Grand Priest, Pope) | **Exorcism**: kneels, hand on the forehead, the other raised, strikes the chest on the last word | 3.2 s | possessed: violent arches, drumming heels, head whipping under the hand, grabs the priest's wrist, a rigid arch a stud off the floor that snaps flat on the strike |
-| Human (Superhuman) | **Hunter's Stake**: knee on the chest, hand on the collar, the stake inches down against two hands, raised and driven | 2.6 s | grabs the stake arm and pushes back, the arms give way, one jolt |
+| Priest (Grand Priest, Pope) | **Exorcism**: crouches by the head, hand on the forehead, the other raised, strikes the chest on the last word | 3.2 s | possessed: violent arches, drumming heels, head whipping under the hand, grabs the priest's wrist, a rigid arch a stud off the floor that snaps flat on the strike |
+| Human (Superhuman) | **Hunter's Stake**: crouches over the body pinning the throat, the stake inches down against two hands, raised and driven | 2.6 s | grabs the stake arm and pushes back, the arms give way, one jolt |
 
 Exorcism still only works on the unholy. The Hunter's Stake works on any body (Humans had no racial grip on mortals).
 
-### VFX (client, `RaceActionFx.RaceGripFx`)
+## 2.6.2 rework: menacing, smoother, and kneels from the game's crouch
+Owner: "make the animations look more menacing, scary, and smoother. Also make sure the legs don't look weird during
+the animation." Then, with reference shots and a "Kneel Example" model: "Kneels should look like this", "Just use the
+crouching > get up animation as reference that we already have in the game" and "Don't be afraid to use other
+animations we already have".
+
+**The kneel is the game's crouch.** Human, Priest and Vampire kneel exactly like Crouch (rbxassetid://139672322709288,
+the 171-key "Crouch idle" in Workspace), frame 0 on a default R6 rig:
+
+| Part | Pose (relative to a standing HRP) |
+|---|---|
+| Torso | drops 0.90, leans 27 deg forward, turned 22 deg |
+| Front leg | near vertical, planted 1.2 studs ahead |
+| Back leg | slants 58 deg back and swings 42 deg out; the knee rests 0.41 under the floor top, as in game |
+| Both legs | slide off their sockets up into the torso, which folds the knee (Pose position, for example (0.84, 0.75, 0.04)) |
+
+- The HRP stays at standing height, as when crouching in game.
+- The generator plants both legs in the world and re-solves each hip's rotation and slide every frame. The body can
+  lean, turn and drive down into a strike (the hips sink up to 0.3) while the legs stay put.
+- A grip with the right foot forward plays the crouch mirrored.
+- Placements were searched so the hands reach and the legs stay clear of the victim:
+  - Human: beside the chest, mirrored.
+  - Priest: by the head, as played.
+  - Vampire: behind the sitting victim's left shoulder, mirrored, turned 14 deg into the neck.
+- The old 2.6.0 kneels pivoted rigid legs at the hip under a torso pitched up to 57 deg, and read as a lunge or a split.
+
+**Menace and smoothness:**
+- Creeping starts with the head cocked and claws curled.
+- Heavier looming leans.
+- The stake and the palm strike commit the hips.
+- The Werewolf snarls with its claws out, then howls from a planted stance.
+- The Wraith dives with its legs trailing back.
+- The Priest stays over the body with the palm down and the head bowed.
+- Clips are smoothed after the contacts are solved.
+
+**Legs and the floor:**
+- No part goes under the floor except the crouch knee. Victim limbs used to dip up to 1.4 studs under it.
+- Arching victims plant their heels.
+- Stand-to-kneel transitions take a step.
+- The Human's victim strains its chest up toward the stake arm.
+- The possessed body lifts a little while it grabs the priest's wrist.
+
+Measured on the built clips (worst frame):
+
+| Grip | Attacker hands | Victim hands | Lowest point |
+|---|---|---|---|
+| Human | 0.28 | 0.08 | crouch knee -3.41 (victim -3.09) |
+| Priest | 0.27 (palm on the face at the strike) | 0.31 (the wrist grab) | crouch knee -3.41 |
+| Vampire | 0.25 | 0.05 | crouch knee -3.41 |
+| Werewolf | 0.38 | 0.00 | -3.04 |
+| Wraith | palm 1.3 over the chest (by design, the soul streak spans it) | 0.00 | -3.04 |
+| Ghoul | (owner's clip) | 0.22 | -3.08 |
+
+The floor is -3.0. animpro passes on every clip; groundContact is waived on the three crouching attackers because
+animpro can't see the leg slide.
+
+## VFX (client, `RaceActionFx.RaceGripFx`)
 - **Every grip:** the race sigil on the floor, a camera ease-in and a hit-stop punch on the kill for the gripper, a
   darkening, desaturating screen with a slowing heartbeat for the victim. Shake honours Camera Shake, flashes honour
   Reduced Flashing, particle counts halve on low Effects Quality.
@@ -72,11 +128,12 @@ a victim heartbeat loop, a finish sting and six sub-race extras. All synthesized
 | Rewards, the Fx payload (victim, sub-race, victim race) | `Features.RaceAction` |
 | VFX, sound, camera | `Controllers.World.RaceActionFx.RaceGripFx` |
 | Clips to publish | `ServerStorage.NH_GripAnims` (11 KeyframeSequences) |
-| Generator | `tools/racial-grips` (see its README and `patches.md`) |
+| Generator | `tools/racial-grips` (see its README and `patches.md`). Checks: `duo.py` (both bodies), `solo.py`, `sinkcheck.py` |
+| The kneel | `tools/racial-grips/clips/_util.py`: `kneel_legs` / `kneel_root` / `kneel_fit` (the crouch frames); the leg slide goes into the pack from `out/*.tuck.json` |
 
 ## Owner steps (group-owned assets)
 1. **Publish the 11 KeyframeSequences** in `ServerStorage.NH_GripAnims` (right-click > Save to Roblox, under the
-   group): GripVampire, GripVampireVictim, GripGhoulVictim, GripWerewolf, GripWerewolfVictim, GripWraith,
+   group). They were rebuilt for 2.6.2, so publish these versions: GripVampire, GripVampireVictim, GripGhoulVictim, GripWerewolf, GripWerewolfVictim, GripWraith,
    GripWraithVictim, GripPriest, GripPriestVictim, GripHuman, GripHumanVictim. Send the ids.
 2. **Upload the 15 sounds** in `art/sfx/racial-grips/` and the **15 textures** in `art/vfx/grips/` under the group.
 3. Then the ids go into `Config.RaceGrips` (`Gripper`/`Victim`, `Sounds`, `Textures`).
@@ -84,7 +141,7 @@ a victim heartbeat loop, a finish sting and six sub-race extras. All synthesized
 Until then: in Studio the clips play from temporary preview ids; on a live server each race falls back to its old single
 clip with no victim clip and no weld; effects use the existing `nh_*` and tier-up art; the grip sounds are silent.
 
-## Verified (2026-11-13, NH Combat Test, slot 4 "Testy", Play)
+## Verified for 2.6.0 (2026-11-13, NH Combat Test, slot 4 "Testy", Play)
 - **All six grips through the real N key** on downed AI dummies (spawned and downed through `NHTestBridge`; race set
   with `SetRace` on the test slot only): the gripper and victim clips both played, the victim was welded
   (`GripWeld` checked on the Human run), and every dummy died at the end of the clip (no test NPCs left).
@@ -95,7 +152,18 @@ clip with no victim clip and no weld; effects use the existing `nh_*` and tier-u
   wraith's palm on the chest within 0.01; the ghoul victim's hand on the ghoul's head within 0.3; most attacker holds
   within 0.4; the werewolf's haul and the priest's head hold slip up to about 0.8 studs on the fastest jolts.
 
+## Verified for 2.6.2 (Edit only)
+- All 11 sequences were rebuilt in NH Combat Test.
+- A rig posed from GripHuman at 1.3 s stood beside one posed from the game's Crouch. Both lowest points were 0.41 under
+  the floor top, and the side views match.
+- The Vampire bite and the Priest exorcism were posed from the installed clips, victims at their offsets, and
+  screenshotted.
+- Not played in a session: Play was reserved by other sessions.
+
 ## Not verified / known limits
+- **2.6.2 has not been play-tested.** The reworked clips haven't run through the N key or replicated to a client.
+  Roblox plays limb Pose positions, and the in-game Crouch relies on them, but these clips haven't been seen in motion
+  in Studio.
 - **The client view used a test mirror.** Studio's temporary preview ids registered on the server don't load on the
   client, so the screenshots came from a test-only script that played the client's own registered copy of each clip in
   step with the server's. Published ids don't have this problem, but the real replicated playback is untested until the

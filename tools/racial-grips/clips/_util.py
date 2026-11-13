@@ -116,3 +116,99 @@ def fit2(root, joints, a_joint, a_target, b_joint, b_target, a_vary="y", b_vary=
         cur = fit(cur, joints, a_joint, a_target, vary=a_vary, lo=a_rng[0], hi=a_rng[1])
         cur = fit(cur, joints, b_joint, b_target, vary=b_vary, lo=b_rng[0], hi=b_rng[1], plant_parts=plant_parts)
     return cur
+
+
+# ---------------------------------------------------------------- planted legs (no floating / jutting legs)
+def foot(x, z, slide=0.7, y=GROUND):
+    """A leg whose sole stays on a fixed floor point (attacker space), sliding along z to its exact reach."""
+    return {"reach": ("world", None, [x, y, z]), "slide": [0, 0, slide]}
+
+
+# The kneel = the game's own crouch (ReplicatedStorage.Assets.Animations...Movement.Crouch, rbxassetid://139672322709288,
+# the 171-key "Crouch idle" in NH Combat Test's Workspace), frame 0, evaluated on a default R6 rig, part frames relative
+# to a STANDING HRP (the crouch never changes HipHeight). Owner's ground logic, as in the crouch and the "Kneel Example"
+# model: the HRP stays at standing height; the torso drops (0.9) and leans in; the front leg stands near vertical a
+# stud ahead; the back leg slants back and out and its knee/shin presses ~0.4 into the floor so it reads as resting
+# on it. Legs slide off their sockets (Pose translation) to fake the folded knee. Native front leg = LEFT.
+CROUCH_TORSO = ((0.0, -0.904, -0.086), (-27.49, -21.89, -3.41))
+CROUCH_FRONT = ((-0.500, -2.138, -1.199), (5.05, 0.0, 0.0))        # Left Leg
+CROUCH_BACK = ((0.713, -2.231, 0.154), (-57.71, -41.82, -14.67))    # Right Leg
+_MIRROR = np.diag([-1.0, 1.0, 1.0, 1.0])
+
+
+def _crouch(part, front):
+    p, r = {"torso": CROUCH_TORSO, "front": CROUCH_FRONT, "back": CROUCH_BACK}[part]
+    M = rig.cf(p, rig.euler(r))
+    return _MIRROR @ M @ _MIRROR if front == "RightHip" else M  # right foot ahead = the crouch mirrored
+
+
+def kneel_anchor(x, z, yaw_deg=0.0):
+    """The standing HRP the crouch is played on, at (x, z) facing yaw_deg (attacker space)."""
+    return rig.cf((x, 0.0, z), rig.ry(math.radians(yaw_deg)))
+
+
+def kneel_legs(x, z, yaw_deg=0.0, front="LeftHip", kid="kneel"):
+    """Both legs planted exactly as the game's crouch, for a crouch played at (x, z, yaw). The legs stay put in the
+    world while the torso leans/turns (the generator re-solves rotation + tuck every frame)."""
+    A = kneel_anchor(x, z, yaw_deg)
+    back = "LeftHip" if front == "RightHip" else "RightHip"
+    return {front: {"plant": A @ _crouch("front", front), "id": kid},
+            back: {"plant": A @ _crouch("back", front), "id": kid}}
+
+
+def kneel_root(x, z, yaw_deg=0.0, lean=0.0, turn=0.0, roll=0.0, front="LeftHip", sink=0.0):
+    """Torso of the crouch at (x, z, yaw), with extra lean (negative = further forward) / turn / roll about its hip
+    line, so the tucked legs stay attached however it bends. sink lowers the hips onto the planted legs (weight
+    committing into a strike); the legs' tuck takes it up."""
+    A = kneel_anchor(x, z, yaw_deg)
+    T = _crouch("torso", front)
+    hip = rig.xf(T, (0, -1.0, 0)) - np.array([0, sink, 0])
+    Rn = rig.ry(math.radians(turn)) @ rig.rx(math.radians(lean)) @ rig.rz(math.radians(roll)) @ T[:3, :3]
+    pn = hip - Rn @ np.array([0, -1.0, 0])
+    W = A @ rig.cf(pn, Rn)
+    return {"p": [round(float(v), 4) for v in W[:3, 3]], "r": [round(float(v), 3) for v in rig.to_euler(W[:3, :3])]}
+
+
+def kneel_fit(x, z, yaw_deg, joint, target, turn=0.0, roll=0.0, rng=(-25.0, 15.0), front="LeftHip", sink=0.0):
+    """Crouch root leaning (extra, within rng) just enough that `joint`'s hand reaches `target` (attacker space)."""
+    lo, hi = rng
+
+    def gap(v):
+        return abs(reach_gap(kneel_root(x, z, yaw_deg, max(lo, min(hi, v)), turn, roll, front, sink), {}, joint, target))
+    best = min((lo + (hi - lo) * n / 80 for n in range(81)), key=gap)
+    step = (hi - lo) / 80
+    for _ in range(20):
+        best = max(lo, min(hi, min((best - step, best, best + step), key=gap)))
+        step /= 2
+    out = kneel_root(x, z, yaw_deg, best, turn, roll, front, sink)
+    out["_lean"] = best  # the extra lean that was needed (callers may add to it)
+    return out
+
+
+def stand_legs(cx, cz, yaw_deg=0.0, stance=0.6, spread=0.35):
+    """Both soles planted, feet slightly apart and staggered."""
+    import math as _m
+    a = _m.radians(yaw_deg)
+
+    def w(dx, dz):
+        return [cx + dx * _m.cos(a) + dz * _m.sin(a), GROUND, cz - dx * _m.sin(a) + dz * _m.cos(a)]
+    return {"RightHip": {"reach": ("world", None, w(stance, -spread)), "slide": [0.2, 0, 0.3]},
+            "LeftHip": {"reach": ("world", None, w(-stance, spread)), "slide": [0.2, 0, 0.3]}}
+
+
+def root_for_legs(root, legs, lo=-2.4, hi=0.6):
+    """Root height so the first leg in `legs` reaches its floor point exactly (the other slides)."""
+    j = next(iter(legs))
+    tgt = legs[j]["reach"][2]
+    return fit(root, {}, j, tgt, vary="y", lo=lo, hi=hi)
+
+
+def heels(offset, lie_root, slide_axis, slide=0.9, lift=0.42):
+    """Heel points on the floor where the lying body's feet rest, as world reach specs for both hips: the legs stay
+    stretched along the floor while the chest arches or lifts. slide_axis: attacker-space direction of the body."""
+    out = {}
+    for j, part in (("RightHip", "Right Leg"), ("LeftHip", "Left Leg")):
+        p = part_point(offset, lie_root, {}, part, (0, -1.0, 0))
+        out[j] = {"reach": ("world", None, [float(p[0]), GROUND + lift, float(p[2])]),
+                  "slide": [slide_axis[0] * slide, 0, slide_axis[2] * slide]}
+    return out

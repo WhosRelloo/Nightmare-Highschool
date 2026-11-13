@@ -134,14 +134,34 @@ def fk(pose, hrp=None):
         R = pose[j]
         piv = cf(PIVOT[j])
         rot = cf(R=R)
-        parts[PART_OF[j]] = torso @ piv @ rot @ cf(CENTRE[j])
+        off = pose.get(j + "_off")  # tuck: the limb slid off its socket in torso space (the owner's kneel)
+        base = torso if off is None else torso @ cf(off)
+        parts[PART_OF[j]] = base @ piv @ rot @ cf(CENTRE[j])
     return parts
+
+
+def plant_solve(pose, joint, W, hrp=None):
+    """A limb whose part frame is fixed in the world (W, 4x4): the joint rotation and the tuck offset (torso space)
+    that put it there for the pose's torso."""
+    hrp = np.eye(4) if hrp is None else hrp
+    torso = hrp @ cf(pose["Root"]["p"], pose["Root"]["R"])
+    L = np.linalg.inv(torso) @ np.asarray(W, float)
+    R = L[:3, :3]
+    off = L[:3, 3] - (np.asarray(PIVOT[joint], float) + R @ np.asarray(CENTRE[joint], float))
+    return R, off
+
+
+def pose_offset(joint, off):
+    """Torso-space tuck offset -> Pose.CFrame position for the default R6 hip (C0 = (+-1,-1,0) * rotY(+-90))."""
+    R = ry(math.radians(90 if joint == "RightHip" else -90))
+    return R.T @ np.asarray(off, float)
 
 
 def end_point(pose, joint, hrp=None):
     hrp = np.eye(4) if hrp is None else hrp
     torso = hrp @ cf(pose["Root"]["p"], pose["Root"]["R"])
-    return xf(torso, np.asarray(PIVOT[joint]) + pose[joint] @ np.asarray(END[joint]))
+    off = np.asarray(pose.get(joint + "_off", (0, 0, 0)), float)
+    return xf(torso, off + np.asarray(PIVOT[joint]) + pose[joint] @ np.asarray(END[joint]))
 
 
 def _angle(A, B):

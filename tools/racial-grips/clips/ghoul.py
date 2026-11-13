@@ -30,11 +30,11 @@ victim = [
      "Neck": [5, 0, 45], "stop": ["Root"]},
     {"t": 0.85, "Root": {"p": [0.1, -2.36, 0], "r": [88, 14, 0]}, "LeftShoulder": SHOVE, "RightShoulder": [60, 0, 100]},
     # rolls away onto its side and claws at the floor
-    {"t": 1.05, "Root": {"p": [0.35, -2.25, 0], "r": [90, 48, 0]}, "LeftShoulder": [150, 0, 10], "RightShoulder": [175, 0, 40],
+    {"t": 1.05, "Root": {"p": [0.35, -2.25, 0], "r": [90, 48, 0]}, "LeftShoulder": [150, 0, 10], "RightShoulder": [160, 0, 40],
      "Neck": [-20, 0, 30], "RightHip": [-20, 0, 8], "LeftHip": [30, 0, -8]},
-    {"t": 1.25, "Root": {"p": [0.55, -2.2, 0], "r": [90, 62, 0]}, "LeftShoulder": [178, 0, 5], "RightShoulder": [165, 0, 60],
+    {"t": 1.25, "Root": {"p": [0.55, -2.2, 0], "r": [90, 62, 0]}, "LeftShoulder": [162, 0, 8], "RightShoulder": [155, 0, 58],
      "RightHip": [25, 0, 8], "LeftHip": [-15, 0, -8]},
-    {"t": 1.38, "RightShoulder": [176, 0, 48], "LeftShoulder": [160, 0, 20]},
+    {"t": 1.38, "RightShoulder": [162, 0, 46], "LeftShoulder": [160, 0, 20]},
     # dragged back under (1.45 - 1.6) and pinned on its back again
     {"t": 1.52, "Root": {"p": [0.05, -2.32, 0], "r": [90, 25, 0]}, "RightShoulder": [150, 0, 70], "LeftShoulder": [120, 0, -10],
      "Neck": [15, 0, 20], "stop": ["Root"]},

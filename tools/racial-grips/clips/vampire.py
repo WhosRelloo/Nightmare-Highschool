@@ -49,59 +49,98 @@ victim = [
 ]
 
 # ---------------------------------------------------------------- attacker
-KNEEL_HIPS = {"RightHip": [95, 0, 4], "LeftHip": [-15, 0, -6]}
+from _util import kneel_legs, kneel_root, kneel_fit, stand_legs, root_for_legs, fit  # noqa: E402
+import rig  # noqa: E402
 
-
-def kneel(p_xz, rr, hips=KNEEL_HIPS):
-    return plant({"p": [p_xz[0], 0, p_xz[1]], "r": rr}, hips)
-
-
-# bite: put the vampire's head just above-behind the victim's left neck, at the victim's bite pose
+# the owner's kneel (mirrored: left foot ahead) on the victim's left, behind the shoulder; the planted front leg runs
+# down the victim's left side, clear of the body. Placed so a hunched lean puts the mouth on the neck.
+KX, KYAW, KFRONT = -0.4, 0.0, "RightHip"   # the game's crouch, mirrored (right foot ahead): placement searched for bite, collar and clearance
+BITE_NECK = [-14, -20, 18]
 bite_target = part_point(OFFSET, BITE_V, BITE_V_J, "Torso", [-0.55, 1.35, 0.35])
-BITE_R = [-58, -15, 5]
-BITE_NECK = [-5, -14, 12]
-bite_root = root_for_head(bite_target, BITE_R, BITE_NECK)
-BITE = {"p": r(bite_root), "r": BITE_R}
+
+
+def _head(root, neck):
+    import numpy as _np
+    R = rig.euler(root["r"])
+    return _np.asarray(root["p"]) + R @ (_np.asarray(rig.PIVOT["Neck"]) + rig.euler(neck) @ _np.asarray(rig.CENTRE["Neck"]))
+
+
+def _solve_bite():
+    best = None
+    for lean in range(-28, 16, 2):
+        for turn in range(-30, 32, 2):
+            h = _head(kneel_root(KX, 0.0, KYAW, lean, turn, 4, KFRONT), BITE_NECK)
+            err = abs(h[0] - bite_target[0]) + abs(h[1] - bite_target[1])
+            if best is None or err < best[0]:
+                best = (err, lean, turn, float(bite_target[2] - h[2]))
+    return best
+
+
+_b = _solve_bite()
+BL, BT, KZ = float(_b[1]), float(_b[2]), round(_b[3], 3)
+VK = kneel_legs(KX, KZ, KYAW, front=KFRONT, kid="vampire")
+VS = stand_legs(0.0, 0.0, stance=0.6, spread=0.3)
+VS_END = stand_legs(-0.6, -0.35, stance=0.7, spread=0.35)
+COLLAR = {"reach": ("victim", "Torso", [0.45, 0.2, -0.5]), "slide": [0, 0.75, 0]}
+HOLD = {"reach": ("victim", "Torso", [-0.75, 0.75, 0.25]), "slide": [0.2, 0.2, 0.25]}
+_KF = VK[KFRONT]["plant"][:3, 3]
+STEP = {"reach": ("world", None, [float(_KF[0]) * 0.8, -2.55, float(_KF[2]) * 0.8]), "slide": [0.3, 0, 0.3]}
+
+
+def kroot(z, lean, yaw=0.0, roll=0.0):
+    """Kneeling, near upright: lean / turn / roll about the hips."""
+    return kneel_root(KX, KZ, KYAW, max(-28, min(15, lean + 12)), yaw, roll, KFRONT)
+
+
+def croot(t, z, lean, yaw=0.0, roll=0.0):
+    """Kneeling, leaning in just enough that the right hand has the collar at time t."""
+    from _util import body_point
+    tgt = body_point(victim, OFFSET, t, "Torso", [0.45, 0.6, -0.5])
+    return kneel_fit(KX, KZ, KYAW, "RightShoulder", tgt, turn=yaw + BT * 0.5, roll=roll, rng=(-25, 15), front=KFRONT)
+
+
+BITE = kneel_root(KX, KZ, KYAW, BL, BT, 4, KFRONT)
+
+
+def bite(dy, dz, rr):
+    """The drinking bob around the bite: rr is the old absolute pose; only its change from the bite pose is used."""
+    return kneel_root(KX, KZ, KYAW, BL + (rr[0] + 50) * 0.6, BT + (rr[1] + 18) * 0.6, 4 + (rr[2] - 8), KFRONT)
+
 
 attacker = [
-    {"t": 0.0, "Root": {"p": [0, 0, 0], "r": [0, 0, 0]}, "Neck": [-12, 0, 0], "RightShoulder": [0, 0, 8],
-     "LeftShoulder": [0, 0, -8], "stop": True},
-    {"t": 0.16, "Root": {"p": [0, 0.05, 0.1], "r": [5, 6, 0]}, "Neck": [-18, 0, 0], "RightShoulder": [-15, 0, 20],
-     "LeftShoulder": [10, 0, -15], "stop": True},
-    {"t": 0.27, "Root": {"p": [0, -0.04, -0.2], "r": [-14, 0, 0]}, "RightHip": [45, 0, 4], "LeftHip": [-4, 0, -6],
-     "Neck": [-22, 0, 0]},
-    {"t": 0.33, "Root": kneel((0, -0.5), [-26, 0, 0], {"RightHip": [75, 0, 4], "LeftHip": [-10, 0, -6]}),
-     "RightHip": [75, 0, 4], "LeftHip": [-10, 0, -6]},
-    {"t": 0.4, "Root": kneel((0, -0.75), [-38, 0, 0]), **KNEEL_HIPS, "Neck": [-25, 0, 0],
-     "RightShoulder": {"reach": ("victim", "Torso", [0.45, 0.2, -0.5]), "slide": [0, 0.75, 0]}, "LeftShoulder": [55, 0, -25]},
-    {"t": 0.6, "Root": kneel((0, -0.8), [-24, 0, 0]), "Neck": [-15, 0, 0],
-     "RightShoulder": {"reach": ("victim", "Torso", [0.45, 0.2, -0.5]), "slide": [0, 0.75, 0]},
-     "LeftShoulder": {"reach": ("victim", "Torso", [-0.75, 0.75, 0.25]), "slide": [0.2, 0.2, 0.25]}},
-    {"t": 0.82, "Root": kneel((0, -0.55), [-10, 0, 4]), "Neck": [14, 0, 0],
-     "RightShoulder": {"reach": ("victim", "Torso", [0.45, 0.2, -0.5]), "slide": [0, 0.75, 0]},
-     "LeftShoulder": {"reach": ("victim", "Torso", [-0.75, 0.75, 0.25]), "slide": [0.2, 0.2, 0.25]}, "stop": ["Root", "Neck"]},
-    {"t": 0.95, "Root": BITE, "Neck": BITE_NECK,
-     "RightShoulder": {"reach": ("victim", "Torso", [0.45, 0.2, -0.5]), "slide": [0, 0.75, 0]},
-     "LeftShoulder": {"reach": ("victim", "Torso", [-0.75, 0.75, 0.25]), "slide": [0.2, 0.2, 0.25]}},
-    {"t": 1.04, "Root": {"p": r([bite_root[0], bite_root[1] - 0.06, bite_root[2] - 0.04]), "r": [-61, -16, 6]},
-     "stop": ["Root"]},
-    {"t": 1.2, "Root": {"p": r([bite_root[0], bite_root[1] + 0.05, bite_root[2]]), "r": [-55, -14, 5]}},
-    {"t": 1.36, "Root": {"p": r([bite_root[0], bite_root[1] - 0.03, bite_root[2] - 0.02]), "r": [-60, -16, 6]}},
-    {"t": 1.6, "Root": {"p": r([bite_root[0], bite_root[1] + 0.06, bite_root[2]]), "r": [-54, -14, 5]}},
-    {"t": 1.76, "Root": {"p": r([bite_root[0], bite_root[1] - 0.02, bite_root[2] - 0.02]), "r": [-59, -15, 6]}},
-    {"t": 2.0, "Root": {"p": r([bite_root[0], bite_root[1] + 0.05, bite_root[2]]), "r": [-55, -14, 5]},
-     "Neck": [-8, -12, 12]},
-    {"t": 2.22, "Root": {"p": r([bite_root[0], bite_root[1] - 0.02, bite_root[2]]), "r": [-58, -15, 5]},
-     "RightShoulder": {"reach": ("victim", "Torso", [0.45, 0.2, -0.5]), "slide": [0, 0.75, 0]},
-     "LeftShoulder": {"reach": ("victim", "Torso", [-0.75, 0.75, 0.25]), "slide": [0.2, 0.2, 0.25]}},
-    {"t": 2.38, "Root": kneel((0, -0.5), [-6, 4, 0]), "Neck": [38, 0, 0], "RightShoulder": [45, 0, 25],
-     "LeftShoulder": [70, 0, -35], "stop": ["Neck"]},
-    {"t": 2.62, "Root": kneel((0, -0.45), [-4, 2, 0]), "Neck": [12, -12, 0],
-     "RightShoulder": {"reach": ("self", "Head", [0.15, -0.35, -0.55])}, "LeftShoulder": [20, 0, -15]},
-    {"t": 2.82, "Root": kneel((0, -0.45), [-5, 0, 0]), "Neck": [6, -18, 0],
-     "RightShoulder": {"reach": ("self", "Head", [-0.2, -0.3, -0.55])}},
-    {"t": 3.0, "Root": kneel((0, -0.45), [-6, 0, 0]), "Neck": [0, -10, 0], "RightShoulder": [25, 0, 12],
-     "LeftShoulder": [12, 0, -12], "stop": True},
+    # looms over the body: a slow forward creep, head cocked, hands curling like claws
+    {"t": 0.0, "Root": root_for_legs({"p": [0, 0, 0], "r": [-4, 0, 0]}, VS), **VS, "Neck": [-18, 0, 10],
+     "RightShoulder": [20, 0, 18], "LeftShoulder": [20, 0, -18], "stop": True},
+    {"t": 0.2, "Root": root_for_legs({"p": [0, 0, -0.12], "r": [-16, 4, 3]}, VS), "Neck": [-30, 10, 22],
+     "RightShoulder": [55, 0, 30], "LeftShoulder": [48, 0, -30]},
+    {"t": 0.3, "Root": root_for_legs({"p": [-0.5, 0, -0.3], "r": [-24, -6, 4]}, {"LeftHip": STEP}),
+     "LeftHip": STEP, "RightHip": [-32, 0, 6], "Neck": [-30, 8, 18]},
+    # sinks to the knee and takes the collar (0.4)
+    {"t": 0.4, "Root": croot(0.4, -0.55, -30), **VK, "Neck": [-28, 6, 14], "RightShoulder": COLLAR,
+     "LeftShoulder": [60, 0, -32], "stop": ["Root"]},
+    {"t": 0.6, "Root": croot(0.6, -0.6, -22, 0, 3), "Neck": [-14, 0, 8], "RightShoulder": COLLAR, "LeftShoulder": HOLD},
+    # drags the body up against its knee; the head draws back, savouring (anticipation, slow)
+    {"t": 0.82, "Root": croot(0.82, -0.5, -6, 6, 6), "Neck": [26, 8, 14], "RightShoulder": COLLAR, "LeftShoulder": HOLD,
+     "stop": ["Neck"]},
+    {"t": 0.89, "Root": croot(0.89, -0.48, -2, 8, 8), "Neck": [32, 10, 16]},
+    # the strike: the head snaps down into the neck (0.95), then presses deeper
+    {"t": 0.95, "Root": BITE, "Neck": BITE_NECK, "RightShoulder": COLLAR, "LeftShoulder": HOLD, "stop": ["Root"]},
+    {"t": 1.05, "Root": bite(-0.07, -0.05, [-54, -19, 9]), "Neck": [-18, -22, 20]},
+    # three long drinks: shoulders rise and roll, the body pulled tighter each time
+    {"t": 1.2, "Root": bite(0.05, 0.0, [-46, -16, 7])},
+    {"t": 1.38, "Root": bite(-0.04, -0.03, [-53, -20, 10])},
+    {"t": 1.6, "Root": bite(0.06, 0.0, [-45, -15, 6])},
+    {"t": 1.78, "Root": bite(-0.03, -0.03, [-52, -20, 10])},
+    {"t": 2.0, "Root": bite(0.05, 0.0, [-46, -16, 7]), "Neck": [-12, -20, 16]},
+    {"t": 2.2, "Root": bite(-0.02, 0.0, [-50, -18, 8]), "RightShoulder": COLLAR, "LeftShoulder": HOLD},
+    # lets the head fall back, sated, and lets go
+    {"t": 2.38, "Root": kroot(-0.45, 2, 4, -2), **VK, "Neck": [42, 0, -10], "RightShoulder": [70, 0, 30],
+     "LeftShoulder": [80, 0, -34], "stop": ["Neck"]},
+    # rises to stand over the body, head tilted, looking down at it
+    {"t": 2.7, "Root": root_for_legs({"p": [0, -0.2, -0.3], "r": [-10, 6, 4]}, VS_END), **VS_END, "Neck": [-24, 12, 18],
+     "RightShoulder": [30, 0, 22], "LeftShoulder": [26, 0, -20]},
+    {"t": 3.0, "Root": root_for_legs({"p": [0, 0, -0.3], "r": [-12, 8, 5]}, VS_END), "Neck": [-30, 14, 24],
+     "RightShoulder": [22, 0, 18], "LeftShoulder": [18, 0, -16], "stop": True},
 ]
 
 CLIP = {
@@ -109,5 +148,5 @@ CLIP = {
     "markers": [(0.4, "Grab"), (0.95, "Bite"), (1.2, "Drink"), (1.6, "Drink"), (2.0, "Drink"), (2.3, "Release"),
                 (2.6, "Finish"), (2.7, "Wipe")],
     "attacker": attacker, "victim": victim,
-    "waive_victim": "groundContact",
+    "waive_victim": "groundContact", "waive_attacker": "groundContact",  # animpro cannot see the tucked crouch legs
 }
