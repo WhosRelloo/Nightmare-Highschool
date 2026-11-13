@@ -1,6 +1,6 @@
 # Combat System: NH Combat Test
 
-This doc covers what was added on top of the existing combat framework. For the base framework (ActionManager, DamageLogic, HitBox, StateManager), see `Project-Audit.md` §3–5.
+This doc covers what was added on top of the existing combat framework. The 2.8.0 combat audit (fists first: recovery timing, the click buffer, hit-stop, parry fixes) and the concepts for what comes next are in [[Combat-Audit-and-Concepts]]. For the base framework (ActionManager, DamageLogic, HitBox, StateManager), see `Project-Audit.md` §3–5.
 
 ## Weapons and movement (1.6 to 1.8.4)
 

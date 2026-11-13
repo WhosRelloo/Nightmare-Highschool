@@ -2,6 +2,64 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.8.0] - 2026-11-13: Combat audit: fists that flow, contact you can feel, and parries that can't be mashed
+
+Owner: "Completely audit and analyze the combat system, especially for fists, and bugfix it and enhance it for a
+smoother gameplay. Then give me concepts on how we can enhance and expand on what we have already." The full audit, the
+test record and 22 concepts are in `docs/Combat-Audit-and-Concepts.md`. The live scripts are mirrored in
+`tools/combat-audit-280/`; the scripts as they were before are in `ServerStorage.NH_Backup.CombatAudit_pre_20261113`.
+
+### Fixed
+- **Fists stuck on each swing.** A swing's recovery was read in clip time, but fists play at 1.15x, so every swing held
+  you about 14% past its own end (0.52 s instead of 0.45 s on the first). `Combat.M1` now converts it to real seconds.
+  Katana (1.3x) and Claws (1.2x) speed up the same way.
+- **Clicks were dropped.** A click made while a swing was recovering was thrown away, so tapping in rhythm lost hits.
+  Now the server remembers a fresh click from the last 0.5 s of a swing and starts the next swing the moment the current
+  one ends (`ActionManager`, players only). One click is still one swing: the client's 0.05 s hold-repeats aren't
+  buffered.
+- **The parry tap flashed the guard.** After a quick parry tap, the block thread woke up 0.25 s later and played the
+  guard pose and Slow over whatever you did next. It now checks it still owns the block, and letting go stops the parry
+  pose (`General.Block`).
+- **Parry could be mashed.** A 0.1 s block cooldown let you reopen a 0.25 s parry window about every 0.35 s, so you were
+  parrying roughly 70% of the time. A window that catches nothing now locks the next one out for 0.5 s; you still guard
+  at once. A parry that lands lifts the lock (`DamageLogic.Parry`).
+- **Combo ender versus cooldown.** The end-of-combo cooldown is set before the 4th swing ends, so a buffered click can't
+  start a 5th hit.
+- **Katana combo order.** The four swings came from `GetChildren()`, which has no order; they're sorted 1-4 now.
+- **Running M1:** an error path called `HitBox:Disconnect`, which doesn't exist.
+
+### Added
+- **Hit-stop:** on contact the swing and the hit-react hold for 0.05 s, or 0.1 s on a heavy hit (combo ender, running
+  straight, downslam, a downing hit). This follows the house style's 3 and 6 frames. Walking and idle aren't paused
+  (`StateController.Misc.General.Damage Type`; `DamageLogic` now sends `Attacker` and `Heavy`).
+- **A camera kick** for the attacker and the victim on each hit, scaled by the Camera Shake setting.
+
+### Tested (NH Combat Test, slot 4 Testy on Fists, Inf Dummy, real mouse and keyboard)
+- **Clicks:** 1, 2 and 3 clicks gave 1, 2 and 3 swings, back to back. A 2.2 s hold gave the full string and then the 1 s
+  cooldown.
+- **10 taps 0.3 s apart:** swings came 0.48, 0.36 and 0.43 s apart, each starting the moment the last one's corrected
+  recovery ended.
+- **Hit-stop:** both swing tracks held 0.07 s on contact and resumed.
+- **Parry tap then a click:** the parry pose stopped on release; no guard pose or Slow at 0.25 s.
+- **Mashing F:** the first press parried, the next two only guarded, and the fourth (0.75 s later) parried again.
+- **Console:** no script errors.
+- **Restored:** `SlotCount` back to 3 and `NHTestNoMenuKeys` cleared. Testy is left on Fists.
+
+### Not tested
+- **Input devices:** gamepad and touch (same remotes).
+- **A second player:** two players, and the camera kick by eye.
+- **The AI tiers:** play against the tiers. Delinquents' fist combos are about 14% faster too; the stunlock guard still
+  caps them.
+- **Discipline:** the tests ran during After School, a monitor duty segment, so Testy may have picked up Fighting
+  violations for hitting the dummy.
+- **The Map:** not ported.
+
+### Found, left for the owner
+- **Heavy damage:** every weapon's heavy (M2) does 1.3x a light hit, and the config's `M2Damage` is never read.
+- **E for fists:** you need E to raise your fists, and any ProximityPrompt on screen takes E (in the test, a quest
+  prompt 7 studs away did).
+- **Uppercut timing:** its recovery has the same clip-time issue, left because the AI timings were tuned to it.
+
 ## [2.7.3] - 2026-11-13: Delinquent system audit: seven fixes to attendance, discipline, the hall monitor and the Delinquents
 
 Owner: "Look through everything on the game and everything you've learned." This is a full audit of the street crews,
