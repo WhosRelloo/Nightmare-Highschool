@@ -2,6 +2,90 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.98.0] - 2026-11-12: Show or hide your weapon, and the Map place catches up
+
+Owner: "Add an option to show your weapon or hide it, also port all the newest additions to "Map" place, BUT respect
+what I wanted to keep out of it for now."
+
+### Added (NH Combat Test and the Map)
+- **Settings > Interface > Character > "Show Weapon When Put Away"** (on by default; `UI.Settings` key `ShowWeapon`,
+  saved with your other settings).
+  - Off hides the weapon on your back while it's put away (the stowed copy in `Character.Accessory.Weapons`), for
+    every player who sees you. The weapon in your hand while it's out always shows.
+  - The server copies the setting to the player attribute `NHShowWeapon` when it's saved and whenever a profile loads
+    (joining, a slot switch).
+  - Every client's `Controllers.World.WeaponVisibility` hides the stowed copy with `LocalTransparencyModifier`. It
+    never changes a part's own Transparency, so invisibility and other effects keep working. The stowed weapon's
+    trails and particles are switched off while it's hidden and put back as they were.
+
+### Ported to the Map place (Combat Test's version each time, merged three ways with the Map's own changes)
+- **Accessories:**
+  - Kit C: the coats (C1, including `Controllers.Character.BodyFollow`, so skirts and capes ride the limbs), the masks
+    (C2) and the bags (C8). `ReplicatedStorage.NHAccessories` now holds 77 templates.
+  - Any hair can wear any accessory (1.88.0).
+  - The five staff capes' models (`NHCapes`), which the Map's wardrobe already listed.
+  - The v2 hair rigs (`NHHairCatalog`).
+- **Inventory:**
+  - The 1.90.1 audit and QOL batches 1 to 3 (`Features.Inventory`, `Gui.Locker`, `Gui.KitUi`, `Gui.KitHud`, `Gui.GamepadControls`).
+  - The snack wheel (`Gui.SnackWheel`, hold G) with Best food, and the snack models (`ReplicatedStorage.NHSnacks`).
+  - The kit updates (`Features.Kit`, `Config.Items`, `ReplicatedStorage.NHKit`).
+- **Contact feel (1.97.0) on the Map's own students:**
+  - `Features.ContactFeel` points at `Features.MapStudents`;
+  - `MapStudents` gets `Contact` and marks its students `NHBrain`;
+  - `MapStudents.Nudges` takes the shared contact-feel `Nudges` file;
+  - `Controllers.World.ContactFeel` as is.
+- **The 1.97.1 equip fix** (`StateController.Misc.Equip`, `Character.AnimationController`).
+- **Kept as the Map's own:** lockers only in the locker room, the K wardrobe anywhere, the Bloodline tab and the no-save `Player.Data`.
+- **Backups:** `ServerStorage.NHCore.Backups.*_pre197` and `*_pre198` (scripts), plus `NHAccessories_pre197`,
+  `NHHairCatalog_pre197` and `NHKit_pre197` (the old folders).
+
+### Kept out of the Map, as the owner asked
+- **No saving:** save slots, the main menu and Back to Menu.
+- **No real Robux:** purchases and the Spin Shop.
+- **No live-game infrastructure:** Cmdr, the anti-teleport and kill trackers, the test bridge.
+- **Combat and loot need a check-in first:** beasts, wolves, delinquents, gear chests and the notice board.
+- **Lockers:** only in the locker room.
+
+### Not ported yet (they need something the Map doesn't have)
+- **The concession stand and the lunch trays** (1.90.0, 1.95.0): they need the stand (`NHConcessionSpot`, `Features.NpcLooks`), which waits for the builder.
+  - Inventory's calls to them are guarded, and the stand's tabs in the Locker stay unused until then.
+- **Clique talk and dress codes** (1.94.0): they need the Map's cliques and standing first (as 1.94.0 says).
+- **Combat Test's school-day students** (`Features.Schedules` with `StudentBrain`): the Map keeps its own `MapStudents`.
+
+### Tested
+- **Map, Studio Play** (no save slots there; `NHTestNoMenuKeys` set then cleared):
+  - **The weapon option** (the real settings remote):
+    - Off hid the stowed katana (6 of 6 parts) and On showed it again.
+    - E drew it, and it showed in the hand (0 of 5 parts hidden).
+    - E put it away, and the new stowed copy was hidden at once.
+  - **Kit C:**
+    - The Inverness coat and the fox mask were worn.
+    - Walking, the coat's follow bones turned with the limbs: legs 51 degrees, arms about 30.
+    - With a violin case and a Gladstone bag too, the coat was left off by the Coat-vs-Back clash rule, as designed.
+  - **The snack wheel:**
+    - Holding a real G opened it (24 elements, 21 art pieces); letting go closed it.
+    - Best food at full health said "You're not hurt."
+  - **Contact feel:**
+    - Walking into a student stopped the player 2.2 studs off them.
+    - The student reacted (`reacting: Contact`) and played Nudge_Right.
+  - **The equip fix:** E while walking dropped WalkSpeed to 0 for one frame and put back 14.40.
+  - **Console:** no errors from the game's scripts. The only messages were a DataStore notice from Studio and one
+    from a test probe of mine.
+- **NH Combat Test, Studio Play, slot 4 "Testy"** (`SlotCount` 4 then back to 3, `NHTestNoMenuKeys` set then cleared,
+  no chat typing):
+  - Off was saved to Testy's profile and hid the stowed katana; On showed it again.
+  - After a fresh join on slot 4, the saved Off came back (`NHShowWeapon=false`) and the katana was hidden.
+  - Testy's setting is back on, and the rest of their settings are unchanged.
+  - No script errors.
+
+### Not tested
+- A second player seeing someone else's hidden weapon (the attribute replicates, and the same code runs for every
+  player, but there was only one player).
+- Clicking the new toggle in the Settings menu (it was set through the settings remote the menu uses).
+- Kit C masks and bags beyond the fox mask, Gladstone bag and violin case; the snack wheel with snacks in hand on the
+  Map (there's nowhere to buy them yet).
+- The owner needs to save both places.
+
 ## [1.97.1] - 2026-11-12: Equipping while walking no longer freezes you
 
 ### Fixed

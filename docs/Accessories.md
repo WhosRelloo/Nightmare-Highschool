@@ -589,3 +589,5 @@ The owner imported every remaining batch at once and asked for one assembly pass
   `Gui.Wardrobe`, `Gui.Enrollment` and `Features.Fx` (`patch_fx_flare`) patches (`tools/accessories/`).
 
 **(1.86.1) In the Map place:** Kit A and Kit B with the Wardrobe tabs, the hair tuck and the regalia effects. Kit C and BodyFollow were not ported (paused).
+
+**(1.98.0) In the Map place:** Kit C too (coats with `BodyFollow`, masks, bags), and any hair can wear any accessory. All 77 templates are there.

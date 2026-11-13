@@ -252,3 +252,10 @@ Other AI changes:
 - disconnect while carried
 - mobile (there are no touch buttons for V/B yet)
 - how the carry pose looks in motion. It was checked only in still screenshots from Studio, so judge the carry while walking yourself and nudge `CarryOffset` if needed.
+
+## Showing or hiding the stowed weapon (1.98.0)
+
+Settings > Interface > Character > "Show Weapon When Put Away" (`UI.Settings` key `ShowWeapon`, saved). The server
+sets the player attribute `NHShowWeapon` from it. Every client's `Controllers.World.WeaponVisibility` hides that
+player's stowed weapon: the `Back` copy in `Character.Accessory.Weapons`, which has a `Torso` Motor6D. It uses
+`LocalTransparencyModifier` and switches off the stowed copy's trails and particles. The weapon in hand always shows.

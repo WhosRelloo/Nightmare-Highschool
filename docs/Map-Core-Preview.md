@@ -157,6 +157,17 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 - **Icons and the crow tint:** the 1.84.0 icon set; the crow teleport takes the regalia's colour.
 - Replaced scripts are backed up as `ServerStorage.NHCore.Backups.*_pre186`.
 
+## Added 2026-11-12 (1.98.0): Kit C, inventory QOL, the snack wheel, contact feel, show or hide your weapon
+
+- **Accessories:** Kit C coats (with `BodyFollow`), masks and bags; any hair with any accessory; the staff capes' models; the v2 hair rigs.
+- **Inventory:** QOL batches 1 to 3, the 1.90.1 audit, the snack wheel (hold G) with Best food and the snack models.
+- **Contact feel on the Map's students:** you can't walk through them, bumps slow you, and they react
+  (`Features.ContactFeel` into `MapStudents.Contact`).
+- **Settings > Interface > "Show Weapon When Put Away"** (`Controllers.World.WeaponVisibility`).
+- **The 1.97.1 equip fix.**
+- **Still waiting:** the concession stand and lunch trays (the builder's stand), clique talk (cliques). The
+  keep-out list (E) is unchanged.
+
 ## What the Map still lacks (re-sorted 2026-11-10, around how far the school is built)
 
 Owner: "The builder is still making the school so give me a better list". The builder has the main building's outside up (the front, both wings around their courtyards, the entrance stairs, the front yard with the dead oaks and a gate) on open baseplates. There are no sports fields, dorms or town yet, and most rooms are still being fitted. So the list is sorted by what each system needs from the map, checked in NH Combat Test's code (which tags and workspace folders it looks for).
