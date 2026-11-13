@@ -2,6 +2,38 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.7.2] - 2026-11-13: Racial grips go live: published clips, sounds and art, and ported to the Map
+
+Owner: "Published and uploaded. And yes port everything to the map place." Details: `docs/Racial-Grips.md`.
+
+### Changed
+- **The grips use their published assets.** All are group-owned:
+  - 11 clips: each race's attacker and victim. The Ghoul attacker keeps the owner's Eat Body.
+  - 15 sounds and 15 textures.
+- **Ids are wired into `Config.RaceGrips`:** `Gripper` / `Victim`, `Sounds` and `Textures`.
+  - Live servers now play both clips with the weld, instead of the old single-clip fallback.
+  - The grip sounds and the custom effect art are on.
+- **Ported to the Map place.** The diff from the NH Combat Test pre-grip backups was applied to the Map's identical
+  scripts: `Features.Downed`, `ActionManager.Misc.RaceAction`, `Features.RaceAction`, `World.RaceActionFx` and
+  `Gui.TouchControls`. `Config.RaceGrips` and the `RaceGripFx` client module were added.
+  - The Map's backups are in `ServerStorage.NH_Backup.RacialGrips_port_pre`.
+
+### Tested
+- **Published ids (NH Combat Test, Edit):** every clip id loads.
+  - The 10 new clips match the 2.7.1 build exactly (keyframe count and length).
+  - All 37 sound and texture ids loaded, including the existing sigils and tier-up art.
+- **Map (Edit):** all 7 grip scripts match NH Combat Test's checksums. The grips' dependencies are in place:
+  `Controllers.Fx` and its API, `Lineage`, and `workspace.Live` and the `Ragdoll` group at run time.
+  - The optional `NHEvolveFX` bone spikes and gilded cross are not in the Map, so it uses the built-in fallback
+    parts.
+- **Map (Play):** the game booted with no grip errors.
+
+### Not tested
+- **No grip was played in the Map.** It skips the slot menu and loads slot 1, so it can't be tested on slot 4
+  "Testy". Its code is byte-identical to the NH Combat Test scripts tested in 2.6.0-2.7.1.
+- **The published clips have not been played in a live server.**
+- **Both places need a save:** NH Combat Test and the Map.
+
 ## [2.7.1] - 2026-11-13: Racial grips: heads look at what they are doing
 
 Owner: "Make the head movements actually follow the animation and look natural for what they are trying to do. The

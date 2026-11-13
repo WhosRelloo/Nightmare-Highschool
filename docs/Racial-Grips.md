@@ -1,4 +1,4 @@
-# Racial Grips (2.6.0, reworked in 2.6.2 and 2.7.1)
+# Racial Grips (2.6.0, reworked in 2.6.2 and 2.7.1, live in 2.7.2)
 
 Up: [[Combat-System]] · Related: [[Races-and-Bloodlines]], [[VFX-Design-Bible]]
 
@@ -160,19 +160,24 @@ a victim heartbeat loop, a finish sting and six sub-race extras. All synthesized
 | The weld, the final frame, the release | `Features.Downed` (`StartGrip`, `EndGrip`, `FinishGrip`) |
 | Rewards, the Fx payload (victim, sub-race, victim race) | `Features.RaceAction` |
 | VFX, sound, camera | `Controllers.World.RaceActionFx.RaceGripFx` |
-| Clips to publish | `ServerStorage.NH_GripAnims` (11 KeyframeSequences) |
+| Clip sources (published in 2.7.2) | `ServerStorage.NH_GripAnims` (11 KeyframeSequences) |
 | Generator | `tools/racial-grips` (see its README and `patches.md`). Checks: `duo.py` (both bodies), `solo.py`, `sinkcheck.py` |
 | The kneel | `tools/racial-grips/clips/_util.py`: `kneel_legs` / `kneel_root` / `kneel_fit` (the crouch frames); the leg slide goes into the pack from `out/*.tuck.json` |
 
-## Owner steps (group-owned assets)
-1. **Publish the 11 KeyframeSequences** in `ServerStorage.NH_GripAnims` (right-click > Save to Roblox, under the
-   group). They were rebuilt for 2.6.2, so publish these versions: GripVampire, GripVampireVictim, GripGhoulVictim, GripWerewolf, GripWerewolfVictim, GripWraith,
-   GripWraithVictim, GripPriest, GripPriestVictim, GripHuman, GripHumanVictim. Send the ids.
-2. **Upload the 15 sounds** in `art/sfx/racial-grips/` and the **15 textures** in `art/vfx/grips/` under the group.
-3. Then the ids go into `Config.RaceGrips` (`Gripper`/`Victim`, `Sounds`, `Textures`).
+## Published assets (2.7.2)
+The owner published everything under the group, and the ids are in `Config.RaceGrips`:
+- **11 clips:** the 2.7.1 builds of `ServerStorage.NH_GripAnims`. The Ghoul attacker is the owner's Eat Body.
+- **15 sounds:** from `art/sfx/racial-grips/`.
+- **15 textures:** from `art/vfx/grips/`.
 
-Until then: in Studio the clips play from temporary preview ids; on a live server each race falls back to its old single
-clip with no victim clip and no weld; effects use the existing `nh_*` and tier-up art; the grip sounds are silent.
+If a clip id is ever reset to 0, Studio falls back to a temporary preview id, and a live server plays the old
+single clip with no victim clip and no weld.
+
+## Places
+| Place | State |
+|---|---|
+| NH Combat Test | Built and tested here, 2.6.0-2.7.1 |
+| Map | Ported in 2.7.2. All 7 scripts match NH Combat Test's checksums, and the backups are in `ServerStorage.NH_Backup.RacialGrips_port_pre`. See `tools/racial-grips/patches.md`. |
 
 ## Verified for 2.6.0 (2026-11-13, NH Combat Test, slot 4 "Testy", Play)
 - **All six grips through the real N key** on downed AI dummies (spawned and downed through `NHTestBridge`; race set
@@ -209,21 +214,35 @@ clip with no victim clip and no weld; effects use the existing `nh_*` and tier-u
     the howl.
   - The victim died at the end. Testy and the flags were restored.
 
+## Verified for 2.7.2
+- **Published ids (NH Combat Test, Edit):** every clip id loads.
+  - The 10 new clips match the 2.7.1 build exactly (keyframe count and length).
+  - All 37 sound and texture ids loaded.
+- **Map:**
+  - In Edit, the checksums match NH Combat Test, and the dependencies are in place: `Controllers.Fx` and its API,
+    `Lineage`, and `workspace.Live` and the `Ragdoll` group at run time.
+  - `NHEvolveFX` is not in the Map, so the Ghoul's cage and the Priest's cross use the fallback parts.
+  - Play booted with no grip errors.
+
 ## Not verified / known limits
+- **2.7.2:**
+  - No grip was played in the Map. It loads slot 1 directly (there is no slot menu), so it can't be tested on slot 4
+    "Testy".
+  - The published clips have not been played in a live server.
 - **2.7.1:** the new heads on the Human, Priest, Vampire, Wraith and Ghoul-victim clips were checked in the generator
   only, not in Play.
 - **2.6.2:**
   - The Werewolf, Wraith and Ghoul-victim clips have not been play-tested.
   - No side-on screenshot of the player mid-grip: the grip camera stays behind the player.
-- **The client view used a test mirror.** Studio's temporary preview ids registered on the server don't load on the
-  client, so the screenshots came from a test-only script that played the client's own registered copy of each clip in
-  step with the server's. Published ids don't have this problem, but the real replicated playback is untested until the
-  owner publishes.
-- **Sounds and the custom textures** are not uploaded, so they were not heard or seen in game (fallback art showed).
+- **The client view used a test mirror (2.6.0-2.7.1).** Studio's temporary preview ids registered on the server don't
+  load on the client, so the screenshots came from a test-only script that played the client's own registered copy of
+  each clip in step with the server's. The published ids (2.7.2) don't need it, but replicated playback of them hasn't
+  been seen in Play yet.
+- **Sounds and the custom textures** were not heard or seen in game before 2.7.2 (fallback art showed). They load
+  now but haven't been played in a grip.
 - Not run: a grip on a **real player** victim (two players), an **interrupted** racial grip releasing the weld (code
   read only), the sub-race richer effects, different heights between gripper and victim (the offset scales with the
   gripper only).
 - **Testy side effects:** feeding as each race opened the rite quests (The Font Below, First Hunt, Shroud, Exorcism,
   Grave-eater) and a Crimson Court rank-up in Testy's journal, and the test ran through a class period (a skipped-class
   violation). Testy's race is back to Human / Human.
-- **Not ported to the Map place.**

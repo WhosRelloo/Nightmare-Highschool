@@ -41,3 +41,29 @@ Config.Downed, TouchControls).
 
 ## Controllers.Gui.TouchControls
 - `RACE_ACTION`: Human `STAKE`, Werewolf `MAUL`.
+
+## 2.7.2: port to the Map place
+The Map's five scripts were identical to NH Combat Test's `RacialGrips_pre220` backups, so the change was moved over
+as an exact transplant rather than a merge:
+1. An LCS line diff between each backup and the current NH Combat Test script gave ops `[start, delCount, lines]`.
+2. The Map applied them bottom-up.
+3. The checksum was checked before (it must equal the backup) and after (it must equal NH Combat Test).
+
+The two modules were written whole: `Config.RaceGrips`, and `RaceGripFx`, which is pasted as a `[=====[ ]=====]` long
+string because Studio can't fetch from localhost.
+
+- Map backups: `ServerStorage.NH_Backup.RacialGrips_port_pre`.
+- Checksums (length:hash, every 7th byte, `h = (h*31 + b) % 2147483647`):
+
+| Script | Checksum |
+|---|---|
+| Features.Downed | 28329:1358790581 |
+| ActionManager.Misc.RaceAction | 4225:1903632717 |
+| Features.RaceAction | 2625:861387712 |
+| World.RaceActionFx | 6738:813717209 |
+| Gui.TouchControls | 26831:930348948 |
+| Config.RaceGrips | 7305:904666806 |
+| RaceActionFx.RaceGripFx | 41463:555311792 |
+
+The Map has no `NHEvolveFX`, so the Ghoul's bone cage and the Priest's cross use the fallback parts. It also has no
+`NHTestBridge` and no slot menu, so grips can't be tested there on slot 4.
