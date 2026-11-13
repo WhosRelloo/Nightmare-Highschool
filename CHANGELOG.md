@@ -2,6 +2,73 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.5.0] - 2026-11-13: Fists first, and the armory
+
+Owner: "I want all students to start off with the "Fist" Class then can buy a katana from the armory shop keeper."
+The owner's decisions: existing saves go to Fist ("Everyone to Fist": a katana was never sold, every save got one by
+default or picked it free at the class locker); the katana costs ¥1,000; Claws are locked for now; a small placeholder
+armory in each place (in the Map, by the Locker Room Placeholder). Details and screenshots: `docs/Armory.md`.
+
+### Changed (NH Combat Test and the Map)
+- **Every student starts on Fist.** `PlayerData.Weapon` defaults to `Fist`, which has had its full moveset since 1.6.
+  - **Saves:** `Config.Armory.Migrate` runs on every profile load. Once per save (`Armory.V = 1`) it sets Fist and
+    clears what's owned. After that, a class you don't own goes back to Fist.
+  - NPCs and dummies keep their Katana default (`EntityLoader`).
+- **The class locker only offers classes you own.**
+  - A katana you haven't bought: "Sold at the armory for ¥1000." and **At the armory**.
+  - Claws: "Locked for now." and **Locked**.
+  - The server refuses picking either.
+- **Admins:** Cmdr `adjustWeapon` also grants the class, so it survives the next load (NH Combat Test; the Map has no
+  Cmdr).
+
+### Added
+- **The armourer** (`Features.Armory`, `Gui.ArmoryUi`, `Config.Armory`). An NPC stands on any part tagged
+  `NHArmoryKeeper`. "Browse" opens the **Iron Vigil Armoury** window, built from the UI kit like the kit counters:
+  - Fists: free, "Your class".
+  - Katana: **Buy ¥1000**.
+  - Claws: **Locked**.
+  - **Buying** is checked by the server: the class must be on sale and not owned, you must be within 16 studs of the
+    armourer or the counter (tag `NHArmoryShop`), and you need the Yen. It charges the Yen and saves the class in
+    `PlayerData.Armory.Owned`. You then switch at a class locker.
+  - The window closes when you walk away or use another prompt.
+- **A placeholder armory** in each place (`tools/armory-2xx/build_placeholder.luau`). It's a 22 by 14 open booth with
+  the batch-46 counter, katana stand, armour stand, shield wall and hanging sign, the armourer, and a class locker.
+  - NH Combat Test: (72, 0.9, -8), south of the school.
+  - Map: (-838, -7.96, -101), east of the Locker Room Placeholder, tagged `NHCore`.
+- **The Map gets the class locker scripts** (`Features.ClassLocker`, `Gui.ClassLocker`); it had none. The Map's
+  armourer is a plain R6 body, because its `AI.Rig` is a stub.
+- Studio test hook `ServerStorage.NHArmoryTest` (`State`, `Yen`), Studio only.
+
+### Verified (Studio Play)
+- **NH Combat Test, slot 4 "Testy"** (entered through the `NHSlots` remotes):
+  - **The migration:** Testy loaded on Fist with `V = 1` and nothing owned (¥1,087).
+  - **Fighting with Fist:** the HUD showed the Fist skills. A four-hit combo on a training dummy landed 3.1 each
+    (100 → 87.6).
+  - **Buying:** the armourer's prompt opened the window, and clicking **Buy ¥1000** took Testy from ¥1,087 to ¥87,
+    with Katana owned.
+  - **Switching:** E at the booth's class locker opened it and closed the armoury. "Choose" with the fists out answered
+    "Put your weapon away first (E)." After putting them away, the class became Katana and the katana went on the back.
+  - **Rejoin:** after Stop and a new Play, slot 4 loaded with Katana current and owned, ¥87, the katana on the back.
+    Drawn with E, the katana hit the dummy for 4.1 each.
+  - **Put back:** Testy was refunded the ¥1,000 (¥1,087) and keeps the katana. `SlotCount` is back to 3 and
+    `NHTestNoMenuKeys` is cleared.
+- **The Map** (it saves nothing):
+  - A new student loaded on Fist (`V = 1`).
+  - Refused through the remotes: buying the katana with no Yen ("Not enough Yen. The Katana costs ¥1000."), buying
+    Claws or Fist, a table as the class, picking Katana before buying it ("Buy it at the armory first."), and picking
+    Claws ("That class is locked for now.").
+  - After a test ¥1,000, the **Buy** button bought it, "Choose" at the class locker switched to Katana, E drew it, and
+    it swung.
+- **The same source:** `Config.Armory`, `Features.Armory` and `Gui.ArmoryUi` are byte-identical in both places and
+  the repo.
+
+### Not verified
+- A second player watching the armourer and the purchase (needs a two-player server).
+- In the booth, the armourer's and the locker's prompts both use E, and Roblox shows one at a time: you face the one
+  you want. This was seen in the test but not changed.
+- The Map's armourer's look is Roblox's default R6 body, dressed by `UI.Appearance`. It wasn't compared to the
+  students around it.
+
 ## [2.4.0] - 2026-11-13: Inventory QOL batch 6: a replace-buff check, "new" dots, the trophy case
 
 Owner: "Continue with the inventory ideas", and while asleep, "I approve everything you are doing". This batch is

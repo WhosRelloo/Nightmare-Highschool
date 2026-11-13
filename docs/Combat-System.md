@@ -16,6 +16,9 @@ Three classes run on the same combat code (`ServerScriptService.Services.Player.
 | Aerial attack | forward glide (30), then a drop | downslam: hang, dive at 0.56 s, impact at 0.66 s | same as Fist |
 | Equip | E draws the katana | E | starts equipped (Specter Claws) |
 
+**Who has which class (2.5.0):** every student starts on Fist. The katana is bought from the armourer for ¥1,000,
+and Claws are locked for now. The class locker only offers the classes you own. See [[Armory]].
+
 ### Timing markers
 `ServerStorage.Packages.AnimMarkers` reads an animation's `Hit` and `EndLag` keyframes. If a clip lacks them, or a freshly loaded track can't report them yet, it falls back to `Config.Weapons.<Name>.Markers[animationId]`. A real keyframe always wins.
 
