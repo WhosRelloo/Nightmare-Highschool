@@ -66,9 +66,22 @@ and in `ServerStorage.NH_Backup.FistAnims_pre_20261113`.
   - **Checked:** in the stage, by measurement and by eye, with the seams re-checked. That version wasn't play-tested.
     The game code is the same for it.
 
+### Published (the owner)
+- **The ids, set in `Fist.Moves`:**
+
+  | Clip | Id |
+  | --- | --- |
+  | FistShove | 99575689929104 |
+  | FistBodyBlow | 115837677569118 |
+  | FistClinch | 105787080820844 |
+  | FistClinchVictim | 127085112840973 |
+
+- **Checked:**
+  - **The clips:** each loads at its length with its Hit / EndLag keyframes. The published Shove has the raised arms.
+  - **In play (slot 4):** the Shove, the Body Blow and the Clinch play for the client at full length, and the Inf Dummy
+    plays the clinch-victim clip.
+
 ### Not done yet (the owner)
-- **Publish the clips:** the four KeyframeSequences in `ServerStorage.NH_FistAnims` go to group 15981569. Then paste
-  the ids into `Fist.Moves` (steps in `tools/fist-moves/README.md`). Until then the stand-ins play.
 - **Save the place:** save NH Combat Test.
 - **The Map:** this isn't ported to the Map yet (same as 2.8 to 2.11).
 

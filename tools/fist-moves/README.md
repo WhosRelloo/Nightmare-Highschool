@@ -52,6 +52,15 @@ python stage/seam.py                                  # every seam should be mil
 
 ## Publishing (the owner)
 
+Published 2026-11-13 and set in `Fist.Moves`:
+
+- `FistShove`: 99575689929104
+- `FistBodyBlow`: 115837677569118
+- `FistClinch`: 105787080820844
+- `FistClinchVictim`: 127085112840973
+
+To republish after a rebuild:
+
 1. Publish the four KeyframeSequences in `ServerStorage.NH_FistAnims` to group 15981569: right-click each, then
    **Save to Roblox**.
 2. Paste each id into the matching Animation under `ReplicatedStorage.Assets.Animations.Weapons.Fist.Moves`: `Shove`,
