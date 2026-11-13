@@ -2,6 +2,55 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.97.0] - 2026-11-12: Bumping into students has weight
+
+Owner: "I want the NPC's to actually FEEL like im touching them, especially when I bump into them. I want it to have
+some weight to it." See `docs/Contact-Feel.md`. Live scripts are mirrored in `tools/contact-feel/`, `tools/ct-npc-1862/`
+and `tools/npc-nudges/`.
+
+### Added
+- **Students take up space.** You can't walk through a student any more: you stop where shoulders meet and slide round
+  them (`Controllers.World.ContactFeel`, client). Students are still physics ghosts, so they can't be shoved through
+  walls or block doors. Pinned for 0.4 s, you're let through.
+- **Bumps have weight:**
+  - **Walking into someone (brush):** you lose a third of your speed for a quarter second, the camera jolts lightly,
+    there's a soft thud, and your shoulder twists away.
+  - **Sprinting into someone (hard):** you nearly stop for a third of a second and rock back half a step, with a
+    sharper camera bump, a heavier thud and a short lean back.
+  - The camera jolt follows the Camera Shake setting; the lean is skipped under Reduce Motion.
+- **Students react to how hard you hit them.** The client reports each impact (`ReplicatedStorage.NHContact.Impact`);
+  the server (`Features.ContactFeel`) checks it and calls `StudentBrain.Contact`, so students react even when they
+  didn't see you coming. A real hit shoves them further the faster you were going (up to 1.5x, room check kept).
+
+### Changed
+- The bump line ("Watch it!", or "No running in the halls!" for a sprint) now lands the moment you touch, not as you
+  approach (`Nudges.OnContact`).
+
+### Fixed (during review)
+- Your speed now always comes back after a bump slow, even when equipping a tool at that exact moment.
+- A student despawned mid-nudge can no longer stop reacting for the rest of the server.
+- Sliding along a wall or the fountain rim no longer jitters or climbs the rim.
+- The server's reach check uses its own speed (capped by the server's WalkSpeed) and the player's ping, not a speed the
+  client could fake.
+
+### Tested
+- Play test on slot 4 (Testy), with numbers in `tools/contact-feel/PLAYTEST.md`:
+  - **Solid contact:** held at 2.2 studs and slid round in 0.15 to 0.35 s.
+  - **Brush:** WalkSpeed 14.4 to 9.36 for 0.25 s, restored exactly.
+  - **Sprint hit:** 25.4 to 2.0 for 0.3 s, then a rock back.
+  - **Reactions and lines:** within a few ms of contact.
+  - **Other cases:** seated students stay solid, a pinned player is let through, the fountain rim is smooth, and Equip
+    at the end of a slow restores speed.
+- Not tested:
+  - the sounds and camera feel, by ear or eye;
+  - the full-speed shove carry;
+  - a transformed or downed player;
+  - a despawn mid-nudge;
+  - a second player.
+- The Map isn't ported.
+- A separate, pre-existing bug was found: pressing E while walking can leave your WalkSpeed at 0, because Equip and
+  AnimationController each zero and restore it.
+
 ## [1.96.0] - 2026-11-12: The snack wheel (the Bell Wheel) and Best food
 
 Owner: batch 4 (concepts 4 and 7 in `docs/Inventory-QOL-Concepts.md`). On the key: "What about holding G?" On the look:
