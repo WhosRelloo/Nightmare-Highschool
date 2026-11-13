@@ -1,0 +1,90 @@
+{
+ "ok": true,
+ "name": "FistClinchVictim",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action4",
+ "authoredDuration": 1.4,
+ "bakedDuration": 1.4,
+ "passes": {
+  "spline": false,
+  "overlapFrames30": {},
+  "settle": "off",
+  "life": 0.35,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 43,
+ "poseKeys": 161,
+ "markers": 0,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: LeftShoulder at 806°/s around 0.2 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 0.24 studs of the HumanoidRootPart and returns within 0"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "skipped",
+   "detail": "only for locomotion or grounded"
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "evenKeys",
+   "message": "Keys are evenly spaced (every 0.03 s). Action has rhythm: a quick strike between slower anticipation and recovery, holds of different lengths. Re-time the keys so the beats differ."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.6892442082738357,
+  "peakAt": 0.35714285714285715,
+  "action": {
+   "effector": "Left Arm",
+   "peakSpeed": 25.534116575224594,
+   "onset": 0.06666666666666667,
+   "peak": 0.2,
+   "stop": 0.26666666666666666,
+   "strike_s": 0.2,
+   "followThrough_s": 0.1,
+   "hold_s": 0,
+   "recovery_s": 0.16666666666666666,
+   "windupBack": 0.059894405041097165,
+   "rootDrop": 0.1115798403193613,
+   "rootShift": 0.1777853924751881,
+   "torsoPeak_ms": 133.33333333333334
+  }
+ },
+ "sheet": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistClinchVictim_sheet.png",
+ "graph": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistClinchVictim_graph.png",
+ "trails": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistClinchVictim_trails.png",
+ "luau": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistClinchVictim.lua",
+ "luauBytes": 8976
+}

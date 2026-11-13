@@ -1,0 +1,98 @@
+{
+ "ok": true,
+ "name": "FistShove",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action4",
+ "authoredDuration": 0.8333,
+ "bakedDuration": 0.833,
+ "passes": {
+  "spline": false,
+  "overlapFrames30": {},
+  "settle": "off",
+  "life": 0.35,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 26,
+ "poseKeys": 125,
+ "markers": 2,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: RightShoulder at 1300°/s around 0.3 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 0.44 studs of the HumanoidRootPart and returns within 0.49"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "fail",
+   "detail": "Left Leg sinks 0.74 studs into the ground at 0.07 s; limit 0.1",
+   "measured": {
+    "penetration": 0.74,
+    "groundedShare": 1
+   }
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "noAnticipation",
+   "message": "The Right Arm launches from a dead start on the first frames of the clip: no pull-back, no hip load, no dip in the 0.6 s before it. Real punches don't pull the hand back; they load the hips (pelvis turn peaks ~50 ms before the hand, shoulders ~35 ms before). Slashes raise first for 0.7-1.4 s. Game telegraphs: player light attacks 0.07-0.1 s, heavies 0.17-0.2 s, NPC attacks the player must read >= 0.34 s (Dark Souls 3)."
+  },
+  {
+   "consider": "evenKeys",
+   "message": "Keys are evenly spaced (every 0.03 s). Action has rhythm: a quick strike between slower anticipation and recovery, holds of different lengths. Re-time the keys so the beats differ."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.4103714593552188,
+  "peakAt": 0.42857142857142855,
+  "action": {
+   "effector": "Right Arm",
+   "peakSpeed": 40.065039172091154,
+   "onset": 0,
+   "peak": 0.1,
+   "stop": 0.2,
+   "strike_s": 0.2,
+   "followThrough_s": 0,
+   "hold_s": 0,
+   "recovery_s": 0.5,
+   "windupBack": 0,
+   "rootDrop": 0,
+   "rootShift": 0.4066992623548757,
+   "torsoPeak_ms": 0
+  }
+ },
+ "sheet": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistShove_sheet.png",
+ "graph": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistShove_graph.png",
+ "trails": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistShove_trails.png",
+ "luau": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistShove.lua",
+ "luauBytes": 7521
+}

@@ -1,0 +1,102 @@
+{
+ "ok": true,
+ "name": "FistBodyBlow",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action4",
+ "authoredDuration": 0.8667,
+ "bakedDuration": 0.867,
+ "passes": {
+  "spline": false,
+  "overlapFrames30": {},
+  "settle": "off",
+  "life": 0.35,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 27,
+ "poseKeys": 125,
+ "markers": 2,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: RightShoulder at 854°/s around 0.1 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 0.29 studs of the HumanoidRootPart and returns within 0.39"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "fail",
+   "detail": "Left Leg sinks 0.78 studs into the ground at 0 s; limit 0.1",
+   "measured": {
+    "penetration": 0.78,
+    "groundedShare": 1
+   }
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "symmetricEasing",
+   "message": "Moves peak in speed at 50% of their duration: every move eases in and out the same amount. Measured gestures reach peak speed at 38% (they leave fast and arrive slowly); tired/old characters at ~25%; only snappy, energetic ones near 50%. Put a breakdown key early in the move or favour the arrival."
+  },
+  {
+   "consider": "noAnticipation",
+   "message": "The Left Arm launches from a dead start on the first frames of the clip: no pull-back, no hip load, no dip in the 0.6 s before it. Real punches don't pull the hand back; they load the hips (pelvis turn peaks ~50 ms before the hand, shoulders ~35 ms before). Slashes raise first for 0.7-1.4 s. Game telegraphs: player light attacks 0.07-0.1 s, heavies 0.17-0.2 s, NPC attacks the player must read >= 0.34 s (Dark Souls 3)."
+  },
+  {
+   "consider": "evenKeys",
+   "message": "Keys are evenly spaced (every 0.03 s). Action has rhythm: a quick strike between slower anticipation and recovery, holds of different lengths. Re-time the keys so the beats differ."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.4313430724765617,
+  "peakAt": 0.5,
+  "action": {
+   "effector": "Left Arm",
+   "peakSpeed": 43.525783787281455,
+   "onset": 0,
+   "peak": 0.1,
+   "stop": 0.23333333333333334,
+   "strike_s": 0.23333333333333334,
+   "followThrough_s": 0,
+   "hold_s": 0,
+   "recovery_s": 0.5,
+   "windupBack": 0,
+   "rootDrop": 0,
+   "rootShift": 0.1817355881174638,
+   "torsoPeak_ms": 0
+  }
+ },
+ "sheet": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistBodyBlow_sheet.png",
+ "graph": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistBodyBlow_graph.png",
+ "trails": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistBodyBlow_trails.png",
+ "luau": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistBodyBlow.lua",
+ "luauBytes": 7535
+}

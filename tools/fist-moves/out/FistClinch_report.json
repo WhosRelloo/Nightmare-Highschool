@@ -1,0 +1,94 @@
+{
+ "ok": true,
+ "name": "FistClinch",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action4",
+ "authoredDuration": 1.4,
+ "bakedDuration": 1.4,
+ "passes": {
+  "spline": false,
+  "overlapFrames30": {},
+  "settle": "off",
+  "life": 0.35,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 30,
+ "poseKeys": 141,
+ "markers": 2,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: LeftShoulder at 715°/s around 0.02 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 0.35 studs of the HumanoidRootPart and returns within 0.08"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "fail",
+   "detail": "Right Leg sinks 0.5 studs into the ground at 0.58 s; limit 0.1",
+   "measured": {
+    "penetration": 0.5,
+    "groundedShare": 1
+   }
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "evenKeys",
+   "message": "Keys are evenly spaced (every 0.03 s). Action has rhythm: a quick strike between slower anticipation and recovery, holds of different lengths. Re-time the keys so the beats differ."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.5376327481614973,
+  "peakAt": 0.17647058823529413,
+  "action": {
+   "effector": "Right Leg",
+   "peakSpeed": 25.608597543617794,
+   "onset": 0.1,
+   "peak": 0.23333333333333334,
+   "stop": 0.4,
+   "strike_s": 0.3,
+   "followThrough_s": 0,
+   "hold_s": 0,
+   "recovery_s": 0.36666666666666664,
+   "windupBack": 0,
+   "rootDrop": 0.1395,
+   "rootShift": 0.25231095893757766,
+   "torsoPeak_ms": -233.33333333333334
+  }
+ },
+ "sheet": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistClinch_sheet.png",
+ "graph": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistClinch_graph.png",
+ "trails": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistClinch_trails.png",
+ "luau": "E:\\Nightmare-Highschool\\tools\\fist-moves\\out\\FistClinch.lua",
+ "luauBytes": 8157
+}

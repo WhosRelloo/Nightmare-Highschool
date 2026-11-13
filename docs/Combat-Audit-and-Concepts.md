@@ -147,6 +147,12 @@ armory, cliques, duels and the hall monitors.
   RIPOSTE and COUNTER.
 - **Stand-in clips:** existing Fist clips are used until bespoke ones are made: M1.4 for the shove, M1.3 for the body
   blow, M2 for the knee.
+- **Bespoke clips (2.12.0):** the Shove, the Body Blow, the Clinch and a clinch victim, built on the game's own fist M1s
+  (`tools/fist-moves/`).
+  - **Seams:** each starts on the pose of the swing it cancels and ends on the fist idle, limb slides included.
+    Measured in Studio, the seams join within 4 mm and 0.2 degrees.
+  - **Where they live:** `ReplicatedStorage.Assets.Animations.Weapons.Fist.Moves`. The code uses a clip once its
+    AnimationId is set, and the stand-in until then.
 
 **Built in 2.11.0:** concepts 7, 10 and 11, which completes section B.
 - **Delay string (7):** throw the 4th hit after a pause (0.3 s or more after hit 3 lands, before the string resets at

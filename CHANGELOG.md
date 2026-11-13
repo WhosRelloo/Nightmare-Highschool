@@ -2,6 +2,76 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.12.0] - 2026-11-13: Bespoke fist animations for the shove, the body blow and the clinch
+
+Owner: "Actually properly animate the stuff I told you no for before", using "the m1s already in the game as the BASE
+LINE ... make sure everything lines up and is smoothly animated into each other". The tools and the clip sources are in
+`tools/fist-moves/` (README). The live scripts are mirrored in `tools/fist-moves/studio/`, with the originals in `pre/`
+and in `ServerStorage.NH_Backup.FistAnims_pre_20261113`.
+
+### Added
+- **Four new R6 clips, built on the owner's fist M1s.**
+  - **Shove (after hit 1):** the arms swing back into a crouched gather, the hips launch, then both palms drive out at
+    chest and shoulder height and recover into the guard.
+  - **Body Blow (after hit 3):** the right hand coils far back with the torso turned away, the hips snap round first,
+    and the arm whips across at rib height a frame behind.
+  - **Clinch (M1 while blocking):** from the guard it reaches, grabs both shoulders, yanks down and drives the right
+    knee into the gut.
+  - **Clinch victim:** yanked in, folds over the knee with the arms clutching in, staggers back, and recovers into a
+    guard.
+- **Seams that line up.** Each clip starts on the exact pose of the swing it cancels (M1.1 at 0.45 s, M1.3 at 0.40 s,
+  the Block guard) and ends on the fist idle's first frame.
+  - **The limb slides:** the clips copy the owner's Moon-style limb slides (arms pulled in, legs tucked), and the
+    soles sit at the idle's height.
+  - **Measured in Studio:** every seam joins within 4 mm and 0.2 degrees. The clinch's end is within 6 cm and
+    3 degrees, which the next clip's fade covers.
+- **New Animation objects (`ReplicatedStorage.Assets.Animations.Weapons.Fist.Moves`).** `Shove`, `BodyBlow`, `Clinch`
+  and `ClinchVictim`, empty until the owner publishes the clips.
+  - **While empty:** each move plays its old stand-in, so nothing breaks before publishing.
+  - **The sources:** `ServerStorage.NH_FistAnims` (KeyframeSequences plus their builder).
+
+### Changed
+- **`Combat.Ender`:** plays the bespoke clip at speed 1 with a 0.08 s fade in. The Hit and EndLag timing come from the
+  clip's own keyframes.
+- **`Combat.Clinch`:** plays the bespoke clip at speed 1 (grab 0.14 s, knee 0.367 s, recovery 0.70 s).
+  - **The catch:** the one caught is set 2.9 studs in front, facing you, at their own height. That spacing is how the
+    pair was animated. If a wall is in the way they stay where they are.
+  - **The victim clip:** they play the clinch-victim clip, and the knee skips its usual hit react so the fold isn't
+    cut off.
+  - **The tag:** it's tagged like a hit react, so their next hit's react replaces it.
+  - **Interrupted:** if you're interrupted before the knee, they're let go.
+- **`Combat.M1`:** an ender or clinch clip still settling after its EndLag fades out (0.12 s) under your next swing.
+  Before, an Action4 clip would have covered the new M1.
+
+### Tested (NH Combat Test, slot 4 Testy on Fists vs the Inf Dummy, real mouse and keyboard)
+- **Setup:** the clips were registered as temporary ids in the play server.
+  - **The client:** it plays the server's clip with the full length (0.83 s), so the test shows what players see.
+- **Shove:** click then R played M1.1, then the Shove (Action4, 0.83 s), which knocked the dummy about 25 studs.
+- **Body Blow:** three clicks then R played M1.1, M1.2, M1.3, then the Body Blow. Frozen on the hit frame, the hook
+  lands across the ribs.
+- **Clinch:** F held plus a click played the Clinch.
+  - **The catch:** the dummy, set 3.4 studs away and 0.6 off-line, was moved to exactly 2.9 straight ahead, facing
+    Testy (facing -1.00).
+  - **The victim clip:** it played the victim clip, and the knee's push moved the dummy back to about 4.3 studs.
+  - **By eye:** frozen on the knee, the dummy is folded over in front of Testy's hands.
+- **Fade:** a click after the Shove's EndLag started M1.1 0.73 s in, and the Shove track stopped at that moment.
+- **Restored:** `SlotCount` back to 3, `NHTestNoMenuKeys` cleared, and the Moves ids are empty again in the saved
+  place.
+
+### Fixed during the work
+- **The Shove's arms were too low.** The owner asked for them higher. On the hit frame the palms were at belly height
+  (0.7 studs under the shoulders), because the body leans 26 degrees.
+  - **The fix:** the shoulders are raised about 45 degrees through the strike, and the arm slide is lifted. The palms
+    now reach out at upper-chest and shoulder height.
+  - **Checked:** in the stage, by measurement and by eye, with the seams re-checked. That version wasn't play-tested.
+    The game code is the same for it.
+
+### Not done yet (the owner)
+- **Publish the clips:** the four KeyframeSequences in `ServerStorage.NH_FistAnims` go to group 15981569. Then paste
+  the ids into `Fist.Moves` (steps in `tools/fist-moves/README.md`). Until then the stand-ins play.
+- **Save the place:** save NH Combat Test.
+- **The Map:** this isn't ported to the Map yet (same as 2.8 to 2.11).
+
 ## [2.11.0] - 2026-11-13: Soft lock-on, the delay string, the charged heavy, and wall splats
 
 Owner: "Let's finish up A first then finish up B" (`docs/Combat-Audit-and-Concepts.md`): concept 5, then 7, 10 and 11.
