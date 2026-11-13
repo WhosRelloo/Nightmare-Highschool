@@ -81,6 +81,7 @@ Each attack's movement comes from one place, so nothing fights it:
 | Carry (**V**) | **Pick up:** works on the nearest downed body within 8 studs. **While carrying:** the carrier walks at 12 and can't attack. **Animations:** the carrier plays *Carry* (`87080849662647`, arms only) and the body plays *Carried* (`113988398408159`), which drapes it over the **left shoulder**. The body's root is held at `Config.Downed.CarryOffset` = (-1.3, 2.0, 0.6) from the carrier's Torso, tuned with screenshots. **Drop:** press V again. Taking a hit also drops the body. |
 | Grip (**B**) | **Target:** the nearest downed body within 8 studs, or the one you're carrying. **Placement:** the victim is placed 3 studs in front, facing the gripper. **Animations:** *Katana Grip* (`89687789815973`) and *Katana Grip (Victim)* (`127090783290737`) play together. **Outcome:** the victim **dies when the gripper's animation ends** (~2 s), and the gripper is credited with the kill. A hit on the gripper cancels the grip, and the victim stays downed. |
 
+- **Racial grips (N, 2.6.0):** every race finishes a downed body with its own paired clip (gripper + victim), the victim welded to the gripper for the whole clip. See [[Racial-Grips]].
 - Applies to **players, AI NPCs, and dummies.** Infinite-HP dummies can't be downed.
 - To exempt a character, set the `NoDowned = true` attribute on its model.
 - **Disconnect or reset while downed:** a reset counts as a kill for the last attacker. A disconnect only releases the body, with no kill credit.

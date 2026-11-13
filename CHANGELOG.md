@@ -2,6 +2,47 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.6.0] - 2026-11-13: Racial grips: every race's own finisher, victims that fight, new effects and sounds
+
+Owner: "/design the racial grip animations that dont have any. And make animations for the victims of the racial
+grips." Designs approved by the owner; the victims "look like they are getting eaten alive or exorcized (priest)";
+"unique, on theme, and HIGHEST quality vfx", custom sounds and drawn VFX art. No blood or gore anywhere. Details,
+screenshots and owner steps: `docs/Racial-Grips.md`.
+
+### Added
+- **Six racial grips on N, each a paired animation** (gripper + victim, R6, authored together by the new generator in
+  `tools/racial-grips`): Vampire **The Kiss** (a bite from behind, no blood), Ghoul **Eat Body** (the owner's clip with a
+  new victim), Werewolf **Maul** (its own clip; it used to share Eat Body), Wraith **Soul Siphon**, Priest **Exorcism**
+  and Human **Hunter's Stake** (Humans used to share Exorcise, which refused mortal bodies).
+- **Victims fight back:** eaten-alive struggles (shoving, kicking, crawling away, dragged back, weakening) and a
+  possessed body that arches, drums its heels and grabs the priest's wrist before the final strike.
+- **The victim is held against the gripper** for the whole clip (`Features.Downed`: a `GripWeld` at the clip's
+  offset), keeps its last frame through the death, and is set down if the grip is interrupted.
+- **New VFX per race** (`Controllers.World.RaceActionFx.RaceGripFx`): bat storm and life thread, grave cracks and a bone
+  cage, claw streaks and a moonrise howl, a soul drawn out of the body, a rune seal, cross and demon torn out, a stake and
+  ash. Sub-races get a richer version; settings for shake, flashing and effects quality are honoured.
+- **Custom art and sound:** 15 textures (`art/vfx/grips`) and 15 synthesized cues (`art/sfx/racial-grips`), waiting for
+  the owner's upload.
+- `ReplicatedStorage.Config.RaceGrips`: kinds, clips, offsets, beats, colours and asset ids.
+
+### Changed
+- Touch race button: Human **STAKE**, Werewolf **MAUL**.
+- Werewolf Maul and Human Stake heal and feed like the others (Maul as Eat Body; Stake heals 20%).
+
+### Fixed
+- **No more blood colours** in the old race-action effects (Eat Body's red "gore bursts" and Blood Drain's red
+  droplets are now grave dust and pale rose motes).
+
+### Owner steps
+- Publish the 11 KeyframeSequences in `ServerStorage.NH_GripAnims` and upload `art/sfx/racial-grips` and
+  `art/vfx/grips` under the group, then send the ids. Until then Studio previews them and live servers keep the old
+  single clips.
+
+### Notes
+- Play-tested on slot 4 Testy against downed dummies, all six races. The client view of the unpublished clips used a
+  test-only mirror (temporary Studio ids don't replicate). Not run: a real player victim, an interrupted grip, sub-race
+  extras, sounds and custom textures in game. Not ported to the Map place.
+
 ## [2.5.0] - 2026-11-13: Fists first, and the armory
 
 Owner: "I want all students to start off with the "Fist" Class then can buy a katana from the armory shop keeper."

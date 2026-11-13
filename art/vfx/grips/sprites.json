@@ -1,0 +1,194 @@
+{
+  "_note": "Racial-grip finisher textures from make_grip_sprites.py (offline numpy render). White art is tinted in Roblox via Color; 'baked' entries carry their own RGB and should use Color white. Fill in the ids after upload.",
+  "files": {
+    "grip_priest_runes": {
+      "file": "grip_priest_runes.png",
+      "id": null,
+      "kind": "decal",
+      "size": [
+        1024,
+        1024
+      ],
+      "tint": "#EBCD78",
+      "purpose": "Priest finisher: holy seal circle on the floor (rings, invented liturgical glyph band, cross-shaped star, filigree).",
+      "usage": "Decal (Face Top) or SurfaceGui ImageLabel on a thin flat part under the target; tint via Color3; spin slowly; tween Transparency in/out."
+    },
+    "grip_lifethread_v": {
+      "file": "grip_lifethread_v.png",
+      "id": null,
+      "kind": "beam",
+      "size": [
+        256,
+        1024
+      ],
+      "tint": "#F4D6DE",
+      "purpose": "Life-drain thread: braided luminous strands + soft core between grabber and victim.",
+      "usage": "Beam.Texture, TextureMode Wrap (or Stretch), TextureLength 4-8, TextureSpeed 1-2, LightEmission 1, Width 0.4-1.2, Color tint; tiles along the beam, alpha 0 at both sides."
+    },
+    "grip_ink_smoke_4x4": {
+      "file": "grip_ink_smoke_4x4.png",
+      "id": null,
+      "kind": "flipbook",
+      "size": [
+        1024,
+        1024
+      ],
+      "layout": "Grid4x4",
+      "tint": null,
+      "baked": "near-black RGB",
+      "purpose": "Boiling black ink-smoke puff that billows and dissolves (16 frames).",
+      "usage": "ParticleEmitter FlipbookLayout Grid4x4, FlipbookMode OneShot, Lifetime 0.8-1.4, Color white (art is baked dark), LightEmission 0, LightInfluence 0-0.3, Size 2-6, Rotation random."
+    },
+    "grip_ink_tendril_v": {
+      "file": "grip_ink_tendril_v.png",
+      "id": null,
+      "kind": "beam",
+      "size": [
+        256,
+        1024
+      ],
+      "tint": null,
+      "baked": "near-black RGB",
+      "purpose": "Clawing dark ink tendril with hooked thorns and smoke wisps.",
+      "usage": "Beam.Texture, TextureMode Wrap, TextureLength 3-6, TextureSpeed 0.5-1.5, Color white (baked dark), LightEmission 0, Width 0.8-2, CurveSize0/1 for a reaching arc; alpha 0 at both sides."
+    },
+    "grip_claw_slash": {
+      "file": "grip_claw_slash.png",
+      "id": null,
+      "kind": "sprite",
+      "size": [
+        1024,
+        1024
+      ],
+      "tint": "#DDE3EE",
+      "purpose": "Werewolf finisher: three curved claw-rake slash smears (hot core, glow, motion smear).",
+      "usage": "ParticleEmitter single burst (Rate 0, Emit 1), Lifetime 0.2-0.35, Size 5-9 shrinking/stretching, LightEmission 1, Orientation FacingCamera or VelocityPerpendicular; or a BillboardGui ImageLabel tweened."
+    },
+    "grip_slash_spark_2x2": {
+      "file": "grip_slash_spark_2x2.png",
+      "id": null,
+      "kind": "flipbook",
+      "size": [
+        512,
+        512
+      ],
+      "layout": "Grid2x2",
+      "tint": "#DDE3EE",
+      "purpose": "Silver impact spark/flare popping and fading (4 frames).",
+      "usage": "ParticleEmitter FlipbookLayout Grid2x2, FlipbookMode OneShot, Lifetime 0.15-0.3, Emit 1-3, Size 2-4, LightEmission 1, random Rotation."
+    },
+    "grip_frost_floor": {
+      "file": "grip_frost_floor.png",
+      "id": null,
+      "kind": "decal",
+      "size": [
+        1024,
+        1024
+      ],
+      "tint": "#BFE6FF",
+      "purpose": "Wraith finisher: circular frost bloom with branching ice dendrites, seen from above.",
+      "usage": "Decal (Face Top) on a thin flat part, grow by tweening the part Size from 0.2x to 1x, then fade Transparency; Color tint."
+    },
+    "grip_grave_cracks": {
+      "file": "grip_grave_cracks.png",
+      "id": null,
+      "kind": "decal",
+      "size": [
+        1024,
+        1024
+      ],
+      "tint": null,
+      "baked": "dark grey-black RGB",
+      "purpose": "Ghoul finisher: radial cracked-stone fracture decal.",
+      "usage": "Decal (Face Top) on a thin flat part, Color white (baked dark); stack grip_grave_cracks_glow on a second decal just above it."
+    },
+    "grip_grave_cracks_glow": {
+      "file": "grip_grave_cracks_glow.png",
+      "id": null,
+      "kind": "decal",
+      "size": [
+        1024,
+        1024
+      ],
+      "tint": "#8FBF6A",
+      "purpose": "Glow channels inside the grave cracks (white mask, same layout as grip_grave_cracks).",
+      "usage": "Second Decal on a part 0.01 stud above the cracks decal, Color #8FBF6A, pulse Transparency 0.2-0.6; same size and position as the cracks."
+    },
+    "grip_ash_4x4": {
+      "file": "grip_ash_4x4.png",
+      "id": null,
+      "kind": "flipbook",
+      "size": [
+        1024,
+        1024
+      ],
+      "layout": "Grid4x4",
+      "tint": "#BDB8B0",
+      "purpose": "Ash flake cluster crumbling apart into drifting flecks (16 frames).",
+      "usage": "ParticleEmitter FlipbookLayout Grid4x4, FlipbookMode OneShot, Lifetime 1-2, Size 1-3, Acceleration slightly up, LightEmission 0, Color tint."
+    },
+    "grip_gold_dust_2x2": {
+      "file": "grip_gold_dust_2x2.png",
+      "id": null,
+      "kind": "flipbook",
+      "size": [
+        512,
+        512
+      ],
+      "layout": "Grid2x2",
+      "tint": "#EBCD78",
+      "purpose": "Twinkling holy motes with tiny 4-point star glints (4 looping frames).",
+      "usage": "ParticleEmitter FlipbookLayout Grid2x2, FlipbookMode Loop, FlipbookFramerate 6-10, Lifetime 1-2, Size 1.5-3, LightEmission 1, Color tint."
+    },
+    "grip_soul_streak_v": {
+      "file": "grip_soul_streak_v.png",
+      "id": null,
+      "kind": "beam",
+      "size": [
+        256,
+        1024
+      ],
+      "tint": "#AAD8FF",
+      "purpose": "Spectral spiralling soul streak with abstract ghostly smears.",
+      "usage": "Beam.Texture, TextureMode Wrap, TextureLength 6-10, TextureSpeed 1.5-3, LightEmission 1, Width 1-2.5, Color tint; alpha 0 at both sides."
+    },
+    "grip_shockwave": {
+      "file": "grip_shockwave.png",
+      "id": null,
+      "kind": "decal",
+      "size": [
+        1024,
+        1024
+      ],
+      "tint": "#CFC8BA",
+      "purpose": "Soft dust/air shockwave ring (thick leading edge, wispy trailing inside) for an expanding ground ring.",
+      "usage": "Decal (Face Top) on a thin flat part; tween Size up 4-6x over 0.4-0.7 s (Quint Out) while Transparency goes 0.2 -> 1."
+    },
+    "grip_moon_halo": {
+      "file": "grip_moon_halo.png",
+      "id": null,
+      "kind": "sprite",
+      "size": [
+        1024,
+        1024
+      ],
+      "tint": null,
+      "baked": "pale cool white RGB",
+      "purpose": "Pale full moon disc with soft craters, a halo and faint radiating rays.",
+      "usage": "BillboardGui ImageLabel or ParticleEmitter (Emit 1, long Lifetime), Color white (baked), LightEmission 0.3-1; fade in behind the finisher."
+    },
+    "grip_demon_shape": {
+      "file": "grip_demon_shape.png",
+      "id": null,
+      "kind": "sprite",
+      "size": [
+        1024,
+        1024
+      ],
+      "tint": null,
+      "baked": "near-black RGB",
+      "purpose": "Abstract shadow-demon silhouette (horned smoky head, clawed reaching arms) torn upward, dissolving into smoke.",
+      "usage": "ParticleEmitter (Emit 1, Lifetime 0.8-1.5, Size 8-14 growing, Acceleration up, Transparency 1 -> 0.1 -> 1) or a BillboardGui ImageLabel; Color white (baked dark), LightEmission 0."
+    }
+  }
+}

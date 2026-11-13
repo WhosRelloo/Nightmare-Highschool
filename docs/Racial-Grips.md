@@ -1,0 +1,110 @@
+# Racial Grips (2.6.0)
+
+Up: [[Combat-System]] · Related: [[Races-and-Bloodlines]], [[VFX-Design-Bible]]
+
+Owner: "/design the racial grip animations that dont have any. And make animations for the victims of the racial
+grips." Then: victims "look like they are getting eaten alive or exorcized (priest)", and "CREATE unique, on theme, and
+HIGHEST quality vfx", custom sounds, and drawn VFX art. **No blood or gore anywhere** (the owner had a Roblox
+moderation warning).
+
+## What a racial grip is
+N on a downed body (D-pad Down, the race button on touch) finishes it with your race's own move, through
+`Downed.StartGrip` like the B grip: it lines the body up, a hit on you cancels it, and the body dies when your clip
+ends. It heals you and feeds your race hunger (`Features.RaceAction`).
+
+## Before (audit, 2026-11-12)
+| Race | Grip | Gripper clip | Victim clip |
+|---|---|---|---|
+| Vampire | Blood Drain | 134503729182597 (arm-out drain) | none |
+| Ghoul | Eat Body | 79651374323565 (owner's) | none |
+| Werewolf | Eat Body | the Ghoul's | none |
+| Wraith | Soul Siphon | placeholder kneel | none |
+| Priest | Exorcise | placeholder kneel | none |
+| Human | Exorcise (refused on mortals) | placeholder kneel | none |
+
+The victim was placed once 3 studs away and stayed in its downed idle. The old effects sprayed dark-red "gore bursts"
+(Eat Body) and red "blood droplets" (Blood Drain).
+
+## Now
+Every race has its own pair: the gripper clip and a victim clip authored together on two R6 rigs, with the victim
+**welded** to the gripper's root at the clip's offset for the whole grip, so hands stay on the body. Sub-races use
+their base race's grip with a richer effect (more particles; the top sub-races add a signature piece).
+
+| Race (sub-races) | Grip | Length | Victim (eaten alive / exorcised) |
+|---|---|---|---|
+| Vampire (Nobleblood, Royal Vamp) | **The Kiss**: hauls the body up by the collar, bites the neck from behind, three drinks, lets go, wipes the mouth | 3.0 s | shoves and claws at the arm across its chest, weakening each drink, then slumps back to the floor |
+| Ghoul (Ghast, Crypt Lord) | **Eat Body** (owner's clip) | 3.5 s | pinned, shoves at the ghoul's head, kicks, rolls away clawing the floor, is dragged back, jerks at the last rip; the outstretched hand trembles and drops |
+| Werewolf (Bloodmoon, Alpha) | **Maul**: snarl, pounce onto all fours, three raking swipes, a shake by the shoulders, a howl | 2.8 s | shields its face, the guard is knocked open on each swipe, tries to crawl away and is hauled back |
+| Wraith (Revenant, Hollow King) | **Soul Siphon**: floats, palm to the chest, draws the hand up, yanks | 3.0 s | the chest arches after the hand as if on a string, then slams down limp |
+| Priest (Grand Priest, Pope) | **Exorcism**: kneels, hand on the forehead, the other raised, strikes the chest on the last word | 3.2 s | possessed: violent arches, drumming heels, head whipping under the hand, grabs the priest's wrist, a rigid arch a stud off the floor that snaps flat on the strike |
+| Human (Superhuman) | **Hunter's Stake**: knee on the chest, hand on the collar, the stake inches down against two hands, raised and driven | 2.6 s | grabs the stake arm and pushes back, the arms give way, one jolt |
+
+Exorcism still only works on the unholy. The Hunter's Stake works on any body (Humans had no racial grip on mortals).
+
+### VFX (client, `RaceActionFx.RaceGripFx`)
+- **Every grip:** the race sigil on the floor, a camera ease-in and a hit-stop punch on the kill for the gripper, a
+  darkening, desaturating screen with a slowing heartbeat for the victim. Shake honours Camera Shake, flashes honour
+  Reduced Flashing, particle counts halve on low Effects Quality.
+- **Vampire:** a bat storm hides the bite; a pale rose-white life thread from neck to mouth; the victim drains grey;
+  crimson eyes and a rim that pulses with each drink; the bats scatter on release.
+- **Ghoul:** the floor cracks with a green glow; grave mist and spores; bone spikes rise from the earth around the pair
+  (never from the body); grit kicks up off the floor on each feed; the cage crumbles at the end.
+- **Werewolf:** amber eyes; three silver claw-streak slashes with sparks and fur tufts; a pale moon and a dust
+  shockwave on the howl (bigger on a full moon, doubled for an Alpha).
+- **Wraith:** frost blooms across the floor and the colour drains; a translucent copy of the victim is drawn up toward
+  the palm along a soul streak, torn free, and spirals into the fist; frost shatters.
+- **Priest:** a gold rune seal, the gilded cross over the raised hand, a god-ray column with gold dust; ink smoke and
+  dark tendrils fight back; on the strike a shadow demon is torn up out of the body and burns to embers, a white-gold
+  flash and a shockwave.
+- **Human:** a wooden stake with a silver band appears in the hand with a glint; dust on the knee and the strike; on a
+  monster the body flashes pale and grey ash drifts off it.
+
+Custom art (15 textures): `art/vfx/grips/` (`make_grip_sprites.py`), contact sheet `docs/img/260/vfx-contact-sheet.png`.
+Custom sounds (15 cues): `art/sfx/racial-grips/` (`tools/sfx/racial_grips.py`), one cue per grip aligned to its beats,
+a victim heartbeat loop, a finish sting and six sub-race extras. All synthesized; nothing wet or gory.
+
+## Files
+| Piece | Where |
+|---|---|
+| Kinds, clips, offsets, beats, colours, sound/texture ids | `ReplicatedStorage.Config.RaceGrips` |
+| N action (race -> Kind, Studio preview ids, fallbacks) | `ActionManager.Misc.RaceAction` |
+| The weld, the final frame, the release | `Features.Downed` (`StartGrip`, `EndGrip`, `FinishGrip`) |
+| Rewards, the Fx payload (victim, sub-race, victim race) | `Features.RaceAction` |
+| VFX, sound, camera | `Controllers.World.RaceActionFx.RaceGripFx` |
+| Clips to publish | `ServerStorage.NH_GripAnims` (11 KeyframeSequences) |
+| Generator | `tools/racial-grips` (see its README and `patches.md`) |
+
+## Owner steps (group-owned assets)
+1. **Publish the 11 KeyframeSequences** in `ServerStorage.NH_GripAnims` (right-click > Save to Roblox, under the
+   group): GripVampire, GripVampireVictim, GripGhoulVictim, GripWerewolf, GripWerewolfVictim, GripWraith,
+   GripWraithVictim, GripPriest, GripPriestVictim, GripHuman, GripHumanVictim. Send the ids.
+2. **Upload the 15 sounds** in `art/sfx/racial-grips/` and the **15 textures** in `art/vfx/grips/` under the group.
+3. Then the ids go into `Config.RaceGrips` (`Gripper`/`Victim`, `Sounds`, `Textures`).
+
+Until then: in Studio the clips play from temporary preview ids; on a live server each race falls back to its old single
+clip with no victim clip and no weld; effects use the existing `nh_*` and tier-up art; the grip sounds are silent.
+
+## Verified (2026-11-13, NH Combat Test, slot 4 "Testy", Play)
+- **All six grips through the real N key** on downed AI dummies (spawned and downed through `NHTestBridge`; race set
+  with `SetRace` on the test slot only): the gripper and victim clips both played, the victim was welded
+  (`GripWeld` checked on the Human run), and every dummy died at the end of the clip (no test NPCs left).
+- **VFX module runs:** effects spawned under `workspace.NHFx` mid-grip; no `[RaceGripFx]` warnings.
+- **Screenshots** (`docs/img/260/`): Human struggle, Vampire bite, Werewolf maul, Wraith soul pull, Priest possession,
+  Ghoul feed; Edit previews of the Vampire grab and bite.
+- **Contact:** the generator's per-frame report: the victim's hands on the vampire's arm within 0.04 studs; the
+  wraith's palm on the chest within 0.01; the ghoul victim's hand on the ghoul's head within 0.3; most attacker holds
+  within 0.4; the werewolf's haul and the priest's head hold slip up to about 0.8 studs on the fastest jolts.
+
+## Not verified / known limits
+- **The client view used a test mirror.** Studio's temporary preview ids registered on the server don't load on the
+  client, so the screenshots came from a test-only script that played the client's own registered copy of each clip in
+  step with the server's. Published ids don't have this problem, but the real replicated playback is untested until the
+  owner publishes.
+- **Sounds and the custom textures** are not uploaded, so they were not heard or seen in game (fallback art showed).
+- Not run: a grip on a **real player** victim (two players), an **interrupted** racial grip releasing the weld (code
+  read only), the sub-race richer effects, different heights between gripper and victim (the offset scales with the
+  gripper only).
+- **Testy side effects:** feeding as each race opened the rite quests (The Font Below, First Hunt, Shroud, Exorcism,
+  Grave-eater) and a Crimson Court rank-up in Testy's journal, and the test ran through a class period (a skipped-class
+  violation). Testy's race is back to Human / Human.
+- **Not ported to the Map place.**

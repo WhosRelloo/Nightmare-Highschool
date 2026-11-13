@@ -1,0 +1,183 @@
+{
+  "grip_vampire": {
+    "file": "grip_vampire.ogg",
+    "length_s": 4.0,
+    "beats": {
+      "haul": 0.0,
+      "hiss": 0.55,
+      "bite": 0.95,
+      "drink1": 1.2,
+      "drink2": 1.6,
+      "drink3": 2.0,
+      "release": 2.3,
+      "settle": 2.6,
+      "last_beat": 2.9
+    },
+    "description": "Vampire grip: collar-haul cloth whoosh, low hiss, bite = bat-wing burst + dark string sting, three slowing muffled heartbeats with ethereal shimmer, release, body settles, bats disperse, final heartbeat stops."
+  },
+  "grip_ghoul": {
+    "file": "grip_ghoul.ogg",
+    "length_s": 4.5,
+    "beats": {
+      "crack": 0.15,
+      "spikes_start": 0.3,
+      "spikes_end": 0.9,
+      "growl_start": 0.9,
+      "lunge1": 1.2,
+      "lunge2": 1.8,
+      "lunge3": 2.4,
+      "lunge4": 2.9,
+      "growl_end": 3.2,
+      "crumble": 3.3
+    },
+    "description": "Ghoul grip: stone floor cracks, bone spikes clack/grind up, irregular guttural growl bed with four stone/gravel crunch lunges over a sickly drone, bone cage crumbles to dust and cracks grind shut."
+  },
+  "grip_werewolf": {
+    "file": "grip_werewolf.ogg",
+    "length_s": 3.8,
+    "beats": {
+      "snarl": 0.1,
+      "pounce": 0.4,
+      "swipe1": 0.65,
+      "swipe2": 0.95,
+      "swipe3": 1.25,
+      "shake_start": 1.6,
+      "shake_end": 2.0,
+      "howl": 2.1,
+      "howl_end": 2.75
+    },
+    "description": "Werewolf grip: formant snarl, heavy pounce pin, three claw swipes (air rip + metallic rake + dull thump), violent shaking growl, shockwave whoomp and a full rising/falling formant wolf howl with dust and reverb tail."
+  },
+  "grip_wraith": {
+    "file": "grip_wraith.ogg",
+    "length_s": 4.0,
+    "beats": {
+      "frost": 0.0,
+      "frost_end": 0.5,
+      "palm": 0.6,
+      "pull_start": 0.7,
+      "pull_end": 2.2,
+      "yank": 2.25,
+      "swirl_start": 2.4,
+      "swirl_end": 2.8,
+      "pulse": 2.85
+    },
+    "description": "Wraith grip: frost crackles spread with icy wind, cold palm thump + glass chime, rising detuned ghost-choir/whisper soul pull, spectral tearing yank into a silence gap, reverse-reverb swirl into the fist, cold pulse with frost shattering."
+  },
+  "grip_priest": {
+    "file": "grip_priest.ogg",
+    "length_s": 4.2,
+    "beats": {
+      "kneel": 0.0,
+      "kneel_end": 0.5,
+      "cross": 0.6,
+      "cross_full": 0.9,
+      "demon_start": 0.9,
+      "spasm1": 1.1,
+      "spasm2": 1.6,
+      "spasm3": 2.0,
+      "demon_end": 2.4,
+      "bell": 2.45
+    },
+    "description": "Priest grip: robe rustle kneel, bright holy choir cross with gold sparkle, a distorted ring-modulated demon voice fighting back with three spasm hits and ink-smoke hisses, then a huge church bell toll + flash + shockwave as the demon voice tears upward and burns out into embers; cathedral tail."
+  },
+  "grip_human": {
+    "file": "grip_human.ogg",
+    "length_s": 3.6,
+    "beats": {
+      "knee": 0.3,
+      "stake": 0.6,
+      "struggle_start": 0.8,
+      "struggle_end": 1.7,
+      "raise_stake": 1.8,
+      "strike": 2.0,
+      "ash_end": 2.6,
+      "hitstop_gap": 0.06
+    },
+    "description": "Human grip: knee drop thud, silver glint shing as the stake appears, wooden creaks/grip tension struggle, raise whoosh, deep wooden THOCK with sub hit and a 60 ms hit-stop silence, ash/dust hiss drifting away."
+  },
+  "grip_human_monster_ash": {
+    "file": "grip_human_monster_ash.ogg",
+    "length_s": 1.5,
+    "beats": {
+      "start": 0.0,
+      "exhale": 0.15,
+      "crumble_peak": 0.25
+    },
+    "description": "Monster-target layer for the human grip: pale whoosh, dry crumbling ash disintegration and a faint ghostly exhale."
+  },
+  "grip_victim_heartbeat": {
+    "file": "grip_victim_heartbeat.ogg",
+    "length_s": 4.0,
+    "beats": {
+      "beat1": 0.06,
+      "beat2": 0.86,
+      "beat3": 1.66,
+      "beat4": 2.46,
+      "beat5": 3.26,
+      "bpm": 75.0,
+      "loop_length": 4.0
+    },
+    "description": "Seamless 4.0 s loop for the victim's screen: muffled heavy heartbeat (75 bpm, 5 beats per loop) over a low dark drone that ducks with each beat."
+  },
+  "grip_finish_sting": {
+    "file": "grip_finish_sting.ogg",
+    "length_s": 1.2,
+    "beats": {
+      "hit": 0.0
+    },
+    "description": "Generic dark low kill sting for the gripper's hit-stop: sub boom, low dissonant string cluster stab, dark metallic resonance."
+  },
+  "sub_royal_bats_gold": {
+    "file": "sub_royal_bats_gold.ogg",
+    "length_s": 1.6,
+    "beats": {
+      "burst": 0.0
+    },
+    "description": "Royal vampire extra: shimmering golden bat-wing burst with bright sparkle."
+  },
+  "sub_alpha_double_shock": {
+    "file": "sub_alpha_double_shock.ogg",
+    "length_s": 1.5,
+    "beats": {
+      "shock1": 0.0,
+      "shock2": 0.22
+    },
+    "description": "Alpha werewolf extra: two stacked shockwave whoomps with debris and dust."
+  },
+  "sub_crypt_cage_tall": {
+    "file": "sub_crypt_cage_tall.ogg",
+    "length_s": 1.8,
+    "beats": {
+      "rise": 0.0,
+      "top": 0.9
+    },
+    "description": "Crypt ghoul extra: bigger, deeper bone cage rise with deep grinding and a heavy top-out."
+  },
+  "sub_hollow_frost_crown": {
+    "file": "sub_hollow_frost_crown.ogg",
+    "length_s": 1.6,
+    "beats": {
+      "form": 0.0,
+      "crown": 0.7
+    },
+    "description": "Hollow wraith extra: crystalline frost crown forming - rising glass arpeggio converging into an eerie detuned glass chord."
+  },
+  "sub_pope_twin_bell": {
+    "file": "sub_pope_twin_bell.ogg",
+    "length_s": 2.0,
+    "beats": {
+      "bell1": 0.0,
+      "bell2": 0.3
+    },
+    "description": "Pope priest extra: two church bells a perfect fifth apart (A3 then E4) in a cathedral."
+  },
+  "sub_super_crater": {
+    "file": "sub_super_crater.ogg",
+    "length_s": 1.6,
+    "beats": {
+      "impact": 0.0
+    },
+    "description": "Super human extra: ground-crack crater impact with sub boom, shockwave and debris rain."
+  }
+}
