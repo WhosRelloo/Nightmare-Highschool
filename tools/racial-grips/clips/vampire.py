@@ -143,6 +143,21 @@ attacker = [
      "RightShoulder": [22, 0, 18], "LeftShoulder": [18, 0, -16], "stop": True},
 ]
 
+
+# ---------------------------------------------------------------- heads (2.6.2): eyes on what the body is doing
+from _util import look, set_necks  # noqa: E402
+_V, _A = "victim", "attacker"
+_NECK = [-0.55, 1.35, 0.35]
+set_necks(attacker, {
+    0.0: look(_V, "Head", tilt=(0, 0, 10)), 0.2: look(_V, "Head", tilt=(0, 10, 22)), 0.3: look(_V, "Head", tilt=(0, 8, 18)),
+    0.4: look(_V, "Torso", _NECK, (0, 6, 14)), 0.6: look(_V, "Torso", _NECK, (0, 0, 8)),     # locks onto the neck
+    0.82: look(_V, "Torso", _NECK, (18, 8, 14)), 0.89: look(_V, "Torso", _NECK, (24, 10, 16)),  # draws back, savouring
+    2.7: look(_V, "Head", tilt=(0, 12, 18)), 3.0: look(_V, "Head", tilt=(0, 14, 24)),         # looks down at the body
+})
+set_necks(victim, {
+    0.0: look(_A, "Head", tilt=(0, 0, 8)), 0.22: look(_A, "Head", tilt=(-6, 0, 0)), 0.42: look(_A, "Head", tilt=(0, 0, -6)),
+})
+
 CLIP = {
     "name": "GripVampire", "length": 3.0, "offset": OFFSET,
     "markers": [(0.4, "Grab"), (0.95, "Bite"), (1.2, "Drink"), (1.6, "Drink"), (2.0, "Drink"), (2.3, "Release"),

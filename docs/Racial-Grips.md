@@ -1,4 +1,4 @@
-# Racial Grips (2.6.0, reworked in 2.6.2)
+# Racial Grips (2.6.0, reworked in 2.6.2 and 2.7.1)
 
 Up: [[Combat-System]] · Related: [[Races-and-Bloodlines]], [[VFX-Design-Bible]]
 
@@ -97,6 +97,39 @@ Measured on the built clips (worst frame):
 The floor is -3.0. animpro passes on every clip; groundContact is waived on the three crouching attackers because
 animpro can't see the leg slide.
 
+## 2.7.1: heads look at what they are doing
+Owner: "Make the head movements actually follow the animation and look natural for what they are trying to do. The
+werewolf eating anim has the head up instead of down on the victim."
+
+- A neck key can be a look: `look(body, part, point, tilt)` in `clips/_util.py`.
+  - The face aims at a point on the other body's Torso, or at its head spot.
+  - It's re-solved every frame within 80 deg turn, 75 deg down and 60 deg up, then turned by the tilt for
+    expression.
+  - Looks never read the other head's own turn, so two heads watching each other can't loop.
+  - `set_necks(keys, {t: spec})` sets them by key time, at the end of each clip file.
+- Deliberate head moves stay as fixed angles: impact whips, the possessed thrashing, the bite pose, the wraith
+  victim's head falling back, and the howl and soul-rip looking up.
+- Werewolf, before vs after (generator; Play matched it):
+
+  | | Face | Miss from the victim |
+  |---|---|---|
+  | Before | level to 21-42 deg down | 57-81 deg |
+  | After | 47-62 deg down | 8-25 deg (throat and chest) |
+
+  The haul shakes it by the throat.
+- Every grip now aims its heads at the right thing on its watching beats (worst miss):
+
+  | Grip | Attacker | Victim |
+  |---|---|---|
+  | Human | face 3-10 deg, heart 3-9 deg | hunter's face 3-7 deg |
+  | Priest | possessed face 2-16 deg | priest's face 1-3 deg |
+  | Vampire | the neck through the drinks, chest within 5-8 deg | head tilted aside for the bite, by design |
+  | Wraith | chest and soul streak 4-10 deg | wraith's face 3-13 deg |
+  | Ghoul | - | ghoul's face 2-9 deg |
+
+- `tools/racial-grips/gaze.py <clip> attacker|victim` prints the face pitch and miss per beat. `duo.py` and
+  `solo.py` draw a nose marker so the gaze shows.
+
 ## VFX (client, `RaceActionFx.RaceGripFx`)
 - **Every grip:** the race sigil on the floor, a camera ease-in and a hit-stop punch on the kill for the gripper, a
   darkening, desaturating screen with a slowing heartbeat for the victim. Shake honours Camera Shake, flashes honour
@@ -169,7 +202,16 @@ clip with no victim clip and no weld; effects use the existing `nh_*` and tier-u
   - The client played the test mirror's copies of the clips (see the 2.6.0 note below).
   - Testy is back to Human / Human, and the slot flags are restored.
 
+## Verified for 2.7.1
+- **Generator:** head aim per beat on all six grips, as above.
+- **Play on Testy:** the Werewolf through the real N key, a Human dummy as the victim.
+  - Face 47-62 deg down, within 8-23 deg of the chest through the maul; on the throat during the haul; 74 deg up for
+    the howl.
+  - The victim died at the end. Testy and the flags were restored.
+
 ## Not verified / known limits
+- **2.7.1:** the new heads on the Human, Priest, Vampire, Wraith and Ghoul-victim clips were checked in the generator
+  only, not in Play.
 - **2.6.2:**
   - The Werewolf, Wraith and Ghoul-victim clips have not been play-tested.
   - No side-on screenshot of the player mid-grip: the grip camera stays behind the player.

@@ -66,6 +66,14 @@ for t, a, b in KICKS:
     k["LeftHip"] = [b, 0, -8]
 victim.sort(key=lambda k: k["t"])
 
+
+# ---------------------------------------------------------------- heads (2.6.2): eyes on what the body is doing
+from _util import look, set_necks  # noqa: E402
+set_necks(victim, {
+    0.0: look("attacker", "Head", tilt=(0, 0, -8)), 0.5: look("attacker", "Head", tilt=(-4, 0, 10)),
+    1.66: look("attacker", "Head", tilt=(0, 0, 10)), 2.05: look("attacker", "Head", tilt=(6, 0, 16)),
+})
+
 CLIP = {
     "name": "GripGhoul", "length": 3.5, "offset": OFFSET,
     "attacker": load("ghoul_eatbody.txt"), "victim": victim,

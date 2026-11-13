@@ -212,3 +212,19 @@ def heels(offset, lie_root, slide_axis, slide=0.9, lift=0.42):
         out[j] = {"reach": ("world", None, [float(p[0]), GROUND + lift, float(p[2])]),
                   "slide": [slide_axis[0] * slide, 0, slide_axis[2] * slide]}
     return out
+
+
+# ---------------------------------------------------------------- heads that look at what the body is doing
+def look(body, part, local=(0, 0, 0), tilt=(0, 0, 0)):
+    """Neck spec: aim the face at a point on the other body ("victim"/"attacker", "Torso" or "Head") with an
+    expressive tilt on top (degrees: x = nod up, y = turn left, z = roll). Solved every frame by pair.py."""
+    return {"look": (body, part, list(local)), "tilt": list(tilt)}
+
+
+def set_necks(keys, table):
+    """Put the neck spec table[t] on the key at time t (the key must exist)."""
+    for t, spec in table.items():
+        k = next((k for k in keys if abs(k["t"] - t) < 1e-6), None)
+        if k is None:
+            raise ValueError(f"no key at t={t}")
+        k["Neck"] = spec

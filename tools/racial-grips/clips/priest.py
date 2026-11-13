@@ -133,6 +133,22 @@ attacker = [
      "Neck": [-48, 10, -8], "stop": True},
 ]
 
+
+# ---------------------------------------------------------------- heads (2.6.2): eyes on what the body is doing
+from _util import look, set_necks  # noqa: E402
+_V, _A = "victim", "attacker"
+set_necks(attacker, {
+    0.0: look(_V, "Head"), 0.2: look(_V, "Head", tilt=(0, -4, 0)),
+    0.48: look(_V, "Head", tilt=(-6, -10, 0)), 0.85: look(_V, "Head", tilt=(-4, -10, 0)),    # on the possessed face
+    1.12: look(_V, "Head", tilt=(0, -14, 0)), 1.62: look(_V, "Head", tilt=(2, -8, 0)), 2.02: look(_V, "Head", tilt=(4, -12, 0)),
+    2.36: look(_V, "Torso", CHEST, (6, -6, 0)), 2.46: look(_V, "Torso", CHEST, (-8, -6, 0)),   # the strike
+    2.9: look(_V, "Head", tilt=(-18, 8, -6)), 3.2: look(_V, "Head", tilt=(-22, 10, -8)),       # bowed over the body
+})
+set_necks(victim, {
+    0.0: look(_A, "Head", tilt=(0, 0, 10)), 0.5: look(_A, "Head", tilt=(-4, 0, 4)),          # glares up at the priest
+    0.8: look(_A, "Head"), 1.25: look(_A, "Head", tilt=(10, 0, 18)),
+})
+
 CLIP = {
     "name": "GripPriest", "length": 3.2, "offset": OFFSET,
     "markers": [(0.48, "Seal"), (0.85, "Cross"), (1.1, "Spasm"), (1.6, "Spasm"), (2.0, "Spasm"), (2.45, "Strike"),

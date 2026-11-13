@@ -26,6 +26,8 @@ for r, t in enumerate(times):
         M2[0, 3] -= c0[0]
         M2[2, 3] -= c0[2]
         boxes.append((who, pn, pair._corners(M2, rig.SIZE[pn])))
+        if pn == "Head":
+            boxes.append(("face", "Nose", pair._corners(M2 @ rig.cf((0, 0, -0.62)), (0.45, 0.22, 0.3))))
     for c, (nm, vy) in enumerate(views):
         V = duo.view(vy - yaw, 6 if nm != "3/4" else 22)
         sheet.paste(duo.cell(boxes, V, f"{t:.2f}s {nm}", 0), (c * duo.CELL, r * duo.CELL))

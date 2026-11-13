@@ -133,6 +133,27 @@ attacker = [
      "Root": pin_root(2.6, -18, 0, 0), "stop": True},
 ]
 
+
+# ---------------------------------------------------------------- heads (2.6.2): eyes on what the body is doing
+from _util import look, set_necks  # noqa: E402
+_V, _A = "victim", "attacker"
+_HEART = [0.0, 0.1, -0.5]
+set_necks(attacker, {
+    0.0: look(_V, "Head", tilt=(0, 8, -10)), 0.16: look(_V, "Head", tilt=(0, 14, -14)), 0.23: look(_V, "Head", tilt=(0, 10, -10)),
+    0.3: look(_V, "Torso", THROAT, (-4, 6, -8)),                      # pins the throat, watching it
+    0.65: look(_V, "Head", tilt=(0, 10, -12)),                        # stares down at the face as the stake comes out
+    0.85: look(_V, "Torso", _HEART, (0, 4, -6)), 1.65: look(_V, "Torso", _HEART, (-4, 0, 0)),   # eyes on the heart
+    1.82: look(_V, "Torso", _HEART, (0, 0, 4)), 2.03: look(_V, "Torso", _HEART, (-6, 0, 0)),
+    2.45: look(_V, "Head", tilt=(0, 12, -14)), 2.6: look(_V, "Head", tilt=(0, 18, -18)),       # watches it go still
+})
+set_necks(victim, {
+    0.0: look(_A, "Head", tilt=(0, 0, -8)), 0.22: look(_A, "Head", tilt=(-6, 0, 6)),
+    0.45: look(_A, "Head"), 0.65: look(_A, "Head", tilt=(0, 0, -4)),
+    0.85: look(_A, "Torso", [1.0, 0.8, -1.2], (-6, 0, 0)),            # on the stake arm it is fighting
+    1.65: look(_A, "Torso", [1.0, 0.8, -1.2], (0, 0, 6)),
+    1.95: look(_A, "Head", tilt=(8, 0, 0)),                           # pleading, just before the strike
+})
+
 CLIP = {
     "name": "GripHuman", "length": 2.6, "offset": OFFSET,
     "markers": [(0.3, "Knee"), (0.65, "Stake"), (1.82, "Raise"), (2.0, "Strike"), (2.0, "Finish")],

@@ -12,7 +12,7 @@ import pair  # noqa: E402
 import rig  # noqa: E402
 
 FACES = [(0, 1, 3, 2), (4, 5, 7, 6), (0, 1, 5, 4), (2, 3, 7, 6), (0, 2, 6, 4), (1, 3, 7, 5)]
-COL = {"attacker": np.array([200, 52, 62]), "victim": np.array([210, 210, 220])}
+COL = {"attacker": np.array([200, 52, 62]), "victim": np.array([210, 210, 220]), "face": np.array([255, 205, 40])}
 CELL, SCALE = 300, 34  # pixels per cell, pixels per stud
 BG, FLOOR = (27, 29, 36), (58, 60, 72)
 
@@ -81,6 +81,8 @@ def main():
             for who, frames in baked.items():
                 for pn, M in rig.fk(frame_at(frames, t), P.bodies[who].hrp).items():
                     boxes.append((who, pn, pair._corners(M, rig.SIZE[pn])))
+                    if pn == "Head":  # a nose, so the gaze shows
+                        boxes.append(("face", "Nose", pair._corners(M @ rig.cf((0, 0, -0.62)), (0.45, 0.22, 0.3))))
             sheet.paste(cell(boxes, V, f"{t:.2f}s {vname}", cx), (c * CELL, r * CELL))
     sheet.save(png)
 

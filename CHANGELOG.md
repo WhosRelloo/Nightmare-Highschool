@@ -2,6 +2,51 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.7.1] - 2026-11-13: Racial grips: heads look at what they are doing
+
+Owner: "Make the head movements actually follow the animation and look natural for what they are trying to do. The
+werewolf eating anim has the head up instead of down on the victim." Details: `docs/Racial-Grips.md`.
+
+### Changed
+- **Heads aim at their targets.** A neck key can now aim the face at a point on the other body: the face, the throat,
+  the chest, the neck, or the soul streak. The generator solves it every frame from wherever the body is, within
+  natural neck limits (80 deg turn, 75 deg down, 60 deg up), with a small expressive tilt on top (a cocked head, a
+  snarl, a bow). The old fixed neck angles ignored the body's lean, so heads stared past the victim.
+- **Werewolf:** it mauls with its head down in the body. Before, its face was level to only 21-42 deg down, missing
+  the victim by 57-81 deg; now it points 47-62 deg down, within 8-25 deg of the throat and chest.
+  - The snarl locks onto the face.
+  - Its eyes follow each raking claw, and it snaps down at the throat between swipes.
+  - It shakes the victim by the neck on the haul.
+  - The howl still looks up.
+- **Attackers:**
+  - Human: watches the face and throat, then the heart through the stake.
+  - Priest: keeps its eyes on the possessed face, goes to the chest for the strike, then bows over the body.
+  - Vampire: creeps in eyeing the face and locks on the neck.
+  - Wraith: follows the soul up to its palm.
+- **Victims:**
+  - They watch their attacker before and between the impact jolts.
+  - The Human's victim watches the stake arm it is fighting.
+  - The possessed body glares up at the priest between spasms.
+- **Kept as they were:** the impact whips, the possessed thrashing, the bite pose, the wraith victim's head falling
+  back, and the howl and soul-rip looking up.
+
+### Tested (NH Combat Test)
+- **Generator:** head aim was measured per beat on every grip, attacker and victim, as above. All 11 sequences were
+  rebuilt and installed in `ServerStorage.NH_GripAnims`. animpro passes on every clip.
+  - The Werewolf attacker now waives groundContact and rootDrift: it is on all fours and the pounce travels.
+- **Play on slot 4 "Testy", Werewolf through the real N key on a Human dummy:** the client measured the same head
+  aim as the generator:
+
+  | Beat | Face pitch | Miss from the chest |
+  |---|---|---|
+  | Maul | 47-62 deg down | 8-23 deg |
+  | Haul | on the throat | 41-48 deg |
+  | Howl | 74 deg up | - |
+
+  - The victim died at the end. Testy is back to Human / Human, and the slot flags are restored.
+- **Not played:** the other five grips' new heads were checked in the generator only.
+- **Still to do:** the KeyframeSequences changed again and need publishing, and NH Combat Test needs a save.
+
 ## [2.7.0] - 2026-11-13: Inventory QOL batch 7: move pouch slots, and Day / Fight / Night loadouts
 
 Owner: "Yes, batch 7" (concepts 2 and 6 in `docs/Inventory-QOL-Concepts.md`). The live scripts are mirrored in

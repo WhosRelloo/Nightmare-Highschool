@@ -36,6 +36,16 @@ def is_plant(v):
     return isinstance(v, dict) and "plant" in v
 
 
+def is_look(v):
+    """Neck only: {"look": ("victim"|"attacker"|"self"|"world", "Torso"|"Head", [x, y, z]), "tilt": [x, y, z]}.
+    The head aims its face at that point (Head = the head's spot on the torso, its own turn ignored), within natural
+    neck limits, then turns by `tilt` (degrees, head space) for expression (a cocked head, a snarl, a nod)."""
+    return isinstance(v, dict) and "look" in v
+
+
+LOOK_YAW, LOOK_DOWN, LOOK_UP = 80.0, 75.0, 60.0
+
+
 def keeps(spec):
     """Specs whose limbs keep an exact place and are not smoothed / floor-turned."""
     return is_plant(spec) or (is_reach(spec) and spec["reach"][0] != "world")
@@ -136,6 +146,11 @@ class Pair:
         tk, spec, _ = body.tracks[joint][idx]
         if is_plant(spec):
             return self.plant_at(who, joint, idx)[0]
+        if is_look(spec):
+            ck = ("look", joint, idx)
+            if ck not in body.cache:
+                body.cache[ck] = self.look_at(who, spec, tk, self.partial_pose(who, tk, joint), spec.get("tilt"))
+            return body.cache[ck]
         if not is_reach(spec):
             return rig.euler(spec)
         ck = (joint, idx)
@@ -149,7 +164,7 @@ class Pair:
     def ref_rot(self, who, joint, t):
         """Twist reference for a reach: the latest plain (non-reach) key at or before t, else the next one, else rest."""
         tr = self.bodies[who].tracks[joint]
-        plain = [k for k in tr if not is_reach(k[1]) and not is_plant(k[1])]
+        plain = [k for k in tr if not is_reach(k[1]) and not is_plant(k[1]) and not is_look(k[1])]
         before = [k for k in plain if k[0] <= t + 1e-9]
         k = before[-1] if before else (plain[0] if plain else None)
         return rig.euler(k[1]) if k else np.eye(3)
@@ -159,7 +174,32 @@ class Pair:
         b = tr[i + 1] if i + 1 < len(tr) else None
         if is_plant(a[1]):
             return b is None or (is_plant(b[1]) and a[1]["id"] == b[1]["id"])
+        if is_look(a[1]):
+            return b is None or (is_look(b[1]) and a[1]["look"] == b[1]["look"])
         return is_reach(a[1]) and (b is None or (is_reach(b[1]) and a[1]["reach"] == b[1]["reach"]))
+
+    def look_point(self, who, target, t, own_pose):
+        body, part, local = target
+        if body in ("world", "self"):
+            return self.target_world(who, target, t, own_pose)
+        other = self.bodies[body]
+        torso = other.hrp @ rig.cf(self.root_at(other, t)["p"], self.root_at(other, t)["R"])
+        if part == "Head":  # the head's spot on the torso: no neck solve, so two looks can't chase each other
+            return rig.xf(torso, np.asarray(rig.PIVOT["Neck"]) + np.asarray(rig.CENTRE["Neck"]) + np.asarray(local, float))
+        return rig.xf(torso, local)
+
+    def look_at(self, who, spec, t, pose, tilt=None):
+        """Neck rotation that turns the face (head -z) toward the look target, clamped to neck limits."""
+        body = self.bodies[who]
+        torso = body.hrp @ rig.cf(pose["Root"]["p"], pose["Root"]["R"])
+        eye = rig.xf(torso, np.asarray(rig.PIVOT["Neck"]) + np.asarray(rig.CENTRE["Neck"]))
+        d = torso[:3, :3].T @ (self.look_point(who, spec["look"], t, pose) - eye)
+        yaw = math.degrees(math.atan2(-d[0], -d[2]))
+        pitch = math.degrees(math.atan2(d[1], math.hypot(d[0], d[2])))
+        yaw = max(-LOOK_YAW, min(LOOK_YAW, yaw))
+        pitch = max(-LOOK_DOWN, min(LOOK_UP, pitch))
+        R = rig.ry(math.radians(yaw)) @ rig.rx(math.radians(pitch))
+        return R @ rig.euler(tilt) if tilt is not None else R
 
     def plant_at(self, who, joint, idx):
         """(R, off) of a plant key at its own time."""
@@ -186,6 +226,12 @@ class Pair:
         body = self.bodies[who]
         tr = body.tracks[joint]
         i = max([n for n, k in enumerate(tr) if k[0] <= t + 1e-9] or [0])
+        if self.held(tr, i) and is_look(tr[i][1]):
+            a, b = tr[i], (tr[i + 1] if i + 1 < len(tr) else None)
+            ta, tb = np.asarray(a[1].get("tilt", [0, 0, 0]), float), np.asarray((b or a)[1].get("tilt", [0, 0, 0]), float)
+            k = 0.0 if b is None else min(1.0, max(0.0, (t - a[0]) / max(1e-6, b[0] - a[0])))
+            k = k * k * (3 - 2 * k)
+            return self.look_at(who, a[1], t, pose_so_far, list(ta + (tb - ta) * k))
         if self.held(tr, i) and is_plant(tr[i][1]):
             R, off = rig.plant_solve(pose_so_far, joint, tr[i][1]["plant"], body.hrp)
             pose_so_far[joint + "_off"] = off
@@ -267,7 +313,7 @@ class Pair:
             held = []
             for t, _ in frames:
                 i = max([n2 for n2, k in enumerate(tr) if k[0] <= t + 1e-9] or [0])
-                held.append(self.held(tr, i))
+                held.append(self.held(tr, i) and not is_look(tr[i][1]))
             Q, prev = [], None
             for t, pose in frames:
                 q = rig.mat2q(pose[joint])
@@ -355,7 +401,7 @@ class Pair:
             for joint in ORDER[1:]:
                 tr = body.tracks[joint]
                 i = max([n for n, k in enumerate(tr) if k[0] <= t + 1e-6] or [0])
-                if is_plant(tr[i][1]):
+                if is_plant(tr[i][1]) or is_look(tr[i][1]):
                     continue
                 if self.held(tr, i) or (is_reach(tr[i][1]) and abs(tr[i][0] - t) < 1e-6):
                     tw = self.resolve(who, tr[i][1], t, pose, joint)

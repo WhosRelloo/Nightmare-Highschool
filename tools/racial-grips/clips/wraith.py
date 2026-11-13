@@ -88,6 +88,22 @@ attacker = [
      "Neck": [5, 0, 6], "stop": True},
 ]
 
+
+# ---------------------------------------------------------------- heads (2.6.2): eyes on what the body is doing
+from _util import look, set_necks  # noqa: E402
+_V, _A = "victim", "attacker"
+_CHEST = [0, 0.15, -0.5]
+_SOUL = [0, 0.2, -1.2]   # the streak between the chest and the rising palm
+set_necks(attacker, {
+    0.0: look(_V, "Head", tilt=(0, 0, 30)), 0.22: look(_V, "Head", tilt=(4, 0, 0)), 0.45: look(_V, "Head", tilt=(10, 0, -24)),
+    0.6: look(_V, "Torso", _CHEST, (0, 0, 18)), 1.1: look(_V, "Torso", _CHEST, (0, 0, 20)),
+    1.6: look(_V, "Torso", _SOUL, (-4, 0, -4)), 2.1: look(_V, "Torso", _SOUL, (-2, 0, 0)),   # follows the soul up
+    3.0: look(_V, "Head", tilt=(0, 0, 6)),
+})
+set_necks(victim, {
+    0.0: look(_A, "Head", tilt=(0, 0, -12)), 0.35: look(_A, "Head", tilt=(-6, 0, -4)), 0.72: look(_A, "Head"),
+})
+
 CLIP = {
     "name": "GripWraith", "length": 3.0, "offset": OFFSET, "grounded": False,
     "markers": [(0.0, "Frost"), (0.6, "Palm"), (0.72, "Pull"), (2.25, "Yank"), (2.5, "Absorb"), (2.85, "Finish")],

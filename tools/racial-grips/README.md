@@ -12,6 +12,7 @@ Builds an attacker clip and a victim clip in one shared space so hands land on t
 | `duo.py` | Both bodies rendered together (side + 3/4) at chosen times: `python duo.py priest out.png 0.5 1.6 2.46` |
 | `solo.py` | One body alone from side / front / back / 3-4 |
 | `sinkcheck.py` | Worst floor penetration per part |
+| `gaze.py` | Where each head looks per beat: face pitch and its miss from the other body's head and chest |
 | `pack.py` | Compact KeyframeSequence payload for `ServerStorage.NH_GripAnims.Builder.BuildPacked` |
 | `out/*.pack.luau` | The exact payloads installed in NH Combat Test |
 | `luau/` | The new game modules (Config.RaceGrips, RaceGripFx); `patches.md` lists the edits to existing scripts |
@@ -35,3 +36,10 @@ turns, rolls and sinks about its hip line.
 - `pack.py` adds them to the leg entries, because animpro only rotates limbs.
 - The crouch's back knee rests 0.41 under the floor, as in game.
 - animpro's groundContact check can't see the slide, so it is waived on the crouching attackers.
+
+## Heads that look (2.7.1)
+A Neck key can be `look(body, part, point, tilt)` (`clips/_util.py`): the face aims at a point on the other body's
+Torso, or at its head spot (`part="Head"`, taken from the torso so two looks can't chase each other). It's solved
+every frame within neck limits and turned by `tilt` (degrees: nod up, turn left, roll). Consecutive keys with the same
+target hold it and blend the tilt. Set them by time with `set_necks(keys, {t: spec})` at the end of a clip. Keep fixed
+angles for deliberate moves (whips, thrashing, bites, howls).
