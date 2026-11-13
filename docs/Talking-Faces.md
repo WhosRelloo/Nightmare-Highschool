@@ -81,7 +81,10 @@ the layers go and the originals come back.
 - A face with no mouth.
 
 **Cost:**
-- Only faces within 70 studs of the camera and on screen are drawn. A line still runs out on time, unseen.
+- Only faces within 70 studs of the camera and on screen are drawn, and at most the 10 nearest (`MAX_FACES`, 2.1.1).
+  A line still runs out on time, unseen.
+- Measured (2.1.1): one shape change on 14 faces at once (168 strips) took 2.1 ms before 2.1.1 set each layer's place
+  only once; the per-frame bookkeeping for 14 faces takes 0.04 ms.
 - It runs at 30 Hz, and images change only when the shape changes.
 - Every atlas is drawn once (1 px) for 4 s after joining, so a face's first line doesn't flash blank while the GPU
   takes the image.

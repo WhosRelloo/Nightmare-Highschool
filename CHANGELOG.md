@@ -2,6 +2,33 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.1.1] - 2026-11-12: Talking faces under load, and the edge cases
+
+Owner: "Continue." (the follow-ups to 2.0.0: many students talking at once, and the faces 2.0.0 left untested).
+
+### Changed (NH Combat Test and the Map)
+- **At most 10 talking faces animate at once**, the nearest to the camera (`FaceTalk.MAX_FACES`); the rest run out their
+  lines unseen, as faces out of range already did.
+- **A new mouth shape only changes the image and its band.** Each layer's place on the strip is set once, when it's
+  made: about half the work of a shape change.
+
+### Tested (NH Combat Test, Studio Play, slot 4 "Testy"; `SlotCount` 4 then back to 3, `NHTestNoMenuKeys` set then cleared)
+- **Setup:** the 14 school students were put in the hallway with the test bridge (`SetTime` 09:55, `SchedulePlan`
+  Passing). All 14 were in view, each saying a new line every 2.5 s for 10 s.
+- **Faces:** up to 10 talked at once before the cap and 8 after it. No talk layer was left afterwards.
+- **Frame times** didn't change with talking: 118 ms baseline vs 110 ms talking, then 46 ms vs 37 ms. Studio was
+  unfocused, so these are coarse, but there were no spikes.
+- **The work itself:** one shape change on all 14 faces in the same frame (168 strips) took 2.1 ms before the change.
+  The per-frame bookkeeping for all 14 takes 0.04 ms.
+- **Sewn Shut and Frozen Seam:** the mouth stays shut while the eyes narrow and the brows move.
+- **A vampire form mouth:** it keeps its mouth and eyes; only the brows move. (The race and form mouth images were put
+  on Testy's face on the client for the test.)
+- **The Map, Studio Play** (`NHTestNoMenuKeys` set, then cleared), with 2.1.0's new chat in: a face talked a line
+  and was left clean, with no errors or warnings from FaceTalk, the chat or the controllers.
+
+### Not tested
+- A real chat message (no chat typing). The Map's students (none spawned).
+
 ## [2.1.0] - 2026-11-12: A new chat, and no keys while you type
 
 Owner: "completely change the chat ui and fix it so it doesn't activate any UI or anything while typing", then, on the

@@ -42,6 +42,7 @@ local Art = require(UI:WaitForChild(`FaceTalkArt`))
 local Shared = {}
 
 local RANGE = 70        -- studs from the camera: nearer faces animate
+local MAX_FACES = 10    -- at most this many talking faces animate at once (the nearest)
 local CPS = 14          -- letters a second
 local RAMP = 0.15       -- s: brows and lids ease in and out
 local EMPH = 1.25       -- the brows' lift at the end of a "!" or "?" line
@@ -195,19 +196,18 @@ end
 -- a layer cut from an atlas band: same columns as Base (its strip's slice), rows Y0 .. Y0 + H of the face
 local function bandLayer(SG: SurfaceGui, Base: ImageLabel, Name: string, Image: string, Row: number, Y0: number, H: number, Z: number)
 	local L = SG:FindFirstChild(Name) :: ImageLabel?
-	if not L then
+	if not L then -- its place on the strip is set once; a new shape only changes the image and the band
 		L = Instance.new(`ImageLabel`)
 		L.Name = Name
 		L.BackgroundTransparency = 1
+		L.ImageRectSize = Vector2.new(Base.ImageRectSize.X, H)
+		L.Size = UDim2.fromScale(Base.Size.X.Scale, H / 1024)
+		L.Position = UDim2.fromScale(Base.Position.X.Scale, Y0 / 1024)
+		L.ZIndex = Z
 		L.Parent = SG
 	end
-	L.Image = Image
+	if L.Image ~= Image then L.Image = Image end
 	L.ImageRectOffset = Vector2.new(Base.ImageRectOffset.X, Row)
-	L.ImageRectSize = Vector2.new(Base.ImageRectSize.X, H)
-	L.Size = UDim2.fromScale(Base.Size.X.Scale, H / 1024)
-	L.Position = UDim2.fromScale(Base.Position.X.Scale, Y0 / 1024)
-	L.ZIndex = Z
-	L.ImageTransparency = 0
 	return L
 end
 
@@ -345,6 +345,15 @@ local function step()
 	local Cam = workspace.CurrentCamera
 	if not Cam then return end
 	local Now = os.clock()
+	-- the nearest MAX_FACES talking faces on screen are drawn; the rest run out their lines unseen
+	local CamPos = Cam.CFrame.Position
+	local Order = {}
+	for Char, F in Faces do
+		if F.Head and F.Head.Parent then table.insert(Order, { F, (F.Head.Position - CamPos).Magnitude }) end
+	end
+	table.sort(Order, function(A, B) return A[2] < B[2] end)
+	local Rank = {}
+	for I, E in Order do Rank[E[1]] = I end
 	for Char, F in Faces do
 		local T = Now - (F.T0 or Now)
 		if not Char.Parent or not F.Head.Parent or T > (F.Total or 0) + RAMP then
@@ -362,7 +371,7 @@ local function step()
 		end
 		-- near and in front of the camera, or not drawn
 		local V, OnScreen = Cam:WorldToViewportPoint(F.Head.Position)
-		local Near = (F.Head.Position - Cam.CFrame.Position).Magnitude <= RANGE and OnScreen and V.Z > 0
+		local Near = (F.Head.Position - CamPos).Magnitude <= RANGE and OnScreen and V.Z > 0 and (Rank[F] or 1) <= MAX_FACES
 		if not Near then
 			if F.Shown or F.LidShown or F.BrowShown then clear(F) end
 			continue
