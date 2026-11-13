@@ -2,6 +2,64 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.11.0] - 2026-11-13: Soft lock-on, the delay string, the charged heavy, and wall splats
+
+Owner: "Let's finish up A first then finish up B" (`docs/Combat-Audit-and-Concepts.md`): concept 5, then 7, 10 and 11.
+That completes sections A and B. The live scripts are mirrored in `tools/combat-2110/` (`pre/` holds the two the Studio
+backup doesn't). The rest are in `ServerStorage.NH_Backup.Combat211_pre_20261113`.
+
+### Added
+- **Soft lock-on (5).**
+  - **Mouse and keyboard:** middle mouse locks on to the nearest opponent in front, and again lets go. While locked
+    you face them between swings, with a small gold diamond over their head. It lets go when they drop, go down, get
+    40+ studs away, or you put your fists away.
+  - **Gamepad and touch:** every pad button is taken, so these get aim assist instead: each swing turns you to the
+    nearest opponent in front within 9 studs. Mouse players keep their own aim.
+
+  (New `InputController.Combat.LockOn` and `LockOn.Core`, `Keybinds` `LockOn`, called from `Combat.M1` / `Combat.M2`.)
+- **The delay string (7).** Throw the 4th hit after a pause (0.3 s or more after hit 3). If they've had their guard up
+  0.25 s or more, it goes straight through: full damage and the knockback, with DELAY on the readout. A late, reactive
+  block still parries (`Combat.M1`, `General.Block`).
+- **The charged heavy (10).** Hold M2 and the wind-up holds and charges, 0.4 s a step, up to three.
+  - **Each step:** +15% damage, guard damage 35 / 50 / 65, a gold glow and a rising chime.
+  - **The third step:** flares and breaks a guard.
+  - **A tap:** the same instant heavy as before.
+  - **Risk:** you can be counter-hit while charging.
+  - **The packet:** `UnPackets.M2` now carries flags (1 aerial, 2 press, 4 let go), like M1 in 2.10.0
+    (`Assets.M2.Fist`, client `Misc.General.Charge`).
+- **Wall splats (11).** A hard knockback (the 4th hit, the running straight, the shove, the heavy) that drives someone
+  into a wall pins them there.
+  - **The pin:** a 0.9 s stun, a head snap against the wall, dust and a thud, with WALL SPLAT on your readout.
+  - **No gore.**
+  - **Code:** `DamageLogic` `Local.WallSplat`, client `Misc.General."Wall Splat"`.
+
+### Tested (NH Combat Test, slot 4 Testy on Fists, 11 PM, real mouse and keyboard where the tools allow)
+- **Delay string (Blocking dummy, guard up):**
+  - A normal-rhythm 4th hit was blocked (0.5 chip).
+  - The 4th thrown 0.8 s after hit 3 went through: 3.1 damage, the knockback, and DELAY on the readout.
+- **Charged heavy:**
+  - **Tap:** an R tap hit 0.56 s after the press (unchanged).
+  - **First build:** holding R 1.5 s reached only step 2 (+50 guard damage). 1.2 / 0.4 is 2.9999... in floating
+    point, so step 3 was missed. The step is now counted with a tolerance and again after the loop.
+  - **After the fix:** the glow at steps 1 and 2, the flare at step 3, and the release broke the blocker's guard
+    (posture 0, stunned and paralyzed about 1.5 s).
+- **Wall splat:** with a test wall 6.6 studs behind the Inf Dummy, 1 click then R (the shove) pinned it 1 stud off the
+  wall, and the readout said WALL SPLAT.
+- **Lock-on (driven through `LockOn.Core`):**
+  - **Lock:** it locked on to the Inf Dummy (AutoRotate off, the marker on its head).
+  - **Follow:** moving the dummy 90 degrees to the side turned Testy to face it (0 degrees off).
+  - **Release:** it put everything back.
+  - **Binding:** the middle-mouse binding registered (no "not binded" warning).
+- **Console:** no script errors.
+- **Restored:** `SlotCount` back to 3 and `NHTestNoMenuKeys` cleared.
+
+### Not tested
+- **Real middle-mouse press:** the input tool can't press middle mouse.
+- **Aim assist:** on a real gamepad or a phone.
+- **Charge cue:** the charge glow and chime by eye and ear.
+- **Splat on real walls:** the school's own walls and props (the test used a plain wall).
+- **The Map:** not ported.
+
 ## [2.10.0] - 2026-11-13: The fist moveset: string enders, the clinch, and riposte
 
 Owner: "Fist moveset 6, 8, 9", concepts 6, 8 and 9 in `docs/Combat-Audit-and-Concepts.md`. The live scripts are mirrored

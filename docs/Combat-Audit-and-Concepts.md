@@ -111,6 +111,15 @@ armory, cliques, duels and the hall monitors.
    read them. A future unblockable gets its own colour.
 4. **Combo counter and damage numbers (S).** "3 HIT" in the corner while a string lands, and optional damage numbers
    in Settings. It also makes the Training dummies useful.
+**Built in 2.11.0:** concept 5, which completes section A.
+- **Mouse and keyboard:** middle mouse locks on to the nearest opponent in front (30 studs), and again lets go. While
+  locked you face them between swings, and a small gold diamond breathes over their head. It lets go by itself when
+  they drop, go down, get 40+ studs away, or you put your fists away. (`InputController.Combat.LockOn` and its `Core`;
+  `Keybinds` `LockOn`.)
+- **Gamepad and touch:** every pad button is already taken, so these get aim assist instead. Each swing (M1 or M2)
+  turns you to the nearest opponent in front within 9 studs. Mouse players keep their own aim.
+- **Not rebindable yet:** middle mouse isn't in Settings > Controls.
+
 5. **Soft lock-on (M).** Hold a key or the gamepad's RS to face the nearest opponent between swings. Phones and pads
    need this most.
 
@@ -138,6 +147,24 @@ armory, cliques, duels and the hall monitors.
   RIPOSTE and COUNTER.
 - **Stand-in clips:** existing Fist clips are used until bespoke ones are made: M1.4 for the shove, M1.3 for the body
   blow, M2 for the knee.
+
+**Built in 2.11.0:** concepts 7, 10 and 11, which completes section B.
+- **Delay string (7):** throw the 4th hit after a pause (0.3 s or more after hit 3 lands, before the string resets at
+  1 s). If they've had their guard up 0.25 s or more, it goes straight through: full damage, the ender's knockback, and
+  DELAY on the readout. A late, reactive block still parries it. (`Combat.M1`; `General.Block` records
+  `BlockStartedAt`.)
+- **Charged heavy (10):** hold M2 and the wind-up holds and charges, 0.4 s a step, up to three.
+  - **Each step:** +15% damage and more guard damage (35, 50, 65), with a gold glow and a rising chime.
+  - **The third step:** flares and breaks a guard outright.
+  - **A tap:** the same instant heavy as before.
+  - **Risk:** you can be counter-hit while charging.
+  - **Code:** the M2 packet carries flags (1 aerial, 2 press, 4 let go), and the hold-repeats keep a charge alive if
+    the let-go is lost (`Assets.M2.Fist`; client `Misc.General.Charge`).
+- **Wall splat (11):** a hard horizontal knockback (40+: the 4th hit, the running straight, the shove, the heavy) that
+  drives someone into a wall within its travel pins them there.
+  - **The pin:** a 0.9 s stun and a head snap against the wall.
+  - **Effects:** dust off the wall, a heavy thud and a camera jolt, with WALL SPLAT on the attacker's readout.
+  - **Code:** `DamageLogic` `Local.WallSplat`; client `Misc.General."Wall Splat"`.
 
 6. **String enders (M).** M2 pressed after hit 2 or 3 of the string replaces the 4th hit with a different ender:
    - after 2: a **launcher** (into the existing air combo);
@@ -202,8 +229,8 @@ armory, cliques, duels and the hall monitors.
 
 | Order | Concepts | Why |
 |---|---|---|
-| 1 | 1, 2, 3, 4 | Read the fight better; all small. **Built in 2.9.0.** |
-| 2 | 6, 9, 8 | The fist moveset gets depth with what exists. **Built in 2.10.0.** |
+| 1 | 1, 2, 3, 4 | Read the fight better; all small. **Built in 2.9.0** (5 in 2.11.0: all of A is done). |
+| 2 | 6, 9, 8 | The fist moveset gets depth with what exists. **Built in 2.10.0** (7, 10, 11 in 2.11.0: all of B is done). |
 | 3 | 12 | The biggest smoothness gain left, but large. |
 | 4 | 15, 16 | Fists become a path, not a starter. |
 
