@@ -200,6 +200,11 @@ armory, cliques, duels and the hall monitors.
 14. **Combat event log (S).** A Studio-only trace of each exchange (inputs, swings, hits, blocks, parries, timings) so
     tuning is measured, not guessed.
 
+**Built in 2.13.0:** all of section C. Prediction covers ground M1s, with a refusal signal for the swings the server
+won't play. Lag compensation rewinds 100 ms, plus your ping for a predicted swing, capped at 0.3 s. The log is in
+`ServerStorage.Packages.CombatLog`. The hitbox's old 0.2 s prediction turned out never to have run (a `typeof` check),
+so it's gone.
+
 ### D. Growth (fists are everyone's first class now)
 
 15. **Fighting styles from Training (L).** Training already rates sets. Unlock a fist style there, swapped at the class
@@ -237,7 +242,7 @@ armory, cliques, duels and the hall monitors.
 |---|---|---|
 | 1 | 1, 2, 3, 4 | Read the fight better; all small. **Built in 2.9.0** (5 in 2.11.0: all of A is done). |
 | 2 | 6, 9, 8 | The fist moveset gets depth with what exists. **Built in 2.10.0** (7, 10, 11 in 2.11.0: all of B is done). |
-| 3 | 12 | The biggest smoothness gain left, but large. |
+| 3 | 12 | The biggest smoothness gain left, but large. **Built in 2.13.0** (with 13 and 14: all of C is done). |
 | 4 | 15, 16 | Fists become a path, not a starter. |
 
 ## Your calls

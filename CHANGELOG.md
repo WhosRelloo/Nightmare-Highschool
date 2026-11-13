@@ -2,6 +2,84 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.13.0] - 2026-11-13: Combat tech: client-predicted swings, lag-compensated hits, and a combat log
+
+Owner: "Let's do Section C" (`docs/Combat-Audit-and-Concepts.md`, concepts 12 to 14). The live scripts are mirrored in
+`tools/combat-2130/`, with the originals in `pre/` and `patches.py` (the exact edits). Studio backup:
+`ServerStorage.NH_Backup.CombatC_pre_20261113`.
+
+### Added
+- **Client-predicted swings (12).** A ground M1 starts on your screen the moment you click, instead of a round trip
+  later.
+  - **How:** your client plays the swing it expects the server to play and sends its guess with the press. If the
+    server plays the same hit, it runs its own copy almost invisibly (weight 0.01) just for the timing: the hit
+    frame, end lag and cancels. Your copy is the one everyone sees, and it stops when the server's copy does
+    (stunned, feinted, cancelled into an ender).
+  - **Wrong guesses:** if the server plays a different hit, yours fades out and the server's plays.
+  - **Swings that won't play** (cooldown, busy, buffered for later, the clinch, a running or air swing): the server
+    bumps `NHPredictRefused` and your copy is dropped at once. A 1 to 1.5 s timeout covers a lost reply.
+  - **When it guesses:** only when the outcome is near certain. That means on the ground, not sprinting, not holding
+    block, not attacking, stunned or busy, not in the last hit's cooldown, and not on the 1 s combo-reset edge.
+  - **How the client counts the 1 s reset:** each hit is stamped on the synced clock (`NHHitAt`). Any other press
+    goes out the old way.
+  - **Off switch:** ReplicatedStorage attribute `NHPredictOff`.
+  - **Code:** new `InputController.Combat.M1.Predict`; edits to the client `Combat.M1`, `General.Block` (a local
+    `NHBlockHeld` flag), `ActionManager` (reads the guess, sends refusals) and `Combat.M1` (weight, refusals,
+    `NHHitAt`).
+- **Lag-compensated hits (13).** A player's hit also counts where the target was on that player's screen.
+  - **The history:** `ServerStorage.Packages.LagComp` keeps 0.6 s of every character's position. Each hitbox also tests
+    targets at their position a moment ago.
+  - **How far back:** 100 ms for a normal attack (other players' interpolation delay). A predicted swing adds your
+    ping. The rewind is capped at 0.3 s.
+  - **Scope:** NPC attackers aren't rewound. A hit still counts if it lands now.
+  - **Code:** `HitBox:Go` and `GetCast`, plus a `Rewind` field.
+  - **Off switch:** `NHLagCompOff`.
+- **Combat log (14, Studio only).** `ServerStorage.Packages.CombatLog` traces each exchange:
+  - **What it records:** presses (with ping and the client's guess), moves starting or refused, every hitbox
+    (current hits and rewound hits), and what DamageLogic made of each hit (lands, blocked, parried, dodged,
+    counter-hit, damage and posture).
+  - **What it keeps:** only lines involving a player, so the auto-swinging dummies don't flood it.
+  - **How to read it:** `NHTestBridge:Invoke("CombatLog", n)`, or set `NHCombatLogPrint` to print live.
+  - **Live servers:** it does nothing there.
+
+### Fixed
+- **The hitbox's "0.2 s prediction" never ran.** `Local.Predict` checked `typeof(Part) == "BasePart"`, but
+  `typeof` returns `"Instance"`, so hits were always judged at the current positions with no compensation. The dead
+  code is gone, and lag compensation does the job instead.
+
+### Tested (NH Combat Test, slot 4 Testy on Fists vs the Inf Dummy, 11 PM, real mouse and keyboard)
+- **The log:** presses, starts, hitboxes and hits all show. M1.1 lands 0.44 s after the press.
+- **Lag compensation, with the hitbox driven directly:**
+
+  | Dummy | Result |
+  | --- | --- |
+  | In front | Hit by the current overlap |
+  | 15 ms after a 10-stud sidestep | Hit through the rewind (100 ms back) |
+  | 440 ms after the sidestep | Missed |
+
+- **Prediction, first try:** a 4-hit string matched the server on every hit, and the press during the last hit's
+  cooldown wasn't predicted. But on Studio's 20 fps play server, the server's copy reached the client 0.55 s after
+  the click, past the first 0.3 s timeout, so the punch was cut off before its hit frame. This led to the refusal
+  signal and the longer timeout.
+- **Prediction, after the fix:**
+  - **Full swings:** predicted swings play in full on the client.
+  - **A wrong guess** (the server had reset the string) swapped to the server's hit.
+  - **A refusal sent mid-swing** dropped the client's copy 0.54 s in, before the timeout.
+  - **The clinch** (F held plus a click) was first wrongly predicted and then refused after 0.17 s. With the local
+    block flag it isn't predicted at all, and the Clinch plays clean.
+  - **After an M2 cancel,** the next predicted M1 matched and played in full.
+- **Console:** no new script errors on the server or client.
+- **Restored:** `SlotCount` back to 3, `NHTestNoMenuKeys` cleared, `NHPredictOff` cleared.
+- **The crash:** Studio crashed once during testing. Its log shows main-thread hangs that began before the test, after
+  24 hours open and 172 play sessions. A plugin had retried `localhost:4455` more than 166,000 times, and the final
+  freeze was in the built-in Asset Manager plugin, not the game's scripts.
+
+### Not tested
+- **Real latency:** Studio runs at 0 ms ping. The timing is reasoned and the paths are exercised, but how it feels at
+  150 ms needs a published server or two-player test (`docs/Two-Player-Test-Plan.md`).
+- **Other players' view:** what a second player sees of your predicted swing.
+- **Katana:** prediction uses each weapon's own clips, but only fists were tested.
+
 ## [2.12.0] - 2026-11-13: Bespoke fist animations for the shove, the body blow and the clinch
 
 Owner: "Actually properly animate the stuff I told you no for before", using "the m1s already in the game as the BASE
