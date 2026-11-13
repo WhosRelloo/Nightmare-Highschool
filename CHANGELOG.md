@@ -2,6 +2,37 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.4.0] - 2026-11-13: Inventory QOL batch 6: a replace-buff check, "new" dots, the trophy case
+
+Owner: "Continue with the inventory ideas", and while asleep, "I approve everything you are doing". This batch is
+concepts 8, 14 and 29 in `docs/Inventory-QOL-Concepts.md`, the ones that need none of the owner's open decisions.
+Search (12) is held back until the owner sees a Locker layout with room for it. The live scripts are mirrored in
+`tools/inventory-qol-batch6/`; the scripts as they were before are `tools/inventory-qol-batch5/`.
+
+### Added
+- **"Replace your buff?"** Drinking a different buff while yours has more than a minute left asks first. For example,
+  "Replace Canned Coffee (4:56 left)? Use again to swap." Using it again within 3 s swaps it. The check is in
+  `Inventory.Use`, which the hotbar, the Locker and the snack wheel all go through.
+- **"New" dots.** A gold dot marks snacks and trophies you haven't looked at in the Locker. Picking one clears it, and it
+  stays cleared (`PlayerData.Inventory.Seen`, remote `NHInventory.Seen`, which saves quietly, so the Locker isn't
+  rebuilt). The first time, everything you already carry counts as seen, so only new things get a dot.
+- **The trophy case.** Under the Trophies chip, the trophies you haven't found show as dark silhouettes with a "?". Their
+  card reads "Not found yet · a rare drop from the <beast>".
+
+### Tested (NH Combat Test, slot 4 Testy, entered through the real slot remotes)
+- **Seeding:** "seen" was filled with all 9 items Testy already carried.
+- **Replacing a buff:** Canned Coffee, then Green Tea, said "Replace Canned Coffee (4:56 left)? Use again to swap." and kept
+  the coffee buff. A second use swapped it to Green Tea.
+- **New dots:** a newly bought Hot Cocoa showed the gold dot in the Locker. Clicking it marked it seen on the server.
+- **The trophy case:** the Trophies chip showed all 5 trophies. The Stalker's Finger-Bone, which Testy hasn't found, was a
+  silhouette, and its card read "Not found yet · a rare drop from the Night Stalker".
+- **Restored:** `SlotCount` back to 3 and the `NHTestNoMenuKeys` attribute cleared.
+
+### Not tested
+- **The snack wheel's toast** for the replace check: it was tried through the remote, not the wheel.
+- **Rejoining:** whether the dots stay cleared after a rejoin. They're saved in the profile, but a rejoin wasn't tried.
+- **The Map:** not ported yet.
+
 ## [2.2.0] - 2026-11-13: The taste book, and feeding students
 
 Owner: "Continue with the inventory ideas", then "Yes, build it" to the batch 5 design (concepts 28 and 25 in

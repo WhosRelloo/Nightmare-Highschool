@@ -106,6 +106,17 @@ Props batch 54 ([[School-Props]]): every item the stand sells is modelled now, w
   - **The line:** the student says a line from `Config.CliqueTalk` `Fed.<Verdict>`.
   - **Standing:** a loved food gives +2 with that clique once a day per clique (`Inventory.Fed = { Day, [clique] = true }`).
 
+## Replace-buff check, "new" dots and the trophy case (2.4.0)
+
+- **Replace-buff check:** in `Inventory.Use`, a buff used while a different one has more than 60 s left returns
+  "Replace <buff> (m:ss left)? Use again to swap." and remembers the ask (`ReplaceAsk`) for 3 s. Using the same item
+  again within that window goes ahead.
+- **"New" dots:** `PlayerData.Inventory.Seen` holds `{ [id] = true }`. The first State call fills it with everything you
+  carry, so only later items are new. The Locker draws a gold dot on unseen snacks and trophies. Picking one calls
+  `NHInventory.Seen`, which saves without a Changed push and has no rate limit.
+- **The trophy case:** under the Trophies chip, the Locker adds the trophies you don't own as locked entries: a black
+  silhouette with a "?", and the card reads "Not found yet · a rare drop from the <beast>".
+
 ## The snack wheel (1.96.0)
 
 `Controllers.Gui.SnackWheel`, with art from `art/ui/hud/make_snack_wheel.py` (ids in the module's `ART`).

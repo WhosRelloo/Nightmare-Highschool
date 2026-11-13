@@ -9,7 +9,9 @@ Batch 3 in 1.93.0 is concepts 11, 13 and 15 (sort and filter, favourites, drop h
 "newest" was left out because nothing records when you got an item. Batch 4 in 1.96.0 is concepts 4 and 7: the snack
 wheel (held on G or D-pad Right, since Q and LB were taken) with the baked, animated Bell Wheel look, and Best food in
 its middle. Batch 5 in 2.2.0 is concepts 28 and 25: the taste book (a Tastes tab, milestone titles and +1 max
-health each) and feeding students (an Offer prompt, clique favourite foods, +2 standing once a day per clique). Everything
+health each) and feeding students (an Offer prompt, clique favourite foods, +2 standing once a day per clique). Batch 6
+in 2.4.0 is concepts 8, 14 and 29: the replace-buff check (a second use within 3 s swaps), "new" dots on snacks and
+trophies (they clear when you pick the item, not on hover, and don't show on the tab yet) and the trophy case. Everything
 else on this page is not built yet.
 
 **The rule behind all of them:** less clicking, fewer surprises. A player should always know what they're carrying,
@@ -198,6 +200,7 @@ Each concept has a size: **S** is about a day, **M** a few days, **L** a week or
 | 3 | 11, 13, 15 | The Locker keeps up with 40+ items. |
 | 4 | 4, 7 | The wheel and smart eat, the big feel upgrade. |
 | 5 | 28, 25 | The taste book and feeding students, which tie into the line matrix. |
+| 6 | 8, 14, 29 | Small fixes that need no decisions from you. |
 
 ## Your calls
 
