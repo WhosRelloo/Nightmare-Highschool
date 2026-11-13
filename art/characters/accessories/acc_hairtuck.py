@@ -291,7 +291,10 @@ def item_bvh(pieces, hair):
             f = P["fit"].get(hair)
             f = f if f else generous(P["fit"])
             fit = f
-            variants = [SEAT + (Vp - SEAT) * f[0] + np.array([0, 0, f[1]])]
+            if pn in C.MASKS:   # (1.99.0) a mask scales out round the head's axis only (acc_check.at_hair_fit)
+                variants = [Vp * np.array([f[0], f[0], 1.0]) + np.array([0, 0, f[1]])]
+            else:
+                variants = [SEAT + (Vp - SEAT) * f[0] + np.array([0, 0, f[1]])]
         elif P["body"]:
             # every body type wears it deeper or shallower (the depth fit scales front-to-back about the part's centre):
             # the hair must clear the shallowest and the deepest fit as well as the standard one
@@ -534,8 +537,9 @@ def render(want):
                         ob.modifiers.remove(md)
                 if lay["pieces"][ob.name]["mount"] == "Head":
                     ob.data.transform(ob.matrix_world); ob.matrix_world = ob.matrix_world.Identity(4)
-                    for v in ob.data.vertices:
-                        v.co = Vector(SEAT) + (v.co - Vector(SEAT)) * f[0] + Vector((0, 0, f[1]))
+                    worn = C.at_hair_fit(ob.name, [v.co.copy() for v in ob.data.vertices], f[0], f[1])
+                    for v, w in zip(ob.data.vertices, worn):
+                        v.co = w
             hm = A.real_hair(h)
             head_piece = any(p["mount"] == "Head" for p in pieces.values())
             tgt = (0, 0, 1.3) if head_piece else (0, 0, 0.8)

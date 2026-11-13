@@ -157,6 +157,14 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 - **Icons and the crow tint:** the 1.84.0 icon set; the crow teleport takes the regalia's colour.
 - Replaced scripts are backed up as `ServerStorage.NHCore.Backups.*_pre186`.
 
+## Added 2026-11-12 (1.99.0): clean eyes, faces under masks, masks on the eyes
+
+- **The face strips:** no slit through the eyes, and the face is drawn under veils and the lace mask (`UI.Appearance`,
+  merged into the Map's own version).
+- **The masks:** they sit on the painted eyes, with any hair (`UI.AccessoryWear` `NHHairScale`, the 9 mask templates).
+- **Backups:** `NHCore.Backups.*_pre199`.
+- **The keep-out list (E)** is unchanged.
+
 ## Added 2026-11-12 (1.98.0): Kit C, inventory QOL, the snack wheel, contact feel, show or hide your weapon
 
 - **Accessories:** Kit C coats (with `BodyFollow`), masks and bags; any hair with any accessory; the staff capes' models; the v2 hair rigs.

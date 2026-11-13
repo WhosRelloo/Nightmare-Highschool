@@ -1,0 +1,30 @@
+{
+ "DominoMask/DominoMask": [
+  "Females_Preppy_Long_Braided",
+  "Females_Super_Long_Japanese_Hair",
+  "Males_Half_Up_Half_Down_Locs"
+ ],
+ "FoxMask/FoxMask": [
+  "Males_Messy_Middle_Part"
+ ],
+ "KintsugiMask/KintsugiMask": [
+  "Females_Short_Mid_Part"
+ ],
+ "Masks/LaceMaskTrim": [
+  "Females_Super_Long_Japanese_Hair"
+ ],
+ "Masks/GiltMask": [
+  "Males_Half_Up_Half_Down_Locs"
+ ],
+ "MothMask/MothMask": [
+  "Females_Side_Bun",
+  "Males_Spiky_Anime_Hair"
+ ],
+ "WatchMask/WatchMask": [
+  "Males_Short"
+ ],
+ "WolfMask/WolfMask": [
+  "Females_EdnaMode_lol",
+  "Males_Baki"
+ ]
+}

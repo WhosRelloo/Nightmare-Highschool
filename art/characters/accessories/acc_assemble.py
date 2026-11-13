@@ -19,6 +19,11 @@ IDS = json.load(open(args[args.index("--ids") + 1])) if "--ids" in args else {}
 OUT = os.path.join("E:/Nightmare-Highschool/tools/accessories", f"assemble_{batch}.luau")
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 SEAT = 1.93 - 1.5   # the headband, above the head centre, on the nominal head
+# (1.99.0) the face masks (acc_hairfit.MASKS, read from its source: that file needs Blender): worn at a hair fit round the
+# head's axis, NHHairScale = "Radial" (UI.AccessoryWear; acc_check.at_hair_fit)
+import re
+_HF = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "acc_hairfit.py"), encoding="utf-8").read()
+MASKS = set(re.findall(r'"(\w+)"', re.search(r"MASKS = \{(.*?)\}", _HF, re.S).group(1)))
 
 
 def lua_v3(v):
@@ -154,6 +159,8 @@ for it in items:
         hf = hair_fit_string(e.get("hair_fit"))
         if hf:
             attrs.append(f"HairFit = \"{hf}\"")
+        if e["mount"] == "Head" and pn in MASKS:   # (1.99.0) worn at a hair fit round the head's axis
+            attrs.append("HairScale = \"Radial\"")
         tk = tuck_string(it, pn)
         if tk:
             attrs.append(f"Tuck = {lua_str(tk)}")
@@ -271,6 +278,7 @@ for item, pieces in pairs(ITEMS) do
 		if a.HairFit then p:SetAttribute("NHHairFit", a.HairFit) end
 		p:SetAttribute("NHHairTuck", a.Tuck)   -- nil clears an old one
 		if a.Mount == "Head" then p:SetAttribute("NHSeat", ''' + f"{SEAT:.3f}" + ''') end
+		p:SetAttribute("NHHairScale", a.HairScale)   -- (1.99.0) "Radial" on the masks; nil clears an old one
 		-- game-side behaviour (Controllers.Character.AccessoryFx)
 		for _, c in ipairs(p:GetChildren()) do
 			if c.Name == "NHLight" then c:Destroy() end

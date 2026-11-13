@@ -124,3 +124,19 @@ python tools/ui-textures/gen_menace.py menace eyes faceparts    # form faces + m
   still; the others sway as before. It needs the v2 rigs (`NHHairRig = 2` on the Handle; the locks carry their strands), which
   wait for the owner's import of `art/group-upload-hair-v2/` and `tools/hair-rig/swap_v2.luau`.
 - **Before 1.71.0**, the weight grew with depth ((depth - 1) x 0.16) and the swing used fixed head axes. Bends added up to 2.4 times the target at a 6-deep tip, and strands lying along the head were twisted. The owner saw that as the hair stretching.
+
+## The face strips (1.99.0)
+
+The painted face is 12 flat strips round the head (`Head.NHFacePlate`, built by `UI.Appearance`), each a SurfaceGui
+showing its slice of the 1024 px eye, brow and mouth art (`FACE_VERSION` 7).
+
+- **No seams:** Roblox draws a light, half-see-through fringe along the edge of a SurfaceGui canvas.
+  - Each strip draws its slice on whole texels, one canvas pixel per texel, inside a canvas `FACE_MARGIN` (3)
+    transparent texels wider on each side, so the fringe falls on nothing.
+  - The art reaches `FACE_OVERLAP` (1) texel into the next strip.
+  - The attributes `Art0` / `Art1` / `Canvas0` / `Canvas1` on each SurfaceGui say where.
+- **Under see-through accessories:** each strip is as deep as the head (`Size.Z` = 2R), with the face drawn on its front
+  face at the skin.
+  - The transparent pass sorts it from the head's middle, so a veil or lace mask in front is drawn over the face.
+  - A thin strip sorted nearer than the veil and was drawn on top of it.
+

@@ -386,6 +386,24 @@ player.
 
 **Next:** C9 extras, C5 hands and feet, C3, C4, C6, C7.
 
+## Masks sit on the painted eyes (1.99.0)
+
+- **The painted eyes** sit at the head's centre: the eye art is centred at 0.49 of its height, and the face plate is
+  centred on the head.
+- **The masks' eye holes** were built about 0.1 studs higher. They were moved down by their layout fit and their blend
+  (lace, bone, gilt 0.10; fox 0.11; wolf 0.095; moth 0.10; domino 0.10).
+  - The wax saint mask stays where it was (full mask, closed-eye slits; lower, it touches the heavy body's chest).
+  - The grille, kintsugi and night-watch masks have no eye holes.
+  - `tools/mask-fit-199/mask_eyes.py` measures each mask's holes (front projection), and `shift.py` moves one.
+- **Hair fits:** masks carry `NHHairScale = "Radial"`. A hair's fit scales them out round the head's vertical axis only,
+  which is how `acc_hairfit.py` measures them.
+  - Hats and veils still scale about the headband (`NHSeat`).
+  - About the headband, a mask at k 1.11 slid 0.06 studs down the face.
+  - `acc_check.py` and `acc_hairtuck.py` wear masks the same way (`acc_check.at_hair_fit`), and `acc_assemble.py`
+    writes the attribute.
+- **Rebuilding a mask from its builder** (`nh_kitc_masks_a.py`, `nh_kitc_masks_b.py`, the Kit A batch) puts it back at
+  the old height: move it down again.
+
 ## The no-clipping rules (how "nothing clips, overlaps or hovers" is checked)
 
 Every piece is measured by `art/characters/accessories/acc_check.py` (headless Blender), not judged by eye:
@@ -492,7 +510,7 @@ crosses. Hair sway (HairSway bends strands as you move) isn't part of the check;
 | `ReplicatedStorage.NHAccessories.<Item>` | templates (`tools/accessories/assemble_<batch>.luau` builds them from the owner's imports) |
 
 Template attributes on each piece: `NHMount`, `NHFit` (on the nominal R6 part), `NHFitBody`, `NHSway`, `NHSwayKeepOut`,
-`NHSwayLock`, `NHSeat` and `NHHairFit` (head pieces).
+`NHSwayLock`, `NHSeat` and `NHHairFit` (head pieces), `NHHairTuck`, and `NHHairScale = "Radial"` on the masks (1.99.0).
 
 ## The art pipeline
 

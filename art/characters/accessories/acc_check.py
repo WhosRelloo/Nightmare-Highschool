@@ -33,6 +33,17 @@ BODIES = ["standard", "female", "lean", "athletic", "muscular", "stocky", "heavy
 PART_AT = {"Torso": Vector((0, 0, 0)), "LeftArm": Vector((1.5, 0, 0)), "RightArm": Vector((-1.5, 0, 0)),
            "LeftLeg": Vector((0.5, 0, -2)), "RightLeg": Vector((-0.5, 0, -2))}
 MOUNT_CENTRE = dict(PART_AT, Head=Vector((0, 0, 1.5)))
+from acc_hairfit import MASKS, SEAT   # the face masks; the headband centre (z)
+
+
+def at_hair_fit(pn, verts, k, dz):
+    """a head piece as worn with a hair's fit (k, dz), the game's way (UI.AccessoryWear): a hat or veil scales about
+    the headband centre and lifts; a mask (1.99.0, NHHairScale = Radial) scales out round the head's axis only, the
+    way acc_hairfit measures it, so its eye holes stay on the painted eyes at any fit"""
+    if pn in MASKS:
+        return [Vector((q.x * k, q.y * k, q.z + dz)) for q in verts]
+    piv = Vector((0, 0, SEAT))
+    return [piv + (q - piv) * k + Vector((0, 0, dz)) for q in verts]
 # which slot each item fills (Config.Accessories): pieces of the same slot are never worn together
 SLOT_OF = {}
 
@@ -734,14 +745,13 @@ def hair_report(pieces, report, fails):
             continue
         hits = {}
         fits = P.get("hair_fit") or {}
-        piv = Vector((0, 0, 1.93))   # the headband centre: head pieces are worn scaled about it and lifted, per hair
         for h, (v, t) in hair_meshes.items():
             if h in fits and fits[h] is None:
                 continue   # this hair can't wear the piece (the Wardrobe and the server refuse it)
             if (it, pn, h) in tucked:
                 v, t = tucked[(it, pn, h)]   # worn with the hair tucked (acc_hairtuck.py): the tucked v2 hair
             k, dz = fits.get(h) or (1.0, 0.0)
-            vv = [piv + (q - piv) * k + Vector((0, 0, dz)) for q in P["verts"]]
+            vv = at_hair_fit(pn, P["verts"], k, dz)
             n = len(tri_bvh(vv, P["tris"]).overlap(tri_bvh(v, t)))
             if n:
                 hits[h] = n

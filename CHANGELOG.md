@@ -2,6 +2,93 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.99.0] - 2026-11-12: Clean eyes, faces stay under masks, masks sit on the eyes
+
+Owner: "Fix the little slit visual glitch on the eyes, and make sure faces don't show over accessories. And fix the
+placement of some of the accessories. Then port it to "Map" place when you're done"
+
+### Fixed (NH Combat Test and the Map)
+- **The slit across the eyes and brows.**
+  - The face is drawn as 12 flat strips round the head (`UI.Appearance`, `Head.NHFacePlate`).
+  - Roblox draws a light, half-see-through fringe along the edge of every SurfaceGui canvas. The strips' canvases ended
+    exactly where the art did, so each joint drew a thin vertical line through the eyes and brows. 1024 / 12 = 85.33
+    also put the joints between texels.
+  - Now each strip draws its slice of the art on whole texels, inside a canvas 3 transparent texels wider on each side
+    (`FACE_MARGIN`). The fringe falls on nothing. The art reaches 1 texel into the next strip's slice (`FACE_OVERLAP`),
+    so no hairline opens.
+  - Overlapping the art instead (tried first) left either the light lines or dark ticks where strokes drew twice.
+- **Faces showing through see-through accessories** (the mourning and fascinator veils, the lace mask).
+  - Roblox draws the face's SurfaceGuis and alpha-blended pieces in one pass, sorted by each part's distance. A thin
+    strip on the skin sorted nearer than the veil in front of it, so the face was drawn over the veil.
+  - Each strip is now as deep as the head, with the face still drawn on its front at the skin. It sorts from the
+    head's middle, so anything worn in front of the face is drawn over it.
+  - Opaque pieces were never affected (the depth test hides the face).
+  - `FACE_VERSION` 7: an older face plate is rebuilt.
+- **Masks sat above the eyes.** Two causes, both fixed:
+  - **Built too high.** The masks' eye holes were built 0.10 to 0.11 studs above the head's centre. The painted eyes
+    sit at the centre (the eye art is centred at 0.49 of its height). So the irises showed at the bottom edge of the
+    holes, or not at all.
+    - Moved down: the lace, bone and gilt half-masks 0.10, fox 0.11, wolf 0.095, moth 0.10, black silk domino 0.10.
+    - Not moved: the wax saint mask (a full mask with its own closed-eye slits; moving it down touched the heavy body's
+      chest), and the grille, kintsugi and night-watch masks (no eye holes).
+  - **The hair fit dragged them down.** A head piece worn with a hair's fit (scale k) was scaled about the headband,
+    0.43 studs above the head's centre. That is right for hats, but it slid a mask down the face: 0.06 studs at the
+    default fit, k 1.11. That default fit is what any hair without a measured fit gets.
+    - Masks now carry `NHHairScale = "Radial"`. `UI.AccessoryWear` scales them out round the head's vertical axis only
+      (across and front to back), which is how `acc_hairfit.py` always measured masks. The eye holes stay on the eyes
+      with any hair. Hats and veils are unchanged.
+- **The masks' hair fits, measured again** at the new height and the new scaling.
+  - 152 measured mask-and-hair fits, up from 134.
+  - 12 mask-and-hair pairs the clearance check found crossing were added to `hair_overrides.json`. Those hairs wear the
+    mask at its default fit, untucked (as 1.88 allows), and the Wardrobe says "(hair won't tuck)".
+  - Pairs that lost their measured fit: fox with Low Ponytail, Natural Trim Pony, Straight Bob and Messy Middle Part;
+    domino and gilt with Half Up Half Down Locs; kintsugi with Short Mid Part; moth with Spiky Anime Hair; night-watch
+    with Short.
+  - The bone mask's old tuck for Half Up Half Down Locs is gone: that hair now fits the mask directly.
+
+### Tools (art/characters/accessories)
+- `acc_check.py`: `at_hair_fit` wears masks radially in the hair check, as the game now does.
+- `acc_hairtuck.py`: the same, for the tuck solver.
+- `acc_assemble.py`: writes `NHHairScale = "Radial"` on the masks (`acc_hairfit.MASKS`), so rebuilding a template keeps it.
+- The moved masks' blends and layouts are in `E:/NH-Work/acc` (old ones in `E:/NH-Work/acc/pre199_masks`).
+- **Rebuilding a mask from its builder would put it back at the old height.** The builders are
+  `nh_kitc_masks_a.py` / `nh_kitc_masks_b.py`, and the batch that built the lace, bone and gilt masks. Move it down
+  again as above (`tools/mask-fit-199/shift.py`).
+
+### The Map place
+- Got all of it: `UI.Appearance` (the face fix, merged into the Map's own version), `UI.AccessoryWear`, and the 9 mask
+  templates.
+- Backups: `ServerStorage.NHCore.Backups.*_pre199`.
+- The keep-out list is unchanged.
+
+### Tested
+- **Offline:** `acc_check.py --hair` on all 9 mask items: **0 fails**.
+  - Bodies: no clipping on any of the 12 body types (gaps 0.008 to 0.015 studs).
+  - No hair crosses a mask at its fit; no pair of pieces intersects.
+  - Before the fix it also passed, but it scaled masks the way the game did then, so its pass didn't show the eyes
+    were off.
+- **NH Combat Test, Studio Play, slot 4 "Testy"** (`SlotCount` 4 then back to 3, `NHTestNoMenuKeys` set then cleared;
+  looks changed through the real wardrobe remote at the wardrobe station):
+  - **Seams:** close-ups straight on show clean eyes and brows, with no lines.
+  - **See-through pieces:** the lace mask and the mourning and fascinator veils are drawn over the face.
+  - **Masks:** all 11 were worn on Testy's hair (Super Long Straight, which wears most masks at the default fit).
+    - Lace, bone, gilt, fox, wolf, moth and domino show the eyes centred in their holes.
+    - Kintsugi and wax cover the eyes by design, and the grille sits below them.
+    - Before the fix, the fox, moth and domino holes showed bare skin.
+  - **Testy's look:** back to no accessories, every other field unchanged.
+  - **Console:** no script errors.
+- **The Map, Studio Play** (no save slots; `NHTestNoMenuKeys` set then cleared):
+  - Face plate version 7, and a close-up shows no seams.
+  - The lace, fox, wolf, moth, domino and gilt masks sit on the eyes, and the lace is drawn over the face.
+  - **Console:** no script errors.
+
+### Not tested
+- A second player seeing these.
+- Every hair in game: the offline check covers all 35.
+- The 11 body types in game: offline only.
+- The Wardrobe's "(hair won't tuck)" label on the newly listed hairs.
+- The owner needs to save both places.
+
 ## [1.98.0] - 2026-11-12: Show or hide your weapon, and the Map place catches up
 
 Owner: "Add an option to show your weapon or hide it, also port all the newest additions to "Map" place, BUT respect
