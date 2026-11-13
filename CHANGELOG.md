@@ -157,8 +157,8 @@ test record and 22 concepts are in `docs/Combat-Audit-and-Concepts.md`. The live
 - **A second player:** two players, and the camera kick by eye.
 - **The AI tiers:** play against the tiers. Delinquents' fist combos are about 14% faster too; the stunlock guard still
   caps them.
-- **Discipline:** the tests ran during After School, a monitor duty segment, so Testy may have picked up Fighting
-  violations for hitting the dummy.
+- **Discipline:** checked afterwards: the tests ran during After School, but Testy picked up no Fighting violations
+  (the Delinquent session compared Testy's record).
 - **The Map:** not ported.
 
 ### Found, left for the owner

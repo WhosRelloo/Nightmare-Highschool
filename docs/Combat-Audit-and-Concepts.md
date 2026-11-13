@@ -52,7 +52,8 @@ as they were before are in `ServerStorage.NH_Backup.CombatAudit_pre_20261113`; t
 - **Gamepad and touch:** they go through the same remotes.
 - **A second player:** whether another viewer sees the hit-stop, and how it feels against a real opponent with ping.
 - **Combos against the AI tiers:** the camera kick by eye.
-- **Discipline:** the tests ran at 2:41 PM After School, a hall-monitor duty segment, so Testy may have picked up Fighting violations for hitting the dummy. The nearest monitor was about 120 studs away.
+- **Discipline:** the tests ran at 2:41 PM After School, a hall-monitor duty segment, but Testy picked up no Fighting
+  violations (checked against Testy's record afterwards). The 2.9.0 tests ran at night.
 
 **NPCs:** Delinquents and other Fist NPCs swing about 14% faster now (fix 1 applies to everyone). The stunlock guard
 (3 hits, 0.8 s, 1.2 s) still caps their pressure. The input buffer is players only.
