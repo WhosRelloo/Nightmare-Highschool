@@ -2,6 +2,37 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.1.2] - 2026-11-12: The pad keeps its combat buttons while you're chilled
+
+### Fixed (NH Combat Test and the Map)
+- **On a controller, every combat button stopped working while you were chilled.**
+  - **The cause:** `Controllers.Gui.GamepadControls` `Local.OpenMenu` counts any visible child of an enabled gui that is
+    at least 400 design px tall or 60% of the screen as an open menu, unless the gui is in its `SKIP` table. The frost
+    edges (`NHKitEdges.FrostEdge`, drawn by `Controllers.World.KitFx` while the character has `NHChilled`) are full
+    screen and weren't skipped. So `NHPadMenu` was set, and `Bind.Keybinds` ignored the pad. Seen in Studio Play:
+    `NHChilled` and `NHPadMenu` both set, with no menu open.
+  - **The same trap, found in the check:**
+    - The wounded ink edges (`NHKitEdges.InkEdge`).
+    - The arrival seal (`NHArrival.Seal`), which grows past the screen for about 2 s after you enter school.
+    - The Settings vignette (`Vingette`): with it on, the pad lost combat for the whole session.
+  - **The fix, two guards:**
+    - `SKIP` now names `NHKitEdges`, `NHArrival` and `Vingette`.
+    - A big panel only counts as a menu if it holds a button or a text box (`Local.Interactive`), so a future screen
+      effect can't trip it. The emote menu, the quick menu and the study group drawer are exempt, as before.
+  - Backups: CT `ServerStorage.NH_Backup.GamepadControls_pre212`, Map `ServerStorage.NHCore.Backups.GamepadControls_pre212`.
+    The two scripts are identical. See `docs/Console-Controls.md`.
+
+### Tested
+- NH Combat Test, Studio Play, slot 4 (Testy). `SlotCount = 4` and `NHTestNoMenuKeys` for the test, both put back.
+- **Entering school:** the arrival seal showed; `NHPadMenu` stayed nil.
+- **Chilled, with the vignette on, for 6 s:** the frost showed; `NHPadMenu` stayed nil the whole time.
+- **Real menus still count, while chilled:**
+  - View opened the quick menu: `NHPadMenu` set.
+  - Settings from the quick menu: `NHPadMenu` set (a big panel, through the new button check).
+  - B closed it: `NHPadMenu` cleared, with the frost still showing.
+- No script errors.
+- Not tested: the ink edge on screen (the server cleared the `NHWounded` set for the test); it's in the same skipped gui.
+
 ## [2.1.1] - 2026-11-12: Talking faces under load, and the edge cases
 
 Owner: "Continue." (the follow-ups to 2.0.0: many students talking at once, and the faces 2.0.0 left untested).

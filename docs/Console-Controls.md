@@ -28,6 +28,9 @@ A gamepad plays the whole game: combat, carrying, race actions, the skateboard, 
 - **LS and RS are toggles.** They press Shift and Ctrl through `InputController.Press`, as the touch buttons do. RS is bound through ContextActionService at priority 3000, because Roblox's gamepad camera uses RS for zoom.
 - **The wolf** (`WolfForm`): RT keeps biting while held (every 0.35 s) and RB leaps, the keyboard's click and R.
 - **No combat from a menu** (1.32.0): while a menu is open the Player attribute `NHPadMenu` is set, and `Bind.Keybinds` ignores pad buttons (by key code name: `Button*` and `DPad*`), so RT, LB, X and the rest drive the menu instead of striking or feinting. Releases still go through, so a held block always ends.
+- **Screen effects aren't menus** (2.1.2): `GamepadControls` `Local.OpenMenu` counts a visible gui child as a menu when it is at least 400 design px tall or 60% of the screen. Full-screen effects matched that too, so they set `NHPadMenu` and the pad lost combat. Two guards now:
+  - **`SKIP`** names the known effects: `NHKitEdges` (the chilled frost and wounded ink, `Controllers.World.KitFx`), `NHArrival` (the arrival seal, `Controllers.World.Arrival`) and `Vingette` (the Settings vignette).
+  - **A big panel must hold a button or a text box** (`Local.Interactive`), so a new screen effect doesn't trip it either. The emote menu, the quick menu and the study group drawer are exempt, as before.
 
 ## PlayStation and Xbox (1.32.0)
 
