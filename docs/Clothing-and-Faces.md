@@ -140,3 +140,4 @@ showing its slice of the 1024 px eye, brow and mouth art (`FACE_VERSION` 7).
   - The transparent pass sorts it from the head's middle, so a veil or lace mask in front is drawn over the face.
   - A thin strip sorted nearer than the veil and was drawn on top of it.
 
+**Talking faces (2.0.0):** mouths that follow the words and six expressions while someone talks. See [Talking-Faces.md](Talking-Faces.md).

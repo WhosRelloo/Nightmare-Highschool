@@ -157,6 +157,14 @@ The doors themselves weren't changed. Tested on both Gothic double doors.
 - **Icons and the crow tint:** the 1.84.0 icon set; the crow teleport takes the regalia's colour.
 - Replaced scripts are backed up as `ServerStorage.NHCore.Backups.*_pre186`.
 
+## Added 2026-11-12 (2.0.0): faces that talk
+
+- **Faces talk** when a player chats or a student says a line (`Controllers.Character.FaceTalk`, `UI.FaceTalkArt`;
+  see Talking-Faces.md).
+- **Map students:** their expression comes from their mood and the words. The line matrix's attitudes come with
+  cliques.
+- **The keep-out list (E)** is unchanged.
+
 ## Added 2026-11-12 (1.99.0): clean eyes, faces under masks, masks on the eyes
 
 - **The face strips:** no slit through the eyes, and the face is drawn under veils and the lace mask (`UI.Appearance`,

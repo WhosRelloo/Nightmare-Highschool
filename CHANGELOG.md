@@ -2,6 +2,91 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.0.0] - 2026-11-12: Faces that talk
+
+Owner: "I want you also to so create some talking facial expressions so the faces are super animated and talk when
+they type or speak", then, on the mockup: "Make the mouth movements more exaggerated", and "Yes, build it".
+
+### Added (NH Combat Test and the Map)
+- **Faces talk.**
+  - A player who sends a chat message: their face talks it (TextChatService).
+  - A student who says a line: their face talks it, starting with the bubble and the voice (the same `NHSay` /
+    `NHSayAt` signal `Controllers.World.NpcLook` uses).
+- **Mouth shapes, from the words, letter by letter** (about 14 a second):
+  - A / I wide open, E stretched wide, O big and round, U / W a tight pucker.
+  - M B P press the lips in, F V put the teeth on the lip, L and TH show the tongue.
+  - Other consonants show the teeth together.
+  - Spaces and commas close the mouth; . ! ? close it a little longer; "..." holds it shut.
+  - Between lines the face's own mouth is back.
+  - They're drawn bigger and bolder than the everyday mouths: the jaw drops further and the mouth is up to 35%
+    larger, as the owner asked on the mockup.
+- **Six expressions**, each with its own set of mouths, brow move and eye squint:
+  - Neutral.
+  - Happy: a wider smile, lifted brows, a soft squint.
+  - Angry: down-turned, brows pulled down in the middle, narrowed eyes.
+  - Surprised: bigger openings, raised brows.
+  - Worried: a wobbly down-turn, brows raised in the middle.
+  - Smug: lopsided, one brow up, half-closed eyes.
+  - "!" and "?" lift the brows at the end of a line. Blinks carry on (`EyeBlink`).
+- **Which expression:**
+  - **A student:** the line's attitude.
+    - A line-matrix line in NH Combat Test: Hostile gives angry, Wary gives worried, Respected or Friendly gives happy.
+    - Otherwise their mood (Friendly is happy; Scared, Uneasy, Shy and Wary are worried), otherwise the words.
+  - **A player:** the words.
+    - ":)", "lol", "thanks", "hey" or "!" give happy; ":(", "sorry" or "help" give worried.
+    - ";)", "told you" or "obviously" give smug; "?!", "what?", "wait" or "wow" give surprised.
+    - Shouting in capitals or "shut up" gives angry; trailing off with "..." gives worried.
+- **Left alone:**
+  - A sewn or stitched race mouth (Sewn Shut, Frozen Seam) stays shut while the rest of the face still moves.
+  - A transformed face keeps its form's mouth and eyes.
+  - A face with no mouth stays mouthless.
+- **Cheap:** only faces within 70 studs of the camera and in front of it animate. Images change only when the
+  shape changes, at most 30 times a second.
+
+### How it's built
+- **The art:** `tools/face-talk/build.py` draws every expression x mouth shape x lips (plain and fuller) with the
+  house mouth renderer (`gen_face.py`'s open x width grid, cel shading and material bake).
+  - 106 mouths and 16 squint lids (8 eye shapes x 2 levels, each clipped to its own eye).
+  - Packed as bands into 20 uploaded images: 18 for mouths, 2 for lids.
+  - `ReplicatedStorage.UI.FaceTalkArt` lists them.
+- **On the face** (`Controllers.Character.FaceTalk`, client), per face strip:
+  - `NHTalkMouth` replaces the face's `NHMouth` while a shape shows.
+  - `NHTalkLid` sits over the eyes, tinted to the skin.
+  - `NHTalkBrow` is a copy of the brows, each strip's slice moved to a curve and turned to its slope, so the brow
+    bends smoothly.
+  - All of them are removed when the line ends, or the moment the face is rebuilt.
+  - The face-over-accessories fix (1.99.0) is untouched: the layers sit in the same strips.
+- **Every atlas is loaded on joining** (a failed fetch is tried again, up to three times) and drawn once (1 px,
+  invisible): an atlas's first draw on a face was blank for a moment.
+- **NH Combat Test's `StudentBrain`:** `bubble()` sets `NHSayMood` from a line-matrix line's attitude.
+  - The Map's `MapStudents` is unchanged: the Map has no line matrix yet, so its students go by mood and words.
+
+### Tested
+- **The Map, Studio Play** (`NHTestNoMenuKeys` set, then cleared):
+  - **Lines:** a player's face talked angry, surprised, happy, worried and smug lines, through `NHTestSay`, a
+    Studio-only hook that runs the same code a chat message does.
+    - "Get out of my way!" ran CONS, E, rest, UW, CONS, rest, O, FV, rest, MBP, E, rest, UW, AI, E, rest, then the
+      face's own mouth.
+  - **Expressions:** the brows turned and the angry squint lid showed. Screenshots show each expression's mouth,
+    brows and eyes.
+  - **The first line of a fresh session** shows its mouth from the first frame (it was blank before the warm-up).
+  - **Afterwards:** no talk layer left, and no original left hidden.
+- **NH Combat Test, Studio Play, slot 4 "Testy"** (`SlotCount` 4 then back to 3, `NHTestNoMenuKeys` set then cleared):
+  - **Testy:** Testy's face talked a line and was left clean.
+  - **A student:** given a line the way `bubble()` says a line-matrix line (`NHSayMood` Hostile), the student talked it
+    with the angry face: the mouth followed the words, the lid narrowed, the brows turned 2.8 degrees.
+  - **Expression rules:** checked on 10 lines (for example "this is the library" is neutral, "GET OUT OF MY WAY" angry,
+    "told you so ;)" smug).
+  - **Console:** no errors from the new scripts.
+
+### Not tested
+- A real chat message (the test rule is no chat typing): the `TextChatService.MessageReceived` hookup itself.
+- Another player watching your face talk; many students talking at once (the cost).
+- The sewn and stitched mouths and a transformed face while talking.
+- The Map's students (none were spawned during the test).
+- Voice chat (only typed chat drives it).
+- The owner needs to save both places.
+
 ## [1.99.0] - 2026-11-12: Clean eyes, faces stay under masks, masks sit on the eyes
 
 Owner: "Fix the little slit visual glitch on the eyes, and make sure faces don't show over accessories. And fix the
