@@ -183,3 +183,7 @@ NH Combat Test's own students (`Features.Schedules`, 14 of them) use the same sy
 - `Controllers.World.Chatter` skips students marked `NHBrain`.
 - The Map still runs `MapStudents` (unchanged). If the Map's brain changes, port the same change to `StudentBrain`.
 - Sources: `tools/ct-npc-1862/`.
+
+## Builds (2.3.0)
+
+Each student has a clique (`Config.Cliques.Students`, the same as NH Combat Test's student of that number) and a build from `Config.NpcBuilds`: a height (before 2.3.0 the Map's students had none), a body type, their bravery and sociability (no longer `math.random`), a posture while standing and walking, and a pace. `spawn` measures `Up` and the stride after the body is scaled. See [NPC-Builds](NPC-Builds.md).

@@ -100,6 +100,66 @@ Search (12) is held back until the owner sees a Locker layout with room for it. 
 - **Rejoining:** whether the dots stay cleared after a rejoin. They're saved in the profile, but a rejoin wasn't tried.
 - **The Map:** not ported yet.
 
+## [2.3.0] - 2026-11-13: Students built by their clique and personality
+
+Owner: "I want the NPC's to have random heights, etc. based on their respective cliques and personalities." Each student
+gets a height, a body type, a posture and a pace from their clique and personality. The roll is seeded, so they're the
+same every time they spawn. Doc: `docs/NPC-Builds.md`. Source and the exact edits: `tools/npc-builds-230/`. Both places.
+
+### Added
+- **`ReplicatedStorage.Config.NpcBuilds`** (new, identical in both places): a range per clique.
+  - **Heights:**
+    - the Athletes run tallest (5'10" to 6'9") and the Pack is rangy (5'8" to 6'10");
+    - the Court stands 5'5" to 6'5";
+    - the Ink Club and the Ordinary are the slightest (4'11" to 5'10");
+    - girls are 0.03 shorter.
+    - Every height stays inside 4'11" to 7'0".
+  - **Body types:** the trained bodies by weight (Athletes mostly Athletic/Muscular, the Pack Lean or Athletic, the
+    Delinquents some Stocky/Heavy, the Ink Club mostly Lean), in the student's own gender.
+  - **Personality:** bravery and sociability, rolled in the clique's range: the Pack, Athletes and Delinquents are brave,
+    the Ordinary mostly timid.
+  - **Posture:** the upper body leans from the hips, -5 to +7 degrees. A Timid student hunches with their head down; a
+    Brave one, and the Court, stands tall with the chin up.
+  - **Pace:** Timid walk 10% slower, Brave 10% faster, the Court is unhurried. Taller legs stride further.
+  - **Idle:** a lively or a subdued idle by sociability.
+- **Who gets a build:**
+  - **Class students** (`Features.Schedules`): everything.
+  - **Ambient students** (`Features.AmbientNpcs`): height, body and personality, by their named clique.
+  - **The Map's students** (`Features.MapStudents`): everything, with the same clique and build as Combat Test's
+    student of the same number.
+
+### Changed
+- **Bravery and sociability:** students' bravery, sociability and stroll speed come from their build. Before, they were
+  `math.random` on every server.
+- **`UI.Appearance`:** the NPC height block uses the build's height (`NHHeightWant`), and a new wrapper takes the
+  posture off while a look is rebuilt.
+- **The Map:** `UI.Appearance`'s `NPC_HEIGHT` includes `NHStudents`, so the Map's students have heights (they had none).
+
+### Fixed
+- **`S.Up`** (the root's height over the feet: Nav, standing up from a seat, the nudges) is measured after the body is
+  scaled. It was measured on the unscaled rig, 0.3 to 0.75 studs short. In Combat Test and on the Map.
+- **The walk and run clips** are slowed for longer legs, so a tall student's feet don't slide.
+
+### Tested (NH Combat Test, slot 4 "Testy", entered through the real slot remotes; the Map)
+- **The lineup:** 40 students, 5 per clique (the shortest to the tallest of 80 rolls), through the real look path. Four
+  pictures are in the doc.
+- **Class:** the six class students walked through the doors into R102 and sat straight, hips 0.05 to 0.06 studs over
+  the cushion.
+- **Lunch:** all 14 walked there with their posture and ate standing straight.
+- **Nudges:** a postured Vigil student made way for Testy, played `Nudge_Left` and `Nudge_Right`, and kept their posture.
+- **Posture:** the legs and feet don't move (0.0000 studs).
+- **Hair:** measured in Blender with all 35 barber hairs:
+  - the whole upper body leaning keeps every hair clear of the legs;
+  - a head tilted on its own would push long hairs into the back (0.02 studs at 2 degrees), so the head never tilts
+    on its own.
+- **The Map:** all 6 students got their clique's build and walked between the yard and the halls.
+- **Consoles:** only the places' existing asset messages.
+- **Students jumping in a crowd:** not new. Nav's stuck-jump fired 100 times in 75 s with 2.3.0 and 115 before (14
+  students, Before School). On the Map, 27 with 2.3.0 against 35 before.
+- **Not tried:** a second player watching; ambient students' reps at their new body types; a full in-game day.
+- **Backups:** `ServerStorage.NH_Backup.NpcBuilds_pre220` (Combat Test);
+  `ServerStorage.NHCore.Backups.Appearance_pre230` and `MapStudents_pre230` (the Map).
+
 ## [2.2.0] - 2026-11-13: The taste book, and feeding students
 
 Owner: "Continue with the inventory ideas", then "Yes, build it" to the batch 5 design (concepts 28 and 25 in

@@ -97,6 +97,8 @@ NPC students use the Human range.
 
 Class students (`NHSchedule`) and ambient students (`NHAmbient`) each get a fixed height from their name and look, in the Human range. Their feet stay where they were placed. Other NPCs (enemies, staff at stations) keep today's size.
 
+**Since 2.3.0** the height comes from the student's clique and personality instead (Athletes run tallest, the Ink Club and the Ordinary slightest), with a body type, a posture and a pace: see [NPC-Builds](NPC-Builds.md). The Map's students (`NHStudents`) get heights too.
+
 ## Saving
 
 `PlayerData.Identity.Height = { P, Band, Spins, Pity, Seen }`, through Identity's `SetIdentity` (ProfileService only). The server rolls P; a client can only ask to spin (`NHIdentity.SpinHeight`) and say it has seen the reveal (`NHIdentity.SeenHeight`).
