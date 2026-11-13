@@ -15,6 +15,13 @@
 	MakeWay fires about a second early, so the handler waits for that contact and does nothing if it never comes.
 	Each play varies speed and weight, and a student can't be nudged again for COOLDOWN seconds.
 
+	(contact feel, 2026-11-12) The player's client feels the bump too (Controllers.World.ContactFeel) and reports it
+	(Features.ContactFeel -> Brain.Contact). Nudges.Remember keeps that impact's speed and direction in the ram memory,
+	and Handle with Kind "Contact" plays the reaction at once, so a student reacts to a real bump even when Senses never
+	flagged an approach (from behind, standing still, in a crowd). A report that comes in while MakeWay is still waiting
+	for the brush ends the wait. A shove carries further the faster the hit (CARRY up to CARRY x CARRY_SCALE, still short
+	of walls), and Nudges.OnContact (set by the brain) says the bump line at the moment of contact.
+
 	The clips are published under the group (IDS, 1.86.4). Their source is NH Combat Test's ServerStorage.NHNudges,
 	built by tools/npc-nudges/build_nudges.luau. With an id of 0, Studio plays that local KeyframeSequence instead, and
 	live servers keep the brain's old step aside.
@@ -44,6 +51,7 @@ local SHOVE_SPEED = 20     -- a passer this fast (sprinting, dashing) shoves ins
 local SIDE_STEP = 0.45
 local SIDE_TIME = 0.25
 local CARRY = 3
+local CARRY_SCALE = 1.5    -- (contact feel) a hit at SHOVE_SPEED carries CARRY, faster ones up to CARRY x this
 local CARRY_TIME = 0.7
 local FOLD_REACH = 3       -- the shove's head comes 2.4 studs ahead of the root at the fold (frame 6), plus hair and a margin
 local COOLDOWN = 1.5
@@ -89,22 +97,42 @@ local function flat(V: Vector3): Vector3
 	return Vector3.new(V.X, 0, V.Z)
 end
 
--- each player's top speed (and which way they were going) over the last RAM_MEMORY seconds
-local Recent = {} :: { [Player]: { Speed: number, At: number, Dir: Vector3 } }
+-- each player's top speed (and which way they were going) over the last RAM_MEMORY seconds. Seen is only what the
+-- server measured itself (the contact report is checked against it); Recent also takes the reported impacts.
+type Ram = { Speed: number, At: number, Dir: Vector3 }
+local Recent = {} :: { [Player]: Ram }
+local Seen = {} :: { [Player]: Ram }
+local function keep(T: { [Player]: Ram }, Pl: Player, Speed: number, Dir: Vector3, Now: number)
+	local Last = T[Pl]
+	if not Last or Speed >= Last.Speed or Now - Last.At > RAM_MEMORY then
+		T[Pl] = { Speed = Speed; At = Now; Dir = Dir }
+	end
+end
 RunService.Heartbeat:Connect(function()
 	local Now = os.clock()
 	for _, Pl in Players:GetPlayers() do
 		local R = Pl.Character and Pl.Character:FindFirstChild(`HumanoidRootPart`)
 		if R and R:IsA(`BasePart`) then
 			local V = flat(R.AssemblyLinearVelocity)
-			local Last = Recent[Pl]
-			if not Last or V.Magnitude >= Last.Speed or Now - Last.At > RAM_MEMORY then
-				Recent[Pl] = { Speed = V.Magnitude; At = Now; Dir = if V.Magnitude > 1 then V.Unit else Vector3.zero }
-			end
+			local Dir = if V.Magnitude > 1 then V.Unit else Vector3.zero
+			keep(Recent, Pl, V.Magnitude, Dir, Now)
+			keep(Seen, Pl, V.Magnitude, Dir, Now)
 		end
 	end
 end)
-Players.PlayerRemoving:Connect(function(Pl) Recent[Pl] = nil end)
+Players.PlayerRemoving:Connect(function(Pl) Recent[Pl] = nil Seen[Pl] = nil end)
+
+-- (contact feel) the top speed the server itself saw this player move at over the last RAM_MEMORY seconds
+function Nudges.TopSpeed(Pl: Player): number
+	local S = Seen[Pl]
+	return if S and os.clock() - S.At <= RAM_MEMORY then S.Speed else 0
+end
+
+-- (contact feel) a bump the player's client felt (already checked by Features.ContactFeel): remember how hard
+function Nudges.Remember(Pl: Player, Speed: number, Dir: Vector3)
+	local D = flat(Dir)
+	keep(Recent, Pl, Speed, if D.Magnitude > 0.1 then D.Unit else Vector3.zero, os.clock())
+end
 
 local function lookAt(S, P: Vector3, Seconds: number)
 	S.Model:SetAttribute(`NHLookAt`, P)
@@ -215,21 +243,35 @@ end
 
 -- set by the brain (StudentBrain): called once a shoved student has turned to look back, to say their line
 Nudges.OnShove = nil :: ((any, any) -> ())?
+-- (contact feel) set by the brain: called the moment contact is made, with the kind, the hit's speed and whether
+-- it's a shove (to say the bump line then, not on the approach)
+Nudges.OnContact = nil :: ((any, any, string, number, boolean) -> ())?
 
--- Brain.OnBump: true when the nudge handled it (the brain skips its step aside)
+-- Brain.OnBump: true when the nudge handled it (the brain skips its step aside). Kind: "MakeWay", "Space", or
+-- "Contact" (a bump the player's client reported: react now)
 function Nudges.Handle(S, Rec, Kind: string): boolean
 	if S.Seated or not (S.Model and S.Hum and S.Root and Rec) then return false end
-	if os.clock() < (S.NudgeReady or 0) then return false end
+	if os.clock() < (S.NudgeReady or 0) or S.NudgeWaiting then return false end
 	if not (idOf(`Nudge_Left`) and idOf(`Nudge_Right`) and idOf(`Shove_Forward`)) then return false end
 	local R = rootOf(Rec)
 	if not R then return false end
-	-- wait for the brush itself (Space: they're already on top of us)
-	local Until = os.clock() + (if Kind == `Space` then 0 else WAIT_CONTACT)
-	local Reach = if Kind == `Space` then CROWD_CONTACT else CONTACT
+	-- wait for the brush itself (Space: they're already on top of us; Contact: it happened)
+	local Until = os.clock() + (if Kind == `MakeWay` then WAIT_CONTACT else 0)
+	local Reach = if Kind == `Space` then CROWD_CONTACT elseif Kind == `Contact` then math.huge else CONTACT
 	local Dist = flat(R.Position - S.Root.Position).Magnitude
-	while Dist > Reach do
-		if os.clock() > Until or not (R.Parent and S.Root.Parent) then return true end -- no brush: carry on walking
+	S.NudgeWaiting = true
+	S.NudgeHit = nil
+	while Dist > Reach and not S.NudgeHit do
+		if os.clock() > Until or not (R.Parent and S.Root.Parent) then S.NudgeWaiting = nil return true end -- no brush: carry on walking
 		RunService.Heartbeat:Wait()
+		Dist = flat(R.Position - S.Root.Position).Magnitude
+	end
+	S.NudgeWaiting = nil
+	-- a reported bump ended the wait (Brain.Contact): it's who actually hit us
+	local Hit = S.NudgeHit
+	S.NudgeHit = nil
+	if Hit and rootOf(Hit) then
+		Rec, R = Hit, rootOf(Hit) :: BasePart
 		Dist = flat(R.Position - S.Root.Position).Magnitude
 	end
 	S.NudgeReady = os.clock() + COOLDOWN + 2
@@ -244,12 +286,16 @@ function Nudges.Handle(S, Rec, Kind: string): boolean
 	local Speed = math.max(V.Magnitude, Rec.Speed or 0, if Ram then Ram.Speed else 0)
 	local Push = if V.Magnitude > 2 then V.Unit elseif Ram and Ram.Dir.Magnitude > 0 then Ram.Dir else Away
 	local Behind = Overlap or Away:Dot(Look) > -0.3 -- the passer is behind or beside us
-	local Room = if Speed >= SHOVE_SPEED and Push:Dot(Look) > 0.35 and Behind then room(S, Push, CARRY + FOLD_REACH + 1) else 0
+	local Room = if Speed >= SHOVE_SPEED and Push:Dot(Look) > 0.35 and Behind then room(S, Push, CARRY * CARRY_SCALE + FOLD_REACH + 1) else 0
+	local Shove = Room >= FOLD_REACH + 0.4
+	-- (contact feel) the faster the hit, the further the carry (still short of what's ahead)
+	local Carry = math.min(CARRY * math.clamp(Speed / SHOVE_SPEED, 1, CARRY_SCALE), Room - FOLD_REACH)
 	if Studio then
-		S.Model:SetAttribute(`NHNudgeWhy`, string.format(`%s: speed %.0f, push.look %.2f, behind %s, room %.1f, dist %.1f`, Kind, Speed, Push:Dot(Look), tostring(Behind), Room, Dist))
+		S.Model:SetAttribute(`NHNudgeWhy`, string.format(`%s: speed %.0f, push.look %.2f, behind %s, room %.1f, dist %.1f, carry %.1f`, Kind, Speed, Push:Dot(Look), tostring(Behind), Room, Dist, if Shove then Carry else 0))
 	end
-	if Room >= FOLD_REACH + 0.4 then
-		shove(S, Rec, Push, math.min(CARRY, Room - FOLD_REACH))
+	if Nudges.OnContact then task.spawn(Nudges.OnContact, S, Rec, Kind, Speed, Shove) end
+	if Shove then
+		shove(S, Rec, Push, Carry)
 	else -- a brush, or a shove with a wall right ahead (no room to fold forward): the twist
 		side(S, Rec, R.Position)
 		-- someone standing on top of us: still back off afterwards, as the brain did

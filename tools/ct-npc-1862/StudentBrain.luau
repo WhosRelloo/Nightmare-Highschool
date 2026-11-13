@@ -24,6 +24,8 @@
 	  Brain.LeanOnWall(S, Walk?)     lean only with a wall right behind (Walk: may step up to 9 studs to one) -> ok
 	  Brain.Urgent(S) -> string?     the reaction due now, if any
 	  Brain.OnBump                   nil, or function(S, Rec, Kind) -> handled  (see the hook in React.MakeWay / Space)
+	  Brain.Contact(Pl, Model, Speed, Dir) -> reacted   a bump Pl's client felt (contact feel: Features.ContactFeel
+	                                 checked it): the student reacts now, even if Senses never flagged an approach
 ]]
 
 local CollectionService = game:GetService(`CollectionService`)
@@ -112,6 +114,18 @@ end
 -- a shove (Nudges) gets its own line once the student turns to look at who did it
 NudgeMod.OnShove = function(S, Rec)
 	sayMatrix(S, `Shoved`, Rec and Rec.Player, nil, 0, Lines.MakeWay)
+end
+
+-- (contact feel) the bump line lands at the moment of contact, not on the approach: a sprinter's hit always gets the
+-- Sprint line, a brush the Bump line 60% of the time (as MakeWay did). Space already said its Crowded line, and a
+-- shove says Shoved once the student has turned round.
+NudgeMod.OnContact = function(S, Rec, Kind, Speed, Shove)
+	if Kind == `Space` or Shove then return end
+	if (Speed or 0) > 18 then
+		say(S, Lines.Sprint, 10)
+	elseif math.random() < 0.6 then
+		sayMatrix(S, `Bump`, Rec and Rec.Player, nil, 10, Lines.MakeWay)
+	end
 end
 
 -- what a student remembers about each player: how often they've met, when they last said hi, when they saw them fight
@@ -355,9 +369,7 @@ function React.MakeWay(S, Snap)
 	if not (Rec and Rec.Pos) then return end
 	mood(S, `Wary`, 3)
 	lookAt(S, headOf(Rec), 1.5)
-	if math.random() < 0.6 then
-		if (Rec.Speed or 0) > 18 then say(S, Lines.Sprint, 10) else sayMatrix(S, `Bump`, Rec.Player, nil, 10, Lines.MakeWay) end
-	end
+	-- (contact feel) no line here any more: it comes at the moment of contact (NudgeMod.OnContact)
 	-- the bump hook (nudges): a handler that plays its own reaction and moves the student replaces the step aside
 	if Brain.OnBump then
 		local Ok, Handled = pcall(Brain.OnBump, S, Rec, `MakeWay`)
@@ -811,6 +823,34 @@ function Brain.Attach(S)
 	S.Senses = Senses.Perceiver(M, { Bravery = S.Bravery or 0.5; ViewRange = 60 + (S.Social or 0.5) * 20 })
 	S.Reacting, S.Chatting, S.Idling, S.Leaning, S.Replan, S.Pending = false, false, false, false, false, nil
 	task.spawn(loop, S, M)
+end
+
+-- (contact feel) a bump the player's client felt and Features.ContactFeel checked (Model is a live student, the player
+-- is next to it, Speed is no more than the server saw them move). The impact goes into the nudges' ram memory; then
+-- the student reacts now, unless they're seated, fleeing or busy with another reaction. If a MakeWay is already
+-- waiting for this brush, the report ends the wait and that handler reacts.
+function Brain.Contact(Pl: Player, Model: Model, Speed: number, Dir: Vector3): boolean
+	local S = nil
+	for _, X in (Host and Host.Students and Host.Students()) or {} do
+		if X.Model == Model then S = X break end
+	end
+	if not (S and S.Root and S.Model) then return false end
+	NudgeMod.Remember(Pl, Speed, Dir)
+	local Root = Pl.Character and Pl.Character:FindFirstChild(`HumanoidRootPart`)
+	if not (Root and Root:IsA(`BasePart`)) then return false end
+	local Rec = { Player = Pl; Root = Root; Pos = Root.Position; Speed = Speed;
+		Dist = (Root.Position - S.Root.Position).Magnitude }
+	if S.Seated then return false end
+	if S.NudgeWaiting then S.NudgeHit = Rec return true end
+	if S.Reacting or os.clock() < (S.NudgeReady or 0) then return false end
+	S.Reacting = true -- the walk (Brain.GoTo) and the loop's reactions wait, as for MakeWay
+	task.spawn(function()
+		mood(S, `Wary`, 3)
+		local Ok, Err = pcall(NudgeMod.Handle, S, Rec, `Contact`)
+		if not Ok then warn(`[StudentBrain] Contact: {Err}`) end
+		S.Reacting = false
+	end)
+	return true
 end
 
 function Brain.Detach(S)
