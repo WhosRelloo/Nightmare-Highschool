@@ -1,0 +1,12 @@
+[
+  {
+    "file_path": "game.StarterPlayer.StarterPlayerScripts.Controllers.StateController.Misc.Equip",
+    "old_string": "\t\tif Humanoid.MoveDirection.Magnitude > 0 then\n\t\t\tlocal WalkSpeed = Humanoid.WalkSpeed\n\t\t\tHumanoid.WalkSpeed = 0\n\n\t\t\ttask.delay(.01, function() Humanoid.WalkSpeed = WalkSpeed end)\n\t\tend",
+    "new_string": "\t\t-- re-kick the walk track: speed 0 for a frame, then the real speed back. (1.97.1) Shared with AnimationController\n\t\t-- through the NHKickSpeed attribute: a second kick in the same frame used to read the first one's 0 and put 0\n\t\t-- back (frozen until sprint). Only the first kick zeroes; the restore only applies if the speed is still 0.\n\t\tif Humanoid.MoveDirection.Magnitude > 0 and Humanoid:GetAttribute(`NHKickSpeed`) == nil then\n\t\t\tHumanoid:SetAttribute(`NHKickSpeed`, Humanoid.WalkSpeed)\n\t\t\tHumanoid.WalkSpeed = 0\n\n\t\t\ttask.delay(.01, function()\n\t\t\t\tlocal Back = Humanoid:GetAttribute(`NHKickSpeed`)\n\t\t\t\tHumanoid:SetAttribute(`NHKickSpeed`, nil)\n\t\t\t\tif Back and Humanoid.WalkSpeed == 0 then Humanoid.WalkSpeed = Back end\n\t\t\tend)\n\t\tend"
+  },
+  {
+    "file_path": "game.StarterPlayer.StarterPlayerScripts.Controllers.Character.AnimationController",
+    "old_string": "\t\t\tif Humanoid.MoveDirection.Magnitude > 0 then\n\t\t\t\tlocal WalkSpeed = Humanoid.WalkSpeed\n\t\t\t\tHumanoid.WalkSpeed = 0\n\n\t\t\t\ttask.delay(.01, function() Humanoid.WalkSpeed = WalkSpeed end)\n\t\t\tend",
+    "new_string": "\t\t\t-- re-kick the walk track (see Misc.Equip, 1.97.1): shared NHKickSpeed so two kicks at once never put a 0 back\n\t\t\tif Humanoid.MoveDirection.Magnitude > 0 and Humanoid:GetAttribute(`NHKickSpeed`) == nil then\n\t\t\t\tHumanoid:SetAttribute(`NHKickSpeed`, Humanoid.WalkSpeed)\n\t\t\t\tHumanoid.WalkSpeed = 0\n\n\t\t\t\ttask.delay(.01, function()\n\t\t\t\t\tlocal Back = Humanoid:GetAttribute(`NHKickSpeed`)\n\t\t\t\t\tHumanoid:SetAttribute(`NHKickSpeed`, nil)\n\t\t\t\t\tif Back and Humanoid.WalkSpeed == 0 then Humanoid.WalkSpeed = Back end\n\t\t\t\tend)\n\t\t\tend"
+  }
+]

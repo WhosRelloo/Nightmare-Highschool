@@ -2,6 +2,23 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.97.1] - 2026-11-12: Equipping while walking no longer freezes you
+
+### Fixed
+- **Pressing E (equip) while walking could leave you frozen until you pressed sprint.**
+  - **The cause:** `Controllers.StateController.Misc.Equip` and `Controllers.Character.AnimationController` both
+    re-kick the walk animation by setting WalkSpeed to 0 for a frame and putting back the speed they read. When both
+    ran in the same frame, the second read the first's 0 and put 0 back.
+  - **The fix:** they now share one kick through the humanoid attribute `NHKickSpeed`. Only the first kick zeroes the
+    speed, and the speed is restored only if it is still 0, so a new speed set by the game in that frame is kept.
+  - The edits are recorded in `tools/equip-speed-fix/patches.json`.
+
+### Tested
+- Play test on slot 4 (Testy).
+- **Walking, E four times:** each press zeroed WalkSpeed once and restored 14.40.
+- **Sprinting, E three times:** every press restored the current speed, ending on the server's 12.
+- No script errors.
+
 ## [1.97.0] - 2026-11-12: Bumping into students has weight
 
 Owner: "I want the NPC's to actually FEEL like im touching them, especially when I bump into them. I want it to have
