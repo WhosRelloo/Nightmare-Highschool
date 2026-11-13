@@ -2,6 +2,112 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.1.3] - 2026-11-12: No box hairs, skin by race, a working colour wheel and options, faster loading
+
+Owner: "Delete the box hairstyles that the ai automatically made, and also remove claude off of the credits section. Also
+fix the color wheel, options, and speed up data loading time." On the hair colour: "Yes turn it on, but people should only
+be able to choose certain skin tones, especially dependant on their race. Make sure the main menu, etc. shows it in real
+time." Wraith skin: the owner picked a Wraith shadow palette. Details and screenshots: `docs/Hair-Skin-Options-Loading.md`.
+
+### Removed (NH Combat Test and the Map)
+- **The box hairstyles** Neat Crop, Fringe, Long and Bun: hairs built out of blocks by `UI.Appearance`'s `hair()`. The
+  builder is gone, and `Appearance.HairStyles` is `{ "None" }`. The Wardrobe's Hairstyle row is one "None (bald)"
+  button above the barber's book (35 real hairs, unchanged).
+  - **Saves aren't touched.** A look that wore a box hair (or never set a hair: the old default was Fringe) is read
+    with a real hair (`Appearance.BoxHairFallback`, in `Sanitize`):
+    - Neat Crop → Short Crop.
+    - Fringe → Emo Fringe (male) / Layered Fringe (female).
+    - Long → Long Messy / Super Long Straight.
+    - Bun → Man Bun / Side Bun.
+  - The next save writes `Hair = "None"` with that hair's id. A chosen "None" stays bald, and "use my Roblox outfit"
+    keeps the avatar's own hair. The old names stay in `LEGACY_ORDER`, so old number saves still read.
+  - New students start with a real hair.
+  - NPC looks already used real hairs.
+- **Claude from the credits** (`Config.MainMenu.Credits`): "Game" and "Map" are left.
+
+### Changed
+- **Skin is limited to your race's tones** (owner).
+  - Vampire and Ghoul keep their palettes. Wraith gets a new shadow palette in `Lineage`: black, charcoals, ash greys and
+    a pale grey (Rello's black skin stays).
+  - Every other race (Human, Priest, Werewolf) picks from 12 natural tones (`Appearance.NaturalSkins`, which include
+    the six old presets).
+  - The skin colour wheel is gone; the Look tab shows the tones as swatches.
+  - Enforced in two places. The server's Set handler snaps a sent colour to the nearest allowed tone
+    (`Appearance.AllowedSkin`). `ApplyTo` does the same when drawing, so the menu's slot students, the creator and the
+    character all show the allowed tone live, and old saves with odd colours show the nearest tone.
+  - The swatches follow your race when it changes.
+- **Picking a hair colour turns "Recolour catalog hair" on** (owner). Every hair is a catalogue hair now, and with
+  Recolour off (the default) the hair colour swatches and wheel did nothing visible.
+
+### Fixed
+- **The colour wheel gave near-black colours from a dark start.** Picking red on the black hair preset gave `#180303`,
+  because the wheel only lifted brightness below 5% and that preset is 9%. It now lifts anything under 30% to 85%
+  (`Components.ColorPicker`). After: `#D94645`.
+- **Options: settings changed from the main menu were thrown away.** Before a slot loads, the server has no profile to
+  save to, and `Settings.Load` then replaced them with the slot's saved settings. They're now kept, the panel says
+  "Kept: saves when you pick a slot", and they're saved into the slot when it loads (`UI.Settings`).
+- **Options: Show HUD, Show Clock and Screen Vignette came back on after the main menu.** The menu hides every screen,
+  then put back the state from before it, which was older than the saved settings. `MainMenu.HideHud(false)` now
+  re-applies those three settings.
+
+### Faster loading (Studio Play, slot 4)
+| Step | Before | After |
+|---|---|---|
+| Loading screen | 21.5 to 27 s (preloaded 953 assets) | 13.5 to 14.5 s (85 menu assets; the other ~900 finish in the background about 10 s later) |
+| Slot list, when the menu asks | 1.04 s (4 reads, one after another) | 0.07 s (read at join, side by side) |
+| Look after spawning (any spawn) | 6.1 s | 1.4 to 1.6 s |
+| Look after Enter School | 7.70 s | 2.23 s |
+- **The look waited 6 s on every spawn.** `Appearance.onCharacter` waited for `HasAppearanceLoaded`, which never turns
+  true with the StarterCharacter. It now waits for the avatar's own pieces to settle, 1.5 s at most. `guardLate`
+  already handles anything that arrives later; no doubled shirts were seen.
+- **The slot list** (`Services.Player.Slots`):
+  - It reads the slots side by side.
+  - It's read when you join, behind the loading screen, and kept for 60 s until you pick a slot.
+  - A second ask waits for the read already running.
+- **The loading screen** (`ReplicatedFirst.NHLoadingScreen`):
+  - It holds only for what the menu shows first: the menu scene, the interface, the sky and the menu textures.
+  - The school, ReplicatedStorage, materials and sounds preload in the background, two batches at a time.
+  - New player attributes: `NHLoadStats` (now with the preload time) and `NHLoadRest`.
+  - The 6 s title-card minimum is unchanged.
+- Choosing a slot is mostly ProfileService's `LoadProfileAsync` (about 1.1 s in Studio). It is unchanged, along with
+  every save rule.
+
+### Map
+- Ported:
+  - `Components`, `Settings`, `SettingsMenu`, `Lineage` and `Config.MainMenu` are byte-identical to NH Combat Test.
+  - `UI.Appearance` and the Wardrobe got the same edits on top of their Map lines (`NHAnywhereWardrobe` ×2, the
+    Bloodline tab).
+- The Map has no main menu, slot service or loading screen.
+- Backups: CT `ServerStorage.NH_Backup.*_pre213`; Map `ServerStorage.NHCore.Backups.*_pre213`.
+
+### Tested
+- NH Combat Test, Studio Play, slot 4 (Testy). `SlotCount = 4` and `NHTestNoMenuKeys` for the test; both put back.
+- **Hairs:**
+  - `Sanitize` on every case: each box name, legacy numbers 1/3/5, female bodies, a chosen "None", a catalogue hair,
+    avatar mode, `{}` and nil.
+  - Live: a look sent through the real Set remote with "Bun" and no hair id came back wearing Side Bun.
+  - The Hair tab shows only "None (bald)" and the barber's book.
+- **Skin:**
+  - Testy's saved magenta showed as the nearest natural tone.
+  - Clicking a tone recoloured the character at once.
+  - In the slot picker, Rello (Wraith) stayed `#000000`, Raiyon (Vampire) is unchanged, and Ren (Werewolf, Nightborn)
+    moved a shade.
+- **Colour wheel:** black preset, then drag to red gave `#D94645`; Recolour turned On and the hair went red.
+- **Options:**
+  - Show Clock turned off in the main menu before picking a slot.
+  - It was still off after the slot loaded, after Enter School, and after a full rejoin.
+  - Show HUD stayed on. Turning the clock back on in school saved.
+- **Credits:** the panel shows Game and Map.
+- **The Map:** in Play, the skin swatches, the hair row and the hair colour wheel all work, and the look came 1.44 s
+  after spawning.
+- No script errors in either place.
+- Testy was put back: skin `#D8B492`, Super Long Straight hair, no tint, clock on.
+- **Not tested:**
+  - A real Wraith or Vampire in the Wardrobe (Testy is Human); their palettes were seen only on the slot picker's
+    copies.
+  - Touch and controller input on the colour wheel.
+  - Live-server load times; Studio's DataStore and asset cache differ from a live server.
+
 ## [2.1.2] - 2026-11-12: The pad keeps its combat buttons while you're chilled
 
 ### Fixed (NH Combat Test and the Map)

@@ -164,6 +164,7 @@ local root, api = Components.Toggle({ label = "Subtitles", value = true,
 **ColorPicker{value?, onChanged(c), onReleased(c), presets?}**
 - A hue/saturation wheel (`Theme.Images.ColorWheel`), a brightness bar, a live swatch, a **HEX** box (`#RRGGBB`, invalid input reverts) and optional preset chips.
 - Mouse and touch drag. `onChanged` fires while dragging, `onReleased` on let-go, preset or HEX.
+- (2.1.3) Touching the wheel while the colour is darker than 30% lifts the brightness to 85%, so a hue picked from black shows. The bar still darkens it.
 - api: `:Set(color, silent?)`, `:Get()`. The root's `Value` attribute holds the colour.
 
 **SpinReel{entry?, height?, textSize?}**
@@ -387,9 +388,9 @@ What each setting changes:
 
 | Tab | What you set |
 |---|---|
-| Look | Look style (Scholar / Chapel / Nightborn) and skin: 6 presets plus a colour wheel / HEX |
+| Look | Look style (Scholar / Chapel / Nightborn) and skin: since 2.1.3 only your race's tones as swatches (12 natural tones; Vampire, Ghoul and Wraith have their own palettes), no colour wheel (docs/Hair-Skin-Options-Loading.md) |
 | Face | Eye shape (Roblox face, Sharp, Hooded, Fierce, Doe, Sleepless, Cat, Gentle, Calm), eye set (Male / Female), eye colour (7 presets plus wheel / HEX; Nightborn is always crimson), brows (None plus 11 styles, including the thick Bold, Heavy and Bushy; "Match hair" or a custom colour) and mouth (None plus 20 anime mouths, frowns included, "Fuller lips") |
-| Hair | Built hairstyle (Neat Crop / Fringe / Long / Bun / None), catalog hair by ID, "Recolour catalog hair", and hair colour (presets plus wheel / HEX). Hair is fitted for the player's 0.9-scale head (1.8 × 0.9 × 0.9) and scaled by the head it goes on (`Appearance.HeadScale`, 1.18.4). The NPC rig's head is full size, so NPC hair used to sit too small: the head showed through and fringes sat on the face. Players are unchanged (×1). Since 1.19.0 the NPC rig is the player's size, and `wearCatalogHair` undoes the rescale `AddAccessory` applies on scaled NPC rigs, so NPC hair matches a player's exactly. NPC clothing follows a dress code (`Appearance.DressCode`; see School-Simulation). |
+| Hair | None (bald) or a hair from the barber's book (the box hairstyles were removed in 2.1.3), catalog hair by ID, "Recolour catalog hair" (turned on by picking a hair colour, 2.1.3), and hair colour (presets plus wheel / HEX). Hair is fitted for the player's 0.9-scale head (1.8 × 0.9 × 0.9) and scaled by the head it goes on (`Appearance.HeadScale`, 1.18.4). The NPC rig's head is full size, so NPC hair used to sit too small: the head showed through and fringes sat on the face. Players are unchanged (×1). Since 1.19.0 the NPC rig is the player's size, and `wearCatalogHair` undoes the rescale `AddAccessory` applies on scaled NPC rigs, so NPC hair matches a player's exactly. NPC clothing follows a dress code (`Appearance.DressCode`; see School-Simulation). |
 | Outfit | "Use my Roblox outfit"; Top: 24 options (the 4 official group shirts, 14 uniform variants, 6 civilian); Bottoms: 13 options (uniform trousers, jeans, slacks, khakis, shorts, skirts, civilian) |
 | Lineage | The server-rolled race and variant (spin reel), race and variant odds, 2 trait slots with rerolls |
 
