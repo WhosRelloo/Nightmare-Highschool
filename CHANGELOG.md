@@ -2,6 +2,60 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.9.0] - 2026-11-13: Combat feel: counter-hits, hits that react to where they land, heavy tells, and a combo counter
+
+Owner: "Feel set 1-4", concepts 1 to 4 in `docs/Combat-Audit-and-Concepts.md`. The live scripts are mirrored in
+`tools/combat-feel-290/`; the scripts as they were before are in `ServerStorage.NH_Backup.FeelSet_pre_20261113`.
+
+### Added
+- **Counter-hits.** Hit someone before their own swing reaches its hit frame and it's a counter:
+  - **Stun:** 1.5x the usual stun.
+  - **Hit-stop:** a longer hold, 0.1 s.
+  - **Flash and sound:** a white flash on them (skipped under Reduce Flashing), and the Critical sound pitched up.
+  - **Readout:** "COUNTER" over your combo count.
+
+  Each swing marks its own wind-up as it starts (`NHWindupUntil`, set by `Combat.M1`, `Running M1`, `Uppercut` and
+  `M2.Fist`). `DamageLogic.TakeAction` reads it.
+- **Hits react to where they land.** The four existing hit clips, measured from their keyframes, are now picked by side
+  (`DamageLogic`, `Local.HitReact`):
+  - **From the front:** a head snap, then a body blow, alternating sides.
+  - **From behind:** doubled over forward.
+  - **From the right / left:** knocked the other way.
+
+  Before, they just cycled. No new animations were needed.
+- **The uppercut has a tell.** It now plays the heavy's critical flash and sound as it winds up, so a defender can read
+  the launcher coming.
+- **Combo counter:** a gold numeral and a spaced "H I T S" at the right edge while your string lands. It appears from
+  the 2nd hit and fades 1.6 s after the last.
+- **Damage numbers:** these float over what you hit: gold on heavy hits, crimson on counters. Off by default.
+- **Settings:** the counter and the numbers have toggles under Settings > Interface > Combat (`ComboCounter`,
+  `DamageNumbers`).
+
+### Tested (NH Combat Test, slot 4 Testy on Fists, at 11 PM so the monitors were off duty)
+- **Direction (server, hitting the Inf Dummy from each side):** front gave clips 3 then 1, back 1 then 2, right 3 then
+  1, left 4 then 2.
+- **Counter (timed into the Attacking dummy's own string):**
+  - **Timing:** its swing started 0.24 s after Testy's, so Testy's hit landed in its wind-up.
+  - **Stun:** 1.31 s, against 0.87 s for a normal hit on the Inf Dummy.
+  - **Client:** the white flash on it, and "COUNTER" on Testy's readout.
+  - **The normal hit:** no flash.
+- **Combo counter (real clicks):** read "2", then "3", then faded. In the first build it sat behind the quest tracker,
+  so it was moved lower; the move was checked by screenshot.
+- **Damage numbers:**
+  - Turned on through the real Settings menu (the new Combat section fits the Interface tab).
+  - Two hits made two "3"s; one was measured on screen above the dummy's head, opaque, in the theme font.
+  - Turned back off afterwards.
+- **Uppercut:** the Heavy tell played as it started, and its wind-up window was 0.36 s.
+- **Console:** no script errors.
+- **Restored:** `SlotCount` back to 3 and `NHTestNoMenuKeys` cleared.
+
+### Not tested
+- **Hit reactions by eye:** how the directional reactions look in motion.
+- **The counter sound:** not heard.
+- **Other viewers:** a second player seeing the flash.
+- **Input devices:** gamepad and touch.
+- **The Map:** not ported (nor is 2.8.0).
+
 ## [2.8.1] - 2026-11-13: A record with teeth: Probation and Suspension now change how school treats you
 
 Owner: "Build concept 1" (concept 1 of the Delinquent audit, `docs/Delinquent-System-Audit.md`). Until now the

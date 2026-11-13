@@ -85,6 +85,22 @@ armory, cliques, duels and the hall monitors.
 
 ### A. Feel and readability
 
+**Built in 2.9.0 (the owner picked "Feel set 1-4"):** concepts 1 to 4, as described below, with these details:
+- **Counter-hits:** a counter is a hit that lands before the target's own swing reaches its hit frame. Each swing (M1,
+  the running straight, the uppercut and the Fist heavy) sets `NHWindupUntil` as it starts. A counter stuns 1.5x
+  (measured 1.31 s against 0.87 s), holds the hit-stop 0.1 s, flashes the target white (skipped under Reduce
+  Flashing), plays the Critical sound pitched up, and shows "COUNTER" over the attacker's combo count.
+- **Directional reactions:** the four existing hit clips were measured from their keyframes and picked by side. Clips
+  1 and 2 double over forward; 3 and 4 snap the head back to the left or right. From the front the hits alternate
+  3, 1, 4, 2 (head, body, head, body); from behind 1 and 2; from the right 3 and 1; from the left 4 and 2. No new
+  animations were needed.
+- **Heavy tells:** the uppercut now plays the M2's critical tell (the Heavy flash and the Critical sound) as it winds
+  up. The running straight is too quick for a tell to help.
+- **Combo counter and damage numbers:** text only, in the kit's title font. The counter is a gold numeral over a
+  spaced "H I T S" at the right edge (60% down, clear of the quest tracker). It appears from the 2nd hit and fades
+  1.6 s after the last. Damage numbers float up over what you hit and are off by default. Both are toggles in
+  Settings > Interface > Combat.
+
 1. **Counter-hits (S).** A hit that lands while the target is winding up their own swing is a counter-hit:
    - **Effect:** +50% stun, a bigger hit-stop, a white flash ring and a distinct sound.
    - **Why:** it rewards reading, not mashing. It's the most important skill signal in fighting games.
@@ -162,7 +178,7 @@ armory, cliques, duels and the hall monitors.
 
 | Order | Concepts | Why |
 |---|---|---|
-| 1 | 1, 2, 3, 4 | Read the fight better; all small. |
+| 1 | 1, 2, 3, 4 | Read the fight better; all small. **Built in 2.9.0.** |
 | 2 | 6, 9, 8 | The fist moveset gets depth with what exists. |
 | 3 | 12 | The biggest smoothness gain left, but large. |
 | 4 | 15, 16 | Fists become a path, not a starter. |
