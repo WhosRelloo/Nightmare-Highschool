@@ -2,6 +2,59 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.8.1] - 2026-11-13: A record with teeth: Probation and Suspension now change how school treats you
+
+Owner: "Build concept 1" (concept 1 of the Delinquent audit, `docs/Delinquent-System-Audit.md`). Until now the
+`DisciplineLevel` and `Suspended` attributes were read by nothing. Details: `docs/Attendance-and-Discipline.md`.
+
+### Added
+- **Probation: the monitor knows your face.**
+  - A hall monitor recognises a fight (or paint) at 40 studs instead of 25, and books it on the spot instead of coming
+    to investigate (`School.HallMonitor.RecognizeRange`).
+  - Hall passes are void: "The Office voided your pass while you're on Probation." No punch is used
+    (`Features.Kit.ShowPass`).
+- **Suspension: stay off campus during class.**
+  - During a class period, a monitor that sees a suspended student inside the school chases them for Trespassing
+    (+3, held over the suspension as in 2.7.3). Leaving campus ends the chase: "And stay out."
+  - "Campus" means any `Config.Regions` place of Kind `School`, or `workspace.School`'s rooms and halls. In NH Combat
+    Test the region boxes sit above the greybox school.
+  - The 40-stud recognition applies too.
+  - The HUD reads "Suspended: stay off campus (Bruno has work at the Back Lot)". The level toast says the same.
+- **Bruno's work for suspended students.** Two daily quests, gated by a new `Requires.Suspended`
+  (`Quests.CanStart`). They skip the clique dress code: Bruno takes any suspended kid.
+  - **Muscle for Hire:** win a scuffle or rumble for the Delinquents.
+  - **Day Off:** prank the Ordinary's Commons. That's on campus, so doing it in class time risks Trespassing.
+  - Each pays ¥25 and +8 Delinquents.
+- **Owed detentions are capped at 3** (`Config.Discipline.Record.MaxDetentionsOwed`). An admin can still add more, and
+  existing higher counts are kept.
+- **New config:** `Config.Discipline.Record` (`ProbationRecognizeRange`, `NoPassLevels`, `MaxDetentionsOwed`).
+
+### Tested (Play, slot 4 "Testy"; data and hotbar restored afterwards)
+- **Cap.** Climbing into Detention owing 1 gives 2, owing 2 gives 3, owing 3 stays 3, and Testy's existing 7 stays 7.
+- **Hall pass.** On Probation in class, showing it gave the void toast; punches stayed 2 and no pass timer was set.
+- **Recognition.**
+  - On Probation, a hit seen from 31 studs was booked at once (+4 Fighting).
+  - At Warning, a hit from 29 studs only sent the monitor to investigate (a chase, no points).
+- **Bruno's jobs.** At Warning, both are `Locked`. Once suspended, both are `Ok`.
+  - First run: `DressCode`. That's why they now skip the dress code.
+- **Trespassing.**
+  - Suspended in the hallway during class: spotted for Trespassing in 0.15 s. Leaving campus ended the chase, 0
+    points.
+  - Next period, staying put: caught, Trespassing by the Hall Monitor (16 → 19), `HeldPoints` 3.
+  - First run: no chase, because the region boxes don't cover NH Combat Test's greybox. The campus check now
+    includes the greybox rooms and halls.
+- **HUD (in class while suspended):** "History · Room 105 · Suspended: stay off campus (Bruno has work at the Back Lot)",
+  waypoint off.
+
+### Not tested
+- Two players.
+- Starting and finishing Bruno's two jobs end to end. Only the start check was run; they use the existing `Scuffle` and
+  `Prank` objectives.
+- The Map place: not ported. Its region boxes should cover its real building.
+
+Studio backups are in `ServerStorage.NH_Backup.*_RecordTeeth_pre`: ConfigDiscipline, Discipline, HallMonitor, Kit,
+Quests, ConfigQuests and ClockHud. NH Combat Test is saved (version 1068).
+
 ## [2.8.0] - 2026-11-13: Combat audit: fists that flow, contact you can feel, and parries that can't be mashed
 
 Owner: "Completely audit and analyze the combat system, especially for fists, and bugfix it and enhance it for a

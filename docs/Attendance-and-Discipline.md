@@ -265,3 +265,21 @@ See [Delinquent-System-Audit](Delinquent-System-Audit.md) for the whole audit.
   - The clock HUD shows "Suspended: stay out of class today" in orange, with no room marker.
 - **Hall monitor.** A monitor responding to a clique scuffle (`Respond`) no longer turns to chase a hit it sees on the
   way.
+
+## A record with teeth (2.8.1)
+
+Probation and Suspension now change how school treats you. Tuning is in `Config.Discipline.Record`.
+
+| Level | What changes |
+|---|---|
+| **Probation** | A hall monitor recognises your fights (and paint) from **40 studs** instead of 25, so it books them on the spot. **Hall passes are void**: the Office refuses them and no punch is used. |
+| **Suspension** | Everything Probation does. In addition, **stay off campus during class**: a monitor that sees you inside the school chases you for **Trespassing** (+3, held over the suspension), and leaving campus ends the chase. **Bruno has work** for you at the Back Lot. |
+
+- **Campus:** any `Config.Regions` place of Kind `School`, or `workspace.School`'s rooms (`R101`...) and halls
+  (`Hallway`...). The second test is needed in NH Combat Test, where the region boxes sit above the greybox school.
+- **Bruno's suspension jobs** (`Config.Quests`, `Requires = { Suspended = true }`). They are daily and skip the clique
+  dress code.
+  - **Muscle for Hire:** win a scuffle or rumble for the Delinquents.
+  - **Day Off:** prank the Ordinary's Commons. That's on campus, so doing it in class time risks Trespassing.
+  - Each pays ¥25 and +8 Delinquents.
+- **Owed detentions** stop growing at 3 (`MaxDetentionsOwed`). An admin can still add more.

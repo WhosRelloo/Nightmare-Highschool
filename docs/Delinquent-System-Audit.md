@@ -73,7 +73,7 @@ The full clique audit, with line numbers, is in `tools/delinquent-audit/clique-f
 
 Ranked by how much they add to the game for the effort. Effort: S is about a day, M is 2-4 days, L is a week or more.
 
-1. **A record with teeth (Probation and Suspension that matter).** Effort: M.
+1. **A record with teeth (Probation and Suspension that matter).** Effort: M. **Built in 2.8.1** (see `Attendance-and-Discipline.md`).
    - **Player:** on Probation, the hall monitor recognises you from 40 studs instead of 25, and hall passes are
      refused. On Suspension, you're barred from campus during class: the gates close, and being caught inside is
      Trespassing. Bruno's crew welcomes you at the Back Lot with "suspension jobs".

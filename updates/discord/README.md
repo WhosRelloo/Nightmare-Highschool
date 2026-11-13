@@ -11,6 +11,7 @@ Two kinds of post, matching the server's channels:
 - 2026-11-02, **The Living School** (1.10 to 1.11): [post](announcements/2026-11-02-the-living-school.md)
 
 ## Game updates
+- [2026-11-13-a-record-with-teeth](game-updates/2026-11-13-a-record-with-teeth.md)
 - [2026-11-13-delinquent-audit](game-updates/2026-11-13-delinquent-audit.md)
 - [2026-11-13-racial-grips-live](game-updates/2026-11-13-racial-grips-live.md)
 - [2026-11-13-racial-grips-heads](game-updates/2026-11-13-racial-grips-heads.md)
