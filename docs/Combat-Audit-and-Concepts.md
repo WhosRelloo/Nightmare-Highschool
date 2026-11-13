@@ -224,6 +224,13 @@ so it's gone.
 18. **A Heat meter (M).** Landing hits and parries fills Heat. Spend a full bar on an EX version of Z, X or C (more
     damage, armour on startup). It gives fights a second resource besides posture, and skilled play earns it.
 
+**Built in 2.14.0:** 16, 17 and 18 (15, fighting styles, is on hold by the owner's call).
+- **Hand gear (16):** wraps, gloves, and brass knuckles as contraband (¥250 / ¥500 / ¥800), sold on a Hand gear tab
+  at the armoury.
+- **Race 4th hit (17):** SIP, SMITE, MAUL, CHILL, ROT and STEADY.
+- **Heat (18):** +6 a hit, +12 a counter-hit, +10 a dodge, +20 a parry. A full bar holds 20 s. An EX is +30% damage
+  with an armoured 0.6 s wind-up. The meter is a small brazier on the health bar's right cap.
+
 ### E. Fights in the world
 
 19. **Crowds at fights (M).** Students gather in a ring around a fight and cheer, which draws the hall monitors faster.
@@ -243,7 +250,7 @@ so it's gone.
 | 1 | 1, 2, 3, 4 | Read the fight better; all small. **Built in 2.9.0** (5 in 2.11.0: all of A is done). |
 | 2 | 6, 9, 8 | The fist moveset gets depth with what exists. **Built in 2.10.0** (7, 10, 11 in 2.11.0: all of B is done). |
 | 3 | 12 | The biggest smoothness gain left, but large. **Built in 2.13.0** (with 13 and 14: all of C is done). |
-| 4 | 15, 16 | Fists become a path, not a starter. |
+| 4 | 15, 16 | Fists become a path, not a starter. **16 built in 2.14.0** (with 17 and 18; 15 on hold). |
 
 ## Your calls
 

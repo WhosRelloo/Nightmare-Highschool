@@ -2,6 +2,97 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.14.0] - 2026-11-13: Fist growth: hand gear, race-flavoured finishers, and the Heat meter
+
+Owner: "D (except fighting styles for now)", as designed and approved: concepts 16, 17 and 18 in
+`docs/Combat-Audit-and-Concepts.md`. The live scripts are mirrored in `tools/combat-2140/`, with the originals in `pre/`
+and `patches.py`. Studio backup: `ServerStorage.NH_Backup.CombatD_pre_20261113`.
+
+### Added
+- **Hand gear at the armory (16).** A new Hand gear tab in the armourer's window. You wear one piece at a time, it's
+  saved in `PlayerData.Armory.Gear`, and the effects only count with fists out.
+
+  | Gear | Price | Effect |
+  | --- | --- | --- |
+  | Hand Wraps | ¥250 | You take 10% less guard damage while blocking |
+  | Weighted Gloves | ¥500 | +20% guard damage dealt; your swings are 5% slower (client prediction matches) |
+  | Brass Knuckles | ¥800 | +15% fist damage, +10% guard damage, contraband |
+
+  - **Contraband:** a hall monitor who sees and recognises you fighting in brass knuckles takes them (they're gone
+    from your save) and books a new Contraband violation (3 points) on top of Fighting.
+  - **On your hands:** the worn piece is the character attribute `NHGear`, and its model is welded to both hands once
+    its mesh is uploaded.
+  - **Code:** `ServerStorage.Packages.HandGear`; `Config.Armory.Gear`; `Features.Armory` (the `Gear` remote: Buy,
+    Wear, Remove); `Gui.ArmoryUi`; `DamageLogic`; `Combat.M1`; `HallMonitor`; `Config.Discipline`.
+- **Race-flavoured 4th hit (17).** The last hit of a fist string carries your race: a tinted burst (a Crimson or Blue
+  moon recolours it), a tag on the combo readout, and one small effect. Sub-races use their race. No blood or gore.
+
+  | Race | Tag | Effect |
+  | --- | --- | --- |
+  | Vampire | SIP | You heal 25% of the damage |
+  | Priest | SMITE | +40 guard damage, against the unholy only (vampires, ghouls, werewolves, wraiths, the night's beasts) |
+  | Werewolf | MAUL | 35% harder knockback, +0.35 s stagger |
+  | Wraith | CHILL | They're slowed for 1.5 s |
+  | Ghoul | ROT | Their guard doesn't recover for 3 s |
+  | Human | STEADY | +20 guard damage |
+
+  - **Code:** `ServerStorage.Packages.RaceFists`, client `Misc.General."Race Fist"`, and `Features.Posture` for ROT.
+- **The Heat meter (18).** A second resource you earn by fighting well.
+  - **Filling it:** a landed hit +6, a counter-hit +12, a perfect dodge +10, a parry +20.
+  - **Draining:** it cools 5 a second after 6 s without a gain. A full bar holds for 20 s first.
+  - **EX skills:** a full bar makes your next Z / X / C skill an EX. That means +30% damage on its hits, an armoured
+    wind-up (hits hurt but don't stun or cancel it, 0.6 s), and a gold flare. Using it empties the bar.
+  - **The meter:** a small ember brazier on the health bar's right cap, mirroring the hunger reliquary on the left.
+    It's 44 px, dims when empty, its coals rise and flicker with sparks as it fills, it breathes when full, and it
+    flares when spent. Until the art is uploaded (`Config.HeatArt`) it draws a plain ember disc.
+  - **Code:** `ServerStorage.Packages.Heat`, `Gui.HeatMeter`, `Misc.General."Heat EX"`, `ActionManager` (the spend),
+    and `DamageLogic` (gains, EX damage, armour).
+- **Off switches:** ReplicatedStorage attributes `NHHeatOff` and `NHRaceFistsOff`.
+
+### Tested (NH Combat Test, slot 4 Testy, Human, on Fists, 11 PM, real mouse and keyboard)
+- **Heat:** four landed hits took it to 24. A full bar plus Z made ? Kick an EX:
+  - **The server:** logged EX, Heat went to 0, and the EX ended with the skill.
+  - **The client:** showed the gold flare on Testy and the spend ring on the meter.
+  - **The damage:** on a 1000-health dummy the EX did 16.1, which is 12 × 1.3 × 1.035 (Testy's progression bonus).
+    The same kick without EX did 12.4.
+- **Found and fixed:** a full bar melted below 100 a second or two later, so the EX was refused. A full bar now holds
+  for 20 s.
+- **Human 4th hit:** STEADY on the readout and +20 guard on the dummy.
+- **The other races,** checked by running the effect code with an NPC attacker (no player's race was changed):
+
+  | Race | Result |
+  | --- | --- |
+  | Vampire | SIP healed 2.5 of a 10 hit |
+  | Werewolf | MAUL knockback 60 → 81, stun 1.5 → 1.85 |
+  | Wraith | CHILL slowed the target |
+  | Ghoul | ROT set the guard-recovery hold |
+  | Priest | Nothing on a plain target; against a vampire, SMITE and +40 guard |
+
+- **Gear,** using the Studio test hook:
+  - **Weighted gloves:** the swing ran at 1.0925 (1.15 × 0.95), and guard damage on the Blocking dummy was 14 against
+    12 without them.
+  - **Brass knuckles:** a 3.6 hit (3.0 × 1.15 × 1.035).
+  - **Confiscation:** it took them off and out of the save. The armory's Hand gear tab then showed Buy ¥800 again
+    for the knuckles and Wear for the gloves.
+- **Console:** no new script errors on the server or client.
+- **Restored:** `SlotCount` back to 3 and `NHTestNoMenuKeys` cleared. Testy still owns the weighted gloves from the
+  test, not worn.
+
+### Not tested
+- **The hall monitor's confiscation:** only the confiscation itself was tested, through the test hook. A live monitor
+  seeing you fight during school hours would also book violations on the test slot, so that wasn't run.
+- **The EX armour:** that a hit during the wind-up doesn't cancel the skill. It needs a second attacker.
+- **The gear models and art:** they need the owner's uploads (below).
+- **The tab highlight:** the active tab's gold label was added after the last play session.
+
+### For the owner
+- **Upload** the art from `art/group-upload-fistgear/` to group 15981569:
+  - **Gear:** the three meshes and their textures go in `Config.Armory.Gear[...]`: `Mesh`, `Textures`, and `Offset`
+    if it isn't the default.
+  - **Icons:** `Icon`.
+  - **Heat meter:** Frame, Fill, Glow, Spark and Flare go in `Config.HeatArt`.
+- **Save** NH Combat Test.
+
 ## [2.13.0] - 2026-11-13: Combat tech: client-predicted swings, lag-compensated hits, and a combat log
 
 Owner: "Let's do Section C" (`docs/Combat-Audit-and-Concepts.md`, concepts 12 to 14). The live scripts are mirrored in
