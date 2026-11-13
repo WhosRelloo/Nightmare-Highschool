@@ -88,6 +88,32 @@ Props batch 54 ([[School-Props]]): every item the stand sells is modelled now, w
   - **Override:** `ReplicatedStorage`'s `NHLunchOpen` attribute still forces lunch open.
   - **The stand:** shows them under its Lunch tab, and under All while lunch is on.
 
+## The snack wheel (1.96.0)
+
+`Controllers.Gui.SnackWheel`, with art from `art/ui/hud/make_snack_wheel.py` (ids in the module's `ART`).
+
+- **Opening it:** hold G (0.3 s) or D-pad Right.
+  - A tap of G still introduces you; the wheel never opens while an "Introduce yourself" prompt shows.
+  - A tap of D-pad Right still steps the hotbar.
+  - It stays shut in matches and drills (`InSport`, `InDrill`), dialogues, lessons, the main menu, while dead or down,
+    or while typing.
+- **What it holds:** up to 12 snacks you carry, favourites first, then your pins. Sockets shrink to fit when there are
+  many.
+- **Using it:** aim with the mouse (its movement, so it works with shift-lock) or the right stick; let go to use the
+  snack. Right click or B cancels.
+- **The middle is Best food** (`Inventory.UseBest`, `NHInventory.UseBest`): the cheapest food covering your missing
+  health (half while tagged), otherwise your biggest heal.
+- **The look:** the Bell Wheel.
+  - The halo, the rays and the glows are white art tinted in code, and every frame of motion comes from one render loop.
+  - **Layers, back to front:** halo, rose window, rays, rune band and its glow, rim and its glow, embers, sockets
+    (glow, sigil, frame, lit frame, rarity ring, 3D view, cooldown, count), hub glow, hand, hub.
+- **Studio test hook:** `SnackWheel.NHSnackWheelTest:Invoke(cmd, n)`, with cmd one of:
+  - `Open`
+  - `Pick n` (0 = Best food)
+  - `Commit`
+  - `Cancel`
+  - `State`
+
 ## The stand's menu (1.92.0)
 
 - **Tabs:** All, Hot food, Snacks, Sweets, Drinks and Lunch. `Items.StandTabs` and `Items.Category` set them; anything

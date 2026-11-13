@@ -6,7 +6,9 @@
 silent refusals: the snack messages; the kit's messages are still to do). Batch 2 in 1.92.0 is concepts 18 to 22
 (the stand's tabs, Restock my pins, the quantity picker, dimming, and lunch from the timetable with its countdown).
 Batch 3 in 1.93.0 is concepts 11, 13 and 15 (sort and filter, favourites, drop how many with Undo); sorting by
-"newest" was left out because nothing records when you got an item. Everything else on this page is not built yet.
+"newest" was left out because nothing records when you got an item. Batch 4 in 1.96.0 is concepts 4 and 7: the snack
+wheel (held on G or D-pad Right, since Q and LB were taken) with the baked, animated Bell Wheel look, and Best food in
+its middle. Everything else on this page is not built yet.
 
 **The rule behind all of them:** less clicking, fewer surprises. A player should always know what they're carrying,
 what each thing will do, and why something didn't work.

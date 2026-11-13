@@ -2,6 +2,74 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [1.96.0] - 2026-11-12: The snack wheel (the Bell Wheel) and Best food
+
+Owner: batch 4 (concepts 4 and 7 in `docs/Inventory-QOL-Concepts.md`). On the key: "What about holding G?" On the look:
+"I want the wheel to have a completely original look, cool, on theme, and animated, with cool markers for each item",
+"Make the item box areas bigger", "And make it cooler and higher quality". The live scripts are mirrored in
+`tools/inventory-qol-196/`. The art is `art/ui/hud/make_snack_wheel.py`; the 16 pieces are uploaded under the group.
+
+### Added
+- **The snack wheel** (`Controllers.Gui.SnackWheel`, new):
+  - **Opening it:**
+    - Hold G (0.3 s), or hold D-pad Right on a gamepad.
+    - A tap of G still introduces you; the wheel never opens while an "Introduce yourself" prompt is on screen.
+    - It doesn't open in sports matches or drills, dialogues, lessons, the main menu, while dead or down, or while
+      typing.
+    - Q (Dodge) and LB (Feint) were taken.
+  - **The ring:** up to 12 of the snacks you carry, favourites first, then your pins.
+  - **Using it:** aim with the mouse or the right stick and let go to eat or drink. Right click or B cancels.
+- **Best food** (`Inventory.UseBest`, remote `NHInventory.UseBest`). Let go in the wheel's middle:
+  - it eats the cheapest food you carry that covers the health you're missing (heals count half while combat-tagged);
+  - if nothing covers it, it eats your biggest heal;
+  - at full health it says "You're not hurt.".
+- **The Bell Wheel look** (baked PBR, `make_snack_wheel.py`, 2x supersampled):
+  - **The ring:** a hammered iron ring with forged cusps, gilt beads and twelve gilt moon phases, and a brass band
+    engraved with a rose vine.
+  - **The rune band:** a band of inlaid runes that turns.
+  - **The rose window:** stained glass lit from behind.
+  - **The hub:** a brass hub lettered NIGHTMARE HIGH · REFECTORY · BEST FOOD, with a silver cloche.
+  - **The clock hand:** blued steel, with gilt filigree and a crescent tip.
+  - **The sockets:** big brass rose sockets with garnets and a finial, one per snack. Each holds the snack in 3D, a
+    ring in its rarity colour, a count pill, and its cooldown draining from the top.
+- **The animation** (one render loop, nothing tweened):
+  - **Opening:** the wheel springs up and the sockets fan out from the hub one by one.
+  - **Always moving:**
+    - a candle halo flickers;
+    - light shafts turn through the window;
+    - the rune band turns;
+    - the runes and moons breathe;
+    - embers drift off the rim.
+  - **Aiming:** the clock hand swings to what you aim at. That socket lifts, turns gilt and glows, with a gilt rune
+    ring spinning behind it. Aim at the hub and it glows instead.
+  - **Letting go:** the snack drops into the hub and the wheel folds shut.
+  - **The caption:** under the wheel, on the kit's ink plate.
+  - **Preloading:** the art loads when the game starts.
+- **`State.BuffReady`:** the drink cooldown, sent to the client for the wheel.
+
+### Tested (NH Combat Test, slot 4 Testy, entered through the real slot remotes)
+- **Opening:**
+  - Holding G for real opened the wheel; holding D-pad Right opened it too.
+  - A right click cancelled it without using anything.
+- **Best food:**
+  - With 45 health missing it ate the Melon Bread (+30, the biggest heal: nothing covered 45).
+  - At full health: "You're not hurt."
+- **Picking:**
+  - Ramune drank it (4 to 3, the Ramune buff).
+  - Mid-fold the socket was flying into the hub; the wheel then closed and the toast said "Ramune".
+  - The food sockets showed the cooldown draining with the seconds left.
+- **The art:**
+  - All 16 ids were Completed before they were used, and all loaded in Play.
+  - A screenshot shows the full wheel with the Prank Kit picked: the hand on it, its sigil spinning and its caption.
+- **The console:** no errors.
+- Testy's slot count and the test key attribute are restored.
+
+### Not tested
+- **Real analogue aiming:** with a mouse or a stick (picks were set through the test hook).
+- **Introduce prompt:** the wheel staying shut while an Introduce prompt shows (needs a second player).
+- **Phones and touch:** they have no way to open the wheel yet.
+- **Busy rings:** a wheel with all 12 sockets (the sockets shrink to fit).
+
 ## [1.95.0] - 2026-11-12: Lunch trays you eat down to the crumbs, and somewhere to take them back
 
 The owner asked for a tray return rack (they chose both a trolley and a wall hatch), then for "different variants of the
