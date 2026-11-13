@@ -2,6 +2,82 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.7.3] - 2026-11-13: Delinquent system audit: seven fixes to attendance, discipline, the hall monitor and the Delinquents
+
+Owner: "Look through everything on the game and everything you've learned." This is a full audit of the street crews,
+the Delinquents clique and the discipline ladder. Details, design questions and expansion concepts are in
+`docs/Delinquent-System-Audit.md`.
+
+### Fixed
+- **Booked Absent from the character creator.**
+  - Before: after picking a slot you're still in the menu, but `School.Attendance` already tracked the class, so a
+    period spent in the creator was booked Absent with +3 points.
+  - Now: nothing is tracked while `InMainMenu` is true, and "first seen" waits for Enter. Entering mid-class counts
+    as a late join.
+- **A suspended student was sent to class.** `Gui.ClockHud` showed "NOT IN CLASS" in red with a room waypoint.
+  - Now it reads "Suspended: stay out of class today" in orange, with no marker.
+- **Suspension was a free pass.** Violations during a suspension were wiped when it ended.
+  - `School.Discipline` now holds them in `Discipline.HeldPoints` and adds them back on top of the 8, with a toast.
+    Enough of them suspends you again.
+  - `PlayerData` documents the new optional field.
+- **A hall monitor on its way to break up a scuffle no longer turns to chase someone it sees hit.** Turning away used
+  to end the scuffle as "Monitor" before it arrived. Changed in `School.HallMonitor` `OnDamage` and `CheckWitness`.
+- **Guard Duty (Bruno's daily job) waits for you.** The Ordinary prank used to come 30 s after the job started, wherever
+  you were, which spent the job's one sure prank. In `Social.CliquePranks.GuardDuty` it now comes once you're within
+  80 studs of the Back Lot (up to 40 min).
+- **No standing for downs after a scuffle or rumble has ended** (`Social.CliqueFights.OnDowned`, same check as `OnHit`).
+- **The Delinquents no longer send backup against a street-crew Delinquent.** `CliqueFights.Backup` now reads the
+  attacker's clique from its tag or `Config.Cliques.Npcs` by name.
+
+### Tested (Play, slot 4 "Testy"; data restored afterwards)
+- **Creator.**
+  - Before the fix: in the creator at 8:21, the server set `ClassRoom = R102`, opened the Period 1 record, and at
+    9:01 booked Absent (6 → 9 points).
+  - After: in the creator during Period 1 there was no `ClassRoom` and no record, and no Absent at the bell.
+  - Entering at 9:38 started the record at 9:38, and it finalized as **Excused**.
+- **Suspended HUD.**
+  - Before: "English · Room 104 · NOT IN CLASS" plus the waypoint.
+  - After: "English · Room 104 · Suspended: stay out of class today" in orange, waypoint off.
+- **Suspension carry-over.**
+  - Before: 16 points plus three Fightings (28), then next day 8.
+  - After: `HeldPoints` 12, then next day 8 + 12 = 20, suspended again.
+  - A day with no violations gives 8 and Probation.
+  - Fighting once while suspended gives 12 next day and the toast "What you did while suspended still counts (+4
+    points)".
+- **Monitor.** A scuffle at the Commons; Testy hit a fighter 30 studs from the responding monitor with a clear line of
+  sight. The monitor stayed in `Respond` with no chase target.
+- **Guard Duty.** With Testy at the school spawn, no prank came in 52 s. At the Back Lot, the Ordinary prankster
+  spawned 13.7 s later.
+- **Late downs.**
+  - Live scuffle: a down paid the Ordinary +8 (+6 help, +2 rival share).
+  - 0.6 s after the scuffle ended: +2 only.
+- **Backup.** A street-crew Delinquent hit Testy as a Delinquents member: no Delinquents backup. The Pack (Testy holds
+  its reward) still sent backup.
+
+### Found, not changed (owner's call)
+See the audit doc, findings A-J:
+- Fighting violations during rumbles and scuffles the game asks for.
+- The street crews are mapped to the Delinquents but never tagged. Tested: downing one changes no standing, unlike
+  what `Cliques.md` says.
+- Delinquents members are jumped at the Commons during class.
+- A showdown win can lower standing, and a third party can win it for you.
+- Commons scuffles mostly end as "Monitor".
+- An uncapped crew farm.
+- Owed detentions pile up.
+- Standing is written outside `UpdateState`.
+
+### Not tested
+- Two players.
+- The Map place: it loads slot 1. None of these fixes is ported to the Map yet.
+- A real rumble with a monitor watching.
+
+### Test leftovers
+Testy's open report-card week (2514) keeps the test's extra entries: one Mathematics absence and +5 violations. The
+test bridge can't edit it. Attendance, discipline and clique standing were restored.
+
+Studio backups are in `ServerStorage.NH_Backup.*_DelinqAudit_pre`: Attendance, Discipline, ClockHud, PlayerData,
+HallMonitor, CliqueFights and CliquePranks. NH Combat Test is saved (version 1061).
+
 ## [2.7.2] - 2026-11-13: Racial grips go live: published clips, sounds and art, and ported to the Map
 
 Owner: "Published and uploaded. And yes port everything to the map place." Details: `docs/Racial-Grips.md`.

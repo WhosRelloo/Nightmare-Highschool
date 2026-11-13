@@ -74,7 +74,7 @@ Standing is how a clique's members see you, from −100 to 100. It's saved per s
 | Hostile | below −40 |
 
 - **Phase 1 source:** putting a clique member on the floor costs **−8** with that clique (`Downed.OnDowned`, with you as the attacker).
-- **Rivals:** any change gives the rival clique the opposite of a quarter of it. Downing a Delinquent gives The Ordinary +2.
+- **Rivals:** any change gives the rival clique the opposite of a quarter of it. Downing a Delinquent gives The Ordinary +2. (2.7.3 audit: this applies to clique fighters only. The Back Lot street crews are mapped by name in `Config.Cliques.Npcs`, but they are never tagged, so downing one changes no standing. See [Delinquent-System-Audit](Delinquent-System-Audit.md), finding B.)
 - **Notifications:** you get one when your standing changes ("−8 The Delinquents"). Crossing into a new tier adds a line, for example "They're wary of you now." or "They respect you now."
 - **API:**
   - `Cliques.Get(player)` returns `{ [id] = value }`
@@ -457,3 +457,16 @@ To run it again: set `Config.MainMenu.SlotCount` to 4, play, and use TestBridge 
 - ~~**Phase 4:** events: pranks, rumble days, the bulletin and dares.~~ Done in 1.33.0 (above).
 - ~~**Phase 5:** leader showdowns, friend or foe, and King of the School.~~ Done in 1.34.0 (above).
 - ~~**Phase 6:** joining a clique.~~ Done in 1.35.0 (above). That completes the owner's Phase 4-6 plan.
+
+## Delinquent audit fixes (2.7.3)
+
+See [Delinquent-System-Audit](Delinquent-System-Audit.md).
+
+- **Guard Duty** (`CliquePranks.GuardDuty`): the rival's prank waits until the member is within 80 studs of the
+  guarded hangout (up to 40 min). It used to come 30 s after the job started, wherever they were.
+- **Scuffle and rumble downs** (`CliqueFights.OnDowned`): they pay only while that event is still live, as hits already
+  did.
+- **Backup** (`CliqueFights.Backup`): a clique never sends backup against its own. The attacker's clique comes from the
+  event fighter, its `Clique` attribute, or `Config.Npcs` by name.
+- **The monitor:** on its way to a scuffle (`Respond`), it no longer turns to chase a hit it sees, so the scuffle ends
+  when it arrives (or at its 30 s give-up).

@@ -251,3 +251,17 @@ Players no longer play the prisoner idle while standing in detention (owner requ
 ## Report cards (1.40)
 
 Every class that's recorded (`Local.Finalize`) and every violation also goes to the week's report card (`School.ReportCards.Class` / `Violation` / `Detention`); see [Phone](Phone.md#report-cards-and-the-app-icons-140).
+
+## Delinquent audit fixes (2.7.3)
+
+See [Delinquent-System-Audit](Delinquent-System-Audit.md) for the whole audit.
+
+- **The menu doesn't count.** Attendance skips a student whose `InMainMenu` is true. That includes the creator and the
+  wardrobe after picking a slot. "First seen" waits for Enter, so entering mid-class is a late join (Excused near the
+  end).
+- **Suspension.**
+  - Violations while suspended are kept in `Discipline.HeldPoints`. When the suspension ends, points become 8 plus
+    the held points, with a toast. That can suspend you again.
+  - The clock HUD shows "Suspended: stay out of class today" in orange, with no room marker.
+- **Hall monitor.** A monitor responding to a clique scuffle (`Respond`) no longer turns to chase a hit it sees on the
+  way.
