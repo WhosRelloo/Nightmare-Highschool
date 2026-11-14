@@ -1,11 +1,16 @@
 # Developer products and gamepasses: concept
 
 **Date:** 2026-11-13. The owner asked: "Give me a concept on which Dev products to add to the game, update it based on
-EVERYTHING we have in the game now. And gamepasses."
+EVERYTHING we have in the game now. And gamepasses." Then: "I want the products to be cheaper so players will be more
+inclined to buy them even if they don't have a bunch of robux. Rerolls should be super cheap. Create designs for all
+of them on theme and their prices."
 
-Nothing here is built. The game sells nothing yet: the Spin Shop's 13 developer products are wired up, but every
-`ProductId` is still 0. Related: [[Names-Clans-and-Spin-Shop]], [[Races-and-Bloodlines]], [[Height]], [[Homes]],
-[[Phone]], [[Skateboards]], [[Accessories]], [[QOL-Kit]], [[Inventory-QOL-Concepts]], [[Main-Menu]].
+**Status:**
+- **Nothing is on sale.** The Spin Shop's 13 developer products are wired up, but every `ProductId` is still 0.
+- **The icons are made:** 50 on-theme PBR icons, one for every product, pass and the subscription, in
+  `art/group-upload-shop/` (see "The icons").
+- **Related:** [[Names-Clans-and-Spin-Shop]], [[Races-and-Bloodlines]], [[Height]], [[Homes]], [[Phone]],
+  [[Skateboards]], [[Accessories]], [[QOL-Kit]], [[Inventory-QOL-Concepts]], [[Main-Menu]], [[Icon-Set]].
 
 ## Ground rules
 
@@ -14,128 +19,153 @@ Nothing here is built. The game sells nothing yet: the Spin Shop's 13 developer 
    - Training: "no Robux boosts exist".
    - The training streak: "Yen buys only cosmetics and kit".
    - So Robux never buys power, EXP, Yen, or a way out of a consequence.
-2. **Race, clan and height stay rolled.** "Race is always rolled by the server; players never pick it." Robux can buy
+2. **Race, clan and height stay rolled.** "Race is always rolled by the server; players never pick it." Robux buys
    spins, never a chosen result.
-3. **Cosmetics only from Robux, and never the earned ones.** Race looks unlock by tier, titles by deeds, trophies by
-   beasts. Those stay earned, or they stop meaning anything.
-4. **Roblox's paid random items rules.** Every spin is a paid random item:
+3. **Cosmetics only, and never the earned ones.** Race looks unlock by tier, titles by deeds, trophies by beasts.
+4. **Cheap on purpose (owner).** Most things cost less than R$ 100 and rerolls cost a few Robux, so a player with the
+   smallest Robux pack can still buy something. The cheapest Robux pack is 80, so nearly everything here fits in it.
+5. **Roblox's paid random items rules.** Every spin is a paid random item:
    - **Odds:** all outcomes and their exact odds must show before purchase, including how pity changes them.
    - **Restricted regions:** players there need a fallback (see below).
-5. **Every new screen follows the UI rule:** unique, on theme, PBR-textured and animated.
-6. **No gore** in anything sold.
+6. **Every new screen follows the UI rule:** unique, on theme, PBR-textured and animated.
+7. **No gore** in anything sold.
 
-## What's on the shelf today (Spin Shop, `Config.Shop`)
+## The icons
 
-| Product | Gives | Price hint |
-|---|---|---|
-| Clan1 / Clan5 / Clan15 | 1 / 5 / 15 clan spins | R$ 49 / 199 / 499 |
-| Height3 / Height10 | 3 / 10 height spins | R$ 49 / 149 |
-| Race3 / Race10 | 3 / 10 race spins | R$ 129 / 349 |
-| Variant3 | 3 variant spins | R$ 99 |
-| Trait5 | 5 trait spins | R$ 99 |
-| NameChange | 1 rename after enrolling | R$ 99 |
-| Vamp Cape / Rogue Cape / Fur Cape | a cape, owned for good by this student | R$ 149 / 149 / 199 |
+- **Every icon is a round medallion,** because Roblox crops gamepass icons to a circle (developer products show
+  square, and the medallion reads the same in both).
+- **The face colour gives the family at a glance:**
 
-**Before any of it goes on sale (required):**
-- **Create the products** on the Creator Dashboard (Monetization > Developer Products) and paste the ids into
-  `Config.Shop`. I'll find the ids on your profile, as for every upload.
-- **Odds for every outcome, before purchase.**
-  - **Shown today:** the clan register lists each rarity's share and its clans, the Height tab lists height odds, and
-    the Bloodline tab lists race odds.
-  - **Missing:**
-    - Each clan's own odds: the rarity share divided by its clans, or the line "Odds for each clan listed below: X%".
-    - Variant odds (85 / 12 / 3).
-    - Trait odds.
-    - A plain note on pity: "the 40th spin without Epic or better is guaranteed Epic or better".
-- **The restricted-region check.** Where `PolicyService` says paid random items are restricted
-  (`ArePaidRandomItemsRestricted`), the spin products must be hidden or blocked with a message.
-  - Free starting spins still work there.
-  - I'd also add a free way to earn spins, so those players aren't stuck: a spin for each rite passed and each
-    report card with an A.
-- **A fairness check on spins.** Races have passives, and clans have planned perks.
-  - **Races:** paid race spins are only fair while races are sidegrades, never a ranking, so a Vampire isn't simply
-    better than a Human. They are now: the moon bonuses alternate, and the hunger penalties apply to every race.
-  - **Clans:** clan perks should stay small or cosmetic, or clan spins become pay-to-win.
+  | Family | Face | Rim |
+  |---|---|---|
+  | Spins and identity | ink | gilt |
+  | Wardrobe | crimson | gilt |
+  | Personal effects | oak | brass |
+  | Moments | midnight blue | silver |
+  | Passes | ink, with a laurel wreath | gilt |
+  | The subscription | ink, with a laurel wreath | silver |
 
-## Developer products to add (repeatable purchases)
+- **Pack size:** a brass plate at the foot of a pack's medallion carries its count ("x5").
+- **How they're made:** the same pipeline as [[Icon-Set]].
+  - `art/ui/hud/make_shop_icons.py` draws each design as a relief and material map.
+  - `blender_shop_icons_render.py` renders it as real PBR geometry in Cycles: brushed brass, gilt, hammered iron,
+    glossy enamel, wax, bone, parchment, and emissive flame.
+  - `finish_shop_icons.py` writes `art/group-upload-shop/NHShop<Name>.png` at 512 px.
+- **The sheet:** [contact sheet](img/shop-icons-contact.png).
 
-Prices are starting points. Managed Pricing (Roblox's price optimisation plus regional pricing) can test them once the
-prices are read from Roblox instead of hard-coded, as the shop already does.
+## Developer products (buy as often as you like)
 
-### A. Lineage spins (round out the Spin Shop)
-| Product | Gives | Price |
-|---|---|---|
-| Variant10 | 10 variant spins | R$ 249 |
-| Trait15 | 15 trait spins | R$ 249 |
-| Bloodline Bundle | 3 race + 3 variant + 5 trait spins | R$ 279 (vs 327 apart) |
-| Identity Bundle | 5 clan + 3 height spins | R$ 219 (vs 248 apart) |
+Rows marked **(new)** are not built yet. The others exist in `Config.Shop`.
 
-Each pack needs the same odds panel as the single spins.
+### Spins: rerolls, super cheap
+| Product | Gives | Price | Icon | Design |
+|---|---|---|---|---|
+| Clan Spin | 1 clan spin | **R$ 5** | `ClanSpins1` | a gilt-edged crimson clan shield (chevron and three stars) inside two chasing reroll arrows |
+| Clan Spins x5 | 5 | **R$ 19** | `ClanSpins5` | three shields, blue, crimson and green |
+| Clan Spins x15 | 15 | **R$ 49** | `ClanSpins15` | five shields fanned |
+| Height Spins x3 | 3 | **R$ 9** | `HeightSpins3` | a notched brass measuring rod, an ivory student and a gilt up-and-down arrow |
+| Height Spins x10 | 10 | **R$ 25** | `HeightSpins10` | the same, "x10" |
+| Race Spins x3 | 3 | **R$ 15** | `RaceSpins3` | a moon-chalk crescent cradling a crimson faceted gem in a brass bezel, six race marks round it |
+| Race Spins x10 | 10 | **R$ 39** | `RaceSpins10` | the same, "x10" |
+| Variant Spins x3 | 3 | **R$ 9** | `VariantSpins3` | three hex gems (blue, gold, crimson): the same race, another variant |
+| Variant Spins x10 (new) | 10 | **R$ 25** | `VariantSpins10` | the same, "x10" |
+| Trait Spins x5 | 5 | **R$ 9** | `TraitSpins5` | three gilt-framed tarot cards with star and moon devices |
+| Trait Spins x15 (new) | 15 | **R$ 25** | `TraitSpins15` | the same, "x15" |
+| Bloodline Bundle (new) | 3 race + 3 variant + 5 trait | **R$ 25** (R$ 33 apart) | `BloodlineBundle` | the crescent and gem, a tarot card, two variant gems, a "BUNDLE" plate |
+| Identity Bundle (new) | 5 clan + 3 height | **R$ 22** (R$ 28 apart) | `IdentityBundle` | the clan shield and the measuring rod |
+| Name Change | 1 rename after enrolling | **R$ 25** | `NameChange` | the open school register, a bone quill across it, a crimson wax seal |
 
-### B. Wardrobe (owned for good, like the capes)
-- **Cloaks:** the 3D PBR cloaks (another session built them) sold like the capes. **R$ 149-249** each.
-- **Outfit sets:** a top, bottoms and an accessory with their own look, e.g. "Midnight Prefect", "Crimson Gala",
-  "Graveyard Formal". **R$ 199-299.**
-  - Never a clique's own pieces: those stay members-only.
-  - Never Kit B regalia or admin capes: those stay staff-only.
-- **Eye-glow tints** within your race's own look (a Vampire's crimson goes darker or brighter). **R$ 99.** Never another
-  race's eyes, and never a tier look.
+### Wardrobe (owned for good)
+| Product | Price | Icon | Design |
+|---|---|---|---|
+| Vamp Cape | **R$ 49** | `CapeVamp` | black cape with a bat-wing hem, a crimson lining, a tall pointed collar, and a silver collar band with a crimson clasp |
+| Rogue Cape | **R$ 49** | `CapeRogue` | an oxblood leather cape with a hood and a brass clasp |
+| Fur Cape | **R$ 69** | `CapeFur` | an oak-brown cape with a thick ivory fur collar |
+| Ravenfeather Cloak (new) | **R$ 59** | `CloakRavenfeather` | a torn black cloak with a hem of feather tips and a silver bat at the throat |
+| Moonlit Shroud (new) | **R$ 69** | `CloakMoonlit` | a midnight-blue cloak with a silver lining, a crescent clasp and scattered stars |
+| Ashen Wool Cloak (new) | **R$ 59** | `CloakAshen` | an iron-grey wool cloak with a ring brooch |
+| Midnight Prefect set (new) | **R$ 79** | `OutfitMidnightPrefect` | an ink blazer with a gilt crest badge on a brass hanger |
+| Crimson Gala set (new) | **R$ 99** | `OutfitCrimsonGala` | a long oxblood coat with black lapels and a gilt bat pin |
+| Graveyard Formal set (new) | **R$ 79** | `OutfitGraveyardFormal` | an iron-grey waistcoat with bone buttons and a crimson tie |
+| Eye-Glow Tint (new) | **R$ 29** | `EyeGlowTint` | an ivory eye with a glowing iris over five tint swatches |
 
-### C. Personal effects (owned for good)
-- **Skateboard decks:** Robux-only decks with an animated grip-tape glow and a light trail. **R$ 149-399.** The Yen boards
-  stay as they are.
-- **Lunchboxes:** the one item the Inventory QOL concept already allows. They're a cosmetic container that holds the
-  same lunch as everyone else's. **R$ 49-99.**
-- **Lantern, umbrella and thermos skins:** for the kit items, the same use with a different look, e.g. a crimson glass
-  lantern or a bat-wing umbrella. **R$ 79-99.**
-- **Phone styles:** animated wallpapers, a case skin on the phone frame, and ringtones for the Midnight Bell. **R$ 49-79.**
-- **Dorm decor sets:** furniture and wall themes (a Gothic Study, a Moonlit Loft, the Crimson Court).
-  - They decorate on top of the room's report-card state, so a wreck is still a wreck underneath.
-  - **R$ 199-499.**
-- **Hand-gear tints:** a colour for wraps or gloves you already own. **R$ 49.** Gear's stats stay what the armory sells.
+### Personal effects (owned for good)
+| Product | Price | Icon | Design |
+|---|---|---|---|
+| Hellfire Deck (new) | **R$ 39** | `DeckHellfire` | a crimson deck with a gilt star and a flame trail |
+| Moonwake Deck (new) | **R$ 59** | `DeckMoonwake` | a midnight-blue deck with a crescent and a moonlight trail |
+| Bone Rail Deck (new) | **R$ 49** | `DeckBoneRail` | a ribbed ivory deck on brass trucks |
+| Coffin Lunchbox (new) | **R$ 15** | `LunchboxCoffin` | an oak coffin-shaped tin with a brass handle and latch |
+| Bat Tin Lunchbox (new) | **R$ 19** | `LunchboxBatTin` | an iron lunch tin with a silver bat |
+| Crimson Bento (new) | **R$ 25** | `LunchboxCrimsonBento` | a crimson lacquer box tied with gilt bands |
+| Crimson Glass Lantern skin (new) | **R$ 25** | `LanternCrimsonGlass` | an iron lantern with crimson glass and a live flame |
+| Bat-Wing Umbrella skin (new) | **R$ 25** | `UmbrellaBatWing` | a black umbrella with a scalloped bat-wing edge |
+| Raven Thermos skin (new) | **R$ 25** | `ThermosRaven` | an ink thermos with silver caps and a raven |
+| Phone Wallpapers (new) | **R$ 15** | `PhoneWallpapers` | a phone showing a moonlit night sky |
+| Phone Case (new) | **R$ 19** | `PhoneCase` | a crimson case with the clan crest |
+| Midnight Bell Ringtones (new) | **R$ 15** | `PhoneRingtones` | the brass school bell ringing out |
+| Gothic Study decor (new) | **R$ 49** | `DecorGothicStudy` | an oak desk with leather books and a lit candle |
+| Moonlit Loft decor (new) | **R$ 79** | `DecorMoonlitLoft` | an arched iron window with the moon in it |
+| Crimson Court decor (new) | **R$ 129** | `DecorCrimsonCourt` | a gilt-framed crimson throne-chair, button-tufted |
+| Gear Tint (new) | **R$ 15** | `GearTint` | wrapped knuckles over four tint swatches |
 
-### D. Moments (consumable and seen by everyone, rate-limited)
-- **Lantern Release:** paper lanterns rise over the campus for every player in the server. A toast reads "<name> lit
-  lanterns for Nightmare High". **R$ 99.**
-- **Crimson Fireworks:** at night only, over the bell tower, with the crimson-moon palette. **R$ 149.**
-- **A Midnight Bell shout-out:** one filtered line in everyone's phone news app for an hour. **R$ 49.**
-- **Rules for all three:**
-  - They're cosmetic only.
-  - Each one runs at most once every 2 minutes per server, with no stacking.
-  - They follow Reduce Flashing and Reduce Motion.
+### Moments (used up, seen by everyone in the server, at most once every 2 minutes)
+| Product | Price | Icon | Design |
+|---|---|---|---|
+| Lantern Release (new) | **R$ 25** | `MomentLanternRelease` | paper lanterns with live flames rising into the night |
+| Crimson Fireworks (new) | **R$ 39** | `MomentCrimsonFireworks` | crimson and gold bursts over the lit bell tower |
+| Midnight Bell Shout-out (new) | **R$ 10** | `MomentShoutout` | a brass bell over an unrolled scroll |
 
-### E. Gifts
-- **Any cosmetic can be bought for someone else:** pick a student in the server from Classmates, and it lands in their
-  save with a toast.
-- **Spins can't be gifted.** They are paid random items, and a gift would hand an odds-disclosed purchase to someone
-  who didn't see the odds.
+- **Gifts:** any cosmetic above can be bought for a classmate (pick them in Classmates).
+- **Spins can't be gifted:** they are paid random items, and the receiver wouldn't have seen the odds.
 
 ## Gamepasses (one-time, account-wide)
+| Pass | What it gives | Price | Icon | Design |
+|---|---|---|---|---|
+| Extra Students | Two more save slots (4 and 5) | **R$ 149** | `PassExtraStudents` | two students on the slot picker's iron plinths, silver and gilt, "+2" |
+| Tailor's Pass | 6 saved outfits per student, recolour owned pieces, open the Wardrobe anywhere outside class and combat | **R$ 99** | `PassTailor` | open steel shears with gilt ring handles under a gold tape measure |
+| Collector's Dorm | A loft above your room, and a 12-spot trophy shelf (trophies still earned) | **R$ 129** | `PassCollectorsDorm` | two oak shelves of gilt cups and four crest plaques, with a brass key |
+| Gothic Emotes | 8 emotes: a bow, a curtsy, a candle prayer, perching on a desk, a slow clap, a cloak flourish, and more | **R$ 79** | `PassGothicEmotes` | two masquerade masks, crimson sorrowful and ivory smiling, on a gilt ribbon |
+| Gramophone | Play Night FM aloud near you, from the game's own tracks only | **R$ 59** | `PassGramophone` | an oak gramophone with a gilt horn and two notes |
+| Prefect's Seal (VIP) | A wax-seal crest by your name, a gold name in the list, the Prefects' Lounge (cosmetic), and a cape | **R$ 199** | `PassPrefectsSeal` | a crimson wax seal pressed with a crown over a crescent, oxblood ribbon tails |
 
-| Pass | What it gives | Price |
-|---|---|---|
-| **Extra Students** | Two more save slots (4 and 5): `SlotCount` becomes per-player (3, or 5 with the pass). The classic RPG pass, with no power at all. | R$ 399 |
-| **Tailor's Pass** | 6 saved outfits per student, recolour any owned piece, and open the Wardrobe anywhere outside class and combat (stations stay for everyone else). | R$ 249 |
-| **Collector's Dorm** | A loft above your dorm room (more decorating space), and the trophy shelf grows from 4 to 12 display spots. Trophies are still earned from beasts. | R$ 349 |
-| **Gothic Emotes** | 8 emotes in the house animation style, e.g. a bow, a curtsy, a candle prayer, perching on a desk, a slow clap, a cloak flourish. | R$ 199 |
-| **Gramophone** | Play your Night FM station aloud to students nearby, from the game's own licensed tracks only (no audio ids). | R$ 149 |
-| **Prefect's Seal** (VIP) | A wax-seal crest beside your name (overhead, chat, Classmates), a gold name in the student list, the Prefects' Lounge (a cosmetic hangout, no loot or shortcuts), and one exclusive cape. | R$ 499 |
-
-Account-wide means a pass works on every student. That's the main reason to make these passes, not products.
+All passes have the laurel wreath round the medallion, so they read as a step up from a product.
 
 ## Subscription and private servers
 
-- **Night Society (optional monthly subscription, about R$ 299 a month):**
+- **Night Society (monthly, R$ 99).**
   - **Each month:** one exclusive cosmetic (a cape, cloak or deck) that you keep for good.
   - **Each month:** 5 clan spins and 3 height spins, with the same odds panel.
   - **The whole time you subscribe:** a "Society" seal.
   - **Never included:** Yen, EXP or power.
-  - **Roblox rules:** benefits can't be revoked mid-term, subscriptions can't be tiered (no Bronze/Silver/Gold), and a
-    Robux price can change at most every 60 days. Roblox Plus subscribers don't get it free (only private servers).
-- **Private servers (about R$ 99 a month):**
-  - **Who they suit:** study groups, roleplay, filming trailers and clique nights.
-  - **What already works:** the server directory doesn't list private servers. Roblox Plus subscribers get paid
-    private servers at no cost, and you're still paid for their time there.
+  - **Icon:** `NightSociety`, a raven before a moon-chalk crescent with a silver key.
+  - **Roblox rules:** the minimum is R$ 49, benefits can't be revoked mid-term, there are no tiers, and a Robux price
+    can change at most every 60 days.
+- **Private servers (R$ 25 a month).**
+  - **Who they suit:** study groups, roleplay, filming and clique nights.
+  - **What already works:** the server directory doesn't list private servers. Roblox Plus subscribers get them at no
+    cost, and you're still paid for their time there.
+
+## Before anything goes on sale (required)
+
+- **Create every product and pass** on the Creator Dashboard, upload the icons (`art/group-upload-shop/`), and paste
+  the ids into `Config.Shop`. I'll find the ids on your profile, as for every upload.
+- **Odds for every outcome, before purchase.**
+  - **Shown today:** the clan register lists each rarity's share and its clans, the Height tab lists height odds, and
+    the Bloodline tab lists race odds.
+  - **Missing:**
+    - Each clan's own odds: the rarity share divided by its clans, or "Odds for each clan listed below: X%".
+    - Variant odds (85 / 12 / 3).
+    - Trait odds.
+    - A plain note on pity: "the 40th spin without Epic or better is guaranteed Epic or better".
+- **The restricted-region check.** Where `PolicyService` says paid random items are restricted, the spin products are
+  hidden or blocked with a message. Free starting spins still work there, and a free way to earn spins gives those
+  players something: a spin for each rite passed and each report card with an A.
+- **Spins must stay fair at these prices.** At R$ 5 a spin, nearly everyone can reroll toward a rare race or clan.
+  - **Races:** that's fine while races are sidegrades (moon bonuses alternate, and the hunger penalties apply to every
+    race).
+  - **Clans:** clan perks must stay small or cosmetic. If a clan or race ever gives a real edge, cheap rerolls become
+    pay-to-win.
 
 ## Not for sale, ever (the red lines)
 
@@ -153,40 +183,38 @@ Account-wide means a pass works on every student. That's the main reason to make
 ## Where they're sold
 
 - **The Spin Shop** (the editing screen after picking a slot): spins and bundles.
-- **The Wardrobe:** a "Tailor" section for capes, cloaks, outfit sets and tints. It shows owned pieces and buyable ones
-  side by side, with a preview on your own student.
+- **The Wardrobe:** a "Tailor" section with owned and buyable pieces side by side, previewed on your own student.
 - **The phone:** a new **Robux shop** app (a black-lacquer catalogue with a wax-seal "Buy" stamp) for personal effects,
   moments, gifts and passes.
 - **Where you'd see the thing anyway:** the dorm for decor, the skate rack for decks, and the kit for lantern skins.
-  Each has one small "more styles" button that opens the right page. No pop-ups and no "limited time!" pressure.
+  Each has one small "more styles" button. No pop-ups and no "limited time!" pressure.
 
 ## Build notes
 
 - **Purchases:** keep the one `ProcessReceipt` (`Services.Player.Purchases`). Every new grant is another `Kind` in
   `Config.Shop`.
-- **Account-wide ownership:** passes, and (your call below) cosmetics, need a small account-level store beside the
-  per-slot saves. Today nothing is account-wide, and receipts live in each student's save.
-- **Odds:** one shared odds panel in the UI kit, used by every spin product, with the restricted-region switch.
-- **Art per group:** cloaks (exist), outfit sets, lunchboxes, kit skins, decks, decor and emotes. Each goes through the
-  usual PBR pipeline and group upload.
+- **Account-wide ownership:** passes, and (your call) cosmetics, need a small account-level store beside the per-slot
+  saves. Today nothing is account-wide.
+- **Odds:** one shared odds panel in the UI kit for every spin product, with the restricted-region switch.
+- **Art still to build:** the new items each need their 3D piece, in the usual PBR pipeline: the cloaks, outfit sets,
+  decks, lunchboxes, kit skins, decor sets and emotes. Their icons are ready now.
+- **Prices:** these are the owner's "cheap" targets. Roblox reads the real price from each product, and Managed
+  Pricing can test them later.
 
 ## Your calls
 
-- **Robux cosmetics: per student or the whole account?** Today a cape belongs to one student. I'd make Robux cosmetics
-  account-wide (nobody wants to buy a cape three times) and keep spins per student, since a spin acts on one student.
+- **Robux cosmetics: per student or the whole account?** I'd make them account-wide and keep spins per student.
 - **Moments in the live game:** keep them, or are server-wide effects too loud?
 - **Night Society:** have a subscription at all?
-- **Stat respec:** reassigning Might, Grit and Wits points is mild convenience but still touches power. I'd leave it out
-  of the shop, or make it earnable only.
-- **The Back Lot farm:** it gives about ¥3,600 and 10,800 EXP an hour with no cap (Delinquent audit G). It isn't Robux,
-  but an uncapped Yen farm undercuts every Yen price this concept leaves alone.
-- **Prices:** the numbers above are starting points; Managed Pricing can test them once the products exist.
+- **Stat respec:** I'd leave it out of the shop, or make it earnable only.
+- **The Back Lot farm:** it gives about ¥3,600 and 10,800 EXP an hour with no cap (Delinquent audit G). It undercuts
+  every Yen price.
 
 ## Where I'd start
 
-1. **Make the Spin Shop sellable:** create the products, add the full odds panel and the restricted-region check, plus
-   a free way to earn spins.
-2. **Extra Students and the Tailor's Pass:** the two passes most players want, with no new art.
+1. **Make the Spin Shop sellable:** create the products with the new prices and icons, add the full odds panel and the
+   restricted-region check, plus a free way to earn spins.
+2. **Extra Students and the Tailor's Pass:** the two passes most players want, with no new 3D art.
 3. **Capes, cloaks and outfit sets** in the Wardrobe's Tailor section, plus gifting.
 4. **Personal effects:** decks, lunchboxes, kit skins and phone styles.
 5. **Collector's Dorm, Gothic Emotes, the Gramophone and Prefect's Seal.**
