@@ -8,6 +8,7 @@
 	Spins go to the student (save slot) you are playing when you buy.
 	Kinds: Spin = "Clan" | "Height" | "Race" | "Variant" | "Trait" (adds spins), Kind = "NameChange", or Kind = "Cape" (owned for good,
 	worn from the Wardrobe; models in ReplicatedStorage.NHCapes).
+	Icon = a key of Shop.Icons: the product's icon image (art/group-upload-shop, docs/Monetization-Concepts.md).
 ]]
 
 local Shop = {}
@@ -23,19 +24,72 @@ Shop.Groups = {
 }
 
 Shop.Products = {
-	{ Key = `Clan1`;      Group = `Clan`;       Spin = `Clan`;    Amount = 1;  Price = 5;  ProductId = 0 };
-	{ Key = `Clan5`;      Group = `Clan`;       Spin = `Clan`;    Amount = 5;  Price = 19; ProductId = 0; Badge = `Popular` };
-	{ Key = `Clan15`;     Group = `Clan`;       Spin = `Clan`;    Amount = 15; Price = 49; ProductId = 0; Badge = `Best value` };
-	{ Key = `Height3`;    Group = `Height`;     Spin = `Height`;  Amount = 3;  Price = 9;  ProductId = 0 };
-	{ Key = `Height10`;   Group = `Height`;     Spin = `Height`;  Amount = 10; Price = 25; ProductId = 0; Badge = `Best value` };
-	{ Key = `Race3`;     Group = `Race`;       Spin = `Race`;    Amount = 3;  Price = 15; ProductId = 0 };
-	{ Key = `Race10`;     Group = `Race`;       Spin = `Race`;    Amount = 10; Price = 39; ProductId = 0; Badge = `Best value` };
-	{ Key = `Variant3`;   Group = `Variant`;    Spin = `Variant`; Amount = 3;  Price = 9;  ProductId = 0 };
-	{ Key = `Trait5`;     Group = `Trait`;      Spin = `Trait`;   Amount = 5;  Price = 9;  ProductId = 0 };
-	{ Key = `NameChange`; Group = `NameChange`; Kind = `NameChange`; Amount = 1; Price = 25; ProductId = 0 };
-	{ Key = `CapeVamp`;   Group = `Capes`;      Kind = `Cape`; Cape = `Vamp Cape`;  Amount = 1; Price = 49; ProductId = 0 };
-	{ Key = `CapeRogue`;  Group = `Capes`;      Kind = `Cape`; Cape = `Rogue Cape`; Amount = 1; Price = 49; ProductId = 0 };
-	{ Key = `CapeFur`;    Group = `Capes`;      Kind = `Cape`; Cape = `Fur Cape`;   Amount = 1; Price = 69; ProductId = 0; Badge = `New` };
+	{ Key = `Clan1`;      Group = `Clan`;       Spin = `Clan`;    Amount = 1;  Price = 5;  ProductId = 0; Icon = `ClanSpins1` };
+	{ Key = `Clan5`;      Group = `Clan`;       Spin = `Clan`;    Amount = 5;  Price = 19; ProductId = 0; Icon = `ClanSpins5`; Badge = `Popular` };
+	{ Key = `Clan15`;     Group = `Clan`;       Spin = `Clan`;    Amount = 15; Price = 49; ProductId = 0; Icon = `ClanSpins15`; Badge = `Best value` };
+	{ Key = `Height3`;    Group = `Height`;     Spin = `Height`;  Amount = 3;  Price = 9;  ProductId = 0; Icon = `HeightSpins3` };
+	{ Key = `Height10`;   Group = `Height`;     Spin = `Height`;  Amount = 10; Price = 25; ProductId = 0; Icon = `HeightSpins10`; Badge = `Best value` };
+	{ Key = `Race3`;     Group = `Race`;       Spin = `Race`;    Amount = 3;  Price = 15; ProductId = 0; Icon = `RaceSpins3` };
+	{ Key = `Race10`;     Group = `Race`;       Spin = `Race`;    Amount = 10; Price = 39; ProductId = 0; Icon = `RaceSpins10`; Badge = `Best value` };
+	{ Key = `Variant3`;   Group = `Variant`;    Spin = `Variant`; Amount = 3;  Price = 9;  ProductId = 0; Icon = `VariantSpins3` };
+	{ Key = `Trait5`;     Group = `Trait`;      Spin = `Trait`;   Amount = 5;  Price = 9;  ProductId = 0; Icon = `TraitSpins5` };
+	{ Key = `NameChange`; Group = `NameChange`; Kind = `NameChange`; Amount = 1; Price = 25; ProductId = 0; Icon = `NameChange` };
+	{ Key = `CapeVamp`;   Group = `Capes`;      Kind = `Cape`; Cape = `Vamp Cape`;  Amount = 1; Price = 49; ProductId = 0; Icon = `CapeVamp` };
+	{ Key = `CapeRogue`;  Group = `Capes`;      Kind = `Cape`; Cape = `Rogue Cape`; Amount = 1; Price = 49; ProductId = 0; Icon = `CapeRogue` };
+	{ Key = `CapeFur`;    Group = `Capes`;      Kind = `Cape`; Cape = `Fur Cape`;   Amount = 1; Price = 69; ProductId = 0; Icon = `CapeFur`; Badge = `New` };
+}
+
+Shop.Icons = { -- (2026-11-13) image ids of the shop icons (art/group-upload-shop/NHShop<Name>.png); 0 = not uploaded yet
+	ClanSpins1 = 81997389624394;
+	ClanSpins5 = 112833070370582;
+	ClanSpins15 = 83524850768587;
+	HeightSpins3 = 107203858871293;
+	HeightSpins10 = 128999897064375;
+	RaceSpins3 = 138177087914276;
+	RaceSpins10 = 133721535617654;
+	VariantSpins3 = 100277619338525;
+	VariantSpins10 = 80887610145448;
+	TraitSpins5 = 105620614161477;
+	TraitSpins15 = 105370084312499;
+	BloodlineBundle = 85562458363237;
+	IdentityBundle = 129740475010091;
+	NameChange = 136880589370002;
+	CapeVamp = 99243484013451;
+	CapeRogue = 94617129303894;
+	CapeFur = 79155264888400;
+	CloakRavenfeather = 82341804116508;
+	CloakMoonlit = 127463890730141;
+	CloakAshen = 108307744691376;
+	OutfitMidnightPrefect = 92295091595921;
+	OutfitCrimsonGala = 82733659165733;
+	OutfitGraveyardFormal = 87602506357322;
+	EyeGlowTint = 127773769827829;
+	DeckHellfire = 106573346339629;
+	DeckMoonwake = 72455282372755;
+	DeckBoneRail = 92635186663680;
+	LunchboxCoffin = 99495207499824;
+	LunchboxBatTin = 90398482929423;
+	LunchboxCrimsonBento = 121675171117041;
+	LanternCrimsonGlass = 101527759702075;
+	UmbrellaBatWing = 135777850866728;
+	ThermosRaven = 138610314496985;
+	PhoneWallpapers = 85088899996593;
+	PhoneCase = 129109819586690;
+	PhoneRingtones = 81230938975821;
+	DecorGothicStudy = 95324863095608;
+	DecorMoonlitLoft = 117142920511540;
+	DecorCrimsonCourt = 94871785001958;
+	GearTint = 131086890927352;
+	MomentLanternRelease = 82834305252245;
+	MomentCrimsonFireworks = 92598015496554;
+	MomentShoutout = 97246518195180;
+	PassExtraStudents = 0;
+	PassTailor = 138343778374809;
+	PassCollectorsDorm = 109263291575654;
+	PassGothicEmotes = 117199176910711;
+	PassGramophone = 135666657549207;
+	PassPrefectsSeal = 93437096118641;
+	NightSociety = 135469725267771;
 }
 
 Shop.ByKey = {}
