@@ -1,0 +1,232 @@
+{
+ "OneShots": {
+  "locker_slam": {
+   "Start": 0.0,
+   "Length": 2.0,
+   "peak_db": -3.0,
+   "rms_db": -20.9,
+   "issues": []
+  },
+  "book_drop": {
+   "Start": 4.0,
+   "Length": 1.6,
+   "peak_db": -3.0,
+   "rms_db": -19.8,
+   "issues": []
+  },
+  "door_far": {
+   "Start": 8.0,
+   "Length": 2.6,
+   "peak_db": -3.0,
+   "rms_db": -21.9,
+   "issues": []
+  },
+  "steps_far": {
+   "Start": 12.0,
+   "Length": 3.2,
+   "peak_db": -3.0,
+   "rms_db": -17.5,
+   "issues": []
+  },
+  "stone_tick": {
+   "Start": 16.0,
+   "Length": 1.2,
+   "peak_db": -5.7,
+   "rms_db": -22.4,
+   "issues": []
+  },
+  "pipe_knock": {
+   "Start": 20.0,
+   "Length": 2.4,
+   "peak_db": -3.0,
+   "rms_db": -22.0,
+   "issues": []
+  },
+  "wood_creak": {
+   "Start": 24.0,
+   "Length": 2.4,
+   "peak_db": -3.0,
+   "rms_db": -22.6,
+   "issues": []
+  },
+  "keys_far": {
+   "Start": 28.0,
+   "Length": 2.8,
+   "peak_db": -3.0,
+   "rms_db": -20.3,
+   "issues": []
+  },
+  "draught": {
+   "Start": 32.0,
+   "Length": 3.6,
+   "peak_db": -3.0,
+   "rms_db": -20.4,
+   "issues": []
+  },
+  "chalk_tap": {
+   "Start": 36.0,
+   "Length": 1.8,
+   "peak_db": -3.0,
+   "rms_db": -28.5,
+   "issues": []
+  },
+  "page_turn": {
+   "Start": 40.0,
+   "Length": 1.4,
+   "peak_db": -3.0,
+   "rms_db": -20.8,
+   "issues": []
+  },
+  "chair_creak": {
+   "Start": 44.0,
+   "Length": 1.4,
+   "peak_db": -3.0,
+   "rms_db": -25.1,
+   "issues": []
+  },
+  "desk_tap": {
+   "Start": 48.0,
+   "Length": 1.2,
+   "peak_db": -3.0,
+   "rms_db": -25.7,
+   "issues": []
+  },
+  "bird_a": {
+   "Start": 52.0,
+   "Length": 2.2,
+   "peak_db": -3.0,
+   "rms_db": -20.2,
+   "issues": []
+  },
+  "bird_b": {
+   "Start": 56.0,
+   "Length": 2.4,
+   "peak_db": -3.0,
+   "rms_db": -16.5,
+   "issues": []
+  },
+  "town_bell": {
+   "Start": 60.0,
+   "Length": 3.75,
+   "peak_db": -3.0,
+   "rms_db": -17.8,
+   "issues": []
+  },
+  "owl": {
+   "Start": 64.0,
+   "Length": 2.8,
+   "peak_db": -3.0,
+   "rms_db": -13.7,
+   "issues": []
+  },
+  "crow": {
+   "Start": 68.0,
+   "Length": 2.4,
+   "peak_db": -3.0,
+   "rms_db": -21.1,
+   "issues": []
+  },
+  "dog_far": {
+   "Start": 72.0,
+   "Length": 3.0,
+   "peak_db": -3.0,
+   "rms_db": -21.4,
+   "issues": []
+  },
+  "gutter_drip": {
+   "Start": 76.0,
+   "Length": 2.4,
+   "peak_db": -3.0,
+   "rms_db": -23.4,
+   "issues": []
+  },
+  "wind_gust": {
+   "Start": 80.0,
+   "Length": 3.75,
+   "peak_db": -3.0,
+   "rms_db": -20.8,
+   "issues": []
+  },
+  "paper_rustle": {
+   "Start": 84.0,
+   "Length": 1.8,
+   "peak_db": -3.0,
+   "rms_db": -18.9,
+   "issues": []
+  },
+  "book_thump": {
+   "Start": 88.0,
+   "Length": 2.0,
+   "peak_db": -3.0,
+   "rms_db": -22.7,
+   "issues": []
+  },
+  "valve_hiss": {
+   "Start": 92.0,
+   "Length": 2.6,
+   "peak_db": -3.0,
+   "rms_db": -19.5,
+   "issues": []
+  },
+  "furnace_clank": {
+   "Start": 96.0,
+   "Length": 2.6,
+   "peak_db": -3.0,
+   "rms_db": -23.6,
+   "issues": []
+  }
+ },
+ "Loops": {
+  "clock_tick": {
+   "Start": 0.0,
+   "Length": 8.0,
+   "peak_db": -4.0,
+   "rms_db": -35.3,
+   "issues": []
+  },
+  "radiator_hum": {
+   "Start": 10.0,
+   "Length": 8.0,
+   "peak_db": -4.0,
+   "rms_db": -12.8,
+   "issues": []
+  },
+  "vending_hum": {
+   "Start": 20.0,
+   "Length": 8.0,
+   "peak_db": -4.0,
+   "rms_db": -12.6,
+   "issues": []
+  },
+  "candle_crackle": {
+   "Start": 30.0,
+   "Length": 8.0,
+   "peak_db": -4.0,
+   "rms_db": -27.2,
+   "issues": []
+  },
+  "tap_drip": {
+   "Start": 40.0,
+   "Length": 8.0,
+   "peak_db": -4.0,
+   "rms_db": -27.7,
+   "issues": []
+  },
+  "tube_buzz": {
+   "Start": 50.0,
+   "Length": 8.0,
+   "peak_db": -4.0,
+   "rms_db": -18.3,
+   "issues": []
+  },
+  "fire_crackle": {
+   "Start": 60.0,
+   "Length": 8.0,
+   "peak_db": -4.0,
+   "rms_db": -22.5,
+   "issues": []
+  }
+ },
+ "OneShotSlot": 4.0,
+ "LoopSlot": 10.0
+}

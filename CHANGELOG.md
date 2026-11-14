@@ -2,6 +2,92 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.17.0] - 2026-11-13: Ambience foundations: the mixer, three sound layers, room reverb, our own sounds, and the Map's region boxes
+
+The owner said "Yes, foundations", then: "make sounds ourselves" and "Add the region boxes to the map, but keep them
+lined up so we can move them and size them however we want." That's concepts 1, 2, 3 and 6 in
+`docs/Environment-Ambience-Concepts.md`, with concept 7 (our own sound pack) started.
+- **Mirror:** the live scripts are in `tools/ambience-2160/live`, with the originals in `pre/` and `patches.py`.
+- **Studio backups:** `ServerStorage.NH_Backup.Ambience_pre_20261113` in NH Combat Test (Soundscape, KitFx,
+  Config.Ambience, Config.Regions) and on the Map (Config.Regions).
+
+### Added
+- **The ambience mixer (1).** `Controllers.World.AmbienceMix` hangs four SoundGroups under the Music & Ambience volume:
+  `NH_Ambience` > Bed, Weather, Spot and OneShot.
+  - **Fights:** while you're combat-tagged, all ambience ducks to half (about -6 dB) in 0.1 s and comes back over
+    1.5 s, so it never hides a tell (`Config.Ambience.Mix`).
+  - **Cutscenes:** in cinematic view or a talk shot, the spot sounds and one-shots fade out and the bed stays, so
+    there's no hole in the sound.
+  - **What goes where:** the soundscape's bed plays through Bed and the rain loop through Weather.
+- **Room reverb (3).** `SoundService.AmbientReverb` now follows where you stand.
+  - **By place** (`Config.Ambience.Reverb`): stone corridors in the halls, Room in the classrooms, LivingRoom in the
+    Archive and library, ConcertHall in the chapel, Arena in the gym, SewerPipe in the boiler yard, Alley in the
+    Back Lot, Forest at the West Edge and graveyard.
+  - **Fallbacks:** a classroom's own zone wins over the hall around it. With no place, under a roof is StoneCorridor and
+    open sky is Plain. The main menu has none.
+  - **Off switch:** the ReplicatedStorage attribute `NHReverbOff`.
+- **Two new sound layers (2).** `Controllers.World.AmbientSounds` adds them on top of the bed:
+  - **Spot sounds:** a part tagged `NHAmbientSound:<Kind>` plays that loop in 3D. The kinds are Clock, Radiator,
+    Vending, Candles, Tap, Tube and Fire. Only the 6 nearest within their range play, and each starts at a random
+    point so two clocks never tick together.
+  - **One-shots:** every 6-20 s, one sound from the current bed's day or night list plays around you by distance band.
+    Close and Medium play in 3D 6-40 studs away; Far and Sky play flat and quiet.
+  - **Variety:** pitch ±5% and level ±2 dB per play, none of the last 3 again, and at most 4 at once.
+  - **When they're silent:** in the main menu and while combat-tagged. The attribute `NHOneShotsOff` turns them off.
+- **Our own sounds (7, started).** `tools/sfx/ambience.py` synthesises 25 one-shots and 7 seamless 8 s loops with the
+  same toolkit as the racial grip SFX (no samples, no gore). The files are in `art/sfx/ambience`.
+  - **Halls:** locker slam, book drop, far door, far footsteps; at night stone settling, pipe knocks, wood creak, the
+    custodian's keys, a draught.
+  - **Classrooms:** chalk, a page turn, a chair creak, desk taps.
+  - **Outdoors:** two birds, the town bell, an owl, a crow, a far dog, gutter drips, a wind gust.
+  - **The Archive and library:** a paper rustle and a book thump.
+  - **The boiler:** a valve hiss and a furnace clank.
+  - **Loops:** a clock, a radiator, a vending machine, candles, a dripping tap, a buzzing tube light, a fire.
+  - **Two uploads, not 32:** each sound sits in a slot on one of two sheets, `NH_Ambience_OneShots.ogg` and
+    `NH_Ambience_Loops.ogg`, played with PlaybackRegion and LoopRegion. Their ids go in `Config.Ambience.Sheets`;
+    until then the layers stay silent.
+- **Region boxes on the Map (6).** `workspace.Regions` (Persistent, tagged NHCore) has one box per place: 29 boxes in a
+  row above the school's front (x -1300 to -404, y 110, z -230).
+  - **How they look:** 24 studs each, coloured by kind (gold school, purple restricted, crimson forbidden and turf,
+    blue sports, green grounds), half see-through, and labelled with the place's name, id and kind on three faces.
+  - **Placing them:** move and resize them over their places. A box can be duplicated to cover an L-shaped place.
+  - **In game:** the `HideRegionBoxes` script inside hides them.
+- **Four new places** in `Config.Regions` (both places): The Library, The Cafeteria, The Dorms and The Graveyard. They
+  have `Discover = false` until they have boxes in every place, so the Explorer count is unchanged.
+- **`ReplicatedStorage.Functions.RegionBoxes`:** finds the place at a point (highest Priority, then the smaller box),
+  for the soundscape and the reverb. It works without the region cards, so it works on the Map once these scripts are
+  ported.
+
+### Changed
+- **Soundscape:** a place's own bed (`Config.Ambience.RegionBed`: classrooms, the Archive, the library, the boiler yard)
+  comes from its region box when no RoomId zone part covers you. Elsewhere the roof check decides, as before.
+
+### Tested (NH Combat Test, slot 4 Testy, at night)
+- **The mixer:** the four groups are built under NH_Music. The night bed plays through Bed, and the rain loop
+  (`NHRain` on) plays through Weather.
+- **Ducking:** with a 3 s combat tag, NH_Ambience held at 0.50 for the whole tag, then rose 0.70, 0.87, 0.94, 0.98 and
+  1.00 over about 1.5 s.
+- **Cutscenes:** with a talk shot (`NHTalkDof`), Spot and OneShot went 1.00 → 0.00 within 0.5 s while Bed stayed at
+  1.00, and came back 0.5 s after it ended.
+- **Reverb:** R101 Room, the Main Hall StoneCorridor, the boiler yard SewerPipe, the chapel ConcertHall, the gym Arena,
+  the Archive LivingRoom (with its eerie night bed), the Back Lot Alley, the West Edge Forest, and outdoors Plain.
+- **Spot sounds:** a tagged clock 5 studs away played in the Spot group, and its loop stayed in its 0-8 s slot
+  (0.4 … 7.5, then 0.5). One 200 studs away stayed silent. With 9 tagged within range, the 6 nearest played. Moved
+  300 studs off, it stopped.
+- **One-shots:** over 75 s outdoors at night, 6 played from the night list (gutter drips in 3D 22 studs away, then an
+  owl, a far dog, a crow, a wind gust and the owl again, flat). Each had its own slot, pitch 0.95-1.05, its level
+  and the OneShot group, and they came 10-17 s apart.
+- **The sheets in that test:** an existing ambience loop stood in for both, because ours aren't uploaded yet. That
+  tested the engine, not how our sounds sound.
+- **Restored:** `SlotCount` back to 3, `NHTestNoMenuKeys` cleared, and the stand-in sheet ids back to 0.
+
+### Not tested
+- **How our sounds sound in game:** they need uploading first. Every file passed the render checks (levels, a clean
+  ending, no loop seam jump).
+- **Whether UI clicks pick up the room's reverb tail.** If they do, the world sounds should move to the newer Audio
+  API (the note on concept 3).
+- **The Map:** it has the boxes and the new places, but not these scripts, so nothing reads the boxes there yet.
+
 ## [2.15.0] - 2026-11-13: Fights in the world: crowds, study-group tag assists, beast stagger, and enemy NPCs on fists
 
 Owner: "For section E, leave out map gaps and the sparring room for now. Continue." That's concepts 19, 21 and 22 in

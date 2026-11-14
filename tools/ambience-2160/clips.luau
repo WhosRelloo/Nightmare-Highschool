@@ -1,0 +1,34 @@
+Ambience.Clips = {
+	locker_slam = { Sheet = `OneShots`; Start = 0.0; Length = 2.0 };
+	book_drop = { Sheet = `OneShots`; Start = 4.0; Length = 1.6 };
+	door_far = { Sheet = `OneShots`; Start = 8.0; Length = 2.6 };
+	steps_far = { Sheet = `OneShots`; Start = 12.0; Length = 3.2 };
+	stone_tick = { Sheet = `OneShots`; Start = 16.0; Length = 1.2 };
+	pipe_knock = { Sheet = `OneShots`; Start = 20.0; Length = 2.4 };
+	wood_creak = { Sheet = `OneShots`; Start = 24.0; Length = 2.4 };
+	keys_far = { Sheet = `OneShots`; Start = 28.0; Length = 2.8 };
+	draught = { Sheet = `OneShots`; Start = 32.0; Length = 3.6 };
+	chalk_tap = { Sheet = `OneShots`; Start = 36.0; Length = 1.8 };
+	page_turn = { Sheet = `OneShots`; Start = 40.0; Length = 1.4 };
+	chair_creak = { Sheet = `OneShots`; Start = 44.0; Length = 1.4 };
+	desk_tap = { Sheet = `OneShots`; Start = 48.0; Length = 1.2 };
+	bird_a = { Sheet = `OneShots`; Start = 52.0; Length = 2.2 };
+	bird_b = { Sheet = `OneShots`; Start = 56.0; Length = 2.4 };
+	town_bell = { Sheet = `OneShots`; Start = 60.0; Length = 3.75 };
+	owl = { Sheet = `OneShots`; Start = 64.0; Length = 2.8 };
+	crow = { Sheet = `OneShots`; Start = 68.0; Length = 2.4 };
+	dog_far = { Sheet = `OneShots`; Start = 72.0; Length = 3.0 };
+	gutter_drip = { Sheet = `OneShots`; Start = 76.0; Length = 2.4 };
+	wind_gust = { Sheet = `OneShots`; Start = 80.0; Length = 3.75 };
+	paper_rustle = { Sheet = `OneShots`; Start = 84.0; Length = 1.8 };
+	book_thump = { Sheet = `OneShots`; Start = 88.0; Length = 2.0 };
+	valve_hiss = { Sheet = `OneShots`; Start = 92.0; Length = 2.6 };
+	furnace_clank = { Sheet = `OneShots`; Start = 96.0; Length = 2.6 };
+	clock_tick = { Sheet = `Loops`; Start = 0.0; Length = 8.0; Loop = true };
+	radiator_hum = { Sheet = `Loops`; Start = 10.0; Length = 8.0; Loop = true };
+	vending_hum = { Sheet = `Loops`; Start = 20.0; Length = 8.0; Loop = true };
+	candle_crackle = { Sheet = `Loops`; Start = 30.0; Length = 8.0; Loop = true };
+	tap_drip = { Sheet = `Loops`; Start = 40.0; Length = 8.0; Loop = true };
+	tube_buzz = { Sheet = `Loops`; Start = 50.0; Length = 8.0; Loop = true };
+	fire_crackle = { Sheet = `Loops`; Start = 60.0; Length = 8.0; Loop = true };
+}
