@@ -44,8 +44,10 @@ lined up so we can move them and size them however we want." That's concepts 1, 
   - **The boiler:** a valve hiss and a furnace clank.
   - **Loops:** a clock, a radiator, a vending machine, candles, a dripping tap, a buzzing tube light, a fire.
   - **Two uploads, not 32:** each sound sits in a slot on one of two sheets, `NH_Ambience_OneShots.ogg` and
-    `NH_Ambience_Loops.ogg`, played with PlaybackRegion and LoopRegion. Their ids go in `Config.Ambience.Sheets`;
-    until then the layers stay silent.
+    `NH_Ambience_Loops.ogg`, played with PlaybackRegion and LoopRegion.
+  - **Uploaded (group 15981569), in `Config.Ambience.Sheets`:** OneShots `109339668335331` (100 s) and Loops
+    `109344296655254` (70 s). Each sheet was uploaded twice; the copies `76169353887667` and `124416607363138` aren't
+    used. All four were still pending moderation when they were wired in, but they load in Studio.
 - **Region boxes on the Map (6).** `workspace.Regions` (Persistent, tagged NHCore) has one box per place: 29 boxes in a
   row above the school's front (x -1300 to -404, y 110, z -230).
   - **How they look:** 24 studs each, coloured by kind (gold school, purple restricted, crimson forbidden and turf,
@@ -79,11 +81,16 @@ lined up so we can move them and size them however we want." That's concepts 1, 
   and the OneShot group, and they came 10-17 s apart.
 - **The sheets in that test:** an existing ambience loop stood in for both, because ours aren't uploaded yet. That
   tested the engine, not how our sounds sound.
-- **Restored:** `SlotCount` back to 3, `NHTestNoMenuKeys` cleared, and the stand-in sheet ids back to 0.
+- **Our sounds, once uploaded:** all 32 clips loaded from the two sheets and played inside their own slots: the
+  one-shots stopped at their slot's end and the loops looped. Every one registered sound (PlaybackLoudness from 69 for
+  the clock and 71 for chalk up to 489 for the owl).
+- **Restored:** `SlotCount` back to 3 and `NHTestNoMenuKeys` cleared. The stand-in sheet ids were swapped for the real
+  ones.
 
 ### Not tested
-- **How our sounds sound in game:** they need uploading first. Every file passed the render checks (levels, a clean
-  ending, no loop seam jump).
+- **How our sounds sound to a listener:** they play, but nobody has listened to them in game yet. Every file passed the
+  render checks (levels, a clean ending, no loop seam jump). They'll be silent for players until moderation
+  approves the sheets.
 - **Whether UI clicks pick up the room's reverb tail.** If they do, the world sounds should move to the newer Audio
   API (the note on concept 3).
 - **The Map:** it has the boxes and the new places, but not these scripts, so nothing reads the boxes there yet.
