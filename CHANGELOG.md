@@ -2,6 +2,57 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.18.0] - 2026-11-13: Fist swings play out in full, and the air combo's finisher lands
+
+The owner: "refine and completely bugfix fist combat, air crits, and the quick M1's. I want the whole animation to play
+out forget about that quick stuff." Then: "And port it for both places."
+- **Mirror:** `tools/combat-2180`: `live/`, `pre/` and `patches.py`.
+- **Studio backups:** `ServerStorage.NH_Backup.FistFull_pre_20261113`, in NH Combat Test and on the Map.
+
+### What was wrong (measured in Play)
+- **Swings were cut short.** A held fist string played each swing at 1.15x and started the next at the swing's EndLag
+  (0.40-0.52 s into a 0.57-0.58 s clip). The log showed hits 2 and 3 stopped at 0.47 and 0.53 of 0.57 s, the moment
+  the next began.
+- **The air crit never came.** After the uppercut, only the first air hit landed; air hits 2-4 found nothing, so the
+  target's air-hit count stuck at 1 and the 3-hit downslam finisher never triggered.
+  - **The cause:** `AirCombat.Reposition` pushed the target back along its own facing and moved the attacker 5.5
+    studs toward where the target had been, which left the target about 5 studs to the side.
+  - **Why nothing corrected it:** nothing turned a mouse player toward the target in the air, since the aim assist
+    only turns to a locked-on target.
+
+### Changed
+- **Whole swings (`Config.Weapons.Fist`):**
+  - **When the next swing starts:** each swing's EndLag is now the end of its clip, less 0.02 s so the marker still
+    fires (M1 0.56 / 0.55 / 0.55 / 0.55, running 0.98, jump 0.96).
+  - **Speed:** `AnimationSpeed` is 1 (was 1.15).
+  - **Result:** the next swing starts when this one has finished. A full string takes about 2.4 s instead of 1.85.
+- **The quick stuff is off.** Client-predicted swings (2.13.0, concept 12) are off by default. Every swing comes from
+  the server. The ReplicatedStorage attribute `NHPredictOn` turns them back on.
+- **The air combo (`AirCombat.Reposition`):** after each air hit, the target is pushed 2.5 studs along the line of the
+  attack (less if a wall is behind it), and the attacker follows to 3.6 studs, inside fist reach. Both are turned to
+  face each other.
+- **Facing in the air (`InputController.Combat.M1`):** before each air-combat swing, you turn to face the one you
+  launched (the nearest in-air fighter within 14 studs).
+- **The Map:** all four scripts were ported. Its copies were identical to NH Combat Test's pre-fix versions, and now
+  they're identical to the fixed ones.
+
+### Tested
+- **NH Combat Test, slot 4 Testy, at night:**
+  - **Ground string:** held M1 on the Inf Dummy. All 4 swings played whole at 1x (0.57-0.58 s each) and all 4 hits
+    landed, 0.6 s apart.
+  - **Air combo, with real mouse and keyboard input:** Ctrl + click uppercut, then held M1. The air-hit count went 1,
+    2, 3, and the 4th was the finisher (4.5 damage, 1.5x).
+  - **Running and jump swings:** the running punch played 1.00 of 1.00 s and the jump punch 0.98 of 0.98 s.
+  - **Console:** no client or server errors in the clean run. The `Packets.Packet:347` errors in an earlier run came
+    from my test harness requiring the packet module a second time from the command bar.
+- **The Map:** a held M1 string played all 4 swings whole at 1x, with no client or server errors.
+- **Restored:** `SlotCount` back to 3 and `NHTestNoMenuKeys` cleared.
+
+### Not tested
+- A real second player in the air combo.
+- The finisher's slam landing on the ground with a real player.
+- The enders and the clinch, which still hand over to the next swing at their own EndLag.
+
 ## [2.17.1] - 2026-11-13: Today's updates are on the Map
 
 The owner asked: "Commit the hunger, and port all of the updates we did today to the Map place." Hunger 1.0 was committed

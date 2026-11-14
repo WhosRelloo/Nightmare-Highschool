@@ -58,6 +58,22 @@ as they were before are in `ServerStorage.NH_Backup.CombatAudit_pre_20261113`; t
 **NPCs:** Delinquents and other Fist NPCs swing about 14% faster now (fix 1 applies to everyone). The stunlock guard
 (3 hits, 0.8 s, 1.2 s) still caps their pressure. The input buffer is players only.
 
+## Whole swings and the air combo (2.18.0)
+
+The owner: "refine and completely bugfix fist combat, air crits, and the quick M1's. I want the whole animation to
+play out forget about that quick stuff."
+- **Swings were cut short.** Each fist swing ended at its EndLag (0.40-0.52 s into a 0.57-0.58 s clip), played at
+  1.15x, and the next click started the next swing on top of it. Hits 2 and 3 were stopped at 0.47 and 0.53 of 0.57 s.
+  Now EndLag is the end of the clip (less 0.02 s), the speed is 1x, and the running and jump swings play their whole
+  clips too. A string takes about 2.4 s instead of 1.85.
+- **The quick stuff is off.** Client-predicted swings (concept 12) are off by default (ReplicatedStorage attribute
+  `NHPredictOn` turns them back on).
+- **The air crit never came.** After the uppercut, only the first air hit landed. `AirCombat.Reposition` pushed the
+  target back along its own facing and moved the attacker toward where the target had been, so the target ended up
+  about 5 studs to the side, and nothing turned a mouse player to face it. Now the pair stay on the line of the attack
+  (the target is pushed 2.5 studs, the attacker follows to 3.6), both face each other, and the M1 input turns you to
+  the one you launched before each air swing. All four air hits land, and the 4th is the 1.5x downslam finisher.
+
 ## Found but left alone
 
 - **Heavy (M2) damage.** Every weapon's heavy does 1.3x a light hit (Fist 3.9, against 3 for a light). The config's
