@@ -94,7 +94,21 @@ and `patches.py`. Studio backup: `ServerStorage.NH_Backup.CombatD_pre_20261113`.
   `Config.HeatArt`.
 - **The overview:** `NHFistGear_Sheet.png` shows everything together.
 
-### For the owner
+### Art uploaded and wired (2026-11-13)
+- **Where the ids come from:** the owner's group creations, looked up in the browser.
+- **Gear:** in `Config.Armory.Gear`, each piece has its Mesh, Icon and four texture maps.
+- **Heat brazier:** its five images are in `Config.HeatArt`.
+- **Found and fixed:** a game script can't set a SurfaceAppearance's maps (or a MeshId) at runtime, so the gear wasn't
+  drawn. The textured parts are now built once in Studio as templates (`ReplicatedStorage.Assets.HandGear`), and
+  `HandGear` clones them. Rebuild the templates if the ids change.
+- **Checked in play:**
+  - **Gear:** brass knuckles drew on both fists with their textures.
+  - **Brazier:** a full bar showed it as a small gold goblet on the health bar's right cap.
+  - **Icons:** all three showed on the Hand gear tab.
+- **Side effect:** the test's clock change rolled the school day over, so Testy was booked absent for a class
+  (+3 discipline points on the test slot).
+
+### For the owner (done)
 - **Upload** the art from `art/group-upload-fistgear/` to group 15981569:
   - **Gear:** the three meshes and their textures go in `Config.Armory.Gear[...]`: `Mesh`, `Textures`, and `Offset`
     if it isn't the default.

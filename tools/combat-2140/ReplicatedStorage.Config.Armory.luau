@@ -33,13 +33,16 @@ Armory.Shop = { Name = `Iron Vigil Armoury`; Sub = `The armourer`; Text = `Every
 -- Mesh = the uploaded FBX's MeshId; Textures = { Color = id, Normal = id, Roughness = id, Metalness = id };
 -- Offset / Size = where the mesh sits on each arm (art README, studs; the same part goes on both arms).
 Armory.Gear = {
-	{ Id = `HandWraps`; Name = `Hand Wraps`; Price = 250; Icon = ``; Mesh = ``; Textures = nil;
+	{ Id = `HandWraps`; Name = `Hand Wraps`; Price = 250; Icon = `rbxassetid://114004647144090`; Mesh = `rbxassetid://76506417891924`;
+		Textures = { Color = `rbxassetid://140272003988296`; Normal = `rbxassetid://125288898284040`; Roughness = `rbxassetid://123605223530771`; Metalness = `rbxassetid://93535278055603` };
 		Offset = CFrame.new(0, -0.677, -0.009); Size = Vector3.new(1.158, 0.784, 1.177);
 		Text = `Taped knuckles. You take 10% less guard damage while blocking.` };
-	{ Id = `WeightedGloves`; Name = `Weighted Gloves`; Price = 500; Icon = ``; Mesh = ``; Textures = nil;
+	{ Id = `WeightedGloves`; Name = `Weighted Gloves`; Price = 500; Icon = `rbxassetid://104858852997845`; Mesh = `rbxassetid://116383270534397`;
+		Textures = { Color = `rbxassetid://73708110837249`; Normal = `rbxassetid://139761961003423`; Roughness = `rbxassetid://70573977483430`; Metalness = `rbxassetid://97013051656433` };
 		Offset = CFrame.new(0, -0.688, -0.016); Size = Vector3.new(1.166, 0.733, 1.198);
 		Text = `Iron in the knuckles. +20% guard damage, but your swings are 5% slower.` };
-	{ Id = `BrassKnuckles`; Name = `Brass Knuckles`; Price = 800; Icon = ``; Contraband = true; Mesh = ``; Textures = nil;
+	{ Id = `BrassKnuckles`; Name = `Brass Knuckles`; Price = 800; Icon = `rbxassetid://72923479109728`; Contraband = true; Mesh = `rbxassetid://129198185936390`;
+		Textures = { Color = `rbxassetid://131013901460282`; Normal = `rbxassetid://130703295706614`; Roughness = `rbxassetid://81404411674756`; Metalness = `rbxassetid://98784437053142` };
 		Offset = CFrame.new(0, -0.729, -0.544); Size = Vector3.new(1.095, 0.679, 0.111);
 		Text = `+15% fist damage, +10% guard damage. Contraband: a hall monitor who sees you fight takes them.` };
 }

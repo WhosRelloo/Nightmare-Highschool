@@ -44,31 +44,29 @@ function HandGear.Dress(Character: Model, Id: string?)
 	for _, ArmName in { `Right Arm`, `Left Arm` } do
 		local Arm = Character:FindFirstChild(ArmName)
 		if not (Arm and Arm:IsA(`BasePart`)) then continue end
-		local Ok, Part = pcall(function()
-			local M = Instance.new(`MeshPart`)
-			M:ApplyMesh(game:GetService(`AssetService`):CreateMeshPartAsync(Content.fromUri(G.Mesh)))
-			return M
-		end)
-		if not (Ok and Part) then
-			local P = Instance.new(`MeshPart`)
-			pcall(function() P.MeshId = G.Mesh end)
-			Part = P
+		-- the template built in Studio (ReplicatedStorage.Assets.HandGear: mesh + SurfaceAppearance). A game script can't
+		-- set a SurfaceAppearance's maps or a MeshPart's MeshId at runtime, so the textured part is made in Edit and cloned.
+		local Folder = ReplicatedStorage:FindFirstChild(`Assets`) and ReplicatedStorage.Assets:FindFirstChild(`HandGear`)
+		local Template = Folder and Folder:FindFirstChild(Id)
+		local Part: MeshPart
+		if Template and Template:IsA(`MeshPart`) then
+			Part = Template:Clone()
+		else
+			-- no template: the bare mesh, untextured
+			local Ok, Made = pcall(function()
+				return game:GetService(`AssetService`):CreateMeshPartAsync(Content.fromUri(G.Mesh))
+			end)
+			if not Ok then return end
+			Part = Made
 		end
 		Part.Name = `NHGear_` .. Id
+		Part.Anchored = false
 		Part.Massless = true
 		Part.CanCollide = false
 		Part.CanQuery = false
 		Part.CanTouch = false
 		Part.CastShadow = false
 		Part:SetAttribute(`NHGearPiece`, true)
-		if G.Textures then
-			local SA = Instance.new(`SurfaceAppearance`)
-			SA.ColorMap = G.Textures.Color or ``
-			SA.NormalMap = G.Textures.Normal or ``
-			SA.RoughnessMap = G.Textures.Roughness or ``
-			SA.MetalnessMap = G.Textures.Metalness or ``
-			SA.Parent = Part
-		end
 		-- the meshes are symmetric left to right, so the same part sits on both arms; Offset is the mesh's bounding-box
 		-- centre in the arm's space (art/group-upload-fistgear/README.md), Size its size in studs
 		if typeof(G.Size) == `Vector3` then Part.Size = G.Size end

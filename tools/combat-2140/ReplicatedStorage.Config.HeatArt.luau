@@ -5,11 +5,11 @@
 	FillTop / FillBottom: where the coals sit in NHHeat_Fill.png, as fractions of its height (the fill rises between them).
 ]]
 return {
-	Frame = ``;   -- NHHeat_Frame.png
-	Fill = ``;    -- NHHeat_Fill.png
-	Glow = ``;    -- NHHeat_Glow.png
-	Spark = ``;   -- NHHeat_Spark.png
-	Flare = ``;   -- NHHeat_Flare.png
+	Frame = `rbxassetid://84687251212158`;   -- NHHeat_Frame.png
+	Fill = `rbxassetid://123881595407515`;    -- NHHeat_Fill.png
+	Glow = `rbxassetid://99798134898903`;    -- NHHeat_Glow.png
+	Spark = `rbxassetid://127994272741499`;   -- NHHeat_Spark.png
+	Flare = `rbxassetid://100020594492485`;   -- NHHeat_Flare.png
 	FillTop = 0.133;   -- the flame tip, y 34 of 256
 	FillBottom = 0.617; -- the coals' bottom, y 158 of 256
 }
