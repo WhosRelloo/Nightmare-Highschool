@@ -9,10 +9,9 @@ of them on theme and their prices."
 - **Nothing is on sale.** The Spin Shop's 13 developer products are wired up, but every `ProductId` is still 0.
 - **The icons are made:** 50 on-theme PBR icons, one for every product, pass and the subscription, in
   `art/group-upload-shop/` (see "The icons").
-  - **Uploaded:** 49 to the group, all pending moderation.
+  - **Uploaded:** all 50 to the group, all pending moderation.
     - **Ids:** in `art/group-upload-shop/ids.json`, and in NH Combat Test's `Config.Shop.Icons`. The 13 existing
       products each carry an `Icon` key.
-    - **Missing:** `NHShopPassExtraStudents` didn't upload.
   - **Products and passes:** none exist on the experience yet.
 - **Related:** [[Names-Clans-and-Spin-Shop]], [[Races-and-Bloodlines]], [[Height]], [[Homes]], [[Phone]],
   [[Skateboards]], [[Accessories]], [[QOL-Kit]], [[Inventory-QOL-Concepts]], [[Main-Menu]], [[Icon-Set]].
