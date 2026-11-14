@@ -6,7 +6,12 @@ inclined to buy them even if they don't have a bunch of robux. Rerolls should be
 of them on theme and their prices."
 
 **Status:**
-- **Nothing is on sale.** The Spin Shop's 13 developer products are wired up, but every `ProductId` is still 0.
+- **The spins are on sale in NH Combat Test (2.20.0).** The owner created 14 developer products on its experience
+  (universe 10773746169): every spin pack, both bundles and the name change. They're wired into `Config.Shop`.
+  - **Prices:** the owner's own, set on the dashboard with managed pricing on (in the table below). The shop shows
+    the price Roblox gives each player, which can differ by region and is 20% less for Roblox Plus members.
+  - **The live game needs its own copies:** a developer product belongs to one experience.
+  - **Not on sale yet:** the capes, and everything marked (new) apart from the spins.
 - **The icons are made:** 50 on-theme PBR icons, one for every product, pass and the subscription, in
   `art/group-upload-shop/` (see "The icons").
   - **Uploaded:** all 50 to the group, all pending moderation.
@@ -61,23 +66,25 @@ of them on theme and their prices."
 
 Rows marked **(new)** are not built yet. The others exist in `Config.Shop`.
 
-### Spins: rerolls, super cheap
-| Product | Gives | Price | Icon | Design |
-|---|---|---|---|---|
-| Clan Spin | 1 clan spin | **R$ 5** | `ClanSpins1` | a gilt-edged crimson clan shield (chevron and three stars) inside two chasing reroll arrows |
-| Clan Spins x5 | 5 | **R$ 19** | `ClanSpins5` | three shields, blue, crimson and green |
-| Clan Spins x15 | 15 | **R$ 49** | `ClanSpins15` | five shields fanned |
-| Height Spins x3 | 3 | **R$ 9** | `HeightSpins3` | a notched brass measuring rod, an ivory student and a gilt up-and-down arrow |
-| Height Spins x10 | 10 | **R$ 25** | `HeightSpins10` | the same, "x10" |
-| Race Spins x3 | 3 | **R$ 15** | `RaceSpins3` | a moon-chalk crescent cradling a crimson faceted gem in a brass bezel, six race marks round it |
-| Race Spins x10 | 10 | **R$ 39** | `RaceSpins10` | the same, "x10" |
-| Variant Spins x3 | 3 | **R$ 9** | `VariantSpins3` | three hex gems (blue, gold, crimson): the same race, another variant |
-| Variant Spins x10 (new) | 10 | **R$ 25** | `VariantSpins10` | the same, "x10" |
-| Trait Spins x5 | 5 | **R$ 9** | `TraitSpins5` | three gilt-framed tarot cards with star and moon devices |
-| Trait Spins x15 (new) | 15 | **R$ 25** | `TraitSpins15` | the same, "x15" |
-| Bloodline Bundle (new) | 3 race + 3 variant + 5 trait | **R$ 25** (R$ 33 apart) | `BloodlineBundle` | the crescent and gem, a tarot card, two variant gems, a "BUNDLE" plate |
-| Identity Bundle (new) | 5 clan + 3 height | **R$ 22** (R$ 28 apart) | `IdentityBundle` | the clan shield and the measuring rod |
-| Name Change | 1 rename after enrolling | **R$ 25** | `NameChange` | the open school register, a bone quill across it, a crimson wax seal |
+### Spins: rerolls (on sale in NH Combat Test)
+Prices are the owner's dashboard base prices (2026-11-14), with the product ids.
+
+| Product | Gives | Price | Product id | Icon | Design |
+|---|---|---|---|---|---|
+| Clan Reroll | 1 clan spin | **R$ 10** | 3731113386 | `ClanSpins1` | a gilt-edged crimson clan shield (chevron and three stars) inside two chasing reroll arrows |
+| Clan Reroll x5 | 5 | **R$ 39** | 3731113943 | `ClanSpins5` | three shields, blue, crimson and green |
+| Clan Reroll x15 | 15 | **R$ 89** | 3731113998 | `ClanSpins15` | five shields fanned |
+| Height Reroll x3 | 3 | **R$ 19** | 3731114273 | `HeightSpins3` | a notched brass measuring rod, an ivory student and a gilt up-and-down arrow |
+| Height Reroll x10 | 10 | **R$ 49** | 3731114370 | `HeightSpins10` | the same, "x10" |
+| Race Reroll x3 | 3 | **R$ 25** | 3731114428 | `RaceSpins3` | a moon-chalk crescent cradling a crimson faceted gem in a brass bezel, six race marks round it |
+| Race Reroll x10 | 10 | **R$ 69** | 3731114490 | `RaceSpins10` | the same, "x10" |
+| Variant Reroll x3 | 3 | **R$ 19** | 3731114557 | `VariantSpins3` | three hex gems (blue, gold, crimson): the same race, another variant |
+| Variant Reroll x10 | 10 | **R$ 49** | 3731114611 | `VariantSpins10` | the same, "x10" |
+| Trait Reroll x5 | 5 | **R$ 29** | 3731114678 | `TraitSpins5` | three gilt-framed tarot cards with star and moon devices |
+| Trait Reroll x15 | 15 | **R$ 69** | 3731114736 | `TraitSpins15` | the same, "x15" |
+| Bloodline Bundle | 3 race + 3 variant + 5 trait | **R$ 79** | 3731117742 | `BloodlineBundle` | the crescent and gem, a tarot card, two variant gems, a "BUNDLE" plate |
+| Identity Bundle | 5 clan + 3 height | **R$ 59** | 3731117907 | `IdentityBundle` | the clan shield and the measuring rod |
+| Name Change | 1 rename after enrolling | **R$ 15** | 3731119590 | `NameChange` | the open school register, a bone quill across it, a crimson wax seal |
 
 ### Wardrobe (owned for good)
 | Product | Price | Icon | Design |

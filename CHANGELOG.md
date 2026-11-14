@@ -2,6 +2,50 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.20.0] - 2026-11-14: The Spin Shop's 14 products are on sale in NH Combat Test, with two bundles
+
+The owner created 14 developer products on NH Combat Test's experience (universe 10773746169) and said: "I've chosen
+these ones so far."
+- **Mirror:** `tools/shop-products-2200` (`live/` and `pre/`), plus `tools/monetization/ReplicatedStorage.Config.Shop.luau`.
+- **Studio backup:** `ServerStorage.NH_Backup.Products_pre_20261114` (Shop, Purchases, Identity).
+
+### What's on sale
+- **The ids are in `Config.Shop`:**
+  - clan rerolls x1, x5 and x15
+  - height x3 and x10
+  - race x3 and x10
+  - variant x3 and x10
+  - trait x5 and x15
+  - the Bloodline and Identity bundles
+  - the name change
+- **Prices:** `Price` now holds the owner's dashboard base prices (10 / 39 / 89, 19 / 49, 25 / 69, 19 / 49, 29 / 69,
+  79, 59, 15). It's only a fallback: the button shows the price Roblox gives the player, so managed pricing and the Roblox
+  Plus discount show correctly.
+- **New rows:** Variant x10, Trait x15 and the two bundles.
+- **Bundles (`Kind = "Bundle"`, `Grants`):**
+  - **What they give:** Bloodline is 3 race, 3 variant and 5 trait spins; Identity is 5 clan and 3 height spins.
+  - **In the shop:** they have their own Bundles section, whose text says what each holds.
+  - **Granting (`Services.Player.Purchases`):** checks the save first, then gives each part. A retried receipt can't
+    give the earlier parts twice.
+  - **The thank-you toast** lists the spins.
+- **Still not on sale:** the three capes (no products yet).
+- **The Map:** unchanged. It has no Spin Shop or purchase handler, and these products belong to NH Combat Test's
+  experience. The live game will need its own copies of the products.
+
+### Tested (NH Combat Test, slot 4 Testy, at night)
+- **The receipt path:** run through the real code with test receipts (`GrantProduct`).
+  - Bloodline gave +3 race, +3 variant and +5 trait.
+  - Identity gave +5 clan and +3 height.
+  - The same receipt a second time gave nothing.
+- **The shop:** every product shows its real price, which for the owner's Plus account is R$ 8 / 32 / 72, 16 / 40,
+  20 / 56, 16 / 40, 24 / 56, 64, 48 and 12. The Bundles section renders, and the capes still say "not on sale yet".
+- **Console:** no errors from game scripts.
+- **Restored:** `SlotCount` back to 3, and `NHTestNoMenuKeys` cleared. Testy keeps the test spins.
+
+### Not tested
+- **A real Robux purchase:** only the receipt code path with test receipts was run.
+- **The product icons on the dashboard:** they show Roblox's placeholder (pending moderation, or not set yet).
+
 ## [2.19.0] - 2026-11-13: Spawn delinquents on the Map, string enders play out in full, and the fist air heavy is a real downslam
 
 The owner: "The string enders should play out in full too. Fix the air m2 for fist sending the player too far. It should

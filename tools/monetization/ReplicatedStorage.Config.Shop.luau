@@ -2,12 +2,14 @@
 	Spin Shop (Robux). Server: Services.Player.Purchases (the only MarketplaceService.ProcessReceipt).
 	Every product is a Developer Product. Create them on the Creator Dashboard
 	(your experience > Monetization > Developer Products), then paste each id into ProductId below.
-	A product with ProductId = 0 shows as "Not on sale yet". Price is only a hint for the button (2026-11-13: the owner's cheap prices, docs/Monetization-Concepts.md);
-	the real price is read from Roblox once the id is set.
+	A product with ProductId = 0 shows as "Not on sale yet". Price is only a hint for the button: the real price is read
+	from Roblox once the id is set (managed pricing can change it by region, and Roblox Plus members see 20% off).
+	(2026-11-14) The owner created the 14 spin products on NH Combat Test's experience (universe 10773746169); Price holds
+	their dashboard base prices. Developer products belong to one experience: the live game needs its own copies.
 
 	Spins go to the student (save slot) you are playing when you buy.
-	Kinds: Spin = "Clan" | "Height" | "Race" | "Variant" | "Trait" (adds spins), Kind = "NameChange", or Kind = "Cape" (owned for good,
-	worn from the Wardrobe; models in ReplicatedStorage.NHCapes).
+	Kinds: Spin = "Clan" | "Height" | "Race" | "Variant" | "Trait" (adds spins), Kind = "NameChange", Kind = "Cape" (owned for good,
+	worn from the Wardrobe; models in ReplicatedStorage.NHCapes), or Kind = "Bundle" (Grants = a list of { Spin; Amount }).
 	Icon = a key of Shop.Icons: the product's icon image (art/group-upload-shop, docs/Monetization-Concepts.md).
 ]]
 
@@ -19,21 +21,28 @@ Shop.Groups = {
 	{ Id = `Race`;       Name = `Race Spins`;    Text = `Roll a new race and variant.` };
 	{ Id = `Variant`;    Name = `Variant Spins`; Text = `Keep your race, roll its variant.` };
 	{ Id = `Trait`;      Name = `Trait Spins`;   Text = `Reroll one trait slot.` };
+	{ Id = `Bundles`;    Name = `Bundles`;       Text = `Bloodline: 3 race, 3 variant and 5 trait spins. Identity: 5 clan and 3 height spins. Each spin has its own kind's odds.` };
 	{ Id = `NameChange`; Name = `Name Change`;   Text = `Change your first name after you have enrolled.` };
 	{ Id = `Capes`;      Name = `Capes`;         Text = `Rigged capes that sway as you move. Owned for good by this student; wear one from the Wardrobe (Outfit).` };
 }
 
 Shop.Products = {
-	{ Key = `Clan1`;      Group = `Clan`;       Spin = `Clan`;    Amount = 1;  Price = 5;  ProductId = 0; Icon = `ClanSpins1` };
-	{ Key = `Clan5`;      Group = `Clan`;       Spin = `Clan`;    Amount = 5;  Price = 19; ProductId = 0; Icon = `ClanSpins5`; Badge = `Popular` };
-	{ Key = `Clan15`;     Group = `Clan`;       Spin = `Clan`;    Amount = 15; Price = 49; ProductId = 0; Icon = `ClanSpins15`; Badge = `Best value` };
-	{ Key = `Height3`;    Group = `Height`;     Spin = `Height`;  Amount = 3;  Price = 9;  ProductId = 0; Icon = `HeightSpins3` };
-	{ Key = `Height10`;   Group = `Height`;     Spin = `Height`;  Amount = 10; Price = 25; ProductId = 0; Icon = `HeightSpins10`; Badge = `Best value` };
-	{ Key = `Race3`;     Group = `Race`;       Spin = `Race`;    Amount = 3;  Price = 15; ProductId = 0; Icon = `RaceSpins3` };
-	{ Key = `Race10`;     Group = `Race`;       Spin = `Race`;    Amount = 10; Price = 39; ProductId = 0; Icon = `RaceSpins10`; Badge = `Best value` };
-	{ Key = `Variant3`;   Group = `Variant`;    Spin = `Variant`; Amount = 3;  Price = 9;  ProductId = 0; Icon = `VariantSpins3` };
-	{ Key = `Trait5`;     Group = `Trait`;      Spin = `Trait`;   Amount = 5;  Price = 9;  ProductId = 0; Icon = `TraitSpins5` };
-	{ Key = `NameChange`; Group = `NameChange`; Kind = `NameChange`; Amount = 1; Price = 25; ProductId = 0; Icon = `NameChange` };
+	{ Key = `Clan1`;      Group = `Clan`;       Spin = `Clan`;    Amount = 1;  Price = 10; ProductId = 3731113386; Icon = `ClanSpins1` };
+	{ Key = `Clan5`;      Group = `Clan`;       Spin = `Clan`;    Amount = 5;  Price = 39; ProductId = 3731113943; Icon = `ClanSpins5`; Badge = `Popular` };
+	{ Key = `Clan15`;     Group = `Clan`;       Spin = `Clan`;    Amount = 15; Price = 89; ProductId = 3731113998; Icon = `ClanSpins15`; Badge = `Best value` };
+	{ Key = `Height3`;    Group = `Height`;     Spin = `Height`;  Amount = 3;  Price = 19; ProductId = 3731114273; Icon = `HeightSpins3` };
+	{ Key = `Height10`;   Group = `Height`;     Spin = `Height`;  Amount = 10; Price = 49; ProductId = 3731114370; Icon = `HeightSpins10`; Badge = `Best value` };
+	{ Key = `Race3`;      Group = `Race`;       Spin = `Race`;    Amount = 3;  Price = 25; ProductId = 3731114428; Icon = `RaceSpins3` };
+	{ Key = `Race10`;     Group = `Race`;       Spin = `Race`;    Amount = 10; Price = 69; ProductId = 3731114490; Icon = `RaceSpins10`; Badge = `Best value` };
+	{ Key = `Variant3`;   Group = `Variant`;    Spin = `Variant`; Amount = 3;  Price = 19; ProductId = 3731114557; Icon = `VariantSpins3` };
+	{ Key = `Variant10`;  Group = `Variant`;    Spin = `Variant`; Amount = 10; Price = 49; ProductId = 3731114611; Icon = `VariantSpins10`; Badge = `Best value` };
+	{ Key = `Trait5`;     Group = `Trait`;      Spin = `Trait`;   Amount = 5;  Price = 29; ProductId = 3731114678; Icon = `TraitSpins5` };
+	{ Key = `Trait15`;    Group = `Trait`;      Spin = `Trait`;   Amount = 15; Price = 69; ProductId = 3731114736; Icon = `TraitSpins15`; Badge = `Best value` };
+	{ Key = `BloodlineBundle`; Group = `Bundles`; Kind = `Bundle`; Label = `Bloodline`; Amount = 1; Price = 79; ProductId = 3731117742; Icon = `BloodlineBundle`;
+		Grants = { { Spin = `Race`; Amount = 3 }; { Spin = `Variant`; Amount = 3 }; { Spin = `Trait`; Amount = 5 } } };
+	{ Key = `IdentityBundle`;  Group = `Bundles`; Kind = `Bundle`; Label = `Identity`;  Amount = 1; Price = 59; ProductId = 3731117907; Icon = `IdentityBundle`;
+		Grants = { { Spin = `Clan`; Amount = 5 }; { Spin = `Height`; Amount = 3 } } };
+	{ Key = `NameChange`; Group = `NameChange`; Kind = `NameChange`; Amount = 1; Price = 15; ProductId = 3731119590; Icon = `NameChange` };
 	{ Key = `CapeVamp`;   Group = `Capes`;      Kind = `Cape`; Cape = `Vamp Cape`;  Amount = 1; Price = 49; ProductId = 0; Icon = `CapeVamp` };
 	{ Key = `CapeRogue`;  Group = `Capes`;      Kind = `Cape`; Cape = `Rogue Cape`; Amount = 1; Price = 49; ProductId = 0; Icon = `CapeRogue` };
 	{ Key = `CapeFur`;    Group = `Capes`;      Kind = `Cape`; Cape = `Fur Cape`;   Amount = 1; Price = 69; ProductId = 0; Icon = `CapeFur`; Badge = `New` };
