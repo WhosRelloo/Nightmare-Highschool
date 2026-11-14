@@ -2,6 +2,50 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.14.1] - 2026-11-13: All the combat work from 2.8 to 2.14 is on the Map
+
+Owner: "Port combat to the Map." The Map (placeId 111107083446202) now has everything from 2.8.0 to 2.14.0:
+- **2.8:** the combat audit fixes.
+- **2.9:** the feel set: counter-hits, directional reacts, the combo counter, damage numbers and the hit-stop
+  settings.
+- **2.10:** string enders, the clinch and riposte.
+- **2.11:** lock-on, the delay string, the charged heavy and wall splats.
+- **2.12:** the bespoke shove, body blow and clinch animations.
+- **2.13:** client-predicted swings, lag-compensated hits and the combat log.
+- **2.14:** hand gear, the race-flavoured 4th hit, and Heat with its brazier.
+
+How it was done is in `tools/map-port-2140/README.md`. The Map's backup is
+`ServerStorage.NH_Backup.CombatPort_pre_20261113`.
+
+### Changed on the Map
+- **23 existing scripts:** each release's edit lists were replayed onto the Map's own copies. Every Map copy matched
+  the pre-release code exactly, and all 139 edits applied cleanly. 21 came out identical to NH Combat Test.
+  - **Config.Armory:** the remaining difference is the asset ids, which were taken over too.
+  - **Config.Discipline:** it gets only the Contraband line, not the Delinquent session's 2.8.1 block.
+- **16 new scripts:** the enders, the clinch, lock-on, prediction, lag compensation, the combat log, Heat, race fists,
+  hand gear, the Heat meter and the client effects. Every path they use exists on the Map.
+- **New assets, tagged `NHCore`:** `Fist.Moves` (the four published clips) and `Assets.HandGear` (the three gear
+  templates).
+
+### Tested (the Map, in Studio play)
+- **Startup:** no new script errors on the server or client. The only error is the Map's existing Studio DataStore
+  block.
+- **Equip and the string:** fists equip with E. A 4-hit string on a 1000-health test dummy played every hit, and
+  hits 1 and 3 were predicted: the client's copy plus the server's 0.01 timing copy.
+- **Heat:** it reached 24 from the four hits.
+- **The Shove:** click then R played the bespoke Shove clip.
+- **Gear:** the weighted gloves drew on both hands from the templates.
+- **The brazier:** it showed on the health bar's right cap.
+- **Cleanup:** the test dummy and gear were removed, and `SlotCount` and `NHTestNoMenuKeys` were restored.
+
+### Not ported, on purpose
+- **The hall monitor and the test bridge:** the Map has neither, so brass knuckles aren't confiscated there yet, and
+  the combat log has no bridge command there.
+- **Other sessions' work** (hunger, delinquent 2.8.1).
+
+### For the owner
+- **Save** the Map and NH Combat Test.
+
 ## [2.14.0] - 2026-11-13: Fist growth: hand gear, race-flavoured finishers, and the Heat meter
 
 Owner: "D (except fighting styles for now)", as designed and approved: concepts 16, 17 and 18 in
