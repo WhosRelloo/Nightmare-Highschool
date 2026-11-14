@@ -1,0 +1,192 @@
+[
+ {
+  "path": "ServerScriptService.Services.Player.Progression",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ServerScriptService.Services.Managers.EntityLoader",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ServerScriptService.Services.Features.RaceAction",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ServerScriptService.Services.Features.Inventory",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ServerScriptService.Services.Features.Kit",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ServerScriptService.Services.AI.AI.NPCActions",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ServerStorage.Packages.DamageLogic",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ReplicatedStorage.PlayerData",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ReplicatedStorage.Config.NPC",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ReplicatedStorage.Config.Discipline",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ReplicatedStorage.Config.Quests",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ReplicatedStorage.Config.DayCycle",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ReplicatedStorage.Config.Items",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ReplicatedStorage.Config.Ambience",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ReplicatedStorage.Functions.UpdateState",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ReplicatedStorage.Packages.Bind.Keybinds.Config",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.Gui.ClockHud",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.Gui.KitHud",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.Gui.Locker",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.Gui.PhoneGames.Hex",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.Gui.PhoneGames.Crypt",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.Gui.SnackWheel",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.World.DayCycle",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.World.Soundscape",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.World.KitFx",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ServerScriptService.Services.Features.MapStudents",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ServerScriptService.Services.Features.MapStudents.Lines",
+  "mode": "replace",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ReplicatedStorage.Functions.RegionBoxes",
+  "mode": "new",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.World.AmbienceMix",
+  "mode": "new",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.World.AmbientSounds",
+  "mode": "new",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ServerStorage.Packages.BeastStagger",
+  "mode": "new",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ServerStorage.Packages.TagAssist",
+  "mode": "new",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.Character.InputController.Combat.Assist",
+  "mode": "new",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.StateController.Misc.General.Beast Stagger",
+  "mode": "new",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.StateController.Misc.General.Tag Assist",
+  "mode": "new",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "StarterPlayer.StarterPlayerScripts.Controllers.Gui.HungerVessel",
+  "mode": "new",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ReplicatedStorage.Config.Body",
+  "mode": "new",
+  "class": "ModuleScript"
+ },
+ {
+  "path": "ServerScriptService.Services.Features.Body",
+  "mode": "new",
+  "class": "ModuleScript"
+ }
+]

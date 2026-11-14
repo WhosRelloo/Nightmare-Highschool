@@ -2,6 +2,69 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.17.1] - 2026-11-13: Today's updates are on the Map
+
+The owner asked: "Commit the hunger, and port all of the updates we did today to the Map place." Hunger 1.0 was committed
+by its own session (`5d621eb`). This release puts today's work into the systems the Map has: the 2.15 fights, the 2.16
+skies, the 2.17 ambience, Hunger 1.0, the inventory batches, and the Delinquent record.
+- **Mirror:** `tools/map-port-2171`. It has `ported/` (what was installed), `pre/` (the Map's versions before),
+  `plan.json`, and `place_hashes.py` (the checksum scan).
+- **Map backup:** `ServerStorage.NH_Backup.TodayPort_pre_20261113`.
+
+### How
+- **Checksums:** every script in both places was checksummed, one folder at a time; one big scan had been cut off by
+  the output cap. 38 scripts differed.
+- **Straight copies:** for 22 of them, the Map's copy was byte-identical to an NH Combat Test backup taken just before a
+  release. Those were brought up to date by copying NH Combat Test's current version, and 35 of the installed scripts
+  now match it exactly.
+- **Merged:**
+  - **`Gui.Locker`:** three-way merged, so it keeps the Map's locker-room rule.
+  - **`Features.MapStudents`:** got 2.15's crowd ring, phones and lines from `AI.StudentBrain`. The one conflict used the
+    Map's own lines (it has no line matrix), and the phone helpers were pointed at the module's `Shared` table.
+- **Left as they are:** 14 scripts are the Map's own versions (its no-save `Data`, `Identity` and `Height`, `Doors`,
+  `Training`, `ContactFeel`, `NpcLook`, `UI.Appearance`, `Wardrobe`, `TopBar`, `Evolution`, `Config.Cliques`,
+  `Config.Shop`). None of them had changes from today.
+
+### What came across
+- **2.15.0, fights in the world:**
+  - **Enemy NPCs on fists:** `EntityLoader`, `Config.NPC` and `NPCActions`.
+  - **Tag assists:** `TagAssist`, the G key (`Combat.Assist`, Keybinds) and its effect.
+  - **Beast stagger:** `DamageLogic`, `BeastStagger` and its effect. The Map has no beasts yet, so it waits.
+  - **Crowds at fights:** `MapStudents` and its Lines.
+- **2.16.0, painted skies:** `World.DayCycle` and `Config.DayCycle`.
+- **2.17.0, ambience:** `Soundscape`, `KitFx` and `Config.Ambience` (with the sheet ids), plus the new `AmbienceMix`,
+  `AmbientSounds` and `Functions.RegionBoxes`. The Map's 29 region boxes now drive the reverb and the place beds once
+  they're moved over their places.
+- **Hunger 1.0:**
+  - **New:** `Config.Body`, `Features.Body` and `Gui.HungerVessel`.
+  - **Updated:** `Functions.UpdateState`, `PlayerData`, `Inventory`, `RaceAction`, `Progression` and `SnackWheel`.
+- **Inventory batches 5 (from yesterday), 6 (2.4.0) and 7 (2.7.0), with the taste book (2.2.0):** `Config.Items`,
+  `Inventory`, `Progression`, `KitHud` and `Locker`.
+- **The Delinquent audit (2.7.3) and the record with teeth (2.8.1):** `PlayerData`, `ClockHud`, `Config.Discipline`
+  (the Record block), `Config.Quests` and `Kit`. The Map has no school services (Discipline, the hall monitor), so most
+  of the record has nothing to act on there yet.
+- **The phone games' seal icons (from 2026-11-11):** `PhoneGames.Hex` and `PhoneGames.Crypt`.
+
+### Not ported, on purpose
+- **Systems the Map doesn't have:** the school, social, quest and sports services; the main menu and slots; the hall
+  monitor; the TestBridge; `BeastTell`.
+- **2.3.0 builds by clique:** these live in `AI.StudentBrain`. `MapStudents` keeps its own looks.
+
+### Tested (Map, Play)
+- **First run:** `MapStudents` failed to load (`Brain._MakePhone`: the module is called `Shared` there), which also
+  stopped `ContactFeel`. Fixed and reinstalled.
+- **Second run:**
+  - **Errors:** no script errors. The `[Progression] missing …` warnings were already there before the port.
+  - **Ambience:** the four ambience groups are built, the day bed plays through Bed, and the reverb outdoors is Plain.
+  - **The sky:** the painted day sky is up (`119988626923704`).
+  - **Hunger:** it ticks (Hunger 69.8, Fed), and the hunger vignette's gui is there.
+  - **The rest:** the `NHAssist` remote exists, 4 students spawned, and the region boxes are hidden in game.
+- **Not checked on the Map:**
+  - A crowd forming round a fight.
+  - A tag assist (it needs two players).
+  - The vessel's art on the health bar.
+  - The reverb by place, which waits until the region boxes are placed.
+
 ## [2.17.0] - 2026-11-13: Ambience foundations: the mixer, three sound layers, room reverb, our own sounds, and the Map's region boxes
 
 The owner said "Yes, foundations", then: "make sounds ourselves" and "Add the region boxes to the map, but keep them
