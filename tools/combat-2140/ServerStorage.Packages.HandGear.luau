@@ -69,9 +69,10 @@ function HandGear.Dress(Character: Model, Id: string?)
 			SA.MetalnessMap = G.Textures.Metalness or ``
 			SA.Parent = Part
 		end
-		-- the left hand is the mirror of the right (the mesh is a right hand)
-		local Mirror = if ArmName == `Left Arm` then CFrame.Angles(0, math.pi, 0) else CFrame.identity
-		Part.CFrame = Arm.CFrame * (G.Offset or CFrame.new(0, -1, 0)) * Mirror
+		-- the meshes are symmetric left to right, so the same part sits on both arms; Offset is the mesh's bounding-box
+		-- centre in the arm's space (art/group-upload-fistgear/README.md), Size its size in studs
+		if typeof(G.Size) == `Vector3` then Part.Size = G.Size end
+		Part.CFrame = Arm.CFrame * (G.Offset or CFrame.new(0, -0.68, 0))
 		local W = Instance.new(`WeldConstraint`)
 		W.Part0 = Arm
 		W.Part1 = Part

@@ -85,6 +85,15 @@ and `patches.py`. Studio backup: `ServerStorage.NH_Backup.CombatD_pre_20261113`.
 - **The gear models and art:** they need the owner's uploads (below).
 - **The tab highlight:** the active tab's gold label was added after the last play session.
 
+### Art (`art/group-upload-fistgear/`, made in Blender, headless)
+- **Gear:** three hand pieces, each about 1,100–1,300 tris with 1024² PBR maps. They're symmetric, so the same mesh
+  goes on both arms.
+  - **Placement:** each piece's `Offset` and `Size` are already in `Config.Armory.Gear`, from the art's README.
+- **Icons:** three armory icons.
+- **The Heat brazier:** Frame, Fill, Glow, Spark and Flare. The fill rows (y 34–158 of 256) are set in
+  `Config.HeatArt`.
+- **The overview:** `NHFistGear_Sheet.png` shows everything together.
+
 ### For the owner
 - **Upload** the art from `art/group-upload-fistgear/` to group 15981569:
   - **Gear:** the three meshes and their textures go in `Config.Armory.Gear[...]`: `Mesh`, `Textures`, and `Offset`

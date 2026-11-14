@@ -54,7 +54,7 @@ function Local.Build(Bottom: Frame)
 	local Glow = new(`ImageLabel`, {
 		Name = `Glow`; BackgroundTransparency = 1; ZIndex = 20; Image = if Has(`Glow`) then Art.Glow else `rbxassetid://117234203443052`;
 		ImageColor3 = EMBER; ImageTransparency = 1; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5);
-		Size = UDim2.fromScale(1.9, 1.9);
+		Size = UDim2.fromScale(1.5, 1.5); -- the art's glow is 1.5x the frame, same centre
 	}, Root)
 	-- the brazier: the art, or an iron disc with a brass rim
 	local Frame
@@ -74,8 +74,9 @@ function Local.Build(Bottom: Frame)
 	}, Root)
 	local Fill
 	if Has(`Fill`) then
+		-- pinned to the brazier, not the clip: the clip's bottom is the coal line (Bot), the image's bottom is the brazier's
 		Fill = new(`ImageLabel`, { Name = `Fill`; BackgroundTransparency = 1; ZIndex = 22; Image = Art.Fill; AnchorPoint = Vector2.new(0, 1);
-			Position = UDim2.fromScale(0, 1); Size = UDim2.fromOffset(SIZE, SIZE) }, Clip)
+			Position = UDim2.new(0, 0, 1, math.floor((1 - Bot) * SIZE + 0.5)); Size = UDim2.fromOffset(SIZE, SIZE) }, Clip)
 	else
 		Fill = new(`Frame`, { Name = `Fill`; BackgroundColor3 = Color3.new(1, 1, 1); ZIndex = 22; AnchorPoint = Vector2.new(0.5, 1);
 			Position = UDim2.new(0.5, 0, 1, 0); Size = UDim2.fromOffset(SIZE * 0.76, SIZE * 0.76) }, Clip)

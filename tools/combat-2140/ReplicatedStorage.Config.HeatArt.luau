@@ -10,6 +10,6 @@ return {
 	Glow = ``;    -- NHHeat_Glow.png
 	Spark = ``;   -- NHHeat_Spark.png
 	Flare = ``;   -- NHHeat_Flare.png
-	FillTop = 0.3;
-	FillBottom = 0.78;
+	FillTop = 0.133;   -- the flame tip, y 34 of 256
+	FillBottom = 0.617; -- the coals' bottom, y 158 of 256
 }

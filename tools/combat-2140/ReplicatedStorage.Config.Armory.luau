@@ -30,12 +30,17 @@ Armory.Shop = { Name = `Iron Vigil Armoury`; Sub = `The armourer`; Text = `Every
 -- (2.14.0, combat concept 16) hand gear for fists: bought here, one worn at a time (PlayerData.Armory.Gear =
 -- { Owned = { [Id] = true }, Worn = Id }). Effects: ServerStorage.Packages.HandGear. Icon / Mesh / textures are group
 -- 15981569 uploads (art/group-upload-fistgear); while empty the shop shows the name and nothing is drawn on the hands.
+-- Mesh = the uploaded FBX's MeshId; Textures = { Color = id, Normal = id, Roughness = id, Metalness = id };
+-- Offset / Size = where the mesh sits on each arm (art README, studs; the same part goes on both arms).
 Armory.Gear = {
-	{ Id = `HandWraps`; Name = `Hand Wraps`; Price = 250; Icon = ``;
+	{ Id = `HandWraps`; Name = `Hand Wraps`; Price = 250; Icon = ``; Mesh = ``; Textures = nil;
+		Offset = CFrame.new(0, -0.677, -0.009); Size = Vector3.new(1.158, 0.784, 1.177);
 		Text = `Taped knuckles. You take 10% less guard damage while blocking.` };
-	{ Id = `WeightedGloves`; Name = `Weighted Gloves`; Price = 500; Icon = ``;
+	{ Id = `WeightedGloves`; Name = `Weighted Gloves`; Price = 500; Icon = ``; Mesh = ``; Textures = nil;
+		Offset = CFrame.new(0, -0.688, -0.016); Size = Vector3.new(1.166, 0.733, 1.198);
 		Text = `Iron in the knuckles. +20% guard damage, but your swings are 5% slower.` };
-	{ Id = `BrassKnuckles`; Name = `Brass Knuckles`; Price = 800; Icon = ``; Contraband = true;
+	{ Id = `BrassKnuckles`; Name = `Brass Knuckles`; Price = 800; Icon = ``; Contraband = true; Mesh = ``; Textures = nil;
+		Offset = CFrame.new(0, -0.729, -0.544); Size = Vector3.new(1.095, 0.679, 0.111);
 		Text = `+15% fist damage, +10% guard damage. Contraband: a hall monitor who sees you fight takes them.` };
 }
 Armory.GearById = {}

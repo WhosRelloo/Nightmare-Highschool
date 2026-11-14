@@ -440,3 +440,19 @@ EDITS = [(U, """	for Name, B in Ui.Tabs or {} do
 	end""", """	for Name, B in Ui.Tabs or {} do
 		pcall(function() B.Label.TextColor3 = if Name == Tab then C.Gold else C.TextDim end)
 	end""")]
+AR = "ReplicatedStorage.Config.Armory"
+EDITS = [
+ (AR, """	{ Id = `HandWraps`; Name = `Hand Wraps`; Price = 250; Icon = ``;""",
+      """	{ Id = `HandWraps`; Name = `Hand Wraps`; Price = 250; Icon = ``; Mesh = ``; Textures = nil;
+		Offset = CFrame.new(0, -0.677, -0.009); Size = Vector3.new(1.158, 0.784, 1.177);"""),
+ (AR, """	{ Id = `WeightedGloves`; Name = `Weighted Gloves`; Price = 500; Icon = ``;""",
+      """	{ Id = `WeightedGloves`; Name = `Weighted Gloves`; Price = 500; Icon = ``; Mesh = ``; Textures = nil;
+		Offset = CFrame.new(0, -0.688, -0.016); Size = Vector3.new(1.166, 0.733, 1.198);"""),
+ (AR, """	{ Id = `BrassKnuckles`; Name = `Brass Knuckles`; Price = 800; Icon = ``; Contraband = true;""",
+      """	{ Id = `BrassKnuckles`; Name = `Brass Knuckles`; Price = 800; Icon = ``; Contraband = true; Mesh = ``; Textures = nil;
+		Offset = CFrame.new(0, -0.729, -0.544); Size = Vector3.new(1.095, 0.679, 0.111);"""),
+ (AR, """-- 15981569 uploads (art/group-upload-fistgear); while empty the shop shows the name and nothing is drawn on the hands.""",
+      """-- 15981569 uploads (art/group-upload-fistgear); while empty the shop shows the name and nothing is drawn on the hands.
+-- Mesh = the uploaded FBX's MeshId; Textures = { Color = id, Normal = id, Roughness = id, Metalness = id };
+-- Offset / Size = where the mesh sits on each arm (art README, studs; the same part goes on both arms)."""),
+]
