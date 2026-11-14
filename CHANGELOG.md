@@ -403,6 +403,103 @@ Owner: "Let's do Section C" (`docs/Combat-Audit-and-Concepts.md`, concepts 12 to
 - **Other players' view:** what a second player sees of your predicted swing.
 - **Katana:** prediction uses each weapon's own clips, but only fists were tested.
 
+## [Hunger 1.0] - 2026-11-13: Every race gets hungry, and a race vessel on the health bar
+
+Owner: "Phases 1 and 2" of `docs/Hunger-and-Body-Concept.md`. The concept's "Your calls" weren't answered, so this
+uses each recommended option:
+- the new need is called Hunger;
+- hunger never costs health;
+- hunger never falls below 35 while you're away;
+- plain food gives Ghouls and Wraiths nothing.
+
+See `docs/Hunger.md`. Sources: `tools/hunger-100/`. Backups: `ServerStorage.NH_Backup.Hunger_pre`. Built in NH Combat
+Test; the Map isn't done yet.
+
+### Added
+- **Hunger** (0 to 100) for every race (`Config.Body`, `Services.Features.Body`).
+  - **Decay:** it falls about 33 an hour while you play.
+  - **Eating:** you fill it by eating, from +8 for a small snack up to +40 for a lunch meal.
+  - **Bands:** Stuffed (2 min of food coma, −6% sprint), Full, Fed, Peckish, Hungry (−4% damage, 5% easier to spot)
+    and Starving (−8% damage, −10% class EXP). It never hurts you.
+  - **Away:** it falls at a quarter of the rate, never below 35. New students and old saves start at 70.
+- **Each race eats its own way:**
+
+  | Race | How it eats |
+  |---|---|
+  | Humans and Priests | food (Priests also Holy Water Lemonade) |
+  | Vampires | a quarter from food and +45 from The Kiss. They get hungrier by day, less at night, and not at all under a crimson moon. |
+  | Werewolves | meat x1.5 and sweets x0.5, +35 from Maul. They get twice as hungry on a full moon. |
+  | Ghouls | +55 from Eat Body and the Mystery Meat Loaf only, but hunger falls at 0.6x |
+  | Wraiths | +40 from Soul Siphon and a little from crowds. They get half as hungry on a new moon. |
+
+  Sub-races tune these numbers.
+- **Racial grips are meals:** a grip finish feeds Hunger as well as the Bloodline.
+- **Best food at full health** feeds your hunger instead of saying "You're not hurt.".
+- **The snack wheel:** each socket shows what the snack does for your hunger ("+14" in your race's colour, struck
+  through in grey when your race can't eat it).
+- **The vessel:** a race reliquary on the left end of the Thornrose health bar, with an enamel plate naming the band in
+  the race's words (Starving, Parched, Ravenous, Frenzied, Hollow, Faint and so on).
+  - **The level:** it fills with the race's contents.
+  - **Running:** the liquid sloshes as you run.
+  - **Eating:**
+    - a bead arcs in, a splash ring flares and "+14" drifts up;
+    - a race that can't eat it gets "Ash." or "Nothing.".
+  - **Band change:** the plate turns over.
+  - **Hungry:** it frosts over and growls.
+  - **Starving:** it pulses with a heartbeat and the screen's edges darken.
+  - **Resting:** it fades while you're fed and nothing changes.
+- **The vessel art** (`art/ui/hud/blender_hunger_vessels.py`, `finish_hunger_vessels.py`): six reliquaries modelled
+  and rendered in Blender with full PBR (`art/group-upload-hunger/`). The owner imported all 22 under the group; the
+  ids were read by name and set in `Config.Body.Art`. The client preloads your race's vessel, and the eating splash
+  uses the baked ring.
+- **Saving:** `PlayerData.Body` through ProfileService only (`SetBody`). The server decides every number.
+- **Test bridge:** `Body(name, "State" | "Set" | "Tick" | "Eat" | "Fed" | "Effects" | "Saved", ...)`.
+
+### Changed (owner: "Make its placement and sizing a little more subtle")
+- **Smaller:** the vessel is 92 px tall (the stand-in 46 x 68) and sits right against the health bar's end.
+- **The band plate** shows only after a band change, on hover, and while Hungry or Starving.
+- **Quieter:** the halo, motes, frost, vignette, growl and numbers are all toned down.
+- **Resting:** it fades sooner while you're fed.
+- **Checked in play:** a small "Parched" plate while Hungry; at Fed, the plate tucked away.
+- **The real art in play** (slot 3, a Vampire): it loaded. At Fed, the ruby heart was lit to the level. At Starving, the
+  heart went dark, the glass frosted and the "Starving" plate showed.
+
+### Tested (NH Combat Test, slot 3, a Vampire; slot 4 was locked)
+- **Loading:** an old save loaded at 70 (Full), and the save was written as `{ Hunger, LastTick, Race = Vampire, V = 1 }`.
+- **Decay:** a Vampire's daytime decay was 41.25 an hour (x1.25). One hour of ticks took 69.8 to 28.5.
+- **Feeding:**
+  - An Onigiri gave a Vampire +2 (8 x 25%).
+  - The Kiss gave +45. Eat Body gave a Vampire nothing.
+- **Effects:**
+  - **Hungry:** damage −0.04 and spotted +0.05, on the character.
+  - **Stuffed:** `NH_SprintMult` 0.943.
+- **Best food** through the real remote at full health and hunger 40: it ate the Nikuman ("Nikuman: +4 hunger").
+- **The vessel:**
+  - In play, the stand-in showed left of the health bar ("Gorged" at 95).
+  - At 3, the plate turned to "Starving" and the vignette came on.
+- **Fixed during the test:**
+  - The title font is an `Enum.Font` in the live theme.
+  - The `HungerBand` attribute lagged one band behind.
+  - The stand-in fill ignored its level, because two UIGradients were on one frame.
+- **A second run after the fixes:**
+  - **Offline:** after about 10 minutes away, the save came back at 68 from 70 (a quarter of the rate).
+  - **The band:** `Set(15)` read "Hungry" at once.
+  - **The stand-in:** it showed only a low fill under "Parched" (the Vampire's Hungry).
+- **The console:** no errors from the new code.
+- **Left behind:** slot 3's hunger was put back to 70; the 2 Onigiri granted for the test are still in its Locker.
+
+### Not tested
+- **The other five races on the live HUD:** their art was checked in a test overlay in game (all loaded, at empty, half
+  and full), not on the HUD itself.
+- **The eating animation by eye.**
+- **The Wraith's crowd.**
+- **Moons:** the full, new and crimson moon rates.
+- **Offline:** decay across a real rejoin.
+- **Grips:** a real grip finish.
+- **The snack-tin bite.**
+- **The snack wheel's hunger chips:** the wheel wasn't opened.
+- **More than one player.**
+
 ## [2.12.0] - 2026-11-13: Bespoke fist animations for the shove, the body blow and the clinch
 
 Owner: "Actually properly animate the stuff I told you no for before", using "the m1s already in the game as the BASE
