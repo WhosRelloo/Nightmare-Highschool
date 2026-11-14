@@ -74,6 +74,17 @@ play out forget about that quick stuff."
   (the target is pushed 2.5 studs, the attacker follows to 3.6), both face each other, and the M1 input turns you to
   the one you launched before each air swing. All four air hits land, and the 4th is the 1.5x downslam finisher.
 
+## Enders in full and real downslams (2.19.0)
+
+- **Enders:** the shove and the body blow now recover to the end of their clips (they were cut at 0.47 of 0.83 s and
+  0.50 of 0.87 s).
+- **Air heavy from a jump:** it was a 30 stud/s forward glide that slid 11-13 studs. It's now a hang and dive
+  (`Config.Weapons.Fist.AerialHeavy`) that lands 3 studs short of someone up to 7 studs ahead and stops dead.
+- **Heavy in an air combo:** it was the ground heavy's 100 stud/s shove, which sent the target across the map. It's
+  now an `AirDownslam` that ends the combo.
+- **The M1 air finisher:** it used the same 45-degree knockback (about 22 studs off). Both slams now push nearly
+  straight down, with a quarter of the force along your facing.
+
 ## Found but left alone
 
 - **Heavy (M2) damage.** Every weapon's heavy does 1.3x a light hit (Fist 3.9, against 3 for a light). The config's

@@ -2,6 +2,82 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.19.0] - 2026-11-13: Spawn delinquents on the Map, string enders play out in full, and the fist air heavy is a real downslam
+
+The owner: "The string enders should play out in full too. Fix the air m2 for fist sending the player too far. It should
+work like a downslam like the katana. And before you do ANY of that, make it so we can spawn delinquents, etc. in the
+map place."
+- **Mirror:** `tools/combat-2190`.
+  - `live/` and `pre/`: the scripts changed in both places.
+  - `map-new/`: the beast scripts added to the Map.
+  - `patches_spawner.py` and `patches_enders_airheavy.py`: the edits.
+- **Studio backups:**
+  - **NH Combat Test:** `ServerStorage.NH_Backup.Spawner_pre_20261113` and `EndersAirHeavy_pre_20261113`.
+  - **The Map:** the same two, plus its old empty AI rig, `AI_Rig_empty_pre`, inside `Spawner_pre_20261113`.
+
+### Spawning enemies (the Headmaster's Desk, F3 > Spawns), both places
+- **On the Map, no AI NPC could spawn at all.** Its `Services.AI.AI.Rig` was an empty model (only an Animate script), so
+  every NPC came out without a body or Humanoid. It's now rebuilt from the Map's own R6 student rig
+  (`ServerStorage.NHCore.NpcRig`, the same 67-part rig as NH Combat Test's), tagged NHCore.
+- **New buttons:** Delinquent, Delinquent Brute and Gang Leader, one at a time, next to the existing Delinquent crew.
+- **Where they come:** the crew and the single delinquents appear 12-16 studs in front of you, on the floor there
+  (`Features.Delinquents.SpawnAt` / `CrewAt`, Admin `SpawnDelinquent`). The Map has no hangout spots, and a test wants
+  them close.
+- **Wolf pack:** 3 wolves 18 studs in front of you, any time of day (`Features.WildWolves.SpawnPack`). Admin-spawned
+  wolves stay through the morning until killed or cleared, as admin beasts already did.
+- **Ported to the Map:** `Features.Delinquents`, `Features.WildWolves`, `Features.Beasts`, `Config.Beasts`,
+  `ReplicatedStorage.Beasts.HellhoundFX`, and the client's `World.BeastGaze` and `Indicators.BeastTell`.
+- **Beasts on the Map need their rigs:** `ServerStorage.NHBeasts` holds 4,143 instances (meshes, surface maps and
+  keyframe clips) that scripts can't copy between places. Until you copy that folder from NH Combat Test into the Map's
+  ServerStorage, a beast button says "The beast rigs (ServerStorage.NHBeasts) aren't in this place". The wolf model
+  (`ServerStorage.NHWolf`) is already on the Map.
+
+### Combat (both places)
+- **The string enders play out in full.** The shove (after hit 1) and the body blow (after hit 3) ended their recovery at
+  their EndLag marker (0.47 of 0.83 s and 0.50 of 0.87 s), where the next move cut in. They now recover to the end of
+  the clip. The uppercut launcher already did.
+- **The fist heavy in an air combo is a downslam.**
+  - **What was wrong:** after an uppercut, R ran the ground heavy, which shoves at 100 studs/s with no air check. It
+    sent the target across the map, and the input also treated it as the jump heavy.
+  - **Now:** it ends the combo and slams the target to the ground nearly straight down, with a small push ahead
+    (`AirDownslam`, a 90 stud/s knockback for 0.3 s, three-quarters of it downward). You turn to face the one you
+    launched first, as with the M1.
+- **The fist air heavy from a jump is a downslam.**
+  - **What was wrong:** it glided forward at 30 studs/s until it landed, then slid: 11 to 13 studs from where you
+    jumped.
+  - **Now (`Config.Weapons.Fist.AerialHeavy`):** you hang in the air until 0.22 s, then dive so the fist meets the
+    ground at 0.40 s. It lands 3 studs short of someone up to 7 studs ahead, or straight down if nobody is there, and
+    you stop dead.
+  - **The hit:** 1.8x damage, 25 posture, a 1.4 s stun, and a downward knockback. The whole 1.28 s clip plays.
+- **The M1 air finisher slams down too.** It used the same 45-degree knockback (your facing plus "down" at 80 studs/s),
+  which sent the target about 22 studs off. Now it's the same near-vertical slam.
+
+### Tested
+- **The Map, Play:**
+  - **Spawns:** through the desk's own remote, one Delinquent (100 HP), one Delinquent Brute (170), one Gang Leader
+    (220), a crew of 3, a sparring partner and a pack of 3 wolves all spawned in front of me, and the delinquents
+    fought me.
+  - **The panel:** the Spawns tab shows the new buttons.
+  - **Beasts and clearing:** a beast button gives the missing-rigs message, and "Clear all enemies" removed all 10.
+  - **Console:** no errors on client or server.
+- **NH Combat Test, slot 4 Testy, at night, with real mouse and keyboard input:**
+  - **The shove:** after hit 1, it played 0.83 of 0.83 s and landed.
+  - **The body blow:** after a 3-hit string, it played 0.87 of 0.87 s and landed (3.6).
+  - **The air-combo heavy:** uppercut, then R. It landed (3.9) and the dummy slammed to the ground about 6 studs
+    ahead. It had flown 24 to 30 studs before.
+  - **The M1 air finisher:** the 4 air hits landed, and the 4.5 finisher slammed the dummy down about 7 studs ahead.
+  - **The jump heavy:** it hung, dived, landed 4 studs forward (3 short of the dummy 7 studs away), stopped, and hit
+    for 5.4. It had travelled 11 to 13 studs before.
+  - **Console:** no errors on client or server.
+- **The Map, Play:** a jump heavy (1.28 of 1.28 s) and a shove ender (0.83 of 0.83 s) played whole, with no errors.
+- **Restored:** `SlotCount` back to 3 and `NHTestNoMenuKeys` cleared. Testy's weapon was switched to Katana for a
+  comparison and back to Fist.
+
+### Not tested
+- A real second player under the downslams.
+- Beasts on the Map, until `ServerStorage.NHBeasts` is copied there.
+- The katana's own air heavy, which still glides about 18 studs. The owner named only the fist.
+
 ## [2.18.0] - 2026-11-13: Fist swings play out in full, and the air combo's finisher lands
 
 The owner: "refine and completely bugfix fist combat, air crits, and the quick M1's. I want the whole animation to play
