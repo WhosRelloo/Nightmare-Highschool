@@ -2,6 +2,78 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.15.0] - 2026-11-13: Fights in the world: crowds, study-group tag assists, beast stagger, and enemy NPCs on fists
+
+Owner: "For section E, leave out map gaps and the sparring room for now. Continue." That's concepts 19, 21 and 22 in
+`docs/Combat-Audit-and-Concepts.md`. Also, from the owner: "the Enemy NPC's should normally have fists class or
+contraband items."
+- **Mirror:** the live scripts are in `tools/combat-2150/`, with the originals in `pre/` and `patches.py`.
+- **Studio backup:** `ServerStorage.NH_Backup.CombatE_pre_20261113`.
+
+### Added
+- **Crowds at fights (19).** Students who notice a fight now form a ring around it, instead of stopping wherever
+  they stood.
+  - **Where they stand:** each takes a spot just outside the distance that would make them flee (braver ones stand
+    closer), spread round the fight, facing it.
+  - **What they do:** the brave chant ("Fight! Fight! Fight!") and shout bets ("My lunch money's on the tall one."),
+    and the timid beg them to stop or say they're glad it isn't them. The rest call the state of the fight, and about
+    a third hold a phone up to record it.
+  - **Hall monitors:** a ring of three or more draws the nearest hall monitor (`HallMonitor.Respond`, once every 25 s
+    per ring).
+  - **Code:** `AI.StudentBrain` (`React.Gawk`) and new crowd lines in `StudentBrain.Lines`. No gore.
+- **Study-group tag assists (21).** The new assist key (G) does both halves:
+  - **Calling:** in a fight (you landed a hit in the last 3 s on someone within 30 studs), G calls your study group.
+    Every groupmate within 45 studs gets a toast: "<you> needs a hand! Press G to assist." for 2.5 s.
+  - **Answering:** a groupmate who presses G in time blinks beside your target in a gold streak and throws a lunging
+    strike. It lands as an ASSIST: 1.5× their weapon's damage, a 1 s stun, +20 guard and a shove.
+  - **Extras:** both of you get +10 Heat. The group's next assist is 20 s away.
+  - **Safety:** nobody's character moves unless they answer, and a groupmate is never the target.
+  - **Code:** `ServerStorage.Packages.TagAssist` (remote `NHAssist`), `InputController.Combat.Assist`, client
+    `Misc.General."Tag Assist"`, Keybinds `Assist`.
+  - **Gamepads:** there's no free pad button for it yet.
+- **Beast stagger (22).** Fists break a beast's footing faster than blades.
+  - **The meter:** every hit on a beast fills a hidden stagger meter: +12 a fist hit, +22 a heavy fist hit (the 4th,
+    an ender, a heavy), +4 for any other weapon. It cools after 3 s without hits.
+  - **Full:** the beast staggers. It's Paralyzed for 2 s (its guard-broken stagger, even through its stun guard),
+    takes 25% more damage meanwhile, and STAGGER shows on the readout. There's a pale-gold burst, and +15 Heat for
+    whoever broke it.
+  - **Cooldown:** it can't be staggered again for 6 s.
+  - **Code:** `ServerStorage.Packages.BeastStagger`, client `Misc.General."Beast Stagger"`, and `DamageLogic`.
+
+### Changed
+- **Enemy NPCs fight with their fists by default** (owner).
+  - **The default:** `Config.NPC.Default.Weapon` is now Fist, and so is the combat profile of every non-player
+    character (`EntityLoader`).
+  - **The named test dummies:** they keep their katanas (Blocking, ParryTrade, Attacking and the katana dummies).
+  - **Contraband:** a fist NPC carries brass knuckles 25% of the time (`ContrabandChance`), drawn on its hands with
+    the +15% damage. The NPC attribute `NHContraband` forces it on (true) or off (false).
+  - **Consistency:** when an NPC equips, its combat profile and its `Weapon` attribute now follow what it equipped
+    (`NPCActions.EquipNow`).
+- **Off switches:** ReplicatedStorage attributes `NHAssistOff` and `NHBeastStaggerOff`.
+
+### Tested (NH Combat Test, slot 4 Testy)
+- **Crowds:**
+  - **The fight:** at lunch, Testy punched the Inf Dummy near a group of students.
+  - **The ring:** two students too close backed away (as before). One watcher walked from 28 studs into a ring spot
+    12.9 studs out, at a new angle round the fight.
+  - **Not checked:** too few students were nearby to see a full ring, the phones (a 35% roll), or the
+    hall-monitor alert.
+  - **Testy's record:** the daytime test booked a Fighting violation on Testy (12 to 16 points), restored to 12 from
+    a snapshot afterwards.
+- **Beast stagger:** the Inf Dummy was put in the beasts folder and punched with fists. The meter read 12, 24, 36,
+  58 (the 4th hit +22), 70, 82, 94, then the next hit staggered it (`NHStaggerUntil` set, meter reset).
+- **Tag assist:** alone, G gives the toast "No study group: form a study group to call in an assist."
+- **Enemy NPCs:** six spawned AI fighters (contraband chance 50% for the test) all equipped Fist. Two carried brass
+  knuckles, drawn on both hands. A knuckle NPC's fist hits on Testy did 3.5 (3.0 × 1.15).
+- **Console:** no new script errors on the server or client (only errors from my own test commands).
+- **Restored:** `SlotCount` back to 3 and `NHTestNoMenuKeys` cleared, and the test NPCs and dummy were put back.
+
+### Not tested
+- **A real tag assist:** it needs two players in a study group (`docs/Two-Player-Test-Plan.md`).
+- **The crowds' phones and the hall-monitor alert:** see Tested.
+- **A real beast:** staggering one at night. The test used the dummy as a stand-in.
+- **The Map:** none of 2.15.0 is on the Map yet.
+
 ## [2.14.1] - 2026-11-13: All the combat work from 2.8 to 2.14 is on the Map
 
 Owner: "Port combat to the Map." The Map (placeId 111107083446202) now has everything from 2.8.0 to 2.14.0:

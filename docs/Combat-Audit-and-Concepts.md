@@ -243,6 +243,14 @@ so it's gone.
 22. **Beast stagger (S).** Fists break beast posture faster than blades: a "stagger" after enough hits opens a window.
     This gives fists a role against the night once you own a katana.
 
+**Built in 2.15.0:** 19, 21 and 22. The sparring room (20) is on hold by the owner's call.
+- **Crowds (19):** students ring a fight, chant, bet, beg and record, and three or more draw a hall monitor.
+- **Tag assists (21):** G calls your study group or answers its call. One assist per group every 20 s.
+- **Beast stagger (22):** a fist hit +12, a heavy fist hit +22, anything else +4. At 100 the beast is Paralyzed for
+  2 s and takes 25% more damage.
+
+Enemy NPCs now fight with their fists by default, and 25% of them carry brass knuckles.
+
 ## Where I'd start
 
 | Order | Concepts | Why |
