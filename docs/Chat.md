@@ -62,6 +62,29 @@ Owner: "completely change the chat ui and fix it so it doesn't activate any UI o
 - `require` from `execute_luau` gets its own module copy. To test the top bar's Chat button, click it; don't call
   `TopBar.SetChat`.
 
+## Roblox's chat and text rules (2.21.0, both places)
+
+- **Filtering:**
+  - **Chat:** every message goes through `TextChannel:SendAsync`, so Roblox filters it and applies each pair's privacy
+    settings. The window shows only the filtered `TextChatMessage.Text`, and bubbles are Roblox's own.
+  - **Names:** names from the register are filtered (`Identity`).
+- **Accounts that can't chat:** `Services.Features.ChatAccess` (server) asks `TextChatService:CanUserChatAsync` on
+  join and sets the Player attribute `NHCanChat`.
+  - **When it's false:** the window and bar are hidden, and `/` does nothing, as Roblox's own chat does.
+  - **When it's unknown:** after 4 tries it stays unset and the bar shows. Roblox still refuses to send for such an
+    account.
+- **Staff-typed text:** `Features.Admin` filters it before any command runs, as the sender's broadcast text
+  (`TextService:FilterStringAsync`). That covers:
+  - the `Reason` and `Text` fields: kick, ban, warn, shutdown, announce and notes
+  - a granted title
+  - the action log
+
+  If the filter can't answer, the command is refused.
+- **Nothing else carries typed text between players:**
+  - The phone has no free-text input.
+  - The wardrobe's box takes a catalog id.
+  - Cmdr's announce filters, and its kick text is fixed.
+
 ## Not covered yet
 - Your own bubble after a sent message didn't show in Studio solo, even with Roblox's chat on. `DisplayBubble` shows.
 - Real typing, other players and whispers, phones and controllers.

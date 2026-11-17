@@ -23,6 +23,16 @@ You only see a student's name once you've learned it.
 - The only public flag is `Signed` (true once you've signed the register). The main menu gets your own name from `Controllers.Gui.Identity`.
 - Duel messages no longer show account names: "Your opponent went down." / "You went down."
 
+## On the Map place (2.21.0)
+
+- **The scripts:** the Map runs the same `Social.Strangers` and `Gui.Strangers`.
+- **Names:** it has no main menu or register, so its no-save `Data.LoadSlot` calls `Identity.Assign`. Each visit gets a
+  first name from a list of 48 that aren't already in the server, and a clan rolled with `Config.Clans`' odds.
+- **In school:** the player is marked `Signed` and `InMainMenu` = false, so introductions ("[G] Introduce yourself")
+  and stranger plates work there.
+- **Saving:** nothing is saved, so every visit is a new student.
+- **The Students list (Tab)** isn't on the Map. The Map's top bar is its own version.
+
 ## Students list (replaces Roblox's player list)
 - **Replaces Roblox's list:** `Controllers.Gui.Students` keeps Roblox's own list switched off. The main menu no longer turns it back on when you enter school.
 - **Closed by default.** **Tab** or the top bar's **Students** button opens it as a narrow ink-and-gold panel under the top bar, at most 40% of the screen tall (it scrolls past that). The same key or button closes it.

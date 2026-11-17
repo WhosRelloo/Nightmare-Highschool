@@ -2,6 +2,94 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.21.0] - 2026-11-17: Introductions and uppercuts work on the Map, and chat follows Roblox's text rules in both places
+
+The owner: "port the introduction system to the map place", "make sure uppercuts work in map place", and "make sure
+the text chat for both places works with roblox TOS, etc."
+- **Mirror:** `tools/map-intro-2210`, with four folders:
+  - `map-live/` and `map-pre/`: the Map's scripts, after and before.
+  - `ct-live/` and `ct-pre/`: NH Combat Test's, after and before.
+- **Studio backups:**
+  - **The Map:** in `ServerStorage.NH_Backup`, `Intro_pre_20261117` (Identity, Data), `BluaMap_pre_20261117` (bLua) and
+    `ChatTos_pre_20261117` (Admin, Chat).
+  - **NH Combat Test:** the last two.
+
+### Introductions on the Map
+- **Why they couldn't work there:** the Map already had the same `Social.Strangers` and `Gui.Strangers` as NH Combat
+  Test, but two things were missing.
+  - **No main menu:** `InMainMenu` was never set to false, so the server treated everyone as not in school.
+  - **No register:** nobody had a name, so "Sign the register first" blocked every introduction.
+- **Now (`Services.Player.Data` and `Services.Player.Identity`, the Map's stand-ins, tagged NHCore):**
+  - **Names:** each visit gets a first name from a list of 48 that aren't already in the server, plus a clan rolled
+    with `Config.Clans`' own odds. Nothing is saved, as before on the Map.
+  - **In school:** the player is marked `Signed` and `InMainMenu` = false from the start. Every other Map script reads
+    `InMainMenu == true` or `~= true`, so false changes nothing else.
+  - **`Identity.FullName`** gives "First Clan", as in NH Combat Test.
+  - **The result:** the stranger plates, "[G] Introduce yourself" and learning names work as in NH Combat Test.
+    Clan perks now apply on the Map too (`Progression` reads the clan).
+
+### Uppercuts on the Map (the fix is in both places)
+- **What was wrong:** the uppercut's launch raycasts with `bLua.Paramaters('Map')`, which only searched
+  `workspace.Map`. NH Combat Test has that folder; the builder's map doesn't (its builds sit loose in workspace). So a
+  landed uppercut errored at the launch ("Map is not a valid member of Workspace"), and nothing went up. The same
+  preset is used by the downslams, the air combo and knockback.
+- **Now:** when there's no `workspace.Map`, the preset searches everything except the characters and the game's own
+  folders (Live, Visuals, Skateboards, NHStudents, NHShopkeepers, Regions). With `workspace.Map` present, as in NH
+  Combat Test, nothing changes.
+
+### Text chat and Roblox's rules (both places)
+- **Chat itself was already right:**
+  - **Sending:** the NH chat window sends through `TextChannel:SendAsync`, so Roblox filters every message and applies
+    each pair's privacy settings.
+  - **Showing:** only the filtered `TextChatMessage.Text` is shown. Bubbles are Roblox's own.
+  - **Muting:** the admin mute uses `ShouldDeliverCallback`.
+  - **Names:** names signed at the register are already filtered (`Identity`).
+- **Accounts that can't chat:**
+  - **What was wrong:** Roblox's own chat window hides itself for accounts with chat turned off (privacy settings,
+    parental controls), but ours replaces it and always showed the bar.
+  - **Now:** a new server module, `Features.ChatAccess`, asks `TextChatService:CanUserChatAsync` on join and sets the
+    Player attribute `NHCanChat`. `Gui.Chat` shows no window or bar when it's false, and `/` doesn't open it.
+  - **If Roblox can't answer:** the module tries 4 times and leaves the attribute unset. The bar then shows, and Roblox
+    still refuses to send for such an account.
+- **The admin desk sent staff-typed text unfiltered.** That covered:
+  - kick, ban, warn and shutdown reasons
+  - announcements to the whole server
+  - staff notes
+  - typed titles
+  - the action log other staff read
+
+  All of it now goes through `TextService:FilterStringAsync` as broadcast text, in one place (`Admin`'s Run handler).
+  If the filter can't answer, the command doesn't run ("The text filter is busy"), so unfiltered text is never sent.
+  Cmdr's own announce already filtered, and its kick message is fixed text.
+- **Nothing else takes typed text from one player to another:**
+  - The phone has no free-text input.
+  - The wardrobe's box takes a catalog id.
+  - The other `TextService` uses only measure text.
+
+### Tested (the Map, Play)
+- **Names:** the server sent "Cassius Marsh" (first name and clan) in the strangers payload. `InMainMenu` = false and
+  `Signed` = true.
+- **Uppercut:**
+  - **Before the fix:** a real Ctrl + click uppercut that landed on a sparring partner hit the launch error.
+  - **After:** another real one launched it about 12 studs with no error, and the game's own `AirCombat.Launch` lifted
+    the partner and the attacker together into the air hang. The new raycast preset finds the floor.
+- **Chat:**
+  - **The window:** it shows with `NHCanChat` = true, hides when it's false, and comes back. Roblox's own window and
+    bar stay off.
+  - **The admin desk:** an announcement and a warning went through the filter and showed in the toasts.
+  - **Console:** no errors from the changed scripts.
+
+### Not tested
+- **A real introduction between two players:** it needs a 2-client local server.
+- **A real chat-restricted account:** the hide was checked by setting the attribute.
+- **NH Combat Test in Play:** its patched scripts are byte-identical to the Map's.
+
+### Follow-ups
+- **Error spam after death:** once your character dies, `LinearVelocity.Linear` (client, line 210) prints
+  "HumanoidRootPart is not a valid member" every frame until you respawn. It's in both places and was there before
+  this change.
+- **The chat window shows players' Roblox display names,** while the stranger system hides names everywhere else.
+
 ## [2.20.0] - 2026-11-14: The Spin Shop's 14 products are on sale in NH Combat Test, with two bundles
 
 The owner created 14 developer products on NH Combat Test's experience (universe 10773746169) and said: "I've chosen
