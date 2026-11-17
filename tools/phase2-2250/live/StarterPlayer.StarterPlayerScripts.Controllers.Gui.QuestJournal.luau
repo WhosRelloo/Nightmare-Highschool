@@ -454,9 +454,10 @@ function Local.RenderQuests(Q)
 	-- (2.24.0) cutscenes you've seen, to watch again (Controllers.Cine.Replay: the server plays it, always skippable)
 	local CineOk, CineConfig = pcall(function() return require(ReplicatedStorage.Config.Cine) end)
 	local Seen = {}
+	local Grades = if typeof(Q.CineGrades) == `table` then Q.CineGrades else {} -- (2.25.0) best grade per interactive cut
 	for Id, Mark in (if typeof(Q.Cine) == `table` then Q.Cine else {}) do
 		local Cut = CineOk and CineConfig.Cuts[Id]
-		if Mark == `Seen` and Cut and Cut.Replay then table.insert(Seen, { Id = Id; Name = Cut.Name }) end
+		if Mark == `Seen` and Cut and Cut.Replay and not Cut.Hidden then table.insert(Seen, { Id = Id; Name = Cut.Name; ShowGrade = Cut.ShowGrade ~= false }) end
 	end
 	if #Seen > 0 then
 		table.sort(Seen, function(A, B) return A.Name < B.Name end)
@@ -464,7 +465,8 @@ function Local.RenderQuests(Q)
 		for _, Cut in Seen do
 			local R = Local.Row(Body, Next())
 			Components.Text({
-				Text = Cut.Name; Font = Theme.Fonts.Body; TextSize = S.TextBody; TextColor3 = C.TextDim;
+				Text = if Grades[Cut.Id] and Cut.ShowGrade then `{Cut.Name}   <font color="#{C.Gold:ToHex()}">{Grades[Cut.Id].Best}</font>` else Cut.Name;
+				RichText = true; Font = Theme.Fonts.Body; TextSize = S.TextBody; TextColor3 = C.TextDim;
 				TextXAlignment = Enum.TextXAlignment.Left; TextTruncate = Enum.TextTruncate.AtEnd;
 				Size = UDim2.new(1, -176, 0, 44); LayoutOrder = 1; Parent = R;
 			})

@@ -15,6 +15,7 @@
 		             (CineJudge.LongestPath) plus the grade card
 		ShowGrade    false: no grade card at the end (a story beat with one prompt); the grade is still kept
 		Rewards      { S = yen, A = yen, B = yen }: a bonus by grade, on the first viewing only
+		Hidden       true: never listed in the Journal (test cuts)
 	}
 ]]
 return {
@@ -23,7 +24,7 @@ return {
 		Prologue = { Name = `Roll Call`; Length = 35; Set = `RollCall`; Replay = true; Arrive = `Arrive`; Interactive = true; ShowGrade = false };
 		Collected = { Name = `Collected`; Length = 13; Set = `Hall`; Replay = true };
 		-- (2.25.0) a test cut for the interactive director (TestBridge / harness only; never in a quest)
-		__QteTest = { Name = `QTE test`; Length = 30; Set = `Hall`; Replay = true; Interactive = true };
+		__QteTest = { Name = `QTE test`; Length = 30; Set = `Hall`; Replay = true; Interactive = true; Hidden = true };
 	};
 	TimeoutPad = 5;    -- doc 04 §6: Length + 5 s, then Done is forced
 	StartGrace = 15;   -- how long a client may take to get ready (the main menu finishing) before the timer starts anyway
