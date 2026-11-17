@@ -14,6 +14,7 @@
 | 07 | [Technical Architecture](07-Technical-Architecture.md) | Modules to extend, new modules, data changes, performance, security, dependencies |
 | 08 | [Roadmap](08-Roadmap.md) | Phases 0-10 with scope, acceptance and testing; the first checkpoint |
 | 09 | [Risk and Scope](09-Risk-and-Scope.md) | Conflicts, duplication avoided, risks, deferred items, approvals needed, the builder list |
+| 10 | [Phase 0 Report](10-Phase0-Report.md) | 2.22.0: what Phase 0 changed, the tests, the save and place sizes, and the archive proposal |
 
 ## The short version
 1. **Most of the foundations already exist and are tested.** The school day, lessons, attendance, discipline, factions and 8 cliques, dialogue, quests with an evidence board and stealth, the phone and Midnight Bell, races, moon, hunger, beasts, sports, training and the wardrobe are all in place. The expansion **extends** them; it doesn't replace them.

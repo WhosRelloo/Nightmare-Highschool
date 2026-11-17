@@ -7,7 +7,7 @@
 | "Evolution" name | Already means the race tier-up (`Player.Evolution`, `NHEvolve`) | Call the new feature **Standing Paths** |
 | "Student Record" / "Report Card" | The L panel and the weekly phone card | L panel becomes **Permanent Record**; "Report Card" stays the weekly card |
 | Five standing systems | Reputation, Factions, Cliques, Relationships, Sports ClubExp | No new bar; paths and the hierarchy are derived from these |
-| `Social` block writers | Fortune and `Cliques.Add` write outside `Reputation.Sync` | Fix in Phase 0 before relationships grow |
+| `Social` block writers | `Cliques.Add` wrote outside `Reputation.Sync` (Fortune was fine) | Fixed in Phase 0 (2.22.0) |
 | Talk shot camera | Bypasses `CameraLease` | Fix in Phase 0; Cine depends on the lease |
 | Night windows | Five definitions | Unify in Phase 0 |
 | New Kid vs enrollment | The tutorial never tells you to enrol; New Kid auto-starts in the editor | Orientation quest plus an `Enrol` objective |
@@ -33,7 +33,7 @@
 | Place size (NH_Backup holds 35k instances) | Archive plan in Phase 0, only with your OK |
 
 ## 4. Data risks
-- **Profile size:** one profile holds every slot. Measure it in Phase 0 and add a warning at 1 MB.
+- **Profile size:** each slot is its own key (4 MB each). Testy's slot measured 20.7 KB in Phase 0. Add a warning at 1 MB.
 - **Every change is additive with a Sanitize.** The store names and slot keys are never changed.
 - **Migration test:** load an old save (Testy before the change), check every new field defaults, and check that nothing is lost.
 

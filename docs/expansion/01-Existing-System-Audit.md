@@ -255,7 +255,7 @@ Treat this audit, the CHANGELOG and the live code as the current truth.
   - NPCs for Mira, the Headmaster and the Night Custodian
 
 ### 3.6 Dependencies between systems (the important ones)
-- **Data:** every saved feature writes a whole block through `UpdateState` (`Set<Block>`), so each block needs **one owner**. `Social` is owned by `Reputation.Sync` (Fortune and `Cliques.Add` break this today).
+- **Data:** every saved feature writes a whole block through `UpdateState` (`Set<Block>`), so each block needs **one owner**. `Social` is owned by `Reputation.Sync`. `Cliques.Add` broke this; it was fixed in 2.22.0. Fortune was checked and was fine.
 - **EXP:** goes only through `Progression.Award`.
 - **Buffs:** go only through `Progression.Effects` / `Apply`.
 - **The clock:** Attendance, Activities, Schedules, HallMonitor, Kit chill, Beasts, Wolves and MoonPhases all read time. They use **five different night windows** today.
@@ -292,7 +292,7 @@ Treat this audit, the CHANGELOG and the live code as the current truth.
 ## 4. Open findings worth fixing before the expansion (no new features)
 1. **Night windows:** five different definitions of "night". Centralise them in `SchoolClock`.
 2. **Talk cinematic:** it bypasses `CameraLease`. Route it through the lease.
-3. **Social writes:** `Cliques.Add` and `Fortune` write `Social` outside `Reputation.Sync`.
+3. **Social writes:** `Cliques.Add` wrote `Social` outside `Reputation.Sync`; fixed in 2.22.0. *(Correction: Fortune edits through `Reputation.Get` and calls `Reputation.Sync`, which is the intended pattern, so it was fine.)*
 4. **Phone text:** it says hall monitors patrol at night; they don't.
 5. **Vesper's location:** the Boiler Yard in her dialogue, the Crimson Parlor in her showdown.
 6. **Canon clash:** "Corvin Ashgrave" (Headmaster portrait) vs "Corvin Crane" (Court twin).

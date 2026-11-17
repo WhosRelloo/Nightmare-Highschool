@@ -16,10 +16,12 @@
 ---
 
 ## Phase 0: Foundations and fixes (no new features)
+**Status: done in NH Combat Test as 2.22.0 (2026-11-17), solo-tested.** The two-client harness run, the canon names and the archive still wait on you. Report: [10](10-Phase0-Report.md).
+
 **Scope:**
 1. **Clock:** add `SchoolClock.IsNight` / `Phase` / `Term`, and move the five night windows onto them.
 2. **Talk shot:** route the talk cinematic through `CameraLease`.
-3. **Social writes:** route `Cliques.Add` and `Fortune` through `Reputation.Sync` (the single writer for `Social`).
+3. **Social writes:** route `Cliques.Add` through `Reputation.Sync` (the single writer for `Social`). Fortune was already correct.
 4. **Canon fixes:** the phone's monitor text, Vesper's location, and the Corvin name clash (pending your call).
 5. **Enrollment:** New Kid points new players to the desk (an Enrol step), and auto-start waits until you're in school.
 6. **Measure:** the profile size and the place size. Propose an NH_Backup archive plan (only with your OK).

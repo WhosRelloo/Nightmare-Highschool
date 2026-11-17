@@ -67,7 +67,7 @@
 | `Housing.Decor` | Homes | 12 slots of item ids | small |
 | `Inventory.Archive` | Archive | a bitset of 24 pages | tiny |
 
-**The profile limit:** one ProfileService profile holds every slot. The new fields add about 12 KB per slot at most, against Roblox's 4 MB per key. **Measure the current profile size first** (Phase 0), and set a CI-style check in TestBridge that warns above 1 MB.
+**The profile limit:** each save slot is its own ProfileService key, so the 4 MB limit applies per slot. *(Corrected in Phase 0: the audit first said one profile held every slot.)* Measured in Phase 0: Testy's whole slot is 20.7 KB. The new fields add about 12 KB per slot at most. A TestBridge check should still warn above 1 MB.
 
 ## 5. Performance considerations
 - **NPC students:** abstract simulation beyond 160 studs. Brains run at 5 Hz near players and 1 Hz otherwise, as today. At most 3 path plans at once, as today. The target is 40 students at 60 fps server and client.

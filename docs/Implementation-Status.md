@@ -1,5 +1,7 @@
 # Implementation Status: NH Combat Test
 
+> **2026-11-17:** this page stops at about 1.89. For the current state of every system, see the expansion audit (`docs/expansion/01-Existing-System-Audit.md`, code baseline 2.20.0) and the CHANGELOG. Since then: 2.21.0 (introductions and uppercuts on the Map, chat), and **2.22.0 (Phase 0, `docs/expansion/10-Phase0-Report.md`)**: shared night windows, the talk shot's camera lease, the `Social` single writer, the enrolment step in New Kid and auto quests that wait for school. **[PT]** on slot 4. The two-player harness is in `Two-Player-Test-Plan.md` §9.
+
 Last updated: 2026-11-05 (through 1.12.0). Done: Milestone 0, combat and three weapon classes (`Combat-System.md`), clock and timetable (`School-Simulation.md`), attendance and discipline (`Attendance-and-Discipline.md`), class activities (`Class-Activities.md`), factions and reputation (`Factions-and-Reputation.md`), quests, races, sports, the main menu (`Main-Menu.md`) and the admin panel (`Admin-Panel.md`).
 
 How each result was checked:

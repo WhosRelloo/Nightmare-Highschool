@@ -2,6 +2,67 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.22.0] - 2026-11-17: Phase 0 foundations: one night clock, the talk camera lease, one writer for Social, and an enrolment step in New Kid
+
+The owner approved Phase 0 of the expansion plan (`docs/expansion/08-Roadmap.md`): "Approve Phase 0". It's fixes only,
+with no new features. Full report: `docs/expansion/10-Phase0-Report.md`.
+- **Mirror:** `tools/phase0-2220` (`live/` is after, `pre/` is before), 25 scripts.
+- **Studio backup:** `ServerStorage.NH_Backup.Phase0_pre_20261117`.
+
+### Changed (NH Combat Test only)
+- **One set of night windows.** `Functions.SchoolTime.Windows` holds five named windows:
+
+  | Window | Hours |
+  |---|---|
+  | Dusk | 18:30-6:30 |
+  | Dark | 19:30-6:00 |
+  | Prowl | 19:30-5:30 |
+  | Night | 20:00-6:00 |
+  | Late | 21:00-6:00 |
+
+  - **New API:** `SchoolTime` has `InWindow`, `IsNight`, `Phase` and `Calendar` (week, 12-week term, 3-term year). `SchoolClock` has `IsNight`, `Phase` and `Calendar`.
+  - **The scripts below used to keep their own hours.** They now name a window, and their timing doesn't change:
+    - Shared and config: Lineage, Config.Kit, Config.Beasts, Config.Ambience, Config.Regions.
+    - Server: Evolution, Turning, Progression, Phone, MoonPhases, Body, StudentBrain, Senses, WildWolves.
+    - Client: ClockHud, HungerVessel, Spotted.
+  - **The one change:** the client's Spotted lantern used 19:30-6:30. It now uses Dark (19:30-6:00), the same darkness as `AI.Senses`.
+- **The talk shot takes a `CameraLease`** ("Talk") instead of setting `CameraType` itself. It only writes the camera while it holds the newest lease, and it hands the camera back through the lease.
+- **`Social` has one writer.** `Social.Cliques.Add` now calls `Reputation.Sync`, so the client's copy of `Social` updates when a clique standing changes. *(Fortune was checked and was already correct; the audit was wrong about it.)*
+- **The Gazette's night front page** no longer says the hall monitors are on their rounds at night (they're off duty). It now says the Night Custodian keeps the Records Office.
+- **New Kid starts with enrolment.**
+  - **The new step:** "Enrol at the Enrollment desk outside the Records Office and pick your uniform". It's a new `Enrol` objective, and its tracker waypoint uses a new `Kind = "Tag"` that points at `NHEnrollDesk`.
+  - **Already enrolled:** the step is skipped.
+  - **Old saves:** a New Kid saved before this keeps its place (`Version = 2; StageShift = 1`, moved once on load).
+  - **Auto quests** now start once you walk into school, not while you're still in the editor.
+  - **Test hook:** `NHTestBridge:Invoke("EnrolSelfTest", name)` runs the real code and puts the quests back afterwards.
+
+### Tested (Play, slot 4 "Testy")
+- **The windows:** 480 sampled hours matched the old formulas exactly.
+- **The clock across the day:**
+
+  | Time | Result |
+  |---|---|
+  | 19:00 | No wolves |
+  | 19:45 | 3 wolves and 8 beasts out; not night yet |
+  | 20:30 | Moon night |
+  | 21:30 on the Field | Chilled after about a minute |
+  | 05:45 | The wolves gone after 5:30; still night |
+  | 12:00 | Day |
+
+- **Enrolment:** the self-test passed in all four cases (already enrolled, new, old save, loaded twice), and Testy's quests came back unchanged. Testy's own old New Kid save kept its step (Note).
+- **The talk shot:** it eased into a 58° over-the-shoulder shot with bars and depth of field. A real key press closed it, and the camera came back to Custom at FOV 70.
+- **Clique standing:** a change reached the client in 0.13 s.
+- **Console:** no game-script errors.
+- **Restored:** `SlotCount` 3 and `NHTestNoMenuKeys`.
+
+### Measured
+- **Save size:** each slot is its own save key. Testy's slot is 20.7 KB (0.5% of 4 MB).
+- **Place size:** ServerStorage holds 118,670 instances. About 100,000 of them are old backups and dummies, and the workspace has showcase models. The archive proposal is in the report; nothing was deleted.
+
+### Not tested
+- **Two players:** the harness is written (`docs/Two-Player-Test-Plan.md` §9, H1-H10) and needs Studio's 2 Players test, started by hand.
+- **Opening a conversation with E:** no prompts showed in this test window. Please press E on Ezra in a normal playtest.
+
 ## [2.21.0] - 2026-11-17: Introductions and uppercuts work on the Map, and chat follows Roblox's text rules in both places
 
 The owner: "port the introduction system to the map place", "make sure uppercuts work in map place", and "make sure
