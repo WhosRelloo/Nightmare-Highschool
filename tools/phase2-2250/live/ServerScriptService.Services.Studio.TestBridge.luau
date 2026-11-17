@@ -821,6 +821,10 @@ function Commands.CineGraphTest()
 	return Out
 end
 
+function Commands.CineGrades(PlayerName: string)
+	return DeepCopy(QuestsService().CineGrades(Players:FindFirstChild(PlayerName)))
+end
+
 -- Move the player next to a map part found by attribute (QuestObject / QuestArea / NpcPost ...).
 function Commands.GoTo(PlayerName: string, Attribute: string, Value: any, Offset: Vector3?)
 	local Player = Players:FindFirstChild(PlayerName)

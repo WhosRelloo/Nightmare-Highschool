@@ -97,6 +97,7 @@ function Local.Get(Player: Player): any?
 	Q.Tracked = if typeof(Q.Tracked) == `string` then Q.Tracked else ``
 	Q.Cine = if typeof(Q.Cine) == `table` then Q.Cine else {} -- (2.24.0) cut state, written through Services.World.Cine
 	Q.Decisions = if typeof(Q.Decisions) == `table` then Q.Decisions else {} -- (2.24.0) Decision objectives
+	Q.CineGrades = if typeof(Q.CineGrades) == `table` then Q.CineGrades else {} -- (2.25.0) best grade per interactive cut
 	return Q
 end
 
@@ -1012,6 +1013,12 @@ function Shared.CineState(Player: Player): { [string]: string }?
 end
 
 function Shared.SyncForCine(Player: Player) Local.Sync(Player) end
+
+-- (2.25.0) the best grade per interactive cut ({ [CutId] = { Best, Points, Max } }); Services.World.Cine is the only writer
+function Shared.CineGrades(Player: Player): { [string]: any }?
+	local Q = Local.Get(Player)
+	return Q and Q.CineGrades
+end
 
 -- a Decision objective's answer, chosen in dialogue (ctx.Decide); the last answer is the one kept
 function Shared.Decide(Player: Player, DecisionId: string, Choice: string): boolean
