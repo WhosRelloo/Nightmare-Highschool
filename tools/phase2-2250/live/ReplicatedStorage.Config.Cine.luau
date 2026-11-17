@@ -21,6 +21,8 @@ return {
 	Cuts = {
 		Prologue = { Name = `Roll Call`; Length = 31; Set = `RollCall`; Replay = true; Arrive = `Arrive` };
 		Collected = { Name = `Collected`; Length = 13; Set = `Hall`; Replay = true };
+		-- (2.25.0) a test cut for the interactive director (TestBridge / harness only; never in a quest)
+		__QteTest = { Name = `QTE test`; Length = 30; Set = `Hall`; Replay = true; Interactive = true };
 	};
 	TimeoutPad = 5;    -- doc 04 §6: Length + 5 s, then Done is forced
 	StartGrace = 15;   -- how long a client may take to get ready (the main menu finishing) before the timer starts anyway

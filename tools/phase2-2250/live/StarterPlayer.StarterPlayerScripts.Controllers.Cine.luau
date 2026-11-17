@@ -17,6 +17,12 @@
 	Poses (R6, radians, eased): RS / LS / RH / LH = arm or leg forward, Lean (torso pitch), Twist (torso yaw),
 	Yaw / Pitch (head). Every actor breathes and drifts a little: nobody is ever dead still.
 
+	(2.25.0) Interactive cuts: the module also exports Def.Graph = { start, segments = { [Name] = { len, next?, prompt? } } }
+	(CineJudge validates it) and Build returns { segments = { [Name] = { shots, events } }, grade? }: each segment's events
+	are timed from that segment's start. A prompt opens at prompt.at (CinePrompt, drawn by CineUI) and slows the scene to
+	prompt.slow; a solo viewer branches the moment the prompt closes, a group at the server's Branch. A cut without a Graph
+	plays as one segment, Main.
+
 	Reduce Motion: moves become cuts (each moving shot holds its last framing), no handheld noise, no Dutch roll.
 	Shared.Replay(Id) asks the server to play a seen cut again (the journal's "Watch again").
 ]]
@@ -34,6 +40,12 @@ local TweenService = game:GetService(`TweenService`)
 local Config = require(ReplicatedStorage:WaitForChild(`Config`):WaitForChild(`Cine`))
 local CameraLease = require(ReplicatedStorage:WaitForChild(`Functions`):WaitForChild(`CameraLease`))
 local Kit = require(ReplicatedStorage:WaitForChild(`UI`):WaitForChild(`Components`))
+local Judge = require(ReplicatedStorage:WaitForChild(`Functions`):WaitForChild(`CineJudge`))
+local function Prompt() return require(script.Parent:WaitForChild(`CinePrompt`)) end
+local function touch(): boolean
+	local UIS = game:GetService(`UserInputService`)
+	return UIS.TouchEnabled and not UIS.KeyboardEnabled
+end
 
 local Player = Players.LocalPlayer
 local LEASE = `Cine`
@@ -630,12 +642,15 @@ function Local.Play(Message)
 		Cut.ClockWas = game:GetService(`Lighting`).ClockTime
 		Local.HoldHour(Def.Clock) -- the whole day/night look (Controllers.World.DayCycle), not just the sun
 	end
-	Cut.Events = Built.events or {}
-	table.sort(Cut.Events, function(A, B) return (A.t or 0) < (B.t or 0) end)
-	local Shots = Local.Strip(Cut, Built.shots)
+	-- (2.25.0) every cut is a graph of segments; a plain cut is one segment, Main
+	Cut.Built = Built
+	Cut.Interactive = typeof(Def.Graph) == `table`
+	Cut.Graph = if Cut.Interactive then Def.Graph else { start = `Main`; segments = { Main = { len = Local.ShotsLength(Built.shots or {}) } } }
+	Built.segments = Built.segments or { Main = { shots = Built.shots; events = Built.events } }
+	Cut.Solo = not Cut.Group
+	Cut.Scale = 1
+	Cut.PromptCount = 0
 	Local.HideLive(Cut)
-	-- the lease lives through Finish's fade to black too (EndingAt): if the watchdog ended it mid-fade, the camera came
-	-- back early and the handle's stop then set it Scriptable again with nobody left to release it
 	if not CameraLease.Take(LEASE, function()
 		if Cut.Live and Current == Cut then return true end
 		return Cut.EndingAt ~= nil and os.clock() - Cut.EndingAt < 3
@@ -645,22 +660,51 @@ function Local.Play(Message)
 	end
 	Gui.Show({ Skippable = Message.Skippable; Group = Cut.Group; Votes = Message.Votes; Need = Message.Need })
 	Gui.Veil(1, 0)
-	-- a group cut runs on the server's clock: everyone is on the same frame (late joiners start mid-cut)
+	-- a group cut runs on the server's clock (late joiners start mid-way through the first segment)
 	local Start = if Cut.Group then math.max(0, workspace:GetServerTimeNow() - (Message.StartAt or 0)) else 0
-	Cut.Clock = Start
+	Local.PlaySegment(Cut, Cut.Graph.start, Start)
+	if not Built.keepBlack then Gui.Veil(0, if Start > 0 then 0.2 else 0.8) end
+	send({ Kind = `Began`; Session = Cut.Session; At = Message.StartAt })
+end
+
+function Local.ShotsLength(Shots): number
+	local T = 0
+	for _, S in Shots do T += S.dur or 0 end
+	return T
+end
+
+-- one segment: its shots on the toolkit's player, its events on the segment's clock, its prompt when its time comes
+function Local.PlaySegment(Cut, Name: string, Start: number?)
+	if not Cut.Live then return end
+	local Seg = Cut.Built.segments[Name]
+	local Node = Cut.Graph.segments[Name]
+	if not (Seg and Node) then warn(`[Cine] no segment {Name}`) Local.Finish(Cut, `Error`) return end
+	if Cut.Handle then pcall(function() Cut.Handle:stop() end) end -- (no camera type restore: the next shot cuts in this frame)
+	pcall(function() Prompt().Cancel() end)
+	Player:SetAttribute(`NHCinePrompt`, nil)
+	Cut.Seg = Name
+	Cut.Prompt = nil
+	Cut.Scale = 1
+	Cut.Path = (Cut.Path or ``) .. (if Cut.Path then `>` else ``) .. Name
+	Player:SetAttribute(`NHCinePath`, Cut.Path) -- tests read the path taken
+	Start = Start or 0
+	Cut.Events = table.clone(Seg.events or {})
+	table.sort(Cut.Events, function(A, B) return (A.t or 0) < (B.t or 0) end)
+	Cut.Fired = 1
 	while Cut.Fired <= #Cut.Events and (Cut.Events[Cut.Fired].t or 0) < Start - 0.05 do
 		local E = Cut.Events[Cut.Fired]
 		Cut.Fired += 1
-		if E.pose or E.look or E.walk then Local.Fire(Cut, E) end -- catch the actors up, but no stale lines or sounds
+		if E.pose or E.look or E.walk or E.place then pcall(Local.Fire, Cut, E) end -- catch the actors up, no stale lines
 	end
+	local Def = Cut.Def
 	local Lib = CineLib()
 	local Last = os.clock()
-	Cut.Handle = Lib.play({ name = Message.Id; letterbox = LETTERBOX; grade = Built.grade; shots = Shots }, {
+	Cut.Handle = Lib.play({ name = `{Cut.Id}.{Name}`; letterbox = LETTERBOX; grade = Cut.Built.grade; shots = Local.Strip(Cut, Seg.shots) }, {
 		start = Start; overlay = false; autoStop = false;
 		onFrame = function(H)
-			if not Cut.Live then return end
+			if not Cut.Live or Cut.Seg ~= Name then return end
 			local Now = os.clock()
-			local Dt = math.min(Now - Last, 0.1)
+			local Dt = math.min(Now - Last, 0.1) * Cut.Scale
 			Last = Now
 			Cut.Clock = H.time
 			if Cut.ClockWas then game:GetService(`Lighting`).ClockTime = Def.Clock end
@@ -672,19 +716,81 @@ function Local.Play(Message)
 			end
 			local Cam = workspace.CurrentCamera
 			for _, A in Cut.Actors do pcall(Local.StepActor, A, Dt, H.time, Cam) end
+			if Node.prompt and not Cut.Prompt and H.time >= Node.prompt.at then Local.OpenPrompt(Cut, Name, Node.prompt) end
 		end;
-		onDone = function() if Current == Cut then Local.Finish(Cut, `Done`) end end;
+		onDone = function() if Cut.Live and Cut.Seg == Name then Local.SegmentDone(Cut, Name) end end;
 	})
-	-- CameraLease owns the camera type: the shot player must never put back the Scriptable it saw when it started
 	Cut.Handle._restoreCameraType = nil
-	if not Built.keepBlack then Gui.Veil(0, if Start > 0 then 0.2 else 0.8) end
-	send({ Kind = `Began`; Session = Cut.Session; At = Message.StartAt })
+	if Cut.Interactive then send({ Kind = `Seg`; Session = Cut.Session; Name = Name; At = workspace:GetServerTimeNow() - Start }) end
+end
+
+function Local.SegmentDone(Cut, Name: string)
+	local Node = Cut.Graph.segments[Name]
+	if Node.prompt then
+		-- the tail ran out before the branch was known (a slow server in a group cut): ask where the cut is
+		if not Cut.Solo then send({ Kind = `Where`; Session = Cut.Session }) end
+		return
+	end
+	if Node.next then Local.PlaySegment(Cut, Node.next) return end
+	task.spawn(Local.EndGraph, Cut)
+end
+
+function Local.OpenPrompt(Cut, SegName: string, P)
+	Cut.Prompt = { Seg = SegName }
+	Cut.PromptCount += 1
+	Cut.Scale = P.slow or 1
+	pcall(function() Cut.Handle:setTimeScale(Cut.Scale) end)
+	Player:SetAttribute(`NHCinePrompt`, P.kind)
+	local Reduced = Cut.Ctx and Cut.Ctx.Reduced or false
+	local Opened = workspace:GetServerTimeNow()
+	Prompt().Open(P, { Reduced = Reduced; Touch = touch() }, function(Input)
+		Player:SetAttribute(`NHCinePrompt`, nil)
+		if not Cut.Live or Cut.Seg ~= SegName then return end
+		send({ Kind = `Input`; Session = Cut.Session; Seg = SegName; Opened = Opened; Times = Input.Times; Pick = Input.Pick;
+			PickAt = Input.PickAt; Release = Input.Release; Touch = Input.Touch; Reduced = Input.Reduced })
+		if Cut.Solo then
+			local Outcome = Judge.Evaluate(P, Input)
+			local Next = Judge.Branch(P, Outcome)
+			if Next then Local.Branch(Cut, SegName, Next, nil) end
+		else
+			task.delay(1.5, function()
+				if Cut.Live and Cut.Seg == SegName then send({ Kind = `Where`; Session = Cut.Session }) end
+			end)
+		end
+	end)
+end
+
+-- cut to the next segment on the branch (solo: now; group: at the server's StartAt, inside the slow-motion hold)
+function Local.Branch(Cut, From: string, Next: string, StartAt: number?)
+	if not Cut.Live or Cut.Seg ~= From then return end
+	local Delay = if StartAt then math.max(0, StartAt - workspace:GetServerTimeNow()) else 0
+	local function go() if Cut.Live and Cut.Seg == From then Local.PlaySegment(Cut, Next) end end
+	if Delay > 0 then task.delay(Delay, go) else go() end
+end
+
+-- the end of the last segment: an interactive cut asks for its grade (server-judged) and shows the card first
+function Local.EndGraph(Cut)
+	if not Cut.Interactive then Local.Finish(Cut, `Done`) return end
+	Cut.GradeMsg = nil
+	send({ Kind = `Grade`; Session = Cut.Session })
+	local T0 = os.clock()
+	while Cut.Live and not Cut.GradeMsg and os.clock() - T0 < 2 do task.wait(0.05) end
+	if not Cut.Live then return end
+	local G = Cut.GradeMsg
+	if G and G.Grade and G.Show ~= false then
+		local Seconds = Config.GradeCard or 2.5
+		pcall(function() UI().GradeCard(G.Grade, G.Perfects or 0, Cut.PromptCount or 0, Seconds) end)
+		task.wait(Seconds)
+	end
+	if Cut.Live then Local.Finish(Cut, `Done`) end
 end
 
 -- How: Done (played out), Skipped / Timeout / Died (the server ended it), Replaced, NotReady, NoCamera, Error
 function Local.Finish(Cut, How: string, Quiet: boolean?)
 	if not Cut.Live then return end
 	Cut.Live = false
+	pcall(function() Prompt().Cancel() end)
+	Player:SetAttribute(`NHCinePrompt`, nil)
 	Cut.EndingAt = os.clock()
 	if Current == Cut then Current = nil end
 	local Gui = UI()
@@ -722,7 +828,7 @@ function Shared.Replay(Id: string)
 	send({ Kind = `Replay`; Id = Id })
 end
 
--- Studio: a cut's shot list for Cine.analyze / capture, built against the live actors without the remote
+-- Studio: a cut built against the live actors without the remote (capture and analysis helpers)
 function Shared.BuildForTests(Id: string)
 	local Def = require(ReplicatedStorage.Cinematics[Id])
 	local Cut = { Id = Id; Def = Def; Actors = {}; Restore = {}; Conns = {}; Sounds = {}; Used = {} }
@@ -735,6 +841,19 @@ function Shared.BuildForTests(Id: string)
 		if A then Cut.Actors[Spec.Name] = A end
 	end
 	return Cut, Def.Build(Ctx), Local
+end
+
+-- one path through a built cut as a single shot list and event list (segment times shifted to the path's clock)
+function Shared.FlattenForTests(Built, Graph, Path: { string })
+	if not Graph then return { shots = Built.shots; events = Built.events } end
+	local Shots, Events, At = {}, {}, 0
+	for _, Name in Path do
+		local Seg = Built.segments[Name]
+		for _, S in Seg.shots do table.insert(Shots, S) end
+		for _, E in Seg.events or {} do local C = table.clone(E) C.t = (E.t or 0) + At table.insert(Events, C) end
+		At += Graph.segments[Name].len
+	end
+	return { shots = Shots; events = Events }
 end
 
 function Shared.OnStart()
@@ -764,6 +883,15 @@ function Shared.OnStart()
 			if Current and Current.Session == Message.Session then
 				pcall(function() UI().Votes(Message.Votes or 0, Message.Need or 1) end)
 			end
+		elseif Message.Kind == `Branch` then
+			if Current and Current.Session == Message.Session then Local.Branch(Current, Message.Seg, Message.Next, Message.StartAt) end
+		elseif Message.Kind == `Segment` then
+			local Cut = Current
+			if Cut and Cut.Session == Message.Session and typeof(Message.Name) == `string` and Cut.Seg ~= Message.Name then
+				Local.PlaySegment(Cut, Message.Name, math.max(0, workspace:GetServerTimeNow() - (Message.StartAt or 0)))
+			end
+		elseif Message.Kind == `Grade` then
+			if Current and Current.Session == Message.Session then Current.GradeMsg = Message end
 		elseif Message.Kind == `End` then
 			if Current and Current.Session == Message.Session then task.spawn(Local.Finish, Current, Message.How or `Ended`, true) end
 		end
