@@ -17,3 +17,6 @@ art/props/source_tapestry/
 # Studio backup archives exported before removal from the place (large binaries; manifest is tracked: archive/studio-backups/*/MANIFEST.md)
 archive/studio-backups/**/*.rbxm
 archive/studio-backups/**/*.rbxm.ok
+
+# phase 2 harness scratch (rewritten on every run)
+tools/phase2-2250/harness/_*
