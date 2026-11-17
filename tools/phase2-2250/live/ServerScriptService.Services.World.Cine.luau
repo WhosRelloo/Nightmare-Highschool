@@ -36,10 +36,11 @@ local HttpService = game:GetService(`HttpService`)
 local SignalPlus = require(ReplicatedStorage.Packages.SignalPlus)
 local StateManager = require(ReplicatedStorage.Packages.Bind.StateManager)
 local Config = require(ReplicatedStorage.Config.Cine)
+local Judge = require(ReplicatedStorage.Functions.CineJudge)
 
 local function Quests() return require(ServerScriptService.Services.Quests.Quests) end -- lazy: Quests requires us too
 
-local RATE = 12 -- messages a second per player
+local RATE = 40 -- messages a second per player (2.25.0: Seg / Where / Input add a few; still blocks floods)
 
 local Local = {}
 local Shared = {}
@@ -199,6 +200,163 @@ function Local.SetMark(Set: string?, Name: string?): BasePart?
 	return if M and M:IsA(`BasePart`) then M else nil
 end
 
+---| interactive cuts (2.25.0): the graph lives in the cut module (ReplicatedStorage.Cinematics.<Id>.Graph) |---
+
+function Local.GraphOf(CutId: string)
+	local Ok, Def = pcall(function() return require(ReplicatedStorage.Cinematics[CutId]) end)
+	return if Ok and typeof(Def) == `table` and typeof(Def.Graph) == `table` then Def.Graph else nil
+end
+
+function Local.Flag(Player: Player, Flag: string, Outcome: string)
+	pcall(function() Quests().Decide(Player, Flag, Outcome) end)
+end
+
+function Local.Score(V, Seg: string, P, Outcome: string, Points: number)
+	V.Judged[Seg] = { Outcome = Outcome }
+	V.Points += Points
+	V.Max += Judge.MAX[P.kind] or 0
+	if Outcome == `Perfect` then V.Perfects += 1 end
+end
+
+function Local.CleanInput(M, P)
+	local Window = Judge.Window(P, { Reduced = M.Reduced == true })
+	local Times = {}
+	if typeof(M.Times) == `table` then
+		for I, T in M.Times do
+			if I > 64 then break end
+			if typeof(T) == `number` and T == T and T >= -0.5 and T <= Window + 0.5 then table.insert(Times, T) end
+		end
+	end
+	return { Times = Times; Pick = if typeof(M.Pick) == `string` then M.Pick else nil; PickAt = tonumber(M.PickAt);
+		Release = tonumber(M.Release); Touch = M.Touch == true; Reduced = M.Reduced == true }
+end
+
+-- a group's prompt is decided when everyone still watching has answered, or at its deadline (missing = a miss)
+function Local.Decide(S, Seg: string)
+	S.Decided = S.Decided or {}
+	if S.Decided[Seg] then return end
+	local P = S.Graph.segments[Seg].prompt
+	local Outs = {}
+	for Player, V in S.Viewers do
+		if not V.Ended then
+			if not V.Judged[Seg] then
+				local O, Pts = Judge.Evaluate(P, {})
+				Local.Score(V, Seg, P, O, Pts)
+			end
+			table.insert(Outs, V.Judged[Seg].Outcome)
+		end
+	end
+	if #Outs == 0 then return end
+	S.Decided[Seg] = true
+	local Team = Judge.Team(P, Outs)
+	local Next = Judge.Branch(P, Team)
+	local StartAt = workspace:GetServerTimeNow() + 0.25
+	S.Seg, S.SegStartAt = Next, StartAt
+	for Player, V in S.Viewers do
+		if not V.Ended then
+			if P.flag then Local.Flag(Player, P.flag, Team) end
+			Local.Send(Player, { Kind = `Branch`; Session = S.Id; Seg = Seg; Next = Next; StartAt = StartAt;
+				Outcome = V.Judged[Seg].Outcome; Team = Team })
+		end
+	end
+	Local.ArmPrompt(S)
+end
+
+function Local.TryDecide(S, Seg: string)
+	for _, V in S.Viewers do
+		if not V.Ended and not V.Judged[Seg] then return end
+	end
+	Local.Decide(S, Seg)
+end
+
+-- group: from the current segment, follow next links to the next prompt and set its deadline on the shared clock
+function Local.ArmPrompt(S)
+	if not (S.Graph and S.Group) then return end
+	local N, At = S.Seg, S.SegStartAt
+	local Seen = {}
+	while N and not Seen[N] do
+		Seen[N] = true
+		local Node = S.Graph.segments[N]
+		if not Node then return end
+		if Node.prompt then
+			local P, Seg = Node.prompt, N
+			local Deadline = At + P.at + Judge.Window(P, { Reduced = true }) + Judge.GRACE
+			task.delay(math.max(0, Deadline - workspace:GetServerTimeNow()), function()
+				if Sessions[S.Id] then Local.Decide(S, Seg) end
+			end)
+			return
+		end
+		At += Node.len
+		N = Node.next
+	end
+end
+
+function Local.OnInput(S, Player: Player, V, M)
+	if not S.Graph or typeof(M.Seg) ~= `string` then return end
+	local Node = S.Graph.segments[M.Seg]
+	local P = Node and Node.prompt
+	if not P or V.Judged[M.Seg] then return end
+	if not Judge.Follows(S.Graph, S.Seg, M.Seg) then return end
+	local Outcome, Points = Judge.Evaluate(P, Local.CleanInput(M, P))
+	Local.Score(V, M.Seg, P, Outcome, Points)
+	if S.Group then
+		Local.TryDecide(S, M.Seg)
+	else
+		V.Judged[M.Seg].Next = Judge.Branch(P, Outcome)
+		if P.flag then Local.Flag(Player, P.flag, Outcome) end
+	end
+end
+
+-- solo: the client says where it is now (it branches on its own); only real moves along the graph are accepted
+function Local.OnSeg(S, Player: Player, V, M)
+	if not S.Graph or S.Group or typeof(M.Name) ~= `string` or not S.Graph.segments[M.Name] then return end
+	local Cur = S.Seg
+	local Ok = Judge.Follows(S.Graph, Cur, M.Name)
+	if not Ok then
+		-- through a prompt: only after it was judged (the server's own verdict says which way)
+		local J = V.Judged[Cur]
+		if J then
+			for _, T in Judge.Successors(S.Graph, Cur) do
+				if Judge.Follows(S.Graph, T, M.Name) then Ok = true end
+			end
+			if Ok and J.Next and not Judge.Follows(S.Graph, J.Next, M.Name) then
+				warn(`[Cine] {Player.Name}: solo branch {Cur} -> {M.Name}, but the server judged {J.Next}`)
+			end
+		end
+	end
+	if not Ok then return end
+	S.Seg = M.Name
+	S.SegStartAt = tonumber(M.At) or workspace:GetServerTimeNow()
+end
+
+-- the grade, once, when the client reaches the end of the cut; saved as the best, and the first viewing pays a bonus
+function Local.SendGrade(S, Player: Player, V)
+	if V.Graded then return end
+	V.Graded = true
+	local Cut = Config.Cuts[S.CutId]
+	local Grade = Judge.Grade(V.Points, V.Max)
+	if Grade then
+		pcall(function()
+			local G = Quests().CineGrades(Player)
+			if not G then return end
+			local Old = G[S.CutId]
+			if not Old or (Judge.GRADE_RANK[Grade] or 0) > (Judge.GRADE_RANK[Old.Best] or 0) then
+				G[S.CutId] = { Best = Grade; Points = V.Points; Max = V.Max }
+				Quests().SyncForCine(Player)
+			end
+		end)
+		local First = not V.SeenBefore and not S.Skippable
+		local Bonus = First and Cut.Rewards and Cut.Rewards[Grade]
+		if typeof(Bonus) == `number` and Bonus > 0 then
+			pcall(function()
+				require(ServerScriptService.Services.Player.Data).UpdateState(Player, { type = `UpdateYen`; amount = Bonus })
+			end)
+		end
+	end
+	Local.Send(Player, { Kind = `Grade`; Session = S.Id; Grade = Grade; Points = V.Points; Max = V.Max; Perfects = V.Perfects;
+		Show = Cut.ShowGrade ~= false })
+end
+
 function Shared.Play(List: { Player }, CutId: string, Opts: any?): string?
 	local Cut = Config.Cuts[CutId]
 	if not Cut then warn(`[Cine] unknown cut {CutId}`) return nil end
@@ -218,23 +376,29 @@ function Shared.Play(List: { Player }, CutId: string, Opts: any?): string?
 		local Release = Local.Hold(Player)
 		if not Release then continue end
 		Local.Mark(Player, CutId, `Started`) -- saved before it plays: a disconnect mid-cut replays on rejoin
-		S.Viewers[Player] = { SeenBefore = SeenBefore; StartedBefore = StartedBefore; Release = Release }
+		S.Viewers[Player] = { SeenBefore = SeenBefore; StartedBefore = StartedBefore; Release = Release;
+			Points = 0; Max = 0; Perfects = 0; Judged = {} }
 		ByPlayer[Player] = S.Id
 		table.insert(Ids, Player.UserId)
 	end
 	if #Ids == 0 then return nil end
 	S.Group = #Ids > 1
 	Sessions[S.Id] = S
+	S.Graph = Local.GraphOf(CutId)
+	if S.Graph then S.Seg = S.Graph.start end
 	local StartAt = workspace:GetServerTimeNow() + (if S.Group then Config.GroupLead else 0)
+	S.SegStartAt = StartAt
 	for Player, V in S.Viewers do
 		-- personal: skippable once seen (or started: the rejoin replay); group: by vote only (doc 04 §2)
 		local Skippable = S.Skippable or (not S.Group and (V.SeenBefore or V.StartedBefore))
 		Local.Send(Player, { Kind = `Play`; Session = S.Id; Id = CutId; StartAt = StartAt; Skippable = Skippable;
-			Group = S.Group; Viewers = Ids; Need = Local.Need(S); Votes = Local.Votes(S); Name = Local.NameOf(Player) })
+			Group = S.Group; Viewers = Ids; Need = Local.Need(S); Votes = Local.Votes(S); Name = Local.NameOf(Player);
+			Interactive = S.Graph ~= nil; Solo = not S.Group })
 		-- the client may take a moment to get ready (the menu finishing); the real timer starts when it says Began
 		Local.ArmTimeout(S, Player, Config.StartGrace + Cut.Length + Config.TimeoutPad)
 		Shared.Began:Fire(Player, CutId)
 	end
+	Local.ArmPrompt(S)
 	if S.Group then Local.BroadcastVotes(S) end
 	return S.Id
 end
@@ -284,6 +448,14 @@ function Local.OnMessage(Player: Player, Message)
 			V.Voted = true
 			Local.BroadcastVotes(S)
 		end
+	elseif Message.Kind == `Input` then
+		Local.OnInput(S, Player, V, Message)
+	elseif Message.Kind == `Seg` then
+		Local.OnSeg(S, Player, V, Message)
+	elseif Message.Kind == `Where` then
+		if S.Graph then Local.Send(Player, { Kind = `Segment`; Session = S.Id; Name = S.Seg; StartAt = S.SegStartAt }) end
+	elseif Message.Kind == `Grade` then
+		if S.Graph then Local.SendGrade(S, Player, V) end
 	end
 end
 
@@ -376,6 +548,80 @@ function Shared.SessionsForTests()
 		for P, X in S.Viewers do V[tostring(P)] = { Ended = X.Ended == true; Voted = X.Voted == true; Seen = X.SeenBefore == true } end
 		Out[Id] = { Cut = S.CutId; Group = S.Group; Viewers = V }
 	end
+	return Out
+end
+
+-- (2.25.0) the group decide, the solo path check, Where and the grade on the real code, with stand-in viewers (the MCP
+-- starts one-player Plays). Nothing is saved: messages to stand-ins are recorded, the real player's grades and
+-- decisions are put back.
+function Shared.QteSelfTestForTests(Player: Player)
+	local Out = {}
+	local function fake(Name: string) return setmetatable({ Name = Name; Parent = game; UserId = -1 }, { __tostring = function() return Name end }) end
+	local A, B, C = Player, fake(`StandInB`), fake(`StandInC`)
+	local Graph = { start = `A`; segments = {
+		A = { len = 3; prompt = { kind = `Press`; at = 1; beat = 0.6; slow = 0.3; on = { Perfect = `B`; Good = `B`; Miss = `C` } } };
+		B = { len = 2; next = `D` }; C = { len = 2; next = `D` };
+		D = { len = 3; prompt = { kind = `Mash`; at = 0.5; dur = 1.6; rate = 7; slow = 0.5; on = { Win = `E`; Lose = `E` } } };
+		E = { len = 1 } } }
+	local Sent = {}
+	local RealSend = Local.Send
+	Local.Send = function(P, M) table.insert(Sent, { To = tostring(P); M = M }) end
+	local SavedGrades = table.clone((Quests().CineGrades(Player)) or {})
+	local function viewer() return { SeenBefore = false; Points = 0; Max = 0; Perfects = 0; Judged = {} } end
+	local function msg(Kind, To) for I = #Sent, 1, -1 do if Sent[I].M.Kind == Kind and (To == nil or Sent[I].To == To) then return Sent[I].M end end return nil end
+	local Ok, Err = pcall(function()
+		-- 1. two viewers: a Perfect and a Miss tie -> the better outcome (Perfect) -> B; each keeps their own points
+		local S = { Id = `qte1`; CutId = `Prologue`; Group = true; Graph = Graph; Seg = `A`; SegStartAt = 0; Viewers = { [A] = viewer(); [B] = viewer() } }
+		Sessions[S.Id] = S
+		Local.OnInput(S, A, S.Viewers[A], { Seg = `A`; Times = { 0.6 } })
+		Out.WaitsForEveryone = msg(`Branch`) == nil
+		Local.OnInput(S, B, S.Viewers[B], { Seg = `A`; Times = {} })
+		local Br = msg(`Branch`, tostring(A))
+		Out.TieBranch = Br and Br.Next
+		Out.PointsA, Out.PointsB = S.Viewers[A].Points, S.Viewers[B].Points
+		Out.SegAfter = S.Seg
+		-- 2. Where tells a lost client the current segment
+		Sent = {}
+		Local.OnMessage(A, { Kind = `Where`; Session = `qte1` })
+		local W = msg(`Segment`)
+		Out.Where = W and W.Name
+		-- 3. three viewers, two miss: majority -> C; a missing answer at the deadline counts as a miss
+		Sent = {}
+		local S3 = { Id = `qte3`; CutId = `Prologue`; Group = true; Graph = Graph; Seg = `A`; SegStartAt = 0;
+			Viewers = { [A] = viewer(); [B] = viewer(); [C] = viewer() } }
+		Sessions[S3.Id] = S3
+		Local.OnInput(S3, A, S3.Viewers[A], { Seg = `A`; Times = { 0.8 } })
+		Local.OnInput(S3, B, S3.Viewers[B], { Seg = `A`; Times = { 0.1 } })
+		Local.Decide(S3, `A`) -- C never answered: the deadline
+		local B3 = msg(`Branch`, tostring(A))
+		Out.MajorityBranch = B3 and B3.Next
+		-- 4. solo: input then a path report the server agrees with; a skip past an unjudged prompt is refused
+		Sent = {}
+		local S4 = { Id = `qte4`; CutId = `Prologue`; Group = false; Graph = Graph; Seg = `A`; SegStartAt = 0; Viewers = { [A] = viewer() } }
+		Sessions[S4.Id] = S4
+		Local.OnSeg(S4, A, S4.Viewers[A], { Name = `D`; At = 1 })
+		Out.SoloSkipRefused = S4.Seg == `A`
+		Local.OnInput(S4, A, S4.Viewers[A], { Seg = `A`; Times = { 0.62 } })
+		Local.OnSeg(S4, A, S4.Viewers[A], { Name = `B`; At = 2 })
+		Out.SoloMovedToB = S4.Seg == `B`
+		Local.OnSeg(S4, A, S4.Viewers[A], { Name = `D`; At = 4 })
+		Out.SoloNextChain = S4.Seg == `D`
+		local Taps = {}
+		for I = 1, 12 do Taps[I] = I * 0.13 end
+		Local.OnInput(S4, A, S4.Viewers[A], { Seg = `D`; Times = Taps })
+		Out.MashOutcome = S4.Viewers[A].Judged.D.Outcome
+		-- 5. the grade: Perfect (3/3) + Mash Win (2/2) = 5/5 -> S
+		Sent = {}
+		Local.SendGrade(S4, A, S4.Viewers[A])
+		local G = msg(`Grade`)
+		Out.Grade = G and G.Grade
+		Out.GradeSaved = ((Quests().CineGrades(Player)) or {}).Prologue ~= nil
+	end)
+	Local.Send = RealSend
+	for _, Id in { `qte1`, `qte3`, `qte4` } do Sessions[Id] = nil end
+	local G = Quests().CineGrades(Player)
+	if G then table.clear(G) for K, V in SavedGrades do G[K] = V end pcall(function() Quests().SyncForCine(Player) end) end
+	if not Ok then Out.Error = tostring(Err) end
 	return Out
 end
 

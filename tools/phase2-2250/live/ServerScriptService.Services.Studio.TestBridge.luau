@@ -825,6 +825,11 @@ function Commands.CineGrades(PlayerName: string)
 	return DeepCopy(QuestsService().CineGrades(Players:FindFirstChild(PlayerName)))
 end
 
+-- the group decide, the solo path check, Where and the grade on the real session code, with stand-in viewers
+function Commands.CineQteTest(PlayerName: string)
+	return DeepCopy(CineService().QteSelfTestForTests(Players:FindFirstChild(PlayerName)))
+end
+
 -- Move the player next to a map part found by attribute (QuestObject / QuestArea / NpcPost ...).
 function Commands.GoTo(PlayerName: string, Attribute: string, Value: any, Offset: Vector3?)
 	local Player = Players:FindFirstChild(PlayerName)
