@@ -33,14 +33,18 @@ The owner: "make it look more like iMessage (our theme though)".
   dare is current. The old list showed Accept on every copy. Now only the newest copy sent today can be answered, and
   older ones read "This dare's over".
 - **Dare names:** the "(Dare: Stand Up)" ending is dropped from the bubble, since the card names the dare.
+- **Refused-reply reason:** it was hidden below the view when the quick replies came back. The conversation now
+  scrolls to it.
 - **Days:** labels follow the clock the player sees. A 5:45 AM Friday text reads "Today" on Friday, though the server
   files it under Thursday's night.
 
 ### Checked
 - **In Play on Testy (slot 4):** the list, opening conversations, per-sender read, a "Not today." reply, and a new
   text arriving while its conversation was open.
-- **Not checked:** phone-size screens, the refused-reply mark, and the typing dots on screen.
-- **Studio:** saved as place version 1149, with the 4-slot test setting and `NHTestNoMenuKeys` put back.
+- **Then (place version 1152):** a reply the server refused showed the red **!** and "Not sent: You're already on
+  it.", and the typing bubble showed three dots for 1.1 s before Pip's new text appeared and was marked read.
+- **Not checked:** phone-size screens (Studio's device emulator can't be driven from the test tools).
+- **Studio:** saved as place version 1152, with the 4-slot test setting and `NHTestNoMenuKeys` put back.
 
 ## [2.22.1] - 2026-11-17: Old backups archived out of NH Combat Test (about 123,000 instances)
 

@@ -1511,6 +1511,11 @@ function Local.TextsThread(From: string, Dir: number?, Fresh: boolean?)
 				Busy = false
 				Chips.Visible = true
 				Body.Size = UDim2.new(1, 0, 1, -86 - COMPOSER - 40)
+				-- the replies take their room back: keep the reason in view
+				task.defer(function()
+					RunService.Heartbeat:Wait()
+					if Body.Parent then Body.CanvasPosition = Vector2.new(0, math.max(0, Body.AbsoluteCanvasSize.Y - Body.AbsoluteSize.Y)) end
+				end)
 			end
 		end
 		local Yes = if T.Invite then `On my way.` else `I'm in.`
