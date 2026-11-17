@@ -32,6 +32,10 @@ The owner: "make it look more like iMessage (our theme though)".
 - **Old copies of a dare:** leaders resend the same dare on later days, and the server accepts any copy while that
   dare is current. The old list showed Accept on every copy. Now only the newest copy sent today can be answered, and
   older ones read "This dare's over".
+- **The server's dare check:** the server still accepted any copy of a current dare, and answers to texts already
+  answered (accepting a declined dare, or declining one you're on). `Features.Phone` now refuses both ("That dare's
+  over.", "You already answered that.") and marks only the live copy answerable in the text list. Backup:
+  `NH_Backup.TextsApp_pre_20261117.Features_Phone_pre_darerule`.
 - **Dare names:** the "(Dare: Stand Up)" ending is dropped from the bubble, since the card names the dare.
 - **Refused-reply reason:** it was hidden below the view when the quick replies came back. The conversation now
   scrolls to it.
@@ -43,8 +47,11 @@ The owner: "make it look more like iMessage (our theme though)".
   text arriving while its conversation was open.
 - **Then (place version 1152):** a reply the server refused showed the red **!** and "Not sent: You're already on
   it.", and the typing bubble showed three dots for 1.1 s before Pip's new text appeared and was marked read.
+- **The server's dare check (place version 1153):** answers sent straight to the remote. An older copy of a live
+  dare was refused ("That dare's over."), and so were accepting a declined dare and declining an accepted one ("You
+  already answered that."). The newest copy took one answer and refused a second. No script errors.
 - **Not checked:** phone-size screens (Studio's device emulator can't be driven from the test tools).
-- **Studio:** saved as place version 1152, with the 4-slot test setting and `NHTestNoMenuKeys` put back.
+- **Studio:** saved as place version 1153, with the 4-slot test setting and `NHTestNoMenuKeys` put back.
 
 ## [2.22.1] - 2026-11-17: Old backups archived out of NH Combat Test (about 123,000 instances)
 

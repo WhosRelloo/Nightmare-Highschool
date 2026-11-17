@@ -331,6 +331,29 @@ function Shared.DareDay(P: Player): number?
 	return Ph and Ph.DareDay
 end
 
+-- (2.23.0) the school's event day, as texts store it in Day (a night belongs to the evening before it), or nil
+function Local.EventDay(): number?
+	local Day = nil
+	pcall(function()
+		local St = require(ServerScriptService.Services.School.SchoolClock).GetState()
+		Day = require(ReplicatedStorage.Config.Cliques).EventDay(St) or St.Day
+	end)
+	return Day
+end
+
+-- (2.23.0) a dare text can be answered only if it is the newest copy of that dare and was sent today. Leaders resend
+-- the same dare on later days, and Quests.CanStart only knows that the dare itself is current.
+function Local.DareLive(Ph, T, Today: number?): boolean
+	for _, X in Ph.Texts do -- newest first
+		if X.Dare == T.Dare then
+			if X ~= T then return false end
+			break
+		end
+	end
+	if Today and typeof(T.Day) == `number` and T.Day ~= 0 and T.Day ~= Today then return false end
+	return true
+end
+
 -- (2.23.0) MarkRead with From marks only that sender's texts read (the Texts app opens one conversation at a time)
 function Shared.Texts(P: Player, MarkRead: boolean?, From: string?)
 	local Ph = Local.Get(P)
@@ -339,13 +362,14 @@ function Shared.Texts(P: Player, MarkRead: boolean?, From: string?)
 	pcall(function() Quests = require(ServerScriptService.Services.Quests.Quests) end)
 	local Out = {}
 	local Changed = false
+	local Today = Local.EventDay()
 	for I, T in Ph.Texts do
 		local Row = table.clone(T)
 		Row.Index = I
 		-- a dare can be accepted while it's still that leader's dare and you haven't done it
 		if T.Dare and Quests and T.State ~= `Accepted` and T.State ~= `Declined` then
 			local Ok = Quests.CanStart(P, T.Dare)
-			Row.CanAccept = Ok == true
+			Row.CanAccept = Ok == true and Local.DareLive(Ph, T, Today)
 		end
 		-- (homes) an invite can be taken while it's fresh and the host's room is open
 		if T.Invite and T.State ~= `Accepted` and T.State ~= `Declined` then
@@ -381,6 +405,9 @@ function Shared.TextAction(P: Player, Index: any, Action: any, Id: any): (boolea
 		T = Ph and typeof(Index) == `number` and Ph.Texts[Index]
 	end
 	if not (T and (T.Dare or T.Invite)) then return false, `Nothing to answer.` end
+	-- (2.23.0) each text is answered once, and only a live dare (the newest copy, sent today) can be answered
+	if T.State == `Accepted` or T.State == `Declined` then return false, `You already answered that.` end
+	if T.Dare and not Local.DareLive(Ph, T, Local.EventDay()) then return false, `That dare's over.` end
 	-- (homes) a dorm-room invite
 	if T.Invite then
 		if Action == `Decline` then
