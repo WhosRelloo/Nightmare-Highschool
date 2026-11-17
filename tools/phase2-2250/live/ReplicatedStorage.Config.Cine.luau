@@ -19,7 +19,8 @@
 ]]
 return {
 	Cuts = {
-		Prologue = { Name = `Roll Call`; Length = 31; Set = `RollCall`; Replay = true; Arrive = `Arrive` };
+		-- (2.25.0) interactive: the longest path is 33.7 s (CineJudge.LongestPath); no grade card for one story prompt
+		Prologue = { Name = `Roll Call`; Length = 35; Set = `RollCall`; Replay = true; Arrive = `Arrive`; Interactive = true; ShowGrade = false };
 		Collected = { Name = `Collected`; Length = 13; Set = `Hall`; Replay = true };
 		-- (2.25.0) a test cut for the interactive director (TestBridge / harness only; never in a quest)
 		__QteTest = { Name = `QTE test`; Length = 30; Set = `Hall`; Replay = true; Interactive = true };

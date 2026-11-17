@@ -1,6 +1,7 @@
 --[[
 	Prologue: Roll Call (Chapter One opens). ReplicatedStorage.Cinematics.Prologue, played by Controllers.Cine.
-	About 31 s (Config.Cine.Cuts.Prologue.Length). Doc: docs/expansion/04-Cinematic-Framework.md, 11-Phase1-Plan.md.
+	About 31-34 s (Config.Cine.Cuts.Prologue.Length). (2.25.0) Interactive: you answer to your own name on the beat
+	(a Press prompt); a miss plays the Late segment ("...Here." / "...Here, apparently."), then both paths rejoin. Doc: docs/expansion/04-Cinematic-Framework.md, 11-Phase1-Plan.md.
 
 	The beat: the bell rings over the hallway on your first morning; you hurry to Room 102 with the other late ones; Mr.
 	Hale reads the register; you answer to your own name; he reads "Holt. Mira Holt." and nobody answers. The empty
@@ -35,6 +36,15 @@ local Def = {
 		{ Name = `S4`; From = { `Ambient`; `Npc:Lucien` }; Mark = `SeatS4`; Pose = `Sit`; Display = `Student` };
 	};
 }
+
+-- (2.25.0) the roll call stops for one prompt: answer to your name on the beat. Late (a miss) changes one line, nothing else.
+Def.Graph = { start = `RollCall`; segments = {
+	RollCall = { len = 15.0; prompt = { kind = `Press`; at = 14.3; beat = 0.55; slow = 0.35; label = `ANSWER`;
+		on = { Perfect = `Answer`; Good = `Answer`; Miss = `Late` } } };
+	Answer = { len = 1.6; next = `Holt` };
+	Late = { len = 2.8; next = `Holt` };
+	Holt = { len = 14.6 };
+} }
 
 function Def.Build(Ctx)
 	local Hale = Ctx.Actor(`Hale`)
@@ -80,9 +90,11 @@ function Def.Build(Ctx)
 		-- 4. Hale, medium: the names go by.
 		{ name = `Hale reads`; dur = 2.8; subject = subj(`Hale`, `HaleMark`);
 			camera = { frame = { size = `MS`; yaw = 18; pitch = 3; lens = 50 } }; noise = `auto`; dof = true };
-		-- 5. You answer to your name.
-		{ name = `You answer`; dur = 2.4; subject = subj(`Self`, `SeatSelf`);
+		-- 5. Your name: the camera finds you as Hale reads it, and the scene slows for your answer (the prompt).
+		{ name = `Your name`; dur = 1.0; subject = subj(`Self`, `SeatSelf`);
 			camera = { frame = { size = `MCU`; yaw = -28; pitch = 2; lens = 50 } }; noise = `auto`; dof = true };
+	}
+	local holt = {
 		-- 6. Hale reads on: "Holt." A breath. "Mira Holt." The camera creeps in on him.
 		{ name = `Holt`; dur = 3.2; subject = subj(`Hale`, `HaleMark`);
 			-- side pinned: on "auto" the eyes jumped from the right third to centre mid-push (a sudden pan)
@@ -115,10 +127,12 @@ function Def.Build(Ctx)
 			noise = { preset = `handheld_normal_mild`; gain = 0.25 } };
 	}
 
-	-- shot starts (the events are on the cut's clock)
-	local T = {}
+	-- shot starts, per segment (each segment's events are on its own clock)
+	local T, H = {}, {}
 	local At = 0
 	for I, S in shots do T[I] = At At += S.dur end
+	At = 0
+	for I, S in holt do H[I] = At At += S.dur end
 
 	local events = {
 		-- 1 / 2: the bell, the hurry
@@ -143,31 +157,58 @@ function Def.Build(Ctx)
 		{ t = T[4] + 0.3; say = { who = `Hale`; text = `Fitch.`; dur = 0.9 } };
 		{ t = T[4] + 1.1; say = { who = `S1`; text = `Here, sir.`; dur = 1.0 } };
 		{ t = T[4] + 1.9; say = { who = `Hale`; text = function() return `{Full}.` end; dur = 1.2 } };
-		-- 5: you
-		{ t = T[5] + 0.45; say = { who = `Self`; name = First; text = `Here.`; dur = 1.2 } };
-		{ t = T[5] + 0.4; pose = { who = `Self`; name = { RS = 1.0; LS = 0.9; Lean = 0.1; Pitch = -0.04 }; speed = 5 } };
-		-- 6: Holt
-		{ t = T[6] + 0.3; say = { who = `Hale`; text = `Holt.`; dur = 1.1 } };
-		{ t = T[6] + 1.9; say = { who = `Hale`; text = `Mira Holt.`; dur = 1.3 } };
-		-- 7: nobody answers. The Archive's faint choral tone, pitched down, under the silence.
-		{ t = T[7] + 0.2; sound = { id = `rbxassetid://9125602882`; volume = 0.3; speed = 0.8 } };
-		{ t = T[7] + 0.4; look = { who = `Self`; at = `MiraDesk` } };
-		-- 8: he looks up, frowns, moves on
-		{ t = T[8]; pose = { who = `Hale`; name = { RS = 0.7; LS = 0.55; Pitch = -0.02; Lean = 0.02 }; speed = 3 } };
-		{ t = T[8]; look = { who = `Hale`; at = `MiraDesk`; speed = 3 } };
-		{ t = T[8] + 1.2; say = { who = `Hale`; text = `...Moving on.`; expr = `frown`; dur = 1.3 } };
-		{ t = T[8] + 2.2; look = { who = `Hale`; at = false } };
-		{ t = T[8] + 2.2; pose = { who = `Hale`; name = `Read`; speed = 4 } };
-		{ t = T[8] + 2.4; say = { who = `Hale`; text = `Price.`; dur = 0.8 } };
-		-- 9: you stand up into the aisle
-		{ t = T[9] + 0.15; look = { who = `Self`; at = false } };
-		-- out of the chair sideways into the aisle, then forward to where play picks up (never through the desk)
-		{ t = T[9] + 0.3; walk = { who = `Self`; to = `Aisle`; dur = 0.8; pose = `Stand`; speed = 7 } };
-		{ t = T[9] + 1.15; walk = { who = `Self`; to = `Arrive`; dur = 1.3 } };
 	}
 
-	return { shots = shots; events = events; duration = At;
-		grade = { contrast = 0.1; saturation = -0.12; tint = { 255, 236, 212 }; bloom = { intensity = 0.5; size = 40; threshold = 0.95 } } }
+	local holtEvents = {
+		-- 6: Holt
+		{ t = H[1] + 0.3; say = { who = `Hale`; text = `Holt.`; dur = 1.1 } };
+		{ t = H[1] + 1.9; say = { who = `Hale`; text = `Mira Holt.`; dur = 1.3 } };
+		-- 7: nobody answers. The Archive's faint choral tone, pitched down, under the silence.
+		{ t = H[2] + 0.2; sound = { id = `rbxassetid://9125602882`; volume = 0.3; speed = 0.8 } };
+		{ t = H[2] + 0.4; look = { who = `Self`; at = `MiraDesk` } };
+		-- 8: he looks up, frowns, moves on
+		{ t = H[3]; pose = { who = `Hale`; name = { RS = 0.7; LS = 0.55; Pitch = -0.02; Lean = 0.02 }; speed = 3 } };
+		{ t = H[3]; look = { who = `Hale`; at = `MiraDesk`; speed = 3 } };
+		{ t = H[3] + 1.2; say = { who = `Hale`; text = `...Moving on.`; expr = `frown`; dur = 1.3 } };
+		{ t = H[3] + 2.2; look = { who = `Hale`; at = false } };
+		{ t = H[3] + 2.2; pose = { who = `Hale`; name = `Read`; speed = 4 } };
+		{ t = H[3] + 2.4; say = { who = `Hale`; text = `Price.`; dur = 0.8 } };
+		-- 9: you stand up into the aisle
+		{ t = H[4] + 0.15; look = { who = `Self`; at = false } };
+		-- out of the chair sideways into the aisle, then forward to where play picks up (never through the desk)
+		{ t = H[4] + 0.3; walk = { who = `Self`; to = `Aisle`; dur = 0.8; pose = `Stand`; speed = 7 } };
+		{ t = H[4] + 1.15; walk = { who = `Self`; to = `Arrive`; dur = 1.3 } };
+	}
+
+	return {
+		segments = {
+			RollCall = { shots = shots; events = events };
+			-- on the beat: a different size from "Your name", so it isn't a jump cut
+			Answer = {
+				shots = { { name = `You answer`; dur = 1.6; subject = subj(`Self`, `SeatSelf`);
+					camera = { frame = { size = `MS`; yaw = -20; pitch = 3; lens = 45 } }; noise = `auto`; dof = true } };
+				events = {
+					{ t = 0.0; pose = { who = `Self`; name = { RS = 1.0; LS = 0.9; Lean = 0.1; Pitch = -0.04 }; speed = 5 } };
+					{ t = 0.05; say = { who = `Self`; name = First; text = `Here.`; dur = 1.2 } };
+				} };
+			-- late: hold on the awkward beat (the same framing as "Your name", on purpose), then Hale notices
+			Late = {
+				shots = {
+					{ name = `Late answer`; dur = 1.2; subject = subj(`Self`, `SeatSelf`); jumpCut = true;
+						camera = { frame = { size = `MCU`; yaw = -28; pitch = 2; lens = 50 } }; noise = `auto`; dof = true };
+					{ name = `Hale glance`; dur = 1.6; subject = subj(`Hale`, `HaleMark`);
+						camera = { frame = { size = `MCU`; yaw = 22; pitch = 1; lens = 50 } }; noise = `auto`; dof = true };
+				};
+				events = {
+					{ t = 0.15; say = { who = `Self`; name = First; text = `...Here.`; dur = 1.0 } };
+					{ t = 1.2; look = { who = `Hale`; at = `Self` } };
+					{ t = 1.35; say = { who = `Hale`; text = `...Here, apparently.`; dur = 1.3 } };
+					{ t = 2.7; look = { who = `Hale`; at = false } };
+				} };
+			Holt = { shots = holt; events = holtEvents };
+		};
+		grade = { contrast = 0.1; saturation = -0.12; tint = { 255, 236, 212 }; bloom = { intensity = 0.5; size = 40; threshold = 0.95 } };
+	}
 end
 
 return Def
