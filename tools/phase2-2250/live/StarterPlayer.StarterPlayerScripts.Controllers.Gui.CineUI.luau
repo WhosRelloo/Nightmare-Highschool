@@ -15,6 +15,7 @@
 
 	API: Show(Opts), Hide(), Subtitle(Speaker, Text, Seconds, Color?), Card(Title, Sub, Seconds), Veil(Alpha, Seconds),
 	     Votes(Votes, Need, Voted), SetSkippable(bool), Ring(), OnSkip(fn)
+     (2.25.0) PromptShow(P, Opts), PromptHit(), PromptMeter(f), PromptHold(down), PromptHide(Outcome?), GradeCard(G, Perfects, Prompts, s)
 ]]
 local Players = game:GetService(`Players`)
 local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
@@ -348,8 +349,151 @@ function Shared.Ring()
 	end)
 end
 
+---| prompts (2.25.0): drawn from the kit's seal, panel and frame art |---
+
+local VERDICT = { Perfect = `PERFECT`; Good = `GOOD`; Miss = `MISS`; Win = `BROKE FREE`; Lose = `TOO SLOW`; Hit = `PERFECT`; Right = `DODGED`; Wrong = `MISSED` }
+local GOOD_OUTCOME = { Perfect = true; Good = true; Win = true; Hit = true; Right = true }
+local CRIMSON = Color3.fromRGB(200, 40, 60)
+
+local function keyGlyph(Touch: boolean): string
+	if Touch then return `TAP` end
+	if UserInputService.GamepadEnabled and not UserInputService.KeyboardEnabled then return `A` end
+	return `E`
+end
+
+local function sealButton(Name: string, Parent: Instance, Pos: UDim2, Size: number, Text: string, TextBase: number)
+	local S = new(`ImageButton`, { Name = Name; BackgroundTransparency = 1; Image = Img.Seal; ImageColor3 = C.Wax; AutoButtonColor = false;
+		AnchorPoint = Vector2.new(0.5, 0.5); Position = Pos; Size = UDim2.fromOffset(Size, Size); ZIndex = 52 }, Parent)
+	new(`TextLabel`, { Name = `Glyph`; BackgroundTransparency = 1; Font = Theme.Fonts.Title; Text = Text; TextColor3 = C.Gold;
+		TextSize = textSize(TextBase); Size = UDim2.fromScale(1, 1); ZIndex = 53 }, S)
+	return S
+end
+
+local function tapWired(B: GuiButton, OnTap: (boolean) -> ())
+	B.InputBegan:Connect(function(I)
+		if I.UserInputType == Enum.UserInputType.Touch or I.UserInputType == Enum.UserInputType.MouseButton1 then OnTap(true) end
+	end)
+	B.InputEnded:Connect(function(I)
+		if I.UserInputType == Enum.UserInputType.Touch or I.UserInputType == Enum.UserInputType.MouseButton1 then OnTap(false) end
+	end)
+end
+
+function Shared.PromptShow(P, Opts)
+	if not Ui then Local.Build() end
+	Ui.Gui.Enabled = true
+	if Ui.Prompt then Ui.Prompt:Destroy() end
+	local L = new(`CanvasGroup`, { Name = `Prompt`; BackgroundTransparency = 1; AnchorPoint = Vector2.new(0.5, 0.5);
+		Position = UDim2.fromScale(0.5, 0.6); Size = UDim2.fromOffset(560, 300); GroupTransparency = 1; ZIndex = 50 }, Ui.Gui)
+	Ui.Prompt = L
+	local Parts = {}
+	Ui.PromptParts = Parts
+	local Kind = P.kind
+	local Label = new(`TextLabel`, { Name = `Label`; BackgroundTransparency = 1; Font = Theme.Fonts.Title; TextColor3 = C.Chalk; Text = ``;
+		TextSize = textSize(22); AnchorPoint = Vector2.new(0.5, 0); Position = UDim2.fromScale(0.5, 0.8); Size = UDim2.new(1, 0, 0, 34); ZIndex = 52 }, L)
+	Parts.Label = Label
+	if Kind == `Press` or Kind == `Mash` or Kind == `Hold` then
+		local Key = sealButton(`Key`, L, UDim2.fromScale(0.5, 0.4), 108, keyGlyph(Opts.Touch), 30)
+		Parts.Key = Key
+		tapWired(Key, Opts.OnTap)
+		Label.Text = if Kind == `Mash` then `MASH` elseif Kind == `Hold` then `HOLD, RELEASE ON THE SEAL` else (P.label or `NOW`)
+		if Kind == `Press` or Kind == `Hold` then
+			-- a faint seal where the closing seal lands; the closing seal shrinks onto it on the beat (Press) or, once the
+			-- key is held, at the release mark (Hold)
+			new(`ImageLabel`, { Name = `Zone`; BackgroundTransparency = 1; Image = Img.Seal; ImageColor3 = C.Gold; ImageTransparency = 0.8;
+				AnchorPoint = Vector2.new(0.5, 0.5); Position = Key.Position; Size = UDim2.fromOffset(124, 124); ZIndex = 51 }, L)
+			local Ring = new(`ImageLabel`, { Name = `Ring`; BackgroundTransparency = 1; Image = Img.Seal; ImageColor3 = C.Gold; ImageTransparency = 0.5;
+				AnchorPoint = Vector2.new(0.5, 0.5); Position = Key.Position; Size = UDim2.fromOffset(264, 264); ZIndex = 51 }, L)
+			Parts.Ring = Ring
+			Parts.RingAt = if Kind == `Press` then (P.beat or 0.6) else (P.zoneAt or 1)
+			if Kind == `Press` then tween(Ring, Parts.RingAt, { Size = UDim2.fromOffset(124, 124) }, Enum.EasingStyle.Linear) end
+		else
+			local Bar = new(`ImageLabel`, { Name = `Meter`; Image = Img.PanelBg; ImageColor3 = C.PanelTint; BackgroundColor3 = C.Ink; BackgroundTransparency = 0.2;
+				BorderSizePixel = 0; ScaleType = Enum.ScaleType.Stretch; AnchorPoint = Vector2.new(0.5, 0); Position = UDim2.fromScale(0.5, 0.93);
+				Size = UDim2.fromOffset(340, 20); ZIndex = 52 }, L)
+			Parts.Fill = new(`ImageLabel`, { Name = `Fill`; Image = Img.PanelBg; ImageColor3 = C.Gold; BackgroundTransparency = 1;
+				ScaleType = Enum.ScaleType.Stretch; Size = UDim2.fromScale(0, 1); ZIndex = 53 }, Bar)
+			Kit.Slice(`FrameThin`, C.GoldDeep, { Name = `Rim`; SliceScale = 0.2; ZIndex = 54; Parent = Bar })
+		end
+	elseif Kind == `Direction` then
+		local Options = P.options or {}
+		local KEY = { Left = `A`; Right = `D`; Up = `W`; Down = `S` }
+		for I, Dir in Options do
+			local X = (I - 0.5) / #Options
+			local Glyph = if Opts.Touch then string.upper(Dir) else KEY[Dir] or Dir
+			local S = sealButton(`Dir_{Dir}`, L, UDim2.fromScale(X, 0.4), 96, Glyph, if Opts.Touch then 20 else 30)
+			S.Activated:Connect(function() Opts.OnPick(Dir) end)
+			new(`TextLabel`, { Name = `Word`; BackgroundTransparency = 1; Font = Theme.Fonts.Body; Text = string.upper(Dir); TextColor3 = C.Chalk;
+				TextSize = textSize(20); AnchorPoint = Vector2.new(0.5, 0); Position = UDim2.new(0.5, 0, 1, 4); Size = UDim2.fromOffset(120, 24); ZIndex = 53 }, S)
+		end
+		Label.Text = P.label or `DODGE`
+	elseif Kind == `Choice` then
+		local Options = P.options or {}
+		for I, O in Options do
+			local B = Kit.Button({ text = `{I}   {O.text}`; style = `default`; onClick = function() Opts.OnPick(O.id) end;
+				Size = UDim2.fromOffset(500, 50); Parent = L })
+			B.AnchorPoint = Vector2.new(0.5, 0)
+			B.Position = UDim2.new(0.5, 0, 0, 10 + (I - 1) * 58)
+			B.ZIndex = 52
+		end
+		Label.Position = UDim2.fromScale(0.5, 0.86)
+		Label.Text = ``
+		local Bar = new(`ImageLabel`, { Name = `Timer`; Image = Img.PanelBg; ImageColor3 = C.Gold; BackgroundTransparency = 1; ScaleType = Enum.ScaleType.Stretch;
+			AnchorPoint = Vector2.new(0.5, 0); Position = UDim2.fromScale(0.5, 0.95); Size = UDim2.fromOffset(500, 6); ZIndex = 52 }, L)
+		tween(Bar, P.dur or 5, { Size = UDim2.fromOffset(0, 6) }, Enum.EasingStyle.Linear)
+	end
+	local Reduced = Opts.Reduced or reduced()
+	if Reduced then L.GroupTransparency = 0 else
+		local Sc = new(`UIScale`, { Scale = 0.9 }, L)
+		tween(Sc, 0.14, { Scale = 1 }, Enum.EasingStyle.Back)
+		tween(L, 0.12, { GroupTransparency = 0 })
+	end
+end
+
+function Shared.PromptHit()
+	local Parts = Ui and Ui.PromptParts
+	pcall(Kit.PlaySound, `Stamp`, 0.4)
+	local Key = Parts and Parts.Key
+	if Key and not reduced() then
+		Key.Size = UDim2.fromOffset(124, 124)
+		tween(Key, 0.18, { Size = UDim2.fromOffset(108, 108) }, Enum.EasingStyle.Back)
+	end
+end
+
+function Shared.PromptMeter(Fraction: number)
+	local Fill = Ui and Ui.PromptParts and Ui.PromptParts.Fill
+	if Fill then Fill.Size = UDim2.fromScale(math.clamp(Fraction, 0, 1), 1) end
+end
+
+function Shared.PromptHold(Down: boolean)
+	local Parts = Ui and Ui.PromptParts
+	if Down and Parts and Parts.Ring then
+		tween(Parts.Ring, Parts.RingAt, { Size = UDim2.fromOffset(124, 124) }, Enum.EasingStyle.Linear)
+	end
+end
+
+function Shared.PromptHide(Outcome: string?)
+	if not (Ui and Ui.Prompt) then return end
+	local L = Ui.Prompt
+	Ui.Prompt = nil
+	local Label = Ui.PromptParts and Ui.PromptParts.Label
+	if Outcome and Label and VERDICT[Outcome] then
+		Label.Text = VERDICT[Outcome]
+		Label.TextColor3 = if GOOD_OUTCOME[Outcome] then C.Gold else CRIMSON
+		task.delay(0.35, function() tween(L, 0.3, { GroupTransparency = 1 }) end)
+		task.delay(0.8, function() L:Destroy() end)
+	else
+		L:Destroy()
+	end
+end
+
+function Shared.GradeCard(Grade: string, Perfects: number, Prompts: number, Seconds: number)
+	local Sub = if Prompts > 0 then `{Perfects} of {Prompts} perfect` else nil
+	Shared.Card(`GRADE {Grade}`, Sub, Seconds)
+end
+
 function Shared.Hide(Seconds: number?)
 	if not Ui then return end
+	if Ui.Prompt then Ui.Prompt:Destroy() Ui.Prompt = nil end
 	local T = Seconds or 0.45
 	On = false
 	Ui.Skip.Visible = false
