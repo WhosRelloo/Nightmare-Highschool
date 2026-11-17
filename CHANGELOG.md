@@ -2,6 +2,85 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.24.0] - 2026-11-17: Expansion Phase 1, the prologue and the cinematic framework
+
+The plan is `docs/expansion/11-Phase1-Plan.md`; the results and the Map port table are in its "Results" section.
+- **Studio backup:** `ServerStorage.NH_Backup.Phase1_pre_20261117` (every script edited, before its first edit).
+- **Mirror:** `tools/phase1-2240/` (`pre/` before, `live/` after). Installed from the mirror with fresh instances.
+- **The Map place:** read only. The cuts were blocked against its Room 102, west hallway and entrance hall, but no
+  mark, post or script was added there (the owner: "Don't move or touch any of the builds").
+
+### Added
+- **Cutscene framework:**
+  - **Server (`Services.World.Cine`):** who sees which cut, saved as Started before it plays and Seen after.
+    - **While a cut plays:** the real character is frozen and untouchable.
+    - **Ending:** the cut ends at its length + 5 s even if the client never answers.
+    - **Group cuts:** a majority vote skips, and a viewer who has already seen the cut counts as a skip vote.
+    - **Remote:** one `ReplicatedStorage.NHCine`, rate-limited.
+  - **Director (`Controllers.Cine`):** plays a cut module from `ReplicatedStorage.Cinematics` with the cinematic
+    toolkit's shot player (`ReplicatedStorage.Cine`).
+    - **Actors:** client-side clones on named marks (`workspace.NHCineSets.<Set>.<Mark>`): your own student, Mr.
+      Hale, background students.
+    - **Hiding:** every other body in the world is hidden on your screen while the cut plays.
+    - **Animation:** walkers play the game's own Default walk clip, at a rate matched to their real speed so feet
+      don't skate. Sitters sit on the true seat height, and the body rises with the legs when they stand.
+    - **Time of day:** a cut can set its hour (morning roll call, midnight COLLECTED). `World.DayCycle` gained
+      `HoldHour` for that.
+    - **Camera:** only through `CameraLease`.
+  - **UI (`Gui.CineUI`):** letterbox, subtitles, the chapter card, and a Skip button with a vote count, from the UI
+    kit's art.
+- **Prologue: Roll Call (31 s):**
+  1. The bell rings over the hallway on your first morning, and you hurry to Room 102 with the other late ones.
+  2. Mr. Hale reads the register, and your student answers to your register name.
+  3. "Holt. Mira Holt." Nobody answers. The empty back-row desk gets the chapter's one dolly zoom.
+  4. He frowns and moves on. You stand up behind your own shoulder, where play picks up.
+- **COLLECTED (13 s):** the last stage of After Hours.
+  1. Mira's file on her desk under one torch beam, with "STATUS: COLLECTED" writing itself in red.
+  2. The hallway at midnight: the Night Custodian at the far end, his face never seen.
+  3. The bell, once. Card: "End of Chapter One: The Empty Desk".
+- **Orientation (new Main quest, new students only, before New Kid):** watch the roll call, report to Mr. Hale,
+  answer his question about the roll call, find the empty desk in the back row.
+- **Quest objectives:** `Cinematic` (plays a cut; an unfinished one replays on rejoin with Skip offered), `Decision`
+  (a dialogue answer, saved; `ctx.Decide` / `ctx.Decided`), `Kill` (by kind: Beast, Wolf, Student, Player, Any).
+- **Mr. Hale and the Night Custodian:**
+  - **Hale:** posted at Room 102's teacher's desk. His dialogue tree asks you about the roll call and won't talk
+    about Room 102.
+  - **The Custodian:** sweeps the main hallway by day, face in shadow. After hours his post is empty because he's the
+    Records Office watcher.
+- **Journal:** a "Cutscenes" section with **Watch again** for cuts you've seen (always skippable).
+- **TestBridge:** `Phase1SelfTest`, `CineVoteTest`, `PlayCut`, `CineState`, `CineMark`.
+
+### Fixed
+- **Two Night Custodians at his post:** the first spawn was still loading his look when the one-second tick checked
+  his post, and it spawned another. Start-up spawns now count as "on their way" until they finish.
+- **The camera stuck in a cutscene after Skip:** the camera lease ended during the fade to black, and the shot player
+  then put back the Scriptable camera it had seen at the start. The lease now lasts through the fade, and the shot
+  player no longer restores a camera type.
+
+### Checked
+- **Self-tests on the real code:**
+  - **Decisions:** a wrong answer doesn't count and the right one does.
+  - **Kills:** a Beast kill doesn't count for Wolves.
+  - **Seen cuts:** a seen cut completes its stage.
+  - **Who gets Orientation:** only fresh slots, and New Kid waits for it.
+  - **The group skip vote:** two viewers, three viewers with a seen one, and a leaver.
+- **In Play on slot 2 (quests reset for the test, then restored exactly):**
+  - **The new-student path:** the prologue, Hale's question ("Who's Mira Holt?" saved), the back-row desk,
+    Orientation done, New Kid started.
+  - **Rejoin:** Play stopped mid-cut; on rejoin the cut replayed with Skip; skipping completed the stage.
+  - **Replays:** a Journal replay was skippable, the camera came back in 0.4 s, no `Cine*` leftovers.
+  - **Cut details:** the bell swings and returns exactly. The morning look holds during the roll call at a 21:30
+    server clock, then snaps back.
+  - **Errors:** no errors from these modules on either side.
+- **`Cine.analyze`, with actors posed where the cut puts them at each shot:** Prologue 0 fixes (9 shots), COLLECTED 0
+  fixes. The key frames were captured and reviewed.
+- **Not checked:**
+  - a real two-player group cut (Studio's 2-player test, started by the owner)
+  - the cuts at full speed by eye
+  - phone-size screens
+  - slot 4 (it needs the 4-slot test setting)
+- **Studio:** saved as place version 1163.
+
 ## [2.23.0] - 2026-11-17: Texts looks like a messaging app, in the school's dress
 
 The owner: "make it look more like iMessage (our theme though)".

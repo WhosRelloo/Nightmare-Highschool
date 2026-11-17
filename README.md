@@ -19,6 +19,8 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
+**Chapter One opens with a roll call (2.24.0, 2026-11-17):** new students now begin with a cutscene. The bell rings, you hurry to Room 102, Mr. Hale reads the register, and one name gets no answer. Then comes a short Orientation quest with Mr. Hale. After Hours now ends on the COLLECTED cliffhanger. The cutscene system behind them handles skip votes, rejoining mid-cut and replays from the Journal. See [the game update](updates/discord/game-updates/2026-11-17-the-roll-call.md) and [the plan and results](docs/expansion/11-Phase1-Plan.md). Next: interactive cutscenes ([doc 12](docs/expansion/12-Interactive-Cutscenes.md)).
+
 **The phone (1.12.0, 2026-11-02):** every student now carries a phone (Y). It has a wallet to send Yen, Night FM for your own music, the Midnight Bell school paper, classmates, a camera, and wallpapers you can change. Click the clock for the new timetable. See [the game update](updates/discord/game-updates/2026-11-02-the-phone.md) and [the docs](docs/Phone.md).
 
 **New keys, a cinematic view and fixed cameras (1.11.0, 2026-11-02):** menu keys moved clear of combat (` Locker, P Options, M Report Card, L Factions), study groups live in a quiet bottom-left dock, \\ hides all UI for a letterboxed cinematic view, and every scripted camera was audited (locker hide, barber, wardrobes, no more stuck cameras). Big-wave announcement: [The Living School](updates/discord/announcements/2026-11-02-the-living-school.md). Patch notes: [game update](updates/discord/game-updates/2026-11-02-keys-cinematic-cameras.md). All posts: [updates/discord](updates/discord/README.md).
