@@ -2,6 +2,46 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.23.0] - 2026-11-17: Texts looks like a messaging app, in the school's dress
+
+The owner: "make it look more like iMessage (our theme though)".
+- **Studio backup:** `ServerStorage.NH_Backup.TextsApp_pre_20261117` (`Gui_Phone`, `Features_Phone`).
+- **Mirror:** `tools/texts-2230/` (`live/` and `pre/`) and the "Texts (2.23.0)" section of `docs/Phone.md`. Both
+  landed in commit ac6eacd.
+
+### Changed
+- **Messages:** one conversation per sender, newest first.
+  - **Avatars:** a wax-seal medallion (the kit's `Seal` art) in the sender's clique colour with their initials. The
+    Office has the crest and Mom & Dad a rose seal.
+  - **Rows:** the last line, when it came ("12:23 PM", "Yesterday", "Monday"), a gold **DARE** or **INVITE** tag
+    when one is open, and a pulsing crimson dot when unread.
+  - **Search:** a pill that filters by name or text.
+- **A conversation:**
+  - **Bubbles:** their texts on the left in inked leather (the kit's grain, a sheen, a gold hairline), your answers on
+    the right in crimson lacquer, with tails and day stamps.
+  - **Cards:** a dare or dorm invite shows as a card under its bubble, with its status.
+  - **Quick replies:** students can't write to NPCs, so the composer is sealed. **I'm in.** / **Not today.** (or **On
+    my way.** / **Maybe later.**) rise above it. Your answer flies up and reads **Sealed**, and a refused answer gets a
+    red **!** with the reason.
+  - **New texts:** a typing bubble plays before they appear.
+- **Read state:** opening a conversation marks only that sender's texts read (`Features.Phone`:
+  `Shared.Texts(P, MarkRead, From)`). The badge counts the rest.
+- **Reduce Motion** turns the animations off.
+
+### Fixed
+- **Old copies of a dare:** leaders resend the same dare on later days, and the server accepts any copy while that
+  dare is current. The old list showed Accept on every copy. Now only the newest copy sent today can be answered, and
+  older ones read "This dare's over".
+- **Dare names:** the "(Dare: Stand Up)" ending is dropped from the bubble, since the card names the dare.
+- **Days:** labels follow the clock the player sees. A 5:45 AM Friday text reads "Today" on Friday, though the server
+  files it under Thursday's night.
+
+### Checked
+- **In Play on Testy (slot 4):** the list, opening conversations, per-sender read, a "Not today." reply, and a new
+  text arriving while its conversation was open.
+- **Not checked:** phone-size screens, the refused-reply mark, and the typing dots on screen.
+- **Studio:** saved as place version 1149, with the 4-slot test setting and `NHTestNoMenuKeys` put back.
+
 ## [2.22.1] - 2026-11-17: Old backups archived out of NH Combat Test (about 123,000 instances)
 
 The owner: "Yes, archive them" (the archive proposal in `docs/expansion/10-Phase0-Report.md` §4).
