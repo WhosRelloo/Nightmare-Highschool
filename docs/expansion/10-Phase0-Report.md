@@ -124,7 +124,17 @@
 | Workspace `Crouch (Idle)`, `Crouch walk` | 1,601 + 648 | Stray KeyframeSequences |
 | Workspace `NHTEMP_SpiderParts`, `NHTEMP_BatB` | 4 + 12 | Beast leftovers |
 
-## 4. Archive proposal (nothing has been deleted; your call)
+## 4. Archive (done 2026-11-17, 2.22.1)
+
+**The owner approved it ("Yes, archive them").**
+- **Exported first:** 15 items, 22.8 MB, 123,471 instances, to verified `.rbxm` files listed in `archive/studio-backups/2026-11/MANIFEST.md`.
+- **The place now:** ServerStorage dropped from 118,670 to 19,865 instances, Workspace from 45,102 to 20,020, and `NH_Backup` from 35,861 to 1,425.
+- **Kept:** `Sean White` (the gym barbell comes from it).
+- **Checked after:** a Play run started with no script errors.
+
+The original proposal follows, for the record.
+
+### The proposal
 **The aim:** cut the place by about 100,000 instances (roughly half of ServerStorage) without losing anything.
 
 1. **Export first:** save each item below as an `.rbxm` file in `E:\Nightmare-Highschool\archive\studio-backups\2026-11\`, named after its Studio path, and commit the list of files with sizes. (The files themselves can stay out of git if they're large.)

@@ -2,6 +2,41 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.22.1] - 2026-11-17: Old backups archived out of NH Combat Test (about 123,000 instances)
+
+The owner: "Yes, archive them" (the archive proposal in `docs/expansion/10-Phase0-Report.md` §4).
+- **Exported first:** 15 items were exported to `.rbxm` files with Studio's `SerializationService`. Each file's size and
+  checksum matched Studio's own, and each has the `<roblox!` header.
+  - **Where:** the files are in `archive/studio-backups/2026-11/` on the owner's machine (git-ignored). The list with
+    sizes and checksums is `MANIFEST.md`.
+  - **Restore:** Insert from File in Studio.
+- **Removed from ServerStorage:**
+  - `_InertLiveDummies_Backup` and `_DummyNpcs_PreTrainingDummy_Backup`
+  - `Capes_Originals`
+  - `NH_Backup.Combat_preAudit_1102`
+  - `NH_Backup.HairImports_100x`, `Hair_v2_import_leftovers` and `Hair_v1`
+- **Removed from the workspace** (every client was loading these):
+  - `NHPropsShowcase` (18 MB)
+  - the three unused cape copies (the game's capes are in `ReplicatedStorage.NHCapes`)
+  - the `Crouch (Idle)` and `Crouch walk` KeyframeSequences
+  - `NHTEMP_SpiderParts` and `NHTEMP_BatB`
+- **Kept:**
+  - `Sean White` (`Features.AmbientNpcs` takes the gym barbell from it)
+  - `MenuScene`
+  - every `*_pre_202611*` backup
+- **The place now:**
+
+  | Where | Before | After |
+  |---|---|---|
+  | ServerStorage | 118,670 | 19,865 |
+  | Workspace | 45,102 | 20,020 |
+  | NH_Backup | 35,861 | 1,425 |
+
+- **Checked:**
+  - Before removal, no script referenced any removed item by name.
+  - After removal, a Play run started with no script errors: 24 NPCs spawned, and the slots, phone and strangers
+    services were up.
+
 ## [2.22.0] - 2026-11-17: Phase 0 foundations: one night clock, the talk camera lease, one writer for Social, and an enrolment step in New Kid
 
 The owner approved Phase 0 of the expansion plan (`docs/expansion/08-Roadmap.md`): "Approve Phase 0". It's fixes only,

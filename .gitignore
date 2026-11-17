@@ -13,3 +13,7 @@ art/props/source_2k/
 # batch 29's woven-textile sources (re-creatable: python art/props/weave_textiles.py fabrics; blender ... tapestry_renders.py)
 art/props/source_fabric/
 art/props/source_tapestry/
+
+# Studio backup archives exported before removal from the place (large binaries; manifest is tracked: archive/studio-backups/*/MANIFEST.md)
+archive/studio-backups/**/*.rbxm
+archive/studio-backups/**/*.rbxm.ok

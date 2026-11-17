@@ -31,8 +31,39 @@ A modern smartphone layout (the owner's reference) in the school's style:
 | Cliques | grid | all eight cliques and your standing with each; the Vigil and the Court also show your faction rank and open the factions panel (1.21.0, replaces the Factions icon; see Cliques.md) |
 | Style | grid | wallpapers: 8 presets or an image ID |
 | Options | grid | opens Options |
+| Texts | grid | leaders' dares, dorm invites, Mom & Dad, the Office, laid out like a messaging app (2.23.0, below) |
+| Report Card | grid | the weekly report card (1.40) |
 
-Per the owner, there's no Report Card, Locker or Journal in the phone.
+Per the owner, there's no Locker or Journal in the phone. (The Report Card app came later, in 1.40.)
+
+## Texts (2.23.0)
+The owner asked for Texts to "look more like iMessage (our theme though)".
+
+**Messages.** One conversation per sender, newest first. Each row has:
+- **An avatar:** a wax-seal medallion (the kit's baked `Seal` art) tinted to the sender. Clique leaders take their clique's colour and their initials; Mom & Dad take a rose seal with "M&D"; the Office takes gold with the school crest.
+- **The text:** the sender's name, two lines of the latest text (an open dare or invite is tagged **DARE** or **INVITE** in gold), and when it came: the time today, "Yesterday", or the weekday.
+- **Unread:** a pulsing crimson dot.
+
+A search pill filters by name or text. Rows fade in one after another.
+
+**A conversation.** A centred seal, the name, and who they are (for example "The Ink Club · leader").
+- **Their texts:** sit left as inked-leather bubbles, a dark gradient with the kit's `PanelBg` grain, a top sheen and a gold hairline.
+- **Your answers:** sit right in crimson lacquer.
+- **Layout:** the last bubble of a run has a tail, and a day stamp ("TODAY  8:35 AM", "MONDAY  ...") marks each new day. Days read the way the player reads the clock: a text at 5:45 AM Friday is "Today" on Friday, even though the server files it under Thursday's night (`Config.Cliques.EventDay`).
+- **Dares and invites:** a card hangs under the bubble, like a link preview. The bubble drops the text's "(Dare: Stand Up)" ending, since the card names the dare. Leaders resend the same dare on later days and the server accepts any copy while that dare is current, so only the **newest copy sent today** is live; older copies read "This dare's over". It shows the dare's name or "Their room, tonight", and the status: Runs out at 6 AM / Open now / Accepted / Visited / Not today / This dare's over.
+- **The receipt:** your last answer reads **Sealed**.
+
+**Answering.** Students can't write to NPCs, so the composer is sealed ("Quick replies only"; tapping it explains why).
+- **The quick replies:** rise above the composer: **I'm in.** / **Not today.** for a dare, **On my way.** / **Maybe later.** for an invite.
+- **Sending:** the answer flies up as a bubble ("Sending…", then "Sealed").
+- **If the server refuses it:** the bubble gets a red **!** with the reason ("Not sent: You already did that dare today."), and the replies come back.
+- **A new text arriving while you read:** three gold dots bob in a typing bubble first.
+
+**Read state.** Opening a conversation marks only that sender's texts read (`NHPhone.Texts(true, From)`; the old all-at-once call still works). The app's badge counts the rest.
+
+**Reduce Motion** turns off the slides, pops, pulse and dots.
+
+Code: `Controllers.Gui.Phone` (`Local.Texts`, `TextsThread`, `TextBubble`, `TextCard`, `TextsTyping`, `TextAvatar`). Server: `Features.Phone` (`Shared.Texts(P, MarkRead, From)`).
 
 ## Games (1.18)
 Three of our own takes on classic phone-game genres, drawn only with the UI kit's art (Glow, Pip, Seal, the kit icons, Frames and gradients). Each has its own grid icon. Every game opens on a title card with a how-to line, **your best**, and **Best in the building** (the top 5 in this server). The game-over card shows your score, "New best!" if it is one, Play again and Back.
