@@ -716,6 +716,40 @@ function Commands.RosterTest(PlayerName: string)
 	return DeepCopy(require(game:GetService(`ServerScriptService`).Services.Social.Roster).SelfTestForTests())
 end
 
+-- (2.27) greetings from the saved memory, on a stand-in student; slot 2's entry for her is put back after
+function Commands.MemoryTest(PlayerName: string)
+	local SSS = game:GetService(`ServerScriptService`).Services
+	local Player = Players:FindFirstChild(PlayerName)
+	local Rep, Brain = require(SSS.Social.Reputation), require(SSS.AI.StudentBrain)
+	local Lines = require(SSS.AI.StudentBrain.Lines)
+	local Id = `OdetteMarsh`
+	local Rels = Rep.Get(Player).Relationships
+	local Saved = Rels[Id] and table.clone(Rels[Id])
+	Rels[Id] = nil
+	local S = { Index = 999; RosterId = Id; First = `Odette`; Temper = `Warm`; Clique = `Choir`; Memory = {} }
+	local Out = {}
+	local Ok, Err = pcall(function()
+		Out.Fresh = (Brain.GreetingForTests(S, Player)) -- expect Intro
+		Rep.Meet(Player, Id)
+		Out.AfterMeet = (Brain.GreetingForTests(S, Player)) ~= `Intro`
+		Rep.ChangeRelationship(Player, Id, 12, nil, `Helped`)
+		Rep.ChangeRelationship(Player, Id, 12, nil, `Helped`)
+		local _, PoolG = Brain.GreetingForTests(S, Player)
+		Out.Grateful = PoolG == Lines.Greet.Grateful.Warm
+		Rep.ChangeRelationship(Player, Id, -40, nil, `Fought`)
+		local _, PoolF = Brain.GreetingForTests(S, Player)
+		Out.Grudge = PoolF == Lines.Greet.Grudge.Warm
+		Rels[Id] = nil
+		Rep.ChangeRelationship(Player, Id, -25, nil, `Fought`) -- a fight before any introduction
+		Out.NoIntroAfterFight = (Brain.GreetingForTests(S, Player)) ~= `Intro`
+		Out.Attitude = require(SSS.AI.StudentBrain.Talk).Attitude(S, Player) -- Rival: at most Wary
+	end)
+	if not Ok then Out.Error = tostring(Err) end
+	Rels[Id] = Saved
+	Rep.Sync(Player)
+	return Out
+end
+
 -- (2.27) the roster's bodies: ids on the live students, and a look that is the same when built twice
 function Commands.Rostered(PlayerName: string)
 	local Sched = require(game:GetService(`ServerScriptService`).Services.Features.Schedules)

@@ -63,6 +63,22 @@ Lines.Greet = {
 	Again = { `Hey, you again.`, `Back already?`, `Oh, it's you.`, `We keep running into each other.`, `Hi again!`, `Hey! Good to see you.` };
 	Often = { `You're always around, huh?`, `Are we friends now?`, `My favourite stranger.`, `Okay, at this point we're basically friends.` };
 	Wary = { `You're the one who started that fight...`, `Keep your distance.`, `I saw what you did.`, `Stay away from me.`, `Not you again.` };
+	-- (2.27) a rostered student who remembers a shove and hasn't forgiven it (by Config.Students Temper)
+	Grudge = {
+		Warm = { `Oh. You again.`, `I haven't forgotten, you know.` };
+		Cool = { `You again.`, `Keep walking.` };
+		Sharp = { `Look who's back. Try it again.`, `You owe me an apology.` };
+		Shy = { `P-please don't...`, `...not you again.` };
+		Wild = { `Round two? Bring it.`, `Oh, it's YOU.` };
+	};
+	-- (2.27) you've been good to them more than once
+	Grateful = {
+		Warm = { `Thanks for last time!`, `There you are! You're the best.` };
+		Cool = { `Hey. Thanks for before.`, `Good to see you.` };
+		Sharp = { `You again. ...Thanks, I guess.`, `I owe you one. Don't make it weird.` };
+		Shy = { `Thank you... for before.`, `Hi! I was hoping I'd see you.` };
+		Wild = { `My favourite person!`, `Hey hey! It's my friend!` };
+	};
 	Race = {
 		Vampire = { `Is it just me, or is it colder near you?`, `Nice fangs. Real?`, `You're very pale. You eating okay?` };
 		Werewolf = { `Nice ears.`, `Is that a tail?`, `You smell like the woods.` };
@@ -70,6 +86,15 @@ Lines.Greet = {
 		Wraith = { `I didn't hear you come up.`, `You walk really quietly.`, `Were you always here?` };
 		Priest = { `Bless you. Or whatever you say.`, `Oh good, someone holy.`, `Keep that cross handy.` };
 	};
+}
+
+-- (2.27) a rostered student's first greeting: they tell you their name ({First} is filled by the brain, not Pick)
+Lines.Intro = {
+	Warm = { `I'm {First}, by the way. Nice to finally meet you.`, `Oh! I'm {First}. Hi.` };
+	Cool = { `{First}. Since you're asking.`, `Name's {First}.` };
+	Sharp = { `{First}. Remember it.`, `I'm {First}. You'll want to know that.` };
+	Shy = { `Um... I'm {First}.`, `I'm {First}... hi.` };
+	Wild = { `{First}! That's me. Who are you?`, `Call me {First}. Everyone does.` };
 }
 
 ---| muttering alone |---

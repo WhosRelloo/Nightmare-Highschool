@@ -62,6 +62,18 @@ function Talk.Attitude(S, Player: Player?): string
 	local Tier = S.Clique and Player:GetAttribute(`CliqueTier_{S.Clique}`)
 	local R = Rank[Tier or `Neutral`] or Rank.Neutral
 	if S.Clique and Talk.IsMember(Player, S.Clique) then R = math.max(R, Rank.Friendly) end
+	if S.RosterId then -- (2.27) how this student feels about you, saved: Hostile / Rival cap it, Friendly / Trusted floor it
+		local Ok, State = pcall(function()
+			local Rep = require(ServerScriptService.Services.Social.Reputation)
+			return Rep.StateOf(Rep.Entry(Player, S.RosterId).Value)
+		end)
+		if Ok then
+			if State == `Hostile` then R = math.min(R, Rank.Hostile)
+			elseif State == `Rival` then R = math.min(R, Rank.Wary)
+			elseif State == `Friendly` then R = math.max(R, Rank.Friendly)
+			elseif State == `Trusted` then R = math.max(R, Rank.Respected) end
+		end
+	end
 	local M = S.Memory and S.Memory[Player.UserId]
 	if M then
 		if os.clock() - (M.Fought or -1e9) < 300 then

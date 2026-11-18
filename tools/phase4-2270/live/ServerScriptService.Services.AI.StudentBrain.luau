@@ -48,6 +48,7 @@ end
 local CliqueConfig = require(ReplicatedStorage.Config.Cliques)
 local Appearance = require(ReplicatedStorage.UI.Appearance)
 local Cliques = require(ServerScriptService.Services.Social.Cliques) -- (line matrix) the dress code, Cliques.Dressed
+local function Rep() return require(ServerScriptService.Services.Social.Reputation) end -- (2.27) lazy: no cycle at load
 
 local Brain = {}
 local Host = nil
@@ -117,8 +118,17 @@ local function sayMatrix(S, Moment: string, Pl: Player?, Opts: { [string]: any }
 end
 
 -- a shove (Nudges) gets its own line once the student turns to look at who did it
+local memo, remembers -- (2.27) declared below; OnShove and glance use them
 NudgeMod.OnShove = function(S, Rec)
-	sayMatrix(S, `Shoved`, Rec and Rec.Player, nil, 0, Lines.MakeWay)
+	local Pl = Rec and Rec.Player
+	if S.RosterId and Pl then -- (2.27) a shove is remembered: -12 and Fought, at most once per 30 s
+		local M = memo(S, Pl)
+		if os.clock() - (M.ShoveSaved or -1e9) >= 30 then
+			M.ShoveSaved = os.clock()
+			pcall(function() Rep().ChangeRelationship(Pl, S.RosterId, -12, nil, `Fought`) end)
+		end
+	end
+	sayMatrix(S, `Shoved`, Pl, nil, 0, Lines.MakeWay)
 end
 
 -- (contact feel) the bump line lands at the moment of contact, not on the approach: a sprinter's hit always gets the
@@ -134,7 +144,7 @@ NudgeMod.OnContact = function(S, Rec, Kind, Speed, Shove)
 end
 
 -- what a student remembers about each player: how often they've met, when they last said hi, when they saw them fight
-local function memo(S, Pl: Player?)
+function memo(S, Pl: Player?)
 	if not Pl then return {} end
 	S.Memory = S.Memory or {}
 	local M = S.Memory[Pl.UserId]
@@ -162,6 +172,15 @@ local function greeting(S, Rec): (string?, { [string]: any }?, { string })
 	local Pl = Rec and Rec.Player
 	local M = memo(S, Pl)
 	local G = Lines.Greet
+	if S.RosterId and Pl and os.clock() - (M.Fought or -1e9) >= 300 then -- (2.27) the saved memory, after a fresh fight
+		local Ok, E = pcall(function() return Rep().Entry(Pl, S.RosterId) end)
+		if Ok and E then
+			local T = S.Temper or `Warm`
+			if not E.Met and E.Value >= -19 then return `Intro`, nil, Lines.Intro[T] or Lines.Intro.Warm end
+			if (E.Flags.Fought or 0) >= 1 and E.Value < 0 then return nil, nil, G.Grudge[T] or G.Grudge.Warm end
+			if (E.Flags.Helped or 0) >= 2 and E.Value >= 10 then return nil, nil, G.Grateful[T] or G.Grateful.Warm end
+		end
+	end
 	if os.clock() - (M.Fought or -1e9) < 300 then
 		local OkA, A = pcall(Talk.Attitude, S, Pl)
 		return `Greet`, { Attitude = if OkA and A == `Hostile` then `Hostile` else `Wary` }, G.Wary
@@ -209,12 +228,32 @@ local function greeting(S, Rec): (string?, { [string]: any }?, { string })
 	return nil, nil, daily(C)
 end
 
+-- (2.27) does this rostered student have something saved to say to Pl (an introduction, a grudge, thanks)?
+-- the same rules as greeting()'s saved-memory branch
+function remembers(S, Pl: Player?): boolean
+	if not (S.RosterId and Pl) then return false end
+	local Ok, E = pcall(function() return Rep().Entry(Pl, S.RosterId) end)
+	if not (Ok and E) then return false end
+	return (not E.Met and E.Value >= -19)
+		or ((E.Flags.Fought or 0) >= 1 and E.Value < 0)
+		or ((E.Flags.Helped or 0) >= 2 and E.Value >= 10)
+end
+
 local function greet(S, Rec): boolean
 	local Pl = Rec and Rec.Player
 	local M = memo(S, Pl)
 	if os.clock() - (M.Greeted or -1e9) < 60 then return false end
 	local Moment, Opts, Pool = greeting(S, Rec)
-	local Said = if Moment then sayMatrix(S, Moment, Pl, Opts, 6, Pool) else say(S, Pool, 6)
+	local Said
+	if Moment == `Intro` then -- (2.27) they tell you their name, and now you've met
+		if os.clock() - (S.SaidAt or -1e9) < 6 then return false end
+		local Line = Pool[math.random(1, #Pool)]
+		sayText(S, (string.gsub(Line, `{First}`, S.First or `me`)))
+		Said = true
+		pcall(function() Rep().Meet(Pl, S.RosterId) end)
+	else
+		Said = if Moment then sayMatrix(S, Moment, Pl, Opts, 6, Pool) else say(S, Pool, 6)
+	end
 	if Said then
 		M.Greeted = os.clock()
 		M.Met = (M.Met or 0) + 1
@@ -506,7 +545,9 @@ local function glance(S, Snap)
 				end
 			elseif Rec.Stare > 6 and not S.Busy then
 				mood(S, `Shy`)
-				say(S, Lines.Shy, 20)
+				-- (2.27) a shy rostered student still speaks up when there's something saved to say: their name the first
+				-- time, a grudge, or thanks (the greeting picks which); otherwise they stay shy
+				if not (remembers(S, Rec.Player) and greet(S, Rec)) then say(S, Lines.Shy, 20) end
 			end
 		end
 		return
@@ -944,7 +985,20 @@ function Brain.Fed(Pl: Player, Model: Model, It): (string?, string?)
 	local C = ctx()
 	C.Snack = It.Name
 	sayMatrix(S, `Fed`, Pl, { Sub = Verdict; Ctx = C; Attitude = if Verdict == `Refuse` then Attitude else nil }, 0)
+	if S.RosterId and Verdict ~= `Refuse` then -- (2.27) a snack they took is remembered, at most once per 10 minutes
+		local M = memo(S, Pl)
+		if os.clock() - (M.FedSaved or -1e9) >= 600 then
+			M.FedSaved = os.clock()
+			pcall(function() Rep().ChangeRelationship(Pl, S.RosterId, if Verdict == `Loved` then 8 else 5, nil, `Helped`) end)
+		end
+	end
 	return Verdict, S.Clique
+end
+
+-- (2.27) tests: the greeting this student would pick for Pl now (the moment, nil for a plain pool, and the pool)
+function Brain.GreetingForTests(S, Pl: Player)
+	local Moment, _, Pool = greeting(S, { Player = Pl })
+	return Moment, Pool
 end
 
 function Brain.Contact(Pl: Player, Model: Model, Speed: number, Dir: Vector3): boolean
