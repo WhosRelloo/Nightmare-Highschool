@@ -2,6 +2,92 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.30.0] - 2026-11-18: Broadcast & curfew (Living School 4 of 4)
+
+The spec is `docs/expansion/13-Living-School.md` §5; the plan is `docs/superpowers/plans/2026-11-18-broadcast-and-curfew.md`.
+This release completes Phase 2, the Living School (2.27 to 2.30).
+- **Studio backup:** `ServerStorage.NH_Backup.Phase4_pre_20261118`: Phone (server and client), ClockHud, HallMonitor,
+  Config.Discipline and TestBridge, as "(2.29)" copies where earlier ones exist.
+- **Mirror:** `tools/phase4-2300/`.
+- **The Map place:** untouched.
+
+### Added
+- **Broadcast** (`Services.World.Broadcast`, `Config.Broadcast`): one source of news with three outputs.
+  - **The PA:** a desk-bell chime and a line typed in gold over the clock (ClockHud). It speaks only of real state:
+    the morning bell, today's substitute, lunch, dismissal, curfew at 22:00 and a rumble's location. It speaks at most
+    once a school segment, except for emergencies.
+  - **The feed:** campus reports from serious incidents, caller lines from rumours that have travelled, and one
+    transmission a night (between 23:00 and 02:00). It keeps the newest 40.
+- **The Gazette reads the school:** WHISPERS quotes the newest live rumours, and a new ON CAMPUS article lists today's
+  campus reports.
+- **Night FM, remade** (`Controllers.Gui.PhoneRadio`), after the owner's music-app reference:
+  - **Home:** a greeting, filter chips, the Midnight Broadcast banner and recently played tracks.
+  - **Library:** saved and recent tracks, and adding a track by audio ID.
+  - **Now Playing:** cover, like, a waveform scrubber, loop, previous, play, next and volume.
+  - **Station:** the Midnight Broadcast, on air 21:00 to 03:00, with new items marked until you've read them.
+  - **Likes** are saved per slot (`Phone.Liked`, 30 at most).
+- **"The Midnight Wireless" art** (owner: "wayy higher quality ... UNIQUE designs ... PBR textures, easy to read"):
+  - **38 PBR pieces** baked by `art/ui/hud/make_nightfm_ui.py`: a lacquer backdrop; a gilt-rimmed 9-slice card, chips
+    and tab bar; gilt-bezel knobs; a crimson ON AIR lamp; a bell-tower banner; a gilt cover frame; 12 painted covers;
+    16 bold icons.
+  - **Uploaded** to group 15981569 (`art/group-upload-nightfm/`).
+  - **No Seal icon anywhere.** Each piece falls back to the kit look if its id is missing.
+- **Night FM's voices:** the owner's 11 clips (`art/sfx/NightFM`, `Config.Broadcast.Voice`).
+  - **How it plays:** tuning in to the Station tab plays a clip picked by `World.Broadcast.Voice`. The music ducks
+    under the voice, an ON THE AIR card shows who's talking (with a stop button), and another clip follows 45 seconds
+    later while you stay tuned. Each clip plays once per night or day.
+  - **Which clip, when:**
+    - the host's introduction, the first time you ever tune in after dark (saved as `Phone.Tuned`)
+    - "And we're back" on later nights
+    - the PSA (20:00 to 23:00)
+    - a special hello
+    - "a suspiciously quiet day", only on a day with no campus report
+    - two lore clips (Mira Holt, the 1887 photograph) from 23:00
+    - the sign-off in the last half hour before 03:00
+    - by day: the hall monitors' morning and after-school bulletins and the afternoon show
+- **Curfew** (`School.HallMonitor`, `Config.Discipline.HallMonitor.Curfew = {From = 22; To = 6}`):
+  - **The patrol:** the hall monitor now patrols at Night too. From 22:00 to 06:00, a student in the school building
+    (not the dorms) is chased: "Curfew! Back to the dorms, now."
+  - **Caught:** it goes on the record as Trespassing, and brass knuckles are confiscated (as Contraband).
+  - **Getting away:** reaching the dorms or leaving the building ends the chase.
+  - **Exempt:** during a cutscene, the After Hours quest, or while downed.
+- **TestBridge:** `BroadcastTest`, `CurfewTest`.
+
+### Changed
+- **Phone (server):** new remotes `Station`, `StationRead`, `SaveLiked` and `Voice`. The save gets `Liked`,
+  `Broadcast` (the last item read) and `Tuned`.
+- **The Station tab** fetches at most every 5 seconds. During development it had redrawn in a loop.
+
+### Fixed
+- **The curfew PA almost never fired:** it checked `Hour == 22`, but the clock's hour is fractional. It now plays once a
+  night, as soon as the clock passes 22:00 (not on server start).
+
+### Checked
+- **Self-tests, in one session:**
+  - **This release:** `BroadcastTest` (40 kept, oldest Report 6, newest Report 45; the PA once a segment, emergencies
+    through) and `CurfewTest` (hallway: 23:00 and 05:00 after hours, 15:00 daytime).
+  - **Earlier releases, all passing:** 2.29 (`IncidentTest`, `RumourTest`, `RumourSafetyTest`: 10,000 hops, 0 broken);
+    2.28 (`StaffTest`, `StaffPlanTest`, `TimetableTest`, `SleepTest`); 2.27 (`RosterTest`, `Rostered`,
+    `RelationshipCapTest`, `MemoryTest`); and the cutscene suite (CineJudge 36/36, CineGraph 9/9, CineVote,
+    AfterHoursMigrate).
+- **Live (slot 2, restored after):**
+  - **The PA:** the lunch line typed over the clock; "Curfew is now in force..." when the clock passed 22:00.
+  - **Curfew:** a real catch at 22:10 (`Curfew`, recorded as Trespassing by Hall Monitor). The rule said Dorms in a
+    dorm box and Outside on the grounds. During a cut it said Cutscene.
+  - **Night FM:** every tab in the uploaded art; the introduction, then the PSA, played from their uploaded ids; the
+    Gazette opens.
+  - **Unchanged:** the truancy chase at 09:10, and the school-day sample (07:40, 08:05, 09:10, 11:30, 15:30) has no
+    curfew in daylight. The Records Office night zone still engages.
+- **Errors:** none from Broadcast, Phone, PhoneRadio, ClockHud, HallMonitor, Rumours, Incidents or Scenes. Other
+  failures in the console were existing combat and VFX sounds the account can't load.
+- **Not checked:**
+  - a two-player run
+  - phone screens on a real phone
+  - the frame rate (skipped, at the owner's request)
+- **Found, not changed (for the owner):** this place has no Dorms region box, so the dorms exemption was proven with a
+  temporary box. The real dorms are instanced homes, which count as outside the building anyway.
+- **Studio:** saved as NH Combat Test version 1216.
+
 ## [2.29.0] - 2026-11-18: Incidents & rumours (Living School 3 of 4)
 
 The spec is `docs/expansion/13-Living-School.md` §4; the plan is `docs/superpowers/plans/2026-11-18-incidents-and-rumours.md`.
