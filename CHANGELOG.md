@@ -2,6 +2,67 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.25.0] - 2026-11-17: Interactive cutscenes, the framework
+
+The spec is `docs/expansion/12-Interactive-Cutscenes.md`; the plan is
+`docs/superpowers/plans/2026-11-17-interactive-cutscenes-framework.md` (part A; the Chapter One finale is part B).
+- **Studio backup:** `ServerStorage.NH_Backup.Phase2_pre_20261117` (every script edited, before its first edit).
+- **Mirror:** `tools/phase2-2250/` (`pre/`, `live/`, and `harness/` with the install, dump, bridge, client, snapshot and
+  restore helpers and the test scripts). Installed from the mirror with fresh instances.
+- **The Map place:** untouched.
+
+### Added
+- **Prompts in cutscenes:**
+  - **Kinds:** Press (on the beat), Mash, Direction (dodge), Hold (release on the mark) and Choice (a timed answer).
+  - **Windows:** Press is Perfect within ±0.12 s and Good within ±0.25 s. Mash needs 7 taps a second (5 on touch).
+    Direction gives 0.9 s, and Hold's zone is ±0.15 s. Reduce Motion widens these windows by 1.3.
+  - **Feel:** the scene slows while a prompt is open.
+  - **Input:** keys are E, Space or gamepad A (A/D/W/S or the arrows for Direction, 1/2/3 for Choice), or the seals
+    on screen. Input is captured above combat, so a prompt's key never throws a punch.
+- **`ReplicatedStorage.Functions.CineJudge`:** pure scoring, branching, the team result, grades and checks on how a
+  cutscene's branches fit together. The client and the server share it.
+- **Cuts as branches:** a cut can be a graph of segments (`Def.Graph`). A plain cut still plays as one.
+- **Solo:** your screen branches the instant you press. The server re-scores your presses for your grade and rewards.
+- **Groups:** everyone plays, and the scene follows the team: the majority outcome wins, and a tie goes to the better
+  one. A missing answer counts as a miss at the deadline. A lost client asks the server where the cut is.
+- **Grades S to D** from the points on the path you took:
+  - **Card:** the grade shows on a card, unless the cut turns it off.
+  - **Saved:** the best grade per cut is kept in `Quests.CineGrades`.
+  - **Bonus:** the first viewing can pay Yen by grade (`Config.Cine` `Rewards`).
+  - **Flags:** a prompt can save a story flag (`flag`).
+- **The prologue's first prompt:** when Mr. Hale reads your name, answer on the beat. Miss it and you answer late:
+  "...Here." / "...Here, apparently." Both paths rejoin. There's no grade card for a single story prompt.
+- **Journal:** your best grade shows beside **Watch again**.
+- **TestBridge:** `CineJudgeTest`, `CineGraphTest`, `CineQteTest`, `CineGrades`. The test cut
+  `ReplicatedStorage.Cinematics.__QteTest` is hidden from the Journal.
+
+### Checked
+- **Self-tests:**
+  - `CineJudgeTest` 36/36 and `CineGraphTest` 9/9.
+  - **`CineQteTest`:** a tie goes to the better outcome; the majority wins; a missing answer is a miss at the
+    deadline; Where answers; a solo skip past an unanswered prompt is refused; the mash; grade S saved and then
+    restored.
+  - **Regressions:** `CineVoteTest` and `Phase1SelfTest` are unchanged.
+- **The prompt input on the real module:** Press Perfect, Direction Right, Mash Win, Hold Hit, and no press Miss.
+- **The director on the test cut:**
+  - A press on the beat took A>B>D>E with grade S; no press took A>C>D>E with grade C.
+  - The best grade stays when a later run is worse.
+  - COLLECTED still replays, skips and cleans up.
+- **The prologue:**
+  - The path analysis found 2 paths and 0 framing fixes; the longest path is 33.7 s.
+  - **Live:** a press on the beat took RollCall>Answer>Holt, and no press took RollCall>Late>Holt.
+  - The prompt opens at 14.4 s, and the camera returns after Skip.
+- **Screenshots:** the Press and Choice prompts, the prologue's open prompt, and the Journal grade.
+- **Errors and test data:** no errors from these modules on either side. Slot 2 was snapshotted and restored after
+  every state-changing test.
+- **Not checked:**
+  - a real two-player group cut (Studio's 2-player test, started by the owner)
+  - the owner watching at full speed
+  - phone-size screens
+  - the Mash, Direction and Hold visuals by screenshot (their input and scoring are tested)
+- **Studio:** the changes are installed in NH Combat Test (Team Create). The final save reported nothing new to save,
+  so check the version history for the version number.
+
 ## [2.24.0] - 2026-11-17: Expansion Phase 1, the prologue and the cinematic framework
 
 The plan is `docs/expansion/11-Phase1-Plan.md`; the results and the Map port table are in its "Results" section.
