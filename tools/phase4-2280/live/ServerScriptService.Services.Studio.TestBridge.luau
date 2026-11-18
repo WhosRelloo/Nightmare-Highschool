@@ -708,6 +708,44 @@ function Commands.StaffTest(PlayerName: string)
 	return Out
 end
 
+-- (2.28) the set rotation, homeroom rooms and skipping (pure)
+function Commands.TimetableTest(PlayerName: string)
+	local Roster = require(game:GetService(`ServerScriptService`).Services.Social.Roster)
+	local Out = { PerRoom = {}, Homeroom = {}, Skips = 0, SkipStable = true }
+	for _, Seg in { `Period 1`, `Period 2`, `Period 3`, `Period 4` } do
+		local Count = {}
+		for _, E in Roster.All() do
+			local P = Roster.Plan(Seg, E.Id, 7)
+			if P.Room then Count[P.Room] = (Count[P.Room] or 0) + 1 end
+		end
+		Out.PerRoom[Seg] = Count
+	end
+	for _, E in Roster.All() do
+		local R = Roster.Plan(`Homeroom`, E.Id, 7).Room
+		Out.Homeroom[R or `-`] = (Out.Homeroom[R or `-`] or 0) + 1
+		for Day = 1, 40 do
+			local A = Roster.Plan(`Period 3`, E.Id, Day)
+			if A.Skip then Out.Skips += 1 end
+			if A.Skip ~= Roster.Plan(`Period 3`, E.Id, Day).Skip then Out.SkipStable = false end
+			if A.Skip and E.Clique ~= `Delinquents` then Out.SkipStable = false end
+		end
+	end
+	Out.Seg1SetA = Roster.Plan(`Period 1`, `OdetteMarsh`, 7).Room -- set A, Period 1: R102
+	Out.Seg2SetA = Roster.Plan(`Period 2`, `OdetteMarsh`, 7).Room -- set A, Period 2: R103
+	return Out
+end
+
+-- (2.28) a fight in a class with its teacher at the desk is booked by that teacher; slot 2 is restored by the caller
+function Commands.WitnessTest(PlayerName: string, RoomId: string)
+	local Player = Players:FindFirstChild(PlayerName)
+	return DeepCopy(require(game:GetService(`ServerScriptService`).Services.School.Teachers).WitnessForTests(Player, RoomId))
+end
+
+-- (2.28) bodies only near players: how many students have a body, and how many are asleep at a spot
+function Commands.SleepTest(PlayerName: string)
+	return DeepCopy(require(game:GetService(`ServerScriptService`).Services.Features.Schedules).SleepForTests())
+end
+
 -- (2.28) which post each staff member uses in each segment (pure)
 function Commands.StaffPlanTest(PlayerName: string)
 	local Npcs = require(game:GetService(`ServerScriptService`).Services.Social.Npcs)

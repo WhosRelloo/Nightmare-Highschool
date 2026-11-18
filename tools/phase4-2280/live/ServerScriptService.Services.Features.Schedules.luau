@@ -32,6 +32,7 @@ local Seats = require(ServerScriptService.Services.Features.Seats) -- where hips
 local Brain = require(ServerScriptService.Services.AI.StudentBrain) -- (1.86.2) walking, senses, reactions, voices
 local CliqueConfig = require(ReplicatedStorage.Config.Cliques) -- each student's clique (1.20)
 local NpcBuilds = require(ReplicatedStorage.Config.NpcBuilds) -- (2.3.0) height, body, personality, posture, pace
+local Roster = require(ServerScriptService.Services.Social.Roster) -- (2.27) who they are; (2.28) their timetable
 local CollectionService2 = game:GetService(`CollectionService`)
 local SpotTaken = {} :: { [BasePart]: any }
 -- (audit) declared up here: Local.Unseat uses it, and below its old spot it was a nil global inside Unseat
@@ -39,7 +40,6 @@ local ChairBy = {} :: { [Model]: any }
 local SpotFailed = {} :: { [BasePart]: number } -- spots nobody could walk to lately (skipped for 2 minutes)
 
 local COUNT = #require(ReplicatedStorage.Config.Students).List -- (2.27) the roster (24); also the lunch arc's size
-local IN_CLASS = 6
 local WALK_SPEED = 6 -- a stroll: the walk clip plays at about 1.1x, feet on the ground (WALK_PACE)
 local WALK_PACE = 5.3 -- studs/s the Default walk clip covers at 1x (measured, 2026-11-03)
 local RUN_PACE = 16 -- (1.86.2) the run clip, for backing away from danger
@@ -116,10 +116,18 @@ function Local.Chairs(RoomId: string): { Model }
 	local Props = workspace.School:FindFirstChild(`NHProps`)
 	if not (CF and Props) then return {} end
 	local Out = {}
+	-- (2.28) Mira's back-row desk in Room 102 stays empty (the story's empty desk, Area_MiraDesk): a full homeroom
+	-- reached it once sets C and D took Mr. Hale's register there
+	local Empty = workspace:FindFirstChild(`Area_MiraDesk`, true)
 	for _, P in Props:GetChildren() do
 		if P.Name == `StudentChair` and P:IsA(`Model`) then
 			local L = CF:PointToObjectSpace(P:GetPivot().Position)
-			if math.abs(L.X) < Size.X / 2 and math.abs(L.Z) < Size.Z / 2 then table.insert(Out, P) end
+			local Kept = false
+			if Empty and Empty:IsA(`BasePart`) then
+				local E = Empty.CFrame:PointToObjectSpace(P:GetPivot().Position)
+				Kept = math.abs(E.X) < Empty.Size.X / 2 + 1.5 and math.abs(E.Z) < Empty.Size.Z / 2 + 1.5
+			end
+			if not Kept and math.abs(L.X) < Size.X / 2 and math.abs(L.Z) < Size.Z / 2 then table.insert(Out, P) end
 		end
 	end
 	local Door = Room:FindFirstChild(`Door`)
@@ -495,7 +503,25 @@ function Local.Class(S, Job, RoomId: string, Seat: number)
 	if not Local.Arrive(S, Job) then return end
 	local Chairs = Local.Chairs(RoomId)
 	local Chair = if #Chairs > 0 then Local.FreeChair(S, Chairs, Seat) else nil
-	if not Chair then Local.Mingle(S, Job) return end
+	if not Chair then -- (2.28) a full room: stand at the back of it (the far side from the teacher's desk)
+		local Room = workspace.School:FindFirstChild(RoomId)
+		local CF, Size = Local.Box(Room)
+		local Desk = Room and Room:FindFirstChild(`TeacherDesk`)
+		if not (CF and Size and Desk) then Local.Mingle(S, Job) return end
+		local Away = (CF.Position - Desk.Position) * Vector3.new(1, 0, 1)
+		local Dir = if Away.Magnitude > 0.1 then Away.Unit else Vector3.zAxis
+		local Depth = math.min(Size.X, Size.Z) / 2 - 2.5
+		local Across = Vector3.new(-Dir.Z, 0, Dir.X)
+		local Spot = CF.Position + Dir * Depth + Across * ((Seat % 5) - 2) * 2.2
+		Spot = Local.Floor(Spot) or Spot
+		S.Model:SetAttribute(`NHActivity`, `In class ({RoomId}, standing)`)
+		Local.WalkTo(S, Job, Spot)
+		if S.Job == Job then
+			Local.Face(S, Desk.Position)
+			Brain.Idle(S, 3600, function() return S.Job == Job and not Paused end)
+		end
+		return
+	end
 	S.Model:SetAttribute(`NHActivity`, `In class ({RoomId})`)
 	local Front = (Chair:GetPivot() * CFrame.new(0, 0, 2.5)).Position
 	-- (2.6.1) stand on the floor by the chair. Rows are 5 studs apart, so in the back rows 2.5 studs behind a chair is
@@ -661,11 +687,14 @@ function Local.OnSegment(State)
 		elseif Kind == `Break` then
 			Local.Assign(S, Local.Hangout) -- with their clique
 		elseif Kind == `Class` then
-			local Period = Classes.Periods[Seg.Name]
-			if Period and I <= IN_CLASS then
-				Local.Assign(S, Local.Class, Period.Room, I)
+			-- (2.28) each set's own room (Roster.Plan, doc 13 §3.3); a Delinquent who skips hangs out instead
+			local P = Roster.Plan(Seg.Name, S.RosterId, tonumber(State.Day) or 1)
+			if P.Room then
+				Local.Assign(S, Local.Class, P.Room, I)
+			elseif P.Skip then
+				Local.Assign(S, Local.Hangout)
 			else
-				Local.Assign(S, Local.Leave) -- the east wing
+				Local.Assign(S, Local.Leave)
 			end
 		elseif Kind == `Lunch` then
 			Local.Assign(S, Local.Lunch, I)
