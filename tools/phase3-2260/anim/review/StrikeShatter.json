@@ -1,0 +1,118 @@
+{
+ "ok": false,
+ "name": "StrikeShatter",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action",
+ "authoredDuration": 1.4,
+ "bakedDuration": 1.85,
+ "passes": {
+  "spline": true,
+  "overlapFrames30": {
+   "Left Arm": 3,
+   "Left Leg": 2
+  },
+  "settle": {
+   "Head": {
+    "f": 7,
+    "z": 0.75
+   },
+   "BodyAttach": {
+    "f": 7,
+    "z": 0.75
+   },
+   "OffHandAttach": {
+    "f": 7,
+    "z": 0.75
+   }
+  },
+  "life": 1,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 45,
+ "poseKeys": 130,
+ "markers": 0,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: RightShoulder at 700°/s around 0.82 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 0.34 studs of the HumanoidRootPart and returns within 0.34"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "pass",
+   "detail": "no foot sinks more than 0 studs into the ground; a foot is down for 21% of it"
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "straightPath",
+   "message": "Right Leg moves in a straight line from 0.23 to 0.67 s (bows 2% of its 2.1-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Left Leg moves in a straight line from 0.00 to 0.13 s (bows 4% of its 0.8-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "fix": "noWeightShift",
+   "message": "The Right Arm strikes at 10 studs/s but the hips barely move (drop 0.00 studs, shift 0.05 studs). The body must commit: in 10 measured punches the hips drop 3-20 cm (median ~8% of hip height = 0.16 studs here) and travel 16-34 cm toward the target (0.36-0.74 studs); slashes drop the hips 5-8 cm. Key the Root down and forward through the strike."
+  },
+  {
+   "consider": "noAnticipation",
+   "message": "The Right Arm launches from a dead start on the first frames of the clip: no pull-back, no hip load, no dip in the 0.6 s before it. Real punches don't pull the hand back; they load the hips (pelvis turn peaks ~50 ms before the hand, shoulders ~35 ms before). Slashes raise first for 0.7-1.4 s. Game telegraphs: player light attacks 0.07-0.1 s, heavies 0.17-0.2 s, NPC attacks the player must read >= 0.34 s (Dark Souls 3)."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.5689655172416956,
+  "peakAt": 0.5714285714285714,
+  "action": {
+   "effector": "Right Arm",
+   "peakSpeed": 10.417387131731624,
+   "onset": 0,
+   "peak": 0.13333333333333333,
+   "stop": 0.23333333333333334,
+   "strike_s": 0.23333333333333334,
+   "followThrough_s": 0,
+   "hold_s": 0,
+   "recovery_s": 0.7666666666666667,
+   "windupBack": 0,
+   "rootDrop": 0,
+   "rootShift": 0.049761574074074076,
+   "torsoPeak_ms": -33.333333333333336
+  }
+ },
+ "sheet": "review/StrikeShatter_sheet.png",
+ "graph": "review/StrikeShatter_graph.png",
+ "trails": "review/StrikeShatter_trails.png",
+ "luau": "out/StrikeShatter.lua",
+ "luauBytes": 7416
+}

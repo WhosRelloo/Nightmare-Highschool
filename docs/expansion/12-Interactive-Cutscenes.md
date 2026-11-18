@@ -1,6 +1,6 @@
 # 12. Interactive cutscenes (QTE cinematics)
 
-**Status:** approved 2026-11-17. **Part A** (§2 to §5, §7, §9) shipped in **2.25.0** (plan: `docs/superpowers/plans/2026-11-17-interactive-cutscenes-framework.md`). **Part B** (§6 the finale, §8 animation sourcing) is next, with its own plan.
+**Status:** approved 2026-11-17. **Part A** (§2 to §5, §7, §9) shipped in **2.25.0** (plan: `docs/superpowers/plans/2026-11-17-interactive-cutscenes-framework.md`). **Part B** (§6 the finale, §8 animation sourcing) shipped in **2.26.0** (plan: `docs/superpowers/plans/2026-11-17-strikethrough-finale.md`).
 **Builds on:** the Phase 1 Cine framework (doc 04 and doc 11): `Services.World.Cine` (server), `Controllers.Cine` (director), `Controllers.Gui.CineUI`, `Config.Cine` and `ReplicatedStorage.Cinematics.<Id>`.
 **Target:** NH Combat Test first. The Map gets the same marks and modules at port time (doc 11, "Sets, not coordinates").
 

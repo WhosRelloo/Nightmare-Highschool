@@ -1,0 +1,104 @@
+{
+ "ok": false,
+ "name": "YouTugPull",
+ "rig": "R6",
+ "loop": true,
+ "priority": "Action",
+ "authoredDuration": 1.2,
+ "bakedDuration": 1.2,
+ "passes": {
+  "spline": true,
+  "overlapFrames30": {
+   "Left Arm": 3
+  },
+  "settle": {
+   "Head": {
+    "f": 7,
+    "z": 0.75
+   },
+   "BodyAttach": {
+    "f": 7,
+    "z": 0.75
+   },
+   "OffHandAttach": {
+    "f": 7,
+    "z": 0.75
+   }
+  },
+  "life": 1,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": [
+   "Left Leg",
+   "Right Leg"
+  ]
+ },
+ "bakedKeys": 37,
+ "poseKeys": 146,
+ "markers": 0,
+ "failing": [
+  "groundContact"
+ ],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: LeftShoulder at 871°/s around 0.22 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 0.31 studs of the HumanoidRootPart and returns within 0"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "pass",
+   "detail": "the last pose meets the first"
+  },
+  {
+   "id": "groundContact",
+   "status": "fail",
+   "detail": "Right Leg sinks 0.25 studs into the ground at 0.27 s; limit 0.1",
+   "measured": {
+    "penetration": 0.25,
+    "groundedShare": 1
+   }
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "symmetricEasing",
+   "message": "Moves peak in speed at 50% of their duration: every move eases in and out the same amount. Measured gestures reach peak speed at 38% (they leave fast and arrive slowly); tired/old characters at ~25%; only snappy, energetic ones near 50%. Put a breakdown key early in the move or favour the arrival."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Right Arm moves in a straight line from 0.57 to 0.67 s (bows 4% of its 0.7-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.729543023729867,
+  "peakAt": 0.5,
+  "action": null
+ },
+ "sheet": "review/YouTugPull_sheet.png",
+ "graph": "review/YouTugPull_graph.png",
+ "trails": "review/YouTugPull_trails.png",
+ "luau": "out/YouTugPull.lua",
+ "luauBytes": 8331
+}

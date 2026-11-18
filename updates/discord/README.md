@@ -8,9 +8,11 @@ Two kinds of post, matching the server's channels:
 | [announcements/](announcements/) | 📢・announcements | **big update waves only**, several releases or a headline feature together, written as a launch post |
 
 ## Announcements (big waves)
+- 2026-11-18, **Chapter One: The Empty Desk** (2.22 to 2.26): [post](announcements/2026-11-18-chapter-one.md)
 - 2026-11-02, **The Living School** (1.10 to 1.11): [post](announcements/2026-11-02-the-living-school.md)
 
 ## Game updates
+- [2026-11-18-the-strikethrough](game-updates/2026-11-18-the-strikethrough.md)
 - [2026-11-17-cutscenes-you-play](game-updates/2026-11-17-cutscenes-you-play.md)
 - [2026-11-17-the-roll-call](game-updates/2026-11-17-the-roll-call.md)
 - [2026-11-17-phase-0-foundations](game-updates/2026-11-17-phase-0-foundations.md)

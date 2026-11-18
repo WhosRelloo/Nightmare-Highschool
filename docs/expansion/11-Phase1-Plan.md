@@ -124,6 +124,17 @@ Map's real rooms, measured read-only on 2026-11-17.
 | RollCall.SeatS4 | (-1010.0, 1.545, 90.7) | +X | back row, right of you |
 | RollCall.Aisle / Arrive | (-1010.0, 0, 87.6) / (-1007.0, 0, 87.6) | +X | Arrive needs 8.5 studs clear behind it (12 here) |
 | RollCall.Bell / Hall.Bell | (-1003.0, 9.2, 65.3), BellPart = `...SchoolBell_Bell` | | the bell over Room 102's door |
+| Strike.You | (-1011.5, 0, 78.1) | +X | (2.26.0) 1.5 behind Mira's chair (test: chair 1.6 behind the desk, Map: 2.6, so the you-side marks are measured from the chair) |
+| Strike.Rise / TugIt | (-1005.1, 0, 78.1) | -X | across Mira's desk, the board side. Test: both at z 68.8, overlapping the carved clue top by 0.1 |
+| Strike.TugYou | (-1011.1, 0, 78.1) | +X | just behind Mira's chair |
+| Strike.LungeTo | (-1010.3, 0, 78.1) | -X | where its lunge lands, an arm's length from you. Mira's chair is pushed aside on screen first |
+| Strike.RiseLow | (-1005.1, -3, 78.1) | -X | under the floor at Rise: it rises from here |
+| Strike.DodgeTo | (-1011.9, 0, 74.7) | +X | the dodge goes to your left (-Z in the Map) |
+| Strike.ThrownTo | (-1013.0, 0, 80.5) | +X | the aisle between Mira's column and yours. Check the west wall (past -1013) by screenshot |
+| Strike.Desk | = RollCall.MiraDesk | +X | the shove's target |
+| Strike.File | = Hall.File | | |
+| Strike.Wide | (-1013.3, 6.4, 88.1) looking at (-1006.9, 2.9, 78.1) | | the establishing camera, back-right of the room |
+| Strike.Bell | = RollCall.Bell | | |
 | Hall.File | (-1007.4, 2.56, 78.1) | +X | on Mira's desk top |
 | Hall.HallCam / HallLook | (-1008, 5.4, 50) / (-930, 4, 50) | | the west hallway at night, toward the entrance hall |
 | Hall.CustodianFar | (-962, 0, 50) | -X | far end, about 46 studs away |
