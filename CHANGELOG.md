@@ -2,6 +2,78 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.26.0] - 2026-11-18: The Strikethrough, Chapter One's finale
+
+The spec is `docs/expansion/12-Interactive-Cutscenes.md` §6 and §8 (part B); the plan is
+`docs/superpowers/plans/2026-11-17-strikethrough-finale.md`. This completes the Chapter One wave (2.22 to 2.26).
+- **Studio backup:** `ServerStorage.NH_Backup.Phase3_pre_20261117` (every script edited, before its first edit).
+- **Mirror:** `tools/phase3-2260/` (`pre/`, `live/`, `harness/`, and `anim/` for the clip work).
+- **The Map place:** untouched. The fight's marks are in doc 11's port table.
+
+### Added
+- **The Strikethrough, a playable fight in Room 102 at night.** After Hours now ends here: you lay Mira's file on
+  her desk, and an Unwritten rises out of it.
+  - **The cut:** `ReplicatedStorage.Cinematics.Strikethrough`, 14 segments and 4 prompts, Length 56 s.
+  - **The prompts:**
+    - **Dodge** (Direction): `Dodge`, or `Thrown` across the aisle.
+    - **Shove** (Press): `Shove` breaks its posture, or it gets you (`Grabbed`).
+    - **Tug of war** over the file (Mash, 7 taps a second, 5 on touch): `Kept`, or `Torn`. This saves the story flag
+      `FileKept` (`Win` / `Lose`).
+    - **Finisher** (Hold): `Shatter` (it comes apart in ink and pages), or `Fade` (it fades out on its own).
+  - **Paths:** 16 paths, all ending on the Still wide. The path analysis found 0 framing fixes.
+  - **Rewards:** S 15, A 10, B 5 Yen on the first viewing. The grade card shows.
+- **The Unwritten:** `ReplicatedStorage.NHCineCast.Strikethrough`, an R6 cast template from the AI rig.
+  - **Look:** a faded 1893 student. The Victorian Waistcoat shirt and Pinstripes pants are washed grey, the limbs are
+    see-through, and the head is half-there ink with no face.
+  - **Effects:** ink smoke bleeds down and pages drift (the game's own smoke texture).
+- **The fight's marks:** `workspace.NHCineSets.Strike`, 12 marks. TugYou sits behind Mira's chair and TugIt across
+  her desk, both checked against Room 102's real props.
+- **The clips:** `ReplicatedStorage.Config.CineClips`, the owner's rule: the game's own animations first, then the
+  group's.
+  - **The game's own:** Uptilt (it rises), Fist RunningM1 (the lunge), Parried 1 (the recoil), Fist Clinch (the grab),
+    Posture Break (the stagger) and Fist M2 (your finisher).
+  - **The group's uploads:** StrikeTug, StrikeShatter and YouTugPull.
+  - **Derived clips** (Studio fallback): 12 related clips were measured by forward kinematics and 9 R6 clips derived,
+    then given a foot-lock bake. 8 of 9 pass the house skate audit, and before the bake, planted feet skated at 0.6 to
+    4.9 st/s. Sources and numbers are in `tools/phase3-2260/anim/REPORT.md` and `PUBLISH.md`.
+- **The director** (`Controllers.Cine`):
+  - actors play clips through a shot's `anim` event, so slow-motion and hitstop apply to them
+  - a `Template:<Name>` cast source
+  - `fx` and `move` events
+  - story flags arrive in the Play message (`Ctx.Flags`)
+- **COLLECTED's torn page:** with `FileKept = "Lose"`, the record shows only its torn half, with "STATUS: COLLECTED"
+  on what's left.
+
+### Changed
+- **After Hours v2:** File, Out, Return (Mira's desk, with the file), Fight (the Strikethrough), then Collected.
+  - **Old saves:** `MigrateVersion` learns `StageShiftFrom`. A v1 save on Collected moves to stage 5, and earlier
+    stages stay where they are.
+- **TestBridge:** `AfterHoursMigrateTest` and `Decide`.
+
+### Checked
+- **Self-tests** (one session, 2026-11-18):
+  - `CineJudgeTest` 36/36 and `CineGraphTest` 9/9.
+  - `CineQteTest` passes.
+  - `CineVoteTest` and `Phase1SelfTest` are unchanged. `AfterLeaveEnded`, `OldSlotCanStart` and
+    `NewKidBeforeOrientation` read false, as the tests expect.
+  - `AfterHoursMigrateTest` gives 1, 2, 5. It gave 1, 2, 3 before the fix.
+- **The fight, live** (inputs fed through `NHCineTestInput`):
+  - **Every prompt right:** `Arrive>Lunge>Dodge>Again>Shove>Tug>Kept>Finisher>Shatter>Still`, grade S.
+  - **Every prompt missed:** `Arrive>Lunge>Thrown>Again>Grabbed>Tug>Torn>Finisher>Fade>Still`, grade D, and
+    `FileKept = "Lose"`.
+  - **The quest flow:** UseObject MiraFile, then RecordsExit, then Mira's desk. The fight plays, After Hours goes to
+    stage 5, and COLLECTED plays.
+- **The prologue:** both paths are unchanged. A press took RollCall>Answer>Holt and no press took RollCall>Late>Holt;
+  the camera returns after Skip.
+- **Errors and test data:** no errors from Cine, CinePrompt, CineUI, CineJudge or Quests. Slot 2 was snapshotted and
+  restored after every run, and matches its snapshot.
+- **Not checked:**
+  - a real two-player run of the fight
+  - phone-size screens
+  - the owner watching at full speed
+  - StrikeShatter's derived fallback still slips for 5 frames. The group's upload plays in its place.
+- **Studio:** installed in NH Combat Test (Team Create), version 1184.
+
 ## [2.25.0] - 2026-11-17: Interactive cutscenes, the framework
 
 The spec is `docs/expansion/12-Interactive-Cutscenes.md`; the plan is

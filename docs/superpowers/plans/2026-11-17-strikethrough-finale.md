@@ -925,13 +925,19 @@ with:
 
 ### Task 8: Final checks, docs, release 2.26.0
 
-- [ ] **Step 1: Regression in one session.**
+> **Outcome (2026-11-18):**
+> - **Self-tests:** CineJudgeTest 36/36, CineGraphTest 9/9, CineQteTest, CineVoteTest, Phase1SelfTest and AfterHoursMigrateTest (1, 2, 5) pass. `AfterLeaveEnded`, `OldSlotCanStart` and `NewKidBeforeOrientation` are false by design.
+> - **The prologue:** slot 2 hasn't seen it, so `Replay` is refused. Start it with `bridge.py PlayCut $P '"Prologue"' true` instead, and clear `NHCinePath` on the client before each run. Answer>Holt and Late>Holt.
+> - **The fight:** S on the Dodge/Shove/Kept/Shatter path, D on the Thrown/Grabbed/Torn/Fade path, FileKept Lose.
+> - **Console:** 0 errors from Cine, CinePrompt, CineUI, CineJudge or Quests. Slot 2 restored and matched its snapshot.
+
+- [x] **Step 1: Regression in one session.**
   - `CineJudgeTest`, `CineGraphTest`, `CineQteTest`, `CineVoteTest`, `Phase1SelfTest` and `AfterHoursMigrateTest`.
   - The prologue's two live paths (2.25.0 `t_prologue.lua`).
   - `t_fight.lua`'s two paths.
   - A console check (no errors from Cine, CinePrompt, CineUI, CineJudge, Quests).
   - Restore slot 2, then `save_place`.
-- [ ] **Step 2: Docs.**
+- [x] **Step 2: Docs.**
   - **CHANGELOG `[2.26.0]`:**
     - the finale, the clips (sources and measured numbers, from `REPORT.md`), the template and the quest change
     - "Checked" with every number, and "Not checked": a two-player run, phone screens, the published clip ids (Studio previews until the owner publishes, per `PUBLISH.md`)
@@ -944,7 +950,7 @@ with:
   - **Doc 12:** part B marked shipped.
   - **Doc 11:** the port table rows.
   - **Vault:** copies, the home note's game-update line and its announcement line.
-- [ ] **Step 3: Commit and merge** (`2.26.0: the Strikethrough, Chapter One's finale`). Stage only this plan's files, and use the hunk-staging method for CHANGELOG if another session's hunk is still there. Then merge `phase3-2260` into `main`, stashing other sessions' working-tree changes around the checkout and popping them after.
+- [x] **Step 3: Commit and merge** (`2.26.0: the Strikethrough, Chapter One's finale`). Stage only this plan's files, and use the hunk-staging method for CHANGELOG if another session's hunk is still there. Then merge `phase3-2260` into `main`, stashing other sessions' working-tree changes around the checkout and popping them after.
 
 ---
 
