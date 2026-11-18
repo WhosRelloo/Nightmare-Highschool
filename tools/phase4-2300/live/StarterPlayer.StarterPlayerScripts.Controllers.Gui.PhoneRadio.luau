@@ -6,6 +6,8 @@
 	Art: "The Midnight Wireless" (owner: "wayy higher quality ... UNIQUE designs ... PBR textures, easy to read"), baked by
 	art/ui/hud/make_nightfm_ui.py and staged in art/group-upload-nightfm (group 15981569): lacquer, gilt bezels, amethyst
 	enamel, 12 painted covers, 16 bold icons. Until an id in ART is set, that piece falls back to the kit look (never the Seal).
+	Voices (the owner's clips, Config.Broadcast.Voice): tuning in to the Station tab plays the host, the hall monitors, the
+	PSA or the lore (World.Broadcast.Voice picks), with the music ducked under it, and the next one after a gap while you stay.
 	Driven by Controllers.Gui.Phone: Open(Ctx), Tick(). ]]
 local Players = game:GetService(`Players`)
 local MarketplaceService = game:GetService(`MarketplaceService`)
@@ -67,6 +69,52 @@ local function label(Parent, Text, Size, Props)
 	return L
 end
 local function hash(N: number): number return (N * 2654435761) % 4294967296 end
+
+-- (2.30) the station's voice: one clip at a time, the music ducked under it
+local Voice = { Sound = nil :: Sound?; Now = nil :: any; Busy = false; NextAt = 0; Ducked = nil :: number? }
+local function duck(On: boolean)
+	local M = Ctx and Ctx.Music and Ctx.Music.Sound
+	if On then
+		if M and not Voice.Ducked then Voice.Ducked = M.Volume M.Volume = M.Volume * 0.3 end
+	else
+		if M and Voice.Ducked then M.Volume = Voice.Ducked end
+		Voice.Ducked = nil
+	end
+end
+function Shared.StopVoice()
+	if Voice.Sound then Voice.Sound:Destroy() Voice.Sound = nil end
+	Voice.Now = nil
+	duck(false)
+	Voice.NextAt = os.clock() + 20
+end
+-- tuning in: ask the station for the next voice (nothing while one plays, or before the gap is up)
+function Shared.TuneIn(Force: boolean?)
+	if Voice.Busy or (Voice.Sound and Voice.Now) then return end
+	if not Force and os.clock() < Voice.NextAt then return end
+	Voice.Busy = true
+	task.spawn(function()
+		local V = Ctx and Ctx.Call(`Voice`)
+		Voice.Busy = false
+		if not (V and V.Id) then Voice.NextAt = os.clock() + 60 return end
+		local S = new(`Sound`, { Name = `NightFMVoice`; SoundId = if typeof(V.Id) == `string` then V.Id else `rbxassetid://{V.Id}`; Volume = 0.9 }, game:GetService(`SoundService`))
+		Voice.Sound, Voice.Now = S, V
+		duck(true)
+		S.Ended:Connect(function()
+			if Voice.Sound ~= S then return end
+			S:Destroy()
+			Voice.Sound, Voice.Now = nil, nil
+			duck(false)
+			Voice.NextAt = os.clock() + (V.Gap or 45)
+			Shared.Refresh()
+			task.delay((V.Gap or 45) + 0.5, function() -- still tuned in? the next voice
+				if Ui and Ui.Root and Ui.Root.Parent and Tab == `Station` then Shared.TuneIn() end
+			end)
+		end)
+		S:Play()
+		pcall(Ctx.Kit.PlaySound, `Tick`, 0.4, 0.7) -- the dial clicking over
+		Shared.Refresh()
+	end)
+end
 
 local function titleOf(Id: number): (string, string)
 	local I = Info[Id]
@@ -280,9 +328,30 @@ function Shared.Station(Parent)
 		Badge.TextTransparency = 1 -- (it still sizes the badge) the words ride above the lamp
 		new(`TextLabel`, { BackgroundTransparency = 1; Text = Badge.Text; Font = Badge.Font; TextSize = 13; TextColor3 = Color3.new(1, 1, 1); ZIndex = 2; Size = UDim2.fromScale(1, 1) }, Badge)
 	end
+	if Voice.Now then -- who's on the air right now (the voice playing), with a stop
+		local V = Voice.Now
+		local Card = new(if art(`FmCard`) then `ImageLabel` else `Frame`, { BackgroundColor3 = PURPLE_DEEP; BackgroundTransparency = 0.15; Size = UDim2.new(1, 0, 0, 66); LayoutOrder = 3 }, S)
+		corner(Card, 12)
+		if art(`FmCard`) then sliced(Card, `FmCard`) Card.ImageColor3 = Color3.fromRGB(215, 185, 255) else new(`UIStroke`, { Color = PURPLE; Transparency = 0.3 }, Card) end
+		local Pad = if art(`FmCard`) then 12 else 10
+		label(Card, `<font color="#{Color3.fromRGB(255, 120, 130):ToHex()}">\u{25CF}</font>  ON THE AIR  \u{00B7}  {string.upper(V.Who or `Night FM`)}`, 11,
+			{ Font = T().Fonts.Title; TextColor3 = Color3.fromRGB(215, 190, 255); Position = UDim2.fromOffset(Pad, 10); Size = UDim2.new(1, -(Pad + 56), 0, 14) })
+		label(Card, V.Title or ``, 16, { Font = T().Fonts.Title; TextColor3 = Color3.fromRGB(248, 240, 228); Position = UDim2.fromOffset(Pad, 28); Size = UDim2.new(1, -(Pad + 56), 0, 22) })
+		local Stop = roundBtn(Card, `Pause`, `\u{23F9}`, 38, false, function() Shared.StopVoice() Shared.Refresh() end)
+		Stop.AnchorPoint = Vector2.new(1, 0.5) Stop.Position = UDim2.new(1, -(Pad - 2), 0.5, 0)
+	elseif St.OnAir or Voice.NextAt > 0 then -- (nothing playing) a dial to tune in again
+		local Go = new(`TextButton`, { Text = `\u{1F4FB}  Tune in`; Font = T().Fonts.Title; TextSize = 14; TextColor3 = Color3.new(1, 1, 1); BackgroundColor3 = PURPLE;
+			AutoButtonColor = true; Size = UDim2.fromOffset(120, 32); LayoutOrder = 3 }, S)
+		corner(Go)
+		local GoArt = new(`ImageLabel`, { Size = UDim2.fromScale(1, 1) }, Go)
+		if sliced(GoArt, `FmChipOn`) then Go.BackgroundTransparency = 1 GoArt.ZIndex = 0 Go.TextTransparency = 1
+			new(`TextLabel`, { BackgroundTransparency = 1; Text = `Tune in`; Font = T().Fonts.Title; TextSize = 14; TextColor3 = Color3.new(1, 1, 1); ZIndex = 2; Size = UDim2.fromScale(1, 1) }, Go)
+		else GoArt:Destroy() end
+		Go.Activated:Connect(function() Shared.TuneIn(true) end)
+	end
 	local Kick = { Announcement = `ANNOUNCEMENT`; IncidentReport = `CAMPUS REPORT`; CallerLine = `CALLER LINE`; Transmission = `TRANSMISSION` }
 	local Items = St.Items or {}
-	if #Items == 0 then label(S, `<i>Quiet tonight. Nothing on the line yet.</i>`, 15, { TextColor3 = Color3.fromRGB(205, 192, 218); Size = UDim2.new(1, 0, 0, 20); LayoutOrder = 3 }) end
+	if #Items == 0 then label(S, `<i>Quiet tonight. Nothing on the line yet.</i>`, 15, { TextColor3 = Color3.fromRGB(205, 192, 218); Size = UDim2.new(1, 0, 0, 20); LayoutOrder = 4 }) end
 	local Newest = 0
 	for K = #Items, 1, -1 do
 		local It = Items[K]
@@ -425,6 +494,7 @@ end
 
 -- a redraw soon after names arrive (one for several), unless the now playing sheet is up (it updates itself)
 local RefreshQueued = false
+local StationAt = 0 -- (2.30) when the Station tab last fetched
 function Shared.Refresh()
 	if RefreshQueued then return end
 	RefreshQueued = true
@@ -439,7 +509,11 @@ function Shared.Render()
 	for _, Ch in Ui.Root:GetChildren() do if Ch ~= Ui.Bg and Ch.Name ~= `NowPlaying` then Ch:Destroy() end end
 	local Page = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.fromScale(1, 1) }, Ui.Root)
 	if Tab == `Station` then
-		task.spawn(function() Ctx.Station = Ctx.Call(`Station`) or Ctx.Station if Tab == `Station` and Page.Parent then Page:Destroy() Shared.Render() end end)
+		if os.clock() - StationAt > 5 then -- (fetch, then redraw once: the redraw doesn't fetch again within 5 s)
+			StationAt = os.clock()
+			task.spawn(function() Ctx.Station = Ctx.Call(`Station`) or Ctx.Station if Tab == `Station` and Page.Parent then Page:Destroy() Shared.Render() end end)
+		end
+		Shared.TuneIn() -- (the voices; it waits out the gap and never talks over itself)
 	end
 	if Tab == `Home` then Shared.Home(Page) elseif Tab == `Library` then Shared.Library(Page) else Shared.Station(Page) end
 	Shared.TabBar(Page)

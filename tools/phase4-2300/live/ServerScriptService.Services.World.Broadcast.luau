@@ -1,7 +1,7 @@
 --[[ (2.30) Broadcast (server). Services.World.Broadcast (docs/expansion/13-Living-School.md §5.1, §5.2): one source of
 	content items and three outputs: the PA (all clients, ClockHud), the Gazette (Features.Phone) and the Night FM
 	station (Features.Phone remote Station). The PA speaks only of real state and at most once per segment.
-	API: Post(Kind, Text, Source?), Items(SinceId?), PA(Text, Emergency?), Station(P), PATestReset() ]]
+	API: Post(Kind, Text, Source?), Items(SinceId?), PA(Text, Emergency?), Station(P), Voice(P), PATestReset() ]]
 local Players = game:GetService(`Players`)
 local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
 local ServerScriptService = game:GetService(`ServerScriptService`)
@@ -68,6 +68,51 @@ function Shared.Station(P: Player)
 	return { OnAir = Local.OnAir(); Items = Out; LastRead = Last }
 end
 
+-- (2.30) Night FM's voices (Config.Voice). Heard[P] = { Key = this night or day, Set = the clips heard in it }
+local Heard = {} :: { [Player]: { Key: string, Set: { [string]: boolean } } }
+local BigDay = nil :: number? -- the last day with a campus report (a quiet day has none)
+local function inHours(H: number, From: number?, To: number?): boolean
+	if not From or not To then return true end
+	if From <= To then return H >= From and H < To end
+	return H >= From or H < To
+end
+function Shared.Voice(P: Player)
+	local S = Clock()
+	local H = (S.MinuteOfDay or ((S.Hour or 0) * 60)) / 60
+	local OnAir = Local.OnAir()
+	local Key = if OnAir then `N{if H >= 12 then S.Day else S.Day - 1}` else `D{S.Day}`
+	local Mine = Heard[P]
+	if not Mine or Mine.Key ~= Key then Mine = { Key = Key; Set = {} } Heard[P] = Mine end
+	local V = Config.Voice
+	local function ok(Name: string): boolean
+		local C = V[Name]
+		return C ~= nil and (typeof(C.Id) == `string` or (C.Id or 0) > 0) and not Mine.Set[Name] and inHours(H, C.From, C.To) and not (C.QuietOnly and BigDay == S.Day)
+	end
+	local Phone = svc(`Features.Phone`)
+	local Pick = nil
+	if OnAir and not Mine.Set.Intro then -- the host opens the night: an introduction the first time ever, else a welcome back
+		local First = Phone and Phone.Tuned and not Phone.Tuned(P)
+		Pick = if First and ok(`FirstTune`) then `FirstTune` elseif not First and ok(`WelcomeBack`) then `WelcomeBack` else nil
+		if Pick then
+			Mine.Set.Intro = true
+			if Pick == `FirstTune` and Phone and Phone.SetTuned then Phone.SetTuned(P) end
+		end
+	end
+	if not Pick and ok(`SignOff`) then Pick = `SignOff` end
+	if not Pick then
+		local Pool = {}
+		for _, Name in { `PSA`, `Hello`, `Quiet`, `Lore1`, `Lore2`, `HallMonitor1`, `Afternoon`, `HallMonitor2` } do if ok(Name) then table.insert(Pool, Name) end end
+		if #Pool > 0 then Pick = pick(Pool) end
+	end
+	if not Pick then return nil end
+	Mine.Set[Pick] = true
+	local C = V[Pick]
+	return { Cue = Pick; Id = C.Id; Len = C.Len; Who = C.Who; Title = C.Title; Gap = Config.VoiceGap }
+end
+function Shared.UseVoice(Map) for K, Id in Map do if Config.Voice[K] then Config.Voice[K].Id = Id end end end -- tests: local clips (rbxasset://)
+function Shared.VoiceTestReset(P: Player?, Quiet: boolean?) if P then Heard[P] = nil end if Quiet ~= nil then BigDay = if Quiet then nil else Clock().Day end end
+Players.PlayerRemoving:Connect(function(P) Heard[P] = nil end)
+
 function Local.OnSegment(State)
 	local Kind = State.Segment and State.Segment.Kind
 	local Lines = Kind and Config.PA[Kind]
@@ -93,7 +138,7 @@ function Shared.OnStart()
 				if (I.Severity or 1) >= 2 then
 					local Ru = svc(`Social.Rumours`)
 					local Rm = Ru and Ru.Make(I)
-					if Rm then Shared.Post(`IncidentReport`, Ru.Text(Rm), I.Kind) end
+					if Rm then Shared.Post(`IncidentReport`, Ru.Text(Rm), I.Kind) BigDay = Clock().Day end -- (no longer a quiet day)
 				end
 				if I.Kind == `Scuffle` and I.Rumble then
 					local Place = (require(ReplicatedStorage.Config.Rumours).Places[I.Region or ``]) or `the grounds`

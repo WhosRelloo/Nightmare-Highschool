@@ -87,6 +87,7 @@ function Shared.Sanitize(Raw)
 		if N and N > 0 and N % 1 == 0 and N < 1e15 and #Out.Liked < 30 and not table.find(Out.Liked, N) then table.insert(Out.Liked, N) end
 	end
 	if typeof(Raw.Broadcast) == `number` then Out.Broadcast = math.max(0, math.floor(Raw.Broadcast)) end
+	if Raw.Tuned == true then Out.Tuned = true end -- (2.30) heard Night FM's introduction
 	return Out
 end
 
@@ -494,6 +495,16 @@ function Shared.BroadcastRead(P: Player): number
 	local Ph = Local.Get(P)
 	return Ph and Ph.Broadcast or 0
 end
+function Shared.Tuned(P: Player): boolean -- (2.30) has this student heard Night FM's first-time introduction?
+	local Ph = Local.Get(P)
+	return Ph ~= nil and Ph.Tuned == true
+end
+function Shared.SetTuned(P: Player, Value: boolean?)
+	local Ph = Local.Get(P)
+	if not Ph then return end
+	Ph.Tuned = if Value == false then nil else true
+	Local.Save(P, Ph)
+end
 function Shared.StationRead(P: Player, Id: any): boolean
 	local Ph = Local.Get(P)
 	local N = tonumber(Id)
@@ -671,6 +682,15 @@ function Shared.OnStart()
 			local Ok, R = pcall(function() return require(ServerScriptService.Services.World.Broadcast).Station(P) end)
 			return if Ok then R else { OnAir = false; Items = {}; LastRead = 0 }
 		end)
+	end
+	-- (2.30) Night FM's voices: the next clip for you, picked when you tune in (World.Broadcast.Voice)
+	local VoiceAt = {} :: { [Player]: number }
+	Players.PlayerRemoving:Connect(function(P) VoiceAt[P] = nil end)
+	rf(`Voice`).OnServerInvoke = function(P)
+		if VoiceAt[P] and os.clock() - VoiceAt[P] < 1 then return nil end -- (its own limit: a tune-in lands beside StationRead)
+		VoiceAt[P] = os.clock()
+		local Ok, R = pcall(function() return require(ServerScriptService.Services.World.Broadcast).Voice(P) end)
+		return if Ok then R else nil
 	end
 	local SaveWallpaper = rf(`SaveWallpaper`)
 	SaveWallpaper.OnServerInvoke = function(P, Wp) if limited(P) then return false end return Shared.SaveWallpaper(P, Wp) end
