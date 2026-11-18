@@ -283,7 +283,11 @@ function Shared.OnStart()
 		if Record.Status == `Present` then
 			Shared.Reduce(Player, Config.Recovery.PresentClass, `Attended class`)
 		elseif Config.Violations[Record.Status] then
-			Shared.AddViolation(Player, Record.Status, { Witness = `Teacher` })
+			local Witness = `Teacher`
+			pcall(function() -- (2.28) the room's teacher, if they're at the desk (Services.School.Teachers)
+				Witness = require(game:GetService(`ServerScriptService`).Services.School.Teachers).NameFor(Record.Room, Record.Period)
+			end)
+			Shared.AddViolation(Player, Record.Status, { Witness = Witness })
 		end
 	end)
 
