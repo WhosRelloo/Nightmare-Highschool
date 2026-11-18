@@ -248,7 +248,7 @@ local function greet(S, Rec): boolean
 	if Moment == `Intro` then -- (2.27) they tell you their name, and now you've met
 		if os.clock() - (S.SaidAt or -1e9) < 6 then return false end
 		local Line = Pool[math.random(1, #Pool)]
-		sayText(S, (string.gsub(Line, `{First}`, S.First or `me`)))
+		sayText(S, (string.gsub(Line, "{First}", S.First or `me`))) -- (2.29) a plain pattern string, not an interpolation
 		Said = true
 		pcall(function() Rep().Meet(Pl, S.RosterId) end)
 	else
@@ -647,7 +647,24 @@ end
 
 -- two students standing together take turns, look at whoever's talking, and break off for anything urgent
 local function chat(A, B)
-	local Lines2 = Lines.PickChat(A, ctx())
+	-- (2.29) a rumour A knows and B doesn't comes first (Social.Rumours); anyone within 12 studs overhears it
+	local Lines2
+	local OkR, Ru = pcall(function() return require(ServerScriptService.Services.Social.Rumours) end)
+	local Rumour = OkR and Ru and A.RosterId and B.RosterId and Ru.ForChat(A.RosterId, B.RosterId)
+	if not Rumour and OkR and Ru and A.RosterId and B.RosterId then
+		Rumour = Ru.ForChat(B.RosterId, A.RosterId)
+		if Rumour then A, B = B, A end -- whoever knows it tells it (the pair's first speaker is just the lower index)
+	end
+	if Rumour then
+		Lines2 = { `A: Did you hear? {Ru.Text(Rumour)}`, `B: ` .. (Lines.Pick(B, Lines.RumourReply or { `No way.` }, ctx()) or `No way.`) }
+		Ru.Heard(B.RosterId, Rumour)
+		for _, P in Players:GetPlayers() do
+			local R = P.Character and P.Character:FindFirstChild(`HumanoidRootPart`)
+			if R and A.Root and (R.Position - A.Root.Position).Magnitude <= 12 then pcall(Ru.HeardByPlayer, P, Rumour) end
+		end
+	else
+		Lines2 = Lines.PickChat(A, ctx())
+	end
 	if not Lines2 then return end
 	A.Chatting, B.Chatting = true, true
 	A.Partner, B.Partner = B, A
@@ -994,6 +1011,9 @@ function Brain.Fed(Pl: Player, Model: Model, It): (string?, string?)
 	end
 	return Verdict, S.Clique
 end
+
+-- (2.29) tests: one pair chat between two students (the rumour path runs if either knows one)
+function Brain.ChatForTests(A, B) chat(A, B) end
 
 -- (2.27) tests: the greeting this student would pick for Pl now (the moment, nil for a plain pool, and the pool)
 function Brain.GreetingForTests(S, Pl: Player)

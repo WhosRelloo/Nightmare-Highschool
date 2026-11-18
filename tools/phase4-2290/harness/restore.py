@@ -19,6 +19,8 @@ local ok, err = pcall(function()
 	Prof.Quests = Snap.Quests
 	Prof.Social = Prof.Social or {}
 	Prof.Social.Relationships = Snap.Relationships or {} -- (2.27)
+	if Snap.Cliques then Prof.Social.Cliques = Snap.Cliques end -- (2.29) clique standings
+	if Snap.Fortune ~= nil then Prof.Social.Fortune = if Snap.Fortune == false then nil else Snap.Fortune end end -- (2.29) the day's reading
 	require(SSS.Social.Reputation).Sync(P)
 	require(SSS.Quests.Quests).SyncForCine(P)
 	Data.UpdateState(P, { type = "UpdateYen"; amount = Snap.Yen - Prof.Yen })

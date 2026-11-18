@@ -266,7 +266,19 @@ function Hint.Stranger(P: Player)
 		Plain = `A substitute covers {E.Subject} on {WEEKDAYS[E.Weekday] or `a school day`}. Expect different rules.` }
 end
 
-local ORDER = { `Tower`, `Fool`, `Moon`, `Seeker`, `Feast`, `Crown`, `Scholar`, `Stranger` }
+-- (2.29) Sable hears the school's whispers (Social.Rumours): the newest live rumour, if any
+function Hint.Whisper(P: Player)
+	local Ru = svc(`Social.Rumours`)
+	local Live = Ru and Ru.Live()
+	local R = Live and Live[#Live]
+	if not R then return nil end
+	local Text = Ru.Text(R)
+	return { Card = `Fool`;
+		Vague = `The fool's bell rings with gossip: something happened, and the telling has already changed it.`;
+		Plain = `The halls are saying: "{Text}" Whether it's true is another matter.` }
+end
+
+local ORDER = { `Tower`, `Fool`, `Moon`, `Seeker`, `Feast`, `Crown`, `Scholar`, `Stranger`, `Whisper` } -- (2.29) Whisper
 
 function Shared.Hints(P: Player)
 	local Out = {}
