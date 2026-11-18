@@ -77,7 +77,7 @@ server, remember what you did to them across rejoins, introduce themselves, and 
   - `Roster.Bind(Id, S)`, `Roster.Body(Id) -> S?`
   - `Roster.SelfTestForTests() -> { [string]: any }`
 
-- [ ] **Step 1: Write the failing test.** Add to TestBridge, beside `Phase1SelfTest`:
+- [x] **Step 1: Write the failing test.** Add to TestBridge, beside `Phase1SelfTest`:
 
 ```lua
 -- (2.27) the roster's data and seeding (nothing saved)
@@ -89,7 +89,7 @@ end
 Install TestBridge, start Play (`start_play.lua`), then run `bridge.py RosterTest '$P'`.
 Expected: `ok:false` with "Roster is not a valid member" (the module doesn't exist yet).
 
-- [ ] **Step 2: Write `Config.Students`** with all 24 rows from doc 13 §8. `First` is the first word of `Name`. Only
+- [x] **Step 2: Write `Config.Students`** with all 24 rows from doc 13 §8. `First` is the first word of `Name`. Only
   Delinquents have `SkipChance`. The first rows are shown; the other 21 follow the same shape, copied from the doc 13
   table exactly:
 
@@ -120,7 +120,7 @@ return {
 }
 ```
 
-- [ ] **Step 3: Write `Social.Roster`:**
+- [x] **Step 3: Write `Social.Roster`:**
 
 ```lua
 --[[ (2.27) Roster (server). Services.Social.Roster: who the rostered students are (Config.Students), each one's
@@ -167,7 +167,7 @@ end
 return Shared
 ```
 
-- [ ] **Step 4: Snapshot and restore the relationships too.**
+- [x] **Step 4: Snapshot and restore the relationships too.**
   - **`snapshot.lua`:** the JSON gains `Relationships = (Prof.Social and Prof.Social.Relationships) or {}`.
   - **`restore.py`:** after `Prof.Quests = Snap.Quests`, add:
 
@@ -177,7 +177,7 @@ return Shared
 	require(SSS.Social.Reputation).Sync(P)
 ```
 
-- [ ] **Step 5: Install and run the test.**
+- [x] **Step 5: Install and run the test.**
   - Stop Play, then run `install.py` on `ReplicatedStorage.Config.Students.luau`,
     `ServerScriptService.Services.Social.Roster.luau` and the TestBridge file.
   - Start Play (`start_play.lua`), then run `bridge.py RosterTest '$P'`.
@@ -185,7 +185,7 @@ return Shared
   - Take a fresh `_slot2.json` with the new `snapshot.lua` (`client.py` is for the client; use rbxc's `Server` with
     `@snapshot.lua`, as `restore.py` does), and keep it for the whole release.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add tools/phase4-2270 docs/superpowers/plans/2026-11-18-roster-and-memory.md
@@ -205,7 +205,7 @@ git -c user.name=Rello commit -m "2.27 (1/7): Config.Students roster and the Ros
 - Produces: each student record `S` gains `S.RosterId`, `S.Name`, `S.First`, `S.Temper`. Each model gets attributes
   `NHStudentId = Id` and `Clique`. `Shared.LookForTests(Id) -> Look` builds a look without spawning.
 
-- [ ] **Step 1: Write the failing test.** Add to TestBridge:
+- [x] **Step 1: Write the failing test.** Add to TestBridge:
 
 ```lua
 -- (2.27) the roster's bodies: ids on the live students, and a look that is the same when built twice
@@ -221,7 +221,7 @@ end
 
 Run `bridge.py Rostered '$P'`. Expected: an error ("LookForTests" is nil).
 
-- [ ] **Step 2: Back up `Schedules`** into `NH_Backup.Phase4_pre_20261118`. Then make `Local.Look` take a seeded `Random`.
+- [x] **Step 2: Back up `Schedules`** into `NH_Backup.Phase4_pre_20261118`. Then make `Local.Look` take a seeded `Random`.
   Every `math.random(a, b)` inside it becomes `Rng:NextInteger(a, b)`:
 
 ```lua
@@ -255,7 +255,7 @@ end
   Schedules.
 - **If `IsFemale` depends on `Body`:** it's set before `Uniform` here, as before.
 
-- [ ] **Step 3: Build students from the roster.** In `Shared.OnStart`, replace `for I = 1, COUNT do … end` with a
+- [x] **Step 3: Build students from the roster.** In `Shared.OnStart`, replace `for I = 1, COUNT do … end` with a
   loop over `Roster.All()`. Delete `local COUNT = 14`, and make the clique-look picks use `Rng`:
 
 ```lua
@@ -294,7 +294,7 @@ end
 - **The Athletes' club:** keep `Club = CLUBS[...]`. It only matters for Athletes, as before.
 - **`IN_CLASS` stays 6:** per-set seating is 2.28.
 
-- [ ] **Step 4: Tag the models, and add the test hooks.**
+- [x] **Step 4: Tag the models, and add the test hooks.**
   - **`Local.Spawn`:** after `M:SetAttribute(\`NHScheduled\`, S.Index)`, add
     `if S.RosterId then M:SetAttribute(\`NHStudentId\`, S.RosterId) end -- (2.27)`.
   - **`Shared.Debug`:** each row gains `RosterId = S.RosterId`.
@@ -309,7 +309,7 @@ end
   - **Update the header comment:** "Fourteen background students" becomes "The roster's 24 students
     (Config.Students, 2.27)".
 
-- [ ] **Step 5: Install and run the test.**
+- [x] **Step 5: Install and run the test.**
   - Install `Schedules` and the TestBridge, start Play, and run `bridge.py Rostered '$P'`.
   - Expected: `Students 24`, `Ids 24`, `SameLook true`.
   - **Then the live check:** `SetTime "07:40"`, so students arrive. Count the models in `workspace.NHSchedule` that
@@ -317,12 +317,12 @@ end
     console.
   - **Stop and start Play,** then check that one id's `NHBuild` attribute and shirt are the same as before.
 
-- [ ] **Step 6: Performance check.** With all 24 spawned (`SetTime "12:10"`, lunch), read the Studio `Stats` (server
+- [x] **Step 6: Performance check.** With all 24 spawned (`SetTime "12:10"`, lunch), read the Studio `Stats` (server
   heartbeat, client FPS) for 20 s.
   - **Expected:** a client frame rate of 55 or more, and server heartbeat of 55 or more.
   - **If it's lower:** stop and report. Don't trim behaviour in this task.
 
-- [ ] **Step 7: Commit** `2.27 (2/7): Schedules makes the roster's 24 bodies, seeded looks`.
+- [x] **Step 7: Commit** `2.27 (2/7): Schedules makes the roster's 24 bodies, seeded looks`.
 
 ---
 
@@ -346,7 +346,7 @@ end
   - `Reputation.StateOf(Value) -> string` (the state ignoring `Met`)
   - `Reputation.TrimForTests(Rels, Cap, Now) -> { droppedIds }`
 
-- [ ] **Step 1: Write the failing test.** Add to TestBridge:
+- [x] **Step 1: Write the failing test.** Add to TestBridge:
 
 ```lua
 -- (2.27) the 64-entry cap's drop order, on a stand-in table (nothing saved)
@@ -373,7 +373,7 @@ end
 
 Expected before the change: an error (`TrimForTests` is nil).
 
-- [ ] **Step 2: Back up `Reputation` and `Config.Reputation`.** Add `SavedCap = 64;` to `Config.Reputation`, under
+- [x] **Step 2: Back up `Reputation` and `Config.Reputation`.** Add `SavedCap = 64;` to `Config.Reputation`, under
   `AttackPenalty`. Then replace `Local.Record`, `Shared.Relationship`, `Shared.Meet` and `Shared.ChangeRelationship`
   in `Reputation`, and add the new functions:
 
@@ -483,20 +483,20 @@ end
   If `require` returns something else, read its structure and adapt `Local.Saved` and `Local.NameOf`. Don't edit
   `Config.Npcs`.
 
-- [ ] **Step 3: Install and run the test.**
+- [x] **Step 3: Install and run the test.**
   - Install `Reputation`, `Config.Reputation` and the TestBridge, start Play, and run
     `bridge.py RelationshipCapTest '$P'`.
   - Expected: `Dropped ["Ac1"]` (the oldest Acquaintance), `Count 64`, `EzraKept true`, `HostileKept true`,
     `Dropped2 ["Fr1"]`, `TrustedKept true`, `HostileKept2 true`.
 
-- [ ] **Step 4: Regression on the real data.**
+- [x] **Step 4: Regression on the real data.**
   - Run `bridge.py Relationship '$P' '"Ezra"'`. Expected: the same `[Value, State, Met]` as before (Ezra wasn't
     touched).
   - Run `bridge.py Relationship '$P' '"OdetteMarsh"' 5`, then the same command with no change. Expected:
     `[5, "Unknown", false]`, with no notification, because she isn't met yet.
   - **Restore slot 2.**
 
-- [ ] **Step 5: Commit** `2.27 (3/7): saved relationships for the roster and cast; the 64 cap`.
+- [x] **Step 5: Commit** `2.27 (3/7): saved relationships for the roster and cast; the 64 cap`.
 
 ---
 
@@ -522,7 +522,7 @@ end
     - **Grudge pool:** `Flags.Fought >= 1` and value below 0.
     - **Grateful pool:** `Flags.Helped >= 2` and value at least 10.
 
-- [ ] **Step 1: Write the failing test.** Add to TestBridge:
+- [x] **Step 1: Write the failing test.** Add to TestBridge:
 
 ```lua
 -- (2.27) greetings from the saved memory, on a stand-in student; slot 2's entry for her is put back after
@@ -558,7 +558,7 @@ end
 
 Expected before the change: an error (`GreetingForTests` is nil).
 
-- [ ] **Step 2: Back up the three files.** Add the line pools to `Lines`: `Intro` is a new top-level table, and
+- [x] **Step 2: Back up the three files.** Add the line pools to `Lines`: `Intro` is a new top-level table, and
   `Grudge` and `Grateful` go inside `Lines.Greet`. `{First}` is the student's own first name:
 
 ```lua
@@ -593,7 +593,7 @@ Inside `Lines.Greet`:
 	};
 ```
 
-- [ ] **Step 3: Read the saved memory in `StudentBrain`.** Near the other lazy requires, add:
+- [x] **Step 3: Read the saved memory in `StudentBrain`.** Near the other lazy requires, add:
 
 ```lua
 local function Rep() return require(ServerScriptService.Services.Social.Reputation) end -- (2.27) lazy: no cycle at load
@@ -631,7 +631,7 @@ In `greet(S, Rec)`, replace the `local Said = …` line with:
   it.
 - **Check the plain pools:** `say(S, Pool, 6)` already handles the Grudge and Grateful pools.
 
-- [ ] **Step 4: Record shoves and snacks.** In `NudgeMod.OnShove`, before `sayMatrix`, add:
+- [x] **Step 4: Record shoves and snacks.** In `NudgeMod.OnShove`, before `sayMatrix`, add:
 
 ```lua
 	local Pl = Rec and Rec.Player
@@ -665,7 +665,7 @@ function Brain.GreetingForTests(S, Pl: Player)
 end
 ```
 
-- [ ] **Step 5: `Talk.Attitude` reads the saved state.** In `Talk.Attitude`, after the membership line (`if S.Clique
+- [x] **Step 5: `Talk.Attitude` reads the saved state.** In `Talk.Attitude`, after the membership line (`if S.Clique
   and Talk.IsMember…`), insert:
 
 ```lua
@@ -683,14 +683,14 @@ end
 	end
 ```
 
-- [ ] **Step 6: Install and run the tests.**
+- [x] **Step 6: Install and run the tests.**
   - Install `StudentBrain`, `StudentBrain.Talk`, `StudentBrain.Lines` and the TestBridge. `StudentBrain`'s
     children (`Talk`, `Lines`, …) are kept by `install.py`; install the parent first, then the children.
   - Start Play, run `bridge.py MemoryTest '$P'`, then restore slot 2.
   - Expected: `Fresh "Intro"`, `AfterMeet true`, `Grateful true`, `Grudge true`, `NoIntroAfterFight true`, and
     `Attitude` is `"Wary"` or `"Hostile"`.
 
-- [ ] **Step 7: The live rejoin check (the 2.27 acceptance).**
+- [x] **Step 7: The live rejoin check (the 2.27 acceptance).**
   1. `SetTime "12:10"`. Walk up to a rostered student with `GoTo` to their root. They introduce themselves: the line
      has their first name, and `bridge.py Relationship '$P' '"<Id>"'` shows `Met true`.
   2. Shove them twice, 31 s apart (the TestBridge `Shove` command if there is one; otherwise ask the owner to press
@@ -703,7 +703,7 @@ end
      `Greet.Grateful[<their Temper>]`.
   5. Restore slot 2.
 
-- [ ] **Step 8: Commit** `2.27 (4/7): students remember you; introductions, grudges and thanks`.
+- [x] **Step 8: Commit** `2.27 (4/7): students remember you; introductions, grudges and thanks`.
 
 ---
 
@@ -718,13 +718,13 @@ end
 - Produces: a `Classmates` group under the player groups: each met student's name, with a second line
   `<Clique name> · <State>`, then the start of their `Bio`
 
-- [ ] **Step 1: Write the failing check.**
+- [x] **Step 1: Write the failing check.**
   - From a Client `execute_luau`, open the list: `require(PlayerScripts.Controllers.Gui.Students).Toggle(true)`.
   - Count the children of `PlayerGui.NHStudents.Plate.List` named `Group_Classmates`.
   - Expected now: 0, after meeting a student in Task 4. Snapshot first, then use
     `bridge.py Relationship '$P' '"OdetteMarsh"' 1` and a Server `Reputation.Meet` call.
 
-- [ ] **Step 2: Back up the list.** Add the requires and the group:
+- [x] **Step 2: Back up the list.** Add the requires and the group:
 
 ```lua
 local StudentsConfig = require(ReplicatedStorage.Config.Students) -- (2.27) the roster
@@ -780,14 +780,14 @@ end
   Use the module's existing names for the open flag and `Dirty`.
 - **Header comment:** add one line about the Classmates group (2.27).
 
-- [ ] **Step 3: Install and check.**
+- [x] **Step 3: Install and check.**
   - Install the list, start Play, meet one student (Step 1's calls), and open the list.
   - Expected: one `Group_Classmates` with one `Classmate` row, named "Odette Marsh", and a second line starting
     "The Chapel Choir · Acquaintance".
   - **Screenshot it** (`screen_capture`) to `tools/phase4-2270/review/classmates.jpg`.
   - Restore slot 2.
 
-- [ ] **Step 4: Commit** `2.27 (5/7): Classmates in the Students list`.
+- [x] **Step 4: Commit** `2.27 (5/7): Classmates in the Students list`.
 
 ---
 
@@ -795,44 +795,44 @@ end
 
 **Files:** none changed (fixes go back to the task that owns the file).
 
-- [ ] **Step 1: The self-tests in one Play session.**
+- [x] **Step 1: The self-tests in one Play session.**
   - **This release:** `RosterTest`, `RelationshipCapTest`, `MemoryTest`, `Rostered`.
   - **Earlier releases:** `CineJudgeTest` (36/36), `CineGraphTest` (9/9), `CineQteTest`, `CineVoteTest`,
     `Phase1SelfTest` and `AfterHoursMigrateTest` (1, 2, 5).
   - **Expected:** this release's values as in Tasks 1 to 4, and the 2.26.0 values for the others. `AfterLeaveEnded`,
     `OldSlotCanStart` and `NewKidBeforeOrientation` read false by design.
-- [ ] **Step 2: The NPCs that already used relationships.**
+- [x] **Step 2: The NPCs that already used relationships.**
   - Run `bridge.py Relationship '$P' '"Ezra"'` and the `Talk` command with Ezra. Expected: his greeting state
     matches his saved value.
   - Open the Factions panel. The leader's relationship line still shows.
-- [ ] **Step 3: The school day.** At `SetTime` 07:40, 09:10 (class), 12:10 (lunch) and 15:30 (after school),
+- [x] **Step 3: The school day.** At `SetTime` 07:40, 09:10 (class), 12:10 (lunch) and 15:30 (after school),
   students arrive, sit six to a class, queue for lunch and go to clubs, as before. No `[Schedules]` or
   `[StudentBrain]` warnings.
-- [ ] **Step 4: The console.** No errors from Roster, Reputation, Schedules, StudentBrain, Talk or Students.
-- [ ] **Step 5: Saving.**
+- [x] **Step 4: The console.** No errors from Roster, Reputation, Schedules, StudentBrain, Talk or Students.
+- [x] **Step 5: Saving.**
   - Run the rejoin check on slot 4 "Testy". Snapshot it with the same tools, using `ChooseSlot 4`, then restore it.
   - Check the size: `#HttpService:JSONEncode(Profile)` stays under 1 MB.
-- [ ] **Step 6: Restore slot 2,** then stop Play and run `save_place`.
+- [x] **Step 6: Restore slot 2,** then stop Play and run `save_place`.
 
 ---
 
 ### Task 7: Docs and release 2.27.0
 
-- [ ] **Step 1: CHANGELOG `[2.27.0] - <date>: Roster & memory`.**
+- [x] **Step 1: CHANGELOG `[2.27.0] - <date>: Roster & memory`.**
   - **Contents:** the roster, Schedules, saved memory, introductions, the Classmates list, the TestBridge commands.
   - **Checked:** every number from Task 6.
   - **Not checked:** a two-player run, and phone screens.
   - If another session's hunk is in CHANGELOG, stage only this entry's hunk (`git diff -U0` → keep the `## [2.27.0]`
     hunk → `git apply --cached --unidiff-zero`).
-- [ ] **Step 2: The other docs.**
+- [x] **Step 2: The other docs.**
   - **README:** a Latest-update line.
   - **Implementation-Status:** a row.
   - **Discord:** a game update in `updates/discord/game-updates/<date>-roster-and-memory.md` ("The students have
     names now…", in player words), and an index line. No announcement; that waits for the end of Phase 2.
   - **Doc 13:** the status line says "2.27 shipped", and §9 gets this plan's spec deltas.
-- [ ] **Step 3: Vault.** Copy the CHANGELOG, the Discord post, Implementation-Status and doc 13, and add a home-note
+- [x] **Step 3: Vault.** Copy the CHANGELOG, the Discord post, Implementation-Status and doc 13, and add a home-note
   line.
-- [ ] **Step 4: Commit and merge.**
+- [x] **Step 4: Commit and merge.**
   - Commit `2.27.0: Roster & memory (24 named students who remember you)`, staging only this plan's files.
   - Merge `phase4-living-school` into `main` with `--no-ff` and a message file
     (`git merge -F <file>`; `-F -` doesn't work). Stash other sessions' working-tree changes around the merge, and pop
@@ -841,7 +841,15 @@ end
 
 ---
 
-## Spec deltas (record in doc 13 §9 at release)
+## Outcome (2026-11-18)
+
+All seven tasks done; the numbers are in CHANGELOG `[2.27.0]`. Beyond the plan:
+- **Shy students:** students with sociability under 0.5 never greet, so a `remembers()` check lets them speak up.
+- **`harness/gamevm.py`:** checks of live state run inside the game, because the MCP's Luau has its own module copies.
+- **The frame-rate bar:** 55 fps was above this machine's empty-school baseline (47), so the measure is the change
+  with students against that baseline.
+
+## Spec deltas (recorded in doc 13 §9 items 8 to 15)
 
 1. **Field names stay `Value` and `Met`** (not `V`). The client's FactionsPanel and four services read them, so no
    migration is needed; `Last` and `Flags` are added.

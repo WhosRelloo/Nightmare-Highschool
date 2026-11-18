@@ -1,7 +1,7 @@
 # 13. The Living School (Expansion Phase 2)
 
-**Status:** the design was approved section by section in chat on 2026-11-18. This spec is waiting for the owner's
-review. Then each release gets its own plan in `docs/superpowers/plans/`.
+**Status:** approved 2026-11-18. **2.27 shipped** (plan: `docs/superpowers/plans/2026-11-18-roster-and-memory.md`;
+its deltas are §9 items 8 to 15). 2.28, 2.29 and 2.30 are next, each with its own plan.
 
 **Sources:** doc 02 §4.1 to §4.6, §7.1 and §11.1, doc 07 §2 to §7, and doc 08 Phase 2. This spec makes them
 buildable; where it differs from them, §9 says so.
@@ -368,3 +368,17 @@ Each set has 6 students; every clique is spread over at least three sets.
 6. **Notable rumours** are saved only once the Archive exists (Phase 3).
 7. **Introductions** are triggered by the first conversation, not by pressing G (the player-to-player rule stays
    as it is in `Strangers`).
+8. **(2.27) Field names stay `Value` and `Met`,** not `V`. The client's Factions panel and four services read them, so
+   old saves need no migration; `Last` and `Flags` are added.
+9. **(2.27) `Last` is `os.time()`** (real time), not the in-game day.
+10. **(2.27) "Fight a rostered student" means a shove.** Players can't hit scheduled students, so a shove is the hostile
+    act that's saved (-12, `Fought`). An accepted snack is the helpful one (+8 or +5, `Helped`) until 2.29's scenes.
+11. **(2.27) No nameplates:** students have none. An unmet student is unnamed everywhere; a met one is in the Students
+    list's Classmates group with their bio.
+12. **(2.27) `Roster.Plan`, `WhereNow` and `Near`** move to the releases that use them (2.28 and 2.29).
+13. **(2.27) The named cast** (`Config.Npcs`) keeps saved entries; `Config.Reputation.Npcs` still means "attacking them
+    costs standing".
+14. **(2.27) Shy students speak up when there's something saved to say.** Sociability under 0.5 never greeted, which
+    would have left half the roster unable to introduce themselves.
+15. **(2.27) The size estimate:** a full 64-entry block with every flag set is about 7.3 KB, not under 4 KB. That's still
+    far under the 1 MB warning.

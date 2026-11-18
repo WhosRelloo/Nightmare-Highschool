@@ -19,6 +19,8 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
+**The students have names now (2.27.0, 2026-11-18):** the school's background students are 24 named classmates, three per clique. Stop and look at one and they'll introduce themselves, and they remember you across visits: shove one and they won't forget it, share snacks and they'll thank you. Classmates you've met are listed under Tab. See [the game update](updates/discord/game-updates/2026-11-18-the-students-have-names.md) and [the spec](docs/expansion/13-Living-School.md).
+
 **The Strikethrough, Chapter One's finale (2.26.0, 2026-11-18):** After Hours now ends in a fight you play in Room 102 at night. Dodge, shove, win a tug of war over Mira's file, and finish it; every miss changes the scene, and losing the tug of war tears her record in half. This completes Chapter One (2.22 to 2.26). See [the game update](updates/discord/game-updates/2026-11-18-the-strikethrough.md), [the announcement](updates/discord/announcements/2026-11-18-chapter-one.md) and [the spec](docs/expansion/12-Interactive-Cutscenes.md).
 
 **Cutscenes you play (2.25.0, 2026-11-17):** cutscenes can stop and ask you to act: press on the beat, mash, dodge, hold, or answer in time. Alone, the scene follows you the instant you press; with your study group, it follows the group. The roll call is the first: answer to your name on the beat, or Mr. Hale notices. Your best grade per cutscene is in the Journal. See [the game update](updates/discord/game-updates/2026-11-17-cutscenes-you-play.md) and [the spec](docs/expansion/12-Interactive-Cutscenes.md).
