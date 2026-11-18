@@ -3,7 +3,8 @@
 **Status:** approved 2026-11-18. **2.27 shipped** (plan: `docs/superpowers/plans/2026-11-18-roster-and-memory.md`;
 its deltas are §9 items 8 to 15). **2.28 shipped** (plan: `docs/superpowers/plans/2026-11-18-staff-school-day.md`;
 deltas 16 to 23). **2.29 shipped** (plan: `docs/superpowers/plans/2026-11-18-incidents-and-rumours.md`;
-deltas 24 to 32). 2.30 is next.
+deltas 24 to 32). **2.30 shipped** (plan: `docs/superpowers/plans/2026-11-18-broadcast-and-curfew.md`; deltas 33 to
+40). **Phase 2 complete (2.27 to 2.30).**
 
 **Sources:** doc 02 §4.1 to §4.6, §7.1 and §11.1, doc 07 §2 to §7, and doc 08 Phase 2. This spec makes them
 buildable; where it differs from them, §9 says so.
@@ -413,3 +414,20 @@ Each set has 6 students; every clique is spread over at least three sets.
     out with you before an introduction.
 31. **(2.29) A rumour's life** is one in-game day: 7,200 real seconds at the clock's 300 seconds per game hour.
 32. **(2.29) Argument casts a rival pair on purpose:** its second student comes from the first one's rival clique.
+33. **(2.30) No PA speakers on the hall props.** The PA is a chime and a typed line on the ClockHud, within the kit-only
+    art rule; a speaker prop needs art.
+34. **(2.30) The station's sound** is the owner's voice clips (host, hall monitors, PSA, lore), played when you tune
+    in, not a continuous audio bed. Players' own tracks keep playing underneath, ducked.
+35. **(2.30) Curfew's patrol** walks the hall monitor's existing indoor route. The Records Office keeps its own night
+    watcher (the Night Custodian, Stealth). The restricted outdoor areas (Graveyard, Boiler Yard) aren't patrolled:
+    they aren't "in the building", so they aren't after hours under this rule.
+36. **(2.30) "In the building"** is HallMonitor's `OnCampus` (rooms and hallways), since the Regions boxes don't line
+    up. This place has no Dorms box; the real dorms are instanced homes, outside the building anyway.
+37. **(2.30) Confiscation on a curfew catch** uses the existing contraband rule (brass knuckles). There's no new
+    "carried for the night" rule.
+38. **(2.30) The phone's "monitors on their rounds" line** no longer exists (2.22 removed it), so there's nothing to
+    make true.
+39. **(2.30) "A match tonight" and "an assembly"** are announced only when those systems report one. There's no
+    assembly system yet.
+40. **(2.30) Night FM was remade** at the owner's request: home, library, now playing and station in
+    `Controllers.Gui.PhoneRadio`, in PBR art of its own. Liked tracks are saved per slot (`Phone.Liked`, 30 at most).

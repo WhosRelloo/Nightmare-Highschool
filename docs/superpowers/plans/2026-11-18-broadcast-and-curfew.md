@@ -91,7 +91,7 @@ with a reference image of three Spotify-like phone screens: home, library, now p
   - **Transmissions:** one per in-game night, at a random time between 23:00 and 02:00, from
     `Config.Broadcast.Transmissions`.
 
-- [ ] **Step 1: Write the failing test.** Add to TestBridge:
+- [x] **Step 1: Write the failing test.** Add to TestBridge:
 
 ```lua
 -- (2.30) the broadcast: items roll at 40, a PA is limited to one per segment (emergencies aside), the station is on air at night
@@ -113,7 +113,7 @@ end
 
   Expected before the code: an error (no `World.Broadcast`).
 
-- [ ] **Step 2: `Config.Broadcast`.** PA lines are plain strings. `{Subject}`, `{Day}` and `{Place}` are filled by the
+- [x] **Step 2: `Config.Broadcast`.** PA lines are plain strings. `{Subject}`, `{Day}` and `{Place}` are filled by the
   service.
 
 ```lua
@@ -142,7 +142,7 @@ return {
 }
 ```
 
-- [ ] **Step 3: `World.Broadcast`.** The module:
+- [x] **Step 3: `World.Broadcast`.** The module:
 
 ```lua
 --[[ (2.30) Broadcast (server). Services.World.Broadcast (docs/expansion/13-Living-School.md §5.1, §5.2): one source of
@@ -292,7 +292,7 @@ return Shared
   it). If it has no `Today` field, compare `E.Weekday` with today's weekday from `SchoolClock.GetState()`, the way
   Fortune's `WEEKDAYS` does.
 
-- [ ] **Step 4: The PA on the ClockHud.**
+- [x] **Step 4: The PA on the ClockHud.**
   - **The label:** in `Local.CreateGui`, add `PA = Local.Label(Lines, \`PA\`, 0, 13, true);` to the labels table
     (order 0 puts it on top). Set `Labels.PA.Visible = false`, and `TextWrapped`, with a gold colour (`KitTheme.Colors.Gold`).
   - **Show it:** add `Shared.ShowPA(Text)`, which plays the chime, types the line in, holds, then fades:
@@ -329,14 +329,14 @@ end
   - **Check names:** read how the module stores its GUI. The labels table is created in `CreateGui` as
     `{ Time = …, Period = … }`. Use that table's real name (`Labels` or `Ui.Labels`) in `ShowPA`.
 
-- [ ] **Step 5: Install and run the test.**
+- [x] **Step 5: Install and run the test.**
   - Install Config.Broadcast, Broadcast, ClockHud and the TestBridge, start Play, and run `bridge.py BroadcastTest '$P'`.
   - Expected: `Count 40`, `Newest "Report 45"`, `Oldest "Report 6"`, `FirstPA true`, `SecondPA false`,
     `EmergencyPA true`, `StationHasItems true`, `OnAirIsBool true`.
   - **Live:** `SetTime "11:24"`, wait for Lunch at 11:25, and screenshot the ClockHud while the PA line types
     (`review/pa_lunch.jpg`).
 
-- [ ] **Step 6: Commit** `2.30 (1/7): World.Broadcast and the PA`.
+- [x] **Step 6: Commit** `2.30 (1/7): World.Broadcast and the PA`.
 
 ---
 
@@ -344,10 +344,10 @@ end
 
 **Files:** modify `Features.Phone` (server).
 
-- [ ] **Step 1: The failing check.** From `gamevm.py`, emit a `Scene` incident (Locker) with a witness. Wait 1 s, then
+- [x] **Step 1: The failing check.** From `gamevm.py`, emit a `Scene` incident (Locker) with a witness. Wait 1 s, then
   call `Phone.Gazette(P)`. Expected now: the WHISPERS article holds the old fixed strings, and there's no ON CAMPUS
   article.
-- [ ] **Step 2: Live WHISPERS.** Replace the WHISPERS `table.insert` (`Body = RUMOURS[...]`) with:
+- [x] **Step 2: Live WHISPERS.** Replace the WHISPERS `table.insert` (`Body = RUMOURS[...]`) with:
 
 ```lua
 	-- rumours (2.30: the school's live rumours, Social.Rumours; the fixed strings when the halls are quiet)
@@ -372,9 +372,9 @@ end
   **Check:** Phone server has a `svc` helper. If not, add one as in Rumours (a `require` of
   `ServerScriptService.Services` by dotted path).
 
-- [ ] **Step 3: Install and run the check again.** Expected: WHISPERS quotes the Locker rumour, and ON CAMPUS lists a
+- [x] **Step 3: Install and run the check again.** Expected: WHISPERS quotes the Locker rumour, and ON CAMPUS lists a
   report (Severity 2 or more; the Locker scene's Missed outcome is Size 3).
-- [ ] **Step 4: Commit** `2.30 (2/7): the Gazette's whispers are the school's real rumours`.
+- [x] **Step 4: Commit** `2.30 (2/7): the Gazette's whispers are the school's real rumours`.
 
 ---
 
@@ -409,7 +409,7 @@ round buttons, and covers made from kit emblems.
 - **Server:** `Phone.BroadcastRead(P) -> number`, plus the remotes `Station` (RF) → `Broadcast.Station(P)`,
   `StationRead` (RF id), and `SaveLiked` (RF list).
 
-- [ ] **Step 1: Server save fields and remotes** (`Features.Phone`).
+- [x] **Step 1: Server save fields and remotes** (`Features.Phone`).
   - **In `Shared.Sanitize`:**
     - `Out.Liked = {}`, filled from `Raw.Liked`: up to 30 positive integers below 1e15
     - `Out.Broadcast = 0`, from `Raw.Broadcast` if it's a number
@@ -450,7 +450,7 @@ end
     (`cached`, or the per-remote `LastCall` pattern) for `Station`.
   - **State:** `Shared.State(P)` must include `Liked` (and `Recent` as now).
 
-- [ ] **Step 2: Write `PhoneRadio`.** The whole module:
+- [x] **Step 2: Write `PhoneRadio`.** The whole module:
 
 ```lua
 --[[ (2.30) PhoneRadio (client). Controllers.Gui.PhoneRadio: Night FM, remade as a music app in the school's dress
@@ -808,7 +808,7 @@ return Shared
 ```
 
 
-- [ ] **Step 3: Phone hands over.**
+- [x] **Step 3: Phone hands over.**
   - In `Controllers.Gui.Phone`, replace the body of `Local.Radio()` with:
 
 ```lua
@@ -827,7 +827,7 @@ end
     Broadcast station, in Controllers.Gui.PhoneRadio".
   - **Check:** `Local.Call` exists (Gazette uses it), and `Ui.App` is the app frame `Local.Page` clears.
 
-- [ ] **Step 4: Install and look.**
+- [x] **Step 4: Install and look.**
   - Install Phone (server), PhoneRadio, Phone (client), Broadcast and Config.Broadcast. Start Play.
   - Take the phone out: press `Y`, or `Shared.Toggle(true)` through a real keypress, then open Night FM.
   - **Screenshots** (`review/nightfm_*.jpg`). Compare each with the reference's layout:
@@ -843,7 +843,7 @@ end
   - **Liking:** like a track, stop and start Play, and the heart is still filled (`Phone.Liked` saved).
   - Restore slot 2, and check `restored`.
 
-- [ ] **Step 5: Commit** `2.30 (3/7): Night FM remade (home, library, now playing, the Midnight Broadcast station)`.
+- [x] **Step 5: Commit** `2.30 (3/7): Night FM remade (home, library, now playing, the Midnight Broadcast station)`.
 
 ---
 
@@ -860,7 +860,7 @@ end
     - and not `Regions.Inside(Player, "Dorms")`
     - **Exempt:** while `workspace.NHCinePlaying`, or the player's `Quests.Active.AfterHours` is set.
 
-- [ ] **Step 1: Write the failing test.** Add to TestBridge:
+- [x] **Step 1: Write the failing test.** Add to TestBridge:
 
 ```lua
 -- (2.30) the curfew rule at a given hour, with the player where the caller put them
@@ -876,9 +876,9 @@ end
 
   Expected before the code: an error.
 
-- [ ] **Step 2: Config.** In `Config.Discipline.HallMonitor.DutyKinds`, add `Night = true;`. Under `HallMonitor`, add
+- [x] **Step 2: Config.** In `Config.Discipline.HallMonitor.DutyKinds`, add `Night = true;`. Under `HallMonitor`, add
   `Curfew = { From = 22; To = 6 }; -- (2.30) after hours: the building (not the dorms), patrolled at night`.
-- [ ] **Step 3: HallMonitor.**
+- [x] **Step 3: HallMonitor.**
   - **Add `IsAfterHours`:**
 
 ```lua
@@ -923,7 +923,7 @@ function Shared.IsAfterHoursForTests(Player: Player, Hour: number) return Local.
   - **Check:** `HallMonitor` requires `SchoolClock` and `ServerScriptService` at the top. It does (`State` comes from
     `SchoolClock.GetState`, and `OnCampus` uses `ServerScriptService`).
   - **The PA:** curfew's PA is in Task 1 (22:00).
-- [ ] **Step 4: Install and run.**
+- [x] **Step 4: Install and run.**
   - Install Config.Discipline, HallMonitor and the TestBridge, then start Play.
   - **In a hallway** (`_hall.lua`), run `bridge.py CurfewTest '$P'`. Expected: `At23 true`, `At15 false` (Daytime),
     `At5 true`.
@@ -936,34 +936,34 @@ function Shared.IsAfterHoursForTests(Player: Player, Hour: number) return Local.
   - **The Records Office at night:** the existing Stealth watcher (the Night Custodian) still works. Walk into
     `Area_RecordsOffice` at 23:00 and be spotted.
   - Restore slot 2 (`restored`, then the snapshot matches).
-- [ ] **Step 5: Commit** `2.30 (4/7): curfew: the night monitor walks the halls from 22:00`.
+- [x] **Step 5: Commit** `2.30 (4/7): curfew: the night monitor walks the halls from 22:00`.
 
 ---
 
 ### Task 5: Regression
 
-- [ ] **Step 1: Self-tests in one session.**
+- [x] **Step 1: Self-tests in one session.**
   - **This release:** `BroadcastTest`, `CurfewTest` (hallway).
   - **2.29:** `IncidentTest`, `RumourTest`, `RumourSafetyTest`.
   - **2.28:** `StaffTest`, `StaffPlanTest`, `TimetableTest`, `SleepTest`.
   - **2.27:** `RosterTest`, `Rostered`, `RelationshipCapTest`, `MemoryTest`.
   - **Earlier:** the cutscene and Phase 1 suite.
-- [ ] **Step 2: Unchanged behaviour.**
+- [x] **Step 2: Unchanged behaviour.**
   - The truancy chase in class still works: at 09:10, stand in a hallway, and the monitor chases for Truancy.
   - The Gazette opens.
   - Night FM plays and pauses.
   - The prologue's two paths: no curfew catch during the cut at night (`NHCinePlaying`).
   - The school day sample (07:40, 08:05, 09:10, 11:30, 15:30).
-- [ ] **Step 3: The console.** No errors from Broadcast, Phone, PhoneRadio, ClockHud, HallMonitor, Rumours, Incidents
+- [x] **Step 3: The console.** No errors from Broadcast, Phone, PhoneRadio, ClockHud, HallMonitor, Rumours, Incidents
   or Scenes.
-- [ ] **Step 4:** Restore slot 2 and check it, stop Play, and run `save_place`.
+- [x] **Step 4:** Restore slot 2 and check it, stop Play, and run `save_place`.
 
 ### Task 6: Docs, release 2.30.0, and the Phase 2 announcement
 
-- [ ] **Step 1: CHANGELOG `[2.30.0]`,** plus README, Implementation-Status, and a Discord game update
+- [x] **Step 1: CHANGELOG `[2.30.0]`,** plus README, Implementation-Status, and a Discord game update
   (`<date>-after-dark.md`).
-- [ ] **Step 2: Doc 13.** The status says **"Phase 2 complete (2.27 to 2.30)"**, plus §9's deltas.
-- [ ] **Step 3: The announcement:** `updates/discord/announcements/<date>-the-living-school-2.md`, "THE LIVING
+- [x] **Step 2: Doc 13.** The status says **"Phase 2 complete (2.27 to 2.30)"**, plus §9's deltas.
+- [x] **Step 3: The announcement:** `updates/discord/announcements/<date>-the-living-school-2.md`, "THE LIVING
   SCHOOL", for the Phase 2 wave (2.27 to 2.30). Emoji headers:
   - classmates with names
   - teachers and timetables
@@ -973,8 +973,8 @@ function Shared.IsAfterHoursForTests(Player: Player, Hour: number) return Local.
 
   It ends with "Full notes in #game-updates". Update both indexes. (The Chapter One announcement from 2.26 is the
   model.)
-- [ ] **Step 4: Vault** copies, the home-note game-update line and its announcement line.
-- [ ] **Step 5: Commit and merge** (stage this plan's files and its CHANGELOG hunk; merge with `-F <file>`; stash
+- [x] **Step 4: Vault** copies, the home-note game-update line and its announcement line.
+- [x] **Step 5: Commit and merge** (stage this plan's files and its CHANGELOG hunk; merge with `-F <file>`; stash
   around the merge). Don't push.
 
 ---
