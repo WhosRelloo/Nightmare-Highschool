@@ -33,7 +33,7 @@ function Shared.Make(I)
 	NextId += 1
 	local Subject = {}
 	for _, W in I.Who or {} do table.insert(Subject, { Id = W.Id; Role = W.Role }) end
-	local R = { Id = NextId; Kind = I.Kind; Key = Key; Subject = Subject; Where = I.Region; Size = math.max(1, I.Size or 1); -- (2.29) a scene's outcome sets the size T = I.T or os.time();
+	local R = { Id = NextId; Kind = I.Kind; Key = Key; Subject = Subject; Where = I.Region; Size = math.max(1, I.Size or 1); T = I.T or os.time(); -- (2.29) Size: a scene's outcome sets it
 		Truth = I.Truth ~= false; Hops = 0; Notable = (I.Severity or 1) >= 3; Knowers = {}; LastHop = os.clock();
 		Witnesses = table.clone(I.Witnesses or {}); Extra = I.Extra or I.Reason or I.Event; Template = 1 }
 	R.Base = { Where = R.Where; Size = R.Size }

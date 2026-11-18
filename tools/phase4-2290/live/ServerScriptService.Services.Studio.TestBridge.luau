@@ -779,7 +779,7 @@ function Commands.RumourTest(PlayerName: string)
 	local R = Ru.Make(I)
 	local Text = R and Ru.Text(R)
 	local H = R and Ru.Hop(R, Random.new(7))
-	return { Made = R ~= nil; Text = Text; KnowerKit = R and R.Knowers.KitHarrow == true; HopCount = H and H.Hops;
+	return { Made = R ~= nil; HasTime = R ~= nil and typeof(R.T) == `number`; Text = Text; KnowerKit = R and R.Knowers.KitHarrow == true; HopCount = H and H.Hops;
 		PlayerStill = H and H.Subject[1].Id == Player; NoTemplate = Ru.Make({ Kind = `Nothing`; Who = {} }) == nil }
 end
 
