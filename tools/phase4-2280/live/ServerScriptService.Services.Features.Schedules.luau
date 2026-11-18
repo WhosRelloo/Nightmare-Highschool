@@ -40,6 +40,7 @@ local ChairBy = {} :: { [Model]: any }
 local SpotFailed = {} :: { [BasePart]: number } -- spots nobody could walk to lately (skipped for 2 minutes)
 
 local COUNT = #require(ReplicatedStorage.Config.Students).List -- (2.27) the roster (24); also the lunch arc's size
+local WAKE, SLEEP = 160, 180 -- (2.28) bodies only near players (doc 13 §3.4); SLEEP > WAKE so they don't flicker
 local WALK_SPEED = 6 -- a stroll: the walk clip plays at about 1.1x, feet on the ground (WALK_PACE)
 local WALK_PACE = 5.3 -- studs/s the Default walk clip covers at 1x (measured, 2026-11-03)
 local RUN_PACE = 16 -- (1.86.2) the run clip, for backing away from danger
@@ -415,14 +416,31 @@ end
 
 ---| activities |---
 
-function Local.Arrive(S, Job): boolean
-	if S.Model then return true end
-	Local.Spawn(S, Local.Gate())
+function Local.Near(P: Vector3, R: number): boolean -- (2.28) is any player within R studs?
+	for _, Pl in Players:GetPlayers() do
+		local Root = Pl.Character and Pl.Character:FindFirstChild(`HumanoidRootPart`)
+		if Root and (Root.Position - P).Magnitude <= R then return true end
+	end
+	return false
+end
+
+-- Where (2.28): where the job is headed. With nobody within WAKE of it, the student is there with no body
+-- (S.Asleep); Local.SleepWake gives them one when a player comes near.
+function Local.Arrive(S, Job, Where: Vector3?): boolean
+	if S.Model then S.Asleep = nil return true end
+	if Where and not Local.Near(Where, WAKE) then
+		S.Asleep = { At = Where }
+		return false
+	end
+	local From = S.WakeAt or Local.Gate() -- (2.28) waking: appear where they already were
+	S.WakeAt, S.Asleep = nil, nil
+	Local.Spawn(S, From)
 	task.wait(0.2)
 	return S.Job == Job
 end
 
 function Local.Leave(S, Job)
+	S.Asleep = nil -- (2.28) going home ends being anywhere
 	if not S.Model then return end
 	S.Model:SetAttribute(`NHActivity`, `Going home`)
 	Local.WalkTo(S, Job, Local.Gate())
@@ -449,7 +467,7 @@ function Local.FreeBench(): (Model?, number?)
 end
 
 function Local.Mingle(S, Job)
-	if not Local.Arrive(S, Job) then return end
+	if not Local.Arrive(S, Job, Local.HallSpot()) then return end -- (2.28) Where
 	S.Model:SetAttribute(`NHActivity`, `Hallway`)
 	while S.Job == Job and not Paused do
 		local Spot = Local.HallSpot()
@@ -500,8 +518,8 @@ function Local.FreeChair(S, Chairs: { Model }, Seat: number): Model?
 end
 
 function Local.Class(S, Job, RoomId: string, Seat: number)
-	if not Local.Arrive(S, Job) then return end
 	local Chairs = Local.Chairs(RoomId)
+	if not Local.Arrive(S, Job, Chairs[1] and Chairs[1]:GetPivot().Position) then return end -- (2.28) Where
 	local Chair = if #Chairs > 0 then Local.FreeChair(S, Chairs, Seat) else nil
 	if not Chair then -- (2.28) a full room: stand at the back of it (the far side from the teacher's desk)
 		local Room = workspace.School:FindFirstChild(RoomId)
@@ -543,7 +561,8 @@ function Local.Class(S, Job, RoomId: string, Seat: number)
 end
 
 function Local.Lunch(S, Job, Slot: number)
-	if not Local.Arrive(S, Job) then return end
+	local Tagged = CollectionService:GetTagged(`NHLunchSpot`)
+	if not Local.Arrive(S, Job, Tagged[1] and Tagged[1].Position) then return end -- (2.28) Where
 	S.Model:SetAttribute(`NHActivity`, `Lunch`)
 	local Spots = CollectionService:GetTagged(`NHLunchSpot`)
 	table.sort(Spots, function(A, B) return A.Position.X + A.Position.Z * 0.01 < B.Position.X + B.Position.Z * 0.01 end)
@@ -595,7 +614,8 @@ end
 -- hang out with your clique (1.20): walk to a free spot at its hangout, face the group, stand and chat a while,
 -- now and then shift to another spot
 function Local.Hangout(S, Job)
-	if not Local.Arrive(S, Job) then return end
+	local Spot0 = S.Clique and Local.FreeSpot(S.Clique)
+	if not Local.Arrive(S, Job, if Spot0 then Spot0.Position else Local.HallSpot()) then return end -- (2.28) Where
 	local Def = S.Clique and CliqueConfig.Defs[S.Clique]
 	if not Def then Local.Mingle(S, Job) return end
 	S.Model:SetAttribute(`NHActivity`, `Hanging out: {Def.HangoutName}`)
@@ -646,7 +666,7 @@ function Local.Linger(S, Job, Seconds: number)
 end
 
 function Local.Club(S, Job)
-	if not Local.Arrive(S, Job) then return end
+	if not Local.Arrive(S, Job, Local.ClubSpot(S.Club) or Local.HallSpot()) then return end -- (2.28) Where
 	S.Model:SetAttribute(`NHActivity`, `Club: {S.Club}`)
 	while S.Job == Job and not Paused do
 		local Spot = Local.ClubSpot(S.Club) or Local.HallSpot()
@@ -664,6 +684,7 @@ function Local.Assign(S, Fn, ...)
 	S.Job = Job
 	local Args = table.pack(...)
 	S.LastJob = { Fn = Fn; Args = Args } -- (1.86.2) Brain's Replan starts it again after a reaction
+	S.Activity = debug.info(Fn, `n`) -- (2.28) for Roster.WhereNow (the job's name: Class, Lunch, Hangout...)
 	local Now = S.ReplanNow
 	S.ReplanNow = nil
 	task.spawn(function()
@@ -731,6 +752,33 @@ function Shared.Debug()
 		table.insert(Out, { Index = S.Index; RosterId = S.RosterId; Club = S.Club; Clique = S.Clique; Spawned = S.Model ~= nil; Activity = S.Model and S.Model:GetAttribute(`NHActivity`); Seated = S.Seated ~= nil })
 	end
 	return Out
+end
+
+-- (2.28) once a second: a body far from every player goes (they stay where they were, asleep); a sleeper a player
+-- comes near wakes there and carries on with their job
+function Local.SleepWake()
+	if Paused then return end
+	for _, S in Students do
+		if S.Model and S.Root then
+			if not S.Reacting and not S.InScene and not Local.Near(S.Root.Position, SLEEP) then
+				local At = S.Root.Position
+				Local.Despawn(S)
+				S.Asleep = { At = At }
+			end
+		elseif S.Asleep and S.LastJob and Local.Near(S.Asleep.At, WAKE) then
+			S.WakeAt = S.Asleep.At
+			S.ReplanNow = true
+			Local.Assign(S, S.LastJob.Fn, table.unpack(S.LastJob.Args, 1, S.LastJob.Args.n))
+		end
+	end
+end
+
+function Shared.SleepForTests()
+	local Bodies, Asleep = 0, 0
+	for _, S in Students do
+		if S.Model then Bodies += 1 elseif S.Asleep then Asleep += 1 end
+	end
+	return { Bodies = Bodies; Asleep = Asleep }
 end
 
 -- (2.27) tests: a roster student's look, built from their seed without spawning
@@ -806,6 +854,8 @@ function Shared.OnStart()
 					if not Ok2 then warn(`[Schedules] {Err}`) end
 				end
 			end
+			local Ok3, Err3 = pcall(Local.SleepWake) -- (2.28)
+			if not Ok3 then warn(`[Schedules] sleep/wake: {Err3}`) end
 			task.wait(1)
 		end
 	end)
