@@ -10,8 +10,10 @@
 	  Dock: Wallet, Night FM, Classmates, Camera     Grid: Midnight Bell, Timetable, Study Group, Cliques, Style, Options,
 	        Wisp Flight, Hex Slash, Crypt Crush
 	  Wallet         your Yen, send money to a classmate (pick them, type an amount, confirm), and your history
-	  Night FM       type a Roblox audio ID and listen (only you hear it): play / pause / stop, loop, volume, a
-	                 progress line, and your recent IDs. Keeps playing with the phone away; the hotbar slot shows a note.
+	  Night FM       (2.30) Controllers.Gui.PhoneRadio, after the owner's reference: home (greeting, chips, the Midnight
+	                 Broadcast banner, recent tracks), library (saved + recent, add by audio ID), now playing (cover,
+	                 like, waveform scrubber, loop / prev / play / next, volume) and the station (21:00-03:00). Only you
+	                 hear your music; it keeps playing with the phone away and the hotbar slot shows a note.
 	  Midnight Bell  the school paper, written live by the server (moon, top students, discipline, specials,
 	                 clubs, rumours)
 	  Classmates     everyone in the building (names only if you know them): send Yen or invite to your study group
@@ -536,44 +538,11 @@ function Local.Play(Id: number)
 	task.spawn(Local.Call, `SaveRecent`, Recent)
 end
 
-function Local.Radio()
-	local Body = Local.Page(`Night FM`)
-	local Now = Local.Card(Body, 132)
-	Local.Label(Now, `NOW PLAYING`, 13, { Font = Fonts.Title; TextColor3 = SECTION; Position = UDim2.fromOffset(14, 8); Size = UDim2.new(1, -28, 0, 16) })
-	local Title = Local.Label(Now, ``, 17, { Name = `Title`; Font = Fonts.Title; TextTruncate = Enum.TextTruncate.AtEnd; Position = UDim2.fromOffset(14, 24); Size = UDim2.new(1, -28, 0, 22) })
-	local Prog = new(`Frame`, { BackgroundColor3 = C.Ink; BorderSizePixel = 0; Position = UDim2.fromOffset(14, 54); Size = UDim2.new(1, -28, 0, 3) }, Now)
-	local Fill = new(`ImageLabel`, { BackgroundTransparency = 1; Image = Img.BarFill; ImageColor3 = Color3.fromRGB(170, 140, 230); ScaleType = Enum.ScaleType.Stretch; Size = UDim2.fromScale(0, 1) }, Prog)
-	local function btn(Text: string, I: number, Fn)
-		Kit.Button({ text = Text; textSize = 14; Size = UDim2.new(1 / 3, -10, 0, 32); Position = UDim2.new((I - 1) / 3, if I == 1 then 12 else (if I == 2 then 5 else -2), 0, 66); Parent = Now; onClick = Fn })
-	end
-	btn(`Play / Pause`, 1, function()
-		local S = Music.Sound
-		if not S then return end
-		if S.IsPlaying then S:Pause() else S:Resume() end
-	end)
-	btn(`Stop`, 2, function() if Music.Sound then Music.Sound:Stop() Music.Id = nil end end)
-	btn(`Loop`, 3, function() if Music.Sound then Music.Sound.Looped = not Music.Sound.Looped end end)
-	local Loop = Local.Label(Now, ``, 13, { TextColor3 = HINT; Position = UDim2.fromOffset(14, 104); Size = UDim2.new(1, -28, 0, 16) })
-	Order += 1
-	Kit.Slider({ label = `Volume`; min = 0; max = 100; step = 5; value = if Music.Sound then math.floor(Music.Sound.Volume * 100) else 50;
-		Size = UDim2.new(1, 0, 0, 34); LayoutOrder = Order; Parent = Body;
-		onChanged = function(V) if Music.Sound then Music.Sound.Volume = V / 100 end end })
-	Order += 1
-	local Input, InputApi = Kit.SearchBar({ placeholder = `Audio ID, then Enter`; Size = UDim2.new(1, 0, 0, 38); LayoutOrder = Order; Parent = Body;
-		onSubmit = function(Text) local N = Local.Digits(Text) if N then Local.Play(N) end end })
-	Order += 1
-	Kit.Button({ text = `Play this ID`; style = `gold`; Size = UDim2.new(1, 0, 0, 36); LayoutOrder = Order; Parent = Body;
-		onClick = function() local N = Local.Digits(InputApi:Get()) if N then Local.Play(N) end end })
-	Local.Line(Body, `<i>Only you hear it. Any public Roblox audio ID works.</i>`, 15, { TextColor3 = HINT })
-	Local.Line(Body, `RECENT`, 14, { Font = Fonts.Title; TextColor3 = SECTION })
-	if #(State.Recent or {}) == 0 then Local.Line(Body, `<i>Nothing yet.</i>`, 15, { TextColor3 = HINT }) end
-	for _, Id in State.Recent or {} do
-		local Row = Local.Card(Body, 34)
-		local B = new(`TextButton`, { Text = ``; BackgroundTransparency = 1; Size = UDim2.fromScale(1, 1) }, Row)
-		Local.Label(Row, `\u{266A}  {Id}`, 14, { Font = Fonts.Title; Position = UDim2.fromOffset(12, 0); Size = UDim2.new(1, -24, 1, 0) })
-		B.Activated:Connect(function() Local.Play(Id) end)
-	end
-	Ui.Radio = { Title = Title; Fill = Fill; Loop = Loop }
+function Local.Radio() -- (2.30) Night FM is its own module now (Controllers.Gui.PhoneRadio), dressed like the owner's reference
+	Ui.Radio = nil
+	require(script.Parent:WaitForChild(`PhoneRadio`)).Open({ App = Ui.App; Music = Music; State = State; Play = Local.Play;
+		Call = Local.Call; Home = Local.ShowHome; Kit = Kit; Theme = Theme })
+	Ui.Home.Visible = false
 end
 
 -- The Midnight Bell
@@ -1724,12 +1693,7 @@ function Shared.OnStart()
 		-- the hotbar slot shows a note while your music plays (local only)
 		local T = Local.Tool()
 		if T then T.Name = if Music.Sound and Music.Sound.IsPlaying then `\u{266A} Phone` else `Phone` end
-		if Ui.Radio and Ui.Radio.Title.Parent then
-			local S = Music.Sound
-			Ui.Radio.Title.Text = if S and Music.Id then Music.Title .. (if S.IsPlaying then `` else `  (paused)`) else `Nothing playing`
-			Ui.Radio.Fill.Size = UDim2.fromScale(if S and S.TimeLength > 0 then S.TimePosition / S.TimeLength else 0, 1)
-			Ui.Radio.Loop.Text = if S and S.Looped then `Loop on` else `Loop off`
-		end
+		pcall(function() require(script.Parent.PhoneRadio).Tick() end) -- (2.30) Night FM (Controllers.Gui.PhoneRadio)
 	end)
 end
 

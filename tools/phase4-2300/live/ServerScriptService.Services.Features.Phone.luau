@@ -43,7 +43,7 @@ local LastCall = {} :: { [Player]: number }
 ---| data |---
 
 function Shared.Sanitize(Raw)
-	local Out = { History = {}; Recent = {}; Wallpaper = { Preset = `CrimsonInk` }; Texts = {} }
+	local Out = { History = {}; Recent = {}; Wallpaper = { Preset = `CrimsonInk` }; Texts = {}; Liked = {}; Broadcast = 0 } -- (2.30) Liked, Broadcast
 	if typeof(Raw) ~= `table` then return Out end
 	-- (1.33) texts: { From, Body, At, Day, Dare?, State = New | Read | Accepted | Declined }
 	local Kept = 30
@@ -81,6 +81,12 @@ function Shared.Sanitize(Raw)
 		local N = tonumber(Id)
 		if N and N > 0 and N % 1 == 0 and #Out.Recent < RECENT and not table.find(Out.Recent, N) then table.insert(Out.Recent, N) end
 	end
+	-- (2.30) Night FM: liked tracks (30 at most) and the station's last read item
+	for _, Id in (typeof(Raw.Liked) == `table` and Raw.Liked) or {} do
+		local N = tonumber(Id)
+		if N and N > 0 and N % 1 == 0 and N < 1e15 and #Out.Liked < 30 and not table.find(Out.Liked, N) then table.insert(Out.Liked, N) end
+	end
+	if typeof(Raw.Broadcast) == `number` then Out.Broadcast = math.max(0, math.floor(Raw.Broadcast)) end
 	return Out
 end
 
@@ -100,7 +106,8 @@ function Shared.State(P: Player)
 	-- (1.40) ReportUnread: a report card you haven't opened (Services.School.ReportCards)
 	local RepUnread = false
 	pcall(function() RepUnread = require(ServerScriptService.Services.School.ReportCards).Unread(P) end)
-	return { History = Ph and Ph.History or {}; Recent = Ph and Ph.Recent or {}; Wallpaper = Ph and Ph.Wallpaper or nil; Yen = Profile and Profile.Yen or 0;
+	return { History = Ph and Ph.History or {}; Recent = Ph and Ph.Recent or {}; Liked = Ph and Ph.Liked or {}; -- (2.30) Liked
+		 Wallpaper = Ph and Ph.Wallpaper or nil; Yen = Profile and Profile.Yen or 0;
 		Unread = Ph and Shared.Unread(P) or 0; ReportUnread = RepUnread }
 end
 
@@ -469,6 +476,33 @@ function Shared.TextAction(P: Player, Index: any, Action: any, Id: any): (boolea
 	return false, `Unknown action.`
 end
 
+-- (2.30) Night FM: liked tracks and the station's last read item (saved per slot)
+function Shared.SaveLiked(P: Player, List: any): boolean
+	if typeof(List) ~= `table` then return false end
+	local Ph = Local.Get(P)
+	if not Ph then return false end
+	local Clean = {}
+	for _, V in List do
+		local N = tonumber(V)
+		if N and N > 0 and N % 1 == 0 and N < 1e15 and #Clean < 30 and not table.find(Clean, N) then table.insert(Clean, N) end
+	end
+	Ph.Liked = Clean
+	Local.Save(P, Ph)
+	return true
+end
+function Shared.BroadcastRead(P: Player): number
+	local Ph = Local.Get(P)
+	return Ph and Ph.Broadcast or 0
+end
+function Shared.StationRead(P: Player, Id: any): boolean
+	local Ph = Local.Get(P)
+	local N = tonumber(Id)
+	if not (Ph and N) then return false end
+	Ph.Broadcast = math.max(Ph.Broadcast or 0, math.floor(N))
+	Local.Save(P, Ph)
+	return true
+end
+
 function Shared.SaveWallpaper(P: Player, Wp: any): boolean
 	local Ph = Local.Get(P)
 	if not Ph or typeof(Wp) ~= `table` then return false end
@@ -629,6 +663,15 @@ function Shared.OnStart()
 	end
 	Contacts.OnServerInvoke = function(P) return cached(P, `Contacts`, 1, function() return Shared.Contacts(P) end) end
 	SaveRecent.OnServerInvoke = function(P, L) if limited(P) then return false end return Shared.SaveRecent(P, L) end
+	-- (2.30) Night FM: liked tracks, the Midnight Broadcast station (World.Broadcast) and what you've read of it
+	rf(`SaveLiked`).OnServerInvoke = function(P, L) if limited(P) then return false end return Shared.SaveLiked(P, L) end
+	rf(`StationRead`).OnServerInvoke = function(P, Id) if limited(P) then return false end return Shared.StationRead(P, Id) end
+	rf(`Station`).OnServerInvoke = function(P)
+		return cached(P, `Station`, 2, function()
+			local Ok, R = pcall(function() return require(ServerScriptService.Services.World.Broadcast).Station(P) end)
+			return if Ok then R else { OnAir = false; Items = {}; LastRead = 0 }
+		end)
+	end
 	local SaveWallpaper = rf(`SaveWallpaper`)
 	SaveWallpaper.OnServerInvoke = function(P, Wp) if limited(P) then return false end return Shared.SaveWallpaper(P, Wp) end
 	local Texts, TextAction = rf(`Texts`), rf(`TextAction`)
