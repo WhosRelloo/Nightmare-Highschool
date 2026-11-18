@@ -159,6 +159,15 @@ end
 
 ---| the Midnight Bell |---
 
+-- (2.30) another service by dotted path (Social.Rumours, World.Broadcast), nil if it isn't there
+local function svc(Path: string)
+	local Node = ServerScriptService.Services
+	for Seg in Path:gmatch(`[^%.]+`) do Node = Node and Node:FindFirstChild(Seg) end
+	if not Node then return nil end
+	local Ok, M = pcall(require, Node)
+	return if Ok then M else nil
+end
+
 local RUMOURS = {
 	`Someone keeps hearing knocking from inside the Archive's locked cabinet. The librarian says it's the pipes.`,
 	`Three students swear the Hollow left a mark on the Boiler Yard wall. By morning, it was gone.`,
@@ -282,8 +291,23 @@ function Shared.Gazette(Viewer: Player)
 	-- clubs
 	table.insert(Articles, { Kicker = `CLUB NOTICES`; Title = `Pitch, court and field`;
 		Body = `Soccer, basketball and football clubs meet after school; the Iron Wardens run routes on the lanes west of the field. Drills pay EXP once every few minutes, and personal bests go on the board. Study groups of up to four share their fight EXP.` })
-	-- rumours
-	table.insert(Articles, { Kicker = `WHISPERS`; Title = `Heard in the halls`; Body = RUMOURS[Day % #RUMOURS + 1] .. `\n\n` .. RUMOURS[(Day + 3) % #RUMOURS + 1] })
+	-- rumours (2.30: the school's live rumours, Social.Rumours; the fixed strings when the halls are quiet)
+	local Ru = svc(`Social.Rumours`)
+	local Live = (Ru and Ru.Live()) or {}
+	local Heard = {}
+	for K = #Live, math.max(1, #Live - 2), -1 do table.insert(Heard, `"{Ru.Text(Live[K])}"`) end
+	table.insert(Articles, { Kicker = `WHISPERS`; Title = `Heard in the halls`;
+		Body = if #Heard > 0 then table.concat(Heard, `\n\n`) .. `\n\n<i>Whether any of it is true is another matter.</i>`
+			else RUMOURS[Day % #RUMOURS + 1] .. `\n\n` .. RUMOURS[(Day + 3) % #RUMOURS + 1] })
+	-- (2.30) today's campus reports (World.Broadcast)
+	local Bc = svc(`World.Broadcast`)
+	local Reports = {}
+	for _, It in (Bc and Bc.Items()) or {} do if It.Kind == `IncidentReport` then table.insert(Reports, It.Text) end end
+	if #Reports > 0 then
+		local Last = {}
+		for K = #Reports, math.max(1, #Reports - 2), -1 do table.insert(Last, Reports[K]) end
+		table.insert(Articles, { Kicker = `ON CAMPUS`; Title = `Today at school`; Body = table.concat(Last, `\n\n`) })
+	end
 	-- the clock's day count runs from 2024, so the paper numbers its issues within the school year
 	return { Date = `{DayName}  \u{00B7}  {ClockText}`; Issue = Day % 200 + 1; Articles = Articles }
 end
