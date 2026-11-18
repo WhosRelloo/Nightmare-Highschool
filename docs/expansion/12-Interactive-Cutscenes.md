@@ -1,6 +1,6 @@
 # 12. Interactive cutscenes (QTE cinematics)
 
-**Status:** design approved in chat on 2026-11-17 (approach A, solo-compatible). This spec is waiting for the owner's review. Then come the plan and the build.
+**Status:** approved 2026-11-17. **Part A** (§2 to §5, §7, §9) shipped in **2.25.0** (plan: `docs/superpowers/plans/2026-11-17-interactive-cutscenes-framework.md`). **Part B** (§6 the finale, §8 animation sourcing) is next, with its own plan.
 **Builds on:** the Phase 1 Cine framework (doc 04 and doc 11): `Services.World.Cine` (server), `Controllers.Cine` (director), `Controllers.Gui.CineUI`, `Config.Cine` and `ReplicatedStorage.Cinematics.<Id>`.
 **Target:** NH Combat Test first. The Map gets the same marks and modules at port time (doc 11, "Sets, not coordinates").
 
@@ -179,3 +179,16 @@ About 35–45 s depending on the path.
 - Interactive cuts in Chapters 2–5. The framework supports them; their scenes come with those chapters.
 - Online leaderboards for grades.
 - Voice acting.
+
+## 11. Spec deltas (implementation choices in 2.25.0)
+
+1. **Where the judge lives:** `ReplicatedStorage.Functions.CineJudge`, not `ReplicatedStorage.Cine.Judge`. The toolkit's
+   installer recreates `ReplicatedStorage.Cine` and would drop a child module.
+2. **Branch table:** a prompt's branches are one table, `on = { <Outcome> = "<Segment>", Else = "<Segment>"? }`.
+3. **Time base:** input times are seconds after the prompt **opens** on that client, and every window is measured from
+   the open (`beat`, `dur`, `zoneAt`).
+4. **Grades and skips:** a grade is recorded only when an interactive cut plays to its end. A skip ends the cut as
+   before and keeps the old best.
+5. **Story beats:** `Config.Cine` `ShowGrade = false` turns the grade card off. The prologue's single prompt shows no
+   grade card.
+6. **Test cuts:** `Config.Cine` `Hidden = true` keeps a cut out of the Journal (`__QteTest`).
