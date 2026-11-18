@@ -643,9 +643,10 @@ function Local.Context(Cut, Message)
 	function Ctx.Clip(Name: string): string?
 		local Ok, Clips = pcall(function() return require(ReplicatedStorage.Config.CineClips) end)
 		local Id = Ok and Clips[Name]
+		if typeof(Id) == `string` and Id:sub(1, 7) == `Assets:` then return Ctx.GameClip(Id:sub(8)) end
 		if typeof(Id) == `string` and Id ~= `` then return Id end
 		local Folder = ReplicatedStorage:FindFirstChild(`NHCineClips`)
-		local Seq = Folder and Folder:FindFirstChild(Name)
+		local Seq = Folder and Folder:FindFirstChild(Name, true)
 		if Seq and Seq:IsA(`KeyframeSequence`) then
 			local Pid = Seq:GetAttribute(`PreviewId`)
 			if not Pid then

@@ -511,6 +511,21 @@ cd tools/phase3-2260/anim && for T in StrikeRise StrikeLunge StrikeRecoil Strike
 
 ### Task 3: Author, check and install the R6 clips
 
+> **Outcome (2026-11-17), the owner's direction:** use the game's own animations first (a strike can be an M1); if the game has none, use the group's.
+> - **From the game:** six clips, mapped in `Config.CineClips` as `Assets:<path>`:
+>   - Rise = `Default.Uptilt`.
+>   - Lunge = `Weapons.Fist.RunningM1`.
+>   - Recoil = `Default.Parried.1`.
+>   - Grab = `Weapons.Fist.Moves.Clinch`.
+>   - Stagger = `Default.Posture Break`.
+>   - Finisher = `Weapons.Fist.M2`.
+> - **The owner's group uploads,** from this task's baked clips:
+>   - StrikeTug 98518994869117.
+>   - StrikeShatter 104606462612953.
+>   - YouTugPull 116365221175140.
+> - **Changed:** `Ctx.Clip` resolves `Assets:` paths through `Ctx.GameClip`. Task 6's hit times follow the game clips, as listed in `Config.CineClips`.
+
+
 **Files:**
 - Modify: `tools/phase3-2260/anim/pose/<Target>.json` (polish passes)
 - Create: `tools/phase3-2260/anim/out/<Target>.lua`, plus sheet, graph and trail PNGs under `tools/phase3-2260/anim/review/`
@@ -741,22 +756,22 @@ Def.Graph = { start = `Arrive`; segments = {
   - `Actors = { { Name="You"; From="Self"; Mark="You"; Pose="Stand" }, { Name="It"; From="Template:Strikethrough"; Mark="Rise"; Pose="Stand"; Display="???"; Faceless=true } }`.
   - The graph above.
 
-  **`Build(Ctx)`** returns `segments` with these shots and events. Times are segment-relative. Clips are named with `Ctx.Clip` (derived) or `Ctx.GameClip` (existing). Every contact has a hitstop, a shake and an effect on its `Hit` time, and a `flash = { t, dur = 0.05 }` impact frame on heavy hits. The camera stays on the open side of the action line (You ↔ It along z), on the +X side.
+  **`Build(Ctx)`** returns `segments` with these shots and events. Times are segment-relative. Clips are named with `Ctx.Clip` (looked up in `Config.CineClips`: the game's own clips as `Assets:<path>`, the group's uploads as ids) or `Ctx.GameClip` (a path under `Assets.Animations`). Every contact has a hitstop, a shake and an effect on its `Hit` time, and a `flash = { t, dur = 0.05 }` impact frame on heavy hits. The camera stays on the open side of the action line (You ↔ It along z), on the +X side.
 
   | Segment | Shots (name, dur, framing) | Events |
   |---|---|---|
   | Arrive | "Night room" 3.0 s, keys from `Wide` (28 mm, slow 1-stud push). "The file" 2.2 s: the `File` mark top-down, 50 mm (Collected's keys). "Seep" 1.8 s: CU on `Desk` at 65 mm, low (pitch −6) | t 0.2 `walk` You → `You` (dur 1.6) while the clip plays `Ctx.GameClip("Default.Movement.Walk")` (Task 1 handles the walk). t 3.1: the file prop appears on the desk (as in Collected's Build: folder and page). t 3.5: `bell = { volume = 0.5; speed = 0.5 }` (the wrong hour). t 5.4: `fx` `CombatFX.DownSmoke` at `Desk`, colour ink (seeping ink), and the actor `It` starts below the floor at `Rise` (y −3) |
-  | Lunge | "It rises" 2.1 s: MWS low angle (pitch −10, yaw 30, 24 mm, dutch roll −8) on `It`; `anim` It `StrikeRise` at 0. "The lunge" 1.1 s: FS profile (yaw 85) on You; `anim` It `StrikeLunge` at 0.0 | t 0.0 `move`: It rises from y −3 to the mark over 0.7 s. At `StrikeRise`'s `Hit` (0.82): `shake 0.4` and `fx CombatFX.Guardbreak` (shards). Lunge t 0.05: `fx CombatFX.Flashstep` black rings at It. The prompt opens at 2.1, the lunge's anticipation creeping in slow-mo (0.12) |
+  | Lunge | "It rises" 2.1 s: MWS low angle (pitch −10, yaw 30, 24 mm, dutch roll −8) on `It`; `anim` It `StrikeRise` at 0. "The lunge" 1.1 s: FS profile (yaw 85) on You; `anim` It `StrikeLunge` at 0.0 | t 0.0 `move`: It rises from y −3 to the mark over 0.7 s. At `StrikeRise`'s `Hit` (Uptilt's, 0.50): `shake 0.4` and `fx CombatFX.Guardbreak` (shards). Lunge t 0.05: `fx CombatFX.Flashstep` black rings at It. The prompt opens at 2.1, the lunge's anticipation creeping in slow-mo (0.12) |
   | Dodge | "Slip" 1.6 s: MS from your left-front (yaw −40) on You | t 0 `anim` You `GameClip("Movement.Dash.LeftVector")`; t 0 `walk` You → `DodgeTo` (dur 0.35); t 0.1 `anim` It `StrikeRecoil` (it overshoots); `fx MovementFX.DashFX` at You |
   | Thrown | "Thrown" 1.2 s: FS profile on You (yaw 85), `flash` at 0.12. "Into the desks" 1.0 s: low wide | t 0.12 `hitstop 0.12`, `shake 0.7`; t 0.12 `anim` You `GameClip("Default.Knockback")`; t 0.12 `walk` You → `ThrownTo` (dur 0.45); t 0.6 `anim` You `GameClip("Weapons.Fist.Movement.Land")`; `fx HitType.Blunt` at You's Torso |
   | Again | "It comes again" 2.8 s: OTS from behind You (yaw 160) toward It, 35 mm, slow push | t 0.4 `anim` It `StrikeLunge` (speed 0.8). Prompt at 1.6 (slow 0.2) |
   | Shove | "Shove" 1.8 s: FS profile (yaw 85) | t 0 `anim` You `GameClip("Weapons.Fist.Moves.Shove")`; t 0.18 `move` part `Desk` to `Desk.CFrame * CFrame.new(0, 0, -1.6)` (dur 0.18); t 0.2 `hitstop 0.1`, `shake 0.5`, `flash`; t 0.2 `anim` It `StrikeStagger`; `fx HitType.Blunt` at It |
-  | Grabbed | "Grabbed" 2.0 s: MCU on your arm and face (yaw 30) | t 0.3 `anim` It `StrikeGrab`; at its `Hit` (0.45): `shake 0.5`, `anim` You `GameClip("Default.Hit.2")` |
+  | Grabbed | "Grabbed" 2.0 s: MCU on your arm and face (yaw 30) | t 0.3 `anim` It `StrikeGrab`; at its `Hit` (Clinch's, 0.37): `shake 0.5`, `anim` You `GameClip("Default.Hit.2")` |
   | Tug | "Tug of war" 3.0 s: a steady 3/4 high wide (pitch 18, yaw 50, 35 mm) keeping both bodies and the file between them | t 0 `place` You → `TugYou`, It → `TugIt`; `anim` You `YouTugPull` looped, It `StrikeTug` looped. The prompt opens at 0.6 (slow 0.5); the meter shakes the camera through CineUI's meter |
   | Kept | "The file holds" 1.6 s: CU on the file | t 0.1 `fx CombatFX.Flashstep` at It (it's thrown off); `anim` It `StrikeRecoil` |
   | Torn | "Torn" 1.8 s: CU on the file | t 0.2 the page prop splits: a half-page Part flies off with `move`; `fx` paper colour (`HitType.Slash` tinted paper) |
   | Finisher | "Charge" 3.0 s: MCU on You, slow push (85 → 65 mm). The prompt opens at 0.8 | `anim` You `YouFinisher` at 0.8, played at speed 0 until the release (the cut's events: `{ t = 0.8; anim = { rig = You; id = Ctx.Clip("YouFinisher"); speed = 0.05 } }`); the strike lands in the next segment |
-  | Shatter | "Release" 0.6 s: FS profile, `flash` on the `Hit` (0.48). "Pages" 2.6 s: VWS low wide, slow-mo `timescale { scale = 0.35; dur = 1.6 }` | t 0 `anim` You `YouFinisher` (from 0.4); t 0.48 `hitstop 0.18`, `shake 1.0`; `anim` It `StrikeShatter`; `fx CombatFX.Guardbreak` tinted ink, and again tinted paper; t 0.6 a `call` event tweens every BasePart of `Ctx.Actor("It")` from `LocalTransparencyModifier` 0 to 1 over 1.2 s (TweenService), and disables its ParticleEmitters at 1.4 s |
+  | Shatter | "Release" 0.6 s: FS profile, `flash` on the `Hit` (0.07). "Pages" 2.6 s: VWS low wide, slow-mo `timescale { scale = 0.35; dur = 1.6 }` | t 0 `anim` You `YouFinisher` (Fist M2, from 0.36; it strikes at 0.43); t 0.07 `hitstop 0.18`, `shake 1.0`; `anim` It `StrikeShatter`; `fx CombatFX.Guardbreak` tinted ink, and again tinted paper; t 0.6 a `call` event tweens every BasePart of `Ctx.Actor("It")` from `LocalTransparencyModifier` 0 to 1 over 1.2 s (TweenService), and disables its ParticleEmitters at 1.4 s |
   | Fade | "It fades" 3.6 s: MS on It; the bell stops | `anim` It `StrikeShatter` (speed 0.6); the `call` fade over 2.5 s; `sound` the bell at volume 0.2, cut off |
   | Still | "Silence" 3.0 s: a wide of the empty room, your back to camera at the desk | t 0.5 `look` You at `File`. The cut ends; After Hours goes to Collected |
 
