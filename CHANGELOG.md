@@ -2,6 +2,97 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.28.0] - 2026-11-18: Staff in the school day (Living School 2 of 4)
+
+The spec is `docs/expansion/13-Living-School.md` §3; the plan is `docs/superpowers/plans/2026-11-18-staff-school-day.md`.
+- **Studio backup:** `ServerStorage.NH_Backup.Phase4_pre_20261118`. Config.Npcs, Social.Npcs, NpcLooks, Discipline and
+  Roster were added, plus the 2.27 states of Schedules and TestBridge. Config.Quests' pre-edit copy is in
+  `tools/phase4-2280/pre/`.
+- **Mirror:** `tools/phase4-2280/` (`pre/`, `live/`, `harness/`, `review/`, and `marks_staff.luau`).
+- **The Map place:** untouched. The staff posts go in doc 11's port table.
+
+### Added
+- **Four new staff** (`Config.Npcs`, `NpcLooks`, `ServerStorage.Dialogue`): Ms. Sallow (Mathematics, Room 102),
+  Mr. Pryce (English, Room 104), Dr. Whitlock (History, Room 105) and Headmaster Ashgrave.
+  - **Looks:** existing clothing ids and cast hair only.
+  - **Talk:** each has a short tree. Pryce: "Ah! Enter, stage left."
+- **Staff posts** (`workspace.School.Quests.Staff`, built by `marks_staff.luau`): 8 parts.
+  - **Desks:** 2.5 studs behind each classroom's TeacherDesk.
+  - **The Staff Room:** three posts.
+  - **Ashgrave:** beside the Records Office door.
+  - **Checks:** every post is clear of solid parts, checked by screenshot.
+- **Staff keep the day** (`Social.Npcs`): staff with `Posts` fade to the post for each school segment.
+  - **Segments:** Homeroom, the class periods, Other (before school, passing, break, lunch, after school) and Off (the
+    rest).
+  - **Teachers:** at their desks in class and in the Staff Room otherwise.
+  - **Ashgrave:** keeps office hours in class time.
+  - **Mr. Hale:** takes the register at his Room 102 desk, teaches Chemistry in Room 103 in the class periods, and is
+    back at his Room 102 desk at all other times, so Orientation can always find him.
+- **Timetables** (`Roster.Plan`): in each class period every subject room hosts one set of six named students, and the
+  sets rotate.
+  - **Homeroom:** sets A and B in Room 101; C and D take Mr. Hale's register in Room 102.
+  - **Full rooms:** extra students stand at the back.
+  - **Skipping:** Delinquents sometimes skip, the same way every time for that day and period, and hang out instead.
+- **Teachers as witnesses** (`Services.School.Teachers`):
+  - **Fights:** a combat hit by a student in a classroom, while that room's teacher is at the desk and can see them,
+    books Fighting with the teacher as witness, once per period.
+  - **Late marks:** they name the room's teacher for that period.
+- **No bodies far away** (`Features.Schedules`):
+  - **Asleep:** a student with no player within 160 studs of where their job goes is there with no body.
+  - **Sleep and wake:** a once-a-second check removes bodies more than 180 studs from every player, and gives a
+    sleeper a body on the spot when a player comes within 160.
+  - **`Roster.WhereNow`:** says where any student is, with a body or without.
+- **TestBridge:** `StaffTest`, `StaffPlanTest`, `TimetableTest`, `WitnessTest`, `SleepTest`.
+
+### Changed
+- **Schedules:** the 6-seat class cap and the "east wing" exit are gone.
+- **Mira's empty back-row desk stays empty** (`Local.Chairs` leaves out chairs in `Area_MiraDesk`). A full Room 102
+  homeroom had put two students at it.
+- **Orientation:** Mr. Hale's step now says "his desk in Room 102, or Room 103 during class".
+
+### Fixed (found in this release's regression)
+- **A job left running after its body was removed** spun (a Script timeout) or indexed the gone model. The sleep check
+  now cancels the job first, and waking re-runs it.
+
+### Checked
+- **Self-tests:**
+  - `StaffTest`: nothing missing.
+  - `StaffPlanTest`: every post key as planned.
+  - `TimetableTest`: 6 per room per period (5 where a Delinquent skipped); homeroom 12 and 12; 19 skips over 3
+    students × 40 days (expected about 20); stable.
+  - `SleepTest`: 24/0 at the lunch stand, 0/24 at 297 studs, 24/0 back (bodies at the lunch spots, not the gate).
+  - **Earlier releases, unchanged:** the 2.27 tests, `CineJudgeTest` 36/36, `CineGraphTest` 9/9, `CineQteTest`,
+    `CineVoteTest`, `Phase1SelfTest`, and `AfterHoursMigrateTest` (1, 2, 5).
+- **Staff, live:** at 07:40, 08:05, 09:10, 11:30 and 21:30, every staff member stood 0.0 studs from the expected post,
+  and was away when expected (`review/teacher_r104.jpg`).
+- **Witnesses, live:**
+  - Pryce booked "Fighting", witness "Mr. Pryce", once per period. The real `Downed.OnDamage` path added one more.
+  - At lunch there's no teacher.
+  - **`NameFor`:** Room 104 in Period 2 is Pryce, Room 102 at Homeroom is Hale, Room 102 in Period 1 is Sallow.
+- **The school day:**
+  - 07:40: hallway 24.
+  - 08:05: Room 101 9 seated and 3 standing; Room 102 8 and 4; Mira's desk empty.
+  - 09:10: six per room.
+  - 11:30: lunch 24.
+  - 15:30: clubs, hangouts and home.
+- **Story:** the prologue's two paths are unchanged; the Custodian leaves his post after hours; Hale talks at night and
+  in class time.
+- **Frame rate (this Studio session):**
+  - near all students: 45.3 fps on the server and 45.1 on the client
+  - with everyone asleep: 51.3 and 50.8
+  - For comparison, 2.27 ran at 42.6 / 45.9 with every student always embodied, and 47.0 / 46.8 with none.
+- **Errors:** none from Schedules, Npcs, Teachers, Discipline, Roster or StudentBrain after the fix. Slot 2 was
+  restored; only `Discipline.LastDecayDay` moved, from the clock jumps.
+- **Not checked:**
+  - a two-player run
+  - phone screens
+  - the slot 4 "Testy" rejoin
+  - the Headmaster at assemblies and crises (those systems don't exist yet)
+- **Found, not changed:** `Features.Regions`' R101 to R106 boxes sit about one room east of the actual classrooms
+  (R104's box is centred at x 174, Room 104's desk at x 152). Teachers finds the room from the classroom folder's own
+  bounds instead. The region boxes need the owner's look.
+- **Studio:** installed in NH Combat Test (Team Create). The final save reported nothing new to save.
+
 ## [2.27.0] - 2026-11-18: Roster & memory (Living School 1 of 4)
 
 The spec is `docs/expansion/13-Living-School.md` §2; the plan is `docs/superpowers/plans/2026-11-18-roster-and-memory.md`.
