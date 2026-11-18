@@ -19,6 +19,8 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
+**Word gets around (2.29.0, 2026-11-18):** what happens at school becomes rumours. Students pass them on in their chats, and each retelling may stretch the story, but never about you: a rumour about a real player stays true. Six small scenes now play out around you (an argument, a locker shove, a defaced notice board, footsteps at dusk, a figure in the hall, a dare), and you can step in. See [the game update](updates/discord/game-updates/2026-11-18-word-gets-around.md) and [the spec](docs/expansion/13-Living-School.md).
+
 **Teachers take the register (2.28.0, 2026-11-18):** four teachers and the Headmaster now keep the school day. Ms. Sallow, Mr. Hale, Mr. Pryce and Dr. Whitlock teach at their desks and retire to the Staff Room between classes, and each class seats its own six classmates. Start a fight in front of a teacher and they'll put their name on it. See [the game update](updates/discord/game-updates/2026-11-18-teachers-take-the-register.md) and [the spec](docs/expansion/13-Living-School.md).
 
 **The students have names now (2.27.0, 2026-11-18):** the school's background students are 24 named classmates, three per clique. Stop and look at one and they'll introduce themselves, and they remember you across visits: shove one and they won't forget it, share snacks and they'll thank you. Classmates you've met are listed under Tab. See [the game update](updates/discord/game-updates/2026-11-18-the-students-have-names.md) and [the spec](docs/expansion/13-Living-School.md).

@@ -2,6 +2,93 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.29.0] - 2026-11-18: Incidents & rumours (Living School 3 of 4)
+
+The spec is `docs/expansion/13-Living-School.md` §4; the plan is `docs/superpowers/plans/2026-11-18-incidents-and-rumours.md`.
+- **Studio backup:** `ServerStorage.NH_Backup.Phase4_pre_20261118`: CliqueFights, Matches, Beasts, Fortune, StudentBrain,
+  Lines, Schedules, Roster, Reputation, TestBridge and Cine, as "(2.28)" copies where earlier ones exist.
+- **Mirror:** `tools/phase4-2290/`.
+- **The Map place:** untouched.
+
+### Added
+- **The incident bus** (`Services.World.Incidents`): one place where school events are reported, and where the
+  rostered students within 40 studs become witnesses.
+  - **Already-existing signals it listens to:** Downed, hall-monitor catches, Discipline violations, wall pranks, and
+    the moon event attribute.
+  - **One new line each in:** CliqueFights (scuffles and rumbles), Matches (results) and Beasts (sightings).
+  - **Relationships:** downing a rostered student costs -15 and counts as Fought; helping one in a scene gives +10
+    and counts as Helped.
+- **Rumours** (`Services.Social.Rumours`, `Config.Rumours`):
+  - **Who knows them:** every event becomes a rumour that its witnesses know.
+  - **Spread:** through students' chats near players and to a nearby student off-screen, at most one hop every 5
+    minutes. A rumour lives one in-game day (2 real hours), and at most 30 are live.
+  - **Change:** each hop may change one detail: the place, the size ("pushed" becomes "slammed"), or which student
+    did it.
+  - **The safety rule:** a rumour that involves a real player never changes at all, so it can never pin something
+    false on you.
+- **Students pass them on** (StudentBrain): "Did you hear? Jax pushed Agnes into a locker in the main hall." The
+  listener answers, and now knows it.
+  - **Overhearing:** a player within 12 studs overhears. A rostered student who fell out with you before introducing
+    themselves can be learned by name this way (`Reputation.Learn`).
+- **Sable's Whisper card** (Fortune): she can draw the newest rumour. "The halls are saying: '...' Whether it's true is
+  another matter."
+- **Six scenes** (`Services.World.Scenes`, `Config.Scenes`):
+  1. an argument between rival cliques
+  2. someone shoved into a locker
+  3. the defaced notice board ("ANSWER THE BELL")
+  4. footsteps in the east wing at dusk
+  5. a figure at the end of the main hall at dusk
+  6. a dare at the Records Office door
+
+  - **When they run:** only where a player can see (60 studs), at most one per place every 10 minutes, never during a
+    cutscene, never in class.
+  - **The prompts:** each has one (Step in, Help out, Read it, Go and look, Look up, Stop them), and the ending depends
+    on whether you pressed it.
+- **TestBridge:** `IncidentTest`, `RumourTest`, `RumourSafetyTest`, `SceneTest`.
+
+### Changed
+- **Schedules:** can lend students to a scene and take them back (`Borrow`, `Release`).
+- **Cine:** sets `NHCinePlaying` while a cutscene plays.
+- **The 2.27 introduction lines:** they are plain strings now. They held `{First}` inside backtick strings, which Luau
+  interpolates; they only worked because the fill happened to replace the word "nil".
+
+### Checked
+- **Self-tests:**
+  - `IncidentTest`: heard, region, witnesses, the Fought flag and -15.
+  - `RumourTest`: "Ren knocked down Mae in the Commons.", timestamped.
+  - **`RumourSafetyTest`: 10,000 hops, 0 broken, 1,684 changes** (all on the case with no player in it).
+  - **Earlier releases, unchanged:** 2.28, 2.27 and the cutscene/Phase 1 suite.
+- **Live:**
+  - **Chats:** Silas (a witness) told Odette the locker rumour; she replied "I heard it was worse." and now knows it.
+  - **Fortune:** Sable's plain reading quotes the rumour.
+  - **A real hall-monitor catch** became "A monitor caught Ren in the grounds. For truancy." It is true, and it never
+    changes.
+  - **A real Vigil–Court scuffle** became an incident with 12 witnesses.
+- **The scenes:** all six ran.
+  - **Locker, with the prompt pressed:** the player is the helper, Clara's Helped flag went up, and the rumour reads
+    "Teodor pushed Clara into a locker in the main hall."
+  - **Argument:** a rival pair (Juniper and Tamsin).
+  - **Notice, read:** the board says ANSWER THE BELL.
+  - **Left alone for 5 minutes:** one scene, two scuffles, and nobody left borrowed.
+- **Regression:** the prologue's two paths are unchanged, `NHCinePlaying` is set during a cut and cleared after, and
+  2.28's school day is unchanged.
+- **Errors:** none from the changed scripts. The console caught one bug in this release's own regression: a misplaced
+  comment had dropped every rumour's timestamp. It's fixed, and `RumourTest` now checks for it.
+- **Not checked:**
+  - a two-player run
+  - phone screens
+  - a scene screenshot (the camera clipped into a wall)
+  - the frame rate (skipped, at the owner's request)
+- **Found, not changed (for the owner):**
+  - **The `workspace.Regions` boxes don't line up with this place.** They sit around y 30 and about one room off from
+    the classrooms. Incidents read them the way Fortune does, and each scene names its own place.
+  - **Students are "watching a fight" much of the day** (the combat-test dummies fight nonstop). It blocks their idle
+    chats, so rumours travel less by chat than they could.
+  - **Two Mr. Hales:** the Staff Room watcher shares his name and look.
+- **Harness:** the snapshot and restore helpers now also cover clique standings and the day's Fortune reading. One
+  restore bug, from earlier in this release, was found and fixed, and slot 2 is back to its baseline.
+- **Studio:** saved as NH Combat Test version 1207.
+
 ## [2.28.0] - 2026-11-18: Staff in the school day (Living School 2 of 4)
 
 The spec is `docs/expansion/13-Living-School.md` §3; the plan is `docs/superpowers/plans/2026-11-18-staff-school-day.md`.

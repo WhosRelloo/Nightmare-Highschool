@@ -2,7 +2,8 @@
 
 **Status:** approved 2026-11-18. **2.27 shipped** (plan: `docs/superpowers/plans/2026-11-18-roster-and-memory.md`;
 its deltas are §9 items 8 to 15). **2.28 shipped** (plan: `docs/superpowers/plans/2026-11-18-staff-school-day.md`;
-deltas 16 to 23). 2.29 and 2.30 are next.
+deltas 16 to 23). **2.29 shipped** (plan: `docs/superpowers/plans/2026-11-18-incidents-and-rumours.md`;
+deltas 24 to 32). 2.30 is next.
 
 **Sources:** doc 02 §4.1 to §4.6, §7.1 and §11.1, doc 07 §2 to §7, and doc 08 Phase 2. This spec makes them
 buildable; where it differs from them, §9 says so.
@@ -396,3 +397,19 @@ Each set has 6 students; every clique is spread over at least three sets.
 22. **(2.28) The room is found from the classroom folder's bounds,** not `Features.Regions`. Its R10x boxes sit about
     one room east of the actual rooms (logged for the owner, not changed).
 23. **(2.28) Mira's empty desk is never a seat** (`Area_MiraDesk` is left out of Room 102's chairs).
+24. **(2.29) "A figure at a window"** became **"a figure at the end of the main hall".** The school building has no
+    windows. The figure is the existing faded-student cast template (the Strikethrough), shown for 4 seconds.
+25. **(2.29) The notice board** is `NoticeBoard_143.5` in the main hall. The part tagged `NHNoticeBoard` is the Midnight
+    Bell board.
+26. **(2.29) The two night scenes run at dusk** (the Evening segment). Every student has gone home by Night, so a Night
+    scene could never be cast.
+27. **(2.29) The moon emitter** listens to `MoonPhases`' `NHMoonEvent` attribute rather than editing `MoonPhases`.
+28. **(2.29) Witnesses** are rostered students within 40 studs, not "in the region". The `workspace.Regions` boxes
+    don't line up with this place's rooms, so `Incidents.RegionAt` reads them the way Fortune does, and each scene
+    names its own place.
+29. **(2.29) A rumour holding a player never changes at all.** That's stricter than "only NPC fields may change": it's
+    the simplest form of the rule that a test can prove (10,000 hops, 0 broken).
+30. **(2.29) Learning a name from a rumour** uses `Reputation.Learn` (met, value unchanged), only for students who fell
+    out with you before an introduction.
+31. **(2.29) A rumour's life** is one in-game day: 7,200 real seconds at the clock's 300 seconds per game hour.
+32. **(2.29) Argument casts a rival pair on purpose:** its second student comes from the first one's rival clique.
