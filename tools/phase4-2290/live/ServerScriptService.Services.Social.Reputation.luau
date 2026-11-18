@@ -10,6 +10,7 @@
 		Reputation.Relationship(Player, NpcId) -> Value, State, Met
 		Reputation.ChangeRelationship(Player, NpcId, Amount, Reason?, Flag?)  -- (2.27) Flag: Fought | Helped | Pranked | Lied
 		Reputation.Meet(Player, NpcId)          -- (2.27) a rostered student's introduction
+		Reputation.Learn(Player, NpcId)         -- (2.29) met by hearing their name; the value doesn't move
 		Reputation.Entry(Player, NpcId) -> { Value, Met, Last, Flags }  (2.27, a copy)
 		Reputation.StateOf(Value) -> state name, ignoring Met (2.27)
 	(2.27) Saved entries: the important NPCs, the named cast (Config.Npcs) and the roster (Config.Students), up to
@@ -180,6 +181,16 @@ function Shared.Meet(Player: Player, NpcId: string)
 	if not Record or Record.Met then return end
 	Record.Met = true
 	Record.Value = math.max(Record.Value, 5)
+	Record.Last = os.time()
+	Shared.Sync(Player)
+	Shared.RelationshipChanged:Fire(Player, NpcId, Local.StateFor(Record.Value, true), `Unknown`)
+end
+
+-- (2.29) a name heard in a rumour: you now know who they are, and how they feel about you doesn't change
+function Shared.Learn(Player: Player, NpcId: string)
+	local Record = Local.Record(Player, NpcId)
+	if not Record or Record.Met then return end
+	Record.Met = true
 	Record.Last = os.time()
 	Shared.Sync(Player)
 	Shared.RelationshipChanged:Fire(Player, NpcId, Local.StateFor(Record.Value, true), `Unknown`)
