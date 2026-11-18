@@ -28,4 +28,6 @@ return {
 	};
 
 	AttackPenalty = { Relationship = -20; Standing = -10 }; -- hitting an important NPC
+
+	SavedCap = 64; -- (2.27) saved relationships per slot (the cast and the roster); see Social.Reputation's Trim
 }

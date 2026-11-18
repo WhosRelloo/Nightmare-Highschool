@@ -588,6 +588,27 @@ function Commands.Relationship(PlayerName: string, NpcId: string, Change: number
 	return { Social().Relationship(Player, NpcId) }
 end
 
+-- (2.27) the 64-entry cap's drop order, on stand-in tables (nothing saved)
+function Commands.RelationshipCapTest(PlayerName: string)
+	local Rep = Social()
+	local Rels = {}
+	-- 60 Acquaintance students, 3 Friendly, Ezra (important), 1 Hostile: 65 entries, cap 64
+	for I = 1, 60 do Rels[`Ac{I}`] = { Value = 0; Met = true; Last = 1000 + I; Flags = {} } end
+	for I = 1, 3 do Rels[`Fr{I}`] = { Value = 30; Met = true; Last = 10 + I; Flags = {} } end
+	Rels.Ezra = { Value = 0; Met = true; Last = 1; Flags = {} }
+	Rels.Ho1 = { Value = -80; Met = true; Last = 2; Flags = {} }
+	local Dropped = Rep.TrimForTests(Rels, 64, 5000)
+	local Count = 0 for _ in Rels do Count += 1 end
+	-- no Acquaintance left: the next drop is the oldest entry that isn't Trusted, Hostile or important
+	local Rels2 = {}
+	for I = 1, 63 do Rels2[`Fr{I}`] = { Value = 30; Met = true; Last = 100 + I; Flags = {} } end
+	Rels2.Tr = { Value = 90; Met = true; Last = 1; Flags = {} }
+	Rels2.Ho = { Value = -90; Met = true; Last = 2; Flags = {} }
+	local Dropped2 = Rep.TrimForTests(Rels2, 64, 5000)
+	return { Dropped = Dropped; Count = Count; EzraKept = Rels.Ezra ~= nil; HostileKept = Rels.Ho1 ~= nil;
+		Dropped2 = Dropped2; TrustedKept = Rels2.Tr ~= nil; HostileKept2 = Rels2.Ho ~= nil }
+end
+
 function Commands.CanJoin(PlayerName: string, Id: string)
 	return { FactionsService().CanJoin(Players:FindFirstChild(PlayerName), Id) }
 end
