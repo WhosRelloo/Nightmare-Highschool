@@ -10,6 +10,8 @@
 	Stranger system: students whose name you haven't learned show as "Stranger" (no file number, no
 	details). Names come only from Controllers.Gui.Strangers (the server sends each player the names
 	they know); faction membership (Faction_<Id> attributes) is public, so groups still show.
+	(2.27) Classmates: the rostered students (Config.Students) you've met, from your saved relationships
+	(Social.Relationships, sent with SetSocial): their name, clique, how they feel about you, and their bio.
 	API: Toggle(on?), IsOpen()
 ]]
 
@@ -27,6 +29,10 @@ local Typing = require(game:GetService(`ReplicatedStorage`):WaitForChild(`Packag
 local Kit = require(ReplicatedStorage:WaitForChild(`UI`):WaitForChild(`Components`))
 local FactionConfig = require(ReplicatedStorage.Config.Factions)
 local SportsConfig = require(ReplicatedStorage.Config.Sports)
+local StudentsConfig = require(ReplicatedStorage.Config.Students) -- (2.27) the roster
+local CliqueConfig = require(ReplicatedStorage.Config.Cliques)
+local RepConfig = require(ReplicatedStorage.Config.Reputation)
+local StateController = require(script.Parent.Parent.StateController)
 local Clans = require(ReplicatedStorage.Config.Clans)
 local Strangers = require(script.Parent:WaitForChild(`Strangers`))
 
@@ -155,6 +161,44 @@ function Local.Group(Order: number, Def, Members)
 	end
 end
 
+-- (2.27) the rostered students you've met, under the player groups
+function Local.Classmates(Order: number): number
+	local Profile = StateController.GetProfile(false)
+	local Rels = Profile and Profile.Social and Profile.Social.Relationships
+	if typeof(Rels) ~= `table` then return 0 end
+	local Rows = {}
+	for Id, R in Rels do
+		local E = StudentsConfig.ById[Id]
+		if E and typeof(R) == `table` and R.Met then
+			local State = `Trusted`
+			for _, St in RepConfig.RelationshipStates do if (R.Value or 0) <= St.Max then State = St.Name break end end
+			local Clique = CliqueConfig.Defs[E.Clique]
+			table.insert(Rows, { Name = E.Name; Sub = `{Clique and Clique.Name or E.Clique}  ·  {State}  ·  {E.Bio}` })
+		end
+	end
+	if #Rows == 0 then return 0 end
+	table.sort(Rows, function(A, B) return A.Name < B.Name end)
+	local Header = new(`Frame`, { Name = `Group_Classmates`; BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 22); LayoutOrder = Order }, Ui.List)
+	new(`TextLabel`, {
+		BackgroundTransparency = 1; Font = Theme.Fonts.Title; TextSize = 15; TextXAlignment = Enum.TextXAlignment.Left;
+		TextColor3 = C.TextDim; Text = `CLASSMATES`; Position = UDim2.fromOffset(4, 4); Size = UDim2.new(1, -40, 1, -4);
+	}, Header)
+	new(`TextLabel`, {
+		BackgroundTransparency = 1; Font = Theme.Fonts.Body; TextSize = 14; TextXAlignment = Enum.TextXAlignment.Right;
+		TextColor3 = C.TextFaint; Text = tostring(#Rows); Position = UDim2.fromOffset(0, 4); Size = UDim2.new(1, -4, 1, -4);
+	}, Header)
+	for I, M in Rows do
+		local Row = new(`Frame`, { Name = `Classmate`; BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 48); LayoutOrder = Order + I }, Ui.List)
+		Kit.PlayerListRow({ name = M.Name; Size = UDim2.new(1, 0, 0, 30); Parent = Row })
+		new(`TextLabel`, {
+			BackgroundTransparency = 1; Font = Theme.Fonts.Body; TextSize = 14; TextColor3 = C.TextDim;
+			TextXAlignment = Enum.TextXAlignment.Right; Text = M.Sub; TextTruncate = Enum.TextTruncate.AtEnd;
+			Position = UDim2.fromOffset(0, 30); Size = UDim2.new(1, -12, 0, 17);
+		}, Row)
+	end
+	return #Rows
+end
+
 function Local.Render()
 	if not Ui then return end
 	Dirty = false
@@ -202,6 +246,7 @@ function Local.Render()
 			Total += #Members
 		end
 	end
+	Local.Classmates(Order + 1000) -- (2.27)
 	Ui.Count.Text = `{Total} enrolled`
 	-- fit the plate to its rows, up to 40% of the screen
 	task.defer(function()
@@ -254,6 +299,9 @@ function Shared.OnStart()
 		end)
 	end
 	Strangers.Changed:Connect(function() Dirty = true end)
+	StateController.ProfileUpdated:Connect(function(_, Action) -- (2.27) a new classmate, or a change in how one feels
+		if Action and Action.type == `SetSocial` then Dirty = true end
+	end)
 	for _, P in Players:GetPlayers() do Watch(P) end
 	Players.PlayerAdded:Connect(function(P) Watch(P) Dirty = true end)
 	Players.PlayerRemoving:Connect(function() Dirty = true end)
