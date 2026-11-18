@@ -127,6 +127,8 @@ Map's real rooms, measured read-only on 2026-11-17.
 | Strike.You | (-1011.5, 0, 78.1) | +X | (2.26.0) 1.5 behind Mira's chair (test: chair 1.6 behind the desk, Map: 2.6, so the you-side marks are measured from the chair) |
 | Strike.Rise / TugIt | (-1005.1, 0, 78.1) | -X | across Mira's desk, the board side. Test: both at z 68.8, overlapping the carved clue top by 0.1 |
 | Strike.TugYou | (-1011.1, 0, 78.1) | +X | just behind Mira's chair |
+| Strike.LungeTo | (-1010.3, 0, 78.1) | -X | where its lunge lands, an arm's length from you. Mira's chair is pushed aside on screen first |
+| Strike.RiseLow | (-1005.1, -3, 78.1) | -X | under the floor at Rise: it rises from here |
 | Strike.DodgeTo | (-1011.9, 0, 74.7) | +X | the dodge goes to your left (-Z in the Map) |
 | Strike.ThrownTo | (-1013.0, 0, 80.5) | +X | the aisle between Mira's column and yours. Check the west wall (past -1013) by screenshot |
 | Strike.Desk | = RollCall.MiraDesk | +X | the shove's target |

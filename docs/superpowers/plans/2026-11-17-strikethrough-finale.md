@@ -717,6 +717,25 @@ return #S:GetChildren() .. " marks"
 
 ### Task 6: The Strikethrough cut
 
+> **Outcome (2026-11-17):** 16 paths, 0 fixes. The live runs:
+> - **All right:** `Arrive>Lunge>Dodge>Again>Shove>Tug>Kept>Finisher>Shatter>Still`, grade S, FileKept `Win`.
+> - **All missed:** `Arrive>Lunge>Thrown>Again>Grabbed>Tug>Torn>Finisher>Fade>Still`, grade D, FileKept `Lose`.
+>
+> **Changes from the table:**
+> - **Length:** 56. `CineJudge.LongestPath` is 52.0 s with the slow-motion prompts.
+> - **Marks:** two added, `RiseLow` (it rises from it) and `LungeTo` (the lunge lands an arm's length from you). Mira's chair is pushed aside on screen.
+> - **Profile shots:** they are a keyed two-shot (`Profile`) from inside the east wall. A full shot cropped the eyes under the letterbox.
+> - **Hit times:** they follow the game's clips.
+> - **Cameras:**
+>   - It rises: in the aisle, over the desk top.
+>   - Tug: high, behind your shoulder.
+>   - Pages: low and side on.
+>   - Still: the back corner.
+>   - Several framed versions put the camera through the east or south wall, or behind Mira's desk.
+> - **Lighting:** a moonlight SpotLight over the desk and a backlight on the board wall. The template is pale as old paper, with a rim light, so it reads after hours.
+> - **Captures:** `review/cut_*.jpg`, taken with `harness/cap.lua`.
+
+
 **Files:**
 - Create: `tools/phase3-2260/live/ReplicatedStorage.Cinematics.Strikethrough.luau`
 - Modify: `…ReplicatedStorage.Config.Cine.luau` (entry)

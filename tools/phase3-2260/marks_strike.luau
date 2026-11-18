@@ -18,6 +18,8 @@ local function mark(name, pos, look, size, attrs)
 end
 mark("You", V(98, 1.1, 63.4), V(98, 1.1, 64.4)) -- you at Mira's desk, the chair side
 mark("Rise", V(98, 1.1, 68.8), V(98, 1.1, 67.8)) -- it stands up out of the desk, on the board side
+mark("RiseLow", V(98, -1.9, 68.8), V(98, -1.9, 67.8)) -- under the floor: it starts here and rises to Rise
+mark("LungeTo", V(98, 1.1, 64.6), V(98, 1.1, 63.6)) -- where its lunge lands, an arm's length from You (Mira's chair is pushed aside first)
 mark("DodgeTo", V(101.4, 1.1, 63.0), V(101.4, 1.1, 64.0)) -- the dodge goes to your left (+X)
 mark("ThrownTo", V(95.6, 1.1, 60.4), V(95.6, 1.1, 61.4)) -- thrown back into the back-row desks
 mark("TugYou", V(98, 1.1, 63.8), V(98, 1.1, 64.8)) -- behind Mira's chair (the chair mesh spans z 64.15 to 65.65)
@@ -30,7 +32,7 @@ mark("Bell", V(146.1, 11.4, 57.7), V(146.1, 11.4, 56.7), nil, { BellPart = "Work
 S.Parent = Sets
 -- check: visible props inside each actor mark's body volume (2 x 4.2 x 0.8 above the floor; prop meshes are not queryable)
 local out = { #S:GetChildren() .. " marks" }
-for _, n in ipairs({ "You", "Rise", "DodgeTo", "ThrownTo", "TugYou", "TugIt" }) do
+for _, n in ipairs({ "You", "Rise", "LungeTo", "DodgeTo", "ThrownTo", "TugYou", "TugIt" }) do
 	local m = S[n]
 	local c = m.Position + V(0, 2.4, 0)
 	local list = {}

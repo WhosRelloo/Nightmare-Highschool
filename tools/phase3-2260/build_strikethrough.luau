@@ -18,13 +18,13 @@ local SMOKE = "rbxassetid://8527116276"
 local Shirt = M:FindFirstChildOfClass("Shirt") or Instance.new("Shirt", M)
 local Pants = M:FindFirstChildOfClass("Pants") or Instance.new("Pants", M)
 Shirt.ShirtTemplate, Pants.PantsTemplate = SHIRT, PANTS
-Shirt.Color3 = Color3.fromRGB(118, 116, 130) -- washes the crimson waistcoat out to a faded grey-plum
-Pants.Color3 = Color3.fromRGB(105, 104, 118)
--- faded: ash-grey skin, slightly see-through limbs, the head an ink smudge (no face)
+Shirt.Color3 = Color3.fromRGB(205, 200, 215) -- washes the crimson waistcoat out: faded, almost paper
+Pants.Color3 = Color3.fromRGB(185, 182, 198)
+-- faded: pale as old paper (it has to read in a dark room), slightly see-through limbs, the head an ink smudge (no face)
 local INK = Color3.fromRGB(18, 14, 22)
 for _, P in M:GetChildren() do
 	if P:IsA("BasePart") and P.Name ~= "HumanoidRootPart" then
-		P.Color = Color3.fromRGB(150, 148, 156)
+		P.Color = Color3.fromRGB(208, 206, 216)
 		P.Transparency = if P.Name == "Torso" or P.Name == "Head" then 0.05 else 0.25
 		P.Material = Enum.Material.SmoothPlastic
 	end
@@ -52,9 +52,9 @@ local function emitter(Part, Name, Props)
 	return E
 end
 for _, P in { M.Torso, M["Left Arm"], M["Right Arm"], M["Left Leg"], M["Right Leg"] } do
-	emitter(P, "Ink", { Texture = SMOKE; Color = ColorSequence.new(INK); LightEmission = 0; Rate = 14;
+	emitter(P, "Ink", { Texture = SMOKE; Color = ColorSequence.new(INK); LightEmission = 0; Rate = 7;
 		Lifetime = NumberRange.new(0.6, 1.2); Speed = NumberRange.new(0.3, 0.9); Acceleration = Vector3.new(0, -2.5, 0);
-		Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 1.4) });
+		Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.35), NumberSequenceKeypoint.new(1, 0.9) });
 		Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.35), NumberSequenceKeypoint.new(1, 1) }); SpreadAngle = Vector2.new(25, 25) })
 end
 emitter(Head, "InkHead", { Texture = SMOKE; Color = ColorSequence.new(INK); Rate = 16; Lifetime = NumberRange.new(0.5, 0.9);
@@ -63,6 +63,10 @@ emitter(M.Torso, "Pages", { Texture = SMOKE; Color = ColorSequence.new(Color3.fr
 	Lifetime = NumberRange.new(1.8, 2.6); Speed = NumberRange.new(1.5, 2.5); RotSpeed = NumberRange.new(-120, 120);
 	Size = NumberSequence.new(0.35); Shape = Enum.ParticleEmitterShape.Cylinder; ShapeStyle = Enum.ParticleEmitterShapeStyle.Surface;
 	Orientation = Enum.ParticleOrientation.VelocityPerpendicular; Transparency = NumberSequence.new(0.1, 1) })
+-- a faint cold rim on the torso, so the silhouette reads against a dark room
+local Rim = Instance.new("PointLight")
+Rim.Name, Rim.Color, Rim.Brightness, Rim.Range, Rim.Shadows = "Rim", Color3.fromRGB(170, 185, 255), 1.6, 8, false
+Rim.Parent = M.Torso
 M.Parent = Cast
 local parts = 0
 for _, P in M:GetChildren() do if P:IsA("BasePart") then parts += 1 end end

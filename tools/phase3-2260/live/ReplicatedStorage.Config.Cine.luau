@@ -22,7 +22,10 @@ return {
 	Cuts = {
 		-- (2.25.0) interactive: the longest path is 33.7 s (CineJudge.LongestPath); no grade card for one story prompt
 		Prologue = { Name = `Roll Call`; Length = 35; Set = `RollCall`; Replay = true; Arrive = `Arrive`; Interactive = true; ShowGrade = false };
-		Collected = { Name = `Collected`; Length = 13; Set = `Hall`; Replay = true };
+		-- (2.26.0) COLLECTED reads the fight's FileKept decision (the torn page)
+		Collected = { Name = `Collected`; Length = 13; Set = `Hall`; Replay = true; Flags = { `FileKept` } };
+		-- (2.26.0) Chapter One's finale: the longest path is 52.0 s (CineJudge.LongestPath, slow-mo prompts included) + the grade card + 1
+		Strikethrough = { Name = `The Strikethrough`; Length = 56; Set = `Strike`; Replay = true; Interactive = true; Rewards = { S = 15; A = 10; B = 5 } };
 		-- (2.25.0) a test cut for the interactive director (TestBridge / harness only; never in a quest)
 		__QteTest = { Name = `QTE test`; Length = 30; Set = `Hall`; Replay = true; Interactive = true; Hidden = true };
 	};
