@@ -93,7 +93,7 @@ something they didn't do.
     | `Moon` | (none) | the `NHMoonEvent` attribute |
     | `Scene` | per scene | World.Scenes (Task 4) |
 
-- [ ] **Step 1: Write the failing test.** Add to TestBridge:
+- [x] **Step 1: Write the failing test.** Add to TestBridge:
 
 ```lua
 -- (2.29) the incident bus: Emit fills time, region and witnesses; On hears it; the relationship consumer applies flags
@@ -121,7 +121,7 @@ end
 
   Install the TestBridge, start Play, and run `bridge.py IncidentTest '$P'`. Expected: an error (no `World.Incidents`).
 
-- [ ] **Step 2: `Roster.Near`.** Add to `Social.Roster`:
+- [x] **Step 2: `Roster.Near`.** Add to `Social.Roster`:
 
 ```lua
 -- (2.29) rostered students within Radius of Pos (their body, or where they are with no body)
@@ -136,7 +136,7 @@ function Shared.Near(Pos: Vector3?, Radius: number): { string }
 end
 ```
 
-- [ ] **Step 3: Write `World.Incidents`:**
+- [x] **Step 3: Write `World.Incidents`:**
 
 ```lua
 --[[ (2.29) Incidents (server). Services.World.Incidents: one bus for things that happen in the school
@@ -284,7 +284,7 @@ function Shared.ClearForTests() table.clear(Log) end
 return Shared
 ```
 
-- [ ] **Step 4: The three one-line emitters** (back up each script first).
+- [x] **Step 4: The three one-line emitters** (back up each script first).
   - **`CliqueFights`, in `Local.EndScuffle`,** after `Local.CountFeud(Ev.A, Ev.B, Winner)`:
 
 ```lua
@@ -319,7 +319,7 @@ return Shared
     **Check the names** in that scope: the beast's root variable is `Root` (`Hum:MoveTo(Root.Position)` is on the same
     branch). If `W.Name` is nil, `W.Model.Name` is used.
 
-- [ ] **Step 5: Install and run the test.**
+- [x] **Step 5: Install and run the test.**
   - Install Roster, Incidents, CliqueFights, Matches, Beasts and the TestBridge. Start Play.
   - Run `bridge.py IncidentTest '$P'`. Expected: `Heard 1`, `Region "MainHall"`, `HasTime true`, `Truth true`,
     `Witnesses true`, `FoughtAdded 1`, `ValueDelta -15`, `Recent ≥ 2`.
@@ -330,7 +330,7 @@ return Shared
     - **Expected:** `Incidents.Recent(5)` holds `Moon`, `Prank` and `Violation`.
     - Restore slot 2.
 
-- [ ] **Step 6: Commit** `2.29 (1/6): the incident bus; eight emitters; relationship flags from incidents`.
+- [x] **Step 6: Commit** `2.29 (1/6): the incident bus; eight emitters; relationship flags from incidents`.
 
 ---
 
@@ -353,7 +353,7 @@ return Shared
     player learn the name (`Reputation.Learn`)
   - `Reputation.Learn(Player, Id)`: sets `Met` without changing `Value`
 
-- [ ] **Step 1: Write the failing tests.** Add to TestBridge:
+- [x] **Step 1: Write the failing tests.** Add to TestBridge:
 
 ```lua
 -- (2.29) rumours from incidents, their text, and one spread
@@ -418,7 +418,7 @@ end
 
   Expected before the code: errors (no `Social.Rumours`).
 
-- [ ] **Step 2: `Reputation.Learn`.** Add beside `Meet`:
+- [x] **Step 2: `Reputation.Learn`.** Add beside `Meet`:
 
 ```lua
 -- (2.29) a name heard in a rumour: you now know who they are, and how they feel about you doesn't change
@@ -432,7 +432,7 @@ function Shared.Learn(Player: Player, NpcId: string)
 end
 ```
 
-- [ ] **Step 3: `Config.Rumours`.** Templates use `{Doer}`, `{Target}`, `{Where}`, `{Size}` and `{Extra}`. Size ladders
+- [x] **Step 3: `Config.Rumours`.** Templates use `{Doer}`, `{Target}`, `{Where}`, `{Size}` and `{Extra}`. Size ladders
   run small to large; a template without `{Size}` has nothing to change there.
 
 ```lua
@@ -472,10 +472,10 @@ return {
 }
 ```
 
-- [ ] **Step 4: Check `LifeSeconds`.** From `gamevm.py`, read the real seconds per in-game day from `SchoolClock` (its
+- [x] **Step 4: Check `LifeSeconds`.** From `gamevm.py`, read the real seconds per in-game day from `SchoolClock` (its
   config's minutes per day). Set `LifeSeconds` to exactly that.
 
-- [ ] **Step 5: Write `Social.Rumours`:**
+- [x] **Step 5: Write `Social.Rumours`:**
 
 ```lua
 --[[ (2.29) Rumours (server). Services.Social.Rumours (docs/expansion/13-Living-School.md §4.3).
@@ -677,14 +677,14 @@ function Shared.AgeForTests(R, Seconds: number) R.LastHop -= Seconds end
 return Shared
 ```
 
-- [ ] **Step 6: Install and run the tests.**
+- [x] **Step 6: Install and run the tests.**
   - Install Reputation, `Config.Rumours`, Rumours and the TestBridge, then start Play.
   - Run `bridge.py RumourTest '$P'`. Expected: `Made true`, `Text` like "Ren knocked down Mae in the Commons.",
     `KnowerKit true`, `HopCount 1`, `PlayerStill true`, `NoTemplate true`.
   - Run `bridge.py RumourSafetyTest '$P'`. Expected: `Bad 0`, `Hops 10000`, and `Mutated > 0` (the NPC-only case
     mutates). If `Bad > 0`, stop: the rule is broken, and nothing else may ship until it's fixed.
 
-- [ ] **Step 7: Commit** `2.29 (2/6): rumours; the safety rule (10,000 hops, 0 broken); off-screen spread`.
+- [x] **Step 7: Commit** `2.29 (2/6): rumours; the safety rule (10,000 hops, 0 broken); off-screen spread`.
 
 ---
 
@@ -698,7 +698,7 @@ return Shared
 - Produces: a pair chat where A tells B the rumour: "Did you hear? <text>", and B answers with a reaction line. A
   player within 12 studs of the speaker is passed to `HeardByPlayer`.
 
-- [ ] **Step 1: The test is live (chats need bodies).** Write `harness/_rumourchat.lua`. It emits a `Locker` scene
+- [x] **Step 1: The test is live (chats need bodies).** Write `harness/_rumourchat.lua`. It emits a `Locker` scene
   incident with two rostered witnesses who are standing near each other at lunch, then waits up to 90 s for one of them
   to say a line starting "Did you hear?":
 
@@ -728,7 +728,7 @@ return ("said: %s | B knows %s"):format(tostring(Said), tostring(R and R.Knowers
 
   Run it before the change. Expected: `said: nil`.
 
-- [ ] **Step 2: `chat` shares a rumour.** In StudentBrain's `chat(A, B)`, replace the first line
+- [x] **Step 2: `chat` shares a rumour.** In StudentBrain's `chat(A, B)`, replace the first line
   (`local Lines2 = Lines.PickChat(A, ctx())`) with:
 
 ```lua
@@ -754,7 +754,7 @@ return ("said: %s | B knows %s"):format(tostring(Said), tostring(R and R.Knowers
     `or \`No way.\``.
   - **The chat loop** already splits `"A: …"` / `"B: …"` lines, so nothing else changes.
 
-- [ ] **Step 3: Fortune's Whisper card.** In `Features.Fortune`, before `local ORDER`, add:
+- [x] **Step 3: Fortune's Whisper card.** In `Features.Fortune`, before `local ORDER`, add:
 
 ```lua
 -- (2.29) Sable hears the school's whispers (Social.Rumours): the newest live rumour, if any
@@ -773,7 +773,7 @@ end
   Then add `\`Whisper\`` to the end of `ORDER`. **Check:** `Hint.*` functions return `{ Card, Vague, Plain }`, and
   `Card` must be a key of `Shared.Cards`. `Fool` is one (`Hint.Fool` uses it).
 
-- [ ] **Step 4: Install and run.**
+- [x] **Step 4: Install and run.**
   - Install StudentBrain (its children Talk, Lines and Nudges are kept), Lines, Fortune and the TestBridge.
   - Start Play, `SetTime "11:30"`, move to the stand (`_stand.lua`), wait 40 s, and run `gamevm.py _rumourchat.lua`.
     Expected: `said: Did you hear? Jax shoved Agnes into a locker in the main hall.` (or a Size variant), and
@@ -781,7 +781,7 @@ end
   - From `gamevm.py`: `Fortune.ReadForTests(P, "Whisper")` returns the Fool card with that rumour in its Plain text
     (or the Vague text, if Sable's standing is low). Restore slot 2 after, since a Fortune reading saves the day's card.
 
-- [ ] **Step 5: Commit** `2.29 (3/6): students pass rumours on in their chats; Sable's Whisper card`.
+- [x] **Step 5: Commit** `2.29 (3/6): students pass rumours on in their chats; Sable's Whisper card`.
 
 ---
 
@@ -807,7 +807,7 @@ end
     Cine service's busy check); not in a class period inside a classroom.
   - `Scenes.SayFor(S, Text)`: a bubble over a borrowed student.
 
-- [ ] **Step 1: Write the failing test.** Add to TestBridge:
+- [x] **Step 1: Write the failing test.** Add to TestBridge:
 
 ```lua
 -- (2.29) run one scene now at its spot (the player is moved there by the caller); returns how it went
@@ -820,7 +820,7 @@ end
 
   Expected before the code: an error.
 
-- [ ] **Step 2: `Schedules.Borrow` and `Release`.** Add to Schedules:
+- [x] **Step 2: `Schedules.Borrow` and `Release`.** Add to Schedules:
 
 ```lua
 -- (2.29) the scene director borrows students with bodies near a spot (World.Scenes) and gives them back after
@@ -857,7 +857,7 @@ function Shared.HallSpotFor() return Local.HallSpot() end
 function Shared.Students() return Students end
 ```
 
-- [ ] **Step 3: `Config.Scenes`.** Each scene is data:
+- [x] **Step 3: `Config.Scenes`.** Each scene is data:
   - **`When`:** segment kinds, or `Night = true`.
   - **`Spot`:** how to find the place.
   - **`Cast`:** the count, plus `Rival = true` for two rival cliques.
@@ -930,7 +930,7 @@ return {
 }
 ```
 
-- [ ] **Step 4: Write `World.Scenes`:**
+- [x] **Step 4: Write `World.Scenes`:**
 
 ```lua
 --[[ (2.29) Scenes (server). Services.World.Scenes: the scene director (docs/expansion/13-Living-School.md §4.2).
@@ -1153,7 +1153,7 @@ return Shared
   - **The clock:** `SchoolClock.IsNight` exists (2.22).
   - **The cast's names:** a borrowed `S` has `First` (2.27).
 
-- [ ] **Step 5: Install and run each scene once.**
+- [x] **Step 5: Install and run each scene once.**
   - Install Schedules, `Config.Scenes`, Scenes, the TestBridge, and Cine if it was edited. Start Play.
   - For each scene, set a fitting time, move the player within 20 studs of its spot (`gamevm.py`), wait 20 s for
     students to settle, and run `bridge.py SceneTest '$P' '"<Id>"'`:
@@ -1176,47 +1176,61 @@ return Shared
   - **Screenshot** one scene mid-play to `tools/phase4-2290/review/scene_locker.jpg`.
   - Restore slot 2.
 
-- [ ] **Step 6: The director on its own.** Leave Play running at `12:10` near the hall for 5 minutes with no commands.
+- [x] **Step 6: The director on its own.** Leave Play running at `12:10` near the hall for 5 minutes with no commands.
   Expected: at most one scene per region in that time (`Incidents.Recent`), no `[Scenes]` warnings, and students back
   on their routines.
 
-- [ ] **Step 7: Commit** `2.29 (4/6): the scene director and six scenes`.
+- [x] **Step 7: Commit** `2.29 (4/6): the scene director and six scenes`.
 
 ---
 
 ### Task 5: Regression
 
-- [ ] **Step 1: Self-tests in one session.**
+- [x] **Step 1: Self-tests in one session.**
   - **This release:** `IncidentTest`, `RumourTest`, `RumourSafetyTest` (`Bad 0`).
   - **2.28:** `StaffTest`, `StaffPlanTest`, `TimetableTest`, `SleepTest`.
   - **2.27:** `RosterTest`, `Rostered`, `RelationshipCapTest`, `MemoryTest`.
   - **Earlier:** the cutscene and Phase 1 suite.
-- [ ] **Step 2: The emitters' own systems still work.**
+- [x] **Step 2: The emitters' own systems still work.**
   - A clique scuffle (`CliqueFights.StartScuffle` from `gamevm.py`) runs and ends, with one `Scuffle` incident.
   - A Fortune reading works.
   - The prologue's two paths are unchanged, and no scene starts during them.
   - 2.28's school day (07:40, 08:05, 09:10, 11:30, 15:30) is unchanged.
-- [ ] **Step 3: The console.** No errors from Incidents, Rumours, Scenes, Schedules, StudentBrain, Fortune,
+- [x] **Step 3: The console.** No errors from Incidents, Rumours, Scenes, Schedules, StudentBrain, Fortune,
   CliqueFights, Matches or Beasts.
-- [ ] **Step 4: Frame rate.** Sample at the lunch stand. It should be within 2 fps of 2.28's 45.3 / 45.1.
-- [ ] **Step 5:** Restore slot 2, stop Play, and run `save_place`.
+- [x] **Step 4: Frame rate.** Sample at the lunch stand. It should be within 2 fps of 2.28's 45.3 / 45.1.
+- [x] **Step 5:** Restore slot 2, stop Play, and run `save_place`.
 
 ### Task 6: Docs and release 2.29.0
 
-- [ ] **Step 1: CHANGELOG `[2.29.0]`,** with Added, Changed, Checked and Not checked, the safety-test numbers, and
+- [x] **Step 1: CHANGELOG `[2.29.0]`,** with Added, Changed, Checked and Not checked, the safety-test numbers, and
   this plan's deltas.
-- [ ] **Step 2: The other docs.**
+- [x] **Step 2: The other docs.**
   - **README:** a Latest-update line.
   - **Implementation-Status:** a row.
   - **Discord:** a game update in `updates/discord/game-updates/<date>-word-gets-around.md`, plus the index.
   - **Doc 13:** the status line and §9 deltas.
-- [ ] **Step 3: Vault.** Copy the docs over, and add the home-note line.
-- [ ] **Step 4: Commit and merge** (as in 2.28: stage only this plan's files and the CHANGELOG hunk; merge with
+- [x] **Step 3: Vault.** Copy the docs over, and add the home-note line.
+- [x] **Step 4: Commit and merge** (as in 2.28: stage only this plan's files and the CHANGELOG hunk; merge with
   `-F <file>`; stash around the merge). Don't push.
 
 ---
 
-## Spec deltas (record in doc 13 §9 at release)
+## Outcome (2026-11-18)
+
+All six tasks are done; the numbers are in CHANGELOG `[2.29.0]`. Beyond the plan:
+- **Placeholders:** `{Placeholders}` must not sit in backtick strings (Luau interpolates them). The templates are
+  plain strings, and the 2.27 intro lines were fixed too.
+- **Chats:** whichever student of a pair knows a rumour tells it.
+- **Regions:** read the way Fortune does; each scene names its place.
+- **Night scenes:** run at dusk.
+- **Argument:** casts a rival pair on purpose.
+- **Tests:** test runs hold the director off.
+- **The harness:** restore covers clique standings and Fortune, and a restore syntax bug was fixed.
+- **Rumour timestamps:** a misplaced comment had dropped them; fixed.
+- **Frame rate:** not measured, at the owner's request.
+
+## Spec deltas (recorded in doc 13 §9 items 24 to 32)
 
 1. **"A figure at a window"** becomes **"a figure at the end of the main hall".** The school building has no windows.
    The figure is the existing faded-student cast template (the Strikethrough), shown for 4 seconds.
