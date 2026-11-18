@@ -72,6 +72,17 @@ function Def.Build(Ctx)
 	local Stamp = line(``, 370, 58, Enum.Font.SpecialElite, RED)
 	Stamp.TextStrokeTransparency = 0.85
 	Stamp.TextStrokeColor3 = RED
+	-- (2.26.0) lost the tug of war in the finale: half the record tore away (Flags from the server). Name, homeroom and
+	-- seat went with it; the header and the status line are on the half that's left.
+	if Ctx.Flags and Ctx.Flags.FileKept == `Lose` then
+		Page.Size = Vector3.new(2.7, 0.02, 1.15)
+		Page.CFrame = Page.CFrame * CFrame.new(0, 0, -0.42)
+		Gui.CanvasSize = Vector2.new(400, 300)
+		for _, L in Gui:GetChildren() do
+			if L:IsA(`TextLabel`) and L.Position.Y.Offset > 100 and L.Position.Y.Offset < 260 then L:Destroy()
+			elseif L:IsA(`TextLabel`) and L.Position.Y.Offset > 260 then L.Position = L.Position - UDim2.fromOffset(0, 230) end
+		end
+	end
 
 	local Custodian = Ctx.Actor(`Custodian`) or Ctx.Mark(`CustodianFar`)
 

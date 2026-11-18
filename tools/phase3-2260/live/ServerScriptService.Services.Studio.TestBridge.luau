@@ -701,6 +701,24 @@ function Commands.CineVoteTest(PlayerName: string)
 end
 
 -- play a cut for a player now (Opts.Skippable = a replay); returns the session id
+-- (2.26.0) After Hours v1 saves: a save on Collected (stage 3) moves past the two new stages; earlier stages stay
+function Commands.AfterHoursMigrateTest()
+	local Q = QuestsService()
+	local Def = require(game:GetService(`ReplicatedStorage`).Config.Quests).Quests.AfterHours
+	local Out = {}
+	for _, Stage in { 1, 2, 3 } do
+		local State = { Stage = Stage; V = 1 }
+		Q.MigrateForTests(Def, State)
+		Out[`From{Stage}`] = State.Stage
+	end
+	return Out
+end
+
+-- (2.26.0) a story decision as the cut would save it (Quests.Decide), e.g. FileKept = Lose
+function Commands.Decide(PlayerName: string, Id: string, Choice: string)
+	return QuestsService().Decide(Players:FindFirstChild(PlayerName), Id, Choice)
+end
+
 function Commands.PlayCut(PlayerName: string, CutId: string, Skippable: boolean?)
 	return CineService().Play({ Players:FindFirstChild(PlayerName) }, CutId, { Skippable = Skippable == true })
 end

@@ -158,8 +158,13 @@ return {
 			Objectives = {
 				{ Id = `File`; Type = `Collect`; Objects = { `MiraFile` }; Item = `MiraFile`; Time = AFTER_HOURS; Grants = { Case = `EmptyDesk`; Clue = `MiraFile` }; Text = `After hours (5 PM onwards), sneak into the Records Office and take Mira's file` };
 				{ Id = `Out`; Type = `Reach`; Area = `RecordsExit`; Item = `MiraFile`; Text = `Get out of the Records Office without being caught` };
+				-- (2.26.0) the Chapter 1 finale: back to her desk, where something is waiting (an interactive cut)
+				{ Id = `Return`; Type = `Reach`; Area = `MiraDesk`; Item = `MiraFile`; Text = `Take Mira's file back to her desk in Room 102` };
+				{ Id = `Fight`; Type = `Cinematic`; Cut = `Strikethrough`; Text = `Something is waiting at the empty desk` };
 				{ Id = `Collected`; Type = `Cinematic`; Cut = `Collected`; Text = `Open Mira's file` }; -- (2.24.0) the Chapter 1 cliffhanger
 			};
+			-- (2.26.0) v2 put Return and Fight before Collected: a v1 save on Collected (stage 3) moves to stage 5
+			Version = 2; StageShift = 2; StageShiftFrom = 3;
 			Rewards = { Yen = 40; Rep = { Trust = 3 }; Title = `Night Owl` };
 			Ending = `Mira's file has one line under her photo, in fresh red ink: STATUS: COLLECTED. End of Chapter 1 (to be continued).`;
 		};

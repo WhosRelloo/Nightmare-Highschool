@@ -513,7 +513,10 @@ end
 -- (2.22.0) objectives inserted before saved stages (Def.Version): move an older save forward, once
 function Local.MigrateVersion(Def, State)
 	if Def and Def.Version and (tonumber(State.V) or 1) < Def.Version then
-		State.Stage = math.clamp((tonumber(State.Stage) or 1) + (Def.StageShift or 0), 1, #Def.Objectives)
+		local Stage = tonumber(State.Stage) or 1
+		-- (2.26.0) StageShiftFrom: objectives were inserted in the middle, so only saves at or past that stage move
+		if Stage >= (Def.StageShiftFrom or 1) then Stage += (Def.StageShift or 0) end
+		State.Stage = math.clamp(Stage, 1, #Def.Objectives)
 		State.V = Def.Version
 	end
 end
@@ -1013,6 +1016,8 @@ function Shared.CineState(Player: Player): { [string]: string }?
 end
 
 function Shared.SyncForCine(Player: Player) Local.Sync(Player) end
+-- (2.26.0) tests: run a quest's save migration on a bare state table
+function Shared.MigrateForTests(Def, State) Local.MigrateVersion(Def, State) end
 
 -- (2.25.0) the best grade per interactive cut ({ [CutId] = { Best, Points, Max } }); Services.World.Cine is the only writer
 function Shared.CineGrades(Player: Player): { [string]: any }?

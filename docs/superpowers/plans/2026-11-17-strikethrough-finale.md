@@ -823,6 +823,17 @@ Def.Graph = { start = `Arrive`; segments = {
 
 ### Task 7: After Hours gets the fight; COLLECTED shows the torn page
 
+> **Outcome (2026-11-18):**
+> - **Migration:** `AfterHoursMigrateTest` gave From1 1, From2 2, From3 3 before the fix, then 1, 2, 5 after.
+> - **Torn page:** COLLECTED with FileKept `Lose` shows the half page, "STATUS: COLLECTED" on what's left (`review/collected_torn.jpg`).
+> - **Quest flow, live:**
+>   - **Getting to stage 3:** UseObject MiraFile → stage 2; RecordsExit → stage 3.
+>   - **Mira's desk:** the `GoTo` must use offset `Vector3.new(0, 0, 0)`. The default +3 z puts you outside `Area_MiraDesk`.
+>   - **The fight:** the Strikethrough plays: grade S.
+>   - **After:** stage 5, and COLLECTED plays.
+> - **Slot 2:** restored after each run.
+
+
 **Files:**
 - Modify: `…Config.Quests.luau`, `…Quests.Quests.luau` (`MigrateVersion`), `…Cinematics.Collected.luau`, `…Studio.TestBridge.luau`
 
