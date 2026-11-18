@@ -69,7 +69,7 @@
   - **`Ctx.GameClip(Path) -> string?`:** the AnimationId of `ReplicatedStorage.Assets.Animations.<Path>` (dotted).
   - **`Ctx.Flags`:** a `{ [Flag] = Outcome }` table from the Play message.
   - **Shot events:**
-    - `{ t, anim = { rig = Ctx.Actor(Name), id = Ctx.Clip(...), speed?, fade?, looped? } }` (the toolkit's own event)
+    - `{ t, anim = { rig = Ctx.Actor(Name), id = Ctx.Clip(...), speed?, fade?, looped? } }` (the toolkit's own event). It goes in a **shot's** `events` table, not the segment's, so the shot player times it and applies slow-motion and hitstop. The director's segment events handle `fx`, `move`, `walk`, `place`, `pose`, `look`, `say`, `bell`, `card`, `sound` and `call`.
     - `{ t, fx = { template = "CombatFX.Flashstep", at = <Instance|CFrame>, part? = "Torso", count = 20, color? = Color3 } }`
     - `{ t, move = { part = <BasePart>, to = <CFrame>, dur = 0.3 } }`: a client-side move, put back when the cut ends.
 - **Server:** the Play message gains `Flags = { [Flag] = Quests.Decided(Player, Flag) }` for each name in `Config.Cine.Cuts[Id].Flags`.
