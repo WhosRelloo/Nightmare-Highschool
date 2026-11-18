@@ -746,6 +746,32 @@ function Commands.SleepTest(PlayerName: string)
 	return DeepCopy(require(game:GetService(`ServerScriptService`).Services.Features.Schedules).SleepForTests())
 end
 
+-- (2.30) the broadcast: items roll at 40, a PA is limited to one per segment (emergencies aside), the station is on air at night
+function Commands.BroadcastTest(PlayerName: string)
+	local B = require(game:GetService(`ServerScriptService`).Services.World.Broadcast)
+	local Player = Players:FindFirstChild(PlayerName)
+	B.PATestReset()
+	for I = 1, 45 do B.Post(`IncidentReport`, `Report {I}`) end
+	local All = B.Items()
+	local First = B.PA(`Test one.`)
+	local Second = B.PA(`Test two.`)
+	local Emergency = B.PA(`Emergency.`, true)
+	B.PATestReset()
+	local St = B.Station(Player)
+	return { Count = #All; Newest = All[#All].Text; Oldest = All[1].Text; FirstPA = First; SecondPA = Second; EmergencyPA = Emergency;
+		StationHasItems = #St.Items > 0; OnAirIsBool = typeof(St.OnAir) == `boolean` }
+end
+
+-- (2.30) the curfew rule at a given hour, with the player where the caller put them
+function Commands.CurfewTest(PlayerName: string)
+	local HM = require(game:GetService(`ServerScriptService`).Services.School.HallMonitor)
+	local P = Players:FindFirstChild(PlayerName)
+	local A, Why23 = HM.IsAfterHoursForTests(P, 23)
+	local B, Why15 = HM.IsAfterHoursForTests(P, 15)
+	local C, Why5 = HM.IsAfterHoursForTests(P, 5)
+	return { At23 = A; Why23 = Why23; At15 = B; Why15 = Why15; At5 = C; Why5 = Why5 }
+end
+
 -- (2.29) the incident bus: Emit fills time, region and witnesses; On hears it; the relationship consumer applies flags
 function Commands.IncidentTest(PlayerName: string)
 	local SSS = game:GetService(`ServerScriptService`).Services

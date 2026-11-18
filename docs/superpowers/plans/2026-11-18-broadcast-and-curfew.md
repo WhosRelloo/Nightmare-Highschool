@@ -42,6 +42,7 @@ with a reference image of three Spotify-like phone screens: home, library, now p
   - the snapshot must then match `_slot2.json`, except `Discipline.LastDecayDay`
 - **UI and art:** existing kit art only (`Theme.Images`, `Theme.Colors`, `Theme.Fonts`, `Kit` components).
   - Icons are text glyphs in the kit fonts (♪ ▶ ❚❚ ⏮ ⏭ ♡ ⟲ ⌂ ⌕), as the phone already uses ♪.
+  - **Never the `Seal` image** (owner, 2026-11-18).
   - No new image uploads. Don't edit `ReplicatedStorage.UI.Components` (the peer session "UI kit" owns it).
 - **The frame rate isn't measured** (owner, 2026-11-18).
 - **Commits:** `git -c user.name=Rello`, with the Co-Authored-By and Claude-Session lines, on `phase4-living-school`.
@@ -457,7 +458,7 @@ end
 	Tabs: Home (greeting, chips, the Midnight Broadcast banner, recent tracks), Library (saved + recent, add by ID),
 	Station (Midnight Broadcast, 21:00-03:00: caller lines, campus reports, transmissions; World.Broadcast), and the
 	Now Playing sheet (cover, title, creator, like, waveform scrubber, loop / prev / play / next / volume).
-	Art: only the kit's (Theme.Images emblems on gradients for covers, Knob / OrbRing behind round buttons, PanelBg grain).
+	Art: only the kit's (Theme.Images emblems on gradients for covers, never the Seal icon (owner), PanelBg grain).
 	Driven by Controllers.Gui.Phone: Open(Ctx), Tick(). ]]
 local Players = game:GetService(`Players`)
 local MarketplaceService = game:GetService(`MarketplaceService`)
@@ -472,7 +473,7 @@ local Info = {} :: { [number]: { Title: string, Creator: string } }
 
 local PURPLE = Color3.fromRGB(150, 95, 230)
 local PURPLE_DEEP = Color3.fromRGB(46, 22, 78)
-local COVERS = { `IconAppRadio`, `IconCandle`, `Crest`, `Seal`, `IconBannerFullMoon`, `IconBannerBlueMoon`, `IconBannerCrimsonMoon`, `IconNib`, `Bell`, `IconCardBack` }
+local COVERS = { `IconAppRadio`, `IconCandle`, `Crest`, `IconBannerFullMoon`, `IconBannerBlueMoon`, `IconBannerCrimsonMoon`, `IconNib`, `Bell`, `IconCardBack` } -- (owner: no Seal icon)
 local GRADS = {
 	{ Color3.fromRGB(120, 60, 200), Color3.fromRGB(150, 30, 60) }, { Color3.fromRGB(70, 40, 150), Color3.fromRGB(20, 10, 40) },
 	{ Color3.fromRGB(170, 70, 140), Color3.fromRGB(60, 20, 90) }, { Color3.fromRGB(90, 30, 40), Color3.fromRGB(150, 95, 230) },

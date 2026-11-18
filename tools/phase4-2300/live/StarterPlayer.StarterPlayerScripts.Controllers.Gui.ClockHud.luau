@@ -2,6 +2,7 @@
 	ClockHud (client)
 	Top-right panel: day + time, current period and time left, and a school-hours badge.
 	Computes time locally from the server's published Epoch (no per-tick network traffic).
+	(2.30) A PA line at the top: World.Broadcast's announcements, typed in with a chime (ReplicatedStorage.NHBroadcast).
 ]]
 
 ---| Services |---
@@ -96,6 +97,10 @@ function Local.CreateGui()
 		Record = Local.Label(Lines, `Record`, 5, 13, true);
 		Carry = Local.Label(Lines, `Carry`, 6, 13, false); -- (1.42) a lost item in your hand (Features.LostFound)
 	}
+	-- (2.30) the PA (World.Broadcast): a typed gold line at the top while the school speaks
+	Labels.PA = Local.Label(Lines, `PA`, 0, 13, true)
+	Labels.PA.TextColor3 = KitTheme.Colors.Gold
+	Labels.PA.Visible = false
 	Kit.Emboss(Labels.Time, Color3.fromRGB(150, 140, 130), 1.4)
 	Labels.Badge.TextColor3 = KitTheme.Colors.Gold
 	-- (1.41) tonight's moon, just left of the day and time (Lineage.MoonIcons; hidden until the icons are set)
@@ -182,9 +187,43 @@ function Local.UpdateWaypoint(RoomId: string?, Text: string)
 	Waypoint.Enabled = true
 end
 
+-- (2.30) the PA (World.Broadcast): a chime, the line typed in, held, then gone
+local PAToken = 0
+function Shared.ShowPA(Text: string, Chime: string?)
+	local L = Local.Labels and Local.Labels.PA
+	if not L then return end
+	PAToken += 1
+	local Mine = PAToken
+	pcall(function()
+		local S = Instance.new(`Sound`)
+		S.SoundId = Chime or `rbxassetid://9114058995`
+		S.Volume = 0.3
+		S.Parent = game:GetService(`SoundService`)
+		S:Play()
+		game:GetService(`Debris`):AddItem(S, 3)
+	end)
+	L.Visible = true
+	for I = 1, #Text do
+		if PAToken ~= Mine then return end
+		L.Text = `PA  ·  ` .. Text:sub(1, I)
+		task.wait(0.025)
+	end
+	task.wait(math.clamp(#Text * 0.06, 4, 10))
+	if PAToken == Mine then L.Visible = false end
+end
+
 function Shared.OnStart()
 	local Clock = ReplicatedStorage:WaitForChild(`SchoolClock`)
 	local Labels = Local.CreateGui()
+	Local.Labels = Labels -- (2.30) for ShowPA
+	task.spawn(function()
+		local R = ReplicatedStorage:WaitForChild(`NHBroadcast`, 60)
+		if R then
+			R.OnClientEvent:Connect(function(M)
+				if typeof(M) == `table` and M.Kind == `PA` and typeof(M.Text) == `string` then task.spawn(Shared.ShowPA, M.Text, M.Chime) end
+			end)
+		end
+	end)
 
 	task.spawn(function()
 		while true do
