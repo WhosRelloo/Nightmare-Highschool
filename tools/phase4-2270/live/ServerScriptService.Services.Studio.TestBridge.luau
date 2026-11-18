@@ -695,6 +695,16 @@ function Commands.RosterTest(PlayerName: string)
 	return DeepCopy(require(game:GetService(`ServerScriptService`).Services.Social.Roster).SelfTestForTests())
 end
 
+-- (2.27) the roster's bodies: ids on the live students, and a look that is the same when built twice
+function Commands.Rostered(PlayerName: string)
+	local Sched = require(game:GetService(`ServerScriptService`).Services.Features.Schedules)
+	local Ids, Seen = {}, {}
+	for _, R in Sched.Debug() do if R.RosterId and not Seen[R.RosterId] then Seen[R.RosterId] = true table.insert(Ids, R.RosterId) end end
+	local A, B = Sched.LookForTests(`MaeGorse`), Sched.LookForTests(`MaeGorse`)
+	return { Students = #Sched.Debug(); Ids = #Ids;
+		SameLook = A.Uniform == B.Uniform and A.Skin == B.Skin and A.HairId == B.HairId and A.Bottoms == B.Bottoms and A.Body == B.Body }
+end
+
 -- Decision, Kill, a seen Cinematic stage and Requires.Fresh on the real Quests code (a throwaway quest; put back after)
 function Commands.Phase1SelfTest(PlayerName: string)
 	return DeepCopy(QuestsService().Phase1SelfTestForTests(Players:FindFirstChild(PlayerName)))

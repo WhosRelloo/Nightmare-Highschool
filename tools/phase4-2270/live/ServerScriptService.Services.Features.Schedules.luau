@@ -1,6 +1,6 @@
 --[[
 	NPC daily schedules (server). Services.Features.Schedules
-	Fourteen background students live by the school timetable (Config.SchoolSchedule segments, Config.Classes rooms):
+	The roster's 24 students (Config.Students, Social.Roster; 2.27) live by the school timetable (Config.SchoolSchedule segments, Config.Classes rooms):
 	  Night / Morning   off campus (not spawned)
 	  Before School     walk in from the gate and mill about the hallway
 	  Class             the first six take seats in that period's room (chairs stay free for players); the rest
@@ -38,7 +38,7 @@ local SpotTaken = {} :: { [BasePart]: any }
 local ChairBy = {} :: { [Model]: any }
 local SpotFailed = {} :: { [BasePart]: number } -- spots nobody could walk to lately (skipped for 2 minutes)
 
-local COUNT = 14
+local COUNT = #require(ReplicatedStorage.Config.Students).List -- (2.27) the roster (24); also the lunch arc's size
 local IN_CLASS = 6
 local WALK_SPEED = 6 -- a stroll: the walk clip plays at about 1.1x, feet on the ground (WALK_PACE)
 local WALK_PACE = 5.3 -- studs/s the Default walk clip covers at 1x (measured, 2026-11-03)
@@ -156,27 +156,36 @@ function Local.Groups()
 	end
 end
 
-function Local.Look(): any
+-- (2.27) Appearance.RandomPiece with a seeded Random: a piece this look's gender could wear, never the admin kit
+function Local.PieceFor(List, Look, Rng: Random): number
+	local Appearance = require(ReplicatedStorage.UI.Appearance)
+	local Pool = {}
+	for I, E in ipairs(List) do
+		if not E.Admin and Appearance.ClothingAllows(E, Look, false) then table.insert(Pool, I) end
+	end
+	return if #Pool > 0 then Pool[Rng:NextInteger(1, #Pool)] else 1
+end
+
+function Local.Look(Rng: Random): any -- (2.27) seeded per roster student: the same look every server
 	local Appearance = require(ReplicatedStorage.UI.Appearance)
 	local Look = Appearance.Sanitize(nil)
 	Look.UseAvatar = false
-	Look.Uniform = math.random(1, #Appearance.Uniforms)
-	Look.Bottoms = math.random(1, math.min(6, #Appearance.BottomsList))
-	Look.Skin = math.random(1, #Appearance.Skins)
-	Look.HairColor = math.random(1, #Appearance.HairColors)
-	Look.Body = math.random(1, 2)
+	Look.Skin = Rng:NextInteger(1, #Appearance.Skins)
+	Look.HairColor = Rng:NextInteger(1, #Appearance.HairColors)
+	Look.Body = Rng:NextInteger(1, 2)
 	-- (1.71) clothes by the NPC's gender (UI.Appearance), never the admin kit
-	Look.Uniform = Appearance.RandomPiece(Appearance.Uniforms, Look)
-	Look.Bottoms = Appearance.RandomPiece(Appearance.BottomsList, Look)
+	Look.Uniform = Local.PieceFor(Appearance.Uniforms, Look, Rng)
+	Look.Bottoms = Local.PieceFor(Appearance.BottomsList, Look, Rng)
 	Look.EyeSet = if Appearance.IsFemale(Look) then 2 else 1
-	Look.Eyes = math.random(1, #Appearance.Eyes)
+	Look.Eyes = Rng:NextInteger(1, #Appearance.Eyes)
 	local Cat = ReplicatedStorage:FindFirstChild(`NHHairCatalog`)
 	if Cat then
 		local Pool = {}
 		for _, H in Cat:GetChildren() do
 			if H:GetAttribute(`Group`) == (if Appearance.IsFemale(Look) then `Female` else `Male`) then table.insert(Pool, H:GetAttribute(`AssetId`)) end
 		end
-		if #Pool > 0 then Look.HairId = Pool[math.random(1, #Pool)] end
+		table.sort(Pool, function(X, Y) return tostring(X) < tostring(Y) end) -- (2.27) child order isn't stable
+		if #Pool > 0 then Look.HairId = Pool[Rng:NextInteger(1, #Pool)] end
 	end
 	Look.Created = true
 	return Look
@@ -217,6 +226,7 @@ function Local.Spawn(S, At: Vector3)
 	M.Name = `Student`
 	M:SetAttribute(`Role`, `Ambient`)
 	M:SetAttribute(`NHScheduled`, S.Index)
+	if S.RosterId then M:SetAttribute(`NHStudentId`, S.RosterId) end -- (2.27)
 	if S.Clique then M:SetAttribute(`Clique`, S.Clique) end
 	if S.Build then -- (2.3.0) Config.NpcBuilds: UI.Appearance makes them this height
 		M:SetAttribute(`NHHeightWant`, S.Build.Height)
@@ -689,9 +699,14 @@ end
 function Shared.Debug()
 	local Out = {}
 	for _, S in Students do
-		table.insert(Out, { Index = S.Index; Club = S.Club; Clique = S.Clique; Spawned = S.Model ~= nil; Activity = S.Model and S.Model:GetAttribute(`NHActivity`); Seated = S.Seated ~= nil })
+		table.insert(Out, { Index = S.Index; RosterId = S.RosterId; Club = S.Club; Clique = S.Clique; Spawned = S.Model ~= nil; Activity = S.Model and S.Model:GetAttribute(`NHActivity`); Seated = S.Seated ~= nil })
 	end
 	return Out
+end
+
+-- (2.27) tests: a roster student's look, built from their seed without spawning
+function Shared.LookForTests(Id: string)
+	return Local.Look(require(ServerScriptService.Services.Social.Roster).Rng(Id))
 end
 
 function Shared.OnStart()
@@ -699,33 +714,42 @@ function Shared.OnStart()
 	Folder = Instance.new(`Folder`)
 	Folder.Name = `NHSchedule`
 	Folder.Parent = workspace
-	for I = 1, COUNT do
-		local Ok, Look = pcall(Local.Look)
-		local Clique = CliqueConfig.Students[I] or `Ordinary`
+	-- (2.27) one student per roster entry (Config.Students), everything rolled from their own seed (Social.Roster.Rng):
+	-- the same look, build and voice every server
+	local Roster = require(ServerScriptService.Services.Social.Roster)
+	local AppearanceMod = require(ReplicatedStorage.UI.Appearance)
+	for I, E in Roster.All() do
+		local Rng = Roster.Rng(E.Id)
+		local Ok, Look = pcall(Local.Look, Rng)
+		local Clique = E.Clique
 		if Ok and Look then
-			local Appearance = require(ReplicatedStorage.UI.Appearance)
 			local L = CliqueConfig.Defs[Clique] and CliqueConfig.Defs[Clique].Look
 			if L then
-				local Female = require(ReplicatedStorage.UI.Appearance).IsFemale(Look)
+				local Female = AppearanceMod.IsFemale(Look)
 				local Tops = table.clone(L.Tops or {})
 				if Female then for _, T in L.FemaleTops or {} do table.insert(Tops, T) end end
 				local Bottoms = if Female and L.FemaleBottoms then L.FemaleBottoms else L.Bottoms
-				Look.Uniform = Appearance.IndexOf(Appearance.Uniforms, Tops[math.random(1, #Tops)]) or Look.Uniform
-				if Bottoms and #Bottoms > 0 then Look.Bottoms = Appearance.IndexOf(Appearance.BottomsList, Bottoms[math.random(1, #Bottoms)]) or Look.Bottoms end
+				if #Tops > 0 then Look.Uniform = AppearanceMod.IndexOf(AppearanceMod.Uniforms, Tops[Rng:NextInteger(1, #Tops)]) or Look.Uniform end
+				if Bottoms and #Bottoms > 0 then Look.Bottoms = AppearanceMod.IndexOf(AppearanceMod.BottomsList, Bottoms[Rng:NextInteger(1, #Bottoms)]) or Look.Bottoms end
 			end
+		elseif not Ok then
+			warn(`[Schedules] look for {E.Id}: {Look}`)
 		end
-		-- (2.3.0) a build by clique and personality (Config.NpcBuilds), the same for this student every spawn: height, body
-		-- type (in their gender), bravery and sociability, posture and pace
-		local AppearanceMod = require(ReplicatedStorage.UI.Appearance)
+		-- (2.3.0) a build by clique and personality (Config.NpcBuilds): height, body type (in their gender), sociability,
+		-- posture and pace; (2.27) keyed by the roster id, and the roster's bravery wins over the roll
 		local Female = Ok and Look and AppearanceMod.IsFemale(Look) or false
-		local Build = NpcBuilds.Roll(`Schedule|{I}`, Clique, Female)
+		local Build = NpcBuilds.Roll(`Roster|{E.Id}`, Clique, Female)
+		Build.Bravery = E.Bravery
 		if Ok and Look then Look.Body = NpcBuilds.BodyFor(AppearanceMod, Female, Build) or Look.Body end
-		Students[I] = { Index = I; Look = if Ok then Look else nil; Club = CLUBS[(I - 1) % #CLUBS + 1]; Clique = Clique; Build = Build;
+		local S = { Index = I; RosterId = E.Id; Name = E.Name; First = E.First; Temper = E.Temper;
+			Look = if Ok then Look else nil; Club = CLUBS[(I - 1) % #CLUBS + 1]; Clique = Clique; Build = Build;
 			-- (1.86.2) a personality and a voice (Config.NpcVoice: Girl / Boy by body, a personal pitch +-8%)
 			Bravery = Build.Bravery; Social = Build.Social; Speed = Build.Speed;
-			VoiceSet = if Ok and Look and require(ReplicatedStorage.UI.Appearance).IsFemale(Look) then `Girl` else `Boy`;
-			Voice = 0.92 + math.random() * 0.16;
+			VoiceSet = if Ok and Look and AppearanceMod.IsFemale(Look) then `Girl` else `Boy`;
+			Voice = 0.92 + Rng:NextNumber() * 0.16;
 		}
+		Students[I] = S
+		Roster.Bind(E.Id, S)
 	end
 	Brain.Init({
 		Pose = Local.Pose;
