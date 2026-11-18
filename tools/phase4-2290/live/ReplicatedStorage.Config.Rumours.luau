@@ -12,7 +12,7 @@ return {
 		Argument = { "{Doer} and {Target} had a {Size} in {Where}." };
 		Locker = { "{Doer} {Size} {Target} into a locker in {Where}." };
 		Notice = { "Someone defaced the notice board in {Where}. {Extra}" };
-		EastWing = { "Somebody heard {Size} in the east wing last night." };
+		EastWing = { "Somebody heard {Size} in the east wing after dark." };
 		Figure = { "{Doer} swears there was {Size} at the end of the main hall." };
 		Dare = { "{Doer} dared {Target} to try the Records Office door." };
 	};
@@ -26,7 +26,9 @@ return {
 	};
 	-- region names as players see them (Config.Regions ids -> words)
 	Places = { MainHall = `the main hall`; Commons = `the Commons`; EastWing = `the east wing`; Cafeteria = `the cafeteria`;
-		Library = `the library`; Chapel = `the chapel`; Dorms = `the dorms`; Grounds = `the grounds` };
+		Library = `the library`; Chapel = `the chapel`; Dorms = `the dorms`; Grounds = `the grounds`; Archive = `the Archive`;
+		Graveyard = `the graveyard`; BoilerYard = `the boiler yard`; StaffRoom = `the staff room`; RecordsOffice = `the Records Office`;
+		Gymnasium = `the gym`; InkStudio = `the Ink Studio`; BackLot = `the back lot`; Den = `the Den`; Ring = `the Ring` };
 	MaxLive = 30;
 	HopSeconds = 300;
 	LifeSeconds = 7200; -- one in-game day: Config.SchoolSchedule RealSecondsPerGameHour 300 x 24 (measured 2026-11-18)

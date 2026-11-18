@@ -754,6 +754,39 @@ function Shared.Debug()
 	return Out
 end
 
+-- (2.29) the scene director borrows students with bodies near a spot (World.Scenes) and gives them back after
+function Shared.Borrow(Pos: Vector3, Count: number, Filter: ((any) -> boolean)?)
+	local Pool = {}
+	for _, S in Students do
+		if S.Model and S.Root and not S.Seated and not S.Reacting and not S.InScene and not S.Chatting
+			and (S.Root.Position - Pos).Magnitude <= 40 and (not Filter or Filter(S)) then
+			table.insert(Pool, S)
+		end
+	end
+	if #Pool < Count then return nil end
+	table.sort(Pool, function(A, B) return (A.Root.Position - Pos).Magnitude < (B.Root.Position - Pos).Magnitude end)
+	local Out = {}
+	for K = 1, Count do
+		local S = Pool[K]
+		S.Job = {} -- cancel the routine (LastJob is kept for Release)
+		S.InScene = true
+		Local.Pose(S, nil)
+		table.insert(Out, S)
+	end
+	return Out
+end
+
+function Shared.Release(S)
+	S.InScene = nil
+	if S.LastJob and S.Model then
+		S.ReplanNow = true
+		Local.Assign(S, S.LastJob.Fn, table.unpack(S.LastJob.Args, 1, S.LastJob.Args.n))
+	end
+end
+
+function Shared.HallSpotFor() return Local.HallSpot() end
+function Shared.Students() return Students end
+
 -- (2.28) once a second: a body far from every player goes (they stay where they were, asleep); a sleeper a player
 -- comes near wakes there and carries on with their job
 function Local.SleepWake()

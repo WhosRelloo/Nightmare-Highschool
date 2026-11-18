@@ -26,21 +26,28 @@ local function svc(Path: string)
 	return if Ok then M else nil
 end
 
+-- the region a point is in, the way Features.Fortune reads it: inside the box in all three axes, the highest
+-- Config.Regions Priority, then the smallest box; the big Grounds box only if nothing else holds it. (The Regions boxes
+-- don't line up well with this place's rooms: World.Scenes names its own place.)
 function Shared.RegionAt(Pos: Vector3?): string?
 	local Folder = workspace:FindFirstChild(`Regions`)
 	if not (Pos and Folder) then return nil end
-	local Best, BestVol = nil, math.huge -- the smallest box that holds the point (a room inside a hall wins)
-	for _, Box in Folder:GetChildren() do
+	local Defs = (require(ReplicatedStorage.Config.Regions).Defs) or {}
+	local Best, BestPri, BestVol, Fallback = nil, -math.huge, math.huge, nil
+	for _, Box in Folder:GetDescendants() do
 		if Box:IsA(`BasePart`) then
+			local Id = Box:GetAttribute(`RegionId`) or Box.Name
 			local L = Box.CFrame:PointToObjectSpace(Pos)
 			local H = Box.Size / 2
-			if math.abs(L.X) <= H.X and math.abs(L.Z) <= H.Z then
-				local Vol = Box.Size.X * Box.Size.Z
-				if Vol < BestVol then Best, BestVol = (Box:GetAttribute(`RegionId`) or Box.Name), Vol end
+			if math.abs(L.X) <= H.X and math.abs(L.Y) <= H.Y and math.abs(L.Z) <= H.Z then
+				local Def = Defs[Id]
+				if Def and Def.Kind == `Grounds` then Fallback = Fallback or Id continue end
+				local Pri, Vol = (Def and Def.Priority) or 0, Box.Size.X * Box.Size.Y * Box.Size.Z
+				if Pri > BestPri or (Pri == BestPri and Vol < BestVol) then Best, BestPri, BestVol = Id, Pri, Vol end
 			end
 		end
 	end
-	return Best
+	return Best or Fallback
 end
 
 function Local.PosOf(Id): Vector3?
@@ -121,7 +128,7 @@ function Shared.OnStart()
 		end) end
 		local HM = svc(`School.HallMonitor`)
 		if HM then HM.Caught:Connect(function(Player: Player, Reason: string, LetOff: boolean?)
-			Shared.Emit({ Kind = `Caught`; Reason = Reason; LetOff = LetOff == true; Severity = 1; Who = { { Id = Player; Role = `Target` } } })
+			Shared.Emit({ Kind = `Caught`; Reason = Reason; Extra = `For {string.lower(Reason or `nothing`)}.`; LetOff = LetOff == true; Severity = 1; Who = { { Id = Player; Role = `Target` } } })
 		end) end
 		local Disc = svc(`School.Discipline`)
 		if Disc then Disc.ViolationAdded:Connect(function(Player: Player, Record)
