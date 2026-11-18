@@ -30,13 +30,14 @@ return {
 	-- west of the entrance hall). The Night Custodian sweeps the main hallway by day; OffWhen = a Config.Stealth zone: while
 	-- it's watched (after hours) his post stays empty, because he's the Records Office watcher then (Quests.Stealth).
 	Hale = { Name = `Mr. Hale`; Role = `Chemistry, Room 103`; Color = Color3.fromRGB(196, 160, 112); Dialogue = `Hale`;
-		-- (2.28) homeroom register at his Room 102 desk (2.24's post), Chemistry in Room 103, the Staff Room otherwise
-		Posts = { Homeroom = `Hale`; Class = `Hale@R103`; Other = `Hale@Staff` } };
+		-- (2.28) his Room 102 desk (2.24's post) all day and after hours, so Orientation can always find him; Chemistry in
+		-- Room 103 during the class periods
+		Posts = { Homeroom = `Hale`; Class = `Hale@R103`; Other = `Hale`; Off = `Hale` } };
 	Custodian = { Name = `Night Custodian`; Role = `Custodian`; Color = Color3.fromRGB(110, 124, 150); Dialogue = `Custodian`; OffWhen = `RecordsOffice` };
 
 	-- (2.28) the subject teachers and the Headmaster (docs/expansion/13-Living-School.md §3.1). Posts by segment:
 	-- Homeroom (the register), Class (the other periods), Other (before school, passing, break, lunch, after school).
-	-- No key for a segment = not on campus then. Sallow has no Homeroom post: Hale takes the register in her room.
+	-- Off = evening, night and morning. No key for a segment = not on campus then. Sallow has no Homeroom post: Hale takes the register in her room.
 	Sallow = { Name = `Ms. Sallow`; Role = `Mathematics, Room 102`; Color = Color3.fromRGB(150, 150, 170); Dialogue = `Sallow`;
 		Posts = { Class = `Sallow`; Other = `Sallow@Staff` } };
 	Pryce = { Name = `Mr. Pryce`; Role = `English, Room 104`; Color = Color3.fromRGB(170, 120, 90); Dialogue = `Pryce`;

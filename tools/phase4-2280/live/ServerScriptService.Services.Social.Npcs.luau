@@ -5,6 +5,10 @@
 
 	Hitting a leader costs relationship and faction standing (Config.Reputation.AttackPenalty),
 	at most once per player per leader every PENALTY_COOLDOWN seconds.
+
+	(2.28) Staff with Posts (Config.Npcs) move between them by school segment: Homeroom, the other Class periods, and
+	Other (before school, passing, break, lunch, after school), Off (the rest); no key = off campus. A change fades them out at the old
+	post and in at the new one, on the next tick. Npcs.PostKey(NpcId, Kind, Name) -> key? (pure).
 ]]
 
 ---| Services |---
@@ -42,8 +46,26 @@ local LastPenalty = {} :: { [Player]: { [string]: number } }
 local Local = {}
 local Shared = {}
 
+-- (2.28) the post key for a school segment: Config.Npcs Posts (Homeroom / Class / Other), else the NPC's own id.
+-- nil = not on campus in that segment.
+local OTHER = { BeforeSchool = true; Passing = true; Break = true; Lunch = true; AfterSchool = true }
+function Shared.PostKey(NpcId: string, Kind: string?, Name: string?): string?
+	local Npc = Cast[NpcId]
+	if not Npc then return nil end
+	if not Npc.Posts then return NpcId end
+	if Kind == `Class` and Name == `Homeroom` then return Npc.Posts.Homeroom end
+	if Kind == `Class` then return Npc.Posts.Class end
+	if OTHER[Kind or ``] then return Npc.Posts.Other end
+	return Npc.Posts.Off -- (2.28) evening, night and morning: most staff have none
+end
+function Local.KeyNow(NpcId: string): string?
+	local Ok, Seg = pcall(function() return require(ServerScriptService.Services.School.SchoolClock).GetState().Segment end)
+	return Shared.PostKey(NpcId, Ok and Seg and Seg.Kind or nil, Ok and Seg and Seg.Name or nil)
+end
+
 function Local.Post(NpcId: string): BasePart?
-	return Places.Find(`NpcPost`, NpcId)
+	local Key = Local.KeyNow(NpcId) -- (2.28)
+	return if Key then Places.Find(`NpcPost`, Key) else nil
 end
 
 function Local.Tag(Model: Model, Npc, Color: Color3)
@@ -146,7 +168,8 @@ end
 
 -- (2.24.0) staff with another job after hours (Config.Npcs OffWhen = a Config.Stealth zone): the post stays empty while
 -- that zone is watched, because the watcher is the same person; they come back to the post when it isn't
-function Local.Away(Npc): boolean
+function Local.Away(Npc, NpcId: string?): boolean
+	if Npc.Posts and NpcId then return Local.KeyNow(NpcId) == nil end -- (2.28) staff off campus in this segment
 	if not Npc.OffWhen then return false end
 	local Ok, Away = pcall(function()
 		local Zone = require(ReplicatedStorage.Config.Stealth).Zones[Npc.OffWhen]
@@ -171,9 +194,10 @@ end
 
 function Local.Spawn(NpcId: string)
 	local Npc = Cast[NpcId]
-	if Npc and Local.Away(Npc) then return end -- (2.24.0) Local.Tick brings them back when the zone closes
+	if Npc and Local.Away(Npc, NpcId) then return end -- (2.24.0) Local.Tick brings them back when the zone closes
 	local Post = Local.Post(NpcId)
 	if not Npc or not Post then
+		if Npc and Npc.Posts and not Local.KeyNow(NpcId) then return end -- (2.28) off campus now: not an error
 		warn(`[Npcs] no part with NpcPost = {NpcId}`)
 		return
 	end
@@ -232,7 +256,7 @@ function Local.Spawn(NpcId: string)
 		if not Ok then warn(`[Npcs] {Err}`) end
 	end)
 
-	local N = { Id = NpcId; Model = Model; Humanoid = Humanoid; Root = Root; Post = Post; Prompt = Prompt }
+	local N = { Id = NpcId; Key = Local.KeyNow(NpcId); Model = Model; Humanoid = Humanoid; Root = Root; Post = Post; Prompt = Prompt } -- (2.28) Key
 	Active[NpcId] = N
 
 	Humanoid:GetAttributeChangedSignal(`Downed`):Connect(function()
@@ -257,11 +281,15 @@ end
 -- Walk back to the post when moved (pushed, carried and dropped, recovered from downed).
 function Local.Tick()
 	-- (2.24.0) staff who go off to another job after hours (OffWhen)
+	-- (2.28) and staff with Posts, who move between them as the school day changes
 	for NpcId, Npc in Cast do
-		if not Npc.OffWhen then continue end
-		local Away = Local.Away(Npc)
-		if Away and Active[NpcId] then Local.Depart(NpcId)
-		elseif not Away and not Active[NpcId] and not Returning[NpcId] and Local.Post(NpcId) then
+		if not (Npc.OffWhen or Npc.Posts) then continue end
+		local Away = Local.Away(Npc, NpcId)
+		local N = Active[NpcId]
+		if Away and N then Local.Depart(NpcId)
+		elseif N and Npc.Posts and N.Key ~= Local.KeyNow(NpcId) then
+			Local.Depart(NpcId) -- (2.28) a new segment: fade out here, back at the new post next tick
+		elseif not Away and not N and not Returning[NpcId] and Local.Post(NpcId) then
 			Returning[NpcId] = true
 			task.spawn(function() pcall(Local.Spawn, NpcId) Returning[NpcId] = nil end)
 		end

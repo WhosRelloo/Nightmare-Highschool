@@ -30,8 +30,8 @@ for Key, Room in { Sallow = `R102`, [`Hale@R103`] = `R103`, Pryce = `R104`, Whit
 	table.insert(Out, string.format("%s %s (%.1f, %.1f, %.1f) chairs %d", Key, Room, At.X, At.Y, At.Z, N))
 end
 local SR = workspace:FindFirstChild(`Area_StaffRoom`, true)
-for I, Key in { `Hale@Staff`, `Sallow@Staff`, `Pryce@Staff`, `Whitlock@Staff` } do
-	local X = (I - 2.5) * 4
+for I, Key in { `Sallow@Staff`, `Pryce@Staff`, `Whitlock@Staff` } do -- (Hale stays at his Room 102 desk)
+	local X = (I - 2) * 4
 	local At = SR.Position + Vector3.new(X, -SR.Size.Y / 2 + 3, 4)
 	Post(Key, At, SR.Position)
 	table.insert(Out, string.format("%s (%.1f, %.1f, %.1f)", Key, At.X, At.Y, At.Z))
