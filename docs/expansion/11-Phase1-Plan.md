@@ -135,6 +135,9 @@ Map's real rooms, measured read-only on 2026-11-17.
 | Strike.File | = Hall.File | | |
 | Strike.Wide | (-1013.3, 6.4, 88.1) looking at (-1006.9, 2.9, 78.1) | | the establishing camera, back-right of the room |
 | Strike.Bell | = RollCall.Bell | | |
+| Staff.Sallow / Pryce / Whitlock / Hale@R103 | 2.5 behind each classroom's TeacherDesk, on the far side from the chairs | toward the chairs | (2.28) Rooms 102, 104, 105, 103. Test: z 83.5, desks at z 81 |
+| Staff.Sallow@Staff / Pryce@Staff / Whitlock@Staff | in the Staff Room, 4 studs apart, 4 in from its centre | the room's centre | (2.28) Test: (43 / 47 / 51, 3.9, 26) |
+| Staff.Ashgrave | 5 east and 2 north of the Records Office exit | the corridor | (2.28) beside the Records Office door; test (142, 4, 42) |
 | Hall.File | (-1007.4, 2.56, 78.1) | +X | on Mira's desk top |
 | Hall.HallCam / HallLook | (-1008, 5.4, 50) / (-930, 4, 50) | | the west hallway at night, toward the entrance hall |
 | Hall.CustodianFar | (-962, 0, 50) | -X | far end, about 46 studs away |

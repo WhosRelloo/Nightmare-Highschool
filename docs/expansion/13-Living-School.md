@@ -1,7 +1,8 @@
 # 13. The Living School (Expansion Phase 2)
 
 **Status:** approved 2026-11-18. **2.27 shipped** (plan: `docs/superpowers/plans/2026-11-18-roster-and-memory.md`;
-its deltas are §9 items 8 to 15). 2.28, 2.29 and 2.30 are next, each with its own plan.
+its deltas are §9 items 8 to 15). **2.28 shipped** (plan: `docs/superpowers/plans/2026-11-18-staff-school-day.md`;
+deltas 16 to 23). 2.29 and 2.30 are next.
 
 **Sources:** doc 02 §4.1 to §4.6, §7.1 and §11.1, doc 07 §2 to §7, and doc 08 Phase 2. This spec makes them
 buildable; where it differs from them, §9 says so.
@@ -382,3 +383,16 @@ Each set has 6 students; every clique is spread over at least three sets.
     would have left half the roster unable to introduce themselves.
 15. **(2.27) The size estimate:** a full 64-entry block with every flag set is about 7.3 KB, not under 4 KB. That's still
     far under the 1 MB warning.
+16. **(2.28) The Headmaster's office:** the place has no office, portrait or office area. Ashgrave keeps office hours
+    beside the Records Office door during class periods.
+17. **(2.28) Assemblies and crises** don't exist yet, so the Headmaster doesn't appear at them.
+18. **(2.28) Staff move between posts by fading** (as 2.24's Custodian does), not by walking.
+19. **(2.28) Homeroom:** sets C and D take Mr. Hale's register in Room 102, not study hall in the Library. A full room
+    stands at the back.
+20. **(2.28) Mr. Hale is never in the Staff Room.** He's at his Room 102 desk whenever he isn't teaching Chemistry in
+    Room 103, so Orientation (which sends new students to him at any hour) always works. Sallow has no homeroom post.
+21. **(2.28) Late marks name the room's timetabled teacher** for that period. Attendance is recorded as the period ends,
+    often after the teacher has left the desk.
+22. **(2.28) The room is found from the classroom folder's bounds,** not `Features.Regions`. Its R10x boxes sit about
+    one room east of the actual rooms (logged for the owner, not changed).
+23. **(2.28) Mira's empty desk is never a seat** (`Area_MiraDesk` is left out of Room 102's chairs).

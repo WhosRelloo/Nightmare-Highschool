@@ -19,6 +19,8 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
+**Teachers take the register (2.28.0, 2026-11-18):** four teachers and the Headmaster now keep the school day. Ms. Sallow, Mr. Hale, Mr. Pryce and Dr. Whitlock teach at their desks and retire to the Staff Room between classes, and each class seats its own six classmates. Start a fight in front of a teacher and they'll put their name on it. See [the game update](updates/discord/game-updates/2026-11-18-teachers-take-the-register.md) and [the spec](docs/expansion/13-Living-School.md).
+
 **The students have names now (2.27.0, 2026-11-18):** the school's background students are 24 named classmates, three per clique. Stop and look at one and they'll introduce themselves, and they remember you across visits: shove one and they won't forget it, share snacks and they'll thank you. Classmates you've met are listed under Tab. See [the game update](updates/discord/game-updates/2026-11-18-the-students-have-names.md) and [the spec](docs/expansion/13-Living-School.md).
 
 **The Strikethrough, Chapter One's finale (2.26.0, 2026-11-18):** After Hours now ends in a fight you play in Room 102 at night. Dodge, shove, win a tug of war over Mira's file, and finish it; every miss changes the scene, and losing the tug of war tears her record in half. This completes Chapter One (2.22 to 2.26). See [the game update](updates/discord/game-updates/2026-11-18-the-strikethrough.md), [the announcement](updates/discord/announcements/2026-11-18-chapter-one.md) and [the spec](docs/expansion/12-Interactive-Cutscenes.md).

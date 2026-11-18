@@ -79,7 +79,7 @@ listed at the end; record them in §9 at release.
     Passing, Break, Lunch and After School. A missing key means the NPC is away (not spawned).
   - Post parts: `workspace.School.Quests.Staff.<key>`, invisible and anchored, with `NpcPost = <key>`.
 
-- [ ] **Step 1: Write the failing test.** Add to TestBridge:
+- [x] **Step 1: Write the failing test.** Add to TestBridge:
 
 ```lua
 -- (2.28) every staff post exists, and every staff member has a look and a talk tree
@@ -105,7 +105,7 @@ end
   Install the TestBridge, start Play, and run `bridge.py StaffTest '$P'`. Expected: `Missing` lists `cast Sallow`,
   `posts Hale`, and so on.
 
-- [ ] **Step 2: Add the staff to `Config.Npcs`.** Back it up first. Replace the `Hale` line and add after the
+- [x] **Step 2: Add the staff to `Config.Npcs`.** Back it up first. Replace the `Hale` line and add after the
   Custodian:
 
 ```lua
@@ -132,7 +132,7 @@ end
 - **Hale's class:** he teaches Chemistry in every class period.
 - **Room conflict:** Room 102 has Hale at Homeroom and Sallow in Periods 1 to 4, so the two never share it.
 
-- [ ] **Step 3: Looks.** Back up `NpcLooks`, then add these specs under the 2.24 staff:
+- [x] **Step 3: Looks.** Back up `NpcLooks`, then add these specs under the 2.24 staff:
 
 ```lua
 	-- (2.28) the subject teachers and the Headmaster (existing clothing ids and cast hair)
@@ -142,7 +142,7 @@ end
 	Ashgrave = { Body = 1; Skin = 1; Uniform = `wool-overcoat`; Bottoms = `charcoal-slacks`; Eyes = 2; Brows = `furrowed`; Mouth = `flat`; HairId = 3609301673 };
 ```
 
-- [ ] **Step 4: The talk trees.** Each is a new ModuleScript in `ServerStorage.Dialogue`, in the Custodian's format.
+- [x] **Step 4: The talk trees.** Each is a new ModuleScript in `ServerStorage.Dialogue`, in the Custodian's format.
   `Sallow.luau`:
 
 ```lua
@@ -212,7 +212,7 @@ return Template({
 })
 ```
 
-- [ ] **Step 5: The posts (`tools/phase4-2280/marks_staff.luau`).** Run it in Edit with rbxc. Desk posts stand 2.5
+- [x] **Step 5: The posts (`tools/phase4-2280/marks_staff.luau`).** Run it in Edit with rbxc. Desk posts stand 2.5
   studs behind each room's `TeacherDesk` part, on its far side from the chairs, facing the room. Staff Room posts are
   spread in `Area_StaffRoom`. Ashgrave's stands beside `Area_RecordsExit`, facing the corridor.
 
@@ -261,10 +261,10 @@ return #F:GetChildren() .. ` posts`
 - **Record the marks** in doc 11's Map port table as relative descriptions: behind the desk, in the Staff Room, by the
   Records door.
 
-- [ ] **Step 6: Install and run the test.** Install `Config.Npcs`, `NpcLooks`, the four dialogue files and the
+- [x] **Step 6: Install and run the test.** Install `Config.Npcs`, `NpcLooks`, the four dialogue files and the
   TestBridge, start Play, and run `bridge.py StaffTest '$P'`. Expected: `Missing []`.
 
-- [ ] **Step 7: Commit** `2.28 (1/7): the subject teachers and the Headmaster; their looks, talk and posts`.
+- [x] **Step 7: Commit** `2.28 (1/7): the subject teachers and the Headmaster; their looks, talk and posts`.
 
 ---
 
@@ -281,7 +281,7 @@ return #F:GetChildren() .. ` posts`
   - `Npcs.PostKey(NpcId, Kind, Name) -> string?` (pure)
   - each active entry remembers `N.Key`
 
-- [ ] **Step 1: Write the failing test.** Add to TestBridge:
+- [x] **Step 1: Write the failing test.** Add to TestBridge:
 
 ```lua
 -- (2.28) which post each staff member uses in each segment (pure)
@@ -299,7 +299,7 @@ end
 
 Expected before the change: an error (`PostKey` is nil).
 
-- [ ] **Step 2: Back up `Social.Npcs`.** Add the pure key function, and route every post lookup through the key:
+- [x] **Step 2: Back up `Social.Npcs`.** Add the pure key function, and route every post lookup through the key:
 
 ```lua
 -- (2.28) the post key for a segment: Config.Npcs Posts (Homeroom / Class / Other), else the NPC's own id
@@ -348,7 +348,7 @@ end
   most one tick.
 - **Update the header comment:** "(2.28) staff with Posts move between them by school segment".
 
-- [ ] **Step 3: Install and run the test.**
+- [x] **Step 3: Install and run the test.**
   - Install `Social.Npcs` and the TestBridge, start Play, and run `bridge.py StaffPlanTest '$P'`.
   - Expected:
     - `Before School`: `{Hale "Hale@Staff", Sallow "Sallow@Staff", Ashgrave "-", Ezra "Ezra"}`
@@ -357,7 +357,7 @@ end
     - `Lunch`: `{Hale "Hale@Staff", Sallow "Sallow@Staff", Ashgrave "-", Ezra "Ezra"}`
     - `Night`: all staff `-`, and `Ezra "Ezra"`
 
-- [ ] **Step 4: The live check.** For each time, `bridge.py SetTime`, wait 5 s, then use `gamevm.py` to list the
+- [x] **Step 4: The live check.** For each time, `bridge.py SetTime`, wait 5 s, then use `gamevm.py` to list the
   `workspace.Live` models with an `NpcId` among the staff, and how far each is from its expected post part:
   - **08:05:** Hale at `Hale`, Ashgrave at `Ashgrave`, Sallow absent.
   - **09:10:** Hale at `Hale@R103`, Sallow at `Sallow`, Pryce at `Pryce`, Whitlock at `Whitlock`.
@@ -367,7 +367,7 @@ end
   - **Screenshot** one classroom with its teacher at 09:10 to `tools/phase4-2280/review/teacher_r104.jpg`.
   - Talk to Pryce (`Npcs.TalkForTests` in `gamevm.py`): his greeting is "Ah! Enter, stage left.".
 
-- [ ] **Step 5: Commit** `2.28 (2/7): staff fade between their posts as the day changes`.
+- [x] **Step 5: Commit** `2.28 (2/7): staff fade between their posts as the day changes`.
 
 ---
 
@@ -383,7 +383,7 @@ end
     `Room` is a room id (`R101` to `R105`); `Skip` is true when a Delinquent skips that period.
   - `Roster.ROTATION`, `Roster.HOMEROOM` (read-only tables)
 
-- [ ] **Step 1: Write the failing test.** Add to TestBridge:
+- [x] **Step 1: Write the failing test.** Add to TestBridge:
 
 ```lua
 -- (2.28) the set rotation, homeroom rooms and skipping (pure)
@@ -416,7 +416,7 @@ end
 
 Expected before the change: an error (`Plan` is nil).
 
-- [ ] **Step 2: Add `Plan` to `Social.Roster`:**
+- [x] **Step 2: Add `Plan` to `Social.Roster`:**
 
 ```lua
 -- (2.28) doc 13 §3.3: in each class period every subject room hosts one set; the sets rotate
@@ -447,7 +447,7 @@ end
 
   Add `Plan(SegName, Id, Day)` to the header's API line.
 
-- [ ] **Step 3: Seat by the plan in `Schedules`.**
+- [x] **Step 3: Seat by the plan in `Schedules`.**
   - **Back up `Schedules`.** Delete `local IN_CLASS = 6`.
   - **`Local.OnSegment`:** replace the `elseif Kind == \`Class\` then … end` branch with the code below.
     `State.Day` is the school clock's day number. In `PlanForTests`, it's nil, so use 1.
@@ -468,7 +468,7 @@ end
   - **Add `local Roster = require(ServerScriptService.Services.Social.Roster)`** at the top of the module, next to the
     other requires. The one inside `OnStart` from 2.27 can then use it.
 
-- [ ] **Step 4: Extra students stand at the back.** In `Local.Class`, replace
+- [x] **Step 4: Extra students stand at the back.** In `Local.Class`, replace
   `if not Chair then Local.Mingle(S, Job) return end` with:
 
 ```lua
@@ -490,7 +490,7 @@ end
 	end
 ```
 
-- [ ] **Step 5: Install and run the tests.**
+- [x] **Step 5: Install and run the tests.**
   - Install `Roster`, `Schedules` and the TestBridge, start Play, and run `bridge.py TimetableTest '$P'`.
   - **Expected:**
     - every `PerRoom[Period n]` is `{R102 ≤6, R103 ≤6, R104 ≤6, R105 ≤6}`, and 6 in each room where no Delinquent
@@ -502,7 +502,7 @@ end
     Expected: about 6 `In class (R10x)` in each of R102 to R105, and none standing. At `SetTime "08:05"`
     (Homeroom): 9 seated and 3 standing in R101, and the same in R102.
 
-- [ ] **Step 6: Commit** `2.28 (3/7): each set's own timetable; full rooms stand at the back; Delinquents skip`.
+- [x] **Step 6: Commit** `2.28 (3/7): each set's own timetable; full rooms stand at the back; Delinquents skip`.
 
 ---
 
@@ -523,7 +523,7 @@ end
   - `Teachers.NameFor(RoomId) -> string`: the teacher's display name, or "Teacher"
   - `Teachers.WitnessForTests(Player, RoomId) -> { Teacher, Sees, Reported }`
 
-- [ ] **Step 1: Write the failing test.** Add to TestBridge:
+- [x] **Step 1: Write the failing test.** Add to TestBridge:
 
 ```lua
 -- (2.28) a fight in a class with its teacher at the desk is booked by that teacher; slot 2 is restored by the caller
@@ -535,7 +535,7 @@ end
 
   Expected before the change: an error (no `Teachers` module).
 
-- [ ] **Step 2: Write `School.Teachers`:**
+- [x] **Step 2: Write `School.Teachers`:**
 
 ```lua
 --[[ (2.28) Teachers (server). Services.School.Teachers: a subject teacher at their desk is a witness in their room.
@@ -656,7 +656,7 @@ return Shared
   is in `Services.Quests.Places`; `Regions.Inside` is in `Features.Regions`. `SchoolClock.GetState()` returns
   `SegmentIndex`, as HallMonitor uses. If not, use `State.Segment.Name`.
 
-- [ ] **Step 3: Late marks name the teacher.** Back up `Discipline`. In its `Attendance.Recorded` handler, replace
+- [x] **Step 3: Late marks name the teacher.** Back up `Discipline`. In its `Attendance.Recorded` handler, replace
   `Shared.AddViolation(Player, Record.Status, { Witness = \`Teacher\` })` with:
 
 ```lua
@@ -665,7 +665,7 @@ return Shared
 			Shared.AddViolation(Player, Record.Status, { Witness = Witness })
 ```
 
-- [ ] **Step 4: Install and run the test.**
+- [x] **Step 4: Install and run the test.**
   - Install `Teachers`, `Discipline` and the TestBridge. Start Play, snapshot, then `SetTime "09:10"` (Period 2).
   - Move the player into Room 104 within the teacher's view: `gamevm.py` pivots the character to 6 studs in front of
     the `Pryce` post, facing it.
@@ -680,7 +680,7 @@ return Shared
     and start Play to clear it).
   - Restore slot 2.
 
-- [ ] **Step 5: Commit** `2.28 (4/7): teachers at their desks book fights and name late marks`.
+- [x] **Step 5: Commit** `2.28 (4/7): teachers at their desks book fights and name late marks`.
 
 ---
 
@@ -699,7 +699,7 @@ return Shared
   - `Roster.WhereNow(Id) -> { Embodied: boolean, At: Vector3?, Activity: string? }`
   - `Schedules.SleepForTests() -> { Bodies: number, Asleep: number }`
 
-- [ ] **Step 1: Write the failing test.** Add to TestBridge:
+- [x] **Step 1: Write the failing test.** Add to TestBridge:
 
 ```lua
 -- (2.28) bodies only near players: how many students have a body, and how many are asleep at a spot
@@ -710,7 +710,7 @@ end
 
   Expected before the change: an error (`SleepForTests` is nil).
 
-- [ ] **Step 2: `Arrive` stays bodiless far from players.** In `Schedules`, add near the top
+- [x] **Step 2: `Arrive` stays bodiless far from players.** In `Schedules`, add near the top
   `local WAKE, SLEEP = 160, 180 -- (2.28) bodies only near players (doc 13 §3.4); SLEEP > WAKE so they don't flicker`.
   Then replace `Local.Arrive`, and add `Local.Near`:
 
@@ -737,7 +737,7 @@ function Local.Arrive(S, Job, Where: Vector3?): boolean
 end
 ```
 
-- [ ] **Step 3: Each job says where it's going.** Change the first line of each job:
+- [x] **Step 3: Each job says where it's going.** Change the first line of each job:
   - **`Local.Mingle`:** `if not Local.Arrive(S, Job, Local.HallSpot()) then return end`
   - **`Local.Class`:** `local Chairs0 = Local.Chairs(RoomId)` and
     `if not Local.Arrive(S, Job, Chairs0[1] and Chairs0[1]:GetPivot().Position) then return end`. Keep the existing
@@ -749,7 +749,7 @@ end
   - **`Local.Club`:** `if not Local.Arrive(S, Job, Local.ClubSpot(S.Club) or Local.HallSpot()) then return end`
   - **`Local.Leave`:** add `S.Asleep = nil` before `if not S.Model then return end`. Going home ends being anywhere.
 
-- [ ] **Step 4: The sleep/wake check, in the existing 1-second clock loop.** In `Shared.OnStart`'s
+- [x] **Step 4: The sleep/wake check, in the existing 1-second clock loop.** In `Shared.OnStart`'s
   `while true do … task.wait(1) end`, before `task.wait(1)`, add `pcall(Local.SleepWake)`, and define:
 
 ```lua
@@ -787,7 +787,7 @@ end
   `S.Activity = debug.info(Fn, \`n\`) -- (2.28) for Roster.WhereNow`. `debug.info` returns the function name, e.g.
   `Class`; `Local.Class` is named `Class`.
 
-- [ ] **Step 5: `Roster.WhereNow`.** Add to `Social.Roster`:
+- [x] **Step 5: `Roster.WhereNow`.** Add to `Social.Roster`:
 
 ```lua
 -- (2.28) where a rostered student is: their body, or the spot they're at with no body
@@ -799,7 +799,7 @@ function Shared.WhereNow(Id: string)
 end
 ```
 
-- [ ] **Step 6: Install and run the test.**
+- [x] **Step 6: Install and run the test.**
   - Install `Schedules`, `Roster` and the TestBridge. Start Play (21:30 puts everyone at home).
   - `SetTime "11:30"` (lunch), wait 40 s, and run `bridge.py SleepTest '$P'` with the player beside the concession
     stand (`gamevm.py` pivots them there). Expected: `Bodies` is 24 (all at lunch near you), `Asleep 0`.
@@ -811,49 +811,61 @@ end
   - **Performance:** with the player at the stand, and then far away, run the 2.27 heartbeat sample (20 s, server and
     client). Report both against 2.27's numbers (24 students: 42.6 server / 45.9 client; none: 47.0 / 46.8).
 
-- [ ] **Step 7: Commit** `2.28 (5/7): students far from every player have no body; WhereNow`.
+- [x] **Step 7: Commit** `2.28 (5/7): students far from every player have no body; WhereNow`.
 
 ---
 
 ### Task 6: Regression
 
-- [ ] **Step 1: Self-tests in one session.**
+- [x] **Step 1: Self-tests in one session.**
   - **This release:** `StaffTest`, `StaffPlanTest`, `TimetableTest`, `SleepTest`, and `WitnessTest` with its setup.
   - **2.27:** `RosterTest`, `Rostered`, `RelationshipCapTest`, `MemoryTest`.
   - **Earlier:** `CineJudgeTest` 36/36, `CineGraphTest` 9/9, `CineQteTest`, `CineVoteTest`, `Phase1SelfTest`, and
     `AfterHoursMigrateTest` (1, 2, 5).
-- [ ] **Step 2: Story staff.**
+- [x] **Step 2: Story staff.**
   - **The prologue roll call** (`bridge.py PlayCut '$P' '"Prologue"' true`, with the 2.26 `t_prologue.lua` started
     first and `NHCinePath` cleared): it still plays with Mr. Hale, through both paths.
   - **The Custodian** still leaves his day post after hours.
   - **Orientation's** Hale talk still works at his Room 102 desk during Homeroom.
-- [ ] **Step 3: The school day.**
+- [x] **Step 3: The school day.**
   - Sample 07:40, 08:05, 09:10, 11:30 and 15:30 with the 2.27 `_day.lua`, from near the rooms.
   - Expected: arrivals, homeroom 9+3 per room, sets of 6 in class, lunch, then clubs and hangouts.
-- [ ] **Step 4: The console.** No errors from Npcs, Teachers, Discipline, Schedules, Roster or StudentBrain.
-- [ ] **Step 5: Saving.** Run the rejoin and save check on slot 4 "Testy" (`ChooseSlot 4` from the main menu; snapshot
+- [x] **Step 4: The console.** No errors from Npcs, Teachers, Discipline, Schedules, Roster or StudentBrain.
+- [x] **Step 5: Saving.** Run the rejoin and save check on slot 4 "Testy" (`ChooseSlot 4` from the main menu; snapshot
   and restore it). Restore slot 2, stop Play, and run `save_place`.
 
 ### Task 7: Docs and release 2.28.0
 
-- [ ] **Step 1: CHANGELOG `[2.28.0] - <date>: Staff in the school day (Living School 2 of 4)`.**
+- [x] **Step 1: CHANGELOG `[2.28.0] - <date>: Staff in the school day (Living School 2 of 4)`.**
   - **Contents:** the staff, posts, timetables, witnesses, the off-screen simulation, and the TestBridge commands.
   - **Checked:** every number from Task 6.
   - **Not checked:** a two-player run, and phone screens.
   - If another session's hunk is in CHANGELOG, stage only this one.
-- [ ] **Step 2: The other docs.**
+- [x] **Step 2: The other docs.**
   - **README:** a Latest-update line.
   - **Implementation-Status:** a row.
   - **Discord:** a game update in `updates/discord/game-updates/<date>-teachers-take-the-register.md`, plus the index.
   - **Doc 13:** the status says "2.28 shipped", and §9 gets this plan's deltas.
   - **Doc 11:** the port table gets the staff post rows.
-- [ ] **Step 3: Vault.** Copy the docs over, and add the home-note line.
-- [ ] **Step 4: Commit and merge.** Commit `2.28.0: Staff in the school day`. Merge into `main` with `--no-ff` and
+- [x] **Step 3: Vault.** Copy the docs over, and add the home-note line.
+- [x] **Step 4: Commit and merge.** Commit `2.28.0: Staff in the school day`. Merge into `main` with `--no-ff` and
   `-F <file>`, stashing other sessions' changes around the merge. Don't push unless the owner asks.
 
 ---
 
-## Spec deltas (record in doc 13 §9 at release)
+## Outcome (2026-11-18)
+
+All seven tasks are done; the numbers are in CHANGELOG `[2.28.0]`. Beyond the plan:
+- **Mr. Hale:** stays at his Room 102 desk outside class periods (Other and a new Off key), for Orientation. The
+  Orientation text was updated.
+- **Mira's desk:** `Local.Chairs` leaves it out.
+- **Late marks:** `Teachers.NameFor(Room, Period)` names the teacher by the timetable.
+- **Room detection:** by the classroom folder (Regions is offset).
+- **Sleep check:** cancels the running job before removing the body.
+- **The plan's estimates:** the 4 to 14 skip estimate was wrong (about 20 expected), and the "6 bodies in R104"
+  check doesn't apply (every classroom is within 160 studs of every other).
+
+## Spec deltas (recorded in doc 13 §9 items 16 to 23)
 
 1. **The Headmaster's office:** the place has no office, portrait or office area. Ashgrave keeps office hours at a new
    post beside the Records Office door during class periods. He maintains the official story, and the files are behind
