@@ -17,6 +17,9 @@ local ok, err = pcall(function()
 	local Snap = H:JSONDecode(script:GetAttribute("Json"))
 	local Prof = Data.GetProfile(P)
 	Prof.Quests = Snap.Quests
+	Prof.Social = Prof.Social or {}
+	Prof.Social.Relationships = Snap.Relationships or {} -- (2.27)
+	require(SSS.Social.Reputation).Sync(P)
 	require(SSS.Quests.Quests).SyncForCine(P)
 	Data.UpdateState(P, { type = "UpdateYen"; amount = Snap.Yen - Prof.Yen })
 	local ls = P:FindFirstChild("leaderstats") if ls and ls:FindFirstChild("Yen") then ls.Yen.Value = Prof.Yen end

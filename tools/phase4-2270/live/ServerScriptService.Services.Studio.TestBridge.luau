@@ -690,6 +690,11 @@ end
 
 local function CineService() return require(game:GetService(`ServerScriptService`).Services.World.Cine) end
 
+-- (2.27) the roster's data and seeding (nothing saved)
+function Commands.RosterTest(PlayerName: string)
+	return DeepCopy(require(game:GetService(`ServerScriptService`).Services.Social.Roster).SelfTestForTests())
+end
+
 -- Decision, Kill, a seen Cinematic stage and Requires.Fresh on the real Quests code (a throwaway quest; put back after)
 function Commands.Phase1SelfTest(PlayerName: string)
 	return DeepCopy(QuestsService().Phase1SelfTestForTests(Players:FindFirstChild(PlayerName)))
