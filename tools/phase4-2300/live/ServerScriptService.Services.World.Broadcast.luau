@@ -159,8 +159,12 @@ function Shared.OnStart()
 					LastSeg = Key
 				end
 				local H = S.Hour or 0
-				if H == Config.CurfewHour and CurfewDay ~= S.Day then
-					CurfewDay = S.Day
+				-- (the hour is fractional: curfew is announced once a night, as soon as the clock is past it)
+				local CurfewNight = if H >= 12 then S.Day else S.Day - 1
+				local InCurfew = H >= Config.CurfewHour or H < 6
+				if CurfewDay == nil then CurfewDay = if InCurfew then CurfewNight else false -- (not announced on server start)
+				elseif InCurfew and CurfewDay ~= CurfewNight then
+					CurfewDay = CurfewNight
 					Shared.PA(pick(Config.PA.Curfew), true)
 				end
 				-- caller lines: a rumour that has travelled

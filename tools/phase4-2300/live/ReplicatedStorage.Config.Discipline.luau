@@ -60,7 +60,8 @@ return {
 		WaypointTimeout = 8;       -- seconds before skipping a waypoint it can't reach
 		RespawnSeconds = 20;       -- after being knocked out / killed
 		-- Segment kinds when monitors are on duty. Truancy is only checked during Class.
-		DutyKinds = { BeforeSchool = true; Class = true; Passing = true; Break = true; Lunch = true; AfterSchool = true };
+		DutyKinds = { BeforeSchool = true; Class = true; Passing = true; Break = true; Lunch = true; AfterSchool = true; Night = true }; -- (2.30) Night: the curfew patrol
+		Curfew = { From = 22; To = 6 }; -- (2.30) after hours: the building (not the dorms), patrolled at night
 	};
 
 	--| (2.8.1) A record with teeth |--

@@ -12,6 +12,8 @@
 	  investigates (chases) and a catch counts.
 	- Never permanently stuck: no progress -> jump; waypoint timeout -> skip waypoint;
 	  twice the timeout -> teleport to the waypoint.
+	- (2.30) Curfew: on duty at Night too; from 22:00 to 06:00 a student in the building (not the dorms) is chased. Caught =
+	  Trespassing on the record (and contraband taken). Exempt during a cut and the After Hours quest.
 	- Monitors can be downed/killed like any NPC. They stop working while downed and respawn
 	  after RespawnSeconds if killed.
 ]]
@@ -178,6 +180,34 @@ function Local.IsTrespassing(Player: Player, State): boolean
 	return Local.OnCampus(Player)
 end
 
+-- (2.30) curfew (doc 13 §5.3): after hours, inside the school building but not the dorms, not during a cut or the
+-- After Hours quest (whose night stages are the story)
+function Local.IsAfterHours(Player: Player, Hour: number?): (boolean, string)
+	local C = Settings.Curfew
+	if not C then return false, `NoCurfew` end
+	local H = Hour or (SchoolClock.GetState().Hour or 12)
+	if not (H >= C.From or H < C.To) then return false, `Daytime` end
+	if workspace:GetAttribute(`NHCinePlaying`) then return false, `Cutscene` end
+	local Ok, Active = pcall(function()
+		local Profile = require(ServerScriptService.Services.Player.Data).GetProfile(Player)
+		return Profile and Profile.Quests and Profile.Quests.Active and Profile.Quests.Active.AfterHours ~= nil
+	end)
+	if Ok and Active then return false, `AfterHoursQuest` end
+	local Character = Player.Character
+	local Humanoid = Character and Character:FindFirstChildWhichIsA(`Humanoid`)
+	if not Humanoid or Humanoid.Health <= 0 or Humanoid:GetAttribute(`Downed`) then return false, `Down` end
+	if not Local.OnCampus(Player) then return false, `Outside` end
+	local OkR, InDorms = pcall(function() return require(ServerScriptService.Services.Features.Regions).Inside(Player, `Dorms`) end)
+	if OkR and InDorms then return false, `Dorms` end
+	return true, `AfterHours`
+end
+function Shared.IsAfterHoursForTests(Player: Player, Hour: number) return Local.IsAfterHours(Player, Hour) end
+-- (2.30) after curfew and not already caught for it this segment
+function Local.IsCurfew(Player: Player, State): boolean
+	if Caught[Player] and Caught[Player].Curfew == Local.PeriodKey(State) then return false end
+	return (Local.IsAfterHours(Player))
+end
+
 function Local.PeriodKey(State): string
 	return `D{State.Day}-S{State.SegmentIndex}`
 end
@@ -275,6 +305,7 @@ function Local.StartChase(M, Player: Player, Reason: string)
 	Local.Say(M, if Reason == `Fighting` then `Hey! Stop right there!`
 		elseif Reason == `Vandalism` then `Hey! Put that paint down!`
 		elseif Reason == `Trespassing` then `You're suspended! Off school grounds!`
+		elseif Reason == `Curfew` then `Curfew! Back to the dorms, now.` -- (2.30)
 		else `You! Why aren't you in class?`)
 end
 
@@ -302,14 +333,24 @@ function Local.Catch(M, Player: Player, State)
 		Local.Say(M, if Reason == `Fighting` then `No fighting on school grounds!`
 			elseif Reason == `Vandalism` then `Painting on the walls? You're done.`
 			elseif Reason == `Trespassing` then `Suspended means off campus. This goes on your record.`
+			elseif Reason == `Curfew` then `Out after curfew. This goes on your record.` -- (2.30)
 			else `Get to class! This is going on your record.`)
 		Discipline.ReportIncident({
-			Type = Reason;
+			Type = if Reason == `Curfew` then `Trespassing` else Reason; -- (2.30) curfew is trespassing on the record
 			Suspect = Player;
 			Witness = `Hall Monitor`;
 			Position = M.Root.Position;
 			Recognized = true;
 		})
+		-- (2.30) caught after curfew: pockets turned out, the contraband kept (as the fight path does)
+		if Reason == `Curfew` then
+			local Took = false
+			pcall(function() Took = require(ServerScriptService.Services.Features.Armory).Confiscate(Player, `BrassKnuckles`) end)
+			if Took then
+				task.delay(1.6, function() Local.Say(M, `And I'll take those knuckles.`) end)
+				Discipline.ReportIncident({ Type = `Contraband`; Suspect = Player; Witness = `Hall Monitor`; Position = M.Root.Position; Recognized = true })
+			end
+		end
 	else
 		Local.Say(M, Line or `...Just this once.`)
 	end
@@ -386,6 +427,13 @@ function Local.UpdateMonitor(M, State)
 			return
 		end
 
+		-- (2.30) back in the dorms (or off the grounds) after curfew: job done
+		if M.Reason == `Curfew` and not Local.IsAfterHours(Player) then
+			Local.Say(M, `Stay there till morning.`)
+			Local.EndChase(M)
+			return
+		end
+
 		-- Went to class: job done.
 		if M.Reason == `Truancy` and not Local.IsTruant(Player, State) then
 			Local.Say(M, if (Player:GetAttribute(`NHPassUntil`) or 0) > workspace:GetServerTimeNow() then `Carry on.` else `That's more like it.`)
@@ -410,7 +458,7 @@ function Local.UpdateMonitor(M, State)
 
 		if Escaped then
 			Discipline.ReportIncident({
-				Type = M.Reason;
+				Type = if M.Reason == `Curfew` then `Trespassing` else M.Reason; -- (2.30)
 				Suspect = Player;
 				Witness = `Hall Monitor`;
 				Position = Root.Position;
@@ -427,11 +475,12 @@ function Local.UpdateMonitor(M, State)
 	end
 
 	-- Patrol: look for truants first.
-	if State.Segment.Kind == `Class` then
+	if State.Segment.Kind == `Class` or State.Segment.Kind == `Night` then -- (2.30) Night: the curfew patrol
 		local Best, BestDistance, BestWhy = nil, math.huge, nil
 		for _, Player in Players:GetPlayers() do
 			if not Player.Character then continue end
-			local Why = if Local.IsTruant(Player, State) then `Truancy` elseif Local.IsTrespassing(Player, State) then `Trespassing` else nil -- (2.8.1)
+			local Why = if Local.IsTruant(Player, State) then `Truancy` elseif Local.IsTrespassing(Player, State) then `Trespassing`
+				elseif Local.IsCurfew(Player, State) then `Curfew` else nil -- (2.8.1, 2.30)
 			if not Why then continue end
 			local Visible, Distance = Local.CanSee(M, Player.Character, true)
 			if Visible and Distance < BestDistance then
