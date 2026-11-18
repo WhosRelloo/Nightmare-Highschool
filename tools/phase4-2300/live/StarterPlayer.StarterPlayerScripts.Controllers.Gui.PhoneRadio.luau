@@ -28,11 +28,11 @@ local GRADS = {
 	{ Color3.fromRGB(170, 70, 140), Color3.fromRGB(60, 20, 90) }, { Color3.fromRGB(90, 30, 40), Color3.fromRGB(150, 95, 230) },
 }
 
--- (2.30) Night FM's PBR art (art/group-upload-nightfm, uploaded under group 15981569). 0 = not imported yet: the kit look stands in.
+-- (2.30) Night FM's PBR art (art/group-upload-nightfm, group 15981569). 0 = not imported: the kit look stands in.
 local ART = {
-	FmBackdrop = 0; FmCard = 0; FmChip = 0; FmChipOn = 0; FmKnob = 0; FmKnobOn = 0; FmTabBar = 0; FmOnAir = 0; FmBanner = 0; FmCoverFrame = 0;
-	FmCover01 = 0; FmCover02 = 0; FmCover03 = 0; FmCover04 = 0; FmCover05 = 0; FmCover06 = 0; FmCover07 = 0; FmCover08 = 0; FmCover09 = 0; FmCover10 = 0; FmCover11 = 0; FmCover12 = 0;
-	FmIconPlay = 0; FmIconPause = 0; FmIconPrev = 0; FmIconNext = 0; FmIconLoop = 0; FmIconQueue = 0; FmIconHeart = 0; FmIconHeartFull = 0; FmIconSearch = 0; FmIconBell = 0; FmIconHome = 0; FmIconLibrary = 0; FmIconStation = 0; FmIconBack = 0; FmIconPlus = 0; FmIconVolume = 0;
+	FmBackdrop = 127584299102551; FmCard = 113509808470918; FmChip = 99474149194088; FmChipOn = 135428344116127; FmKnob = 121754044071543; FmKnobOn = 87400242169148; FmTabBar = 139401041948754; FmOnAir = 119760735963337; FmBanner = 120062098656401; FmCoverFrame = 102140831342487;
+	FmCover01 = 115207179383792; FmCover02 = 129339770425808; FmCover03 = 78521782695502; FmCover04 = 85842377440992; FmCover05 = 120254835544079; FmCover06 = 125971269956977; FmCover07 = 100458599549919; FmCover08 = 84310157061916; FmCover09 = 120827498837397; FmCover10 = 96216876489409; FmCover11 = 116184429450292; FmCover12 = 81335875522563;
+	FmIconPlay = 107934318677097; FmIconPause = 103299744726376; FmIconPrev = 71254529174801; FmIconNext = 76973076777397; FmIconLoop = 119391678462515; FmIconQueue = 136134569814000; FmIconHeart = 115051670439309; FmIconHeartFull = 118215613287012; FmIconSearch = 102419618933770; FmIconBell = 119998418603355; FmIconHome = 138834344537959; FmIconLibrary = 109630327095017; FmIconStation = 96986282526360; FmIconBack = 127715630347481; FmIconPlus = 104299352902905; FmIconVolume = 92169605654444;
 }
 local function art(Name: string): string?
 	local Id = ART[Name]

@@ -22,20 +22,20 @@ return {
 	Chime = `rbxassetid://9114058995`; -- the desk bell (the kit's Confirm and Moments' Chime)
 	-- (2.30) Night FM's voices (the owner's clips, art/sfx/NightFM): the station's host, the hall monitors' bulletins, the
 	-- PSA and the lore. World.Broadcast.Voice picks one when you tune in (the Station tab), then the next after VoiceGap
-	-- seconds of music while you stay tuned. Id 0 = not uploaded yet: that clip is skipped. From/To are hours, a [From, To)
+	-- seconds of music while you stay tuned. Id 0 = not uploaded: that clip is skipped. From/To are hours, a [From, To)
 	-- window that may wrap past midnight.
 	Voice = {
-		FirstTune = { Id = 0; Len = 28; Who = `Night FM`; Title = `You're listening to Night FM` }; -- the first time you ever tune in after dark
-		WelcomeBack = { Id = 0; Len = 16; Who = `Night FM`; Title = `And we're back` }; -- your first tune-in of a later night
-		PSA = { Id = 0; Len = 23; Who = `Public service`; Title = `Stay inside, stay out of trouble`; From = 20; To = 23 };
-		Hello = { Id = 0; Len = 10; Who = `Night FM`; Title = `A special hello`; From = 21; To = 3 };
-		Quiet = { Id = 0; Len = 15; Who = `Night FM`; Title = `A suspiciously quiet day`; From = 15; To = 3; QuietOnly = true }; -- only with no campus report today
-		Lore1 = { Id = 0; Len = 33; Who = `Night FM`; Title = `About Mira Holt`; From = 23; To = 3 };
-		Lore2 = { Id = 0; Len = 20; Who = `Night FM`; Title = `The photograph from 1887`; From = 23; To = 3 };
-		SignOff = { Id = 0; Len = 18; Who = `Night FM`; Title = `Signing off`; From = 2.5; To = 3 }; -- the last half hour
-		HallMonitor1 = { Id = 0; Len = 19; Who = `Hall monitor`; Title = `The dress code remains in effect`; From = 6; To = 12 };
-		Afternoon = { Id = 0; Len = 16; Who = `Night FM`; Title = `The afternoon is rolling along`; From = 12; To = 18 };
-		HallMonitor2 = { Id = 0; Len = 19; Who = `Hall monitor`; Title = `After hours, the halls are patrolled`; From = 15; To = 21 };
+		FirstTune = { Id = 111499524031786; Len = 28; Who = `Night FM`; Title = `You're listening to Night FM` }; -- the first time you ever tune in after dark
+		WelcomeBack = { Id = 134125591548166; Len = 16; Who = `Night FM`; Title = `And we're back` }; -- your first tune-in of a later night
+		PSA = { Id = 97206902894473; Len = 23; Who = `Public service`; Title = `Stay inside, stay out of trouble`; From = 20; To = 23 };
+		Hello = { Id = 77658749464340; Len = 10; Who = `Night FM`; Title = `A special hello`; From = 21; To = 3 };
+		Quiet = { Id = 75710916882636; Len = 15; Who = `Night FM`; Title = `A suspiciously quiet day`; From = 15; To = 3; QuietOnly = true }; -- only with no campus report today
+		Lore1 = { Id = 100641239050743; Len = 33; Who = `Night FM`; Title = `About Mira Holt`; From = 23; To = 3 };
+		Lore2 = { Id = 107164773510555; Len = 20; Who = `Night FM`; Title = `The photograph from 1887`; From = 23; To = 3 };
+		SignOff = { Id = 138187748818510; Len = 18; Who = `Night FM`; Title = `Signing off`; From = 2.5; To = 3 }; -- the last half hour
+		HallMonitor1 = { Id = 91112498069449; Len = 19; Who = `Hall monitor`; Title = `The dress code remains in effect`; From = 6; To = 12 };
+		Afternoon = { Id = 105987665107075; Len = 16; Who = `Night FM`; Title = `The afternoon is rolling along`; From = 12; To = 18 };
+		HallMonitor2 = { Id = 115752323853903; Len = 19; Who = `Hall monitor`; Title = `After hours, the halls are patrolled`; From = 15; To = 21 };
 	};
 	VoiceGap = 45;
 }
