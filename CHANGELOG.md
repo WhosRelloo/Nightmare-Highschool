@@ -2,6 +2,83 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.27.0] - 2026-11-18: Roster & memory (Living School 1 of 4)
+
+The spec is `docs/expansion/13-Living-School.md` §2; the plan is `docs/superpowers/plans/2026-11-18-roster-and-memory.md`.
+This is the first of Expansion Phase 2's four releases.
+- **Studio backup:** `ServerStorage.NH_Backup.Phase4_pre_20261118` (8 scripts, before their first edit).
+- **Mirror:** `tools/phase4-2270/` (`pre/`, `live/`, `harness/`, `review/`). New helper: `harness/gamevm.py` runs a check
+  inside the running game. The MCP's own Luau gets separate copies of every module, so it can't see live state.
+- **The Map place:** untouched.
+
+### Added
+- **24 named students** (`ReplicatedStorage.Config.Students`): 3 per clique, each with a year, bravery, temper, timetable
+  set and a one-line bio. Their ids are save keys.
+- **`Services.Social.Roster`:** roster lookups, and one seeded `Random` per student.
+- **Students remember you** (`Social.Reputation`):
+  - **Saved entries:** each rostered student and each of the named cast keeps a saved entry: `Value`, `Met`, `Last`
+    and counts of `Fought`, `Helped`, `Pranked` and `Lied`.
+  - **The cap:** 64 entries. When full, the oldest Acquaintance goes first, then the oldest entry that isn't Trusted or
+    Hostile. The important NPCs are never dropped.
+  - **No early names:** a rostered student's name never appears in a notification before you've met them.
+- **Introductions:** stop and look at a rostered student, and the first time they tell you their name, in their own
+  temper ("Leo. Since you're asking.", "Um... I'm Agnes.").
+  - **A fight first** (Rival or worse before you've met) means no introduction.
+  - **Shy students:** sociability under 0.5 never greeted before. A shy rostered student still speaks up when they have
+    something saved to say.
+- **Grudges and thanks:**
+  - **Shoves:** a shove costs -12 and counts as `Fought`, at most once per 30 s. Afterwards the student says "You
+    again." (the `Greet.Grudge` lines).
+  - **Snacks:** a snack they accept gives +8 (loved) or +5 and counts as `Helped`, at most once per 10 minutes. After two,
+    the student thanks you (`Greet.Grateful`).
+  - **Attitude:** a saved Hostile or Rival caps how a student treats you, and Friendly or Trusted raises it.
+- **Classmates in the Students list** (Tab): every rostered student you've met, with their clique, how they feel about
+  you, and their bio.
+- **TestBridge:** `RosterTest`, `Rostered`, `RelationshipCapTest`, `MemoryTest`.
+
+### Changed
+- **`Features.Schedules`:** the 14 anonymous students become the roster's 24.
+  - **Fixed looks:** each look, build and voice comes from the student's own seed, so they look the same every server.
+  - **Bravery:** the roster's bravery replaces the roll.
+  - **Models:** each carries `NHStudentId`.
+
+### Checked
+- **Self-tests** (one session):
+  - **This release:**
+    - `RosterTest`: 24 students, 3 per clique, 6 per set, no bad rows.
+    - `Rostered`: 24 ids, and the same look built twice.
+    - `RelationshipCapTest`: drops Ac1, then Fr1.
+    - `MemoryTest`: Intro, AfterMeet, Grateful, Grudge, NoIntroAfterFight, and Wary while Rival.
+  - **Unchanged:** `CineJudgeTest` 36/36, `CineGraphTest` 9/9, `CineQteTest`, `CineVoteTest`, `Phase1SelfTest`, and
+    `AfterHoursMigrateTest` (1, 2, 5).
+- **Live, on slot 2, inside the game:**
+  - **Leo:** introduced himself. Two shoves through `Brain.Contact` took him from 5 to -7 to -19, with Fought 2. After a
+    rejoin he said "You again.".
+  - **Odette:** took two MoonCakes across a rejoin (16, Helped 2), introduced herself, and her next greeting is
+    Grateful.
+  - **Fixed looks:** all 24 students had the same build and shirt after a restart.
+- **The NPCs that already had relationships:** Ezra's entry is unchanged (5, Acquaintance) and his dialogue opens. The
+  Factions panel shows "Ezra Vale (Acquaintance)" and "Vesper Crane (Not met)".
+- **The school day:**
+  - 07:40: all 24 in the hallway.
+  - 09:10: 6 seated in R103, the rest away, as before.
+  - 11:30: all 24 at lunch.
+  - 15:30: clubs, hanging out and going home.
+- **Errors and test data:** no errors from Roster, Reputation, Schedules, StudentBrain, Talk or Students. Slot 2 was
+  restored after each test and matches its snapshot.
+- **Size:** the profile is 18.8 KB. A full 64-entry relationship block with every flag set would be 7.3 KB, over doc
+  13's 4 KB estimate but far under the 1 MB warning.
+- **Frame rate (this Studio session):**
+  - with no students: 47.0 fps on the server and 46.8 on the client
+  - with 24 students: 42.6 and 45.9
+  - The plan's 55 fps target is above this machine's empty-school baseline.
+- **Not checked:**
+  - a two-player run
+  - phone screens
+  - the slot 4 "Testy" rejoin (the rejoin was checked on slot 2)
+  - what the after-school crowd stops to watch (an existing fight reaction, unchanged)
+- **Studio:** installed in NH Combat Test (Team Create). The final save reported nothing new to save.
+
 ## [2.26.0] - 2026-11-18: The Strikethrough, Chapter One's finale
 
 The spec is `docs/expansion/12-Interactive-Cutscenes.md` §6 and §8 (part B); the plan is
