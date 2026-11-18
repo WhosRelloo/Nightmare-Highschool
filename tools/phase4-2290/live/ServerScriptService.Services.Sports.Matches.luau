@@ -251,6 +251,13 @@ function Match:End(Winner: string?, Why: string)
 	self.Winner = Winner
 	if self.Plug and self.Plug.Stop then pcall(self.Plug.Stop, self) end
 	local Summary = Local.Reward(self, Winner, Why)
+	pcall(function() -- (2.29) the incident bus (World.Incidents; rumours come from it)
+		local Root = self.Venue and self.Venue:IsA(`Model`) and self.Venue:GetPivot().Position or nil
+		local Team = Winner and Config.Teams[Winner] and Config.Teams[Winner].Name
+		require(ServerScriptService.Services.World.Incidents).Emit({ Kind = `Match`; Where = Root; Sport = self.Sport;
+			Winner = Team; Score = table.clone(self.Score); Severity = 1; Extra = Team and `{self.Sport}.` or nil;
+			Who = if Team then { { Id = Team; Role = `Doer` } } else {} })
+	end)
 	for _, P in self:Players() do
 		if Remotes then Remotes.Summary:FireClient(P, Summary) end
 	end

@@ -746,6 +746,96 @@ function Commands.SleepTest(PlayerName: string)
 	return DeepCopy(require(game:GetService(`ServerScriptService`).Services.Features.Schedules).SleepForTests())
 end
 
+-- (2.29) the incident bus: Emit fills time, region and witnesses; On hears it; the relationship consumer applies flags
+function Commands.IncidentTest(PlayerName: string)
+	local SSS = game:GetService(`ServerScriptService`).Services
+	local Player = Players:FindFirstChild(PlayerName)
+	local Inc, Rep = require(SSS.World.Incidents), require(SSS.Social.Reputation)
+	local Rels = Rep.Get(Player).Relationships
+	local Saved = Rels.MaeGorse and table.clone(Rels.MaeGorse)
+	local Heard = {}
+	local C = Inc.On(`TestKind`, function(I) table.insert(Heard, I.Kind) end)
+	local Hall = workspace.Regions:FindFirstChild(`MainHall`)
+	local I = Inc.Emit({ Kind = `TestKind`; Where = Hall and Hall.Position; Who = { { Id = Player; Role = `Doer` } } })
+	task.wait(0.3) -- SignalPlus delivers on the next frame
+	C:Disconnect()
+	local Before = Rep.Entry(Player, `MaeGorse`)
+	Inc.Emit({ Kind = `Downed`; Who = { { Id = Player; Role = `Doer` }, { Id = `MaeGorse`; Role = `Target` } } })
+	task.wait(0.3)
+	local After = Rep.Entry(Player, `MaeGorse`)
+	Rels.MaeGorse = Saved
+	Rep.Sync(Player)
+	return { Heard = #Heard; Region = I.Region; HasTime = typeof(I.T) == `number`; Truth = I.Truth;
+		Witnesses = typeof(I.Witnesses) == `table`; FoughtAdded = (After.Flags.Fought or 0) - (Before.Flags.Fought or 0);
+		ValueDelta = After.Value - Before.Value; Recent = #Inc.Recent(5) }
+end
+
+-- (2.29) rumours from incidents, their text, and one spread
+function Commands.RumourTest(PlayerName: string)
+	local SSS = game:GetService(`ServerScriptService`).Services
+	local Player = Players:FindFirstChild(PlayerName)
+	local Ru = require(SSS.Social.Rumours)
+	local I = { Kind = `Downed`; Region = `Commons`; Who = { { Id = Player; Role = `Doer` }, { Id = `MaeGorse`; Role = `Target` } }; Witnesses = { `KitHarrow` }; Truth = true; Severity = 2; T = os.time() }
+	local R = Ru.Make(I)
+	local Text = R and Ru.Text(R)
+	local H = R and Ru.Hop(R, Random.new(7))
+	return { Made = R ~= nil; Text = Text; KnowerKit = R and R.Knowers.KitHarrow == true; HopCount = H and H.Hops;
+		PlayerStill = H and H.Subject[1].Id == Player; NoTemplate = Ru.Make({ Kind = `Nothing`; Who = {} }) == nil }
+end
+
+-- (2.29) the safety rule over many random hops: a player is never added, swapped or moved off their own deed
+function Commands.RumourSafetyTest(PlayerName: string)
+	local SSS = game:GetService(`ServerScriptService`).Services
+	local Player = Players:FindFirstChild(PlayerName)
+	local Ru = require(SSS.Social.Rumours)
+	local Rng = Random.new(2029)
+	local Bad, Mutated = 0, 0
+	local Cases = {
+		{ Kind = `Downed`; Region = `Commons`; Who = { { Id = Player; Role = `Doer` }, { Id = `MaeGorse`; Role = `Target` } }; Witnesses = { `KitHarrow`, `JaxCalloway` } };
+		{ Kind = `Downed`; Region = `MainHall`; Who = { { Id = `RonanFell`; Role = `Doer` }, { Id = Player; Role = `Target` } }; Witnesses = { `KitHarrow` } };
+		{ Kind = `Scene`; Scene = `Locker`; Region = `MainHall`; Who = { { Id = `JaxCalloway`; Role = `Doer` }, { Id = `AgnesLowe`; Role = `Target` } }; Witnesses = { `NicoRuiz`, `ClaraWebb` } };
+		{ Kind = `Caught`; Reason = `Truancy`; Region = `EastWing`; Who = { { Id = Player; Role = `Target` } }; Witnesses = {} };
+	}
+	for _, I in Cases do
+		I.Truth, I.T, I.Severity = true, os.time(), 2
+		for _ = 1, 2500 do
+			local R = Ru.Make(I)
+			for _ = 1, Rng:NextInteger(1, 6) do
+				local Before = R
+				R = Ru.Hop(R, Rng)
+				if Ru.Text(R) ~= Ru.Text(Before) then Mutated += 1 end
+			end
+			-- every player in the rumour is in the incident, in the same role; every player in the incident is still there
+			for _, S in R.Subject do
+				if typeof(S.Id) == `Instance` then
+					local Ok = false
+					for _, W in I.Who do if W.Id == S.Id and W.Role == S.Role then Ok = true end end
+					if not Ok then Bad += 1 end
+				end
+			end
+			for _, W in I.Who do
+				if typeof(W.Id) == `Instance` then
+					local Still = false
+					for _, S in R.Subject do if S.Id == W.Id and S.Role == W.Role then Still = true end end
+					if not Still then Bad += 1 end
+				end
+			end
+			-- no rumour about a player may change its place or its size: a mutation there would make it untrue
+			local HasPlayer = false
+			for _, S in R.Subject do if typeof(S.Id) == `Instance` then HasPlayer = true end end
+			if HasPlayer and (R.Where ~= R.Base.Where or R.Size ~= R.Base.Size) then Bad += 1 end
+		end
+	end
+	return { Hops = 10000; Bad = Bad; Mutated = Mutated }
+end
+
+-- (2.29) run one scene now at its spot (the player is moved there by the caller); returns how it went
+function Commands.SceneTest(PlayerName: string, Id: string)
+	local Scenes = require(game:GetService(`ServerScriptService`).Services.World.Scenes)
+	local Ok, Why = Scenes.RunForTests(Id)
+	return { Ok = Ok; Why = Why; Last = Scenes.LastForTests() }
+end
+
 -- (2.28) which post each staff member uses in each segment (pure)
 function Commands.StaffPlanTest(PlayerName: string)
 	local Npcs = require(game:GetService(`ServerScriptService`).Services.Social.Npcs)

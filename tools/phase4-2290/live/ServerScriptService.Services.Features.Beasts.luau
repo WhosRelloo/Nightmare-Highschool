@@ -1081,6 +1081,10 @@ local function think(W)
 			W.CircleUntil = os.clock() + 1.5 -- it sizes you up first
 			if Def.Sighted and not W.Sighted and W.Tracks[Def.Sighted] then
 				W.Sighted = true
+				pcall(function() -- (2.29) the incident bus: a beast was seen
+					require(ServerScriptService.Services.World.Incidents).Emit({ Kind = `Beast`; Where = Root.Position;
+						Beast = W.Name; Severity = 2; Who = { { Id = W.Name; Role = `Doer` } } })
+				end)
 				W.Busy = true
 				Hum:MoveTo(Root.Position)
 				face(W, TR)

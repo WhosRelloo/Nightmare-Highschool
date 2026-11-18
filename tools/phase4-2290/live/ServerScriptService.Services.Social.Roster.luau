@@ -1,6 +1,6 @@
 --[[ (2.27) Roster (server). Services.Social.Roster: who the rostered students are (Config.Students), each one's
 	seeded randomness (the same look every server), and the body Schedules made for them.
-	Spec: docs/expansion/13-Living-School.md §2.2, §3.3 (2.28: Plan, WhereNow). Near comes in 2.29.
+	Spec: docs/expansion/13-Living-School.md §2.2, §3.3 (2.28: Plan, WhereNow). Near(Pos, Radius) came in 2.29.
 	API: All(), Get(Id), IsRostered(Id), Rng(Id), Bind(Id, S), Body(Id), SelfTestForTests()
 	     Plan(SegName, Id, Day) -> { Room?, Skip }  (2.28) the room a student's set uses in a class segment
 	     WhereNow(Id) -> { Embodied, At?, Activity? } (2.28) their body, or the spot they're at with no body ]]
@@ -50,6 +50,17 @@ function Shared.WhereNow(Id: string)
 	if not S then return { Embodied = false } end
 	if S.Model and S.Root then return { Embodied = true; At = S.Root.Position; Activity = S.Activity } end
 	return { Embodied = false; At = S.Asleep and S.Asleep.At; Activity = S.Activity }
+end
+
+-- (2.29) rostered students within Radius of Pos (their body, or where they are with no body)
+function Shared.Near(Pos: Vector3?, Radius: number): { string }
+	local Out = {}
+	if not Pos then return Out end
+	for _, E in Config.List do
+		local W = Shared.WhereNow(E.Id)
+		if W.At and (W.At - Pos).Magnitude <= Radius then table.insert(Out, E.Id) end
+	end
+	return Out
 end
 
 function Shared.SelfTestForTests()

@@ -450,6 +450,15 @@ function Local.ScuffleStep(Ev)
 	end
 end
 
+-- (2.29) a scuffle or rumble ended: tell the incident bus (World.Incidents; rumours come from it)
+function Local.Emit(Ev, Why: string, Winner: string?)
+	pcall(function()
+		require(ServerScriptService.Services.World.Incidents).Emit({ Kind = `Scuffle`; Where = Ev.Venue; A = Ev.A; B = Ev.B;
+			Winner = Winner; Why = Why; Rumble = Ev.Kind == `Rumble`; Severity = if Ev.Kind == `Rumble` then 3 else 2;
+			Who = { { Id = Winner or Ev.A; Role = `Doer` } } })
+	end)
+end
+
 function Local.EndScuffle(Ev, Why: string, Winner: string?)
 	if Scuffle ~= Ev then return end
 	Scuffle = nil
@@ -465,6 +474,7 @@ function Local.EndScuffle(Ev, Why: string, Winner: string?)
 	end
 	if Winner then pcall(Shared.RecordWin, Ev.Owner or Ev.A, Local.Other(Ev, Ev.Owner or Ev.A), Winner, Ev) end
 	Local.CountFeud(Ev.A, Ev.B, Winner)
+	Local.Emit(Ev, Why, Winner) -- (2.29)
 	-- the winning side thanks the students who fought for it (and their leader's quest hears about it)
 	if Cl and Winner then
 		local Quests = svc(`Quests.Quests`)
@@ -906,6 +916,7 @@ function Local.EndRumble(Ev, Why: string, Winner: string?)
 	Local.LastResult = `Rumble {Ev.A} vs {Ev.B}: {Why}{if Winner then ` ({Winner} won)` else ``} after {math.floor(os.clock() - Ev.Started)} s`
 	Local.LastRumble = { A = Ev.A; B = Ev.B; Winner = Winner; Why = Why }
 	Local.CountFeud(Ev.A, Ev.B, Winner)
+	Local.Emit(Ev, Why, Winner) -- (2.29)
 	local Cl = svc(`Social.Cliques`)
 	if Cl then
 		for Id, List in Ev.Sides do
