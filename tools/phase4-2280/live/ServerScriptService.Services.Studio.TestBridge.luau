@@ -689,6 +689,37 @@ function Commands.ResetQuests(PlayerName: string, AutoStart: boolean?)
 	return true
 end
 
+-- (2.28) every staff post exists, and every staff member has a look and a talk tree
+function Commands.StaffTest(PlayerName: string)
+	local Cast = require(game:GetService(`ReplicatedStorage`).Config.Npcs)
+	local Looks = require(game:GetService(`ServerScriptService`).Services.Features.NpcLooks)
+	local Places = require(game:GetService(`ServerScriptService`).Services.Quests.Places)
+	local Out = { Missing = {} }
+	for _, Id in { `Sallow`, `Hale`, `Pryce`, `Whitlock`, `Ashgrave` } do
+		local Npc = Cast[Id]
+		if not Npc then table.insert(Out.Missing, `cast {Id}`) continue end
+		if not Npc.Posts then table.insert(Out.Missing, `posts {Id}`) continue end
+		for Slot, Key in Npc.Posts do
+			if not Places.Find(`NpcPost`, Key) then table.insert(Out.Missing, `post {Id}.{Slot}={Key}`) end
+		end
+		if not Looks.Specs[Id] then table.insert(Out.Missing, `look {Id}`) end
+		if not game:GetService(`ServerStorage`).Dialogue:FindFirstChild(Npc.Dialogue or ``) then table.insert(Out.Missing, `talk {Id}`) end
+	end
+	return Out
+end
+
+-- (2.28) which post each staff member uses in each segment (pure)
+function Commands.StaffPlanTest(PlayerName: string)
+	local Npcs = require(game:GetService(`ServerScriptService`).Services.Social.Npcs)
+	local Out = {}
+	for _, Seg in { { `BeforeSchool`, `Before School` }, { `Class`, `Homeroom` }, { `Class`, `Period 2` }, { `Lunch`, `Lunch` }, { `Night`, `Night` } } do
+		local Row = {}
+		for _, Id in { `Hale`, `Sallow`, `Ashgrave`, `Ezra` } do Row[Id] = Npcs.PostKey(Id, Seg[1], Seg[2]) or `-` end
+		Out[Seg[2]] = Row
+	end
+	return Out
+end
+
 function Commands.StartQuest(PlayerName: string, Id: string)
 	return QuestsService().Start(Players:FindFirstChild(PlayerName), Id)
 end

@@ -38,6 +38,11 @@ Shared.Specs = {
 	Hale = { Body = 1; Skin = 1; Uniform = `charcoal-cardigan`; Bottoms = `khaki-trousers`; Eyes = 4; Brows = `thick`; Mouth = `flat`; HairId = 3259670582 };
 	[`Night Custodian`] = { Body = 1; Skin = 3; Uniform = `black-blazer`; Bottoms = `charcoal-slacks`; Eyes = 2; Brows = `straight`; Mouth = `frown`; HairId = 1940153034; Faceless = true };
 	Custodian = { Body = 1; Skin = 3; Uniform = `black-blazer`; Bottoms = `charcoal-slacks`; Eyes = 2; Brows = `straight`; Mouth = `frown`; HairId = 1940153034; Faceless = true };
+	-- (2.28) the subject teachers and the Headmaster (existing clothing ids and cast hair)
+	Sallow = { Body = 2; Skin = 1; Uniform = `crest-blazer`; Bottoms = `wide-leg-trousers`; Eyes = 2; Brows = `straight`; Mouth = `flat`; HairId = 1903448711 };
+	Pryce = { Body = 1; Skin = 3; Uniform = `victorian-waistcoat`; Bottoms = `trousers-chelsea`; Eyes = 4; Brows = `angled`; Mouth = `smile`; HairId = 3379112107 };
+	Whitlock = { Body = 2; Skin = 2; Uniform = `cropped-cardigan`; Bottoms = `velvet-midi`; Eyes = 3; Brows = `soft`; Mouth = `flat`; HairId = 3432180024 };
+	Ashgrave = { Body = 1; Skin = 1; Uniform = `wool-overcoat`; Bottoms = `charcoal-slacks`; Eyes = 2; Brows = `furrowed`; Mouth = `flat`; HairId = 3609301673 };
 }
 
 -- (2.24.0) a face nobody sees clearly: hide the painted face strips (now and whenever they're rebuilt) and put the head in shadow
