@@ -762,6 +762,9 @@ function Local.SleepWake()
 		if S.Model and S.Root then
 			if not S.Reacting and not S.InScene and not Local.Near(S.Root.Position, SLEEP) then
 				local At = S.Root.Position
+				-- cancel the running job first: a job left running with no body spins (every walk and idle returns at
+				-- once) or indexes the gone model. LastJob is kept, so waking re-runs it.
+				S.Job = {}
 				Local.Despawn(S)
 				S.Asleep = { At = At }
 			end
