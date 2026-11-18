@@ -1,0 +1,108 @@
+{
+ "ok": false,
+ "name": "YouFinisher",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action",
+ "authoredDuration": 1.25,
+ "bakedDuration": 1.7,
+ "passes": {
+  "spline": true,
+  "overlapFrames30": {
+   "Left Arm": 3
+  },
+  "settle": {
+   "Head": {
+    "f": 7,
+    "z": 0.75
+   },
+   "BodyAttach": {
+    "f": 7,
+    "z": 0.75
+   },
+   "OffHandAttach": {
+    "f": 7,
+    "z": 0.75
+   }
+  },
+  "life": 1,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": [
+   "Left Leg"
+  ]
+ },
+ "bakedKeys": 40,
+ "poseKeys": 163,
+ "markers": 1,
+ "failing": [
+  "groundContact"
+ ],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: RightShoulder at 1126°/s around 1.07 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 0.43 studs of the HumanoidRootPart and returns within 0.39"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "fail",
+   "detail": "Left Leg sinks 0.16 studs into the ground at 0.83 s; limit 0.1",
+   "measured": {
+    "penetration": 0.16,
+    "groundedShare": 0.78
+   }
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.7346833857181039,
+  "peakAt": 0.3,
+  "action": {
+   "effector": "Right Arm",
+   "peakSpeed": 46.26121542665719,
+   "onset": 0.8666666666666667,
+   "peak": 0.9333333333333333,
+   "stop": 1.0333333333333334,
+   "strike_s": 0.16666666666666666,
+   "followThrough_s": 0,
+   "hold_s": 0,
+   "recovery_s": 0.23333333333333334,
+   "windupBack": 3.8139630668202593,
+   "rootDrop": 0.03311936369893761,
+   "rootShift": 0.42384656048214125,
+   "torsoPeak_ms": 0
+  }
+ },
+ "sheet": "review/YouFinisher_sheet.png",
+ "graph": "review/YouFinisher_graph.png",
+ "trails": "review/YouFinisher_trails.png",
+ "luau": "out/YouFinisher.lua",
+ "luauBytes": 9171
+}

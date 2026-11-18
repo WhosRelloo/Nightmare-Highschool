@@ -1,0 +1,103 @@
+{
+ "ok": false,
+ "name": "StrikeTug",
+ "rig": "R6",
+ "loop": true,
+ "priority": "Action",
+ "authoredDuration": 1.2,
+ "bakedDuration": 1.2,
+ "passes": {
+  "spline": true,
+  "overlapFrames30": {
+   "Left Arm": 3
+  },
+  "settle": {
+   "Head": {
+    "f": 7,
+    "z": 0.75
+   },
+   "BodyAttach": {
+    "f": 7,
+    "z": 0.75
+   },
+   "OffHandAttach": {
+    "f": 7,
+    "z": 0.75
+   }
+  },
+  "life": 1,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": [
+   "Left Leg"
+  ]
+ },
+ "bakedKeys": 36,
+ "poseKeys": 161,
+ "markers": 0,
+ "failing": [
+  "groundContact"
+ ],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: RightShoulder at 763°/s around 1.17 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 0.38 studs of the HumanoidRootPart and returns within 0"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "pass",
+   "detail": "the last pose meets the first"
+  },
+  {
+   "id": "groundContact",
+   "status": "fail",
+   "detail": "Right Leg sinks 0.18 studs into the ground at 1.17 s; limit 0.1",
+   "measured": {
+    "penetration": 0.18,
+    "groundedShare": 0.42
+   }
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "straightPath",
+   "message": "Right Arm moves in a straight line from 0.67 to 0.77 s (bows 4% of its 1.0-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Left Leg moves in a straight line from 0.33 to 0.43 s (bows 3% of its 0.8-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.5932656139217345,
+  "peakAt": 0.75,
+  "action": null
+ },
+ "sheet": "review/StrikeTug_sheet.png",
+ "graph": "review/StrikeTug_graph.png",
+ "trails": "review/StrikeTug_trails.png",
+ "luau": "out/StrikeTug.lua",
+ "luauBytes": 8971
+}

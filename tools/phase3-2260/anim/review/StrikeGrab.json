@@ -1,0 +1,106 @@
+{
+ "ok": true,
+ "name": "StrikeGrab",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action",
+ "authoredDuration": 1.2,
+ "bakedDuration": 1.65,
+ "passes": {
+  "spline": true,
+  "overlapFrames30": {
+   "Left Arm": 3,
+   "Left Leg": 2
+  },
+  "settle": {
+   "Head": {
+    "f": 7,
+    "z": 0.75
+   },
+   "BodyAttach": {
+    "f": 7,
+    "z": 0.75
+   },
+   "OffHandAttach": {
+    "f": 7,
+    "z": 0.75
+   }
+  },
+  "life": 1,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 43,
+ "poseKeys": 172,
+ "markers": 1,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: LeftShoulder at 2094°/s around 0.52 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 1.02 studs of the HumanoidRootPart and returns within 0"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "pass",
+   "detail": "no foot sinks more than 0.07 studs into the ground; a foot is down for 60% of it"
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "symmetricEasing",
+   "message": "Moves peak in speed at 50% of their duration: every move eases in and out the same amount. Measured gestures reach peak speed at 38% (they leave fast and arrive slowly); tired/old characters at ~25%; only snappy, energetic ones near 50%. Put a breakdown key early in the move or favour the arrival."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.184756201984033,
+  "peakAt": 0.5,
+  "action": {
+   "effector": "Right Arm",
+   "peakSpeed": 37.720238951556006,
+   "onset": 0.36666666666666664,
+   "peak": 0.43333333333333335,
+   "stop": 0.5,
+   "strike_s": 0.13333333333333333,
+   "followThrough_s": 0,
+   "hold_s": 0.36666666666666664,
+   "recovery_s": 0.36666666666666664,
+   "windupBack": 0.30077479760921644,
+   "rootDrop": 0.4994965253448042,
+   "rootShift": 1.0142515633428046,
+   "torsoPeak_ms": 0
+  }
+ },
+ "sheet": "review/StrikeGrab_sheet.png",
+ "graph": "review/StrikeGrab_graph.png",
+ "trails": "review/StrikeGrab_trails.png",
+ "luau": "out/StrikeGrab.lua",
+ "luauBytes": 9156
+}

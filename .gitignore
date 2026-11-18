@@ -21,4 +21,5 @@ archive/studio-backups/**/*.rbxm.ok
 # phase 2 harness scratch (rewritten on every run)
 tools/phase2-2250/harness/_*
 tools/phase3-2260/harness/_*
-tools/phase3-2260/anim/_x.luau
+tools/phase3-2260/anim/_*
+tools/phase3-2260/anim/review/*.err

@@ -72,8 +72,11 @@ local function measure(rigKind, seq)
 	local kfs = seq:GetKeyframes()
 	table.sort(kfs, function(a, b) return a.Time < b.Time end)
 	local keys, last = {}, nil
-	for _, kf in kfs do
+	-- a baked clip (over 40 keys) keeps every second key: the converter thins to key poses anyway, and the bridge caps output
+	local Step = if #kfs > 40 then 2 else 1
+	for I, kf in kfs do
 		last = posesOf(kf, last)
+		if Step > 1 and I % Step == 0 and I ~= #kfs then continue end
 		local W = fk(rig, M, last)
 		local Torso = W[if R6 then "Torso" else "UpperTorso"]
 		local Head = W.Head
@@ -94,13 +97,19 @@ local function measure(rigKind, seq)
 				RightHip = aim(Torso, W.RightUpperLeg.Position, W.RightFoot.Position);
 			}
 		end
+		local function front(part)
+			local d = Torso:VectorToObjectSpace(W[part].LookVector)
+			return { x = d.X; y = d.Y; z = -d.Z }
+		end
+		local fronts = if R6 then { LeftShoulder = front("Left Arm"); RightShoulder = front("Right Arm"); LeftHip = front("Left Leg"); RightHip = front("Right Leg") }
+			else { LeftShoulder = front("LeftUpperArm"); RightShoulder = front("RightUpperArm"); LeftHip = front("LeftUpperLeg"); RightHip = front("RightUpperLeg") }
 		local lowest = math.huge
 		for _, part in (if R6 then { "Left Leg", "Right Leg" } else { "LeftFoot", "RightFoot" }) do
 			lowest = math.min(lowest, (W[part] * CFrame.new(0, if R6 then -1 else -0.2, 0)).Position.Y)
 		end
 		table.insert(keys, { t = kf.Time; root = { x = Torso.Position.X; y = Torso.Position.Y; z = Torso.Position.Z };
 			torso = euler(Torso - Torso.Position); neck = euler((Torso:ToObjectSpace(Head)) - (Torso:ToObjectSpace(Head)).Position);
-			aims = aims; footY = lowest })
+			aims = aims; fronts = fronts; footY = lowest })
 	end
 	return { rig = rigKind; length = kfs[#kfs].Time; keys = keys }
 end
@@ -118,7 +127,7 @@ for _, S in SOURCES do
 	end
 end
 local function round(v)
-	if typeof(v) == "number" then return math.floor(v * 1000 + 0.5) / 1000 end
+	if typeof(v) == "number" then return math.floor(v * 100 + 0.5) / 100 end
 	if typeof(v) == "table" then local T = {} for K, X in v do T[K] = round(X) end return T end
 	return v
 end

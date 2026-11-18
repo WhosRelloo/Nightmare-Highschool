@@ -1,11 +1,204 @@
 {
-  "StrikeRise":    { "source": "GhoulEmerge",  "length": 1.6,  "phases": { "anticipation": [0, 0.7], "strike": [0.7, 0.82], "settle": [0.82, 1.6] }, "contacts": [0.82], "drop": 0.35 },
-  "StrikeLunge":   { "source": "StalkerReach", "alt": "GhoulAttack1", "length": 1.05, "phases": { "anticipation": [0, 0.38], "strike": [0.38, 0.47], "settle": [0.47, 1.05] }, "contacts": [0.47], "drop": 0.3 },
-  "StrikeRecoil":  { "source": "GhoulStun1",   "length": 0.8,  "phases": { "anticipation": [0, 0.05], "strike": [0.05, 0.14], "settle": [0.14, 0.8] }, "contacts": [0.14], "drop": 0.2 },
-  "StrikeGrab":    { "source": "GhoulGrab",    "length": 1.2,  "phases": { "anticipation": [0, 0.36], "strike": [0.36, 0.45], "settle": [0.45, 1.2] }, "contacts": [0.45], "drop": 0.25 },
-  "StrikeStagger": { "source": "GhoulStun1",   "length": 1.0,  "phases": { "anticipation": [0, 0.04], "strike": [0.04, 0.15], "settle": [0.15, 1.0] }, "contacts": [0.15, 0.6], "drop": 0.4 },
-  "StrikeTug":     { "source": "FistClinchVictim", "length": 1.0, "loop": true, "phases": { "anticipation": [0, 0.3], "strike": [0.3, 0.5], "settle": [0.5, 1.0] }, "contacts": [], "drop": 0.1 },
-  "StrikeShatter": { "source": "GhoulDeath",   "length": 1.4,  "phases": { "anticipation": [0, 0.1], "strike": [0.1, 0.2], "settle": [0.2, 1.4] }, "contacts": [], "drop": 0.5 },
-  "YouTugPull":    { "source": "FistClinch",   "length": 1.0,  "loop": true, "phases": { "anticipation": [0, 0.3], "strike": [0.3, 0.5], "settle": [0.5, 1.0] }, "contacts": [], "drop": 0.15 },
-  "YouFinisher":   { "source": "FistM2", "blend": ["FistBodyBlow", "Uptilt"], "length": 1.25, "phases": { "anticipation": [0, 0.4], "strike": [0.4, 0.48], "settle": [0.48, 1.25] }, "contacts": [0.48], "drop": 0.4 }
+ "StrikeRise": {
+  "source": "GhoulEmerge",
+  "length": 1.6,
+  "phases": {
+   "anticipation": [
+    0,
+    0.7
+   ],
+   "strike": [
+    0.7,
+    0.82
+   ],
+   "settle": [
+    0.82,
+    1.6
+   ]
+  },
+  "contacts": [
+   0.82
+  ],
+  "drop": 0.35
+ },
+ "StrikeLunge": {
+  "source": "StalkerReach",
+  "alt": "GhoulAttack1",
+  "length": 1.05,
+  "phases": {
+   "anticipation": [
+    0,
+    0.38
+   ],
+   "strike": [
+    0.38,
+    0.5
+   ],
+   "settle": [
+    0.5,
+    1.05
+   ]
+  },
+  "contacts": [
+   0.5
+  ],
+  "drop": 0.3
+ },
+ "StrikeRecoil": {
+  "source": "GhoulStun1",
+  "length": 0.8,
+  "phases": {
+   "anticipation": [
+    0,
+    0.05
+   ],
+   "strike": [
+    0.05,
+    0.14
+   ],
+   "settle": [
+    0.14,
+    0.8
+   ]
+  },
+  "contacts": [
+   0.14
+  ],
+  "drop": 0.2
+ },
+ "StrikeGrab": {
+  "source": "GhoulGrab",
+  "length": 1.2,
+  "phases": {
+   "anticipation": [
+    0,
+    0.36
+   ],
+   "strike": [
+    0.36,
+    0.45
+   ],
+   "settle": [
+    0.45,
+    1.2
+   ]
+  },
+  "contacts": [
+   0.45
+  ],
+  "drop": 0.25
+ },
+ "StrikeStagger": {
+  "source": "GhoulStun1",
+  "length": 1.0,
+  "phases": {
+   "anticipation": [
+    0,
+    0.04
+   ],
+   "strike": [
+    0.04,
+    0.15
+   ],
+   "settle": [
+    0.15,
+    1.0
+   ]
+  },
+  "contacts": [
+   0.15,
+   0.6
+  ],
+  "drop": 0.4
+ },
+ "StrikeTug": {
+  "source": "FistClinchVictim",
+  "length": 1.2,
+  "loop": true,
+  "phases": {
+   "anticipation": [
+    0,
+    0.45
+   ],
+   "strike": [
+    0.45,
+    0.7
+   ],
+   "settle": [
+    0.7,
+    1.2
+   ]
+  },
+  "contacts": [],
+  "drop": 0.1
+ },
+ "StrikeShatter": {
+  "source": "GhoulDeath",
+  "length": 1.4,
+  "phases": {
+   "anticipation": [
+    0,
+    0.1
+   ],
+   "strike": [
+    0.1,
+    0.2
+   ],
+   "settle": [
+    0.2,
+    1.4
+   ]
+  },
+  "contacts": [],
+  "drop": 0.5,
+  "travel": 0.25
+ },
+ "YouTugPull": {
+  "source": "FistClinch",
+  "length": 1.2,
+  "loop": true,
+  "phases": {
+   "anticipation": [
+    0,
+    0.45
+   ],
+   "strike": [
+    0.45,
+    0.7
+   ],
+   "settle": [
+    0.7,
+    1.2
+   ]
+  },
+  "contacts": [],
+  "drop": 0.15,
+  "plantLegs": 0.7
+ },
+ "YouFinisher": {
+  "source": "FistBodyBlow",
+  "blend": [
+   "FistM2",
+   "Uptilt"
+  ],
+  "length": 1.25,
+  "phases": {
+   "anticipation": [
+    0,
+    0.4
+   ],
+   "strike": [
+    0.4,
+    0.5
+   ],
+   "settle": [
+    0.5,
+    1.25
+   ]
+  },
+  "contacts": [
+   0.5
+  ],
+  "drop": 0.4
+ }
 }

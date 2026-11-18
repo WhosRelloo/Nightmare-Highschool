@@ -1,0 +1,9 @@
+StrikeRise     PASS audit 0.08 | planted 106 | skate mean 0.06, worst 3.96 st/s, over 0.6: 1 | deepest -0.00 | sole pop 0.24 at 0.33 | torso pop 0.23 at 0.33
+StrikeLunge    PASS audit 0.04 | planted  68 | skate mean 0.04, worst 1.43 st/s, over 0.6: 1 | deepest -0.00 | sole pop 0.32 at 0.53 | torso pop 0.41 at 0.45
+StrikeRecoil   PASS audit 0.01 | planted  75 | skate mean 0.01, worst 0.08 st/s, over 0.6: 0 | deepest -0.00 | sole pop 0.00 at 0.82 | torso pop 0.09 at 0.05
+StrikeGrab     PASS audit 0.22 | planted  98 | skate mean 0.14, worst 10.71 st/s, over 0.6: 2 | deepest -0.00 | sole pop 0.19 at 0.50 | torso pop 0.43 at 0.43
+StrikeStagger  PASS audit 0.01 | planted  87 | skate mean 0.02, worst 0.07 st/s, over 0.6: 0 | deepest -0.00 | sole pop 0.00 at 1.20 | torso pop 0.08 at 0.08
+StrikeTug      PASS audit 0.07 | planted  67 | skate mean 0.09, worst 3.93 st/s, over 0.6: 2 | deepest -0.00 | sole pop 0.57 at 0.77 | torso pop 0.29 at 1.02
+StrikeShatter  FAIL audit 2.23 | planted  97 | skate mean 1.40, worst 58.84 st/s, over 0.6: 5 | deepest -0.00 | sole pop 0.98 at 0.88 | torso pop 0.31 at 0.88
+YouTugPull     PASS audit 0.01 | planted  71 | skate mean 0.01, worst 0.07 st/s, over 0.6: 0 | deepest -0.00 | sole pop 0.66 at 0.42 | torso pop 0.16 at 0.42
+YouFinisher    PASS audit 0.01 | planted  99 | skate mean 0.01, worst 0.07 st/s, over 0.6: 0 | deepest -0.00 | sole pop 0.77 at 0.70 | torso pop 0.20 at 1.15
