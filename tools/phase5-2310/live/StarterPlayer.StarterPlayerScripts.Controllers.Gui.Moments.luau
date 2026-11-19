@@ -403,6 +403,16 @@ function Local.QuestBeat(D)
 	end
 end
 
+---| (2.31) Standing Path tier |---
+
+function Local.PathTier(D)
+	if typeof(D) ~= `table` or typeof(D.Name) ~= `string` then return end
+	Local.Enqueue(function()
+		Local.Banner({ Caption = `Standing: {D.Path or ``}`; Title = string.upper(D.Name); Text = `The {D.Path} path, tier {D.Tier} of {D.Of}.`;
+			Color = GOLD; Icon = `IconBannerQuestDone`; Sound = `Chime`; Hold = 3.2 })
+	end)
+end
+
 ---| P1-5 Clue Discovered |---
 
 function Local.ClueWorld(Pos: Vector3)
@@ -617,6 +627,7 @@ end
 
 function Shared.OnStart()
 	Fx.On(`QuestBeat`, Local.QuestBeat)
+	Fx.On(`PathTier`, Local.PathTier) -- (2.31) Standing Paths
 	Fx.On(`Clue`, Local.Clue)
 	Fx.On(`LevelUp`, Local.LevelUp)
 	Fx.On(`Purchase`, Local.Purchase)

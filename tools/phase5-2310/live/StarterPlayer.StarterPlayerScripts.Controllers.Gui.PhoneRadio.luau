@@ -349,7 +349,7 @@ function Shared.Station(Parent)
 		else GoArt:Destroy() end
 		Go.Activated:Connect(function() Shared.TuneIn(true) end)
 	end
-	local Kick = { Announcement = `ANNOUNCEMENT`; IncidentReport = `CAMPUS REPORT`; CallerLine = `CALLER LINE`; Transmission = `TRANSMISSION` }
+	local Kick = { Announcement = `ANNOUNCEMENT`; IncidentReport = `CAMPUS REPORT`; CallerLine = `CALLER LINE`; Transmission = `TRANSMISSION`; Notable = `SHOUT-OUT` }
 	local Items = St.Items or {}
 	if #Items == 0 then label(S, `<i>Quiet tonight. Nothing on the line yet.</i>`, 15, { TextColor3 = Color3.fromRGB(205, 192, 218); Size = UDim2.new(1, 0, 0, 20); LayoutOrder = 4 }) end
 	local Newest = 0

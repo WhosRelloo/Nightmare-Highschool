@@ -15,7 +15,7 @@ return {
 		"Somewhere under the music, a register being read. One name too many.",
 		"Static, and a girl humming the school hymn a beat behind the choir.",
 	};
-	Kickers = { Announcement = `ANNOUNCEMENT`; IncidentReport = `CAMPUS REPORT`; CallerLine = `CALLER LINE`; Transmission = `TRANSMISSION` };
+	Kickers = { Announcement = `ANNOUNCEMENT`; IncidentReport = `CAMPUS REPORT`; CallerLine = `CALLER LINE`; Transmission = `TRANSMISSION`; Notable = `SHOUT-OUT` }; -- (2.31) Notable: a Standing Path tier 4+
 	MaxItems = 40;
 	StationFrom = 21; StationTo = 3; -- hours (wraps past midnight)
 	CurfewHour = 22;

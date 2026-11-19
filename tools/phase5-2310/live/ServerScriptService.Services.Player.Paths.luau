@@ -186,10 +186,27 @@ function Shared.CheckNow(P: Player): { { Path: string, Tier: number } }
 	return Made
 end
 
--- what a tier gives: its title (Task 3 adds the banner, attributes and the broadcast mention)
+-- what a tier gives: its title, a Moments banner (the newest tier of each path only), and from tier 4 a mention on
+-- the PA by day or the Midnight Broadcast by night (Services.World.Broadcast; the PA speaks at most once a segment)
 function Local.Reward(P: Player, Path: string, T: number, Tier, Last: boolean)
 	local Rep = svc(`Social.Reputation`)
 	if Tier.Title and Rep then pcall(Rep.AwardTitle, P, Tier.Title) end
+	if not Last then return end
+	local Fx = svc(`Features.Fx`)
+	if Fx then pcall(Fx.Fire, P, `PathTier`, { Path = Path; Tier = T; Name = Tier.Name; Of = #Config.Paths[Path].Tiers }) end
+	if T >= 4 then
+		local First = P.DisplayName
+		pcall(function() local Id = svc(`Player.Identity`) First = Id.Get(P).First or First end)
+		local Article = if Tier.Name:match(`^[AEIOU]`) then `an` else `a`
+		local Text = Config.Mention:gsub("{Name}", First):gsub("{Article}", Article):gsub("{Tier}", Tier.Name)
+		local Bc = svc(`World.Broadcast`)
+		if Bc then
+			local OnAir = false
+			pcall(function() OnAir = Bc.Station(P).OnAir end)
+			if OnAir or not Bc.PA(Text) then Bc.Post(`Notable`, Text, `Paths`) end
+		end
+	end
+	Shared.LastReward = { Player = P; Path = Path; Tier = T }
 end
 
 function Shared.Check(P: Player)
@@ -306,6 +323,31 @@ function Shared.SelfTestForTests(P: Player)
 	Con:Disconnect()
 	Shared.FactsOverride[P] = nil
 	-- put everything back
+	local _, Pr2 = Local.Saved(P)
+	Pr2.Paths = Before Local.Save(P, Pr2)
+	Social.Titles = TitlesBefore Social.Title = TitleBefore Rep.Sync(P)
+	Local.Mirror(P, Before)
+	return R
+end
+
+function Shared.RewardTestForTests(P: Player)
+	local Saved, Pr = Local.Saved(P)
+	local Before = table.clone(Saved)
+	local Rep = svc(`Social.Reputation`)
+	local Social = Rep.Get(P)
+	local TitlesBefore, TitleBefore = table.clone(Social.Titles), Social.Title
+	local Bc = svc(`World.Broadcast`)
+	local Items0 = #Bc.Items()
+	Bc.PATestReset()
+	Pr.Paths = {} Local.Save(P, Pr)
+	local F = Local.MaxFacts()
+	F.Rep.Intimidation, F.Takedowns, F.Showdowns, F.Tally.Beasts = 0, 0, 0, 0 -- only Combat stays at 1
+	Shared.FactsOverride[P] = F
+	Shared.LastReward = nil
+	local Made = Shared.CheckNow(P)
+	local R = { Made = #Made; Last = Shared.LastReward and `{Shared.LastReward.Path}:{Shared.LastReward.Tier}` or `none`;
+		Mentions = #Bc.Items() - Items0; Top = P:GetAttribute(`PathTop`); Academic = P:GetAttribute(`Path_Academic`) }
+	Shared.FactsOverride[P] = nil
 	local _, Pr2 = Local.Saved(P)
 	Pr2.Paths = Before Local.Save(P, Pr2)
 	Social.Titles = TitlesBefore Social.Title = TitleBefore Rep.Sync(P)

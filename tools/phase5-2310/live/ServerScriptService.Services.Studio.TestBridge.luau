@@ -1507,4 +1507,12 @@ function Commands.TallyTest(PlayerName: string)
 	return Out
 end
 
+-- (2.31) reaching a tier: the banner event, and a broadcast mention from tier 4 (put back after)
+function Commands.PathRewardTest(PlayerName: string)
+	local SSS = ServerScriptService.Services
+	local P = Players:FindFirstChild(PlayerName)
+	local Paths = require(SSS.Player.Paths)
+	return DeepCopy(Paths.RewardTestForTests(P))
+end
+
 return Shared
