@@ -239,7 +239,7 @@ Paths.Paths = {
 }
 
 -- the lines that mention a student by tier (Services.World.Broadcast), tier 4 and up
-Paths.Mention = `Congratulations to {Name}, now {Article} {Tier}.`
+Paths.Mention = "Congratulations to {Name}, now {Article} {Tier}." -- (a plain string: {Name} is filled by Paths, not interpolated)
 
 return Paths
 ```
@@ -529,6 +529,7 @@ function Shared.SelfTestForTests(P: Player)
 	local Second = Shared.CheckNow(P)
 	Shared.FactsOverride[P] = Local.ZeroFacts()
 	Shared.CheckNow(P)
+	task.wait(0.1) -- (SignalPlus delivers on a later frame)
 	R.AfterDrop = Shared.Tier(P, `Academic`) -- still 3
 	R.FirstGrants, R.SecondGrants, R.GrantSignals = #First, #Second, Grants -- 2, 0, 2 (Academic 2 and 3)
 	R.TitleGiven = table.find(Rep.Get(P).Titles, `Honor Student`) ~= nil
@@ -687,7 +688,7 @@ function Local.Reward(P: Player, Path: string, T: number, Tier, Last: boolean)
 		local First = P.DisplayName
 		pcall(function() local Id = svc(`Player.Identity`) First = Id.Get(P).First or First end)
 		local Article = if Tier.Name:match(`^[AEIOU]`) then `an` else `a`
-		local Text = Config.Mention:gsub(`{Name}`, First):gsub(`{Article}`, Article):gsub(`{Tier}`, Tier.Name)
+		local Text = Config.Mention:gsub("{Name}", First):gsub("{Article}", Article):gsub("{Tier}", Tier.Name)
 		local Bc = svc(`World.Broadcast`)
 		if Bc then
 			local OnAir = false
@@ -810,9 +811,9 @@ end
 	-- (2.31) a Standing Path at tier 3+ (the player's PathTop): StudentBrain greets with it now and then
 	Path = {
 		Academic = { Any = { `That's the honor student.`, `Top of the class, that one.`, `Heard you aced another test.` } };
-		Social = { Any = { `Everyone knows you, huh?`, `Oh, it's {Name}. Of course it is.`, `You know everyone here.` } };
+		Social = { Any = { `Everyone knows you, huh?`, "Oh, it's {Name}. Of course it is.", `You know everyone here.` } };
 		Combat = { Any = { `Don't start with that one.`, `I heard about you. Respect.`, `Easy. I'm not looking for trouble.` } };
-		Athletic = { Any = { `Good game last week, {Name}.`, `There's the varsity star.`, `Saving a seat at the next match.` } };
+		Athletic = { Any = { "Good game last week, {Name}.", `There's the varsity star.`, `Saving a seat at the next match.` } };
 		Supernatural = { Any = { `You've seen things. I can tell.`, `You were out the night it rang.`, `People say you know about Mira.` } };
 	};
 ```
