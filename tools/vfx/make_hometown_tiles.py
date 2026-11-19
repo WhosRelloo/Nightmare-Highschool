@@ -280,7 +280,124 @@ def floor_oak(name="WF_FloorOak", seed=5601):
     save(name, col, h, tile, rough, np.zeros((N, N), np.float32), boost=1.0)
 
 
+def checker(name="WF_Checker", seed=5701):
+    """black-and-cream linoleum squares (1 stud), slightly worn and waxed; 4 studs a tile"""
+    tile = 4.0
+    us, vs = U * tile, V * tile
+    i = (np.floor(us).astype(int) + np.floor(vs).astype(int)) % 2
+    fine = fbm(200, 200, 3, seed + 1)
+    blot = fbm(5, 5, 4, seed + 2)
+    cream = lin((226, 214, 188)) * (0.95 + 0.08 * fine[..., None])
+    black = lin((34, 34, 38)) * (0.9 + 0.2 * fine[..., None])
+    col = np.where((i == 0)[..., None], cream, black)
+    fu, fv = us % 1.0, vs % 1.0
+    seam = (np.minimum(fu, 1 - fu) < 0.008) | (np.minimum(fv, 1 - fv) < 0.008)
+    col = np.where(seam[..., None], col * 0.7, col)
+    scuff = smoothstep(0.6, 0.85, blot)
+    col = col * (1 - 0.1 * scuff[..., None])
+    h = -seam.astype(np.float32) * 0.002 + (fine - 0.5) * 0.0008
+    rough = np.clip(0.3 + 0.35 * scuff + 0.2 * seam, 0, 1)
+    save(name, col, h, tile, rough, np.zeros((N, N), np.float32), boost=1.0)
+
+
+def subway(name="WF_Subway", seed=5801):
+    """white glazed subway tiles 0.6 x 0.3, grey grout, running bond; 2.4 studs a tile"""
+    tile, w, hgt = 2.4, 0.6, 0.3
+    us, vs = U * tile, V * tile
+    k = np.floor(vs / hgt).astype(int)
+    uu = us + (k % 2) * w / 2
+    fu, fv = (uu % w) / w, (vs % hgt) / hgt
+    grout = (np.minimum(fu, 1 - fu) * w < 0.012) | (np.minimum(fv, 1 - fv) * hgt < 0.012)
+    edge = np.minimum(np.minimum(fu, 1 - fu) * w, np.minimum(fv, 1 - fv) * hgt)
+    tone = np.random.default_rng(seed).uniform(0.95, 1.03, (64, 64)).astype(np.float32)
+    t = tone[k % 64, np.floor(uu / w).astype(int) % 64]
+    col = lin((236, 234, 226)) * t[..., None]
+    col = np.where(grout[..., None], lin((150, 146, 138)), col)
+    h = np.where(grout, -0.01, 0.006 * smoothstep(0.0, 0.03, edge))
+    h = R.wblur(h, 0.8)
+    rough = np.where(grout, 0.9, 0.12)
+    save(name, col, h, tile, rough, np.zeros((N, N), np.float32), boost=1.3)
+
+
+def kitchen_paint(name="WF_KitchenPaint", seed=5901):
+    """butter-yellow painted plaster: a soft roller stipple, faint patches; 6 studs a tile"""
+    tile = 6.0
+    fine = fbm(260, 260, 3, seed + 1)
+    blot = fbm(6, 6, 4, seed + 2)
+    col = lin((236, 214, 150)) * (0.96 + 0.06 * fine[..., None]) * (0.96 + 0.06 * blot[..., None])
+    h = (fine - 0.5) * 0.0015
+    rough = np.clip(0.7 + (fine - 0.5) * 0.1, 0, 1)
+    save(name, col, h, tile, rough, np.zeros((N, N), np.float32), boost=1.0)
+
+
+# ------------------------------------------------------------------ neutral material sets for nh_props material() (tinted there)
+# Written at 1024 into art/props/source_wickfield (python tools/vfx/make_hometown_tiles.py art/props/source_wickfield 1024 MAT_...)
+
+def mat_painted_wood(name="NH_PaintedWood", seed=6001):
+    """near-white paint over wood: long brush strokes along u, the grain faintly through, a few pits and drips"""
+    tile = 4.0
+    grain = fbm(3, 90, 5, seed + 1, gain=0.6)
+    brush = fbm(2, 260, 2, seed + 2)
+    fine = fbm(220, 220, 2, seed + 3)
+    pits = smoothstep(0.86, 0.9, fbm(90, 90, 2, seed + 4))
+    v = 0.86 + 0.05 * (grain - 0.5) + 0.05 * (brush - 0.5) + 0.02 * (fine - 0.5) - 0.12 * pits
+    col = np.stack([v, v * 0.995, v * 0.985], -1).astype(np.float32)
+    h = 0.004 * (grain - 0.5) + 0.0025 * (brush - 0.5) - 0.002 * pits
+    rough = np.clip(0.42 + 0.12 * (brush - 0.5) + 0.25 * pits, 0, 1)
+    save(name, col, h, tile, rough, np.zeros((N, N), np.float32), boost=1.0)
+
+
+def mat_cotton(name="NH_Cotton", seed=6101):
+    """a plain weave: warp and weft threads over and under, slubs, soft fuzz"""
+    tile = 1.0
+    us, vs = U * 64, V * 64                         # 64 threads a repeat
+    fu, fv = us % 1.0, vs % 1.0
+    iu, iv = np.floor(us).astype(int), np.floor(vs).astype(int)
+    over = ((iu + iv) % 2 == 0)
+    warp = np.sin(np.pi * fu) ** 0.7
+    weft = np.sin(np.pi * fv) ** 0.7
+    h = np.where(over, warp * (0.6 + 0.4 * weft), weft * (0.6 + 0.4 * warp))
+    slub = fbm(4, 64, 3, seed + 1)
+    fuzz = fbm(300, 300, 2, seed + 2)
+    v = 0.78 + 0.14 * h + 0.06 * (slub - 0.5) + 0.04 * (fuzz - 0.5)
+    col = np.stack([v, v, v * 0.99], -1).astype(np.float32)
+    rough = np.clip(0.88 + 0.06 * (fuzz - 0.5), 0, 1)
+    save(name, col, h * 0.004, tile, rough, np.zeros((N, N), np.float32), boost=1.0)
+
+
+def mat_denim(name="NH_Denim", seed=6201):
+    """3/1 twill: diagonal ribs, white weft showing between, slub fade (tint it blue)"""
+    tile = 1.0
+    us, vs = U * 80, V * 80
+    d = (us + vs) % 4.0
+    rib = np.clip(np.sin(np.pi * d / 4.0) ** 2, 0, 1)
+    slub = fbm(3, 80, 3, seed + 1)
+    fade = fbm(6, 6, 4, seed + 2)
+    v = 0.55 + 0.35 * rib * (0.8 + 0.4 * slub) + 0.1 * fade
+    col = np.stack([v * 0.92, v * 0.96, v], -1).astype(np.float32)
+    rough = np.clip(0.9 + 0.05 * (slub - 0.5), 0, 1)
+    save(name, col, rib * 0.004, tile, rough, np.zeros((N, N), np.float32), boost=1.0)
+
+
+def mat_enamel(name="NH_Enamel", seed=6301):
+    """glossy baked enamel: a faint orange peel, a few hairline scratches"""
+    tile = 2.0
+    peel = fbm(60, 60, 3, seed + 1)
+    sc = np.abs(fbm(8, 8, 5, seed + 2) - 0.5) < 0.004
+    v = 0.92 - 0.02 * (peel - 0.5) - 0.05 * sc
+    col = np.stack([v, v, v * 0.99], -1).astype(np.float32)
+    rough = np.clip(0.14 + 0.05 * (peel - 0.5) + 0.25 * sc, 0, 1)
+    save(name, col, 0.0012 * (peel - 0.5) - 0.0005 * sc, tile, rough, np.zeros((N, N), np.float32), boost=1.0)
+
+
 SETS = {
+    "MAT_PaintedWood": mat_painted_wood,
+    "MAT_Cotton": mat_cotton,
+    "MAT_Denim": mat_denim,
+    "MAT_Enamel": mat_enamel,
+    "WF_Checker": checker,
+    "WF_Subway": subway,
+    "WF_KitchenPaint": kitchen_paint,
     "WF_Wallpaper": wallpaper,
     "WF_WallpaperRose": lambda: wallpaper("WF_WallpaperRose", 5502, base_rgb=(190, 142, 150), cream_rgb=(244, 230, 214), floral=True),
     "WF_FloorOak": floor_oak,

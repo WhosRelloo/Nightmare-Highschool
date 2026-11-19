@@ -64,6 +64,34 @@ Built at Roblox scale for R6 (1 stud per Blender unit, doors 7 to 8 studs tall),
 It's placed in the NH Combat Test place as its own area away from the school (`Workspace.Hometown`), streamed in
 only for the tutorial. **The Map place is never touched.**
 
+### Rigged and animated props (owner, 2026-11-19: "Make sure some stuff is rigged and animated too")
+
+**How the rigs work:**
+- **One armature per prop.** Each moving part is its own piece, weighted only to its own bones; the rest of the prop rides
+  a static Root bone, so nothing else deforms.
+- **Clips** are written in world terms (a rotation about the bone's head, plus a move).
+  - They're baked into the FBX as actions.
+  - They're saved to `art/props/anim/<Prop>.json` for the Studio step that turns them into KeyframeSequences.
+  - They're rendered as review sheets (`art/props/previews/<Prop>_clips.png`).
+- **Motion style:** overshoot and settle, as in the house style.
+
+| Prop | Rig | Clips |
+|---|---|---|
+| WFBedroom | the duvet (3-bone chain over the pillow decoy), both curtains (3-bone chains, subdivided folds), the door | DuvetReveal, CurtainBillow (loops), DoorOpen |
+| WFKitchen | Dad's newspaper (2 bones, a subdivided sheet), the envelope and its flap, the fridge door (with a fridge interior behind it), the clock hands, the kettle lid | NewspaperLower, NewspaperShake (loops), EnvelopeSlide, EnvelopeOpen, FridgeOpen, ClockMinuteTick, KettleBoil (loops) |
+| WickHouse | the bedroom window's lower sash | SashOpen |
+| WFMailbox | the flag | FlagDown, FlagUp |
+| WFPicketGate | the gate | GateOpen, GateSwingShut |
+
+**Still to come:** Biscuit and the goose are full creature rigs with locomotion and acting clips (§4).
+
+**PBR on the printed props:** every canvas also has `_canvas_normal`, `_canvas_rough` and `_canvas_metal` maps.
+- **Relief:** paper fibres, creases, ink lift, a raised wax seal, felt fuzz.
+- **Roughness:** glossy cereal board through to matte newsprint.
+- **Metalness:** gilt only.
+
+The furniture and fabrics use tinted PBR sets: painted wood, cotton, denim, enamel and velvet.
+
 ## 3. Custom art and logos (all original, made by Claude)
 
 Every sign and logo is original, drawn at 4x and baked into PBR (painted wood, enamel, neon tubes, brass letters and

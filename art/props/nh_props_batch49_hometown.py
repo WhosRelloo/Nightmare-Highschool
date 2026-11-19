@@ -33,9 +33,22 @@ TILES = {"Siding": ("WF_ClapCream", 8.0), "Roof": ("WF_Shingle", 6.0), "Brick": 
 BUILDERS = {}
 
 
+WSRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "source_wickfield")
+FSRC = os.path.join(os.path.dirname(os.path.abspath(__file__)), "source_fabric")
+
+
+def wmat(name, set_name, tint, scale, **kw):
+    """a material from the Wickfield neutral sets (source_wickfield: NH_PaintedWood, NH_Cotton, NH_Denim, NH_Enamel), tinted"""
+    return material(name, os.path.join(WSRC, set_name), tint=tint, scale=scale, metal=0.0, **kw)
+
+
+def fmat(name, set_name, tint, scale, **kw):
+    return material(name, os.path.join(FSRC, set_name), tint=tint, scale=scale, metal=0.0, **kw)
+
+
 def kit(M):
     return {
-        "trim": material("WFTrim", base=(0.86, 0.84, 0.8), rough=0.55, wear=0.25, dirt=0.7),
+        "trim": wmat("WFTrim", "NH_PaintedWood", (0.98, 0.96, 0.92), 0.3, wear=0.25, dirt=0.7),
         "door": material("WFDoorRed", "NH_PaintedMetal", tint=(0.36, 0.05, 0.045), scale=1.0, rough_add=0.1, wear=0.35),
         "shutter": material("WFShutter", "NH_PaintedMetal", tint=(0.2, 0.28, 0.2), scale=1.0, rough_add=0.15, wear=0.4),
         "deck": material("WFDeck", "NH_DeskWood", tint=(0.48, 0.36, 0.26), scale=0.3, rough_add=0.1, wear=0.45, dirt=0.9),
@@ -75,6 +88,34 @@ def _tile_uv(ob, tile):
 
 
 P.tile_uv = _tile_uv
+
+_orig_canvas_material = P.canvas_material
+
+
+def _canvas_material(ob, image):
+    """Wickfield canvases carry full PBR (art/hometown/posters_hq.py writes <image>_canvas_{normal,rough,metal}.png): load
+    every map that exists, else the plain canvas material."""
+    _orig_canvas_material(ob, image)
+    base = os.path.join(P.OUT_TEX, f"{image}_canvas")
+    if not os.path.exists(base + "_normal.png"):
+        return
+    nt = ob.data.materials[0].node_tree
+    bs = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+
+    def tex(path):
+        t = nt.nodes.new("ShaderNodeTexImage")
+        t.image = bpy.data.images.load(path, check_existing=True)
+        t.image.colorspace_settings.name = "Non-Color"
+        uv = next((n for n in nt.nodes if n.type == "UVMAP"), None)
+        return t
+    nm = nt.nodes.new("ShaderNodeNormalMap")
+    nt.links.new(tex(base + "_normal.png").outputs["Color"], nm.inputs["Color"])
+    nt.links.new(nm.outputs["Normal"], bs.inputs["Normal"])
+    nt.links.new(tex(base + "_rough.png").outputs["Color"], bs.inputs["Roughness"])
+    nt.links.new(tex(base + "_metal.png").outputs["Color"], bs.inputs["Metallic"])
+
+
+P.canvas_material = _canvas_material
 
 
 # ------------------------------------------------------------------ helpers
@@ -434,9 +475,11 @@ def mailbox(M):
     box("Door", (0.08, 1.16, 1.06), (0.3 - L / 2 - 0.04, 0, 4.05 + 0.52), navy, bevel=0.03)
     box("Latch", (0.12, 0.25, 0.12), (0.3 - L / 2 - 0.1, 0, 4.05 + 0.3), K["brass"], bevel=0.02)
     # the flag (up): an arm and a plate on the +Y side
+    set_group("Flag")
     box("FlagArm", (0.12, 0.06, 1.4), (0.75, 0.6, 4.75), red, bevel=0.01)
     box("FlagPlate", (0.6, 0.06, 0.45), (0.95, 0.6, 5.25), red, bevel=0.02)
-    cyl("FlagPivot", 0.08, 0.1, (0.75, 0.6, 4.2), K["iron"], rot=(math.pi / 2, 0, 0), verts=12)
+    set_group("Main")
+    cyl("FlagPivot", 0.08, 0.1, (0.75, 0.66, 4.2), K["iron"], rot=(math.pi / 2, 0, 0), verts=12)
     # the lettering plate on the -Y side (canvas)
     set_group("Sign")
     box("LetterPlate", (1.9, 0.02, 0.62), (0.3, -0.565, 4.05 + 0.42), K["place"], bevel=0)
@@ -580,6 +623,255 @@ def sidewalk(M):
     return (16, 16.8, 1.0)
 
 
+# ================================================================== rigs and animation clips
+# A prop's rig: one armature (a static Root, then a bone per moving part). Each moving part is its own piece (group) and is
+# weighted only to its own bones; every other piece rides Root, so nothing else deforms. Clips are written in world terms
+# (a rotation about the bone's head, a move), applied as Blender actions (exported in the FBX, rendered as preview strips) and
+# saved to art/props/anim/<Prop>.json for the Studio step that turns them into KeyframeSequences.
+
+RIG = {}      # prop -> dict(bones={name: (head, tail, parent)}, own={group: bone | [bones]})
+CLIPS = {}    # prop -> {clip: dict(length=s, loop=bool, fps=30, keys={bone: fn(t) -> (axis, deg, (dx, dy, dz)) | [(axis, deg)...]})}
+ANIM_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "anim")
+
+
+def ease(t):
+    t = max(0.0, min(1.0, t))
+    return t * t * (3 - 2 * t)
+
+
+def back_out(t, s=1.4):
+    """ease out with a little overshoot (the house style: overshoot, then settle)"""
+    t = max(0.0, min(1.0, t)) - 1
+    return 1 + t * t * ((s + 1) * t + s)
+
+
+def rig_pieces(prop, objs):
+    spec = RIG[prop]
+    bones = {"Root": ((0, 0, 0), (0, 0, 1), None)}
+    bones.update(spec["bones"])
+    arm_data = bpy.data.armatures.new(f"{prop}Rig")
+    arm = bpy.data.objects.new(f"{prop}Rig", arm_data)
+    bpy.context.collection.objects.link(arm)
+    bpy.ops.object.select_all(action="DESELECT")
+    bpy.context.view_layer.objects.active = arm
+    arm.select_set(True)
+    bpy.ops.object.mode_set(mode="EDIT")
+    eb = arm_data.edit_bones
+    for bn, (h, t, _) in bones.items():
+        b = eb.new(bn)
+        b.head, b.tail = tuple(h), tuple(t)
+    for bn, (_, _, par) in bones.items():
+        if bn != "Root":
+            eb[bn].parent = eb[par or "Root"]
+    bpy.ops.object.mode_set(mode="OBJECT")
+
+    def dist(p, a, b):
+        ab = b - a
+        u = max(0.0, min(1.0, (p - a).dot(ab) / max(1e-9, ab.dot(ab))))
+        return (p - (a + ab * u)).length
+    for ob in objs:
+        if ob.type != "MESH":
+            continue
+        grp = ob.name[len(prop) + 1:] if ob.name.startswith(prop + "_") else "Main"
+        owner = spec["own"].get(grp, "Root")
+        groups = {}
+
+        def vg(bn):
+            if bn not in groups:
+                groups[bn] = ob.vertex_groups.new(name=bn)
+            return groups[bn]
+        mw = ob.matrix_world
+        if isinstance(owner, str):
+            vg(owner).add([v.index for v in ob.data.vertices], 1.0, "REPLACE")
+        else:
+            segs = [(bn, Vector(bones[bn][0]), Vector(bones[bn][1])) for bn in owner]
+            for v in ob.data.vertices:
+                p = mw @ v.co
+                ds = sorted(((dist(p, a, b), bn) for bn, a, b in segs), key=lambda x: x[0])[:2]
+                ws = [(bn, 1.0 / (d * d + 0.02)) for d, bn in ds]
+                tot = sum(w for _, w in ws)
+                for bn, w in ws:
+                    vg(bn).add([v.index], w / tot, "REPLACE")
+        md = ob.modifiers.new("Rig", "ARMATURE")
+        md.object = arm
+        ob.parent = arm
+    make_clips(prop, arm, bones)
+    print(f"[rig] {prop}: {len(bones)} bones, clips {list(CLIPS.get(prop, {}))}")
+    return arm
+
+
+def _delta(axis_deg_list, head, move):
+    """T(head) R T(-head), then a move, as a 4x4 in armature space"""
+    from mathutils import Matrix
+    R = Matrix.Identity(4)
+    for axis, deg in axis_deg_list:
+        ax = {"x": (1, 0, 0), "y": (0, 1, 0), "z": (0, 0, 1)}[axis] if isinstance(axis, str) else axis
+        R = Matrix.Rotation(math.radians(deg), 4, Vector(ax)) @ R
+    h = Vector(head)
+    return Matrix.Translation(Vector(move)) @ Matrix.Translation(h) @ R @ Matrix.Translation(-h)
+
+
+def make_clips(prop, arm, bones):
+    import json
+    clips = CLIPS.get(prop, {})
+    if not clips:
+        return
+    os.makedirs(ANIM_DIR, exist_ok=True)
+    out = {"prop": prop, "bones": {bn: {"head": list(h), "tail": list(t), "parent": p or ("Root" if bn != "Root" else None)}
+                                   for bn, (h, t, p) in bones.items()}, "clips": {}}
+    sc = bpy.context.scene
+    bpy.context.view_layer.objects.active = arm
+    bpy.ops.object.mode_set(mode="POSE")
+    order = list(bones)                                    # parents are listed before children
+    arm.animation_data_create()
+    for cname, c in clips.items():
+        fps = c.get("fps", 30)
+        n = int(round(c["length"] * fps))
+        act = bpy.data.actions.new(f"{prop}_{cname}")
+        act.use_fake_user = True
+        arm.animation_data.action = act
+        frames = []
+        for f in range(n + 1):
+            t = f / fps
+            deltas, rec = {}, {}
+            for bn in order:
+                par = bones[bn][2] or ("Root" if bn != "Root" else None)
+                D = deltas.get(par) if par else None
+                fn = c["keys"].get(bn)
+                rots, move = [], (0, 0, 0)
+                if fn:
+                    r = fn(t)
+                    if len(r) == 3 and not isinstance(r[0], (list, tuple)):
+                        rots, move = [(r[0], r[1])], r[2]
+                    else:
+                        rots, move = r[0], r[1]
+                own = _delta(rots, bones[bn][0], move)
+                deltas[bn] = (D @ own) if D is not None else own
+                if fn:
+                    rec[bn] = {"rot": [[a if isinstance(a, str) else list(a), d] for a, d in rots], "move": list(move)}
+            for bn in order:
+                if bn == "Root":
+                    continue
+                pb = arm.pose.bones[bn]
+                pb.rotation_mode = "QUATERNION"
+                pb.matrix = deltas[bn] @ arm.data.bones[bn].matrix_local
+                bpy.context.view_layer.update()
+                pb.keyframe_insert("location", frame=f)
+                pb.keyframe_insert("rotation_quaternion", frame=f)
+            frames.append({"t": round(t, 4), "bones": rec})
+        out["clips"][cname] = {"length": c["length"], "loop": c.get("loop", False), "fps": fps, "frames": frames}
+        trk = arm.animation_data.nla_tracks.new()
+        trk.name = cname
+        trk.strips.new(cname, 0, act)
+        trk.mute = True
+    arm.animation_data.action = None
+    for pb in arm.pose.bones:
+        pb.matrix_basis.identity()
+    bpy.ops.object.mode_set(mode="OBJECT")
+    with open(os.path.join(ANIM_DIR, f"{prop}.json"), "w", encoding="utf-8") as fh:
+        json.dump(out, fh, indent=1)
+    sc.frame_set(0)
+
+
+_orig_export = P.export
+
+
+def _export(objs, name, arm=None):
+    """props with clips export their actions too (all actions, baked)"""
+    if arm is None or name not in CLIPS:
+        return _orig_export(objs, name, arm)
+    bpy.ops.object.select_all(action="DESELECT")
+    for ob in objs:
+        ob.select_set(True)
+    arm.select_set(True)
+    bpy.context.view_layer.objects.active = objs[0]
+    bpy.ops.export_scene.fbx(filepath=os.path.join(P.OUT_FBX, f"{name}.fbx"), use_selection=True, object_types={"MESH", "ARMATURE"},
+                             apply_unit_scale=True, global_scale=1.0, axis_forward="-Z", axis_up="Y", mesh_smooth_type="FACE",
+                             path_mode="STRIP", embed_textures=False, add_leaf_bones=False, bake_anim=True,
+                             bake_anim_use_all_actions=True, bake_anim_use_nla_strips=False, bake_anim_force_startend_keying=True)
+
+
+P.export = _export
+
+
+def clip_strips(prop, cam=None, target=None, samples=24):
+    """render each clip at its start, middle and end (3 frames): previews/_clip_<Prop>_<Clip>_<k>.png (art/hometown/clip_sheet.py
+    lays them out)"""
+    arm = bpy.data.objects.get(f"{prop}Rig")
+    if arm is None or prop not in CLIPS:
+        return
+    sc = bpy.context.scene
+    sc.cycles.samples = samples
+    if cam is not None:
+        camd = bpy.data.cameras.new("ClipCam")
+        camd.lens = 22
+        co = bpy.data.objects.new("ClipCam", camd)
+        sc.collection.objects.link(co)
+        co.location = cam
+        co.rotation_euler = (Vector(target) - Vector(cam)).to_track_quat("-Z", "Y").to_euler()
+        sc.camera = co
+    for ob in bpy.data.objects:                       # undo the open-door preview's turn
+        if "nh_swing" in ob.keys():
+            ob.rotation_euler = (0, 0, 0)
+    for cname, c in CLIPS[prop].items():
+        cc = CLIP_CAM.get(prop, {}).get(cname)
+        if cc:
+            co = bpy.data.objects.get("ClipCam") or bpy.data.objects.new("ClipCam", bpy.data.cameras.new("ClipCam"))
+            if co.name not in sc.collection.objects:
+                sc.collection.objects.link(co)
+            co.data.lens = 24
+            co.location = cc[0]
+            co.rotation_euler = (Vector(cc[1]) - Vector(cc[0])).to_track_quat("-Z", "Y").to_euler()
+            sc.camera = co
+        arm.animation_data.action = bpy.data.actions.get(f"{prop}_{cname}")
+        n = int(round(c["length"] * c.get("fps", 30)))
+        for k, f in enumerate((0, n // 2, n)):
+            sc.frame_set(f)
+            sc.render.filepath = os.path.join(P.OUT_PRE, f"_clip_{prop}_{cname}_{k}.png")
+            bpy.ops.render.render(write_still=True)
+    arm.animation_data.action = None
+    sc.frame_set(0)
+    print(f"[clips] {prop}: {list(CLIPS[prop])}")
+
+
+def panel(name, x0, x1, z0, z1, y, mat, nu=6, nv=12, thick=0.02):
+    """a flat sheet in the XZ plane at y, subdivided so a rig can bend it (a newspaper, a page), thickened"""
+    me = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    vs = [[bm.verts.new((x0 + (x1 - x0) * i / nu, y - thick / 2, z0 + (z1 - z0) * j / nv)) for j in range(nv + 1)] for i in range(nu + 1)]
+    for i in range(nu):
+        for j in range(nv):
+            bm.faces.new((vs[i][j], vs[i][j + 1], vs[i + 1][j + 1], vs[i + 1][j]))
+    bm.to_mesh(me)
+    bm.free()
+    ob = bpy.data.objects.new(name, me)
+    bpy.context.collection.objects.link(ob)
+    so = ob.modifiers.new("Thick", "SOLIDIFY")
+    so.thickness = thick
+    so.offset = 0.0
+    return _finish(ob, mat, 0)
+
+
+def drape(name, x0, x1, y0, y1, zfn, mat, nu=28, nv=40, thick=0.1):
+    """a soft sheet over a height field z = zfn(x, y) (a duvet, a cloth), thickened downward, smooth shaded"""
+    me = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    vs = [[bm.verts.new((x0 + (x1 - x0) * i / nu, y0 + (y1 - y0) * j / nv, zfn(x0 + (x1 - x0) * i / nu, y0 + (y1 - y0) * j / nv)))
+           for j in range(nv + 1)] for i in range(nu + 1)]
+    for i in range(nu):
+        for j in range(nv):
+            f = bm.faces.new((vs[i][j], vs[i + 1][j], vs[i + 1][j + 1], vs[i][j + 1]))
+            f.smooth = True
+    bm.to_mesh(me)
+    bm.free()
+    ob = bpy.data.objects.new(name, me)
+    bpy.context.collection.objects.link(ob)
+    so = ob.modifiers.new("Thick", "SOLIDIFY")
+    so.thickness = thick
+    so.offset = -1.0
+    return _finish(ob, mat, 0)
+
+
 # ------------------------------------------------------------------ clip check: every item against every other one
 
 ITEMS = []        # (item name, first part index) in build order; parts after it belong to it until the next
@@ -659,10 +951,10 @@ def bedroom(M):
     ITEMS.clear()
     K = kit(M)
     oak = material("WFOak", "NH_DeskWood", tint=(0.6, 0.42, 0.26), scale=0.25, rough_add=0.05, wear=0.4)
-    paint_w = material("WFFurnWhite", base=(0.84, 0.82, 0.78), rough=0.5, wear=0.3, dirt=0.6)
-    quilt = material("WFQuilt", base=(0.12, 0.2, 0.36), rough=0.92, wear=0.0, dirt=0.3)
-    sheet = material("WFSheet", base=(0.86, 0.84, 0.8), rough=0.9, wear=0.0, dirt=0.3)
-    cloth_r = material("WFCurtain", base=(0.5, 0.2, 0.12), rough=0.9, wear=0.0, dirt=0.4)
+    paint_w = wmat("WFFurnWhite", "NH_PaintedWood", (0.96, 0.94, 0.9), 0.3, wear=0.3, dirt=0.6)
+    quilt = fmat("WFQuilt", "NH_Velvet", (0.16, 0.26, 0.46), 0.5, normal=0.7, wear=0.0, dirt=0.3)
+    sheet = wmat("WFSheet", "NH_Cotton", (0.98, 0.96, 0.92), 0.15, wear=0.0, dirt=0.3)
+    cloth_r = wmat("WFCurtain", "NH_Cotton", (0.66, 0.26, 0.16), 0.15, wear=0.0, dirt=0.4)
     R = BED_ROOM
     X0, X1, Y0, Y1, Z0, Z1 = R["X0"], R["X1"], R["Y0"], R["Y1"], R["Z0"], R["Z1"]
     G = 0.27                          # furniture stands this far from a wall (clear of the baseboard)
@@ -736,9 +1028,12 @@ def bedroom(M):
     cyl("CurtainRod", 0.07, ww + 4.6, (wc, Y0 + 0.62, wz + wh + 0.85), K["brass"], rot=(0, math.pi / 2, 0), verts=12)
     for s_ in (-1, 1):
         box(f"RodBracket{s_}", (0.12, 0.42, 0.12), (wc + s_ * (ww / 2 + 1.9), Y0 + 0.4, wz + wh + 0.85), K["brass"], bevel=0.02)
+        set_group("Curtains")
         for k in range(5):
-            cyl(f"Curtain{s_}{k}", 0.17, wh + 1.3, (wc + s_ * (ww / 2 + 0.75 + k * 0.3), Y0 + 0.62 + 0.06 * (k % 2), wz + wh + 0.78 - (wh + 1.3) / 2),
-                cloth_r, verts=10)
+            ztop_, zbot_ = wz + wh + 0.78, wz + wh + 0.78 - (wh + 1.3)
+            lathe(f"Curtain{s_}{k}", [(0.0, zbot_)] + [(0.17 + 0.012 * math.sin(i * 1.7 + k), zbot_ + (ztop_ - zbot_) * i / 16) for i in range(17)] + [(0.0, ztop_)],
+                  cloth_r, seg=10, loc=(wc + s_ * (ww / 2 + 0.75 + k * 0.3), Y0 + 0.62 + 0.06 * (k % 2), 0))
+        set_group("Main")
         box(f"Tieback{s_}", (1.6, 0.18, 0.15), (wc + s_ * (ww / 2 + 1.35), Y0 + 0.86, wz + 1.6), K["brass"], bevel=0.04)
 
     # ---------------------------------------------------------------- the bed, against the back wall, and its decoy
@@ -757,13 +1052,28 @@ def bedroom(M):
     box("Mattress", (bx1 - bx0 - 0.6, by1 - by0 - 0.8, 0.9), ((bx0 + bx1) / 2, (by0 + by1) / 2, mz), sheet, bevel=0.18, segments=3)
     top = mz + 0.45
     box("Pillow", (3.0, 1.2, 0.5), ((bx0 + bx1) / 2, by1 - 1.15, top + 0.25), sheet, bevel=0.22, segments=4)
-    box("Duvet", (bx1 - bx0 - 0.6, by1 - by0 - 2.4, 0.3), ((bx0 + bx1) / 2, (by0 + by1) / 2 - 0.8, top + 0.15), quilt, bevel=0.13, segments=3)
-    dtop = top + 0.42
-    for nm, r, loc, sc in (("Head", 0.5, ((bx0 + bx1) / 2 + 0.2, by1 - 2.6, dtop), (1.0, 0.9, 0.55)),
-                           ("Body", 0.7, ((bx0 + bx1) / 2, (by0 + by1) / 2 - 0.4, dtop), (1.3, 2.4, 0.5)),
-                           ("Knee", 0.5, ((bx0 + bx1) / 2 + 0.6, by0 + 1.8, dtop + 0.05), (1.2, 1.0, 0.6))):
-        sphere(f"Lump{nm}", r, loc, quilt, seg=20, rings=12, scale=sc)
-    box("DuvetFold", (bx1 - bx0 - 0.6, 0.7, 0.3), ((bx0 + bx1) / 2, by1 - 2.15, top + 0.32), sheet, bevel=0.13, segments=3)
+    # the decoy: pillows rolled into a sleeping-kid shape (head, body, bent knees), then the duvet draped over them
+    cxb = (bx0 + bx1) / 2
+    lumps = (("Head", (cxb + 0.2, by1 - 2.6), (0.5, 0.45, 0.32)), ("Body", (cxb, (by0 + by1) / 2 - 0.4), (0.9, 1.7, 0.36)),
+             ("Knee", (cxb + 0.6, by0 + 1.8), (0.6, 0.5, 0.42)))
+    for nm, (lx_, ly_), (rx_, ry_, rz_) in lumps:
+        sphere(f"Decoy{nm}", 1.0, (lx_, ly_, top + rz_ * 0.92), sheet, seg=20, rings=12, scale=(rx_, ry_, rz_))
+    dy0, dy1 = by0 + 0.35, by1 - 2.0
+
+    def duvet_z(x, y):
+        z = top + 0.1
+        for _, (lx_, ly_), (rx_, ry_, rz_) in lumps:
+            q = 1 - ((x - lx_) / (rx_ + 0.35)) ** 2 - ((y - ly_) / (ry_ + 0.35)) ** 2
+            if q > 0:
+                z = max(z, top + rz_ * 0.92 + rz_ * math.sqrt(q) * 1.05 + 0.08)
+        edge = min(x - (bx0 + 0.3), (bx1 - 0.3) - x)
+        if edge < 0.3:
+            z -= 0.275 * (1 - max(edge, -0.3) / 0.3) ** 1.5
+        return z
+    set_group("Duvet")
+    drape("Duvet", bx0 + 0.12, bx1 - 0.12, dy0, dy1, duvet_z, quilt, nu=32, nv=48, thick=0.12)
+    set_group("Main")
+    drape("TurnDown", bx0 + 0.15, bx1 - 0.15, dy1 - 0.02, dy1 + 0.7, lambda x, y: top + 0.18 + 0.05 * math.sin(3.0 * (y - dy1)), sheet, nu=24, nv=6, thick=0.08)
 
     # ---------------------------------------------------------------- a bookshelf on the left wall, between the bed and the door
     item("Bookshelf")
@@ -845,7 +1155,7 @@ def bedroom(M):
     box("ChairBack", (0.15, 1.4, 1.6), (cx_ + 0.62, cy_, Z0 + 2.5), oak, bevel=0.04)
     # the backpack (green canvas, a W patch), leaning against the front wall by the chair
     item("Backpack")
-    bag = material("WFBackpack", base=(0.18, 0.3, 0.22), rough=0.9, wear=0.2, dirt=0.7)
+    bag = wmat("WFBackpack", "NH_Denim", (0.26, 0.42, 0.3), 0.2, wear=0.2, dirt=0.7)
     px_, py_ = 6.65, Y0 + G + 0.45
     box("Pack", (1.2, 0.7, 1.6), (px_, py_, Z0 + 0.82), bag, bevel=0.25, segments=3, rot=(0.12, 0, 0))
     box("PackPocket", (0.9, 0.25, 0.7), (px_, py_ + 0.42, Z0 + 0.55), bag, bevel=0.1, segments=2, rot=(0.12, 0, 0))
@@ -867,9 +1177,9 @@ def bedroom(M):
 
     # ---------------------------------------------------------------- the clothes pile by the closet: folded and dropped
     item("Clothes")
-    tee = material("WFTee", base=(0.65, 0.62, 0.55), rough=0.95, wear=0.0)
-    jean = material("WFJean", base=(0.16, 0.22, 0.36), rough=0.95, wear=0.0)
-    hood = material("WFHoodie", base=(0.42, 0.12, 0.1), rough=0.95, wear=0.0)
+    tee = wmat("WFTee", "NH_Cotton", (0.8, 0.78, 0.7), 0.15, wear=0.0)
+    jean = wmat("WFJean", "NH_Denim", (0.26, 0.36, 0.6), 0.15, wear=0.1)
+    hood = fmat("WFHoodie", "NH_Velvet", (0.55, 0.16, 0.13), 0.5, wear=0.0)
     kx, ky = CLO[0] - 0.6, Y1 - 2.4
     # jeans: two legs crossing, a waistband
     box("JeansL", (0.7, 2.6, 0.18), (kx - 0.2, ky - 0.2, Z0 + 0.09), jean, bevel=0.07, segments=2, rot=(0, 0, 0.35))
@@ -910,27 +1220,419 @@ def bedroom(M):
     clip_check(((X0 + 0.1, Y0 + 0.1, Z0), (X1 - 0.1, Y1 - 0.1, Z1)))
     return (X1 - X0 + 2, Y1 - Y0 + 2, Z1)
 
+# ================================================================== the kitchen (inside WickHouse, the same origin)
+
+KIT_ROOM = dict(X0=0.0, X1=18.7, Y0=0.5, Y1=13.7, Z0=1.6, Z1=11.4)
+KIT_WIN = (3.25, 4.5, 5.2, 4.4)                  # the back window: centre x, width, sill z, height
+KIT_DOOR = (8.0, 11.5)                            # the back door (x), full height 8
+
+
+def kitchen(M):
+    """The kitchen, ground floor back right of WickHouse, in the house's own space: 18.7 x 13.2 studs. The breakfast
+    scene (docs/expansion/15 beat 9): the table with three places, the black envelope propped against your cereal box,
+    Dad's newspaper (held up in the scene), the brochure by Mom's place. Clip-checked like the bedroom."""
+    ITEMS.clear()
+    K = kit(M)
+    R = KIT_ROOM
+    X0, X1, Y0, Y1, Z0, Z1 = R["X0"], R["X1"], R["Y0"], R["Y1"], R["Z0"], R["Z1"]
+    wc, ww, wz, wh = KIT_WIN
+    paint_w = wmat("WFFurnWhite", "NH_PaintedWood", (0.96, 0.94, 0.9), 0.3, wear=0.3, dirt=0.6)
+    cab = wmat("WFCabinet", "NH_PaintedWood", (0.5, 0.65, 0.55), 0.3, wear=0.35, dirt=0.7)        # sage-green cabinets
+    top_m = material("WFCounter", "NH_DeskWood", tint=(0.62, 0.44, 0.26), scale=0.3, rough_add=0.1, wear=0.4)   # butcher block
+    steel = material("WFSteel", base=(0.78, 0.78, 0.8), rough=0.25, metal=1.0, wear=0.2)
+    enamel = wmat("WFEnamelCream", "NH_Enamel", (0.98, 0.93, 0.82), 0.5, wear=0.3, dirt=0.6)
+    chrome = material("WFChrome", base=(0.8, 0.8, 0.82), rough=0.18, metal=1.0, wear=0.2)
+    oak = material("WFOak", "NH_DeskWood", tint=(0.6, 0.42, 0.26), scale=0.25, rough_add=0.05, wear=0.4)
+    ging = wmat("WFGingham", "NH_Cotton", (0.8, 0.26, 0.22), 0.15, wear=0.0)
+    china = wmat("WFChina", "NH_Enamel", (1.0, 0.99, 0.95), 0.6, wear=0.1, dirt=0.4)
+    S = 0.11                                          # cabinets stand this far off the wall paint (no baseboard behind them)
+    G = 0.27                                          # loose furniture stands this far from a wall
+
+    # ---------------------------------------------------------------- the room
+    item("Room")
+    set_group("Floor")
+    box("Floor", (X1 - X0, Y1 - Y0, 0.4), ((X0 + X1) / 2, (Y0 + Y1) / 2, Z0 - 0.2), K["place"], bevel=0)
+    set_group("Walls")
+    wall("WallB", "y", Y1 - 0.05, X0, X1, Z0, Z1, 0.1, [(wc - ww / 2, wc + ww / 2, wz, wz + wh), (KIT_DOOR[0], KIT_DOOR[1], Z0, Z0 + 8.0),
+                                                        (X0, 7.45, Z0 + 3.12, Z0 + 5.0)], K["place"])
+    wall("WallF", "y", Y0 + 0.05, X0, X1, Z0, Z1, 0.1, [(13.0, 16.5, Z0, Z0 + 7.6)], K["place"])
+    wall("WallL", "x", X0 + 0.05, Y0, Y1, Z0, Z1, 0.1, [(2.0, 5.5, Z0, Z0 + 7.6)], K["place"])
+    wall("WallR", "x", X1 - 0.05, Y0, Y1, Z0, Z1, 0.1, [(1.2, 9.8, Z0 + 3.12, Z0 + 5.0)], K["place"])
+    set_group("Tile")                                  # the subway backsplashes behind the counters
+    wall("SplashB", "y", Y1 - 0.05, X0, 7.45, Z0 + 3.12, Z0 + 5.0, 0.1, [(wc - ww / 2, wc + ww / 2, wz, Z0 + 5.0)], K["place"])
+    wall("SplashR", "x", X1 - 0.05, 1.2, 9.8, Z0 + 3.12, Z0 + 5.0, 0.1, [], K["place"])
+    set_group("Main")
+    box("Ceiling", (X1 - X0, Y1 - Y0, 0.2), ((X0 + X1) / 2, (Y0 + Y1) / 2, Z1 + 0.1), paint_w, bevel=0)
+    def base_x(nm, y, runs):
+        for k_, (a, b) in enumerate(runs):
+            box(f"Base{nm}{k_}", (b - a, 0.15, 0.55), ((a + b) / 2, y, Z0 + 0.275), K["trim"], bevel=0.02)
+
+    def base_y(nm, x, runs):
+        for k_, (a, b) in enumerate(runs):
+            box(f"Base{nm}{k_}", (0.15, b - a, 0.55), (x, (a + b) / 2, Z0 + 0.275), K["trim"], bevel=0.02)
+    base_x("B", Y1 - 0.17, [(KIT_DOOR[1] + 0.45, 12.05), (15.75, X1 - 0.1)])
+    base_x("F", Y0 + 0.17, [(X0 + 0.1, 12.55), (16.95, X1 - 0.1)])
+    base_y("L", X0 + 0.17, [(Y0 + 0.1, 1.55), (5.95, 11.2)])
+    base_y("R", X1 - 0.17, [(Y0 + 0.1, 1.05), (9.95, Y1 - 0.1)])
+    for nm, size, loc in (("F", (X1 - X0 - 0.2, 0.3, 0.4), ((X0 + X1) / 2, Y0 + 0.25, Z1 - 0.2)), ("B", (X1 - X0 - 0.2, 0.3, 0.4), ((X0 + X1) / 2, Y1 - 0.25, Z1 - 0.2)),
+                          ("L", (0.3, Y1 - Y0 - 0.8, 0.4), (X0 + 0.25, (Y0 + Y1) / 2, Z1 - 0.2)), ("R", (0.3, Y1 - Y0 - 0.8, 0.4), (X1 - 0.25, (Y0 + Y1) / 2, Z1 - 0.2))):
+        box(f"Crown{nm}", size, loc, K["trim"], bevel=0.05)
+    for s_ in (-1, 1):                                # window and door casings
+        box(f"WCas{s_}", (0.4, 0.2, wh + 0.4), (wc + s_ * (ww / 2 + 0.2), Y1 - 0.2, wz + wh / 2), K["trim"], bevel=0.03)
+        box(f"DCas{s_}", (0.45, 0.2, 8.3), ((KIT_DOOR[0] + KIT_DOOR[1]) / 2 + s_ * ((KIT_DOOR[1] - KIT_DOOR[0]) / 2 + 0.22), Y1 - 0.2, Z0 + 4.15), K["trim"], bevel=0.03)
+    box("WHead", (ww + 1.0, 0.22, 0.45), (wc, Y1 - 0.2, wz + wh + 0.42), K["trim"], bevel=0.03)
+    box("DHead", (KIT_DOOR[1] - KIT_DOOR[0] + 1.3, 0.22, 0.45), ((KIT_DOOR[0] + KIT_DOOR[1]) / 2, Y1 - 0.2, Z0 + 8.45), K["trim"], bevel=0.03)
+    for s_ in (-1, 1):                                # the doorways to the hall and the living room (trim only)
+        box(f"HCas{s_}", (0.2, 0.45, 7.9), (X0 + 0.2, 3.75 + s_ * 1.97, Z0 + 3.95), K["trim"], bevel=0.03)
+        box(f"LCas{s_}", (0.45, 0.2, 7.9), (14.75 + s_ * 1.97, Y0 + 0.2, Z0 + 3.95), K["trim"], bevel=0.03)
+    box("HHead", (0.22, 4.4, 0.45), (X0 + 0.2, 3.75, Z0 + 7.85), K["trim"], bevel=0.03)
+    box("LHead", (4.4, 0.22, 0.45), (14.75, Y0 + 0.2, Z0 + 7.85), K["trim"], bevel=0.03)
+    # café curtains on the window, and the wall clock over the back door (7:45)
+    cyl("CafeRod", 0.05, ww + 0.8, (wc, Y1 - 0.45, wz + 2.2), chrome, rot=(0, math.pi / 2, 0), verts=10)
+    for k in range(8):
+        cyl(f"Cafe{k}", 0.14, 2.0, (wc - ww / 2 + 0.25 + k * (ww - 0.5) / 7, Y1 - 0.48 + 0.05 * (k % 2), wz + 1.2), ging, verts=8)
+    ccx, ccz = (KIT_DOOR[0] + KIT_DOOR[1]) / 2, Z0 + 9.25
+    cyl("ClockRim", 0.62, 0.16, (ccx, Y1 - 0.2, ccz), material("WFClockRim", base=(0.6, 0.12, 0.1), rough=0.3, wear=0.2), rot=(math.pi / 2, 0, 0), verts=32, bevel=0.04)
+    cyl("ClockDial", 0.54, 0.02, (ccx, Y1 - 0.29, ccz), china, rot=(math.pi / 2, 0, 0), verts=32, bevel=0)
+    for k in range(12):
+        a = k * math.pi / 6
+        box(f"Tick{k}", (0.04, 0.02, 0.1), (ccx + 0.46 * math.sin(a), Y1 - 0.305, ccz + 0.46 * math.cos(a)), K["iron"], bevel=0, rot=(0, -a, 0))
+    for nm, ang, ln in (("Hr", math.radians(232), 0.3), ("Min", math.radians(270), 0.44)):
+        set_group(f"Hand{nm}")
+        box(f"Hand{nm}", (0.05, 0.02, ln), (ccx + ln / 2 * math.sin(ang), Y1 - 0.32 - (0.01 if nm == "Min" else 0), ccz + ln / 2 * math.cos(ang)), K["iron"], bevel=0, rot=(0, -ang, 0))
+    set_group("Main")
+    # the pendant light over the table
+    tx, ty = 8.8, 6.0
+    cyl("PendCord", 0.03, 2.4, (tx, ty, Z1 - 1.2), K["iron"], verts=8)
+    set_group("Glass")
+    lathe("PendShade", [(0.0, Z1 - 3.1), (0.25, Z1 - 3.05), (0.9, Z1 - 2.75), (1.0, Z1 - 2.6), (0.15, Z1 - 2.35), (0.0, Z1 - 2.35)],
+          material("WFMilkGlass", base=(0.97, 0.94, 0.85), rough=0.35, wear=0.0), seg=28, loc=(tx, ty, 0))
+    set_group("Main")
+
+    # ---------------------------------------------------------------- the counters: the sink run (back), the stove run (right)
+    item("Counters")
+    set_group("Counters")
+    CZ = Z0 + 3.0                                     # countertop surface
+    def base_run(nm, x0, x1, y0, y1, doors_axis):
+        box(f"{nm}Carcass", (x1 - x0, y1 - y0, 2.6), ((x0 + x1) / 2, (y0 + y1) / 2, Z0 + 0.3 + 1.3), cab, bevel=0.03)
+        box(f"{nm}Toe", (x1 - x0 - (0.3 if doors_axis == "x" else 0.02), y1 - y0 - (0.3 if doors_axis == "y" else 0.02), 0.3),
+            ((x0 + x1) / 2 + (0.15 if doors_axis == "x" else 0), (y0 + y1) / 2 + (0.15 if doors_axis == "y" else 0), Z0 + 0.15), K["iron"], bevel=0)
+        n = max(1, int(round(((x1 - x0) if doors_axis == "y" else (y1 - y0)) / 1.5)))
+        span = (x1 - x0) if doors_axis == "y" else (y1 - y0)
+        for i in range(n):
+            c = (x0 if doors_axis == "y" else y0) + (i + 0.5) * span / n
+            if doors_axis == "y":
+                box(f"{nm}Door{i}", (span / n - 0.12, 0.08, 1.7), (c, y0 - 0.04, Z0 + 1.35), cab, bevel=0.04)
+                box(f"{nm}Drawer{i}", (span / n - 0.12, 0.08, 0.6), (c, y0 - 0.04, Z0 + 2.55), cab, bevel=0.04)
+                box(f"{nm}Pull{i}", (0.5, 0.08, 0.06), (c, y0 - 0.12, Z0 + 2.55), chrome, bevel=0.02)
+                box(f"{nm}Knob{i}", (0.08, 0.08, 0.3), (c + (span / n) / 2 - 0.3, y0 - 0.12, Z0 + 1.9), chrome, bevel=0.02)
+            else:
+                box(f"{nm}Door{i}", (0.08, span / n - 0.12, 1.7), (x0 - 0.04, c, Z0 + 1.35), cab, bevel=0.04)
+                box(f"{nm}Drawer{i}", (0.08, span / n - 0.12, 0.6), (x0 - 0.04, c, Z0 + 2.55), cab, bevel=0.04)
+                box(f"{nm}Pull{i}", (0.08, 0.5, 0.06), (x0 - 0.12, c, Z0 + 2.55), chrome, bevel=0.02)
+                box(f"{nm}Knob{i}", (0.08, 0.08, 0.3), (x0 - 0.12, c + (span / n) / 2 - 0.3, Z0 + 1.9), chrome, bevel=0.02)
+    # the sink run along the back wall: x from the left wall to 7.6
+    bx0, bx1, by0, by1 = X0 + S, 7.35, Y1 - S - 2.0, Y1 - S
+    base_run("SinkRun", bx0, bx1, by0, by1, "y")
+    top = box("SinkTop", (bx1 - bx0, by1 - by0 + 0.12, 0.2), ((bx0 + bx1) / 2, (by0 + by1) / 2 - 0.06, CZ - 0.1), top_m, bevel=0.03)
+    # the sink: a steel basin let into the top, a gooseneck tap
+    box("SinkRim", (2.6, 1.5, 0.05), (wc, by0 + 1.0, CZ + 0.025), steel, bevel=0.02)
+    box("SinkBowl", (2.3, 1.2, 0.04), (wc, by0 + 1.0, CZ + 0.055), material("WFSinkDark", base=(0.3, 0.3, 0.32), rough=0.3, metal=1.0, wear=0.1), bevel=0)
+    lathe("TapBase", [(0, CZ + 0.05), (0.14, CZ + 0.05), (0.1, CZ + 0.2), (0, CZ + 0.2)], chrome, seg=16, loc=(wc, by1 - 0.35, 0))
+    tube("TapNeck", [Vector((wc, by1 - 0.35, CZ + 0.2)), Vector((wc, by1 - 0.35, CZ + 1.1)), Vector((wc, by1 - 0.6, CZ + 1.35)), Vector((wc, by1 - 0.95, CZ + 1.05))], 0.06, chrome)
+    for s_ in (-1, 1):
+        lathe(f"TapHandle{s_}", [(0, CZ + 0.05), (0.08, CZ + 0.05), (0.06, CZ + 0.25), (0.12, CZ + 0.32), (0, CZ + 0.34)], chrome, seg=12, loc=(wc + s_ * 0.5, by1 - 0.35, 0))
+    # the stove run along the right wall: y 1.2 to 9.8, the range in the middle
+    rx0, rx1 = X1 - S - 2.0, X1 - S
+    base_run("RunA", rx0, rx1, 1.2, 4.5, "x")
+    base_run("RunB", rx0, rx1, 7.1, 9.8, "x")
+    for nm, (a, b) in (("A", (1.2, 4.5)), ("B", (7.1, 9.8))):
+        box(f"RTop{nm}", (rx1 - rx0 + 0.12, b - a, 0.2), ((rx0 + rx1) / 2 - 0.06, (a + b) / 2, CZ - 0.1), top_m, bevel=0.03)
+    # upper cabinets: beside the window on the back wall, over both right runs
+    UZ0, UZ1 = Z0 + 5.0, Z0 + 8.2
+    def upper(nm, x0, x1, y0, y1, face):
+        box(f"{nm}Box", (x1 - x0, y1 - y0, UZ1 - UZ0), ((x0 + x1) / 2, (y0 + y1) / 2, (UZ0 + UZ1) / 2), cab, bevel=0.03)
+        n = max(1, int(round(((x1 - x0) if face == "y" else (y1 - y0)) / 1.5)))
+        span = (x1 - x0) if face == "y" else (y1 - y0)
+        for i in range(n):
+            c = (x0 if face == "y" else y0) + (i + 0.5) * span / n
+            if face == "y":
+                box(f"{nm}Door{i}", (span / n - 0.12, 0.08, UZ1 - UZ0 - 0.2), (c, y0 - 0.04, (UZ0 + UZ1) / 2), cab, bevel=0.04)
+                box(f"{nm}Knob{i}", (0.08, 0.08, 0.3), (c + (span / n) / 2 - 0.3, y0 - 0.12, UZ0 + 0.5), chrome, bevel=0.02)
+            else:
+                box(f"{nm}Door{i}", (0.08, span / n - 0.12, UZ1 - UZ0 - 0.2), (x0 - 0.04, c, (UZ0 + UZ1) / 2), cab, bevel=0.04)
+                box(f"{nm}Knob{i}", (0.08, 0.08, 0.3), (x0 - 0.12, c + (span / n) / 2 - 0.3, UZ0 + 0.5), chrome, bevel=0.02)
+    upper("UpB", wc + ww / 2 + 0.75, 7.35, Y1 - S - 1.2, Y1 - S, "y")
+    upper("UpRA", X1 - S - 1.2, X1 - S, 1.2, 4.5, "x")
+    upper("UpRB", X1 - S - 1.2, X1 - S, 7.1, 9.8, "x")
+
+    # ---------------------------------------------------------------- the range (cream enamel, chrome) and the hood
+    set_group("Main")
+    item("Range")
+    sy0, sy1 = 4.62, 6.98
+    box("RangeBody", (2.0, sy1 - sy0, 2.95), (rx0 + 1.0, (sy0 + sy1) / 2, Z0 + 1.475), enamel, bevel=0.05)
+    box("RangeOven", (0.06, sy1 - sy0 - 0.5, 1.6), (rx0 - 0.03, (sy0 + sy1) / 2, Z0 + 1.2), enamel, bevel=0.04)
+    set_group("Glass")
+    box("OvenWindow", (0.04, 1.2, 0.7), (rx0 - 0.07, (sy0 + sy1) / 2, Z0 + 1.3), material("WFOvenGlass", base=(0.05, 0.05, 0.06), rough=0.1, wear=0.0), bevel=0)
+    set_group("Main")
+    box("OvenHandle", (0.1, 1.5, 0.08), (rx0 - 0.14, (sy0 + sy1) / 2, Z0 + 2.05), chrome, bevel=0.03)
+    box("Backguard", (0.3, sy1 - sy0, 0.8), (rx1 - 0.15, (sy0 + sy1) / 2, Z0 + 3.35), enamel, bevel=0.04)
+    for k in range(4):
+        cyl(f"Dial{k}", 0.1, 0.1, (rx1 - 0.32, sy0 + 0.4 + k * 0.52, Z0 + 3.4), chrome, rot=(0, math.pi / 2, 0), verts=12, bevel=0.02)
+    for ox in (-0.5, 0.5):
+        for oy in (-0.55, 0.55):
+            cyl(f"Burner{ox}{oy}", 0.35, 0.05, (rx0 + 1.0 + ox * 0.6 - 0.15, (sy0 + sy1) / 2 + oy, Z0 + 2.975), K["iron"], verts=20, bevel=0)
+    item("Kettle")
+    set_group("KettleLid")
+    lathe("KettleLid", [(0, Z0 + 3.76), (0.17, Z0 + 3.76), (0.15, Z0 + 3.82), (0.04, Z0 + 3.86), (0.06, Z0 + 3.95), (0, Z0 + 3.97)], K["iron"], seg=20,
+          loc=(rx0 + 0.6, (sy0 + sy1) / 2 - 0.55, 0))
+    set_group("Main")
+    lathe("Kettle", [(0, Z0 + 3.001), (0.45, Z0 + 3.001), (0.5, Z0 + 3.2), (0.42, Z0 + 3.6), (0.17, Z0 + 3.75), (0, Z0 + 3.75)],
+          material("WFKettle", base=(0.62, 0.1, 0.08), rough=0.25, wear=0.3), seg=24, loc=(rx0 + 0.6, (sy0 + sy1) / 2 - 0.55, 0))
+    tube("KettleSpout", [Vector((rx0 + 0.2, (sy0 + sy1) / 2 - 0.55, Z0 + 3.3)), Vector((rx0 - 0.05, (sy0 + sy1) / 2 - 0.55, Z0 + 3.65))], 0.06, K["iron"])
+    tube("KettleHandle", [Vector((rx0 + 0.85, (sy0 + sy1) / 2 - 0.55, Z0 + 3.6)), Vector((rx0 + 0.6, (sy0 + sy1) / 2 - 0.55, Z0 + 4.05)), Vector((rx0 + 0.35, (sy0 + sy1) / 2 - 0.55, Z0 + 3.6))], 0.04, K["iron"])
+    item("Hood")
+    hz = Z0 + 6.2
+    solid("Hood", [(rx0 - 0.1, sy0 - 0.1, hz), (X1 - S, sy0 - 0.1, hz), (X1 - S, sy1 + 0.1, hz), (rx0 - 0.1, sy1 + 0.1, hz)],
+          [(X1 - S - 1.0, sy0 + 0.3, hz + 1.2), (X1 - S, sy0 + 0.3, hz + 1.2), (X1 - S, sy1 - 0.3, hz + 1.2), (X1 - S - 1.0, sy1 - 0.3, hz + 1.2)], steel)
+    box("HoodFlue", (1.0, sy1 - sy0 - 0.6, Z1 - 0.45 - hz - 1.2), (X1 - S - 0.5, (sy0 + sy1) / 2, (hz + 1.2 + Z1 - 0.45) / 2), steel, bevel=0.02)
+
+    # ---------------------------------------------------------------- the fridge (back wall, right of the door) and its door art
+    item("Fridge")
+    fx0, fx1 = 12.2, 15.6
+    fy1 = Y1 - S
+    fy0 = fy1 - 2.8
+    box("FridgeBody", (fx1 - fx0, fy1 - fy0 - 0.32, 6.8), ((fx0 + fx1) / 2, (fy0 + fy1) / 2 + 0.16, Z0 + 3.4), enamel, bevel=0.3, segments=4)
+    # the inside, seen when the door swings open: a white liner, wire shelves, a few things in a shallow relief
+    liner = wmat("WFLiner", "NH_Enamel", (0.98, 0.98, 0.96), 0.5, wear=0.05, dirt=0.3)
+    fz = fy0 + 0.315
+    box("FridgeLiner", (fx1 - fx0 - 0.4, 0.004, 6.2), ((fx0 + fx1) / 2, fz + 0.002, Z0 + 3.4), liner, bevel=0)
+    for k, z in enumerate((Z0 + 1.6, Z0 + 3.0, Z0 + 4.6, Z0 + 5.6)):
+        box(f"FridgeShelf{k}", (fx1 - fx0 - 0.5, 0.004, 0.06), ((fx0 + fx1) / 2, fz - 0.001, z), chrome, bevel=0)
+    for k, (x, z, w, h, col_) in enumerate(((12.7, Z0 + 3.05, 0.35, 0.9, (0.95, 0.95, 0.93)), (13.3, Z0 + 3.05, 0.55, 0.45, (0.85, 0.75, 0.55)),
+                                             (14.2, Z0 + 3.05, 0.4, 0.7, (0.75, 0.15, 0.12)), (13.0, Z0 + 4.65, 0.9, 0.3, (0.92, 0.88, 0.7)),
+                                             (14.5, Z0 + 4.65, 0.3, 0.55, (0.3, 0.55, 0.2)), (13.6, Z0 + 1.65, 1.6, 0.5, (0.9, 0.55, 0.2)))):
+        box(f"FridgeItem{k}", (w, 0.008, h), (x, fz - 0.006, z + h / 2), material(f"WFFridgeItem{k}", base=col_, rough=0.4, wear=0.0), bevel=0)
+    set_group("Glow")
+    box("FridgeLight", (0.5, 0.004, 0.2), ((fx0 + fx1) / 2, fz - 0.001, Z0 + 6.3), material("WFFridgeBulb", base=(1.0, 0.96, 0.85), rough=0.3, wear=0.0), bevel=0)
+    set_group("FridgeDoor")
+    box("FridgeDoorLow", (fx1 - fx0, 0.3, 4.75), ((fx0 + fx1) / 2, fy0 + 0.15, Z0 + 2.4), enamel, bevel=0.12, segments=3)
+    box("FridgeDoorHigh", (fx1 - fx0, 0.3, 2.0), ((fx0 + fx1) / 2, fy0 + 0.15, Z0 + 5.8), enamel, bevel=0.12, segments=3)
+    box("FridgeSeam", (fx1 - fx0 - 0.1, 0.04, 0.05), ((fx0 + fx1) / 2, fy0 - 0.005, Z0 + 4.79), K["iron"], bevel=0)
+    for z, h_ in ((Z0 + 5.9, 1.2), (Z0 + 3.2, 1.8)):
+        box(f"FridgeHandle{z}", (0.12, 0.18, h_), (fx1 - 0.35, fy0 - 0.12, z), chrome, bevel=0.04)
+    box("FridgeBadge", (0.9, 0.03, 0.2), ((fx0 + fx1) / 2, fy0 - 0.01, Z0 + 6.4), chrome, bevel=0.01)
+    for k, (mx_, mz_, col_) in enumerate(((12.8, 5.8, (0.9, 0.2, 0.2)), (15.0, 5.2, (0.2, 0.5, 0.9)), (13.1, 3.1, (0.95, 0.75, 0.1)))):
+        cyl(f"Magnet{k}", 0.13, 0.08, (mx_, fy0 - 0.04, Z0 + mz_), material(f"WFMagnet{k}", base=col_, rough=0.4, wear=0.0), rot=(math.pi / 2, 0, 0), verts=12, bevel=0.02)
+    set_group("FridgeArt")
+    box("FridgeArt", (1.6, 0.01, 1.2), ((fx0 + fx1) / 2 - 0.15, fy0 - 0.01, Z0 + 2.6), K["place"], bevel=0)
+    set_group("Main")
+    set_group("Main")
+    # the calendar on the back wall, beyond the fridge
+    item("Calendar")
+    set_group("Calendar")
+    box("Calendar", (1.3, 0.02, 1.95), (17.1, Y1 - 0.12, Z0 + 6.3), K["place"], bevel=0)
+    set_group("Main")
+    box("CalNail", (0.06, 0.08, 0.06), (17.1, Y1 - 0.15, Z0 + 7.32), K["iron"], bevel=0)
+
+    # ---------------------------------------------------------------- the table and three chairs (Mom, Dad; you across)
+    item("Table")
+    tx0, tx1, ty0, ty1, tz = 6.3, 11.3, 4.4, 7.6, Z0 + 2.5
+    box("TableTop", (tx1 - tx0, ty1 - ty0, 0.18), ((tx0 + tx1) / 2, (ty0 + ty1) / 2, tz - 0.09), oak, bevel=0.05)
+    box("TableApron", (tx1 - tx0 - 0.6, ty1 - ty0 - 0.6, 0.4), ((tx0 + tx1) / 2, (ty0 + ty1) / 2, tz - 0.38), oak, bevel=0.03)
+    for x in (tx0 + 0.45, tx1 - 0.45):
+        for y in (ty0 + 0.45, ty1 - 0.45):
+            lathe(f"TableLeg{x}{y}", [(0.14, Z0), (0.16, Z0 + 0.3), (0.12, Z0 + 0.6), (0.18, Z0 + 1.1), (0.12, Z0 + 1.7), (0.16, tz - 0.58), (0.0, tz - 0.58)],
+                  oak, seg=12, loc=(x, y, 0))
+    def chair(nm, x, y, facing):
+        item(nm)
+        box(f"{nm}Seat", (1.4, 1.4, 0.2), (x, y, Z0 + 1.6), oak, bevel=0.05)
+        for ox in (-0.55, 0.55):
+            for oy in (-0.55, 0.55):
+                box(f"{nm}Leg{ox}{oy}", (0.14, 0.14, 1.5), (x + ox, y + oy, Z0 + 0.75), oak, bevel=0.02)
+        by_ = y + 0.62 * facing
+        box(f"{nm}BackTop", (1.4, 0.15, 0.3), (x, by_, Z0 + 3.35), oak, bevel=0.04)
+        for k in range(4):
+            box(f"{nm}Spindle{k}", (0.1, 0.1, 1.5), (x - 0.5 + k * 0.33, by_, Z0 + 2.45), oak, bevel=0.02)
+    chair("ChairMom", 7.6, ty1 + 1.0, 1)
+    chair("ChairDad", 10.0, ty1 + 1.0, 1)
+    chair("ChairYou", 8.8, ty0 - 1.0, -1)
+
+    # ---------------------------------------------------------------- breakfast on the table
+    item("Places")
+    for nm, (x, y) in (("You", (7.9, 5.1)), ("Mom", (7.6, 6.8)), ("Dad", (10.2, 6.85))):
+        lathe(f"Bowl{nm}", [(0.0, tz + 0.005), (0.28, tz + 0.005), (0.42, tz + 0.18), (0.5, tz + 0.36), (0.45, tz + 0.36), (0.38, tz + 0.2), (0.0, tz + 0.06)], china, seg=24, loc=(x, y, 0))
+        box(f"Spoon{nm}", (0.08, 0.7, 0.03), (x - 0.65, y, tz + 0.02), chrome, bevel=0.01)
+    item("Cereal")
+    cbx, cby = 10.2, 5.9
+    box("CerealBox", (1.0, 0.36, 1.5), (cbx, cby, tz + 0.755), material("WFCerealSide", base=(0.16, 0.13, 0.42), rough=0.5, wear=0.2), bevel=0.02)
+    set_group("Cereal")
+    box("CerealFront", (0.98, 0.01, 1.47), (cbx, cby - 0.185, tz + 0.755), K["place"], bevel=0)
+    set_group("Main")
+    item("Envelope")                                     # propped up against the cereal box, facing your place
+    set_group("Envelope")
+    ex, ey = cbx, cby - 0.18 - 0.22
+    box("EnvelopeFace", (1.5, 0.02, 1.0), (ex, ey, tz + 0.52), K["place"], bevel=0, rot=(-0.18, 0, 0))
+    set_group("Main")
+    envb = material("WFEnvBlack", base=(0.03, 0.025, 0.03), rough=0.6, wear=0.1)
+    set_group("EnvBack")
+    box("EnvelopeBack", (1.5, 0.03, 1.0), (ex, ey + 0.03, tz + 0.525), envb, bevel=0, rot=(-0.18, 0, 0))
+    set_group("EnvFlap")
+    ca_, sa_ = math.cos(-0.18), math.sin(-0.18)
+    ty_, tz_ = ey + 0.05 + 0.5 * -sa_, tz + 0.525 + 0.5 * ca_
+    prism("EnvelopeFlap", [(ex - 0.75, 0.0), (ex + 0.75, 0.0), (ex, -0.6)], 0.0, 0.02, envb, plane="XZ")
+    from mathutils import Matrix as _M
+    P.PARTS[-1].matrix_world = _M.Translation((0, ty_, tz_)) @ _M.Rotation(-0.18, 4, "X")
+    set_group("Main")
+    item("Milk")
+    lathe("MilkJug", [(0, tz + 0.005), (0.32, tz + 0.005), (0.34, tz + 0.7), (0.24, tz + 0.95), (0.12, tz + 1.1), (0.12, tz + 1.2), (0, tz + 1.2)],
+          material("WFMilk", base=(0.95, 0.95, 0.93), rough=0.3, wear=0.0), seg=20, loc=(10.9, 4.9, 0))
+    lathe("MilkCap", [(0, tz + 1.2), (0.14, tz + 1.2), (0.14, tz + 1.32), (0, tz + 1.32)], material("WFMilkCap", base=(0.2, 0.4, 0.85), rough=0.4, wear=0.0),
+          seg=16, loc=(10.9, 4.9, 0))
+    item("DadMug")
+    mx_, my_ = 11.0, 7.25
+    lathe("Mug", [(0, tz + 0.005), (0.25, tz + 0.005), (0.27, tz + 0.62), (0.23, tz + 0.62), (0.21, tz + 0.1), (0, tz + 0.1)], china, seg=24, loc=(mx_, my_, 0))
+    tube("MugHandle", [Vector((mx_ + 0.26, my_, tz + 0.5)), Vector((mx_ + 0.45, my_, tz + 0.42)), Vector((mx_ + 0.45, my_, tz + 0.22)), Vector((mx_ + 0.26, my_, tz + 0.15))], 0.045, china)
+    set_group("DadMug")
+    box("MugPrint", (0.36, 0.01, 0.24), (mx_, my_ - 0.272, tz + 0.33), K["place"], bevel=0)
+    set_group("Main")
+    item("Brochure")                                      # standing open by Mom's place, its cover toward you
+    set_group("Brochure")
+    box("BrochureCover", (0.62, 0.02, 0.93), (6.85, 5.6, tz + 0.47), K["place"], bevel=0, rot=(0, 0, 0))
+    set_group("Main")
+    for s_ in (-1, 1):
+        box(f"BrochurePanel{s_}", (0.62, 0.02, 0.93), (6.85 + s_ * 0.58, 5.6 + 0.2, tz + 0.47), china, bevel=0, rot=(0, 0, -s_ * 0.6))
+    item("Fruit")
+    lathe("FruitBowl", [(0, tz + 0.005), (0.25, tz + 0.005), (0.6, tz + 0.3), (0.53, tz + 0.3), (0.2, tz + 0.06), (0, tz + 0.06)],
+          material("WFFruitBowl", base=(0.85, 0.5, 0.2), rough=0.35, wear=0.2), seg=24, loc=(8.8, 6.0, 0))
+    for k, (ox, oy, col_) in enumerate(((-0.2, 0.0, (0.75, 0.1, 0.08)), (0.21, 0.04, (0.85, 0.7, 0.1)), (0.0, -0.22, (0.5, 0.7, 0.15)))):
+        sphere(f"Fruit{k}", 0.19, (8.8 + ox, 6.0 + oy, tz + 0.27), material(f"WFFruit{k}", base=col_, rough=0.35, wear=0.0), seg=16, rings=10)
+    item("Toaster")
+    box("Toaster", (1.1, 0.7, 0.8), (0.8, by0 + 0.9, CZ + 0.405), chrome, bevel=0.15, segments=3)
+    for k in (-0.2, 0.2):
+        box(f"Slot{k}", (0.7, 0.12, 0.02), (0.8, by0 + 0.9 + k, CZ + 0.81), K["iron"], bevel=0)
+    item("DishRack")
+    for k in range(5):
+        box(f"Plate{k}", (0.06, 0.8, 0.8), (6.1 + k * 0.18, by0 + 1.0, CZ + 0.42), china, bevel=0.02)
+    box("RackBase", (1.3, 1.0, 0.06), (6.45, by0 + 1.0, CZ + 0.035), chrome, bevel=0.01)
+
+    # ---------------------------------------------------------------- Dad's newspaper: its own piece, held up in the scene
+    item("Newspaper")
+    set_group("Newspaper")
+    panel("NewsFront", 9.0, 11.0, Z0 + 3.025, Z0 + 5.775, ty1 + 0.25, K["place"], nu=6, nv=14, thick=0.02)
+    set_group("Main")
+    set_group("NewsBack")
+    panel("NewsBack", 9.0, 11.0, Z0 + 3.025, Z0 + 5.775, ty1 + 0.272, material("WFNewsprint", base=(0.86, 0.83, 0.75), rough=0.9, wear=0.0), nu=6, nv=14, thick=0.02)
+    set_group("Main")
+
+    clip_check(((X0 + 0.04, Y0 + 0.04, Z0), (X1 - 0.04, Y1 - 0.04, Z1)))
+    return (X1 - X0 + 2, Y1 - Y0 + 2, Z1)
+
 BUILDERS.update({
-    "WFBedroom": bedroom,
+    "WFBedroom": bedroom, "WFKitchen": kitchen,
     "WFStreetLamp": street_lamp, "WFMailbox": mailbox, "WFPicketFence": picket_fence, "WFPicketGate": picket_gate,
     "WFKennel": kennel, "WFHydrant": hydrant, "WFSidewalk": sidewalk,
 })
 TILES.update({"Walk": ("WF_Sidewalk", 8.0), "Asphalt": ("WF_Road", 12.0), "Floor": ("WF_FloorOak", 6.0), "Paper": ("WF_Wallpaper", 4.0)})
+TILES_BY = {"WFKitchen": {"Floor": ("WF_Checker", 4.0), "Walls": ("WF_KitchenPaint", 6.0), "Tile": ("WF_Subway", 2.4)}}   # per-prop overrides
 P.CANVAS.update({"WFMailbox_Sign": "WF_Mailbox14", "WFKennel_Sign": "WF_Biscuit", "WFBedroom_Clock": "WF_Clock1158",
                  "WFBedroom_Pennant": "WF_Pennant", "WFBedroom_PosterBand": "WF_PosterBand", "WFBedroom_PosterMoon": "WF_PosterMoon"})
+P.CANVAS.update({f"WFKitchen_{g}": f"WF_{c}" for g, c in (("FridgeArt", "FridgeArt"), ("Calendar", "Calendar"), ("Cereal", "Cereal"), ("Envelope", "Envelope"),
+                                                        ("DadMug", "DadMug"), ("Brochure", "Brochure"), ("Newspaper", "Gazette"))})
 
 for _n in BUILDERS:
     for _g, (_set, _t) in TILES.items():
+        P.TILED[f"{_n}_{_g}"] = (_set, _t)
+    for _g, (_set, _t) in TILES_BY.get(_n, {}).items():
         P.TILED[f"{_n}_{_g}"] = (_set, _t)
 P.BUILD.update(BUILDERS)
 P.PREVIEW_PAD.update({"WickHouse": 1.25})
 P.PREVIEW_PAD.update({"WFBedroom": 1.1})
 
 
-INSIDE = {"WFBedroom": ((17.6, -12.8, 18.8), (6.0, 0.5, 13.0), (10.35, -5.85, 20.0))}   # camera, target, lamp
+
+# ------------------------------------------------------------------ the rigs and clips (house space; studs, seconds)
+def _sin(t, period, phase=0.0):
+    return math.sin(2 * math.pi * t / period - phase)
 
 
-def inside_render(name, cam, target, lamp):
+_bz = 14.25                                   # the duvet's rest height (bedroom: mattress top + a little)
+RIG["WFBedroom"] = dict(
+    bones={"Duvet0": ((6.9, -5.52, _bz), (6.9, -2.7, _bz), None), "Duvet1": ((6.9, -2.7, _bz), (6.9, -1.45, _bz), "Duvet0"),
+           "Duvet2": ((6.9, -1.45, _bz), (6.9, -0.27, _bz), "Duvet1"),
+           "CurtL0": ((8.15, -13.08, 19.38), (8.15, -13.08, 17.2), None), "CurtL1": ((8.15, -13.08, 17.2), (8.15, -13.08, 15.03), "CurtL0"),
+           "CurtL2": ((8.15, -13.08, 15.03), (8.15, -13.08, 12.88), "CurtL1"),
+           "CurtR0": ((15.35, -13.08, 19.38), (15.35, -13.08, 17.2), None), "CurtR1": ((15.35, -13.08, 17.2), (15.35, -13.08, 15.03), "CurtR0"),
+           "CurtR2": ((15.35, -13.08, 15.03), (15.35, -13.08, 12.88), "CurtR1"),
+           "Door": ((2.0, -7.8, 12.0), (2.0, -7.8, 13.0), None)},
+    own={"Duvet": ["Duvet0", "Duvet1", "Duvet2"], "Curtains": ["CurtL0", "CurtL1", "CurtL2", "CurtR0", "CurtR1", "CurtR2"], "Door": "Door"})
+CLIPS["WFBedroom"] = {
+    # Mom yanks the covers back from the head end: the top two thirds fold over toward the foot, overshoot, settle
+    "DuvetReveal": dict(length=1.4, keys={
+        "Duvet0": lambda t: ("x", 4 * math.sin(math.pi * min(1, t / 0.7)), (0, 0, 0)),
+        "Duvet1": lambda t: ("x", 150 * back_out(t / 0.9, 1.2), (0, 0, 0.45 * math.sin(math.pi * min(1, t / 0.9)))),
+        "Duvet2": lambda t: ("x", 26 * back_out((t - 0.15) / 0.9, 1.0) - 6 * math.sin(min(1, t / 1.4) * math.pi * 2) * (1 - t / 1.4), (0, 0, 0))}),
+    # the night breeze through the open window: the curtains billow into the room, loopable
+    "CurtainBillow": dict(length=4.0, loop=True, keys={
+        **{f"Curt{s}{k}": (lambda t, k=k, ph=(0.0 if s == "L" else 0.9): ("x", [4, 8, 11][k] + [5, 7, 9][k] * _sin(t, 4.0, ph + 0.7 * k), (0, 0, 0)))
+           for s in "LR" for k in range(3)}}),
+    "DoorOpen": dict(length=1.2, keys={"Door": lambda t: ("z", 95 * back_out(t / 1.0, 0.8), (0, 0, 0))}),
+}
+
+RIG["WFKitchen"] = dict(
+    bones={"NewsRoot": ((10.0, 7.85, 4.63), (10.0, 7.85, 6.0), None), "NewsTop": ((10.0, 7.85, 6.0), (10.0, 7.85, 7.4), "NewsRoot"),
+           "Env": ((10.2, 5.30, 4.12), (10.2, 5.30, 5.1), None), "Flap": ((9.45, 5.44, 5.117), (10.95, 5.44, 5.117), "Env"),
+           "FridgeDoor": ((12.2, 10.79, 1.6), (12.2, 10.79, 2.6), None),
+           "HandHr": ((9.75, 13.38, 10.85), (9.75, 13.0, 10.85), None), "HandMin": ((9.75, 13.37, 10.85), (9.75, 13.0, 10.85), None),
+           "Lid": ((17.19, 5.25, 5.36), (17.19, 5.25, 5.6), None)},
+    own={"Newspaper": ["NewsRoot", "NewsTop"], "NewsBack": ["NewsRoot", "NewsTop"], "Envelope": "Env", "EnvBack": "Env", "EnvFlap": "Flap",
+         "FridgeDoor": "FridgeDoor", "FridgeArt": "FridgeDoor", "HandHr": "HandHr", "HandMin": "HandMin", "KettleLid": "Lid"})
+CLIPS["WFKitchen"] = {
+    # Dad lowers the paper, slowly, to look at you over it; the top flops forward
+    "NewspaperLower": dict(length=1.6, keys={
+        "NewsRoot": lambda t: ("x", 12 * ease(t / 1.3), (0, 0, -1.5 * ease(t / 1.3))),
+        "NewsTop": lambda t: ("x", 38 * back_out((t - 0.3) / 1.0, 1.2) - 5 * math.sin(min(1, t / 1.6) * math.pi * 3) * (1 - t / 1.6), (0, 0, 0))}),
+    "NewspaperShake": dict(length=0.6, loop=True, keys={
+        "NewsRoot": lambda t: ([("x", 1.5 * _sin(t, 0.3)), ("z", 1.0 * _sin(t, 0.6, 1.0))], (0, 0, 0.02 * _sin(t, 0.3))),
+        "NewsTop": lambda t: ("x", 3 * _sin(t, 0.3, 0.8), (0, 0, 0))}),
+    # Mom slides the envelope across the table to your place
+    "EnvelopeSlide": dict(length=1.2, keys={"Env": lambda t: ("z", 8 * (1 - ease(t / 1.0)) * math.sin(t * 6), (0, 2.2 * (1 - back_out(t / 1.0, 0.6)), 0))}),
+    "EnvelopeOpen": dict(length=0.8, keys={"Flap": lambda t: ("x", 165 * back_out(t / 0.7, 0.9), (0, 0, 0))}),
+    "FridgeOpen": dict(length=1.0, keys={"FridgeDoor": lambda t: ("z", -100 * back_out(t / 0.8, 0.7), (0, 0, 0))}),
+    "ClockMinuteTick": dict(length=0.3, keys={"HandMin": lambda t: ("y", 6 * back_out(t / 0.12, 2.0), (0, 0, 0))}),
+    # the kettle on the boil: the lid rattles, loopable
+    "KettleBoil": dict(length=1.0, loop=True, keys={
+        "Lid": lambda t: ([("x", 5 * _sin(t, 1 / 9.0)), ("y", 4 * _sin(t, 1 / 7.0, 0.5))], (0, 0, 0.05 * abs(_sin(t, 1 / 4.5))))}),
+}
+
+RIG["WFMailbox"] = dict(bones={"Flag": ((0.75, 0.6, 4.2), (0.75, 0.6, 5.2), None)}, own={"Flag": "Flag"})
+CLIPS["WFMailbox"] = {"FlagDown": dict(length=0.8, keys={"Flag": lambda t: ("y", 90 * back_out(t / 0.6, 1.6), (0, 0, 0))}),
+                      "FlagUp": dict(length=0.8, keys={"Flag": lambda t: ("y", 90 * (1 - back_out(t / 0.6, 1.6)), (0, 0, 0))})}
+
+RIG["WFPicketGate"] = dict(bones={"Gate": ((-1.95, 0.0, 0.0), (-1.95, 0.0, 1.0), None)}, own={"Gate": "Gate"})
+CLIPS["WFPicketGate"] = {"GateOpen": dict(length=1.4, keys={"Gate": lambda t: ("z", -100 * back_out(t / 1.0, 1.0), (0, 0, 0))}),
+                         "GateSwingShut": dict(length=1.2, keys={"Gate": lambda t: ("z", -100 * (1 - back_out(t / 0.8, 2.0)), (0, 0, 0))})}
+
+RIG["WickHouse"] = dict(bones={"Sash": ((11.75, -14.12, 13.4), (11.75, -14.12, 14.4), None)}, own={"BedSash": "Sash"})
+CLIPS["WickHouse"] = {"SashOpen": dict(length=1.0, keys={"Sash": lambda t: ("x", 0, (0, 0, 2.45 * ease(t / 0.9)))})}
+
+CLIP_CAM = {   # per clip review cameras (cam, target)
+    "WFBedroom": {"CurtainBillow": ((14.5, 0.8, 18.0), (11.75, -13.0, 15.5)), "DuvetReveal": ((12.0, -8.0, 18.0), (6.9, -2.2, 14.0)),
+                  "DoorOpen": ((12.0, -1.0, 17.0), (2.0, -6.3, 14.5))},
+    "WFKitchen": {"NewspaperLower": ((8.8, 2.4, 7.0), (10.0, 7.8, 5.2)), "NewspaperShake": ((8.8, 2.4, 7.0), (10.0, 7.8, 5.2)),
+                  "EnvelopeSlide": ((8.0, 2.5, 6.6), (10.2, 6.0, 4.3)), "EnvelopeOpen": ((12.6, 6.6, 6.0), (10.2, 5.45, 4.9)),
+                  "FridgeOpen": ((15.8, 4.6, 7.4), (13.9, 10.8, 4.6)), "ClockMinuteTick": ((9.75, 12.2, 10.85), (9.75, 13.7, 10.85)),
+                  "KettleBoil": ((14.0, 5.25, 7.0), (17.2, 5.25, 5.3))},
+}
+
+for _p in RIG:
+    P.RIGS[_p] = (lambda p: (lambda objs: rig_pieces(p, objs)))(_p)
+
+INSIDE = {"WFBedroom": ((17.6, -12.8, 18.8), (6.0, 0.5, 13.0), (10.35, -5.85, 20.0)),
+          "WFKitchen": ((1.2, 1.2, 8.6), (11.0, 10.0, 3.5), (8.8, 6.0, 9.0), ((3.25, 17.5, 8.0), 2500, (1.0, 0.92, 0.75)))}   # camera, target, lamp
+
+
+def inside_render(name, cam, target, lamp, fill=((11.75, -16.5, 16.0), 1500, (0.55, 0.62, 1.0))):
     """an interior view: a wide camera in the room's corner, the ceiling light on"""
     sc = bpy.context.scene
     camd = bpy.data.cameras.new("InCam")
@@ -941,7 +1643,7 @@ def inside_render(name, cam, target, lamp):
     d = Vector(target) - Vector(cam)
     co.rotation_euler = d.to_track_quat("-Z", "Y").to_euler()
     sc.camera = co
-    for k, (loc, e, col) in enumerate(((lamp, 900, (1.0, 0.85, 0.65)), ((11.75, -16.5, 16.0), 1500, (0.55, 0.62, 1.0)))):
+    for k, (loc, e, col) in enumerate(((lamp, 900, (1.0, 0.85, 0.65)), fill)):
         ld = bpy.data.lights.new(f"InL{k}", "POINT")
         ld.energy = e
         ld.color = col
@@ -959,3 +1661,5 @@ if __name__ == "__main__":
         P.run(n)
         if n in INSIDE:
             inside_render(n, *INSIDE[n])
+        if n in CLIPS:
+            clip_strips(n, *((INSIDE[n][0], INSIDE[n][1]) if n in INSIDE else (None, None)))

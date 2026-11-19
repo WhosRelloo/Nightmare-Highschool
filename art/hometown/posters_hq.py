@@ -26,11 +26,74 @@ H.SS = 2
 OUT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "props", "textures"))
 
 
+# per-canvas surface: base roughness, roughness where there's ink, how far ink stands off the paper, felt-like fuzz,
+# relief strength (normal map), and whether gold-coloured areas are gilt foil (metal)
+PBR = {
+    "WF_PosterBand": dict(rough=0.86, ink_rough=0.62, ink_lift=0.3, strength=3.0),
+    "WF_PosterMoon": dict(rough=0.55, ink_rough=0.45, ink_lift=0.12, strength=2.5, gilt=True),
+    "WF_Pennant": dict(rough=0.95, ink_rough=0.95, ink_lift=0.0, fuzz=1.0, strength=4.0),
+    "WF_Clock1158": dict(rough=0.06, ink_rough=0.06, ink_lift=0.0, strength=0.5),
+    "WF_Cereal": dict(rough=0.32, ink_rough=0.28, ink_lift=0.06, strength=2.0),
+    "WF_Gazette": dict(rough=0.92, ink_rough=0.8, ink_lift=0.18, strength=3.0),
+    "WF_Envelope": dict(rough=0.72, ink_rough=0.6, ink_lift=0.1, strength=3.5, gilt=True),
+    "WF_Brochure": dict(rough=0.25, ink_rough=0.22, ink_lift=0.04, strength=1.8),
+    "WF_Calendar": dict(rough=0.6, ink_rough=0.5, ink_lift=0.12, strength=2.5),
+    "WF_DadMug": dict(rough=0.12, ink_rough=0.1, ink_lift=0.05, strength=1.5),
+    "WF_FridgeArt": dict(rough=0.88, ink_rough=0.55, ink_lift=0.4, strength=3.5),
+}
+
+
+def _down(L, a):
+    if a.ndim == 2:
+        return a.reshape(L.h, H.SS, L.w, H.SS).mean((1, 3))
+    return a.reshape(L.h, H.SS, L.w, H.SS, a.shape[2]).mean((1, 3))
+
+
 def save(L, name):
+    """the colour map, then the PBR maps from what the canvas is made of (PBR[name]): <name>_canvas_normal.png (OpenGL,
+    as Roblox), _canvas_rough.png, _canvas_metal.png"""
     L.name = name
     p = L.save()
     Image.open(p).convert("RGB").save(os.path.join(OUT, f"{name}_canvas.png"))
-    print("ok", name)
+    cfg = dict(rough=0.8, ink_rough=0.7, ink_lift=0.2, fuzz=0.0, strength=2.5, gilt=False)
+    cfg.update(PBR.get(name, {}))
+    col = _down(L, L.col)
+    lum = (col @ np.array([0.299, 0.587, 0.114], np.float32)) / 255.0
+    paper = np.percentile(lum, 85)
+    ink = np.clip((paper - lum) / max(0.15, paper), 0, 1)              # how much ink (or dark paint) covers each pixel
+    rng = np.random.default_rng(sum(map(ord, name)))
+    fib = ndimage.gaussian_filter(rng.standard_normal(lum.shape).astype(np.float32), (0.5, 1.6))
+    fib /= np.abs(fib).max() + 1e-6
+    hgt = 0.12 * fib + cfg["ink_lift"] * ndimage.gaussian_filter(ink, 0.7)
+    if cfg["fuzz"]:
+        fz = ndimage.gaussian_filter(rng.standard_normal(lum.shape).astype(np.float32), 0.6)
+        hgt += cfg["fuzz"] * 0.25 * fz / (np.abs(fz).max() + 1e-6)
+    for attr, k in (("crease_h", -0.9), ("extra_h", 1.0)):
+        v = getattr(L, attr, None)
+        if v is not None:
+            hgt += k * _down(L, v)
+    gy, gx = np.gradient(hgt)
+    st = cfg["strength"]
+    nx, ny, nz = -gx * st, gy * st, np.ones_like(hgt)                  # rows go down; v goes up (OpenGL)
+    ln = np.sqrt(nx * nx + ny * ny + nz * nz)
+    nrm = np.stack([nx / ln, ny / ln, nz / ln], -1) * 0.5 + 0.5
+    rough = cfg["rough"] + (cfg["ink_rough"] - cfg["rough"]) * ink
+    metal = np.zeros_like(lum)
+    if cfg["gilt"]:
+        r_, g_, b_ = col[..., 0], col[..., 1], col[..., 2]
+        gold = ((r_ > 150) & (g_ > 105) & (b_ < g_ * 0.78) & (r_ - b_ > 70)).astype(np.float32)
+        metal = ndimage.gaussian_filter(gold, 0.6)
+        rough = rough * (1 - metal) + 0.3 * metal
+    ro = getattr(L, "rough_over", None)
+    if ro is not None:
+        m_, v_ = ro
+        m_ = _down(L, m_)
+        rough = rough * (1 - m_) + v_ * m_
+    u8 = lambda a: np.clip(a * 255 + 0.5, 0, 255).astype(np.uint8)
+    Image.fromarray(u8(nrm), "RGB").save(os.path.join(OUT, f"{name}_canvas_normal.png"))
+    Image.fromarray(u8(np.clip(rough, 0, 1)), "L").save(os.path.join(OUT, f"{name}_canvas_rough.png"))
+    Image.fromarray(u8(np.clip(metal, 0, 1)), "L").save(os.path.join(OUT, f"{name}_canvas_metal.png"))
+    print("ok", name, "(+ normal, rough, metal)")
 
 
 def noise(L, scale, seed):
@@ -58,6 +121,7 @@ def age_paper(L, seed, folds=((0.5, "v"),), tape=True):
         crease = np.exp(-(p / 1.2) ** 2)
         side = np.exp(-((p - 3) / 3.0) ** 2)
         L.col *= (1 - 0.18 * crease[..., None] + 0.06 * side[..., None])
+        L.crease_h = (getattr(L, "crease_h", 0) + crease - 0.3 * side).astype(np.float32)
     edge = np.minimum(np.minimum(x, w - x), np.minimum(y, h - y))
     yel = np.exp(-edge / 30.0)
     L.col = L.col * (1 - 0.25 * yel[..., None]) + np.array([196, 168, 112], np.float32) * 0.25 * yel[..., None]
@@ -277,6 +341,7 @@ def pennant():
     L.col *= (1 + 0.12 * fz[..., None] * L.grow(word, 8)[..., None])
     st = np.clip(L.grow(word, -5) - L.grow(word, -7), 0, 1) * dash
     L.paint(st, "#c8b48a")
+    L.extra_h = 0.6 * L.grow(word, 8) + 0.3 * word - 0.25 * st + 0.4 * head
     # the candle mascot (small): flame with a face, a cream candle with a green band
     cx, cy = 380, 400
     cand = L.rrect(cx - 50, cy + 10, cx + 50, cy + 170, 12)
