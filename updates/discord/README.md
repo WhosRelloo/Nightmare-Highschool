@@ -8,11 +8,13 @@ Two kinds of post, matching the server's channels:
 | [announcements/](announcements/) | 📢・announcements | **big update waves only**, several releases or a headline feature together, written as a launch post |
 
 ## Announcements (big waves)
+- 2026-11-18, **Make a Name, Phase 3** (2.31 to 2.34): [post](announcements/2026-11-18-make-a-name.md)
 - 2026-11-18, **The Living School, Phase 2** (2.27 to 2.30): [post](announcements/2026-11-18-the-living-school-2.md)
 - 2026-11-18, **Chapter One: The Empty Desk** (2.22 to 2.26): [post](announcements/2026-11-18-chapter-one.md)
 - 2026-11-02, **The Living School** (1.10 to 1.11): [post](announcements/2026-11-02-the-living-school.md)
 
 ## Game updates
+- [2026-11-18-path-wardrobe](game-updates/2026-11-18-path-wardrobe.md)
 - [2026-11-18-trophies](game-updates/2026-11-18-trophies.md)
 - [2026-11-18-the-permanent-record](game-updates/2026-11-18-the-permanent-record.md)
 - [2026-11-18-standing-paths](game-updates/2026-11-18-standing-paths.md)

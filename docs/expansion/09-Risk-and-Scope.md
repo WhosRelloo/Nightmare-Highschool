@@ -50,7 +50,7 @@
 
 ## 6. Features needing your approval before work
 1. The mythology direction (03 §2) and the canon conflict fixes (03 §1).
-2. The anatomy specimen look (05 §6): a wax teaching model or a clockwork specimen.
+2. ~~The anatomy specimen look (05 §6)~~ **Decided 2026-11-18:** a mix: a clockwork specimen for level 1, then rigged and animated uncanny school creatures with stylised, gore-free insides.
 3. The Archive page placement method:
    - **Runtime anchors:** data-only coordinates near existing objects, created at runtime in a separate `NHSystems` folder. The builds stay untouched.
    - **Builder tags:** the builder adds a tag to chosen props.

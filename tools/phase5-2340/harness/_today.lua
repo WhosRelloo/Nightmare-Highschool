@@ -1,0 +1,6 @@
+local Ph = require(game.Players.LocalPlayer.PlayerScripts.Controllers.Gui.Phone)
+Ph.Toggle(true)
+task.wait(1)
+local T = Ph.TodayForTests()
+local H = game:GetService("HttpService")
+return H:JSONEncode(T or {})

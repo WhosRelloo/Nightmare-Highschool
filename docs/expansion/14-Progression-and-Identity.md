@@ -2,7 +2,7 @@
 
 **Status:** approved 2026-11-18. **2.31 shipped** (plan: `docs/superpowers/plans/2026-11-18-standing-paths.md`; its
 deltas are §10 items 9 to 13). **2.32 shipped** (no separate plan: the owner reshaped the look during the build;
-deltas 14 to 18). **2.33 shipped** (deltas 19 to 22). 2.34 is next.
+deltas 14 to 18). **2.33 shipped** (deltas 19 to 22). **2.34 shipped** (deltas 23 to 27). **Phase 3 is complete.**
 
 **Sources:** doc 02 §3.1 to §3.3, doc 06 §3, §4 and §6, doc 07 (`Progression`, `Phone`, `Homes`), and doc 08 Phase 3.
 This spec makes them buildable. §10 lists where it differs from them.
@@ -375,3 +375,12 @@ import. Until a model is in, the trophy shows its silhouette in the case.
     (there's no tournament system yet).
 22. **(2.33) The models are one piece each** (props batch 48), shown in a ViewportFrame in the case and as a clone on
     the wall; nothing in the dorm template was moved, only the TrophyWall added.
+23. **(2.34) Unlocks are checked after every Paths check,** not only at the moment of a tier-up, so tiers held before
+    2.34 grant theirs on the player's first check (no separate migration).
+24. **(2.34) The three tops are new rows marked `Earned`**, made from existing uniform pieces (the navy vest, the
+    charcoal vest, the crest blazer) rather than drawn from scratch; they're unisex and have no counterpart pair.
+25. **(2.34) The varsity jacket** stays sold at the School Store as before; Varsity also grants it free.
+26. **(2.34) The Today card's NOW line uses clock times** ("Chemistry at 9:50 AM"), not "in 3 min": game minutes pass
+    too fast for a countdown to read well.
+27. **(2.34) The Today card sits above the app grid** and the grid moved down; there are no page swipes yet, so all apps
+    stay on one page.
