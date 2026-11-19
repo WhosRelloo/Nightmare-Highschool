@@ -19,6 +19,8 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
+**Path wardrobe & the Today card (2.34.0, 2026-11-18):** Standing Path tiers now unlock things to wear: the Academic Pin, Scarred Knuckle Wraps and Silver Sigil (modelled in PBR), and the Rolled Sleeves, Loosened Tie and Worn Blazer uniforms. The phone's home screen gets the Today card. This completes Phase 3, Progression & Identity. See [the game update](updates/discord/game-updates/2026-11-18-path-wardrobe.md), [the announcement](updates/discord/announcements/2026-11-18-make-a-name.md) and [the spec](docs/expansion/14-Progression-and-Identity.md).
+
 **Trophies (2.33.0, 2026-11-18):** nine trophies to earn, each modelled in gilt, oak, leather and crimson enamel: the Club Cup, the Honour Roll Plaque, the Ring Belt, the Register (Chapter One) and five Path Medals. Watch them turn in the Trophy Case (M, Honours & Trophies) and see them on your dorm room's trophy wall. See [the game update](updates/discord/game-updates/2026-11-18-trophies.md) and [the spec](docs/expansion/14-Progression-and-Identity.md).
 
 **The Permanent Record (2.32.0, 2026-11-18):** M now opens the school's leather-bound file on you, remade in its own PBR art with a cover for your race (Human, Priest, Vampire, Werewolf, Ghoul, Wraith), each with its own slow effect. Nine tabs laid out the same way, 30 Honours to earn (two secret), and Notable Entries written in the school's voice. The book opens, pages turn, and new honours stamp in. See [the game update](updates/discord/game-updates/2026-11-18-the-permanent-record.md) and [the spec](docs/expansion/14-Progression-and-Identity.md).

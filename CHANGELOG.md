@@ -2,6 +2,70 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.34.0] - 2026-11-18: Path wardrobe & the Today card (Progression & Identity 4 of 4)
+
+The spec is `docs/expansion/14-Progression-and-Identity.md` §6. This release completes Phase 3.
+- **Mirror:** `tools/phase5-2340/`.
+- **The Map place:** untouched.
+
+### Added
+- **Three path accessories**, modelled and baked in PBR (`art/characters/accessories/nh_acc_batchp1.py`, staged in
+  `art/group-upload-pathwear/`, assembled by `tools/accessories/assemble_pathwear.luau` into
+  `ReplicatedStorage.NHAccessories`):
+
+  | Item | What it looks like | Unlock |
+  |---|---|---|
+  | Academic Pin (Lapel) | a gilt brooch: crimson enamel field, an ivory open book with gilt ruled lines, a gilt quill, two silk tails | Academic 3, Honor Student |
+  | Scarred Knuckle Wraps (Arms) | worn linen tape wound over both hands, a figure-eight over the knuckles, a leather wrist band with a brass stud, frayed ends; no blood | Combat 4, Notorious |
+  | Silver Sigil (Neck) | a silver pendant on a chain over the collar: black enamel, a crescent, a seven-point star, a softly glowing moonstone | Supernatural 4, Keeper of Secrets |
+
+- **Three school tops**, drawn on the classic layout (`art/clothing/tools/pathwear.py`):
+
+  | Top | What it looks like | Unlock |
+  |---|---|---|
+  | Rolled Sleeves | the navy vest uniform with sleeves rolled to the elbow | Social 3, Popular |
+  | Loosened Tie | the charcoal vest, collar undone, the tie pulled loose and askew | Combat 3, Enforcer |
+  | Worn Blazer | an old crest blazer: faded, leather elbow patches, frayed cuffs, a darned tear, tarnished buttons | Supernatural 3, Initiated |
+
+  The Varsity Jacket (Athletic 3, Varsity) was already in the game and is now also a path unlock.
+- **Tier unlocks:** `Config.Paths` tiers carry `Unlock = { Uniform | Accessory }`. `Player.Paths` grants every unlock at
+  or below your saved tier, once, after each check. Tiers reached before 2.34 grant theirs on the first check. A new
+  unlock shows a "New in your wardrobe" notice. Wear them at the wardrobe stations.
+- **The Today card**, a widget at the top of the phone's home screen. It shows up to four quiet lines, each only when
+  there's something to say:
+  - **Now:** from the school clock and timetable ("Chemistry until 9:45 AM, Room 103", "Lunch until 12:00 PM").
+  - **Heard:** the newest live rumour (`Social.Rumours`).
+  - **Next step:** your closest path tier and the first thing it's missing.
+  - **Lead:** your tracked quest's current objective.
+
+  Tap a line to open the Timetable, the Midnight Bell, the Record (M) or the Journal. It has no badges, sounds or
+  notifications, and it refreshes when you open the phone. The server lines come from the new `NHPhone.Today` remote
+  (`Features.Phone.Today`).
+- **TestBridge:** `WardrobeTest` and `TodayTest`.
+
+### Changed
+- **Earned items are never sold or put on NPCs:**
+  - `Appearance.Uniforms` rows carry `Earned`.
+  - The School Store catalogue and its buy check skip them.
+  - `Appearance.RandomPiece` skips them.
+  - Earned accessories have no `Price`, so the store never sells them.
+- **The phone's app grid** moved down to make room for the Today card.
+
+### Checked
+- **Self-tests:**
+  - `WardrobeTest`: all 7 unlocks granted once, none on a second pass, none for tier 2.
+  - `TodayTest`: the server lines.
+  - **Every earlier suite, all passing:** 28 in one session.
+- **Live (slot 2, restored after):**
+  - All six items worn on a character in game: the blazer, the sleeves and the tie on the torso, the wraps on both
+    hands, the sigil on its chain, and the pin on the left breast (under a cape it's hidden, like any lapel item).
+  - The Today card on the phone: Now, Next step and Lead filled from real data. Heard was hidden because no rumours
+    were live.
+- **Not checked:**
+  - a two-player run
+  - a real tier-up granting an item mid-session (the grant path is the same one `WardrobeTest` runs)
+  - the female body fit of the wraps
+
 ## [2.33.0] - 2026-11-18: Trophies (Progression & Identity 3 of 4)
 
 The spec is `docs/expansion/14-Progression-and-Identity.md` §5.

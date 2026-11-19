@@ -1,8 +1,8 @@
 local B = game.ServerStorage.NHTestBridge
 local H = game:GetService("HttpService")
-P.Character:PivotTo(CFrame.new(120, 5, 50)) task.wait(0.5)
+local P = game.Players:GetPlayers()[1] P.Character.HumanoidRootPart.Anchored = false P.Character:PivotTo(CFrame.new(120, 5, 50)) task.wait(0.5)
 local tests = {
-  {"TrophyTest", P.Name}, {"HonoursTest", P.Name}, {"RecordTest", P.Name}, {"PathsTest", P.Name}, {"TallyTest", P.Name}, {"PathRewardTest", P.Name}, {"RecognitionTest"},
+  {"WardrobeTest", P.Name}, {"TodayTest", P.Name}, {"TrophyTest", P.Name}, {"HonoursTest", P.Name}, {"RecordTest", P.Name}, {"PathsTest", P.Name}, {"TallyTest", P.Name}, {"PathRewardTest", P.Name}, {"RecognitionTest"},
   {"BroadcastTest", P.Name}, {"CurfewTest", P.Name},
   {"IncidentTest", P.Name}, {"RumourTest", P.Name}, {"RumourSafetyTest", P.Name},
   {"StaffTest", P.Name}, {"StaffPlanTest", P.Name}, {"TimetableTest", P.Name}, {"SleepTest", P.Name},

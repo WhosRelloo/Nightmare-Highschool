@@ -98,6 +98,10 @@ Appearance.Uniforms = {
 	{ Id = "charcoal-cardigan", Name = "Charcoal Cardigan", Shirt = "rbxassetid://74775509137658" },
 	{ Id = "varsity-jacket", Name = "Varsity Jacket", Shirt = "rbxassetid://130358206613936" },
 	{ Id = "gym-pe-shirt", Name = "Gym / PE Shirt", Shirt = "rbxassetid://81495425196079" },
+	-- (2.34) the Standing Path tops: earned at a path tier (Config.Paths Unlock), never sold, never on NPCs
+	{ Id = "path-rolled-sleeves", Name = "Rolled Sleeves", Shirt = "rbxassetid://127215554096383", Earned = true },
+	{ Id = "path-loose-tie", Name = "Loosened Tie", Shirt = "rbxassetid://82859052682714", Earned = true },
+	{ Id = "path-worn-blazer", Name = "Worn Blazer", Shirt = "rbxassetid://74760557780883", Earned = true },
 	-- civilian (clothing session)
 	{ Id = "blood-moon-hoodie", Name = "Blood Moon Hoodie", Shirt = "rbxassetid://117967871612083" },
 	{ Id = "leather-jacket", Name = "Leather Jacket", Shirt = "rbxassetid://131118808030664" },
@@ -1721,6 +1725,7 @@ Appearance.SchoolTops = {
 	["forest-vest"] = true, ["charcoal-vest"] = true, ["vigil-vest"] = true, ["crimson-court-vest"] = true,
 	["navy-polo"] = true, ["forest-polo"] = true, ["ivory-polo"] = true, ["crimson-polo"] = true, ["delinquent-polo"] = true,
 	["black-blazer"] = true, ["charcoal-cardigan"] = true, ["varsity-jacket"] = true, ["gym-pe-shirt"] = true,
+	["path-rolled-sleeves"] = true, ["path-loose-tie"] = true, ["path-worn-blazer"] = true, -- (2.34)
 	["sailor-uniform"] = true, ["bolero-pinafore"] = true, ["cheer-uniform"] = true,
 }
 Appearance.SchoolBottoms = {

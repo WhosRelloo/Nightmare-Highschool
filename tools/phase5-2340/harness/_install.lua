@@ -1,1837 +1,2539 @@
 local Report = {}
 local Items = {}
-table.insert(Items, { Path = {"StarterPlayer", "StarterPlayerScripts", "Controllers", "Gui", "Phone"}; Source = [==[
+table.insert(Items, { Path = {"ReplicatedStorage", "UI", "Appearance"}; Source = [==[
+--!nonstrict
 --[[
-	Phone (client). Controllers.Gui.Phone   (the Phone in your hotbar, or Y to take it out / put it away)
-	Every student spawns with a Phone tool (Services.Features.Phone builds it from the owner's model). Holding it
-	slides the handset up from the bottom-right corner; putting it away slides it down.
-	Laid out like a modern smartphone (owner's reference, 2026-11-02), dressed for the school: a rounded iron body with
-	a polished-gold edge and side buttons, the kit's PBR slate grain, a notch with a lens, a status bar with the school
-	clock, a 4-wide grid of rounded enamel app icons (the kit's glyph art pressed into a slot well), page dots, a
-	frosted dock and red badges (money received, a new paper each day). Labels are outlined and shadowed so they read
-	on any wallpaper.
-	  Dock: Wallet, Night FM, Classmates, Camera     Grid: Midnight Bell, Timetable, Study Group, Cliques, Style, Options,
-	        Wisp Flight, Hex Slash, Crypt Crush
-	  Wallet         your Yen, send money to a classmate (pick them, type an amount, confirm), and your history
-	  Night FM       (2.30) Controllers.Gui.PhoneRadio, after the owner's reference: home (greeting, chips, the Midnight
-	                 Broadcast banner, recent tracks), library (saved + recent, add by audio ID), now playing (cover,
-	                 like, waveform scrubber, loop / prev / play / next, volume) and the station (21:00-03:00). Only you
-	                 hear your music; it keeps playing with the phone away and the hotbar slot shows a note.
-	  Midnight Bell  the school paper, written live by the server (moon, top students, discipline, specials,
-	                 clubs, rumours)
-	  Classmates     everyone in the building (names only if you know them): send Yen or invite to your study group
-	  Camera         the cinematic view (Controllers.Gui.Cinematic)
-	  Style          your wallpaper: eight presets, or your own image / decal ID (saved; only you see it)
-	  Cliques        all eight cliques (Config.Cliques, server Services.Social.Cliques): who they are, their hangout,
-	                 leader and rival, and your standing with each on a -100 to 100 bar with its tier. The Vigil and
-	                 the Crimson Court also show your faction rank and open the faction panel (join, missions). (1.20)
-	  Timetable / Study Group / Options   open those panels
-	  Wisp Flight / Hex Slash / Crypt Crush   the arcade: three small games played on the screen, with your best and
-	                 the building's top five (Controllers.Gui.PhoneGames; server Services.Features.PhoneGames).
-	                 Back or putting the phone away stops the game.
-	  Texts          (2.23.0) like a messaging app in the school's dress: conversations by sender, inked and crimson
-	                 bubbles, dare and invite cards, quick replies (players never type to NPCs). See docs/Phone.md.
-	  (Owner: no Locker or Journal in the phone. The Report Card app came later, in 1.40.)
-	It never captures input: combat and movement keys keep working with the phone up.
-	Server: Services.Features.Phone (ReplicatedStorage.NHPhone).
+	NH Appearance - the student the player makes (Wardrobe, K). COSMETIC ONLY.
+
+	Data (all optional, Sanitize fills defaults):
+	  LookStyle  Scholar | Chapel (gold cross pin) | Nightborn (pale skin, crimson eyes)
+	  Skin, HairColor, EyeColor   preset index;  SkinHex / HairHex / EyeHex "RRGGBB" override it ("" = preset)
+	  Hair       built hairstyle index (last = None);  HairId = catalog hair accessory id (0 = none)
+	  TintHair   true = recolour the catalog hair with the hair colour
+	  Eyes       1 = keep the Roblox face, 2+ = NH painted eye shape (UI.EyeArt);  EyeSet 1 = Male, 2 = Female
+	  Brows      1 = none, 2+ = brow style (fitted to the eye shape);  BrowHex "" = match the hair colour
+	  Mouth      1 = none, 2+ = mouth style;  Lips = fuller tinted lips
+	  (brows and mouth are separate decals and only show with painted eyes)
+	  Uniform (top), Bottoms (1 = uniform trousers), UseAvatar, Created
+	  UseAvatar = true (default): your Roblox outfit stays; eyes, look marks and catalog hair still apply.
+	  UseAvatar = false: your outfit is stashed (not deleted) and you wear the official Nightmare High
+	                     uniform (group Shirt + Pants), with skin BodyColors and your hair.
+	  This is NOT race: race is rolled by ReplicatedStorage.Lineage. Nothing here writes Race.
+
+	Transformations: when gameplay sets the character attribute Transformation to Vampire / Wolf /
+	Ghoul / Wraith, the painted eyes switch to that form's art (and back when it is cleared).
+	TransformationStage = 2 gives Vampire and Ghoul their second form: jet-black sclera.
+	This module only reads that attribute.
+
+	Server  Appearance.StartServer()   (ServerScriptService.NHAppearance runs it)
+	  Saved in ProfileService data (PlayerData.Appearance) via Data.UpdateState({ type = "SetAppearance" }).
+	  ReplicatedStorage.NHAppearance.Set (RemoteEvent) and .CheckHair (RemoteFunction id -> ok, name|reason).
+	Client  Appearance.Fetch() -> data, isNew      Appearance.Send(data)     Appearance.CheckHair(id)
 ]]
-local MarketplaceService = game:GetService(`MarketplaceService`)
-local Players = game:GetService(`Players`)
-local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
-local RunService = game:GetService(`RunService`)
-local SoundService = game:GetService(`SoundService`)
-local TweenService = game:GetService(`TweenService`)
-local UserInputService = game:GetService(`UserInputService`)
-local Typing = require(game:GetService(`ReplicatedStorage`):WaitForChild(`Packages`):WaitForChild(`Bind`):WaitForChild(`Typing`)) -- (2.1.0) one "is the player typing?" for every key
 
-local Kit = require(ReplicatedStorage:WaitForChild(`UI`):WaitForChild(`Components`))
-local SchoolTime = require(ReplicatedStorage.Functions.SchoolTime)
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Player = Players.LocalPlayer
-local Theme = Kit.Theme
-local C = Theme.Colors
-local Fonts = Theme.Fonts
-local Img = Theme.Images
-local YEN = `\u{A5}`
-local TOGGLE_KEY = Enum.KeyCode.Y
-local W, H = 360, 690
-local SECTION = Color3.fromRGB(214, 178, 112) -- section headers: muted gold
-local HINT = Color3.fromRGB(205, 196, 186) -- hints and empty states: light enough to read on the dark pages
-local RACE_COLOR = {
-	Vampire = Color3.fromRGB(220, 60, 70); Werewolf = Color3.fromRGB(235, 170, 70); Ghoul = Color3.fromRGB(140, 210, 100);
-	Wraith = Color3.fromRGB(150, 200, 245); Priest = Color3.fromRGB(235, 205, 120); Human = Color3.fromRGB(200, 190, 170);
+local rgb = Color3.fromRGB
+local EyeArt = require(script.Parent:WaitForChild("EyeArt"))
+
+local Appearance = {}
+Appearance.RemotesName = "NHAppearance"
+Appearance.EyeArt = EyeArt
+
+-- Cosmetic look styles (not race).
+Appearance.Looks = {
+	{ Id = "Scholar", Label = "Scholar", Icon = "IconNib", Text = "Plain and tidy. Nothing to see here." },
+	{ Id = "Chapel", Label = "Chapel", Icon = "IconCross", Text = "A gold cross pinned to the blazer." },
+	{ Id = "Nightborn", Label = "Nightborn", Icon = "IconDrop", Text = "Pale skin and crimson eyes." },
 }
-
-local Shared = {}
-local Local = {}
-local Ui = nil
-local State = { History = {}; Recent = {}; Yen = 0 }
-local Open = false
-local Music = { Sound = nil :: Sound?; Title = ``; Id = nil :: number? }
-local Pending = nil -- wallet: { UserId, Name }
-
----| helpers |---
-
-local function new(Class: string, Props, Parent: Instance?)
-	local I = Instance.new(Class)
-	for K, V in Props do I[K] = V end
-	if Parent then I.Parent = Parent end
-	return I
-end
-
-local function tween(I: Instance, T: number, Props, Style: Enum.EasingStyle?)
-	local Tw = TweenService:Create(I, TweenInfo.new(T, Style or Enum.EasingStyle.Quart, Enum.EasingDirection.Out), Props)
-	Tw:Play()
-	return Tw
-end
-
-function Local.Remote(Name: string)
-	local F = ReplicatedStorage:FindFirstChild(`NHPhone`)
-	return F and F:GetAttribute(`Ready`) and F:FindFirstChild(Name)
-end
-
-function Local.Call(Name: string, ...)
-	local R = Local.Remote(Name)
-	if not R then return nil end
-	local Ok, A, B = pcall(R.InvokeServer, R, ...)
-	if not Ok then return nil end
-	return A, B
-end
-
-function Local.Label(Parent: Instance, Text: string, Size: number, Props)
-	local T = Kit.Text({ Text = Text; TextSize = Size; TextColor3 = C.Text; RichText = true; TextXAlignment = Enum.TextXAlignment.Left; Parent = Parent })
-	for K, V in Props or {} do T[K] = V end
-	return T
-end
-
--- the number in a typed box ("12,500" -> 12500); nil if there's none
-function Local.Digits(Text: string?): number?
-	local Clean = string.gsub(Text or ``, `[^%d]`, ``)
-	return tonumber(Clean)
-end
-
-function Local.Clock(): string
-	local Clock = ReplicatedStorage:FindFirstChild(`SchoolClock`)
-	local Epoch = Clock and Clock:GetAttribute(`Epoch`)
-	if not Epoch then return `--:--`, `` end
-	local S = SchoolTime.GetState(Epoch, workspace:GetServerTimeNow())
-	return S.ClockText, S.DayName
-end
-
-function Local.Controller(Name: string)
-	local M = script.Parent:FindFirstChild(Name)
-	if not M then return nil end
-	local Ok, Mod = pcall(require, M)
-	return if Ok then Mod else nil
-end
-
----| the handset |---
-
--- Home screen laid out like a modern smartphone (owner's reference, 2026-11-02), dressed for Nightmare High:
--- a rounded iron handset with a gold rim and side buttons, a notch with a lens, a status bar, a 4-wide grid of
--- rounded app icons (each its own ink colour, the kit's glyph art), page dots, a frosted dock, red badges.
-local APPS = {
-	{ Id = `Gazette`; Name = `Midnight Bell`; Icon = `IconAppGazette`; A = Color3.fromRGB(64, 52, 44); B = Color3.fromRGB(28, 22, 20); Tint = Color3.new(1, 1, 1) };
-	{ Id = `Timetable`; Name = `Timetable`; Icon = `IconAppTimetable`; A = Color3.fromRGB(200, 140, 60); B = Color3.fromRGB(110, 60, 20); Tint = Color3.fromRGB(255, 240, 210) };
-	{ Id = `Group`; Name = `Study Group`; Icon = `IconAppGroup`; A = Color3.fromRGB(170, 30, 44); B = Color3.fromRGB(70, 8, 16); Tint = Color3.fromRGB(255, 220, 220) };
-	{ Id = `Cliques`; Name = `Cliques`; Icon = `IconAppCliques`; A = Color3.fromRGB(120, 20, 60); B = Color3.fromRGB(40, 6, 22); Tint = Color3.fromRGB(255, 200, 220) };
-	{ Id = `Texts`; Name = `Texts`; Icon = `IconAppTexts`; A = Color3.fromRGB(60, 150, 90); B = Color3.fromRGB(14, 56, 30); Tint = Color3.fromRGB(230, 255, 230) }; -- (1.33) dares and news from leaders
-	{ Id = `Report`; Name = `Report Card`; Icon = `IconReport`; A = Color3.fromRGB(92, 58, 36); B = Color3.fromRGB(28, 16, 10); Tint = Color3.fromRGB(255, 246, 226) }; -- (1.40) weekly report cards
-	{ Id = `Style`; Name = `Style`; Icon = `IconAppStyle`; A = Color3.fromRGB(110, 70, 170); B = Color3.fromRGB(40, 20, 80); Tint = Color3.new(1, 1, 1) };
-	{ Id = `Options`; Name = `Options`; Icon = `IconAppOptions`; A = Color3.fromRGB(90, 90, 100); B = Color3.fromRGB(36, 36, 44); Tint = Color3.fromRGB(235, 235, 245) };
-	{ Id = `Wisp`; Name = `Wisp Flight`; Icon = `IconAppWisp`; A = Color3.fromRGB(56, 64, 150); B = Color3.fromRGB(14, 14, 48); Tint = Color3.fromRGB(255, 214, 140) };
-	{ Id = `Hex`; Name = `Hex Slash`; Icon = `IconAppHex`; A = Color3.fromRGB(196, 44, 40); B = Color3.fromRGB(66, 8, 12); Tint = Color3.fromRGB(255, 226, 190) };
-	{ Id = `Crypt`; Name = `Crypt Crush`; Icon = `IconAppCrypt`; A = Color3.fromRGB(42, 118, 96); B = Color3.fromRGB(8, 36, 30); Tint = Color3.fromRGB(232, 244, 224) };
+Appearance.Skins = {
+	rgb(236, 206, 178), rgb(216, 180, 146), rgb(180, 132, 98),
+	rgb(132, 92, 62), rgb(94, 64, 46), rgb(246, 228, 216),
 }
-local DOCK = {
-	{ Id = `Wallet`; Name = `Wallet`; Icon = `IconAppWallet`; A = Color3.fromRGB(168, 124, 44); B = Color3.fromRGB(70, 44, 12); Tint = Color3.fromRGB(255, 244, 226) };
-	{ Id = `Radio`; Name = `Night FM`; Icon = `IconAppRadio`; A = Color3.fromRGB(140, 90, 220); B = Color3.fromRGB(50, 20, 100); Tint = Color3.new(1, 1, 1) };
-	{ Id = `Contacts`; Name = `Classmates`; Icon = `IconAppContacts`; A = Color3.fromRGB(70, 140, 160); B = Color3.fromRGB(16, 50, 64); Tint = Color3.new(1, 1, 1) };
-	{ Id = `Camera`; Name = `Camera`; Icon = `IconAppCamera`; A = Color3.fromRGB(70, 70, 78); B = Color3.fromRGB(18, 18, 22); Tint = Color3.fromRGB(220, 220, 230) };
+-- (2.1.3) owner: "people should only be able to choose certain skin tones, especially dependant on their race".
+-- Races with a Lineage Palette (Vampire, Ghoul) keep theirs; every other race picks from these natural tones, light to
+-- dark (the six Skins above are among them). There is no free colour wheel for skin any more: the server's Set handler
+-- and ApplyTo snap any other colour (an old save, a bad request) to the nearest allowed tone (Appearance.SkinPalette).
+Appearance.NaturalSkins = {
+	rgb(246, 228, 216), rgb(236, 206, 178), rgb(227, 191, 156), rgb(216, 180, 146), rgb(201, 160, 122), rgb(180, 132, 98),
+	rgb(160, 112, 78), rgb(132, 92, 62), rgb(116, 80, 58), rgb(94, 64, 46), rgb(76, 50, 38), rgb(58, 38, 29),
 }
--- wallpapers (Style app): presets, or any image / decal ID shown through rbxthumb
-local WALLPAPERS = {
-	{ Id = `CrimsonInk`; Name = `Crimson Ink`; Top = Color3.fromRGB(14, 10, 18); Bottom = Color3.fromRGB(96, 14, 26) };
-	{ Id = `VioletNight`; Name = `Violet Night`; Top = Color3.fromRGB(40, 16, 70); Bottom = Color3.fromRGB(150, 70, 140) };
-	{ Id = `BloodMoon`; Name = `Blood Moon`; Top = Color3.fromRGB(60, 6, 10); Bottom = Color3.fromRGB(200, 40, 30) };
-	{ Id = `VigilCandle`; Name = `Vigil Candle`; Top = Color3.fromRGB(20, 14, 8); Bottom = Color3.fromRGB(150, 96, 30) };
-	{ Id = `CourtVelvet`; Name = `Court Velvet`; Top = Color3.fromRGB(30, 4, 14); Bottom = Color3.fromRGB(110, 10, 50) };
-	{ Id = `GraveFog`; Name = `Grave Fog`; Top = Color3.fromRGB(16, 22, 24); Bottom = Color3.fromRGB(80, 100, 100) };
-	{ Id = `MidnightBlue`; Name = `Midnight Blue`; Top = Color3.fromRGB(6, 10, 26); Bottom = Color3.fromRGB(40, 60, 130) };
-	{ Id = `Ash`; Name = `Ash`; Top = Color3.fromRGB(12, 12, 14); Bottom = Color3.fromRGB(70, 66, 70) };
+Appearance.HairColors = {
+	{ Id = "black", Name = "Black", Color = rgb(24, 20, 24) },
+	{ Id = "raven", Name = "Raven", Color = rgb(36, 40, 64) },
+	{ Id = "chestnut", Name = "Chestnut", Color = rgb(98, 60, 36) },
+	{ Id = "ash-blonde", Name = "Ash Blonde", Color = rgb(196, 176, 130) },
+	{ Id = "silver", Name = "Silver", Color = rgb(192, 192, 202) },
+	{ Id = "blood-red", Name = "Blood Red", Color = rgb(132, 24, 36) },
 }
-local WallById = {}
-for _, Wp in WALLPAPERS do WallById[Wp.Id] = Wp end
-
-function Local.Build()
-	local G = new(`ScreenGui`, { Name = `NHPhone`; ResetOnSpawn = false; DisplayOrder = 11; ZIndexBehavior = Enum.ZIndexBehavior.Sibling }, Player:WaitForChild(`PlayerGui`))
-	Kit.AutoScale(G)
-	-- the handset: dark iron, a gold rim, side buttons
-	local Body = new(`Frame`, { Name = `Body`; BackgroundColor3 = Color3.fromRGB(22, 20, 26); BorderSizePixel = 0; AnchorPoint = Vector2.new(1, 1);
-		Position = UDim2.new(1, -22, 1, H + 40); Size = UDim2.fromOffset(W, H); Visible = false }, G)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 56) }, Body)
-	new(`UIStroke`, { Color = C.GoldDeep; Thickness = 2; Transparency = 0.15 }, Body)
-	new(`UIGradient`, { Rotation = 35; Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(70, 66, 74)), ColorSequenceKeypoint.new(0.5, Color3.fromRGB(26, 24, 30)), ColorSequenceKeypoint.new(1, Color3.fromRGB(60, 56, 64)) }) }, Body)
-	-- PBR finish (the kit's baked art): a worked slate grain over the iron, and the kit's hammered-iron rim
-	local Grain = new(`ImageLabel`, { Name = `Grain`; BackgroundTransparency = 1; Image = Img.PanelBg; ImageColor3 = Color3.fromRGB(120, 112, 124);
-		ImageTransparency = 0.3; ScaleType = Enum.ScaleType.Tile; TileSize = UDim2.fromOffset(160, 160); Size = UDim2.fromScale(1, 1) }, Body)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 56) }, Grain)
-	-- a rounded polished-metal edge (a square 9-slice frame left sharp corners sticking out past the curve)
-	local RimLine = Body:FindFirstChildOfClass(`UIStroke`)
-	if RimLine then
-		RimLine.Thickness = 2.5
-		RimLine.Transparency = 0
-		RimLine.Color = Color3.new(1, 1, 1)
-		new(`UIGradient`, { Rotation = 45; Color = ColorSequence.new({
-			ColorSequenceKeypoint.new(0, Color3.fromRGB(240, 214, 150)), ColorSequenceKeypoint.new(0.3, Color3.fromRGB(120, 92, 50)),
-			ColorSequenceKeypoint.new(0.55, Color3.fromRGB(235, 205, 130)), ColorSequenceKeypoint.new(0.8, Color3.fromRGB(96, 72, 40)),
-			ColorSequenceKeypoint.new(1, Color3.fromRGB(220, 190, 120)) }) }, RimLine)
-	end
-	local Inner = new(`Frame`, { Name = `InnerRim`; BackgroundTransparency = 1; Position = UDim2.fromOffset(5, 5); Size = UDim2.new(1, -10, 1, -10) }, Body)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 50) }, Inner)
-	new(`UIStroke`, { Color = Color3.fromRGB(8, 6, 10); Thickness = 1.5; Transparency = 0.2 }, Inner)
-	for _, B in { { -1, 120, 30 }, { -1, 170, 56 }, { -1, 236, 56 }, { 1, 180, 90 } } do
-		local Btn = new(`Frame`, { BackgroundColor3 = Color3.fromRGB(46, 42, 50); BorderSizePixel = 0; AnchorPoint = Vector2.new(if B[1] < 0 then 1 else 0, 0);
-			Position = UDim2.new(if B[1] < 0 then 0 else 1, 0, 0, B[2]); Size = UDim2.fromOffset(4, B[3]) }, Body)
-		new(`UICorner`, { CornerRadius = UDim.new(0, 2) }, Btn)
-		new(`UIStroke`, { Color = C.GoldDeep; Thickness = 1; Transparency = 0.5 }, Btn)
-	end
-	local Screen = new(`CanvasGroup`, { Name = `Screen`; BackgroundColor3 = Color3.fromRGB(10, 8, 12); BorderSizePixel = 0;
-		Position = UDim2.fromOffset(11, 11); Size = UDim2.new(1, -22, 1, -22) }, Body)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 46) }, Screen)
-	-- wallpaper
-	local Wall = new(`Frame`, { Name = `Wall`; BackgroundColor3 = Color3.new(1, 1, 1); BorderSizePixel = 0; Size = UDim2.fromScale(1, 1) }, Screen)
-	local WallGrad = new(`UIGradient`, { Rotation = 90 }, Wall)
-	local WallImage = new(`ImageLabel`, { Name = `Image`; BackgroundTransparency = 1; ScaleType = Enum.ScaleType.Crop; Size = UDim2.fromScale(1, 1); Visible = false }, Wall)
-	local Shade = new(`Frame`, { Name = `Shade`; BackgroundColor3 = Color3.new(0, 0, 0); BackgroundTransparency = 0.55; BorderSizePixel = 0; Size = UDim2.fromScale(1, 1); Visible = false }, Wall)
-	new(`UIGradient`, { Rotation = 90; Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.2), NumberSequenceKeypoint.new(0.5, 1), NumberSequenceKeypoint.new(1, 0.2) }) }, Shade)
-	-- ink-on-slate grain over the wallpaper (the kit's PanelBg)
-	new(`ImageLabel`, { Name = `Grain`; BackgroundTransparency = 1; Image = Img.PanelBg; ImageColor3 = Color3.fromRGB(26, 16, 28); ImageTransparency = 0.5;
-		ScaleType = Enum.ScaleType.Tile; TileSize = UDim2.fromOffset(200, 200); Size = UDim2.fromScale(1, 1); ZIndex = 2 }, Wall)
-	local Crest = new(`ImageLabel`, { Name = `Crest`; BackgroundTransparency = 1; Image = Img.CrestFlat; ImageTransparency = 0.9; ScaleType = Enum.ScaleType.Fit;
-		AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.62); Size = UDim2.fromOffset(240, 240) }, Wall)
-	-- the notch: a speaker slot and a lens
-	local Notch = new(`Frame`, { Name = `Notch`; BackgroundColor3 = Color3.fromRGB(6, 5, 8); BorderSizePixel = 0; AnchorPoint = Vector2.new(0.5, 0);
-		Position = UDim2.new(0.5, 0, 0, -14); Size = UDim2.fromOffset(150, 40); ZIndex = 8 }, Screen)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 16) }, Notch)
-	local Slot = new(`Frame`, { BackgroundColor3 = Color3.fromRGB(34, 30, 36); BorderSizePixel = 0; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.new(0.5, -10, 0, 27); Size = UDim2.fromOffset(46, 5); ZIndex = 9 }, Notch)
-	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Slot)
-	local Lens = new(`Frame`, { BackgroundColor3 = Color3.fromRGB(20, 18, 40); BorderSizePixel = 0; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.new(0.5, 30, 0, 27); Size = UDim2.fromOffset(9, 9); ZIndex = 9 }, Notch)
-	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Lens)
-	new(`UIStroke`, { Color = Color3.fromRGB(120, 30, 50); Thickness = 1; Transparency = 0.3 }, Lens)
-	-- status bar
-	local Bar = new(`Frame`, { Name = `Status`; BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 34); ZIndex = 7 }, Screen)
-	local BarTime = Local.Label(Bar, ``, 15, { Font = Fonts.Title; Position = UDim2.fromOffset(26, 6); Size = UDim2.fromOffset(84, 24) })
-	for I = 1, 4 do
-		new(`Frame`, { BackgroundColor3 = C.Text; BackgroundTransparency = if I == 4 then 0.55 else 0.05; BorderSizePixel = 0; AnchorPoint = Vector2.new(0, 1);
-			Position = UDim2.new(1, -84 + I * 5, 0, 23); Size = UDim2.fromOffset(3, 3 + I * 2) }, Bar)
-	end
-	local Batt = new(`Frame`, { BackgroundTransparency = 1; AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, -24, 0, 13); Size = UDim2.fromOffset(22, 10) }, Bar)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 3) }, Batt)
-	new(`UIStroke`, { Color = C.Text; Thickness = 1 }, Batt)
-	new(`Frame`, { BackgroundColor3 = C.Gold; BorderSizePixel = 0; Position = UDim2.fromOffset(2, 2); Size = UDim2.new(0.72, -2, 1, -4) }, Batt)
-	-- pages
-	local Home = new(`Frame`, { Name = `Home`; BackgroundTransparency = 1; Position = UDim2.fromOffset(0, 34); Size = UDim2.new(1, 0, 1, -34); ZIndex = 3 }, Screen)
-	local App = new(`Frame`, { Name = `App`; BackgroundColor3 = Color3.fromRGB(12, 10, 14); BackgroundTransparency = 0.12; BorderSizePixel = 0;
-		Position = UDim2.fromOffset(0, 34); Size = UDim2.new(1, 0, 1, -56); ZIndex = 3; Visible = false }, Screen)
-	new(`ImageLabel`, { Name = `Grain`; BackgroundTransparency = 1; Image = Img.PanelBg; ImageColor3 = Color3.fromRGB(80, 70, 84); ImageTransparency = 0.55;
-		ScaleType = Enum.ScaleType.Tile; TileSize = UDim2.fromOffset(200, 200); Size = UDim2.fromScale(1, 1); ZIndex = 0 }, App)
-	local HomeBar = new(`TextButton`, { Name = `HomeBar`; Text = ``; BackgroundColor3 = C.Text; BackgroundTransparency = 0.25; BorderSizePixel = 0; AutoButtonColor = false;
-		AnchorPoint = Vector2.new(0.5, 1); Position = UDim2.new(0.5, 0, 1, -8); Size = UDim2.fromOffset(120, 5); ZIndex = 9 }, Screen)
-	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, HomeBar)
-	HomeBar.Activated:Connect(function() Local.ShowHome() end)
-	Ui = { Gui = G; Body = Body; Screen = Screen; Home = Home; App = App; BarTime = BarTime; WallGrad = WallGrad; WallImage = WallImage; Shade = Shade; Crest = Crest; Badges = {} }
-	Local.BuildHome()
-	Local.ApplyWallpaper()
-end
-
-function Local.Icon(Parent: Instance, A, Size: number): Frame
-	local Tile = new(`Frame`, { Name = `Tile`; BackgroundColor3 = Color3.new(1, 1, 1); BorderSizePixel = 0; AnchorPoint = Vector2.new(0.5, 0);
-		Position = UDim2.new(0.5, 0, 0, 0); Size = UDim2.fromOffset(Size, Size) }, Parent)
-	new(`UICorner`, { CornerRadius = UDim.new(0, math.floor(Size * 0.24)) }, Tile)
-	new(`UIGradient`, { Rotation = 90; Color = ColorSequence.new(A.A, A.B) }, Tile)
-	-- PBR: the kit's recessed slot well pressed into the enamel, and a thin hammered-iron rim
-	local Well = new(`ImageLabel`, { Name = `Well`; BackgroundTransparency = 1; Image = Img.SlotBg; ImageColor3 = A.B:Lerp(Color3.new(0, 0, 0), 0.35); ImageTransparency = 0.4;
-		ScaleType = Enum.ScaleType.Stretch; Size = UDim2.fromScale(1, 1); ZIndex = 2 }, Tile)
-	new(`UICorner`, { CornerRadius = UDim.new(0, math.floor(Size * 0.24)) }, Well)
-	new(`UIStroke`, { Color = Color3.fromRGB(190, 160, 100); Thickness = 1.2; Transparency = 0.35 }, Tile)
-	-- a soft gloss across the top
-	local Gloss = new(`Frame`, { BackgroundColor3 = Color3.new(1, 1, 1); BackgroundTransparency = 0.88; BorderSizePixel = 0; Size = UDim2.fromScale(1, 0.48) }, Tile)
-	new(`UICorner`, { CornerRadius = UDim.new(0, math.floor(Size * 0.24)) }, Gloss)
-	new(`UIGradient`, { Rotation = 90; Transparency = NumberSequence.new(0, 1) }, Gloss)
-	if A.Glyph then
-		Local.Label(Tile, A.Glyph, math.floor(Size * 0.55), { Font = Fonts.Title; TextColor3 = A.Tint; TextXAlignment = Enum.TextXAlignment.Center; TextStrokeTransparency = 1; ZIndex = 4 })
-	else
-		-- (1.40) the custom app icons: big enough to keep their detail, one warm bone tint so the relief reads on any tile colour,
-		-- and a soft drop shadow under each so it sits on the tile rather than in it
-		local Icon = Img[A.Icon] or Img.Pip
-		new(`ImageLabel`, { Name = `GlyphShadow`; BackgroundTransparency = 1; Image = Icon; ImageColor3 = Color3.new(0, 0, 0); ImageTransparency = 0.45; ScaleType = Enum.ScaleType.Fit;
-			AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.new(0.5, 0, 0.5, math.max(1, math.floor(Size * 0.035))); Size = UDim2.fromScale(0.74, 0.74); ZIndex = 3 }, Tile)
-		new(`ImageLabel`, { Name = `Glyph`; BackgroundTransparency = 1; Image = Icon; ImageColor3 = Color3.fromRGB(255, 244, 226); ScaleType = Enum.ScaleType.Fit;
-			AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromScale(0.74, 0.74); ZIndex = 4 }, Tile)
-	end
-	return Tile
-end
-
-function Local.AppButton(Parent: Instance, A, Order: number, Label: boolean)
-	local Cell = new(`TextButton`, { Name = A.Id; Text = ``; AutoButtonColor = false; BackgroundTransparency = 1; LayoutOrder = Order }, Parent)
-	local Tile = Local.Icon(Cell, A, 58)
-	if Label then
-		-- readable on any wallpaper: heavier type, a full black outline, and a soft drop shadow behind it
-		for _, L in {
-			Local.Label(Cell, A.Name, 13, { Name = `Shadow`; Font = Fonts.Title; TextColor3 = Color3.new(0, 0, 0); TextTransparency = 0.35; TextStrokeTransparency = 1;
-				TextScaled = true; TextXAlignment = Enum.TextXAlignment.Center; Position = UDim2.fromOffset(-1, 64); Size = UDim2.new(1, 4, 0, 17) }),
-			Local.Label(Cell, A.Name, 13, { Name = `Name`; Font = Fonts.Title; TextColor3 = Color3.fromRGB(250, 244, 232); TextStrokeColor3 = Color3.new(0, 0, 0);
-				TextStrokeTransparency = 0; TextScaled = true; TextXAlignment = Enum.TextXAlignment.Center; Position = UDim2.fromOffset(-2, 63); Size = UDim2.new(1, 4, 0, 17); ZIndex = 4 }),
-		} do new(`UITextSizeConstraint`, { MaxTextSize = 13; MinTextSize = 10 }, L) end
-	end
-	local Badge = new(`TextLabel`, { Name = `Badge`; BackgroundColor3 = Color3.fromRGB(220, 40, 50); BorderSizePixel = 0; Text = ``; Font = Fonts.Title; TextSize = 12;
-		TextColor3 = Color3.new(1, 1, 1); AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.new(0.5, 27, 0, 3); Size = UDim2.fromOffset(20, 20); ZIndex = 6; Visible = false }, Cell)
-	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Badge)
-	Ui.Badges[A.Id] = Badge
-	local Scale = new(`UIScale`, {}, Tile)
-	Cell.MouseButton1Down:Connect(function() tween(Scale, 0.08, { Scale = 0.9 }) end)
-	Cell.MouseLeave:Connect(function() tween(Scale, 0.12, { Scale = 1 }) end)
-	Cell.Activated:Connect(function() tween(Scale, 0.12, { Scale = 1 }) Local.OpenApp(A.Id) end)
-end
-
-function Local.BuildHome()
-	local Home = Ui.Home
-	Local.BuildToday(Home) -- (2.34) the Today card, above the grid
-	local Grid = new(`Frame`, { Name = `Grid`; BackgroundTransparency = 1; Position = UDim2.fromOffset(14, 162); Size = UDim2.new(1, -28, 0, 320) }, Home)
-	new(`UIGridLayout`, { CellSize = UDim2.fromOffset(70, 88); CellPadding = UDim2.fromOffset(5, 14); SortOrder = Enum.SortOrder.LayoutOrder; HorizontalAlignment = Enum.HorizontalAlignment.Center }, Grid)
-	for I, A in APPS do Local.AppButton(Grid, A, I, true) end
-	-- page dots
-	local Dots = new(`Frame`, { Name = `Dots`; BackgroundTransparency = 1; AnchorPoint = Vector2.new(0.5, 1); Position = UDim2.new(0.5, 0, 1, -116); Size = UDim2.fromOffset(60, 8) }, Home)
-	new(`UIListLayout`, { FillDirection = Enum.FillDirection.Horizontal; HorizontalAlignment = Enum.HorizontalAlignment.Center; Padding = UDim.new(0, 8) }, Dots)
-	for I = 1, 3 do
-		local D = new(`Frame`, { BackgroundColor3 = C.Text; BackgroundTransparency = if I == 2 then 0 else 0.6; BorderSizePixel = 0; Size = UDim2.fromOffset(7, 7); LayoutOrder = I }, Dots)
-		new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, D)
-	end
-	-- the dock: frosted ink
-	local Dock = new(`Frame`, { Name = `Dock`; BackgroundColor3 = Color3.fromRGB(30, 20, 34); BackgroundTransparency = 0.35; BorderSizePixel = 0;
-		AnchorPoint = Vector2.new(0.5, 1); Position = UDim2.new(0.5, 0, 1, -22); Size = UDim2.new(1, -20, 0, 84) }, Home)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 28) }, Dock)
-	-- PBR: slate grain and a thin iron rim on the dock
-	local DockGrain = new(`ImageLabel`, { BackgroundTransparency = 1; Image = Img.PanelBg; ImageColor3 = Color3.fromRGB(90, 70, 96); ImageTransparency = 0.45;
-		ScaleType = Enum.ScaleType.Tile; TileSize = UDim2.fromOffset(160, 160); Size = UDim2.fromScale(1, 1) }, Dock)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 28) }, DockGrain)
-	new(`UIStroke`, { Color = Color3.fromRGB(190, 160, 100); Thickness = 1.2; Transparency = 0.45 }, Dock)
-	local DockRow = new(`Frame`, { BackgroundTransparency = 1; Position = UDim2.fromOffset(6, 13); Size = UDim2.new(1, -12, 0, 62) }, Dock)
-	new(`UIGridLayout`, { CellSize = UDim2.fromOffset(70, 62); CellPadding = UDim2.fromOffset(5, 0); SortOrder = Enum.SortOrder.LayoutOrder; HorizontalAlignment = Enum.HorizontalAlignment.Center }, DockRow)
-	for I, A in DOCK do Local.AppButton(DockRow, A, I, false) end
-end
-
--- (2.34) The Today card (docs/expansion/14 §6.2): up to four quiet lines, each only when there's something real to say.
--- NOW (the timetable), HEARD (one live rumour), NEXT STEP (the closest path tier), LEAD (the tracked quest's objective).
--- Tap a line to open its app. It never nags: no badges, no sounds, no notifications; it refreshes when the phone opens.
-local TODAY_ROWS = {
-	{ Key = `Now`; Label = `NOW`; Open = function() Local.OpenApp(`Timetable`) end };
-	{ Key = `Heard`; Label = `HEARD`; Open = function() Local.Seen = Local.Seen or {} local _, Day = Local.Clock() Local.Seen.Paper = Day Local.Gazette() end };
-	{ Key = `Next`; Label = `NEXT STEP`; Open = function()
-		Shared.Toggle(false)
-		local M = Local.Controller(`StatsPanel`)
-		if M and M.Toggle then task.delay(0.15, function() pcall(M.Toggle, true) end) end
-	end };
-	{ Key = `Lead`; Label = `LEAD`; Open = function()
-		Shared.Toggle(false)
-		local M = Local.Controller(`QuestJournal`)
-		if M and M.Toggle then task.delay(0.15, function() pcall(M.Toggle, true) end) end
-	end };
+-- (2.1.3) owner: the part-built "box" hairstyles (Neat Crop, Fringe, Long, Bun) are gone; every hair is a real one
+-- (ReplicatedStorage.NHHairCatalog). "None" (bald) is the only built choice left. A save that wore a box hair (or never
+-- set one: the old default was Fringe) gets a real cut in Sanitize; the old names stay in LEGACY_ORDER so old saves read.
+Appearance.HairStyles = { "None" }
+Appearance.BoxHairFallback = { -- [old box style] = { male body's hair, female body's hair } (NHHairCatalog AssetIds)
+	["Neat Crop"] = { 3576061351, 3576061351 }, -- Short Crop
+	Fringe = { 2688717892, 3502132184 }, -- Emo Fringe / Layered Fringe
+	Long = { 9000000001, 3612414364 }, -- Long Messy / Super Long Straight
+	Bun = { 9000000003, 3608734264 }, -- Man Bun / Side Bun
 }
-
-function Local.BuildToday(Home: Instance)
-	local Card = new(`Frame`, { Name = `Today`; BackgroundColor3 = Color3.fromRGB(30, 20, 34); BackgroundTransparency = 0.3; BorderSizePixel = 0;
-		Position = UDim2.fromOffset(12, 8); Size = UDim2.new(1, -24, 0, 144); ZIndex = 3 }, Home)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 22) }, Card)
-	-- dressed like the dock: slate grain and a thin iron rim
-	local Grain = new(`ImageLabel`, { BackgroundTransparency = 1; Image = Img.PanelBg; ImageColor3 = Color3.fromRGB(90, 70, 96); ImageTransparency = 0.45;
-		ScaleType = Enum.ScaleType.Tile; TileSize = UDim2.fromOffset(160, 160); Size = UDim2.fromScale(1, 1); ZIndex = 3 }, Card)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 22) }, Grain)
-	new(`UIStroke`, { Color = Color3.fromRGB(190, 160, 100); Thickness = 1.2; Transparency = 0.45 }, Card)
-	local Head = Local.Label(Card, `TODAY`, 14, { Name = `Head`; Font = Fonts.Title; TextColor3 = C.Gold; TextStrokeTransparency = 1;
-		Position = UDim2.fromOffset(16, 9); Size = UDim2.new(1, -32, 0, 16); ZIndex = 5 })
-	local Day = Local.Label(Card, ``, 13, { Name = `Day`; Font = Fonts.Body; TextColor3 = HINT; TextStrokeTransparency = 1;
-		TextXAlignment = Enum.TextXAlignment.Right; Position = UDim2.fromOffset(16, 9); Size = UDim2.new(1, -32, 0, 16); ZIndex = 5 })
-	local List = new(`Frame`, { Name = `Lines`; BackgroundTransparency = 1; Position = UDim2.fromOffset(10, 30); Size = UDim2.new(1, -20, 1, -34); ZIndex = 4 }, Card)
-	new(`UIListLayout`, { SortOrder = Enum.SortOrder.LayoutOrder; Padding = UDim.new(0, 2) }, List)
-	local Lines = {}
-	for I, R in TODAY_ROWS do
-		local Row = new(`TextButton`, { Name = R.Key; Text = ``; AutoButtonColor = false; BackgroundColor3 = Color3.new(1, 1, 1); BackgroundTransparency = 1;
-			BorderSizePixel = 0; Size = UDim2.new(1, 0, 0, 26); LayoutOrder = I; Visible = false; ZIndex = 4 }, List)
-		new(`UICorner`, { CornerRadius = UDim.new(0, 8) }, Row)
-		Local.Label(Row, R.Label, 12, { Name = `Tag`; Font = Fonts.Title; TextColor3 = C.GoldDeep:Lerp(C.Gold, 0.6); TextStrokeTransparency = 1;
-			Position = UDim2.fromOffset(6, 0); Size = UDim2.new(0, 76, 1, 0); ZIndex = 5 })
-		local Text = Local.Label(Row, ``, 15, { Name = `Text`; Font = Fonts.Body; TextColor3 = Color3.fromRGB(240, 232, 220); TextStrokeTransparency = 1;
-			RichText = true; TextTruncate = Enum.TextTruncate.AtEnd; Position = UDim2.fromOffset(84, 0); Size = UDim2.new(1, -90, 1, 0); ZIndex = 5 })
-		Row.MouseEnter:Connect(function() tween(Row, 0.12, { BackgroundTransparency = 0.92 }) end)
-		Row.MouseLeave:Connect(function() tween(Row, 0.12, { BackgroundTransparency = 1 }) end)
-		Row.Activated:Connect(function() pcall(Kit.PlaySound, `Tick`, 0.6, 1.2) R.Open() end)
-		Lines[R.Key] = { Row = Row; Text = Text }
-	end
-	local Quiet = Local.Label(List, `A quiet day.`, 15, { Name = `Quiet`; Font = Fonts.Body; TextColor3 = HINT; TextStrokeTransparency = 1;
-		Size = UDim2.new(1, 0, 0, 26); LayoutOrder = 99; Visible = false; ZIndex = 5 })
-	Ui.Today = { Card = Card; Day = Day; Lines = Lines; Quiet = Quiet; Head = Head }
-end
-
--- NOW from the school clock and the class list: "Chemistry until 9:45 AM, Room 103" / "Next: Chemistry at 9:50 AM, Room 103" /
--- "Lunch until 12:00 PM"
-function Local.TodayNow(): string?
-	local Clock = ReplicatedStorage:FindFirstChild(`SchoolClock`)
-	local Epoch = Clock and Clock:GetAttribute(`Epoch`)
-	if not Epoch then return nil end
-	local St = SchoolTime.GetState(Epoch, workspace:GetServerTimeNow())
-	local Seg = St and St.Segment
-	if not Seg then return nil end
-	local Ok, Classes = pcall(require, ReplicatedStorage.Config.Classes)
-	local function room(Cl) return if Ok then (Classes.Rooms[Cl.Room] or Cl.Room) else Cl.Room end
-	local Cl = Ok and Seg.Kind == `Class` and Classes.Periods[Seg.Name]
-	if Cl then return `<b>{Cl.Subject}</b> until {SchoolTime.FormatClock(Seg.End)}, {room(Cl)}` end
-	if Seg.Kind == `Passing` or Seg.Kind == `BeforeSchool` then
-		local Nx = SchoolTime.Segments[St.SegmentIndex + 1]
-		local NCl = Ok and Nx and Nx.Kind == `Class` and Classes.Periods[Nx.Name]
-		if NCl then return `<b>{NCl.Subject}</b> at {SchoolTime.FormatClock(Nx.Start)}, {room(NCl)}` end
-	end
-	return `<b>{Seg.Name}</b> until {SchoolTime.FormatClock(Seg.End)}`
-end
-
--- LEAD from your saved quests: the tracked quest's current objective
-function Local.TodayLead(): string?
-	local Ok, Line = pcall(function()
-		local Sc = require(script.Parent.Parent.StateController)
-		local Profile = Sc.GetProfile(false)
-		local Q = Profile and Profile.Quests
-		local Id = Q and Q.Tracked
-		local St = Id and Id ~= `` and Q.Active and Q.Active[Id]
-		local Def = St and require(ReplicatedStorage.Config.Quests).Quests[Id]
-		local Obj = Def and Def.Objectives[St.Stage]
-		if not Obj then return nil end
-		local Need, Have = Obj.Count or 1, (St.Counts or {})[Obj.Id] or 0
-		return `<b>{Def.Name}:</b> {Obj.Text}` .. (if Need > 1 then ` ({Have}/{Need})` else ``)
-	end)
-	return if Ok then Line else nil
-end
-
-function Local.Today()
-	local T = Ui and Ui.Today
-	if not T then return end
-	local _, DayName = Local.Clock()
-	T.Day.Text = DayName or ``
-	local Vals = { Now = Local.TodayNow(); Lead = Local.TodayLead() }
-	local function show()
-		local Any = 0
-		for _, R in TODAY_ROWS do
-			local L, V = T.Lines[R.Key], Vals[R.Key]
-			L.Row.Visible = V ~= nil and V ~= ``
-			L.Text.Text = V or ``
-			if L.Row.Visible then Any += 1 end
-		end
-		T.Quiet.Visible = Any == 0
-	end
-	show()
-	-- the server's two lines arrive a beat later (never blocks the home screen)
-	task.spawn(function()
-		local S = Local.Call(`Today`)
-		if typeof(S) ~= `table` or not Ui then return end
-		if typeof(S.Heard) == `string` and S.Heard ~= `` then Vals.Heard = `"{S.Heard}"` end
-		local N = S.Next
-		if typeof(N) == `table` and N.Name then
-			Vals.Next = `<b>{N.Name}:</b> {N.Missing}` .. (if (N.More or 0) > 0 then ` <font color="#{HINT:ToHex()}">(+{N.More} more)</font>` else ``)
-		end
-		show()
-	end)
-end
-function Shared.TodayForTests()
-	Local.Today()
-	task.wait(1.5)
-	local T = Ui and Ui.Today
-	if not T then return nil end
-	local Out = {}
-	for K, L in T.Lines do Out[K] = if L.Row.Visible then L.Text.Text else nil end
-	return Out
-end
-
-function Local.ApplyWallpaper()
-	if not Ui then return end
-	local Wp = State.Wallpaper or {}
-	local Preset = WallById[Wp.Preset or ``] or WALLPAPERS[1]
-	Ui.WallGrad.Color = ColorSequence.new(Preset.Top, Preset.Bottom)
-	local Image = tonumber(Wp.Image)
-	Ui.WallImage.Visible = Image ~= nil
-	Ui.Shade.Visible = Image ~= nil
-	Ui.Crest.Visible = Image == nil
-	if Image then Ui.WallImage.Image = `rbxthumb://type=Asset&id={Image}&w=420&h=420` end
-end
-
--- (audit) the newest incoming wallet row's Seq (0 when none, or only old rows without one)
-function Local.TopIn(): number
-	local Top = 0
-	for _, Hx in State.History or {} do
-		if Hx.Dir == `In` then Top = math.max(Top, tonumber(Hx.Seq) or 0) end
-	end
-	return Top
-end
-
--- red badges: money that arrived since you last opened the wallet, a new issue of the paper each day
-function Local.Badges()
-	if not Ui then return end
-	Local.Seen = Local.Seen or {}
-	local Seen = Local.Seen
-	-- (audit) count incoming rows newer than the newest one seen (the server's Seq): counting In rows stopped working
-	-- once the 15-row history was full, and showed every old row as new after a rejoin
-	if Seen.InSeq == nil then Seen.InSeq = Local.TopIn() end
-	local NewIn = 0
-	for _, Hx in State.History or {} do
-		if Hx.Dir == `In` and (tonumber(Hx.Seq) or 0) > Seen.InSeq then NewIn += 1 end
-	end
-	local B = Ui.Badges
-	if B.Wallet then B.Wallet.Visible = NewIn > 0 B.Wallet.Text = tostring(NewIn) end
-	local _, Day = Local.Clock()
-	if B.Gazette then B.Gazette.Visible = Day ~= `` and Seen.Paper ~= Day B.Gazette.Text = `1` end
-	local Unread = tonumber(State.Unread) or 0
-	if B.Texts then B.Texts.Visible = Unread > 0 B.Texts.Text = tostring(Unread) end
-	if B.Report then B.Report.Visible = State.ReportUnread == true B.Report.Text = `1` end -- (1.40)
-end
-
-function Local.ShowHome()
-	Local.StopGames()
-	Ui.App.Visible = false
-	Ui.Home.Visible = true
-	Pending = nil
-	Local.Badges()
-	Local.Today() -- (2.34)
-end
-
--- an app page: a header with back and a title, then a scrolling body
-function Local.Page(Title: string): ScrollingFrame
-	local App = Ui.App
-	for _, Ch in App:GetChildren() do if Ch.Name ~= `Grain` then Ch:Destroy() end end
-	local Head = new(`Frame`, { Name = `Head`; BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 40) }, App)
-	local Back = new(`TextButton`, { Text = `\u{2039}`; Font = Fonts.Title; TextSize = 30; TextColor3 = C.Gold; BackgroundTransparency = 1; Position = UDim2.fromOffset(8, 0); Size = UDim2.fromOffset(34, 40) }, Head)
-	Back.Activated:Connect(function() Local.ShowHome() end)
-	Local.Label(Head, Title, 20, { Font = Fonts.Title; TextColor3 = C.Gold; Position = UDim2.fromOffset(44, 0); Size = UDim2.new(1, -60, 1, 0) })
-	local Rule = new(`Frame`, { BackgroundColor3 = C.Crimson; BorderSizePixel = 0; Position = UDim2.new(0, 14, 1, -1); Size = UDim2.new(1, -28, 0, 1) }, Head)
-	new(`UIGradient`, { Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.2), NumberSequenceKeypoint.new(1, 1) }) }, Rule)
-	local Body = new(`ScrollingFrame`, { Name = `Body`; BackgroundTransparency = 1; BorderSizePixel = 0; Position = UDim2.fromOffset(0, 46); Size = UDim2.new(1, 0, 1, -46);
-		CanvasSize = UDim2.new(); AutomaticCanvasSize = Enum.AutomaticSize.Y; ScrollBarThickness = 3; ScrollBarImageColor3 = C.IronDim }, App)
-	new(`UIListLayout`, { SortOrder = Enum.SortOrder.LayoutOrder; Padding = UDim.new(0, 6); HorizontalAlignment = Enum.HorizontalAlignment.Center }, Body)
-	new(`UIPadding`, { PaddingLeft = UDim.new(0, 14); PaddingRight = UDim.new(0, 14); PaddingBottom = UDim.new(0, 10) }, Body)
-	Ui.Home.Visible = false
-	App.Visible = true
-	return Body
-end
-
-local Order = 0
-function Local.Line(Body: Instance, Text: string, Size: number, Props)
-	Order += 1
-	local T = Local.Label(Body, Text, Size, { TextWrapped = true; AutomaticSize = Enum.AutomaticSize.Y; Size = UDim2.new(1, 0, 0, Size + 4); LayoutOrder = Order })
-	for K, V in Props or {} do T[K] = V end
-	return T
-end
-
-function Local.Card(Body: Instance, Height: number): Frame
-	Order += 1
-	local F = new(`Frame`, { BackgroundColor3 = C.Ink; BackgroundTransparency = 0.35; BorderSizePixel = 0; Size = UDim2.new(1, 0, 0, Height); LayoutOrder = Order }, Body)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 8) }, F)
-	new(`UIStroke`, { Color = C.IronDim; Thickness = 1; Transparency = 0.5 }, F)
-	return F
-end
-
----| apps |---
-
-function Local.OpenApp(Id: string)
-	pcall(Kit.PlaySound, `Tick`, 0.6, 1.2)
-	Order = 0
-	if Id == `Camera` then
-		Shared.Toggle(false)
-		local Cm = Local.Controller(`Cinematic`)
-		if Cm then task.delay(0.3, function() Cm.Toggle(true) end) end
-		return
-	elseif Id == `Timetable` or Id == `Group` or Id == `Options` or Id == `Factions` then
-		Shared.Toggle(false)
-		local Name = ({ Timetable = `Timetable`; Group = `StudyGroup`; Options = `SettingsMenu`; Factions = `FactionsPanel` })[Id]
-		local M = Local.Controller(Name)
-		if M and M.Toggle then task.delay(0.15, function() pcall(M.Toggle, true) end) end
-		return
-	end
-	if Id == `Wisp` or Id == `Hex` or Id == `Crypt` then Local.Arcade(Id) return end
-	if Id == `Cliques` then Local.Cliques() return end
-	if Id == `Texts` then Local.Texts() return end
-	if Id == `Report` then Local.Report() return end -- (1.40)
-	Local.Seen = Local.Seen or {}
-	if Id == `Wallet` then
-		Local.Seen.InSeq = Local.TopIn() -- (audit) seen up to the newest incoming row
-	elseif Id == `Gazette` then
-		local _, Day = Local.Clock()
-		Local.Seen.Paper = Day
-	end
-	if Id == `Style` then Local.Style() return end
-	if Id == `Wallet` then Local.Wallet()
-	elseif Id == `Radio` then Local.Radio()
-	elseif Id == `Gazette` then Local.Gazette()
-	elseif Id == `Contacts` then Local.Contacts() end
-end
-
--- the arcade (Controllers.Gui.PhoneGames): the game plays on a stage under the page header
-local ARCADE = { Wisp = `Wisp Flight`; Hex = `Hex Slash`; Crypt = `Crypt Crush` }
-function Local.StopGames()
-	local M = script.Parent:FindFirstChild(`PhoneGames`)
-	local Ok, PG = pcall(require, M)
-	if M and Ok and PG and PG.Close then PG.Close() end
-end
-
-function Local.Arcade(Id: string)
-	local Body = Local.Page(ARCADE[Id])
-	Body:Destroy()
-	local Stage = new(`Frame`, { Name = `Stage`; BackgroundColor3 = Color3.fromRGB(8, 6, 10); BorderSizePixel = 0; ClipsDescendants = true;
-		Position = UDim2.fromOffset(0, 46); Size = UDim2.new(1, 0, 1, -46) }, Ui.App)
-	local M = script.Parent:WaitForChild(`PhoneGames`, 5)
-	local Ok, PG = pcall(require, M)
-	if M and Ok and PG then PG.Open(Id, Stage, Local.ShowHome) end
-end
-
--- Wallet
-function Local.Wallet()
-	local Body = Local.Page(`Wallet`)
-	local S = Local.Call(`Get`)
-	if S then State = S end
-	local Bal = Local.Card(Body, 84)
-	Local.Label(Bal, `BALANCE`, 13, { Font = Fonts.Title; TextColor3 = SECTION; Position = UDim2.fromOffset(14, 8); Size = UDim2.new(1, -28, 0, 16) })
-	Local.Label(Bal, `{YEN} {State.Yen}`, 36, { Font = Fonts.Title; TextColor3 = C.Gold; Position = UDim2.fromOffset(14, 26); Size = UDim2.new(1, -28, 0, 44) })
-	Local.Line(Body, `SEND TO`, 14, { Font = Fonts.Title; TextColor3 = SECTION })
-	local Who = Local.Line(Body, if Pending then `<b>{Pending.Name}</b>` else `<i>Pick a classmate below.</i>`, 15)
-	Order += 1
-	local _, AmountApi = Kit.SearchBar({ placeholder = `Amount`; Size = UDim2.new(1, 0, 0, 38); LayoutOrder = Order; Parent = Body })
-	local Status = nil
-	local Confirm = false
-	local ConfirmN = nil -- (audit) the amount that was confirmed
-	local Page = Body
-	Order += 1
-	local SendBtn, SendApi = Kit.Button({ text = `Send`; style = `gold`; Size = UDim2.new(1, 0, 0, 40); LayoutOrder = Order; Parent = Body;
-		onClick = function(Api)
-			local N = Local.Digits(AmountApi:Get())
-			if not Pending then Status.Text = `Pick who to send to.` return end
-			if not N or N < 1 then Status.Text = `Type an amount.` return end
-			if Confirm and N ~= ConfirmN then Confirm = false end -- (audit) the amount changed: confirm it again
-			if not Confirm then
-				Confirm = true
-				ConfirmN = N
-				Api:SetText(`Confirm {YEN}{N} to {Pending.Name}?`)
-				task.delay(4, function() if Confirm then Confirm = false pcall(function() Api:SetText(`Send`) end) end end)
-				return
-			end
-			Confirm = false
-			Api:SetText(`Send`)
-			local Ok, Msg = Local.Call(`Send`, Pending.UserId, N)
-			Status.Text = Msg or ``
-			Status.TextColor3 = if Ok then Color3.fromRGB(150, 205, 140) else Color3.fromRGB(235, 120, 110)
-			if Ok then pcall(Kit.PlaySound, `Confirm`) task.delay(1.2, function() if Open and Ui.App.Visible and Page.Parent then Local.Wallet() end end) end -- (audit) only if the Wallet is still the open page
-		end })
-	Status = Local.Line(Body, ``, 15, { TextColor3 = HINT })
-	-- pick a classmate
-	local List = Local.Call(`Contacts`) or {}
-	if #List == 0 then Local.Line(Body, `<i>Nobody else is in the building.</i>`, 15, { TextColor3 = HINT }) end
-	for _, P in List do
-		local Row = Local.Card(Body, 40)
-		local Btn = new(`TextButton`, { Text = ``; BackgroundTransparency = 1; Size = UDim2.fromScale(1, 1) }, Row)
-		Local.Label(Row, P.Name, 15, { Font = Fonts.Title; Position = UDim2.fromOffset(12, 2); Size = UDim2.new(1, -24, 0, 20) })
-		Local.Label(Row, string.upper(`{P.Race}  \u{00B7}  LV {P.Level}`), 12, { Font = Fonts.Title; TextColor3 = RACE_COLOR[P.Family] or C.Text; Position = UDim2.fromOffset(12, 22); Size = UDim2.new(1, -24, 0, 16) })
-		Btn.Activated:Connect(function() Pending = { UserId = P.UserId; Name = P.Name } Who.Text = `<b>{P.Name}</b>` Confirm = false end)
-	end
-	Local.Line(Body, `HISTORY`, 14, { Font = Fonts.Title; TextColor3 = SECTION })
-	if #State.History == 0 then Local.Line(Body, `<i>No transfers yet.</i>`, 15, { TextColor3 = HINT }) end
-	for _, Hx in State.History do
-		local In = Hx.Dir == `In`
-		Local.Line(Body, `<font color="#{(if In then Color3.fromRGB(150, 205, 140) else Color3.fromRGB(235, 120, 110)):ToHex()}">{if In then `+` else `\u{2212}`}{YEN}{Hx.Amount}</font>  {if In then `from` else `to`} {Hx.Who}  <font color="#{HINT:ToHex()}">{Hx.At}</font>`, 15)
-	end
-end
-
--- Night FM
-function Local.Play(Id: number)
-	if not Music.Sound then
-		Music.Sound = new(`Sound`, { Name = `NHPhoneMusic`; Volume = 0.5; Looped = true }, SoundService)
-	end
-	local S = Music.Sound
-	S:Stop()
-	S.SoundId = `rbxassetid://{Id}`
-	Music.Id = Id
-	Music.Title = `Track {Id}`
-	task.spawn(function()
-		local Ok, Info = pcall(MarketplaceService.GetProductInfo, MarketplaceService, Id, Enum.InfoType.Asset)
-		if Ok and Info and Info.AssetTypeId == 3 then Music.Title = Info.Name or Music.Title
-		elseif Ok and Info then Music.Title = `Not an audio ID` end
-	end)
-	S:Play()
-	-- remember it
-	local Recent = table.clone(State.Recent or {})
-	local At = table.find(Recent, Id)
-	if At then table.remove(Recent, At) end
-	table.insert(Recent, 1, Id)
-	while #Recent > 10 do table.remove(Recent) end
-	State.Recent = Recent
-	task.spawn(Local.Call, `SaveRecent`, Recent)
-end
-
-function Local.Radio() -- (2.30) Night FM is its own module now (Controllers.Gui.PhoneRadio), dressed like the owner's reference
-	Ui.Radio = nil
-	require(script.Parent:WaitForChild(`PhoneRadio`)).Open({ App = Ui.App; Music = Music; State = State; Play = Local.Play;
-		Call = Local.Call; Home = Local.ShowHome; Kit = Kit; Theme = Theme })
-	Ui.Home.Visible = false
-end
-
--- The Midnight Bell
--- (1.40) the Report Card app: last week's card on parchment, a wax seal with your average, earlier weeks, this week so far
-local PARCH_TOP, PARCH_BOT = Color3.fromRGB(242, 233, 208), Color3.fromRGB(214, 196, 160)
-local INK = Color3.fromRGB(30, 20, 16)
-local INK_SOFT = Color3.fromRGB(78, 58, 44)
-local BOLD = Theme.FontFaces.BodyBold -- bold Garamond: thin strokes blur on parchment at phone size
-local WAX = Color3.fromRGB(150, 22, 34)
-local GRADE_INK = {
-	[`A+`] = Color3.fromRGB(34, 96, 58); A = Color3.fromRGB(34, 96, 58);
-	B = Color3.fromRGB(38, 62, 124); C = Color3.fromRGB(70, 56, 40);
-	D = Color3.fromRGB(150, 22, 34); F = Color3.fromRGB(150, 22, 34);
+-- Official uniform clothing (Nightmare Highschool group). Shirt/Pants are the texture ids that
+-- InsertService:LoadAsset(Catalog) returns; Catalog is the shop item id.
+Appearance.Pants = { Name = "Uniform Pants", Template = "rbxassetid://11092315741", Catalog = 11092315756 }
+Appearance.Uniforms = {
+	{ Id = "red-vest", Name = "Red Vest", Shirt = "rbxassetid://11092306245", Catalog = 11092306255 },
+	{ Id = "red-shirt", Name = "Red Shirt", Shirt = "rbxassetid://11092301473", Catalog = 11092301482 },
+	{ Id = "black-vest", Name = "Black Vest", Shirt = "rbxassetid://11092309131", Catalog = 11092309137 },
+	{ Id = "black-shirt", Name = "Black Shirt", Shirt = "rbxassetid://11092303922", Catalog = 11092303926 },
+	-- variants made from the uniform templates (clothing session; image ids)
+	{ Id = "navy-vest", Name = "Navy Vest", Shirt = "rbxassetid://126033480692745" },
+	{ Id = "forest-vest", Name = "Forest Vest", Shirt = "rbxassetid://134507908775962" },
+	{ Id = "charcoal-vest", Name = "Charcoal Vest", Shirt = "rbxassetid://90592600352473" },
+	{ Id = "vigil-vest", Name = "Vigil Vest", Shirt = "rbxassetid://136662504832591" },
+	{ Id = "crimson-court-vest", Name = "Crimson Court Vest", Shirt = "rbxassetid://96445202871241" },
+	{ Id = "navy-polo", Name = "Navy Polo", Shirt = "rbxassetid://107114650770030" },
+	{ Id = "forest-polo", Name = "Forest Polo", Shirt = "rbxassetid://134361944222018" },
+	{ Id = "ivory-polo", Name = "Ivory Polo", Shirt = "rbxassetid://105124419047920" },
+	{ Id = "crimson-polo", Name = "Crimson Polo", Shirt = "rbxassetid://88220726097116" },
+	{ Id = "delinquent-polo", Name = "Delinquent Polo", Shirt = "rbxassetid://108805155717873" },
+	{ Id = "black-blazer", Name = "Black Blazer", Shirt = "rbxassetid://114503423083394" },
+	{ Id = "charcoal-cardigan", Name = "Charcoal Cardigan", Shirt = "rbxassetid://74775509137658" },
+	{ Id = "varsity-jacket", Name = "Varsity Jacket", Shirt = "rbxassetid://130358206613936" },
+	{ Id = "gym-pe-shirt", Name = "Gym / PE Shirt", Shirt = "rbxassetid://81495425196079" },
+	-- (2.34) the Standing Path tops: earned at a path tier (Config.Paths Unlock), never sold, never on NPCs
+	{ Id = "path-rolled-sleeves", Name = "Rolled Sleeves", Shirt = "rbxassetid://127215554096383", Earned = true },
+	{ Id = "path-loose-tie", Name = "Loosened Tie", Shirt = "rbxassetid://82859052682714", Earned = true },
+	{ Id = "path-worn-blazer", Name = "Worn Blazer", Shirt = "rbxassetid://74760557780883", Earned = true },
+	-- civilian (clothing session)
+	{ Id = "blood-moon-hoodie", Name = "Blood Moon Hoodie", Shirt = "rbxassetid://117967871612083" },
+	{ Id = "leather-jacket", Name = "Leather Jacket", Shirt = "rbxassetid://131118808030664" },
+	{ Id = "open-flannel", Name = "Open Flannel", Shirt = "rbxassetid://135280609408620" },
+	{ Id = "victorian-waistcoat", Name = "Victorian Waistcoat", Shirt = "rbxassetid://92860287023765" },
+	{ Id = "hussar-coat", Name = "Hussar Coat", Shirt = "rbxassetid://131384159019053" },
+	{ Id = "the-hollow-band-tee", Name = "\"The Hollow\" Band Tee", Shirt = "rbxassetid://81586058028887" },
+	-- female outfits (2026-11-03, Clothing/tools/female.py; drawn for the Female body). School wear first, then civilian.
+	{ Id = "sailor-uniform", Name = "Sailor Uniform", Shirt = "rbxassetid://82560658973588", Female = true },
+	{ Id = "chapel-corset", Name = "Chapel Blouse & Corset", Shirt = "rbxassetid://113065665742505", Female = true },
+	{ Id = "bolero-pinafore", Name = "Crimson Bolero & Pinafore", Shirt = "rbxassetid://116103505706898", Female = true },
+	{ Id = "cheer-uniform", Name = "NH Cheer Uniform", Shirt = "rbxassetid://74342213311812", Female = true },
+	{ Id = "lolita-dress", Name = "Gothic Lolita Dress", Shirt = "rbxassetid://135700738872216", Female = true },
+	{ Id = "cable-knit", Name = "Oversized Cable Knit", Shirt = "rbxassetid://118771757807189", Female = true },
+	{ Id = "gala-gown", Name = "Midnight Gala Gown", Shirt = "rbxassetid://95458576559201", Female = true },
+	-- (1.71) gender kits (art/clothing/tools/kit_school_f.py, kit_civilian.py, kit_admin2.py; group 15981569 images).
+	-- Schoolgirl kit (school tops: owned through enrolment, the School Store or a clique reward), civilian per gender,
+	-- and the admin kit (Admin = true: staff only, Appearance.ClothingAllows).
+	{ Id = "crest-blazer", Name = "Crest Blazer & Ribbon", Shirt = "rbxassetid://105376183533118", Gender = "Female" },
+	{ Id = "navy-vest-f", Name = "Navy Sweater Vest", Shirt = "rbxassetid://109010216363354", Gender = "Female" },
+	{ Id = "cropped-cardigan", Name = "Cropped Cardigan & Bow", Shirt = "rbxassetid://86481957958704", Gender = "Female" },
+	{ Id = "vigil-vest-f", Name = "Vigil Sweater Vest", Shirt = "rbxassetid://108749195786444", Gender = "Female" },
+	{ Id = "crimson-court-blazer", Name = "Crimson Court Blazer", Shirt = "rbxassetid://81449676375446", Gender = "Female" },
+	{ Id = "choir-capelet", Name = "Choir Blouse & Capelet", Shirt = "rbxassetid://92038344609400", Gender = "Female" },
+	{ Id = "ink-club-blouse", Name = "Ink Club Blouse", Shirt = "rbxassetid://130146407301064", Gender = "Female" },
+	{ Id = "mourning-pinafore", Name = "Mourning Pinafore", Shirt = "rbxassetid://125153508249005", Gender = "Female" },
+	{ Id = "summer-blouse", Name = "Summer Blouse", Shirt = "rbxassetid://71468061666418", Gender = "Female" },
+	{ Id = "forest-vest-f", Name = "Forest Sweater Vest", Shirt = "rbxassetid://73003580509095", Gender = "Female" },
+	{ Id = "delinquent-long-blazer", Name = "Delinquent Long Blazer", Shirt = "rbxassetid://95446318684651", Gender = "Female" },
+	{ Id = "crimson-jumper", Name = "Crimson V-Neck Jumper", Shirt = "rbxassetid://82267514052524", Gender = "Female" },
+	{ Id = "velvet-corset", Name = "Wine Velvet Corset", Shirt = "rbxassetid://93087343963914", Gender = "Female" },
+	{ Id = "moto-cami", Name = "Cropped Moto Jacket & Lace Cami", Shirt = "rbxassetid://89558072025525", Gender = "Female" },
+	{ Id = "moon-sweater", Name = "Off-Shoulder Moon Sweater", Shirt = "rbxassetid://81324792857416", Gender = "Female" },
+	{ Id = "lace-blouse", Name = "Victorian Lace Blouse", Shirt = "rbxassetid://118907107993430", Gender = "Female" },
+	{ Id = "cropped-hoodie", Name = "Cropped Crimson Hoodie", Shirt = "rbxassetid://88659118807328", Gender = "Female" },
+	{ Id = "duster-slip", Name = "Long Duster & Slip Top", Shirt = "rbxassetid://82474737277515", Gender = "Female" },
+	{ Id = "wool-overcoat", Name = "Wool Overcoat + Turtleneck", Shirt = "rbxassetid://106739966385590", Gender = "Male" },
+	{ Id = "satin-bomber", Name = "Crimson Satin Bomber", Shirt = "rbxassetid://74398198814828", Gender = "Male" },
+	{ Id = "denim-hoodie", Name = "Denim Jacket + Hoodie", Shirt = "rbxassetid://109051191198254", Gender = "Male" },
+	{ Id = "henley-suspenders", Name = "Henley + Brass Suspenders", Shirt = "rbxassetid://117483426682275", Gender = "Male" },
+	{ Id = "shawl-cardigan", Name = "Shawl Cardigan + Tie", Shirt = "rbxassetid://115359201454289", Gender = "Male" },
+	{ Id = "track-jacket", Name = "Track Jacket", Shirt = "rbxassetid://71972073669268", Gender = "Male" },
+	{ Id = "adm-night-warden", Name = "Night Warden Greatcoat", Shirt = "rbxassetid://89056529988336", Gender = "Unisex", Admin = true },
+	{ Id = "adm-crimson-haori", Name = "Crimson Haori", Shirt = "rbxassetid://105148376808676", Gender = "Unisex", Admin = true },
+	{ Id = "adm-exorcist-coat", Name = "Exorcist's Coat", Shirt = "rbxassetid://136667186002126", Gender = "Unisex", Admin = true },
+	{ Id = "adm-reaper-cloak", Name = "Reaper's Hooded Cloak", Shirt = "rbxassetid://113659324463163", Gender = "Unisex", Admin = true },
+	{ Id = "adm-council-captain", Name = "Council Captain's Coat", Shirt = "rbxassetid://96446121590415", Gender = "Unisex", Admin = true },
+	{ Id = "adm-shadow-ops", Name = "Shadow Ops Jacket", Shirt = "rbxassetid://135675322522231", Gender = "Unisex", Admin = true },
+	{ Id = "adm-midnight-tailcoat", Name = "Midnight Lord Tailcoat", Shirt = "rbxassetid://110052705054383", Gender = "Unisex", Admin = true },
+	{ Id = "adm-duelist", Name = "Duelist's Jacket & Cape", Shirt = "rbxassetid://134379224025273", Gender = "Unisex", Admin = true },
 }
-local function when(Ago: number): string
-	if Ago <= 1 then return `LAST WEEK` end
-	if Ago == 2 then return `TWO WEEKS AGO` end
-	if Ago == 3 then return `THREE WEEKS AGO` end
-	return `{Ago} WEEKS AGO`
-end
-local function seal(Parent: Instance, Size: number, Letter: string?, Pos: UDim2, Anchor: Vector2, Z: number)
-	local Holder = new(`Frame`, { Name = `Seal`; BackgroundTransparency = 1; AnchorPoint = Anchor; Position = Pos; Size = UDim2.fromOffset(Size, Size); ZIndex = Z }, Parent)
-	Kit.Image(`Glow`, { AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.55); Size = UDim2.fromScale(1.5, 1.5); ImageColor3 = Color3.fromRGB(60, 8, 12);
-		ImageTransparency = 0.55; ScaleType = Enum.ScaleType.Stretch; ZIndex = Z; Parent = Holder })
-	local S = Kit.Image(`IconGradeSeal`, { Name = `Wax`; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromScale(1, 1); ImageColor3 = WAX; ZIndex = Z + 1; Parent = Holder })
-	local L = Local.Label(Holder, Letter or `\u{2014}`, math.floor(Size * (if Letter and #Letter > 1 then 0.34 else 0.42)), { Name = `Letter`; Font = Fonts.Title;
-		TextColor3 = Color3.fromRGB(252, 232, 206); TextStrokeColor3 = Color3.fromRGB(70, 6, 12); TextStrokeTransparency = 0.35;
-		TextXAlignment = Enum.TextXAlignment.Center; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.52); Size = UDim2.fromScale(0.8, 0.5); ZIndex = Z + 2 })
-	return Holder, S, L
-end
-
-function Local.Report()
-	local Body = Local.Page(`Report Card`)
-	local R = Local.Call(`Reports`)
-	State.ReportUnread = false
-	Local.Badges()
-	-- the masthead: the crest, the school, the title, an ornate rule
-	Order += 1
-	-- the crest at a size its detail survives (no glow behind it: a glow only smears it)
-	local Mast = new(`Frame`, { Name = `Mast`; BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 138); LayoutOrder = Order }, Body)
-	Kit.Image(`CrestFlat`, { AnchorPoint = Vector2.new(0.5, 0); Position = UDim2.new(0.5, 0, 0, 0); Size = UDim2.fromOffset(66, 66); ScaleType = Enum.ScaleType.Fit; Parent = Mast })
-	Local.Label(Mast, `N I G H T M A R E   H I G H`, 13, { Font = Fonts.Title; TextColor3 = SECTION; TextXAlignment = Enum.TextXAlignment.Center; Position = UDim2.fromOffset(0, 70); Size = UDim2.new(1, 0, 0, 16) })
-	Local.Label(Mast, `Report Card`, 28, { Font = Fonts.Title; TextColor3 = C.Text; TextXAlignment = Enum.TextXAlignment.Center; Position = UDim2.fromOffset(0, 86); Size = UDim2.new(1, 0, 0, 30) })
-	Kit.Image(`Divider`, { AnchorPoint = Vector2.new(0.5, 0); Position = UDim2.new(0.5, 0, 0, 120); Size = UDim2.new(0.86, 0, 0, 14); ImageColor3 = C.Gold; ImageTransparency = 0.15;
-		ScaleType = Enum.ScaleType.Fit; Parent = Mast })
-	if type(R) ~= `table` then Local.Line(Body, `<i>The Office isn't answering. Try again in a moment.</i>`, 15, { TextColor3 = HINT; TextXAlignment = Enum.TextXAlignment.Center }) return end
-	local Cards = type(R.Cards) == `table` and R.Cards or {}
-	local Now = tonumber(R.Week) or 0
-
-	-- one parchment card
-	local function parchment(Height: number?)
-		Order += 1
-		local Outer = new(`Frame`, { Name = `Parchment`; BackgroundColor3 = Color3.new(1, 1, 1); BorderSizePixel = 0; Size = UDim2.new(1, 0, 0, Height or 0);
-			AutomaticSize = if Height then Enum.AutomaticSize.None else Enum.AutomaticSize.Y; LayoutOrder = Order }, Body)
-		new(`UICorner`, { CornerRadius = UDim.new(0, 6) }, Outer)
-		new(`UIGradient`, { Rotation = 90; Color = ColorSequence.new(PARCH_TOP, PARCH_BOT) }, Outer)
-		-- a soft burnt edge and the gilt frame
-		new(`UIStroke`, { Color = Color3.fromRGB(96, 66, 36); Thickness = 2; Transparency = 0.45 }, Outer)
-		Kit.Slice(`FrameThin`, Color3.fromRGB(196, 154, 82), { Name = `Gilt`; SliceScale = 0.34; ImageTransparency = 0.05; ZIndex = 6; Parent = Outer })
-		local Inner = new(`Frame`, { Name = `Inner`; BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 0); AutomaticSize = Enum.AutomaticSize.Y }, Outer)
-		new(`UIListLayout`, { SortOrder = Enum.SortOrder.LayoutOrder; Padding = UDim.new(0, 4) }, Inner)
-		new(`UIPadding`, { PaddingLeft = UDim.new(0, 18); PaddingRight = UDim.new(0, 18); PaddingTop = UDim.new(0, 16); PaddingBottom = UDim.new(0, 16) }, Inner)
-		return Outer, Inner
-	end
-	local function ink(Parent, Text, Size, N, Props)
-		local L = Local.Label(Parent, Text, Size, { FontFace = BOLD; TextColor3 = INK; TextWrapped = true; AutomaticSize = Enum.AutomaticSize.Y; Size = UDim2.new(1, 0, 0, Size + 2); LayoutOrder = N; ZIndex = 7 })
-		for K, V in Props or {} do L[K] = V end
-		return L
-	end
-	local function rule(Parent, N)
-		local F = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 14); LayoutOrder = N }, Parent)
-		Kit.Image(`Divider`, { AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.new(0.9, 0, 0, 12); ImageColor3 = Color3.fromRGB(110, 78, 46);
-			ImageTransparency = 0.3; ScaleType = Enum.ScaleType.Fit; ZIndex = 7; Parent = F })
-	end
-	local function heading(Parent, Text, N)
-		return ink(Parent, Text, 14, N, { Font = Fonts.Title; TextColor3 = WAX })
-	end
-
-	if #Cards == 0 then
-		local _, In = parchment()
-		heading(In, `YOUR FIRST REPORT CARD`, 1)
-		ink(In, `Mr. Hale sends report cards on Monday morning, for the week before: your grades in every subject, your attendance and your conduct. Good marks earn an allowance.`, 16, 2, { TextColor3 = INK_SOFT })
-	else
-		local Card = Cards[1]
-		local Outer, In = parchment()
-		-- the head: when, who, and the seal
-		local Head = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 90); LayoutOrder = 1 }, In)
-		Local.Label(Head, when(Now - (tonumber(Card.Week) or Now - 1)), 14, { Font = Fonts.Title; TextColor3 = WAX; Size = UDim2.new(1, -96, 0, 18); ZIndex = 7 })
-		Local.Label(Head, R.Student ~= `` and R.Student or Player.DisplayName, 23, { Font = Fonts.Title; TextColor3 = INK; TextWrapped = true; Position = UDim2.fromOffset(0, 20); Size = UDim2.new(1, -96, 0, 48); ZIndex = 7;
-			TextYAlignment = Enum.TextYAlignment.Top })
-		Local.Label(Head, `{R.Race or `Student`}  \u{00B7}  Homeroom 101`, 15, { FontFace = BOLD; TextColor3 = INK_SOFT; Position = UDim2.fromOffset(0, 68); Size = UDim2.new(1, -96, 0, 18); ZIndex = 7 })
-		local SealF, Wax = seal(Head, 76, Card.Average, UDim2.new(1, 4, 0, -4), Vector2.new(1, 0), 8)
-		Local.Label(SealF, `AVERAGE`, 12, { Font = Fonts.Title; TextColor3 = INK_SOFT; TextXAlignment = Enum.TextXAlignment.Center; AnchorPoint = Vector2.new(0.5, 0);
-			Position = UDim2.new(0.5, 0, 1, -2); Size = UDim2.new(1, 0, 0, 12); ZIndex = 9 })
-		if R.New and not Kit.ReducedMotion() then
-			-- pressed in: the seal drops onto the paper with a little give
-			SealF.Rotation = -14
-			Wax.Size = UDim2.fromScale(1.9, 1.9)
-			Wax.ImageTransparency = 1
-			tween(Wax, 0.32, { Size = UDim2.fromScale(1, 1); ImageTransparency = 0 }, Enum.EasingStyle.Back)
-			tween(SealF, 0.32, { Rotation = 0 }, Enum.EasingStyle.Back)
-			task.delay(0.2, function() pcall(Kit.PlaySound, `Confirm`, 0.6, 0.9) end)
-		end
-		rule(In, 2)
-		-- the grades
-		heading(In, `GRADES`, 3)
-		local Rows = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 0); AutomaticSize = Enum.AutomaticSize.Y; LayoutOrder = 4 }, In)
-		new(`UIListLayout`, { SortOrder = Enum.SortOrder.LayoutOrder; Padding = UDim.new(0, 2) }, Rows)
-		for I, S in Card.Subjects or {} do
-			-- a shaded stripe on every other row, so the eye can follow it to the grade
-			local Row = new(`Frame`, { BackgroundColor3 = Color3.fromRGB(120, 86, 50); BackgroundTransparency = if I % 2 == 1 then 0.86 else 1; BorderSizePixel = 0;
-				Size = UDim2.new(1, 0, 0, 30); LayoutOrder = I; ZIndex = 7 }, Rows)
-			new(`UICorner`, { CornerRadius = UDim.new(0, 4) }, Row)
-			new(`UIPadding`, { PaddingLeft = UDim.new(0, 8); PaddingRight = UDim.new(0, 8) }, Row)
-			Local.Label(Row, S.Name, 18, { FontFace = BOLD; TextColor3 = INK; Size = UDim2.new(0.68, 0, 1, 0); ZIndex = 8 })
-			local G = S.Grade
-			local Letter = G == `Attended` or G == `Absent`
-			Local.Label(Row, if Letter then string.lower(G) else G, if Letter then 16 else 23, { Font = if Letter then nil else Fonts.Title; FontFace = if Letter then BOLD else nil;
-				TextColor3 = if G == `Absent` then WAX elseif Letter then INK_SOFT else (GRADE_INK[G] or INK); TextXAlignment = Enum.TextXAlignment.Right;
-				AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, 0, 0, 0); Size = UDim2.new(0.32, 0, 1, 0); ZIndex = 8 })
-		end
-		if #(Card.Subjects or {}) == 0 then ink(In, `No classes attended.`, 16, 4, { TextColor3 = INK_SOFT }) end
-		rule(In, 5)
-		-- attendance: a pip for every class (ink: there; crimson: missed)
-		local A = Card.Attendance or {}
-		heading(In, `ATTENDANCE`, 6)
-		local Parts = { `{A.Attended or 0} of {A.Total or 0} classes` }
-		if (A.Tardy or 0) > 0 then table.insert(Parts, `{A.Tardy} late`) end
-		if (A.LeftEarly or 0) > 0 then table.insert(Parts, `{A.LeftEarly} left early`) end
-		if (A.Absent or 0) > 0 then table.insert(Parts, `{A.Absent} absent`) end
-		ink(In, table.concat(Parts, `  \u{00B7}  `), 17, 7)
-		local Pips = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 0); AutomaticSize = Enum.AutomaticSize.Y; LayoutOrder = 8 }, In)
-		new(`UIGridLayout`, { CellSize = UDim2.fromOffset(13, 13); CellPadding = UDim2.fromOffset(4, 4); SortOrder = Enum.SortOrder.LayoutOrder }, Pips)
-		local Missed = (A.Absent or 0)
-		local Late = (A.Tardy or 0) + (A.LeftEarly or 0)
-		for I = 1, math.min(30, A.Total or 0) do
-			local Col = if I > (A.Total or 0) - Missed then WAX elseif I > (A.Total or 0) - Missed - Late then Color3.fromRGB(176, 120, 50) else INK
-			Kit.Image(`Pip`, { ImageColor3 = Col; LayoutOrder = I; ZIndex = 7; Parent = Pips })
-		end
-		if A.Perfect then
-			ink(In, `\u{2726}  Perfect attendance  \u{2726}`, 16, 9, { Font = Fonts.Title; TextColor3 = Color3.fromRGB(140, 94, 24) })
-		elseif (A.Streak or 0) > 1 then
-			ink(In, `On-time streak: {A.Streak} classes`, 15, 9, { TextColor3 = INK_SOFT })
-		end
-		-- conduct
-		heading(In, `CONDUCT`, 10)
-		local Cn = Card.Conduct or `Clear`
-		ink(In, if Cn == `Clear` then `Clear. Not a mark against you.` elseif Cn == `Detention` then `Detention. See the Office.` else `{Cn} from the hall monitors.`, 17, 11,
-			{ TextColor3 = if Cn == `Clear` then Color3.fromRGB(34, 96, 58) elseif Cn == `Detention` then WAX else INK })
-		rule(In, 12)
-		-- the comment, signed
-		heading(In, `MR. HALE SAYS`, 13)
-		ink(In, `\u{201C}{Card.Comment or ``}\u{201D}`, 17, 14, { TextColor3 = INK })
-		-- the signature: the nib right beside the name, both flush right
-		local Sig = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 24); LayoutOrder = 15 }, In)
-		new(`UIListLayout`, { FillDirection = Enum.FillDirection.Horizontal; HorizontalAlignment = Enum.HorizontalAlignment.Right; VerticalAlignment = Enum.VerticalAlignment.Center;
-			SortOrder = Enum.SortOrder.LayoutOrder; Padding = UDim.new(0, 6) }, Sig)
-		Kit.Image(`IconNib`, { Size = UDim2.fromOffset(20, 20); ImageColor3 = INK; ZIndex = 7; LayoutOrder = 1; Parent = Sig })
-		Local.Label(Sig, `{Card.Teacher or `Mr. Hale, Homeroom`}`, 15, { FontFace = BOLD; TextColor3 = INK_SOFT; AutomaticSize = Enum.AutomaticSize.X;
-			Size = UDim2.new(0, 0, 1, 0); ZIndex = 7; LayoutOrder = 2 })
-		-- the allowance: a dark ribbon across the foot of the card
-		-- the allowance: a bursar's voucher pinned to the foot of the card, a gold coin, the sum, and a rubber stamp
-		local Paid = tonumber(Card.Allowance) or 0
-		local Gap = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 6); LayoutOrder = 16 }, In)
-		local Slip = new(`Frame`, { Name = `Voucher`; BackgroundColor3 = Color3.new(1, 1, 1); BorderSizePixel = 0; Size = UDim2.new(1, 0, 0, 74); LayoutOrder = 17; ZIndex = 7 }, In)
-		new(`UICorner`, { CornerRadius = UDim.new(0, 4) }, Slip)
-		new(`UIGradient`, { Rotation = 0; Color = ColorSequence.new(Color3.fromRGB(222, 204, 164), Color3.fromRGB(232, 218, 184)) }, Slip)
-		new(`UIStroke`, { Color = Color3.fromRGB(120, 86, 44); Thickness = 1; Transparency = 0.5 }, Slip)
-		Kit.Slice(`FrameThin`, Color3.fromRGB(188, 146, 70), { SliceScale = 0.28; ImageTransparency = 0.1; ZIndex = 8; Parent = Slip })
-		-- the coin: a struck gold yen (IconCoinYen)
-		local Coin = new(`Frame`, { BackgroundTransparency = 1; AnchorPoint = Vector2.new(0, 0.5); Position = UDim2.new(0, 10, 0.5, 0); Size = UDim2.fromOffset(48, 48); ZIndex = 8 }, Slip)
-		Kit.Image(`IconCoinYen`, { Size = UDim2.fromScale(1, 1); ImageColor3 = if Paid > 0 then Color3.new(1, 1, 1) else Color3.fromRGB(150, 140, 126); ZIndex = 9; Parent = Coin })
-		Local.Label(Coin, ``, 22, { -- the coin art is struck with the yen Font = Fonts.Title; TextColor3 = if Paid > 0 then Color3.fromRGB(96, 58, 14) else Color3.fromRGB(80, 72, 64);
-			TextXAlignment = Enum.TextXAlignment.Center; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.52); Size = UDim2.fromScale(1, 0.6); ZIndex = 10 })
-		Local.Label(Slip, `Allowance`, 19, { Font = Fonts.Title; TextColor3 = INK; Position = UDim2.fromOffset(68, 14); Size = UDim2.new(1, -160, 0, 24); ZIndex = 9 })
-		Local.Label(Slip, if Paid > 0 then `From the Bursar` else `Better marks next week`, 14, { FontFace = BOLD; TextColor3 = INK_SOFT; TextWrapped = true;
-			Position = UDim2.fromOffset(68, 38); Size = UDim2.new(1, -160, 0, 32); TextYAlignment = Enum.TextYAlignment.Top; ZIndex = 9 })
-		Local.Label(Slip, if Paid > 0 then `{YEN}{Paid}` else `\u{2014}`, 28, { Font = Fonts.Title; TextColor3 = if Paid > 0 then Color3.fromRGB(122, 80, 16) else INK_SOFT;
-			TextXAlignment = Enum.TextXAlignment.Center; AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, -12, 0, 36); Size = UDim2.fromOffset(84, 32); ZIndex = 9 })
-		-- the rubber stamp, struck at a slant above the sum
-		local Stamp = new(`Frame`, { Name = `Stamp`; BackgroundColor3 = WAX; BackgroundTransparency = 0.9; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.new(1, -54, 0, 22);
-			Size = UDim2.fromOffset(74, 26); Rotation = -9; ZIndex = 11 }, Slip)
-		new(`UICorner`, { CornerRadius = UDim.new(0, 3) }, Stamp)
-		new(`UIStroke`, { Color = WAX; Thickness = 2; Transparency = 0.05 }, Stamp)
-		Local.Label(Stamp, if Paid > 0 then `PAID` else `NONE`, 17, { Font = Fonts.Title; TextColor3 = WAX; TextXAlignment = Enum.TextXAlignment.Center;
-			Size = UDim2.fromScale(1, 1); ZIndex = 12 })
-		if R.New and not Kit.ReducedMotion() then
-			Stamp.Size = UDim2.fromOffset(120, 42)
-			Stamp.Rotation = -24
-			task.delay(0.45, function()
-				tween(Stamp, 0.22, { Size = UDim2.fromOffset(74, 26); Rotation = -9 }, Enum.EasingStyle.Back)
-			end)
-		end
-		-- earlier weeks
-		if #Cards > 1 then
-			Local.Line(Body, `EARLIER WEEKS`, 14, { Font = Fonts.Title; TextColor3 = SECTION })
-			for I = 2, #Cards do
-				local K = Cards[I]
-				local Row = Local.Card(Body, 58)
-				seal(Row, 42, K.Average, UDim2.fromOffset(8, 8), Vector2.zero, 2)
-				local Ka = K.Attendance or {}
-				Local.Label(Row, when(Now - (tonumber(K.Week) or Now - I)), 14, { Font = Fonts.Title; TextColor3 = SECTION; Position = UDim2.fromOffset(60, 8); Size = UDim2.new(1, -70, 0, 18) })
-				Local.Label(Row, `{if K.Average then `{K.Average} average` else `no grades`}  \u{00B7}  {Ka.Attended or 0} of {Ka.Total or 0} classes  \u{00B7}  {YEN}{K.Allowance or 0}`, 15,
-					{ FontFace = BOLD; TextColor3 = HINT; Position = UDim2.fromOffset(60, 28); Size = UDim2.new(1, -70, 0, 20); TextWrapped = true })
-			end
-		end
-	end
-	-- this week so far
-	local So = R.SoFar or {}
-	local Row = Local.Card(Body, 70)
-	Kit.Image(`Bell`, { AnchorPoint = Vector2.new(0, 0.5); Position = UDim2.new(0, 10, 0.5, 0); Size = UDim2.fromOffset(30, 30); ImageColor3 = SECTION; Parent = Row })
-	Local.Label(Row, `THIS WEEK SO FAR`, 14, { Font = Fonts.Title; TextColor3 = SECTION; Position = UDim2.fromOffset(50, 8); Size = UDim2.new(1, -60, 0, 18) })
-	Local.Label(Row, if (So.Total or 0) > 0 then `{So.Attended} of {So.Total} classes{if So.Average then `, {So.Average} average` else ``}. The next card comes Monday.` else `No classes yet this week. The next card comes Monday.`, 15,
-		{ FontFace = BOLD; TextColor3 = HINT; TextWrapped = true; TextYAlignment = Enum.TextYAlignment.Top; Position = UDim2.fromOffset(50, 28); Size = UDim2.new(1, -60, 0, 38) })
-end
-
-function Local.Gazette()
-	local Body = Local.Page(`The Midnight Bell`)
-	local G = Local.Call(`Gazette`)
-	Local.Line(Body, `THE  MIDNIGHT  BELL`, 24, { Font = Fonts.Title; TextColor3 = C.Gold; TextXAlignment = Enum.TextXAlignment.Center })
-	Local.Line(Body, `<i>Nightmare Highschool's paper of record  \u{00B7}  Issue {G and G.Issue or `?`}</i>`, 13, { TextColor3 = HINT; TextXAlignment = Enum.TextXAlignment.Center })
-	Local.Line(Body, G and G.Date or ``, 14, { TextColor3 = HINT; TextXAlignment = Enum.TextXAlignment.Center })
-	if not G then Local.Line(Body, `<i>The presses are down. Try again in a moment.</i>`, 14) return end
-	for I, A in G.Articles do
-		Order += 1
-		local Rule = new(`Frame`, { BackgroundColor3 = if I == 1 then C.Gold else C.IronDim; BackgroundTransparency = 0.3; BorderSizePixel = 0; Size = UDim2.new(1, 0, 0, 1); LayoutOrder = Order }, Body)
-		Local.Line(Body, A.Kicker, 12, { Font = Fonts.Title; TextColor3 = Color3.fromRGB(225, 80, 90) })
-		Local.Line(Body, A.Title, if I == 1 then 22 else 17, { Font = Fonts.Title })
-		Local.Line(Body, A.Body, 15, { TextColor3 = Color3.fromRGB(225, 218, 206) })
-	end
-end
-
--- Cliques (1.20): every clique, your standing with each, and the two factions' ranks
-local CliqueConn = nil
-local CliqueTab = 1 -- (1.33) Standing | Today
-function Local.Cliques()
-	local Body = Local.Page(`Cliques`)
-	local F = ReplicatedStorage:FindFirstChild(`NHCliques`)
-	local Tabs = Kit.TabBar({ tabs = { `Standing`, `Today` }; selected = CliqueTab; textSize = 15; Size = UDim2.new(1, 0, 0, 38); Parent = Body;
-		onChanged = function(I) if I ~= CliqueTab then CliqueTab = I Order = 0 Local.Cliques() end end })
-	if typeof(Tabs) == `Instance` then Tabs.LayoutOrder = 0 end
-	if CliqueTab == 2 then Local.CliquesToday(Body, F) return end
-	local Get = F and F:GetAttribute(`Ready`) and F:FindFirstChild(`Get`)
-	local List = nil
-	if Get then local Ok, R = pcall(Get.InvokeServer, Get) if Ok then List = R end end
-	Local.Line(Body, `<i>Every crowd at Nightmare High, and how its members see you. Hurt one of theirs and they remember; their rivals may not mind.</i>`, 14, { TextColor3 = HINT })
-	if type(List) ~= `table` then Local.Line(Body, `<i>No signal. Try again in a moment.</i>`, 15, { TextColor3 = HINT }) return end
-	for _, Q in List do
-		local Faction = type(Q.Faction) == `table` and Q.Faction or nil
-		local Member = type(Q.Member) == `table` and Q.Member or nil -- (1.35) one of the six you've joined
-		local Row = Local.Card(Body, if Faction or Member then 150 else 118)
-		local Col = typeof(Q.Color) == `Color3` and Q.Color or C.Text
-		local Chip = new(`Frame`, { BackgroundColor3 = Col; BorderSizePixel = 0; Position = UDim2.fromOffset(0, 10); Size = UDim2.new(0, 4, 1, -20) }, Row)
-		new(`UICorner`, { CornerRadius = UDim.new(0, 2) }, Chip)
-		Local.Label(Row, Q.Name, 17, { Font = Fonts.Title; TextColor3 = Col; Position = UDim2.fromOffset(14, 6); Size = UDim2.new(1, -120, 0, 22) })
-		local TierCol = if Q.Standing >= 20 then Color3.fromRGB(150, 210, 120) elseif Q.Standing <= -10 then Color3.fromRGB(230, 90, 90) else HINT
-		Local.Label(Row, string.upper(Q.Tier), 12, { Font = Fonts.Title; TextColor3 = TierCol; TextXAlignment = Enum.TextXAlignment.Right; AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, -12, 0, 10); Size = UDim2.fromOffset(100, 16) })
-		Local.Label(Row, string.upper(`{Q.Archetype}  \u{00B7}  {Q.Hangout}`), 11, { Font = Fonts.Title; TextColor3 = SECTION; Position = UDim2.fromOffset(14, 28); Size = UDim2.new(1, -28, 0, 14) })
-		Local.Label(Row, `<i>{Q.Tagline}</i>`, 13, { TextColor3 = HINT; TextWrapped = true; TextYAlignment = Enum.TextYAlignment.Top; Position = UDim2.fromOffset(14, 44); Size = UDim2.new(1, -28, 0, 32) })
-		-- standing bar: -100 on the left, 0 in the middle, 100 on the right
-		local Bar = new(`Frame`, { BackgroundColor3 = C.Ink; BorderSizePixel = 0; Position = UDim2.fromOffset(14, 82); Size = UDim2.new(1, -70, 0, 5) }, Row)
-		new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Bar)
-		new(`UIStroke`, { Color = C.IronDim; Thickness = 1; Transparency = 0.4 }, Bar)
-		local V = math.clamp(tonumber(Q.Standing) or 0, -100, 100) / 100
-		local Fill = new(`ImageLabel`, { BackgroundTransparency = 1; Image = Img.BarFill; ImageColor3 = TierCol; ScaleType = Enum.ScaleType.Stretch;
-			AnchorPoint = Vector2.new(if V < 0 then 1 else 0, 0); Position = UDim2.fromScale(0.5, 0); Size = UDim2.fromScale(math.abs(V) / 2, 1) }, Bar)
-		new(`Frame`, { BackgroundColor3 = C.Gold; BorderSizePixel = 0; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.new(0, 1, 1, 6) }, Bar)
-		Local.Label(Row, `{if Q.Standing > 0 then `+` else ``}{Q.Standing}`, 13, { Font = Fonts.Title; TextColor3 = TierCol; TextXAlignment = Enum.TextXAlignment.Right; AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, -12, 0, 76); Size = UDim2.fromOffset(46, 16) })
-		Local.Label(Row, `Leader <b>{Q.Leader}</b>   \u{00B7}   Rival <b>{Q.Rival}</b>`, 12, { TextColor3 = C.Text; TextTruncate = Enum.TextTruncate.AtEnd; Position = UDim2.fromOffset(14, 94); Size = UDim2.new(1, -28, 0, 16) })
-		if Member then
-			Local.Label(Row, `MEMBER  \u{00B7}  {string.upper(tostring(Member.Rank or `Hanger-on`))}`, 11, { Font = Fonts.Title; TextColor3 = C.Gold; Position = UDim2.fromOffset(14, 120); Size = UDim2.new(0.5, 0, 0, 16) })
-			Kit.Button({ text = `Leave`; style = `crimson`; textSize = 13; Size = UDim2.fromOffset(110, 26); AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, -12, 0, 114); Parent = Row;
-				onClick = function(Api)
-					local R = F and F:FindFirstChild(`Leave`)
-					if not R then return end
-					local Ok, Done, Text = pcall(R.InvokeServer, R)
-					if Ok and Api and not Done then Api:SetText(`Sure?`) end
-					if Ok and Text then Local.Line(Body, `<i>{Text}</i>`, 13, { TextColor3 = HINT; LayoutOrder = -1 }) end
-				end })
-		end
-		if Faction then
-			Local.Label(Row, `FACTION  \u{00B7}  {string.upper(tostring(Faction.Rank or `Outsider`))}{if Faction.Member then `  \u{00B7}  MEMBER` else ``}`, 11, { Font = Fonts.Title; TextColor3 = C.Gold; Position = UDim2.fromOffset(14, 120); Size = UDim2.new(0.5, 0, 0, 16) })
-			Kit.Button({ text = `Faction`; style = `gold`; textSize = 13; Size = UDim2.fromOffset(110, 26); AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, -12, 0, 114); Parent = Row;
-				onClick = function()
-					Shared.Toggle(false)
-					local M = Local.Controller(`FactionsPanel`)
-					if M and M.Toggle then task.delay(0.15, function() pcall(M.Toggle, true) end) end
-				end })
-		end
-	end
-	-- refresh while this page is open
-	if CliqueConn then CliqueConn:Disconnect() CliqueConn = nil end
-	local Changed = F and F:FindFirstChild(`Changed`)
-	local Page = Body
-	if Changed then
-		CliqueConn = Changed.OnClientEvent:Connect(function()
-			if Page.Parent and Ui.App.Visible then Order = 0 Local.Cliques() elseif CliqueConn then CliqueConn:Disconnect() CliqueConn = nil end
-		end)
-	end
-end
-
--- (1.33) the bulletin: what's going on between the cliques today
-local TodayConn = nil
-function Local.CliquesToday(Body: Instance, F: Instance?)
-	local Get = F and F:FindFirstChild(`Today`)
-	local D = nil
-	if Get then local Ok, R = pcall(Get.InvokeServer, Get) if Ok then D = R end end
-	if type(D) ~= `table` then Local.Line(Body, `<i>No signal. Try again in a moment.</i>`, 15, { TextColor3 = HINT }) return end
-	local function Head(Text: string) Local.Line(Body, string.upper(Text), 12, { Font = Fonts.Title; TextColor3 = SECTION }) end
-	local function Row(Text: string, Col: Color3?) Local.Line(Body, Text, 14, { TextColor3 = Col or C.Text }) end
-	local function None(Text: string) Local.Line(Body, `<i>{Text}</i>`, 13, { TextColor3 = HINT }) end
-	-- rumble
-	Head(`Rumble`)
-	local R = D.Rumble
-	if R and R.Live then
-		Row(`<b>LIVE</b> at {R.Venue}: {R.A} ({R.WavesA or 0} waves left) vs {R.B} ({R.WavesB or 0} left)`, Color3.fromRGB(240, 120, 110))
-	elseif R and R.Plan then
-		Row(`{R.Plan.A} vs {R.Plan.B}, after school {if R.Plan.Today then `<b>today</b>` else `tomorrow`}, at {R.Venue}.`)
-	else
-		None(`Nothing planned. They come every few days.`)
-	end
-	if R and R.Last then Row(`Last time: {R.Last.A} vs {R.Last.B}, {if R.Last.Winner then `{R.Last.Winner} won` else `nobody won`}.`, HINT) end
-	-- turf
-	Head(`Turf`)
-	if #(D.Turf or {}) == 0 then None(`Every hangout is with its own crowd.`) end
-	for _, T in D.Turf or {} do Row(`{T.Hangout}: held by <b>{T.Holder}</b> (it's {T.Owner}'s)`, typeof(T.Color) == `Color3` and T.Color or nil) end
-	-- pranks
-	Head(`Pranks`)
-	if #(D.Pranks or {}) == 0 and #(D.Messes or {}) == 0 then None(`All quiet. For now.`) end
-	for _, P in D.Pranks or {} do Row(`<b>Right now:</b> {P.By} at {P.Hangout}{if P.Stopped then ` (someone stopped them)` else ``}`, Color3.fromRGB(240, 200, 110)) end
-	for _, M in D.Messes or {} do Row(`{M.Hangout}: a {string.lower(tostring(M.Kind or `mess`))} mess, by {M.By}`) end
-	-- feuds
-	Head(`Feuds today`)
-	if #(D.Feuds or {}) == 0 then None(`No fights yet today.`) end
-	for _, Fe in D.Feuds or {} do Row(`{Fe.A} vs {Fe.B}: {Fe.Count} fight{if Fe.Count == 1 then `` else `s`}{if Fe.Wins ~= `` then ` ({Fe.Wins})` else ``}`) end
-	-- (1.35) your clique
-	local Mb = D.Member
-	if type(Mb) == `table` then
-		Head(`Your clique`)
-		if Mb.Faction then
-			Row(`<b>{Mb.Clique}</b> (your faction: see the Factions panel)`)
-		else
-			Row(`<b>{Mb.Clique}</b>, {Mb.Rank or `Hanger-on`}{if Mb.Next then `  \u{00B7}  {Mb.ToNext} to {Mb.Next}` else ``}`, C.Gold)
-			if Mb.Job then Row(`Today's job: <b>{Mb.Job}</b> ({Mb.JobState})`) end
-		end
-	end
-	-- (1.34) showdowns with the leaders
-	local Sd = D.Showdowns
-	if type(Sd) == `table` then
-		Head(`Showdowns  \u{00B7}  {Sd.Beaten or 0}/{Sd.Of or 8} leaders beaten`)
-		if Sd.King then Row(`<b>You run this school.</b> 10% off at every shop, and backup at every hangout.`, C.Gold) end
-		for _, O in Sd.Open or {} do
-			Row(if O.Foe then `<b>{O.Leader}</b> challenged you: {O.Hangout}, after school or tonight.` else `<b>{O.Leader}</b> is waiting for you at {O.Hangout}.`,
-				if O.Foe then Color3.fromRGB(240, 120, 110) else nil)
-		end
-		if #(Sd.Open or {}) == 0 and not Sd.King then None(`Friendly with a clique and done its leader's quests? Ask them: "I want to test myself."`) end
-	end
-	-- your dares
-	local Left = tonumber(D.HoursLeft)
-	Head(`Your dares{if Left then `  \u{00B7}  {math.max(1, math.floor(Left + 0.5))} h to dawn` else ``}`)
-	if #(D.Dares or {}) == 0 then None(`None today. Leaders text them in the morning, or ask one: "Got a dare for me?"`) end
-	for _, Dr in D.Dares or {} do
-		local St = if Dr.State == `Done` then `\u{2713} done` elseif Dr.State == `Offered` then `in your Texts` else (Dr.Status or `on it`)
-		Row(`<b>{Dr.Name}</b> from {Dr.From}: {St}`, if Dr.State == `Done` then Color3.fromRGB(150, 210, 120) elseif typeof(Dr.Color) == `Color3` then Dr.Color else nil)
-	end
-	-- refresh while open (standing changes, and every 5 s)
-	if TodayConn then TodayConn:Disconnect() TodayConn = nil end
-	local Page = Body
-	local Changed = F and F:FindFirstChild(`Changed`)
-	if Changed then
-		TodayConn = Changed.OnClientEvent:Connect(function()
-			if Page.Parent and Ui.App.Visible and CliqueTab == 2 then Order = 0 Local.Cliques() elseif TodayConn then TodayConn:Disconnect() TodayConn = nil end
-		end)
-	end
-	task.delay(5, function()
-		if Page.Parent and Ui.App.Visible and CliqueTab == 2 then Order = 0 Local.Cliques() end
-	end)
-end
-
--- (2.23.0) Texts, laid out like a modern messaging app (owner, 2026-11-17: "make it look more like iMessage (our theme
--- though)"). Messages: one conversation per sender (a wax-seal avatar in their clique's colour, the last line, when it
--- came, a crimson unread dot), with search. A conversation: their texts sit left in inked leather with a hairline of
--- gold, your answers right in crimson lacquer; tails on the last of a run, day stamps between days, a dare or a dorm
--- invite as a card under its bubble, quick replies over a sealed composer (players never type to NPCs), a typing quill
--- when a new text lands while you're reading, and "Sealed" under your last answer. Opening a conversation marks only
--- that sender's texts read (NHPhone.Texts(true, From)).
-local TextService = game:GetService(`TextService`)
-local TX = {
-	MaxShare = 0.74;                                                     -- a bubble is at most this share of the page
-	In = { Color3.fromRGB(50, 44, 58), Color3.fromRGB(28, 24, 32) };      -- theirs: inked leather
-	Out = { Color3.fromRGB(184, 38, 58), Color3.fromRGB(116, 18, 34) };   -- yours: crimson lacquer
-	Office = Color3.fromRGB(214, 178, 112);
-	Family = Color3.fromRGB(214, 128, 138);
-	Other = Color3.fromRGB(150, 140, 160);
-	TextSize = 15;
+-- Civilian clothes: what every new student owns. School tops must be owned (the enrollment pick at the
+-- Enrollment desk, or the School Store); school bottoms unlock on enrolling. (Services.School.Enrollment)
+Appearance.CivilianTops = {
+	["blood-moon-hoodie"] = true, ["leather-jacket"] = true, ["open-flannel"] = true,
+	["victorian-waistcoat"] = true, ["hussar-coat"] = true, ["the-hollow-band-tee"] = true,
+	["lolita-dress"] = true, ["cable-knit"] = true, ["gala-gown"] = true,
+	-- (1.71) civilian kit and admin kit (the admin kit is never sold; staff wear it free)
+	["velvet-corset"] = true, ["moto-cami"] = true, ["moon-sweater"] = true, ["lace-blouse"] = true, ["cropped-hoodie"] = true, ["duster-slip"] = true, ["wool-overcoat"] = true, ["satin-bomber"] = true, ["denim-hoodie"] = true, ["henley-suspenders"] = true, ["shawl-cardigan"] = true, ["track-jacket"] = true, ["adm-night-warden"] = true, ["adm-crimson-haori"] = true, ["adm-exorcist-coat"] = true, ["adm-reaper-cloak"] = true, ["adm-council-captain"] = true, ["adm-shadow-ops"] = true, ["adm-midnight-tailcoat"] = true, ["adm-duelist"] = true,
 }
-local TextsView = { Mode = `List`; From = nil :: string?; Filter = ``; Conn = nil :: RBXScriptConnection?; Token = 0 }
-
-function Local.TextsCalm(): boolean
-	local Ok, Calm = pcall(Kit.ReducedMotion)
-	return Ok and Calm == true
-end
-
--- who a sender is: their colour, initials, a line under their name, and whether they sign with the school crest
-function Local.TextSender(From: string)
-	local Info = { Color = TX.Other; Initials = ``; Sub = ``; Crest = false }
-	if From == `The Office` then
-		Info.Color, Info.Crest, Info.Sub = TX.Office, true, `Nightmare High front office`
-		return Info
-	end
-	if From == `Mom & Dad` then
-		Info.Color, Info.Initials, Info.Sub = TX.Family, `M&D`, `Home`
-		return Info
-	end
-	local Ok, CC = pcall(function() return require(ReplicatedStorage.Config.Cliques) end)
-	if Ok and CC and CC.Defs then
-		for _, Id in CC.Order or {} do
-			local D = CC.Defs[Id]
-			if D and D.Leader == From then
-				Info.Color = D.Color or Info.Color
-				Info.Sub = `{D.Name} \u{00B7} leader`
-				break
-			end
+Appearance.CivilianBottoms = {
+	["dark-indigo-jeans"] = true, ["black-jeans"] = true, ["ripped-jeans"] = true, ["cargo-boots"] = true,
+	["black-jeans-boots"] = true, ["striped-joggers"] = true, ["pinstripes-riding-boots"] = true, ["black-skirt-fishnets"] = true,
+	["lolita-skirt"] = true, ["plaid-mini"] = true, ["gala-skirt"] = true,
+	-- (1.71) civilian kit and admin kit
+	["corset-flares"] = true, ["velvet-midi"] = true, ["leather-mini"] = true, ["wide-leg-trousers"] = true, ["skater-thighhighs"] = true, ["lace-maxi"] = true, ["trousers-chelsea"] = true, ["dark-jeans-hightops"] = true, ["track-pants"] = true, ["chinos-loafers"] = true, ["ripped-black-boots"] = true, ["cargo-shorts"] = true, ["adm-night-warden-tails"] = true, ["adm-hakama"] = true, ["adm-exorcist-trousers"] = true, ["adm-reaper-hem"] = true, ["adm-captain-riding"] = true, ["adm-shadow-cargo"] = true, ["adm-midnight-tails"] = true, ["adm-duelist-breeches"] = true,
+}
+-- the three uniforms offered on enrolling, per gender (Body 2 = female); race recolours apply automatically
+Appearance.StarterUniforms = {
+	Male = { Tops = { "black-blazer", "navy-vest", "charcoal-cardigan" }, Bottoms = "uniform-trousers" },
+	Female = { Tops = { "crest-blazer", "navy-vest-f", "cropped-cardigan" }, Bottoms = "charcoal-pleats" }, -- (1.71) the schoolgirl kit
+}
+Appearance.UniformPrice = 250 -- Yen per school top at the School Store
+function Appearance.IndexOf(list, id)
+	for i, e in ipairs(list) do
+		if e.Id == id then
+			return i
 		end
 	end
-	local Words = {}
-	for Wd in From:gmatch(`%a+`) do if Wd ~= `Captain` and Wd ~= `The` then table.insert(Words, Wd) end end
-	Info.Initials = string.upper((Words[1] or `?`):sub(1, 1) .. (Words[#Words] and #Words > 1 and Words[#Words]:sub(1, 1) or ``))
-	return Info
+	return nil
+end
+function Appearance.IsSchoolTop(index)
+	local u = Appearance.Uniforms[index]
+	return u ~= nil and not Appearance.CivilianTops[u.Id]
+end
+function Appearance.IsSchoolBottom(index)
+	local b = Appearance.BottomsList[index]
+	return b ~= nil and not Appearance.CivilianBottoms[b.Id]
 end
 
--- the school's "today" as texts store it (Config.Cliques.EventDay: a night belongs to the evening before it), and the
--- weekday on the clock right now. Returns { Day, Name } or nil.
-function Local.TextsToday()
-	local Clock = ReplicatedStorage:FindFirstChild(`SchoolClock`)
-	local Epoch = Clock and Clock:GetAttribute(`Epoch`)
-	if not Epoch then return nil end
-	local St = SchoolTime.GetState(Epoch, workspace:GetServerTimeNow())
-	local Day = if St.Hour >= 6 then St.Day else St.Day - 1
-	pcall(function() Day = require(ReplicatedStorage.Config.Cliques).EventDay(St) or Day end)
-	return { Day = Day; Name = Local.TextsDayName(St.Day) }
+-- Gender and staff clothing (1.71, owner: "the clothing needs to be separate by gender"). Every top and bottom has a
+-- Gender: "Male", "Female" or "Unisex" (shown to both). A piece's own Gender field wins; else Female = true or
+-- FemaleClothing makes it Female, UnisexClothing makes it Unisex, and the rest is Male. Admin = true pieces (the admin
+-- kit) are for staff only: player attribute NHStaff >= 1, set by Features.Admin. The Wardrobe, the School Store and the
+-- server's look check all use Appearance.ClothingAllows. A saved look keeps what it wears until it's changed.
+Appearance.UnisexClothing = {
+	["gym-pe-shirt"] = true, ["varsity-jacket"] = true, ["blood-moon-hoodie"] = true, ["the-hollow-band-tee"] = true,
+	["striped-joggers"] = true, ["dark-indigo-jeans"] = true, ["black-jeans"] = true, ["ripped-jeans"] = true,
+}
+Appearance.FemaleClothing = { ["pleated-tartan-skirt"] = true, ["black-skirt-fishnets"] = true }
+-- each piece and its other-gender version: switching gender swaps to it, and owning one school top counts for both
+Appearance.Counterparts = {}
+for _, pair in ipairs({
+	{ "black-blazer", "crest-blazer" }, { "navy-vest", "navy-vest-f" }, { "charcoal-cardigan", "cropped-cardigan" },
+	{ "vigil-vest", "vigil-vest-f" }, { "crimson-court-vest", "crimson-court-blazer" }, { "forest-vest", "forest-vest-f" },
+	{ "delinquent-polo", "delinquent-long-blazer" }, { "black-shirt", "ink-club-blouse" }, { "crimson-polo", "crimson-jumper" },
+	{ "ivory-polo", "summer-blouse" },
+	{ "uniform-trousers", "charcoal-pleats" }, { "charcoal-slacks", "black-pleats-sheer" }, { "khaki-trousers", "navy-pleats" },
+	{ "leather-jacket", "moto-cami" }, { "victorian-waistcoat", "lace-blouse" }, { "hussar-coat", "velvet-corset" },
+	{ "open-flannel", "duster-slip" }, { "satin-bomber", "cropped-hoodie" }, { "denim-hoodie", "moon-sweater" },
+	{ "cargo-boots", "leather-mini" }, { "black-jeans-boots", "corset-flares" }, { "pinstripes-riding-boots", "wide-leg-trousers" },
+	{ "trousers-chelsea", "velvet-midi" }, { "chinos-loafers", "lace-maxi" },
+}) do
+	Appearance.Counterparts[pair[1]] = pair[2]
+	Appearance.Counterparts[pair[2]] = pair[1]
 end
-
-function Local.TextsDayName(Day: number?): string
-	local Ok, Sched = pcall(function() return require(ReplicatedStorage.Config.SchoolSchedule) end)
-	if not (Ok and Sched and Sched.DayNames and typeof(Day) == `number`) then return `` end
-	return Sched.DayNames[(Day % #Sched.DayNames) + 1] or ``
-end
-
--- when a text came, the way the player reads the clock: (`Today` | `Yesterday` | a weekday, "8:35 AM").
--- At is "Friday 8:35 AM"; Day is the event day (texts sent at 5 AM Friday belong to Thursday's night, but read as today).
-function Local.TextsStamp(T, Now): (string, string)
-	local At = tostring(T.At or ``)
-	local Weekday = At:match(`^(%a+)`) or ``
-	local Time = At:match(`%d+:%d+%s*[AP]M`) or At
-	if not (Now and typeof(T.Day) == `number`) then return Weekday, Time end
-	if T.Day >= Now.Day - 1 and Weekday == Now.Name then return `Today`, Time end
-	if T.Day >= Now.Day - 1 then return `Yesterday`, Time end
-	return Weekday, Time
-end
-
--- "8:35 AM" today, "Yesterday", or the weekday
-function Local.TextsWhen(T, Now): string
-	local Rel, Time = Local.TextsStamp(T, Now)
-	return if Rel == `Today` then Time else Rel
-end
-
--- a dare's text ends "(Dare: Stand Up)"; the card under the bubble already names it
-function Local.TextsClean(T): string
-	local Body = tostring(T.Body or ``)
-	if T.Dare then Body = Body:gsub(`%s*%(Dare:[^)]*%)%s*$`, ``) end
-	return Body
-end
-
--- a wax-seal avatar: the kit's baked Seal art tinted to the sender, their initials (or the crest) pressed in
-function Local.TextAvatar(Parent: Instance, Info, Size: number, Props)
-	local A = new(`Frame`, { Name = `Avatar`; BackgroundTransparency = 1; Size = UDim2.fromOffset(Size, Size) }, Parent)
-	new(`ImageLabel`, { Name = `Shadow`; BackgroundTransparency = 1; Image = Img.Shadow; ImageTransparency = 0.45; ImageColor3 = Color3.new(0, 0, 0);
-		AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.new(0.5, 1, 0.5, 3); Size = UDim2.fromScale(1.35, 1.35) }, A)
-	new(`ImageLabel`, { Name = `Seal`; BackgroundTransparency = 1; Image = Img.Seal; ImageColor3 = Info.Color; ScaleType = Enum.ScaleType.Fit;
-		Size = UDim2.fromScale(1, 1) }, A)
-	if Info.Crest then
-		new(`ImageLabel`, { Name = `Crest`; BackgroundTransparency = 1; Image = Img.CrestFlat; ImageColor3 = Color3.fromRGB(40, 26, 18); ImageTransparency = 0.1;
-			ScaleType = Enum.ScaleType.Fit; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromScale(0.56, 0.56) }, A)
-	else
-		local T = Local.Label(A, Info.Initials, math.floor(Size * (if #Info.Initials > 2 then 0.26 else 0.34)), { Font = Fonts.Title; TextColor3 = Color3.fromRGB(30, 20, 16);
-			TextXAlignment = Enum.TextXAlignment.Center; RichText = false; Size = UDim2.fromScale(1, 1) })
-		T.TextStrokeTransparency = 1
-		local Hi = new(`UIStroke`, { Color = Color3.new(1, 1, 1); Thickness = 1; Transparency = 0.75; ApplyStrokeMode = Enum.ApplyStrokeMode.Contextual }, T)
-		_ = Hi
+-- what a gender gets when nothing it wears suits it any more (tops default to the unisex Blood Moon Hoodie)
+Appearance.GenderDefaults = { Male = { Bottoms = "cargo-boots" }, Female = { Bottoms = "corset-flares" } }
+function Appearance.GenderOf(entry)
+	if not entry then
+		return "Unisex"
 	end
-	for K, V in Props or {} do A[K] = V end
-	return A
+	if entry.Gender then
+		return entry.Gender
+	end
+	if entry.Female or Appearance.FemaleClothing[entry.Id] then
+		return "Female"
+	end
+	return Appearance.UnisexClothing[entry.Id] and "Unisex" or "Male"
 end
-
--- the Texts app's own page: the shared App frame, cleared, holding one CanvasGroup we can slide and fade
-function Local.TextsPage(Dir: number?): CanvasGroup
-	local App = Ui.App
-	for _, Ch in App:GetChildren() do if Ch.Name ~= `Grain` then Ch:Destroy() end end
-	local Page = new(`CanvasGroup`, { Name = `Texts`; BackgroundTransparency = 1; Size = UDim2.fromScale(1, 1) }, App)
-	Ui.Home.Visible = false
-	App.Visible = true
-	if Dir and not Local.TextsCalm() then
-		Page.GroupTransparency = 1
-		Page.Position = UDim2.fromOffset(28 * Dir, 0)
-		tween(Page, 0.32, { GroupTransparency = 0; Position = UDim2.fromOffset(0, 0) })
-	end
-	return Page
+function Appearance.IsStaff(player)
+	return typeof(player) == "Instance" and (tonumber(player:GetAttribute("NHStaff")) or 0) >= 1
 end
-
-function Local.TextsFetch(MarkFrom: string?)
-	local List = if MarkFrom then Local.Call(`Texts`, true, MarkFrom) else Local.Call(`Texts`, false)
-	if type(List) ~= `table` then return nil end
-	return List
+-- may this look (its body's gender) wear this piece? staff = may wear the admin kit
+function Appearance.ClothingAllows(entry, look, staff)
+	if not entry then
+		return false
+	end
+	if entry.Admin and not staff then
+		return false
+	end
+	local g = Appearance.GenderOf(entry)
+	return g == "Unisex" or g == Appearance.BodyGender(type(look) == "table" and look.Body or look)
 end
-
--- newest-first texts -> conversations (newest first), each with its texts oldest first
-function Local.TextsThreads(List)
-	local Threads, ByFrom = {}, {}
-	-- only the newest copy of a dare, sent today, can be answered (a leader resends the same dare on later days, and
-	-- the server still says yes to every copy while that dare is current)
-	local Now = Local.TextsToday()
-	local SeenDare = {}
-	for _, T in List do
-		if T.Dare then
-			if T.CanAccept and (SeenDare[T.Dare] or (Now and typeof(T.Day) == `number` and T.Day ~= Now.Day)) then T.CanAccept = false end
-			SeenDare[T.Dare] = true
-		end
+-- school-top ownership: owning a piece counts for its other-gender version too (Identity.Uniforms holds ids)
+function Appearance.OwnsTop(owned, id)
+	if type(owned) ~= "table" or not id then
+		return false
 	end
-	for _, T in List do
-		local From = T.From or `Unknown`
-		local Th = ByFrom[From]
-		if not Th then
-			Th = { From = From; Texts = {}; Unread = 0; Open = false; Latest = T }
-			ByFrom[From] = Th
-			table.insert(Threads, Th)
-		end
-		table.insert(Th.Texts, 1, T)
-		if T.State == `New` then Th.Unread += 1 end
-		if (T.Dare or T.Invite) and T.CanAccept then Th.Open = true end
-	end
-	return Threads, ByFrom
+	local cp = Appearance.Counterparts[id]
+	return table.find(owned, id) ~= nil or (cp ~= nil and table.find(owned, cp) ~= nil)
 end
-
-function Local.TextsUnreadExcept(List, From: string?): number
-	local N = 0
-	for _, T in List do if T.State == `New` and T.From ~= From then N += 1 end end
-	return N
-end
-
--- the hook for a new text arriving while the app is open
-function Local.TextsWatch()
-	if TextsView.Conn then TextsView.Conn:Disconnect() TextsView.Conn = nil end
-	local F = ReplicatedStorage:FindFirstChild(`NHPhone`)
-	local Changed = F and F:FindFirstChild(`Changed`)
-	if not Changed then return end
-	TextsView.Conn = Changed.OnClientEvent:Connect(function(S)
-		local Page = Ui and Ui.App:FindFirstChild(`Texts`)
-		if not (Page and Ui.App.Visible) then
-			if TextsView.Conn then TextsView.Conn:Disconnect() TextsView.Conn = nil end
-			return
-		end
-		if not (typeof(S) == `table` and (tonumber(S.Unread) or 0) > 0) then return end
-		if TextsView.Mode == `Thread` and TextsView.From then
-			local List = Local.TextsFetch(nil)
-			if not List then return end
-			local _, ByFrom = Local.TextsThreads(List)
-			local Th = ByFrom[TextsView.From]
-			if Th and Th.Unread > 0 then
-				Local.TextsTyping(Page, function() Local.TextsThread(TextsView.From, nil, true) end)
-			end
-		else
-			Local.Texts(nil, true)
-		end
-	end)
-end
-
----| the conversation list |---
-
-function Local.Texts(Dir: number?, Fresh: boolean?)
-	TextsView.Mode, TextsView.From = `List`, nil
-	TextsView.Token += 1
-	local Token = TextsView.Token
-	local Page = Local.TextsPage(Dir)
-	local Calm = Local.TextsCalm()
-	-- header: back, a large title, the search pill
-	local Back = new(`TextButton`, { Name = `Back`; Text = `\u{2039}`; Font = Fonts.Title; TextSize = 30; TextColor3 = C.Gold; BackgroundTransparency = 1;
-		Position = UDim2.fromOffset(8, 0); Size = UDim2.fromOffset(40, 36) }, Page)
-	Back.Activated:Connect(function() Local.ShowHome() end)
-	local Title = Local.Label(Page, `Messages`, 30, { Font = Fonts.Title; TextColor3 = C.Gold; Position = UDim2.fromOffset(18, 30); Size = UDim2.new(1, -36, 0, 36) })
-	pcall(Kit.Emboss, Title)
-	local Search = new(`Frame`, { Name = `Search`; BackgroundColor3 = Color3.fromRGB(34, 30, 38); BackgroundTransparency = 0.15; BorderSizePixel = 0;
-		Position = UDim2.fromOffset(14, 72); Size = UDim2.new(1, -28, 0, 32) }, Page)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 10) }, Search)
-	new(`UIStroke`, { Color = C.IronDim; Thickness = 1; Transparency = 0.55 }, Search)
-	-- a drawn magnifier (the fonts have no search glyph): a ring and a short handle
-	local Lens = new(`Frame`, { Name = `Lens`; BackgroundTransparency = 1; Position = UDim2.fromOffset(11, 9); Size = UDim2.fromOffset(10, 10) }, Search)
-	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Lens)
-	new(`UIStroke`, { Color = HINT; Thickness = 1.5 }, Lens)
-	new(`Frame`, { Name = `Handle`; BackgroundColor3 = HINT; BorderSizePixel = 0; Rotation = 45; AnchorPoint = Vector2.new(0.5, 0.5);
-		Position = UDim2.fromOffset(22, 21); Size = UDim2.fromOffset(6, 2) }, Search)
-	local Box = new(`TextBox`, { Name = `Box`; Text = TextsView.Filter; PlaceholderText = `Search`; PlaceholderColor3 = HINT; ClearTextOnFocus = false;
-		Font = Fonts.Body; TextSize = 15; TextColor3 = C.Text; TextXAlignment = Enum.TextXAlignment.Left; BackgroundTransparency = 1;
-		Position = UDim2.fromOffset(30, 0); Size = UDim2.new(1, -38, 1, 0) }, Search)
-	local Body = new(`ScrollingFrame`, { Name = `Body`; BackgroundTransparency = 1; BorderSizePixel = 0; Position = UDim2.fromOffset(0, 112); Size = UDim2.new(1, 0, 1, -112);
-		CanvasSize = UDim2.new(); AutomaticCanvasSize = Enum.AutomaticSize.Y; ScrollBarThickness = 3; ScrollBarImageColor3 = C.IronDim }, Page)
-	new(`UIListLayout`, { SortOrder = Enum.SortOrder.LayoutOrder; Padding = UDim.new(0, 0) }, Body)
-	new(`UIPadding`, { PaddingBottom = UDim.new(0, 12) }, Body)
-
-	local List = Local.TextsFetch(nil)
-	if Token ~= TextsView.Token then return end
-	if not List then
-		Local.Label(Body, `<i>No signal. Try again in a moment.</i>`, 14, { TextColor3 = HINT; TextXAlignment = Enum.TextXAlignment.Center; Size = UDim2.new(1, 0, 0, 60) })
-		return
-	end
-	State.Unread = Local.TextsUnreadExcept(List, nil)
-	Local.Badges()
-	local Threads = Local.TextsThreads(List)
-	local Now = Local.TextsToday()
-	if #Threads == 0 then
-		local Empty = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 220) }, Body)
-		new(`ImageLabel`, { BackgroundTransparency = 1; Image = Img.IconAppTexts; ScaleType = Enum.ScaleType.Fit; ImageTransparency = 0.25;
-			AnchorPoint = Vector2.new(0.5, 0); Position = UDim2.new(0.5, 0, 0, 40); Size = UDim2.fromOffset(72, 72) }, Empty)
-		Local.Label(Empty, `No messages yet`, 18, { Font = Fonts.Title; TextColor3 = C.Gold; TextXAlignment = Enum.TextXAlignment.Center; Position = UDim2.fromOffset(0, 124); Size = UDim2.new(1, 0, 0, 24) })
-		Local.Label(Empty, `<i>Leaders text you dares, your parents write after report cards, and the Office keeps you posted.</i>`, 13,
-			{ TextColor3 = HINT; TextWrapped = true; TextXAlignment = Enum.TextXAlignment.Center; Position = UDim2.fromOffset(30, 152); Size = UDim2.new(1, -60, 0, 50) })
-		Local.TextsWatch()
-		return
-	end
-	local Rows = {}
-	for I, Th in Threads do
-		local Info = Local.TextSender(Th.From)
-		local L = Th.Latest
-		local Row = new(`CanvasGroup`, { Name = `Row_{I}`; BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 70); LayoutOrder = I }, Body)
-		local Btn = new(`TextButton`, { Name = `Open`; Text = ``; AutoButtonColor = false; BackgroundColor3 = C.Gold; BackgroundTransparency = 1;
-			Size = UDim2.fromScale(1, 1) }, Row)
-		if Th.Unread > 0 then
-			local Dot = new(`Frame`, { Name = `Unread`; BackgroundColor3 = C.Crimson; BorderSizePixel = 0; AnchorPoint = Vector2.new(0.5, 0.5);
-				Position = UDim2.new(0, 11, 0.5, 0); Size = UDim2.fromOffset(9, 9); ZIndex = 3 }, Row)
-			new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Dot)
-			local Glow = new(`ImageLabel`, { Name = `Glow`; BackgroundTransparency = 1; Image = Img.Glow; ImageColor3 = C.Crimson; ImageTransparency = 0.35;
-				AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.new(0, 11, 0.5, 0); Size = UDim2.fromOffset(26, 26); ZIndex = 2 }, Row)
-			if not Calm then
-				TweenService:Create(Glow, TweenInfo.new(1.1, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true), { ImageTransparency = 0.8 }):Play()
-			end
-		end
-		Local.TextAvatar(Row, Info, 46, { Position = UDim2.fromOffset(22, 12) })
-		local Name = Local.Label(Row, Th.From, 16, { Font = Fonts.Title; RichText = false; TextColor3 = if Th.Unread > 0 then C.Gold else C.Text;
-			TextTruncate = Enum.TextTruncate.AtEnd; Position = UDim2.fromOffset(80, 10); Size = UDim2.new(1, -170, 0, 20) })
-		_ = Name
-		Local.Label(Row, `{Local.TextsWhen(L, Now)}  \u{203A}`, 12, { RichText = false; TextColor3 = HINT; TextXAlignment = Enum.TextXAlignment.Right;
-			AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, -14, 0, 12); Size = UDim2.fromOffset(90, 18) })
-		local Tag = if Th.Open then `<font color="{`#` .. C.Gold:ToHex()}"><b>{if L.Invite then `INVITE` else `DARE`}</b></font>  ` else ``
-		local Preview = Local.TextsClean(L):gsub(`[<>&]`, { [`<`] = `&lt;`; [`>`] = `&gt;`; [`&`] = `&amp;` })
-		Local.Label(Row, Tag .. Preview, 13, { TextColor3 = if Th.Unread > 0 then C.Text else HINT; TextWrapped = true; TextYAlignment = Enum.TextYAlignment.Top;
-			TextTruncate = Enum.TextTruncate.AtEnd; Position = UDim2.fromOffset(80, 31); Size = UDim2.new(1, -96, 0, 34) })
-		local Rule = new(`Frame`, { Name = `Rule`; BackgroundColor3 = C.IronDim; BackgroundTransparency = 0.55; BorderSizePixel = 0;
-			AnchorPoint = Vector2.new(0, 1); Position = UDim2.new(0, 80, 1, 0); Size = UDim2.new(1, -80, 0, 1) }, Row)
-		_ = Rule
-		Btn.MouseEnter:Connect(function() if not Calm then tween(Btn, 0.12, { BackgroundTransparency = 0.93 }) end end)
-		Btn.MouseLeave:Connect(function() tween(Btn, 0.2, { BackgroundTransparency = 1 }) end)
-		Btn.Activated:Connect(function()
-			pcall(Kit.PlaySound, `Tick`, 0.5, 1.35)
-			Btn.BackgroundTransparency = 0.86
-			Local.TextsThread(Th.From, 1)
-		end)
-		table.insert(Rows, { Row = Row; Hay = string.lower(Th.From .. ` ` .. tostring(L.Body or ``)); I = I })
-	end
-	-- rows slide in, one after another (a fresh text drops in from the top instead)
-	if not Calm then
-		for K, R in Rows do
-			R.Row.GroupTransparency = 1
-			local Delay = if Fresh then 0 else (K - 1) * 0.035
-			task.delay(Delay, function()
-				if R.Row.Parent then tween(R.Row, 0.28, { GroupTransparency = 0 }) end
-			end)
-		end
-	end
-	local function Filter()
-		local Q = string.lower(Box.Text or ``)
-		TextsView.Filter = Box.Text or ``
-		for _, R in Rows do R.Row.Visible = Q == `` or string.find(R.Hay, Q, 1, true) ~= nil end
-	end
-	Box:GetPropertyChangedSignal(`Text`):Connect(Filter)
-	Filter()
-	Local.TextsWatch()
-end
-
----| a conversation |---
-
-local function textSize(Text: string, Size: number, Font: Enum.Font, Width: number): Vector2
-	local Ok, V = pcall(TextService.GetTextSize, TextService, Text, Size, Font, Vector2.new(Width, 10000))
-	return if Ok then V else Vector2.new(Width, Size * 2)
-end
-
--- one bubble. Side "In" (theirs, left) or "Out" (yours, right); Tail on the last of a run. Returns its row and bubble.
-function Local.TextBubble(Body: Instance, Order: number, Side: string, Text: string, Tail: boolean, Width: number)
-	local MaxW = math.floor(Width * TX.MaxShare)
-	local Sz = textSize(Text, TX.TextSize, Fonts.Body, MaxW - 26)
-	-- a few units of slack: the font rounds up at the handset's scale, and a tight bubble wraps its last word
-	local BW, BH = math.min(MaxW, math.max(44, math.ceil(Sz.X) + 32)), math.ceil(Sz.Y) + 16
-	local Row = new(`Frame`, { Name = `Bubble`; BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, BH); LayoutOrder = Order }, Body)
-	local Out = Side == `Out`
-	local Cols = if Out then TX.Out else TX.In
-	local B = new(`Frame`, { Name = `B`; BackgroundColor3 = Color3.new(1, 1, 1); BorderSizePixel = 0; ZIndex = 3;
-		AnchorPoint = Vector2.new(if Out then 1 else 0, 0); Position = UDim2.new(if Out then 1 else 0, 0, 0, 0); Size = UDim2.fromOffset(BW, BH) }, Row)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 17) }, B)
-	new(`UIGradient`, { Rotation = 90; Color = ColorSequence.new(Cols[1], Cols[2]) }, B)
-	-- the kit's baked grain, so the leather and lacquer read as surfaces (clipped to the same rounding)
-	local Grain = new(`ImageLabel`, { Name = `Grain`; BackgroundTransparency = 1; Image = Img.PanelBg; ImageColor3 = if Out then Color3.fromRGB(255, 190, 190) else Color3.fromRGB(150, 140, 160);
-		ImageTransparency = if Out then 0.86 else 0.8; ScaleType = Enum.ScaleType.Tile; TileSize = UDim2.fromOffset(120, 120); Size = UDim2.fromScale(1, 1); ZIndex = 3 }, B)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 17) }, Grain)
-	-- a soft sheen across the top, like lacquer catching light
-	local Sheen = new(`Frame`, { Name = `Sheen`; BackgroundColor3 = Color3.new(1, 1, 1); BackgroundTransparency = if Out then 0.84 else 0.92; BorderSizePixel = 0;
-		Position = UDim2.fromOffset(4, 2); Size = UDim2.new(1, -8, 0, math.min(12, BH * 0.4)); ZIndex = 3 }, B)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 12) }, Sheen)
-	new(`UIGradient`, { Rotation = 90; Transparency = NumberSequence.new(0, 1) }, Sheen)
-	new(`UIStroke`, { Color = if Out then Color3.fromRGB(255, 120, 130) else C.GoldDeep; Thickness = 1; Transparency = if Out then 0.7 else 0.55 }, B)
-	local T = new(`TextLabel`, { Name = `Text`; BackgroundTransparency = 1; Text = Text; RichText = false; TextWrapped = true; Font = Fonts.Body; TextSize = TX.TextSize;
-		TextColor3 = if Out then Color3.fromRGB(255, 240, 236) else C.Text; TextXAlignment = Enum.TextXAlignment.Left; TextYAlignment = Enum.TextYAlignment.Center;
-		Position = UDim2.fromOffset(13, 0); Size = UDim2.new(1, -26, 1, 0); ZIndex = 4 }, B)
-	_ = T
-	if Tail then
-		-- the tail: a small turned square tucked under the bottom corner, in the bubble's bottom colour
-		local Tl = new(`Frame`, { Name = `Tail`; BackgroundColor3 = Cols[2]; BorderSizePixel = 0; Rotation = 45; ZIndex = 2;
-			AnchorPoint = Vector2.new(0.5, 0.5); Position = if Out then UDim2.new(1, -3, 1, -7) else UDim2.new(0, 3, 1, -7); Size = UDim2.fromOffset(12, 12) }, Row)
-		new(`UICorner`, { CornerRadius = UDim.new(0, 3) }, Tl)
-	end
-	local Scale = new(`UIScale`, { Scale = 1 }, B)
-	return Row, B, Scale
-end
-
--- a dare or invite, shown as a card under its bubble (like a link preview)
-function Local.TextCard(Body: Instance, Order: number, T, Width: number)
-	local MaxW = math.floor(Width * TX.MaxShare)
-	local Row = new(`Frame`, { Name = `Card`; BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 52); LayoutOrder = Order }, Body)
-	local Card = new(`Frame`, { BackgroundColor3 = Color3.fromRGB(18, 15, 20); BackgroundTransparency = 0.1; BorderSizePixel = 0; Size = UDim2.fromOffset(MaxW, 48) }, Row)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 12) }, Card)
-	new(`UIStroke`, { Color = C.GoldDeep; Thickness = 1; Transparency = 0.45 }, Card)
-	new(`ImageLabel`, { BackgroundTransparency = 1; Image = if T.Invite then Img.IconAppContacts else Img.IconNpcOffer; ScaleType = Enum.ScaleType.Fit;
-		Position = UDim2.fromOffset(8, 8); Size = UDim2.fromOffset(32, 32) }, Card)
-	local Kind = if T.Invite then `DORM INVITE` else `DARE`
-	local Name = if T.Invite then `Their room, tonight` else (T.DareName or `A dare`)
-	local Status = if T.State == `Accepted` then (if T.Invite then `Visited` else `Accepted`)
-		elseif T.State == `Declined` then (if T.Invite then `Maybe later` else `Not today`)
-		elseif T.CanAccept then (if T.Invite then `Open now` else `Runs out at 6 AM`)
-		else (if T.Invite then `This invite's over` else `This dare's over`)
-	local StatusColor = if T.State == `Accepted` then Color3.fromRGB(150, 210, 120) elseif T.CanAccept then C.Gold else HINT
-	Local.Label(Card, `<b>{Kind}</b>  \u{00B7}  <font color="#{StatusColor:ToHex()}">{Status}</font>`, 11, { TextColor3 = HINT; Position = UDim2.fromOffset(48, 6); Size = UDim2.new(1, -56, 0, 16) })
-	Local.Label(Card, Name, 15, { Font = Fonts.Title; RichText = false; TextColor3 = C.Text; TextTruncate = Enum.TextTruncate.AtEnd; Position = UDim2.fromOffset(48, 22); Size = UDim2.new(1, -56, 0, 20) })
-	return Row
-end
-
--- three embers bobbing in an inked bubble: someone is writing to you
-function Local.TextsTyping(Page: Instance, OnDone: () -> ())
-	local Body = Page:FindFirstChild(`Body`)
-	if not Body then OnDone() return end
-	local Row = new(`Frame`, { Name = `Typing`; BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 36); LayoutOrder = 100000 }, Body)
-	local B = new(`Frame`, { BackgroundColor3 = TX.In[1]; BorderSizePixel = 0; Size = UDim2.fromOffset(62, 34) }, Row)
-	new(`UICorner`, { CornerRadius = UDim.new(0, 17) }, B)
-	new(`UIStroke`, { Color = C.GoldDeep; Thickness = 1; Transparency = 0.55 }, B)
-	local Dots = {}
-	for I = 1, 3 do
-		local D = new(`Frame`, { BackgroundColor3 = C.Gold; BorderSizePixel = 0; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.new(0, 16 + (I - 1) * 15, 0.5, 0); Size = UDim2.fromOffset(7, 7) }, B)
-		new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, D)
-		Dots[I] = D
-	end
-	task.defer(function() Body.CanvasPosition = Vector2.new(0, math.max(0, Body.AbsoluteCanvasSize.Y - Body.AbsoluteSize.Y)) end)
-	local T0 = os.clock()
-	local Conn
-	Conn = RunService.RenderStepped:Connect(function()
-		if not Row.Parent then Conn:Disconnect() return end
-		for I, D in Dots do
-			local P = math.sin((os.clock() - T0) * 7 - I * 0.9)
-			D.Position = UDim2.new(0, 16 + (I - 1) * 15, 0.5, -math.max(0, P) * 4)
-			D.BackgroundTransparency = 0.45 - math.max(0, P) * 0.45
-		end
-	end)
-	task.delay(if Local.TextsCalm() then 0.3 else 1.1, function()
-		Conn:Disconnect()
-		Row:Destroy()
-		OnDone()
-	end)
-end
-
-function Local.TextsThread(From: string, Dir: number?, Fresh: boolean?)
-	TextsView.Mode, TextsView.From = `Thread`, From
-	TextsView.Token += 1
-	local Token = TextsView.Token
-	local Page = Local.TextsPage(Dir)
-	local Calm = Local.TextsCalm()
-	local Info = Local.TextSender(From)
-	-- header: back to Messages, their seal and name centred
-	local Back = new(`TextButton`, { Name = `Back`; Text = `\u{2039} Messages`; Font = Fonts.Title; TextSize = 15; TextColor3 = C.Gold; BackgroundTransparency = 1;
-		TextXAlignment = Enum.TextXAlignment.Left; Position = UDim2.fromOffset(12, 4); Size = UDim2.fromOffset(110, 30) }, Page)
-	Back.Activated:Connect(function() pcall(Kit.PlaySound, `Tick`, 0.5, 1.1) Local.Texts(-1) end)
-	Local.TextAvatar(Page, Info, 40, { AnchorPoint = Vector2.new(0.5, 0); Position = UDim2.new(0.5, 0, 0, 4) })
-	Local.Label(Page, From, 14, { Font = Fonts.Title; RichText = false; TextColor3 = C.Text; TextXAlignment = Enum.TextXAlignment.Center;
-		TextTruncate = Enum.TextTruncate.AtEnd; Position = UDim2.fromOffset(40, 46); Size = UDim2.new(1, -80, 0, 18) })
-	Local.Label(Page, Info.Sub, 11, { RichText = false; TextColor3 = HINT; TextXAlignment = Enum.TextXAlignment.Center; Position = UDim2.fromOffset(20, 63); Size = UDim2.new(1, -40, 0, 14) })
-	local Rule = new(`Frame`, { BackgroundColor3 = C.Crimson; BorderSizePixel = 0; Position = UDim2.new(0, 14, 0, 82); Size = UDim2.new(1, -28, 0, 1) }, Page)
-	new(`UIGradient`, { Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1), NumberSequenceKeypoint.new(0.5, 0.25), NumberSequenceKeypoint.new(1, 1) }) }, Rule)
-	local COMPOSER = 46
-	local Body = new(`ScrollingFrame`, { Name = `Body`; BackgroundTransparency = 1; BorderSizePixel = 0; Position = UDim2.fromOffset(0, 86); Size = UDim2.new(1, 0, 1, -86 - COMPOSER);
-		CanvasSize = UDim2.new(); AutomaticCanvasSize = Enum.AutomaticSize.Y; ScrollBarThickness = 3; ScrollBarImageColor3 = C.IronDim }, Page)
-	new(`UIListLayout`, { SortOrder = Enum.SortOrder.LayoutOrder; Padding = UDim.new(0, 3) }, Body)
-	new(`UIPadding`, { PaddingLeft = UDim.new(0, 12); PaddingRight = UDim.new(0, 12); PaddingTop = UDim.new(0, 8); PaddingBottom = UDim.new(0, 10) }, Body)
-	-- the composer: sealed (answers are the quick replies above it)
-	local Comp = new(`Frame`, { Name = `Composer`; BackgroundTransparency = 1; AnchorPoint = Vector2.new(0, 1); Position = UDim2.new(0, 0, 1, 0); Size = UDim2.new(1, 0, 0, COMPOSER) }, Page)
-	local Pill = new(`TextButton`, { Name = `Pill`; Text = ``; AutoButtonColor = false; BackgroundColor3 = Color3.fromRGB(28, 24, 32); BackgroundTransparency = 0.1; BorderSizePixel = 0;
-		Position = UDim2.fromOffset(14, 6); Size = UDim2.new(1, -62, 0, 34) }, Comp)
-	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Pill)
-	new(`UIStroke`, { Color = C.IronDim; Thickness = 1; Transparency = 0.45 }, Pill)
-	local Hint = Local.Label(Pill, `Quick replies only`, 14, { RichText = false; TextColor3 = HINT; Position = UDim2.fromOffset(14, 0); Size = UDim2.new(1, -20, 1, 0) })
-	local Send = new(`Frame`, { Name = `Send`; BackgroundColor3 = C.Crimson; BackgroundTransparency = 0.55; BorderSizePixel = 0; AnchorPoint = Vector2.new(1, 0);
-		Position = UDim2.new(1, -14, 0, 8); Size = UDim2.fromOffset(30, 30) }, Comp)
-	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Send)
-	Local.Label(Send, `\u{2191}`, 17, { Font = Fonts.Title; RichText = false; TextColor3 = Color3.fromRGB(255, 230, 230); TextTransparency = 0.4; TextXAlignment = Enum.TextXAlignment.Center; Size = UDim2.fromScale(1, 1) })
-	Pill.Activated:Connect(function()
-		Hint.Text = `You can't write to them: answer with a quick reply`
-		if not Calm then
-			local X = Pill.Position
-			tween(Pill, 0.06, { Position = X + UDim2.fromOffset(5, 0) }).Completed:Connect(function() tween(Pill, 0.12, { Position = X }, Enum.EasingStyle.Elastic) end)
-		end
-		task.delay(2.5, function() if Hint.Parent then Hint.Text = `Quick replies only` end end)
-	end)
-
-	local List = Local.TextsFetch(From)
-	if Token ~= TextsView.Token then return end
-	if not List then
-		Local.Label(Body, `<i>No signal. Try again in a moment.</i>`, 14, { TextColor3 = HINT; TextXAlignment = Enum.TextXAlignment.Center; Size = UDim2.new(1, 0, 0, 60) })
-		return
-	end
-	State.Unread = Local.TextsUnreadExcept(List, From)
-	Local.Badges()
-	local _, ByFrom = Local.TextsThreads(List)
-	local Th = ByFrom[From]
-	if not Th then Local.Texts(-1) return end
-	local Now = Local.TextsToday()
-	-- in the phone's own units (the handset is scaled to the screen, so AbsoluteSize would be too small)
-	local Width = W - 22 - 24
-	local N = 0
-	local LastDay = nil
-	local Bubbles = {}
-	local Actionable = nil
-	local LastAnswered = 0
-	for I, T in Th.Texts do if T.State == `Accepted` or T.State == `Declined` then LastAnswered = I end end
-	for I, T in Th.Texts do
-		-- a day stamp whenever the day changes
-		local Rel, Time = Local.TextsStamp(T, Now)
-		-- one stamp per day as the player reads it (Today / Yesterday can span two school nights)
-		local DayKey = if Rel == `Today` or Rel == `Yesterday` then Rel else `{T.Day}|{Rel}`
-		if DayKey ~= LastDay then
-			LastDay = DayKey
-			N += 1
-			Local.Label(Body, `<b>{string.upper(Rel)}</b>  {Time}`, 11, { TextColor3 = HINT; TextXAlignment = Enum.TextXAlignment.Center; Size = UDim2.new(1, 0, 0, 24); LayoutOrder = N })
-		end
-		local Next = Th.Texts[I + 1]
-		local Answered = T.State == `Accepted` or T.State == `Declined`
-		local NextRel = if Next then (Local.TextsStamp(Next, Now)) else nil
-		local RunEnds = Answered or not Next or (if NextRel == `Today` or NextRel == `Yesterday` then NextRel else `{Next.Day}|{NextRel}`) ~= DayKey
-		N += 1
-		-- a tail on the last bubble of a run (not when a card hangs under it)
-		local _, B, Scale = Local.TextBubble(Body, N, `In`, Local.TextsClean(T), RunEnds and not (T.Dare or T.Invite), Width)
-		table.insert(Bubbles, { B = B; Scale = Scale })
-		if T.Dare or T.Invite then
-			N += 1
-			Local.TextCard(Body, N, T, Width)
-			if T.CanAccept then Actionable = T end
-		end
-		if Answered then
-			local Reply = if T.Invite then (if T.State == `Accepted` then `On my way.` else `Maybe later.`)
-				else (if T.State == `Accepted` then `I'm in.` else `Not today.`)
-			N += 1
-			local _, OB, OScale = Local.TextBubble(Body, N, `Out`, Reply, true, Width)
-			table.insert(Bubbles, { B = OB; Scale = OScale })
-			if I == LastAnswered then
-				-- the receipt under your last answer
-				N += 1
-				Local.Label(Body, `Sealed`, 11, { RichText = false; TextColor3 = HINT; TextXAlignment = Enum.TextXAlignment.Right; Size = UDim2.new(1, -4, 0, 14); LayoutOrder = N })
-			end
-		end
-	end
-	-- the last few bubbles pop in (a new text: just that one)
-	if not Calm then
-		local From0 = if Fresh then #Bubbles else math.max(1, #Bubbles - 5)
-		for K = From0, #Bubbles do
-			local Bb = Bubbles[K]
-			Bb.Scale.Scale = 0.86
-			Bb.B.BackgroundTransparency = 1
-			task.delay((K - From0) * 0.04, function()
-				if not Bb.B.Parent then return end
-				TweenService:Create(Bb.Scale, TweenInfo.new(0.32, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
-				tween(Bb.B, 0.18, { BackgroundTransparency = 0 })
-			end)
-		end
-	end
-	-- quick replies, over the composer
-	if Actionable then
-		local T = Actionable
-		local Chips = new(`Frame`, { Name = `Replies`; BackgroundTransparency = 1; AnchorPoint = Vector2.new(0, 1); Position = UDim2.new(0, 0, 1, -COMPOSER); Size = UDim2.new(1, 0, 0, 40) }, Page)
-		Body.Size = UDim2.new(1, 0, 1, -86 - COMPOSER - 40)
-		new(`UIListLayout`, { FillDirection = Enum.FillDirection.Horizontal; HorizontalAlignment = Enum.HorizontalAlignment.Right; Padding = UDim.new(0, 8); SortOrder = Enum.SortOrder.LayoutOrder }, Chips)
-		new(`UIPadding`, { PaddingRight = UDim.new(0, 14); PaddingTop = UDim.new(0, 4) }, Chips)
-		local Busy = false
-		local function Answer(Action: string, Text: string)
-			if Busy then return end
-			Busy = true
-			pcall(Kit.PlaySound, `Tick`, 0.6, 1.5)
-			Chips.Visible = false
-			Body.Size = UDim2.new(1, 0, 1, -86 - COMPOSER)
-			-- your answer flies up out of the composer
-			N += 1
-			local _, OB, OScale = Local.TextBubble(Body, N, `Out`, Text, true, Width)
-			local Status = Local.Label(Body, `Sending\u{2026}`, 11, { RichText = false; TextColor3 = HINT; TextXAlignment = Enum.TextXAlignment.Right; Size = UDim2.new(1, -4, 0, 14); LayoutOrder = N + 1 })
-			if not Calm then
-				OScale.Scale = 0.6
-				OB.Position = UDim2.new(1, 0, 0, 28)
-				TweenService:Create(OScale, TweenInfo.new(0.34, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
-				tween(OB, 0.3, { Position = UDim2.new(1, 0, 0, 0) })
-			end
-			task.defer(function() Body.CanvasPosition = Vector2.new(0, math.max(0, Body.AbsoluteCanvasSize.Y - Body.AbsoluteSize.Y)) end)
-			-- (audit) the text's id, with the index as the fallback for old texts
-			local Ok, Msg = Local.Call(`TextAction`, T.Index, Action, T.Id)
-			if Ok then
-				Status.Text = `Sealed`
-				task.delay(0.9, function() if Token == TextsView.Token then Local.TextsThread(From) end end)
+-- after a gender change: each worn piece the new gender can't wear becomes its counterpart, else that gender's default
+function Appearance.DressForGender(look, staff)
+	for _, spec in ipairs({ { "Uniform", Appearance.Uniforms }, { "Bottoms", Appearance.BottomsList } }) do
+		local key, list = spec[1], spec[2]
+		local cur = list[look[key]]
+		if cur and not Appearance.ClothingAllows(cur, look, staff) then
+			local cp = Appearance.Counterparts[cur.Id]
+			local ci = cp and Appearance.IndexOf(list, cp)
+			if ci and Appearance.ClothingAllows(list[ci], look, staff) then
+				look[key] = ci
 			else
-				-- not delivered: a red mark beside the bubble and the reason, and the replies come back
-				Status.Text = `Not sent: {tostring(Msg or `try again`)}`
-				Status.TextColor3 = C.Danger
-				local Bang = new(`Frame`, { BackgroundColor3 = C.Danger; BorderSizePixel = 0; AnchorPoint = Vector2.new(1, 0.5); Position = UDim2.new(0, -6, 0.5, 0); Size = UDim2.fromOffset(18, 18) }, OB)
-				new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Bang)
-				Local.Label(Bang, `!`, 13, { Font = Fonts.Title; RichText = false; TextXAlignment = Enum.TextXAlignment.Center; Size = UDim2.fromScale(1, 1) })
-				Busy = false
-				Chips.Visible = true
-				Body.Size = UDim2.new(1, 0, 1, -86 - COMPOSER - 40)
-				-- the replies take their room back: keep the reason in view
-				task.defer(function()
-					RunService.Heartbeat:Wait()
-					if Body.Parent then Body.CanvasPosition = Vector2.new(0, math.max(0, Body.AbsoluteCanvasSize.Y - Body.AbsoluteSize.Y)) end
+				local d = Appearance.GenderDefaults[Appearance.BodyGender(look.Body)]
+				look[key] = (d and d[key] and Appearance.IndexOf(list, d[key])) or Appearance.Defaults[key]
+			end
+		end
+	end
+	return look
+end
+-- a random piece an NPC of this look's gender could wear (never the admin kit)
+function Appearance.RandomPiece(list, look)
+	local pool = {}
+	for i, e in ipairs(list) do
+		if not e.Admin and not e.Earned and Appearance.ClothingAllows(e, look, false) then -- (2.34) Earned: path rewards
+			table.insert(pool, i)
+		end
+	end
+	return #pool > 0 and pool[math.random(1, #pool)] or 1
+end
+
+-- Race versions of the school uniform (clothing session; image ids). Worn in uniform mode only, keyed by
+-- the player's Race: Shirts[i] replaces Uniforms[i]; Pants replaces the official trousers (Bottoms 1).
+-- Other tops / bottoms, avatar mode and transformation outfits are unchanged.
+Appearance.RaceUniforms = {
+	Ghoul = {
+		Shirts = {
+			[1] = "rbxassetid://75282115673322", -- Red Vest
+			[2] = "rbxassetid://71851326048367", -- Red Shirt
+			[3] = "rbxassetid://70473044441154", -- Black Vest
+			[4] = "rbxassetid://117242546409771", -- Black Shirt
+		},
+		Pants = "rbxassetid://115495222925569",
+	},
+}
+
+-- Bottoms (data key Bottoms). 1 = the official uniform trousers.
+Appearance.BottomsList = {
+	{ Id = "uniform-trousers", Name = "Uniform Trousers", Template = Appearance.Pants.Template },
+	{ Id = "dark-indigo-jeans", Name = "Dark Indigo Jeans", Template = "rbxassetid://96000307451923" },
+	{ Id = "black-jeans", Name = "Black Jeans", Template = "rbxassetid://128318648376057" },
+	{ Id = "ripped-jeans", Name = "Ripped Jeans", Template = "rbxassetid://134667912165119" },
+	{ Id = "charcoal-slacks", Name = "Charcoal Slacks", Template = "rbxassetid://79890092859210" },
+	{ Id = "khaki-trousers", Name = "Khaki Trousers", Template = "rbxassetid://92165415452345" },
+	{ Id = "khaki-shorts", Name = "Khaki Shorts", Template = "rbxassetid://121776222862081" },
+	{ Id = "pleated-tartan-skirt", Name = "Pleated Tartan Skirt", Template = "rbxassetid://85690129195432" },
+	-- civilian (clothing session)
+	{ Id = "cargo-boots", Name = "Cargo + Boots", Template = "rbxassetid://100719470659873" },
+	{ Id = "black-jeans-boots", Name = "Black Jeans + Boots", Template = "rbxassetid://111155560587590" },
+	{ Id = "striped-joggers", Name = "Striped Joggers", Template = "rbxassetid://139412137380678" },
+	{ Id = "pinstripes-riding-boots", Name = "Pinstripes + Riding Boots", Template = "rbxassetid://121154909777878" },
+	{ Id = "black-skirt-fishnets", Name = "Black Skirt + Fishnets", Template = "rbxassetid://102014097640002" },
+	-- female outfits (2026-11-03): each pairs with the matching top above
+	{ Id = "sailor-skirt", Name = "Sailor Skirt", Template = "rbxassetid://98354523964224", Female = true },
+	{ Id = "chapel-skirt", Name = "Chapel Skirt + Tights", Template = "rbxassetid://129354749586720", Female = true },
+	{ Id = "pinafore-skirt", Name = "Pinafore Skirt", Template = "rbxassetid://132305935792023", Female = true },
+	{ Id = "cheer-skirt", Name = "Cheer Skirt", Template = "rbxassetid://87915264137976", Female = true },
+	{ Id = "lolita-skirt", Name = "Lolita Skirt + Stockings", Template = "rbxassetid://138883555295233", Female = true },
+	{ Id = "plaid-mini", Name = "Plaid Mini + Boots", Template = "rbxassetid://120585760495378", Female = true },
+	{ Id = "gala-skirt", Name = "Gala Gown Skirt", Template = "rbxassetid://76676349618674", Female = true },
+	-- (1.71) gender kits: schoolgirl skirts (school bottoms), civilian per gender, admin kit (staff only)
+	{ Id = "charcoal-pleats", Name = "Charcoal Pleats + Knee Socks", Template = "rbxassetid://136595680779871", Gender = "Female" },
+	{ Id = "vigil-tartan", Name = "Vigil Tartan + Tights", Template = "rbxassetid://84047896244219", Gender = "Female" },
+	{ Id = "court-pleats", Name = "Crimson Court Pleats", Template = "rbxassetid://84119009662768", Gender = "Female" },
+	{ Id = "navy-pleats", Name = "Navy Pleats + Ivory Socks", Template = "rbxassetid://129239234992657", Gender = "Female" },
+	{ Id = "forest-tartan", Name = "Forest Tartan Skirt", Template = "rbxassetid://102514205734979", Gender = "Female" },
+	{ Id = "black-pleats-sheer", Name = "Black Pleats + Sheer Tights", Template = "rbxassetid://127991026166918", Gender = "Female" },
+	{ Id = "pinafore-stockings", Name = "Pinafore Skirt + Stockings", Template = "rbxassetid://104520896399978", Gender = "Female" },
+	{ Id = "delinquent-long-skirt", Name = "Long Delinquent Skirt + Boots", Template = "rbxassetid://87839260098528", Gender = "Female" },
+	{ Id = "crimson-tartan-tights", Name = "Crimson Tartan + Tights", Template = "rbxassetid://112945599527000", Gender = "Female" },
+	{ Id = "chapel-midi", Name = "Chapel Midi Skirt + Tights", Template = "rbxassetid://138828254289244", Gender = "Female" },
+	{ Id = "corset-flares", Name = "Corset-Belt Flares + Platforms", Template = "rbxassetid://139341866928255", Gender = "Female" },
+	{ Id = "velvet-midi", Name = "Velvet Midi Skirt + Boots", Template = "rbxassetid://82409096922756", Gender = "Female" },
+	{ Id = "leather-mini", Name = "Leather Mini + Ripped Tights", Template = "rbxassetid://100960345453121", Gender = "Female" },
+	{ Id = "wide-leg-trousers", Name = "Wide-Leg Trousers", Template = "rbxassetid://126689427325893", Gender = "Female" },
+	{ Id = "skater-thighhighs", Name = "Tartan Skater + Thigh-Highs", Template = "rbxassetid://110698266380980", Gender = "Female" },
+	{ Id = "lace-maxi", Name = "Lace-Hem Maxi Skirt", Template = "rbxassetid://131837355491642", Gender = "Female" },
+	{ Id = "trousers-chelsea", Name = "Wool Trousers + Chelsea Boots", Template = "rbxassetid://100320593351698", Gender = "Male" },
+	{ Id = "dark-jeans-hightops", Name = "Dark Jeans + High-Tops", Template = "rbxassetid://124413043338399", Gender = "Male" },
+	{ Id = "track-pants", Name = "Track Pants + Sneakers", Template = "rbxassetid://89194891614405", Gender = "Male" },
+	{ Id = "chinos-loafers", Name = "Chinos + Loafers", Template = "rbxassetid://80222373485230", Gender = "Male" },
+	{ Id = "ripped-black-boots", Name = "Ripped Black Jeans + Boots", Template = "rbxassetid://76269817376489", Gender = "Male" },
+	{ Id = "cargo-shorts", Name = "Cargo Shorts + Socks", Template = "rbxassetid://129085384688877", Gender = "Male" },
+	{ Id = "adm-night-warden-tails", Name = "Night Warden Coat Tails + Jackboots", Template = "rbxassetid://103839093067497", Gender = "Unisex", Admin = true },
+	{ Id = "adm-hakama", Name = "Hakama + Tabi Boots", Template = "rbxassetid://124563755573649", Gender = "Unisex", Admin = true },
+	{ Id = "adm-exorcist-trousers", Name = "Exorcist Trousers + Buckle Boots", Template = "rbxassetid://82910616585092", Gender = "Unisex", Admin = true },
+	{ Id = "adm-reaper-hem", Name = "Tattered Cloak Hem + Wraps", Template = "rbxassetid://87142530546870", Gender = "Unisex", Admin = true },
+	{ Id = "adm-captain-riding", Name = "Captain's Coat Tails + Riding Boots", Template = "rbxassetid://118424182345884", Gender = "Unisex", Admin = true },
+	{ Id = "adm-shadow-cargo", Name = "Shadow Ops Cargo + Boots", Template = "rbxassetid://112823749606573", Gender = "Unisex", Admin = true },
+	{ Id = "adm-midnight-tails", Name = "Tailcoat Tails + Riding Boots", Template = "rbxassetid://100394738477575", Gender = "Unisex", Admin = true },
+	{ Id = "adm-duelist-breeches", Name = "Duelist Breeches + Thigh Boots", Template = "rbxassetid://91315441485958", Gender = "Unisex", Admin = true },
+}
+-- Eyes: 1 = Roblox face, then the painted shapes from UI.EyeArt.
+Appearance.Eyes = { { Name = "Roblox face" } }
+for _, s in ipairs(EyeArt.Shapes) do
+	table.insert(Appearance.Eyes, { Name = s.Name, Shape = s.Id })
+end
+Appearance.EyeSets = { "Male", "Female" }
+Appearance.Brows = { { Name = "None" } }
+for _, b in ipairs(EyeArt.BrowStyles) do
+	table.insert(Appearance.Brows, { Name = b.Name, Style = b.Id })
+end
+Appearance.Mouths = { { Name = "None" } }
+for _, mo in ipairs(EyeArt.MouthStyles) do
+	table.insert(Appearance.Mouths, { Name = mo.Name, Style = mo.Id })
+end
+-- Race mouths (2026-11-04): only offered to, and only drawn on, that race (Race = a Lineage race id)
+for _, mo in ipairs(EyeArt.RaceMouths or {}) do
+	table.insert(Appearance.Mouths, { Name = mo.Name, Style = mo.Id, Race = mo.Race })
+end
+-- Face marks (2026-11-04): 1 = none, then EyeArt.Marks. A mark with a Race only shows on that race.
+Appearance.Marks = { { Name = "None" } }
+for _, mk in ipairs(EyeArt.Marks or {}) do
+	table.insert(Appearance.Marks, { Name = mk.Name, Style = mk.Id, Race = mk.Race })
+end
+-- Bloodline eyes (look field RaceEyes): your race's eyes without transforming. Priests get a gold iris.
+Appearance.PriestIris = rgb(236, 196, 90)
+function Appearance.RaceAllows(entry, race)
+	return entry ~= nil and (entry.Race == nil or entry.Race == race)
+end
+Appearance.EyeColors = {
+	{ Id = "umber", Name = "Umber", Color = rgb(150, 98, 62) },
+	{ Id = "hazel", Name = "Hazel", Color = rgb(150, 128, 70) },
+	{ Id = "moss", Name = "Moss", Color = rgb(96, 136, 88) },
+	{ Id = "ice", Name = "Ice", Color = rgb(124, 172, 214) },
+	{ Id = "ash", Name = "Ash", Color = rgb(150, 156, 166) },
+	{ Id = "violet", Name = "Violet", Color = rgb(128, 96, 166) },
+	{ Id = "amber", Name = "Amber", Color = rgb(214, 156, 52) },
+}
+Appearance.NightbornIris = rgb(214, 34, 50)
+-- Transformation forms (character attribute Transformation, set by gameplay) -> eye art + iris tint
+Appearance.Forms = {
+	-- Stage2: the second transformation (character attribute TransformationStage = 2): jet-black sclera
+	-- Veins: vein layer colour, mixed 50/50 with the character's real skin colour so veins look natural on any skin
+	-- Outfit: worn while transformed (clothing session). Priest has an outfit only (eyes unchanged).
+	-- UniformOutfit: the school top as it transforms, used when you transform wearing a school top; it has no
+	--   Pants, so your own uniform bottoms (trousers or skirt) stay on. FemaleOutfit: the full form on the
+	--   Female body when you aren't in uniform. Appearance.FormOutfit picks between the three.
+	Vampire = { Key = "vampire", Tint = rgb(220, 34, 52), Stage2 = "vampire2", Veins = rgb(158, 10, 31),
+		Outfit = { Shirt = "rbxassetid://84954175291601", Pants = "rbxassetid://91761624304127" },
+		UniformOutfit = { Shirt = "rbxassetid://99568494756631" },
+		FemaleOutfit = { Shirt = "rbxassetid://82036496118569", Pants = "rbxassetid://72055367907700" } },
+	Wolf = { Key = "wolf", Tint = rgb(236, 158, 40),
+		Outfit = { Shirt = "rbxassetid://77909860828071", Pants = "rbxassetid://129868849941474" },
+		UniformOutfit = { Shirt = "rbxassetid://81458513797704" } },
+	Ghoul = { Key = "ghoul", Tint = rgb(214, 220, 204), Stage2 = "ghoul2", Veins = rgb(77, 13, 82),
+		Outfit = { Shirt = "rbxassetid://122227122884831", Pants = "rbxassetid://80804276005159" },
+		UniformOutfit = { Shirt = "rbxassetid://121170882178993" } },
+	Wraith = { Key = "wraith", Tint = rgb(158, 220, 255),
+		Outfit = { Shirt = "rbxassetid://92404956711982", Pants = "rbxassetid://121029292372649" },
+		UniformOutfit = { Shirt = "rbxassetid://81276347693530" },
+		FemaleOutfit = { Shirt = "rbxassetid://94381120030964", Pants = "rbxassetid://129307806934839" } },
+	Priest = { Outfit = { Shirt = "rbxassetid://130811233234323", Pants = "rbxassetid://73003093663735" } },
+}
+-- Which transformation outfit to wear: the transformed school top over your own bottoms when you're in
+-- uniform (a school top, not your Roblox outfit), else the Female full form on the Female body, else the
+-- form's full outfit. Returns { Shirt, Pants? } or nil; a nil Pants means "keep your own bottoms".
+function Appearance.FormOutfit(form, data)
+	if not form then
+		return nil
+	end
+	if data and not data.UseAvatar and form.UniformOutfit and Appearance.IsSchoolTop(data.Uniform) then
+		return form.UniformOutfit
+	end
+	local body = data and Appearance.Bodies[data.Body]
+	if body and body.Gender == "Female" and form.FemaleOutfit then
+		return form.FemaleOutfit
+	end
+	return form.Outfit
+end
+-- race names map onto the same forms (Races/Bloodlines design): Transformation = "Werewolf" works like "Wolf"
+Appearance.Forms.Werewolf = Appearance.Forms.Wolf
+-- The form a character is in, so every race wears its own transformation outfit (and eyes / mouth):
+--   Transformation = a form name ("Vampire", "Wolf"/"Werewolf", "Ghoul", "Wraith", "Priest") -> that form
+--   Transformation = a race or sub-race id ("Bloodmoon", "RoyalVamp"...) -> that race's form
+--   Transformation = true / "Race" / anything else -> the player's rolled race (Player attribute Race)
+-- Humans have no transformation form. Returns the Forms entry, or nil when not transformed.
+function Appearance.FormOf(character)
+	if not character then
+		return nil
+	end
+	local t = character:GetAttribute("Transformation")
+	if t == nil or t == false or t == "" then
+		return nil
+	end
+	if type(t) == "string" and Appearance.Forms[t] then
+		return Appearance.Forms[t]
+	end
+	local okL, Lineage = pcall(require, ReplicatedStorage:FindFirstChild("Lineage"))
+	if type(t) == "string" and okL and type(Lineage) == "table" and Lineage.SubById and Lineage.SubById[t] then
+		return Appearance.Forms[Lineage.SubById[t].Race.Id]
+	end
+	local player = Players:GetPlayerFromCharacter(character)
+	local race = (player and player:GetAttribute("Race")) or character:GetAttribute("Race")
+	return race and Appearance.Forms[race] or nil
+end
+-- Transformation variants (2026-11-04): every everyday piece has its own transformed version per form
+-- (UI.FormVariants, keyed by the template id the piece is worn with). nil = no variant for that piece / form.
+local FormVariantsOk, FormVariants = pcall(function()
+	return require(script.Parent:FindFirstChild("FormVariants"))
+end)
+local FORM_NAME = {}
+for name, f in pairs(Appearance.Forms) do
+	if name ~= "Werewolf" then
+		FORM_NAME[f] = name
+	end
+end
+function Appearance.FormVariant(form, template)
+	if not (FormVariantsOk and type(FormVariants) == "table" and form and type(template) == "string") then
+		return nil
+	end
+	local id = string.match(template, "%d+")
+	local v = id and FormVariants[id]
+	return v and v[FORM_NAME[form] or ""] or nil
+end
+-- Body shape (2026-11-01): Standard or Female. Saved as an id.
+-- Female (2026-11-10): five R6 CharacterMeshes (art/characters/female, group meshes). The torso keeps the old hourglass,
+--   smoothed, with softer shoulders, a soft bust and hips; arms and legs taper on the outer side. Every mesh stays inside its
+--   R6 part box, and the UVs index Roblox's R6 clothing atlas, so Shirts / Pants / skin colour work as on a standard body.
+--   v2 (2026-11-10, owner): the legs meet like standard R6 (near-square inner edges) and a fuller bust.
+--   (Before: TorsoMesh 48112070, Roblox's 2011 Girl torso, on standard limbs.)
+Appearance.Bodies = {
+	{ Id = "standard", Name = "Standard", Gender = "Male", Build = "Average", Step = 0 },
+	{ Id = "female", Name = "Female", Gender = "Female", Build = "Average", Step = 0, TorsoMesh = 107771235632658,
+		Meshes = { Torso = 107771235632658, RightArm = 107796907683955, LeftArm = 80112520115136,
+			RightLeg = 111053847385892, LeftLeg = 87713593848889 } },
+	-- body types (2026-11-10, art/characters/bodies/nh_body_types.py): earned only through training or the admin desk
+	-- (Appearance.SetBuild). Variants of the standard body (male) and the Female body v2 (female).
+	{ Id = "lean", Name = "Lean", Gender = "Male", Build = "Skinny", Step = 1, TorsoMesh = 80599151440718,
+		Meshes = { Torso = 80599151440718, RightArm = 81698806804529, LeftArm = 115700541325418, RightLeg = 102705588776863, LeftLeg = 133298074138660 } },
+	{ Id = "athletic", Name = "Athletic", Gender = "Male", Build = "Conditioned", Step = 1, TorsoMesh = 131786090664045,
+		Meshes = { Torso = 131786090664045, RightArm = 132414762109621, LeftArm = 131417759794420, RightLeg = 120173701032082, LeftLeg = 112936256263410 } },
+	{ Id = "muscular", Name = "Muscular", Gender = "Male", Build = "Conditioned", Step = 2, TorsoMesh = 77979027494394,
+		Meshes = { Torso = 77979027494394, RightArm = 105787224767323, LeftArm = 132341858324942, RightLeg = 123508178938073, LeftLeg = 129971107420398 } },
+	{ Id = "stocky", Name = "Stocky", Gender = "Male", Build = "Heavy", Step = 1, TorsoMesh = 97395586937787,
+		Meshes = { Torso = 97395586937787, RightArm = 116817128513775, LeftArm = 99902053204043, RightLeg = 127221281464817, LeftLeg = 110235894677793 } },
+	{ Id = "heavy", Name = "Heavy", Gender = "Male", Build = "Heavy", Step = 2, TorsoMesh = 113481648066946,
+		Meshes = { Torso = 113481648066946, RightArm = 94026483479391, LeftArm = 117091958168532, RightLeg = 111602082267684, LeftLeg = 76843775024418 } },
+	{ Id = "petite", Name = "Petite", Gender = "Female", Build = "Skinny", Step = 1, TorsoMesh = 98160542260548,
+		Meshes = { Torso = 98160542260548, RightArm = 137735929863681, LeftArm = 140464173247332, RightLeg = 93849031916640, LeftLeg = 81128309715298 } },
+	{ Id = "toned", Name = "Toned", Gender = "Female", Build = "Conditioned", Step = 1, TorsoMesh = 109650324114415,
+		Meshes = { Torso = 109650324114415, RightArm = 108348625488717, LeftArm = 101966670697769, RightLeg = 91312785820514, LeftLeg = 119700145873929 } },
+	{ Id = "curvy", Name = "Curvy", Gender = "Female", Build = "Heavy", Step = 1, TorsoMesh = 90093573152527,
+		Meshes = { Torso = 90093573152527, RightArm = 97161066706362, LeftArm = 81650822243600, RightLeg = 79830470075363, LeftLeg = 116410414866469 } },
+	{ Id = "strong", Name = "Strong", Gender = "Female", Build = "Conditioned", Step = 2, TorsoMesh = 97081723455688,
+		Meshes = { Torso = 97081723455688, RightArm = 81789560903270, LeftArm = 121910719117018, RightLeg = 135474747479085, LeftLeg = 86478900952963 } },
+	{ Id = "plus", Name = "Plus", Gender = "Female", Build = "Heavy", Step = 2, TorsoMesh = 77671978644176,
+		Meshes = { Torso = 77671978644176, RightArm = 131507995802644, LeftArm = 132653815234283, RightLeg = 120966302767125, LeftLeg = 138612636058559 } },
+}
+-- Body gender (2026-11-10 body types): every body carries Gender. Use these instead of `Body == 2`, so the female
+-- body types (Petite, Toned, Curvy, Strong, Plus) count as female everywhere. `body` is an index or an id.
+function Appearance.BodyGender(body)
+	local b = type(body) == "number" and Appearance.Bodies[body] or nil
+	if not b and type(body) == "string" then
+		for _, x in ipairs(Appearance.Bodies) do
+			if x.Id == body then b = x end
+		end
+	end
+	return (b and b.Gender) or "Male"
+end
+function Appearance.IsFemale(look)
+	return type(look) == "table" and Appearance.BodyGender(look.Body) == "Female"
+end
+-- Builds (2026-11-10, owner: body types come "Only through training (or the admin menu)"): every body has a Build
+-- ("Average", "Skinny", "Conditioned" or "Heavy") and a Step (0 for Average, then 1, 2). The creator only picks the
+-- gender; Appearance.SetBuild (server) is how training and the admin desk change the build.
+Appearance.Builds = { "Average", "Skinny", "Conditioned", "Heavy" }
+function Appearance.BodyBuild(body)
+	local b = type(body) == "number" and Appearance.Bodies[body] or nil
+	if not b and type(body) == "string" then
+		for _, x in ipairs(Appearance.Bodies) do
+			if x.Id == body then b = x end
+		end
+	end
+	return (b and b.Build) or "Average", (b and b.Step) or 0
+end
+-- the body index for a gender, build and step: the highest step that exists up to `step`, else that gender's base body
+function Appearance.BodyFor(gender, build, step)
+	gender = gender == "Female" and "Female" or "Male"
+	local best, bestStep, base = nil, -1, nil
+	for i, b in ipairs(Appearance.Bodies) do
+		if (b.Gender or "Male") == gender then
+			if (b.Build or "Average") == "Average" and not base then base = i end
+			if b.Build == build and (b.Step or 0) <= (step or 0) and (b.Step or 0) > bestStep then
+				best, bestStep = i, b.Step or 0
+			end
+		end
+	end
+	return best or base
+end
+-- (training 1.81) per-area bodies. Training changes one area at a time (Appearance.SetArea, server): the torso, both
+-- arms or both legs can each come from a different build path and step. A look's Areas is "torso|arms|legs" (body
+-- ids); "" means Body for all three, so every save from before training keeps its body. Each area is shown in the
+-- look's gender (a gender switch in the creator keeps each area's build and step).
+Appearance.AreaNames = { "Torso", "Arms", "Legs" }
+Appearance.AreaParts = { Torso = { "Torso" }, Arms = { "RightArm", "LeftArm" }, Legs = { "RightLeg", "LeftLeg" } }
+local function bodyIndexById(id)
+	for i, b in ipairs(Appearance.Bodies) do
+		if b.Id == id then
+			return i
+		end
+	end
+	return nil
+end
+function Appearance.ParseAreas(s)
+	if type(s) ~= "string" or s == "" then
+		return nil
+	end
+	local ids = string.split(s, "|")
+	if #ids ~= 3 then
+		return nil
+	end
+	local out = {}
+	for i, name in ipairs(Appearance.AreaNames) do
+		local idx = bodyIndexById(ids[i])
+		if not idx then
+			return nil
+		end
+		out[name] = idx
+	end
+	return out
+end
+function Appearance.EncodeAreas(areas)
+	local ids = {}
+	for i, name in ipairs(Appearance.AreaNames) do
+		local b = Appearance.Bodies[areas[name]] or Appearance.Bodies[1]
+		ids[i] = b.Id
+	end
+	return table.concat(ids, "|")
+end
+-- { Torso = index, Arms = index, Legs = index } for a sanitized look, each in the look's gender
+function Appearance.AreaBodies(look)
+	look = type(look) == "table" and look or {}
+	local body = type(look.Body) == "number" and look.Body or 1
+	local gender = Appearance.BodyGender(body)
+	local parsed = Appearance.ParseAreas(look.Areas)
+	local out = {}
+	for _, name in ipairs(Appearance.AreaNames) do
+		local idx = parsed and parsed[name] or body
+		if Appearance.BodyGender(idx) ~= gender then
+			local build, step = Appearance.BodyBuild(idx)
+			idx = Appearance.BodyFor(gender, build, step) or body
+		end
+		out[name] = idx
+	end
+	return out
+end
+-- Capes (2026-11-01): bought in the Spin Shop (Config.Shop Kind = "Cape"), owned in Identity.Capes, worn here.
+-- Models: ReplicatedStorage.NHCapes.<Model> (rigged; Controllers.Character.CapeSway moves the bones).
+Appearance.Capes = {
+	{ Id = "none", Name = "None" },
+	{ Id = "CapeVamp", Name = "Vamp Cape", Model = "Vamp Cape" },
+	{ Id = "CapeRogue", Name = "Rogue Cape", Model = "Rogue Cape" },
+	{ Id = "CapeFur", Name = "Fur Cape", Model = "Fur Cape" },
+	-- the admin kit's 3D capes (staff-only: Wardrobe + server look check + WearCape; never sold). docs/Admin-Capes.md
+	{ Id = "CapeWardenMantle", Name = "Night Warden's Mantle", Model = "Night Warden's Mantle", Admin = true },
+	{ Id = "CapeReaperShroud", Name = "Reaper's Tattered Shroud", Model = "Reaper's Tattered Shroud", Admin = true },
+	{ Id = "CapeDuelist", Name = "Duelist's Shoulder Cape", Model = "Duelist's Shoulder Cape", Admin = true },
+	{ Id = "CapeCaptain", Name = "Council Captain's Greatcape", Model = "Council Captain's Greatcape", Short = "Captain's Greatcape", Admin = true },
+	{ Id = "CapeMidnight", Name = "Midnight Lord's High-Collar Cape", Model = "Midnight Lord's High-Collar Cape", Short = "Midnight Lord's Cape", Admin = true },
+}
+Appearance.Defaults = {
+	LookStyle = "Scholar", Skin = 2, SkinHex = "", Hair = 1, HairColor = 1, HairHex = "", HairId = 0, TintHair = false,
+	Uniform = 19, Eyes = 2, EyeSet = 1, EyeColor = 1, EyeHex = "", Brows = 2, BrowHex = "", Mouth = 2, Lips = false, Bottoms = 9,
+	UseAvatar = false, Created = false, Body = 1, Cape = 1, Marks = 1, RaceEyes = false,
+	Acc = "", -- NHAccessories (1.79): the worn 3D accessories (Config.Accessories ids, one per slot, comma list)
+	Areas = "", -- (training 1.81) per-area bodies "torso|arms|legs" (body ids); "" = Body for all three. Server-only (SetArea).
+}
+
+local LookIds = {}
+for _, l in ipairs(Appearance.Looks) do
+	LookIds[l.Id] = true
+end
+
+local function hexOf(v)
+	if type(v) ~= "string" then
+		return ""
+	end
+	local h = string.match(v, "^%s*#?(%x%x%x%x%x%x)%s*$")
+	return h and string.upper(h) or ""
+end
+Appearance.Hex = hexOf
+
+--------------------------------------------------------------------------
+-- Saved looks use stable ids, not list positions (so reordering / inserting options never changes
+-- anyone's look). In memory (Sanitize output, the Wardrobe) the fields are list indices, marked _Idx.
+-- On the wire and in the profile they are ids:  Eyes = "doe", Uniform = "red-vest", Skin = "#D8B492"...
+-- Id per list: Skin = "#"..hex of the colour, Hair / EyeSet = the name, Eyes / Brows / Mouth = the
+-- EyeArt id ("face" / "none" for slot 1), HairColor / Uniform / Bottoms / EyeColor = the entry's Id.
+-- New options: give them a NEW unique Id; never reuse or change an existing one.
+--------------------------------------------------------------------------
+-- FROZEN: the list order before ids (2026-10-30). A bare number in a save is read through this table,
+-- never through the live lists, so old saves stay right forever. NEVER EDIT OR REORDER THIS TABLE.
+local LEGACY_ORDER = {
+	Skin = { "#ECCEB2", "#D8B492", "#B48462", "#845C3E", "#5E402E", "#F6E4D8" },
+	Hair = { "Neat Crop", "Fringe", "Long", "Bun", "None" },
+	HairColor = { "black", "raven", "chestnut", "ash-blonde", "silver", "blood-red" },
+	Uniform = { "red-vest", "red-shirt", "black-vest", "black-shirt", "navy-vest", "forest-vest", "charcoal-vest", "vigil-vest", "crimson-court-vest", "navy-polo", "forest-polo", "ivory-polo", "crimson-polo", "delinquent-polo", "black-blazer", "charcoal-cardigan", "varsity-jacket", "gym-pe-shirt", "blood-moon-hoodie", "leather-jacket", "open-flannel", "victorian-waistcoat", "hussar-coat", "the-hollow-band-tee" },
+	Bottoms = { "uniform-trousers", "dark-indigo-jeans", "black-jeans", "ripped-jeans", "charcoal-slacks", "khaki-trousers", "khaki-shorts", "pleated-tartan-skirt", "cargo-boots", "black-jeans-boots", "striped-joggers", "pinstripes-riding-boots", "black-skirt-fishnets" },
+	Eyes = { "face", "sharp", "hooded", "fierce", "doe", "sleepless", "cat", "gentle", "calm" },
+	EyeSet = { "Male", "Female" },
+	EyeColor = { "umber", "hazel", "moss", "ice", "ash", "violet", "amber" },
+	Brows = { "none", "straight", "arched", "angled", "soft", "thick", "thin", "furrowed", "raised", "bold", "heavy", "bushy", "sleek", "flatthick", "higharch", "sharparch", "worried", "angry", "feathered", "wisp", "tapered", "rounded" },
+	Mouth = { "none", "neutral", "smile", "flat", "smirk", "hint", "grin", "small", "ooh", "open", "talk", "laugh", "shout", "pout", "frown", "scowl", "sulk", "grimace", "cat", "fang", "shark" },
+}
+
+local LIST_KEYS = { "Skin", "Hair", "HairColor", "Uniform", "Bottoms", "Eyes", "EyeSet", "EyeColor", "Brows", "Mouth", "Marks" }
+local function listOf(key)
+	return ({
+		Skin = Appearance.Skins, Hair = Appearance.HairStyles, HairColor = Appearance.HairColors,
+		Uniform = Appearance.Uniforms, Bottoms = Appearance.BottomsList, Eyes = Appearance.Eyes,
+		EyeSet = Appearance.EyeSets, EyeColor = Appearance.EyeColors, Brows = Appearance.Brows, Mouth = Appearance.Mouths,
+		Marks = Appearance.Marks,
+	})[key]
+end
+local function entryId(key, e)
+	if key == "Skin" then
+		return "#" .. e:ToHex():upper()
+	elseif key == "Hair" or key == "EyeSet" then
+		return e
+	elseif key == "Eyes" then
+		return e.Shape or "face"
+	elseif key == "Brows" or key == "Mouth" or key == "Marks" then
+		return e.Style or "none"
+	end
+	return e.Id
+end
+local IndexById = {} -- [key][id] = current index
+for _, key in ipairs(LIST_KEYS) do
+	IndexById[key] = {}
+	for i, e in ipairs(listOf(key)) do
+		IndexById[key][entryId(key, e)] = i
+	end
+end
+function Appearance.IdOf(key, index)
+	local e = listOf(key)[index]
+	return e ~= nil and entryId(key, e) or nil
+end
+-- a saved / sent value -> current list index (nil = unknown, keep the default)
+local function resolveIndex(key, v, isIndex)
+	if type(v) == "string" then
+		return IndexById[key][v]
+	elseif type(v) == "number" and v == math.floor(v) then
+		if isIndex then -- already a current index (an in-memory look)
+			return (v >= 1 and v <= #listOf(key)) and v or nil
+		end
+		local id = LEGACY_ORDER[key] and LEGACY_ORDER[key][v] -- an old save: a position in the frozen order (new keys have none)
+		return id and IndexById[key][id] or nil
+	end
+	return nil
+end
+-- in-memory look (indices) -> stored / sent form (ids). Drops the _Idx marker.
+function Appearance.Encode(look)
+	local out = table.clone(Appearance.Sanitize(look))
+	out._Idx = nil
+	for _, key in ipairs(LIST_KEYS) do
+		out[key] = Appearance.IdOf(key, out[key])
+	end
+	out.Body = (Appearance.Bodies[out.Body] or Appearance.Bodies[1]).Id
+	out.Cape = (Appearance.Capes[out.Cape] or Appearance.Capes[1]).Id
+	out.V = 2
+	return out
+end
+-- does a stored look still use old list positions? (one-time migration)
+function Appearance.IsLegacy(stored)
+	if type(stored) ~= "table" or stored._Idx then
+		return false
+	end
+	for _, key in ipairs(LIST_KEYS) do
+		if type(stored[key]) == "number" then
+			return true
+		end
+	end
+	return false
+end
+
+function Appearance.Sanitize(data)
+	local out = table.clone(Appearance.Defaults)
+	if type(data) ~= "table" then
+		out.HairId = Appearance.BoxHairFallback.Fringe[1] -- (2.1.3) no look yet: a real hair, not bald
+		out._Idx = true
+		return out
+	end
+	if LookIds[data.LookStyle] then
+		out.LookStyle = data.LookStyle
+	end
+	local isIndex = data._Idx == true
+	local function index(key, _list)
+		local i = resolveIndex(key, data[key], isIndex)
+		if i then
+			out[key] = i
+		end
+	end
+	index("Skin", Appearance.Skins)
+	index("Hair", Appearance.HairStyles)
+	index("HairColor", Appearance.HairColors)
+	index("Uniform", Appearance.Uniforms)
+	index("Bottoms", Appearance.BottomsList)
+	index("Eyes", Appearance.Eyes)
+	index("EyeSet", Appearance.EyeSets)
+	index("EyeColor", Appearance.EyeColors)
+	index("Brows", Appearance.Brows)
+	index("Mouth", Appearance.Mouths)
+	index("Marks", Appearance.Marks)
+	for i, c in ipairs(Appearance.Capes) do
+		if data.Cape == c.Id or (isIndex and data.Cape == i) then
+			out.Cape = i
+		end
+	end
+	for i, b in ipairs(Appearance.Bodies) do
+		if data.Body == b.Id or (isIndex and data.Body == i) then
+			out.Body = i
+		end
+	end
+	do -- 3D accessories: a comma list of known ids, one per slot, in slot order (equal looks compare equal)
+		local cfgF = ReplicatedStorage:FindFirstChild("Config")
+		local mod = cfgF and cfgF:FindFirstChild("Accessories")
+		local okA, AccCfg = pcall(require, mod)
+		if mod and okA and type(data.Acc) == "string" then
+			out.Acc = AccCfg.Join(AccCfg.Parse(data.Acc))
+		end
+	end
+	out.SkinHex, out.HairHex, out.EyeHex = hexOf(data.SkinHex), hexOf(data.HairHex), hexOf(data.EyeHex)
+	out.BrowHex = hexOf(data.BrowHex)
+	local id = tonumber(data.HairId)
+	if id and id == math.floor(id) and id > 0 and id < 1e15 then
+		out.HairId = id
+	end
+	if type(data.Areas) == "string" and Appearance.ParseAreas(data.Areas) then
+		out.Areas = data.Areas -- (training 1.81) per-area bodies
+	end
+	for _, k in ipairs({ "UseAvatar", "Created", "TintHair", "Lips", "RaceEyes" }) do
+		if type(data[k]) == "boolean" then
+			out[k] = data[k]
+		end
+	end
+	-- (2.1.3) the box hairstyles are gone: a look that wore one (or never set a hair) gets the matching real cut instead
+	-- of going bald. A chosen "None" stays bald; "use my Roblox outfit" keeps the avatar's own hair. The save itself
+	-- isn't touched here; the next save writes Hair = "None" with the real HairId.
+	if out.HairId == 0 and not out.UseAvatar then
+		local was = data.Hair
+		if type(was) == "number" then
+			was = if isIndex then Appearance.HairStyles[was] else LEGACY_ORDER.Hair[was]
+		end
+		if was ~= "None" then
+			local pair = Appearance.BoxHairFallback[was] or Appearance.BoxHairFallback.Fringe
+			out.HairId = if Appearance.IsFemale(out) then pair[2] else pair[1]
+		end
+	end
+	out._Idx = true -- list fields are current indices (Appearance.Encode gives the saved form)
+	return out
+end
+
+-- Resolved colours for a sanitized look
+function Appearance.SkinColor(d)
+	return d.SkinHex ~= "" and Color3.fromHex(d.SkinHex) or Appearance.Skins[d.Skin]
+end
+function Appearance.HairColor(d)
+	return d.HairHex ~= "" and Color3.fromHex(d.HairHex) or Appearance.HairColors[d.HairColor].Color
+end
+function Appearance.BrowColor(d)
+	if d.BrowHex ~= "" then
+		return Color3.fromHex(d.BrowHex)
+	end
+	return Appearance.HairColor(d):Lerp(Color3.new(0, 0, 0), 0.18) -- brows read a little darker than hair
+end
+function Appearance.EyeColor(d)
+	return d.EyeHex ~= "" and Color3.fromHex(d.EyeHex) or Appearance.EyeColors[d.EyeColor].Color
+end
+
+--------------------------------------------------------------------------
+-- building the look (server)
+--------------------------------------------------------------------------
+local LOOK = "NHLook"
+
+-- Hair is fitted for the player's head (the game's characters are 0.9 scale: StarterCharacter's head is 1.8 x 0.9 x
+-- 0.9). The NPC rig's head is full size (2 x 1 x 1), so hair fitted for a player sat too small on every NPC: the
+-- head showed through it and fringes sat on the face (owner report, 2026-11-03). Both kinds of hair now scale by
+-- the head they go on (players: x1, unchanged).
+local FIT_HEAD = 0.9
+local function headScale(head)
+	local k = head and head:IsA("BasePart") and head.Size.Y / FIT_HEAD or 1
+	return if math.abs(k - 1) < 0.01 then 1 else k
+end
+Appearance.HeadScale = headScale
+
+local function part(parent, name, size, color, cf, attachTo, shape, material)
+	local p = Instance.new("Part")
+	p.Name = name
+	p.Size = size
+	p.Color = color
+	p.Material = material or Enum.Material.SmoothPlastic
+	p.Shape = shape or Enum.PartType.Block
+	p.TopSurface, p.BottomSurface = Enum.SurfaceType.Smooth, Enum.SurfaceType.Smooth
+	p.CanCollide, p.CanQuery, p.CanTouch, p.Massless = false, false, false, true
+	p.CastShadow = false
+	p.CFrame = attachTo.CFrame * cf
+	local w = Instance.new("WeldConstraint")
+	w.Part0, w.Part1 = attachTo, p
+	w.Parent = p
+	p.Parent = parent
+	return p
+end
+
+-- (2.1.3) the part-built box hairstyles that were made here are gone (owner); see Appearance.BoxHairFallback
+
+-- Stash / restore the Roblox avatar outfit (kept in ServerStorage while the uniform is worn).
+local Stashes = setmetatable({}, { __mode = "k" }) -- [character] = { folder, colors }
+local HairStashes = setmetatable({}, { __mode = "k" }) -- [character] = folder (avatar hair hidden by a catalog hair id)
+local AVATAR_CLASSES = { "Accessory", "Shirt", "Pants", "ShirtGraphic" }
+local BODY_PROPS = { "HeadColor3", "TorsoColor3", "LeftArmColor3", "RightArmColor3", "LeftLegColor3", "RightLegColor3" }
+local NH_HAIR = "NHHair"
+
+local function stashRoot(name)
+	local storage = game:GetService("ServerStorage")
+	local root = storage:FindFirstChild(name) or Instance.new("Folder")
+	root.Name = name
+	root.Parent = storage
+	return root
+end
+
+local function bodyColors(character)
+	local bc = character:FindFirstChildOfClass("BodyColors")
+	if not bc then
+		bc = Instance.new("BodyColors")
+		local function c(n)
+			local p = character:FindFirstChild(n)
+			return p and p:IsA("BasePart") and p.Color or rgb(163, 162, 165)
+		end
+		bc.HeadColor3, bc.TorsoColor3 = c("Head"), c("Torso")
+		bc.LeftArmColor3, bc.RightArmColor3 = c("Left Arm"), c("Right Arm")
+		bc.LeftLegColor3, bc.RightLegColor3 = c("Left Leg"), c("Right Leg")
+		bc.Parent = character
+	end
+	return bc
+end
+
+local function stash(character, clothesOnly)
+	if Stashes[character] then
+		return
+	end
+	local folder = Instance.new("Folder")
+	folder.Name = character.Name
+	folder.Parent = stashRoot("NHAppearanceStash")
+	local bc = bodyColors(character)
+	local colors = {}
+	for _, n in ipairs(BODY_PROPS) do
+		colors[n] = bc[n]
+	end
+	for _, d in ipairs(character:GetChildren()) do
+		for _, cls in ipairs(AVATAR_CLASSES) do
+			if d:IsA(cls) and d.Name ~= NH_HAIR and not (clothesOnly and cls == "Accessory") then
+				d.Parent = folder
+			end
+		end
+	end
+	Stashes[character] = { folder = folder, colors = colors, clothesOnly = clothesOnly == true }
+	character.Destroying:Connect(function()
+		folder:Destroy()
+	end)
+end
+
+local UNIFORM_SHIRT, UNIFORM_PANTS = "NHUniformShirt", "NHUniformPants"
+local function clearUniform(character)
+	for _, n in ipairs({ UNIFORM_SHIRT, UNIFORM_PANTS }) do
+		local c = character:FindFirstChild(n)
+		if c then
+			c:Destroy()
+		end
+	end
+end
+
+local function restore(character)
+	clearUniform(character)
+	local s = Stashes[character]
+	if not s then
+		return
+	end
+	Stashes[character] = nil
+	for _, d in ipairs(s.folder:GetChildren()) do
+		d.Parent = character
+	end
+	s.folder:Destroy()
+	local bc = bodyColors(character)
+	for n, v in pairs(s.colors) do
+		bc[n] = v
+	end
+end
+
+-- Catalog hair (any Roblox hair accessory id). Loaded once per id through a HumanoidDescription.
+local HairCache = {} -- [id] = Accessory template | false (known not a hair)
+local HairNames = {}
+local HairCount = 0
+local HairFailedAt = {} -- [id] = os.clock() of a temporary failure (lookup / load), retried after HAIR_RETRY
+local HAIR_RETRY, HAIR_CACHE_MAX = 30, 300
+-- (audit) a server-wide budget for uncached catalog lookups (the 1.5 s per-player gap still let a full server make
+-- ~20 web calls a second), and failures are pruned once past their retry window (the table only ever grew)
+local HAIR_BUDGET, HAIR_WINDOW = 40, 60
+local HairLookups, HairWindowAt, HairPruneAt = 0, 0, 0
+local function hairFailed(id)
+	local now = os.clock()
+	HairFailedAt[id] = now
+	if now >= HairPruneAt then
+		HairPruneAt = now + HAIR_RETRY
+		for k, t in pairs(HairFailedAt) do
+			if now - t >= HAIR_RETRY then
+				HairFailedAt[k] = nil
+			end
+		end
+	end
+end
+local function cacheHair(id, v, name)
+	if HairCount >= HAIR_CACHE_MAX then -- bounded: start over rather than grow forever
+		table.clear(HairCache)
+		table.clear(HairNames)
+		HairCount = 0
+	end
+	HairCount += 1
+	HairCache[id], HairNames[id] = v, name
+end
+function Appearance.IsHairCached(id)
+	return HairCache[id] ~= nil
+end
+function Appearance.IsKnownNotHair(id) -- true only when the id is definitely not a hair accessory
+	return HairCache[id] == false
+end
+function Appearance.LoadHair(id)
+	if HairCache[id] ~= nil then
+		return HairCache[id], HairNames[id]
+	end
+	-- the owner's hairs (ReplicatedStorage.NHHairCatalog, AssetId attribute): straight from the place
+	local Cat = ReplicatedStorage:FindFirstChild("NHHairCatalog")
+	local Local = Cat and Cat:FindFirstChild("Hair_" .. tostring(id))
+	if Local and Local:IsA("Accessory") then
+		local acc = Local:Clone()
+		acc.Name = NH_HAIR
+		-- the catalog hairs are cut for a full-size head: bring them in a little (owner, 2026-11-01)
+		local HAIR_FIT = 0.88
+		local h = acc:FindFirstChild("Handle")
+		if h then
+			if h:IsA("MeshPart") then
+				h.Size = h.Size * HAIR_FIT
+			else
+				local sm = h:FindFirstChildOfClass("SpecialMesh")
+				if sm then sm.Scale = sm.Scale * HAIR_FIT end
+				h.Size = h.Size * HAIR_FIT
+			end
+			for _, at in ipairs(h:GetChildren()) do
+				if at:IsA("Attachment") and not at:IsA("Bone") then at.Position = at.Position * HAIR_FIT end
+			end
+			-- rigged hairs: bones don't follow Size, so bring their offsets in too (keeps the skin on the mesh)
+			for _, bn in ipairs(h:GetDescendants()) do
+				if bn:IsA("Bone") then bn.Position = bn.Position * HAIR_FIT end
+			end
+		end
+		for _, jn in ipairs(acc:GetDescendants()) do
+			if jn:IsA("JointInstance") or jn:IsA("WeldConstraint") then
+				jn:Destroy()
+			end
+		end
+		cacheHair(id, acc, Local:GetAttribute("DisplayName") or Local.Name)
+		return HairCache[id], HairNames[id]
+	end
+	if HairFailedAt[id] and os.clock() - HairFailedAt[id] < HAIR_RETRY then
+		return false, "Couldn't load that hair right now (try again soon)"
+	end
+	local now = os.clock()
+	if now - HairWindowAt >= HAIR_WINDOW then
+		HairWindowAt, HairLookups = now, 0
+	end
+	if HairLookups >= HAIR_BUDGET then
+		return false, "The catalog is busy right now (try again in a minute)" -- (audit) budget spent: not cached as a failure
+	end
+	HairLookups += 1
+	local MPS = game:GetService("MarketplaceService")
+	local ok, info = pcall(MPS.GetProductInfo, MPS, id, Enum.InfoType.Asset)
+	if not ok or type(info) ~= "table" then
+		hairFailed(id)
+		return false, "Couldn't look up that id (try again)"
+	end
+	if HairCache[id] ~= nil then -- another caller finished while we waited
+		return HairCache[id], HairNames[id]
+	end
+	if info.AssetTypeId ~= Enum.AssetType.HairAccessory.Value then
+		cacheHair(id, false, "That id isn't a hair accessory")
+		return false, HairNames[id]
+	end
+	local desc = Instance.new("HumanoidDescription")
+	desc.HairAccessory = tostring(id)
+	local ok2, model = pcall(Players.CreateHumanoidModelFromDescription, Players, desc, Enum.HumanoidRigType.R6)
+	local acc = ok2 and model and model:FindFirstChildOfClass("Accessory")
+	if acc then
+		acc = acc:Clone()
+		acc.Name = NH_HAIR
+		-- drop the weld to the throwaway model: cloned it points at nothing, and on the client
+		-- AddAccessory keeps it instead of making its own, so the hair fell out of the world
+		for _, j in ipairs(acc:GetDescendants()) do
+			if j:IsA("JointInstance") or j:IsA("WeldConstraint") then
+				j:Destroy()
+			end
+		end
+		cacheHair(id, acc, info.Name)
+		HairFailedAt[id] = nil
+	else
+		if model then
+			model:Destroy()
+		end
+		hairFailed(id) -- (audit) pruned like the lookup failures
+		return false, "That hair couldn't be loaded"
+	end
+	if model then
+		model:Destroy()
+	end
+	return acc, info.Name
+end
+
+local function hideAvatarHair(character)
+	local hidden = HairStashes[character]
+	for _, d in ipairs(character:GetChildren()) do
+		if d:IsA("Accessory") and d.Name ~= NH_HAIR and d.AccessoryType == Enum.AccessoryType.Hair then
+			if not hidden then
+				hidden = Instance.new("Folder")
+				hidden.Name = character.Name
+				hidden.Parent = stashRoot("NHHairStash")
+				HairStashes[character] = hidden
+				character.Destroying:Connect(function()
+					hidden:Destroy()
 				end)
 			end
-		end
-		local Yes = if T.Invite then `On my way.` else `I'm in.`
-		local No = if T.Invite then `Maybe later.` else `Not today.`
-		Kit.Button({ text = No; textSize = 14; Size = UDim2.fromOffset(112, 32); LayoutOrder = 1; Parent = Chips; onClick = function() Answer(`Decline`, No) end })
-		Kit.Button({ text = Yes; style = `gold`; textSize = 14; Size = UDim2.fromOffset(112, 32); LayoutOrder = 2; Parent = Chips; onClick = function() Answer(`Accept`, Yes) end })
-		-- the replies rise into place
-		if not Calm then
-			Chips.Position = UDim2.new(0, 0, 1, -COMPOSER + 16)
-			tween(Chips, 0.3, { Position = UDim2.new(0, 0, 1, -COMPOSER) }, Enum.EasingStyle.Back)
+			d.Parent = hidden
 		end
 	end
-	-- open at the newest message
-	task.defer(function()
-		RunService.Heartbeat:Wait()
-		if Body.Parent then Body.CanvasPosition = Vector2.new(0, math.max(0, Body.AbsoluteCanvasSize.Y - Body.AbsoluteSize.Y)) end
-	end)
-	Local.TextsWatch()
 end
 
--- Classmates
-function Local.Contacts()
-	local Body = Local.Page(`Classmates`)
-	local List = Local.Call(`Contacts`) or {}
-	Local.Line(Body, `<i>Everyone in the building. You only see names you've learned. Introduce yourself (G) to swap names.</i>`, 15, { TextColor3 = HINT })
-	if #List == 0 then Local.Line(Body, `<i>Nobody else is here right now.</i>`, 15, { TextColor3 = HINT }) end
-	for _, P in List do
-		local Row = Local.Card(Body, 108)
-		Local.Label(Row, P.Name, 16, { Font = Fonts.Title; TextColor3 = if P.Known then C.Text else C.TextDim; Position = UDim2.fromOffset(12, 4); Size = UDim2.new(1, -24, 0, 20) })
-		Local.Label(Row, string.upper(`{P.Race}  \u{00B7}  LV {P.Level}`), 12, { Font = Fonts.Title; TextColor3 = RACE_COLOR[P.Family] or C.Text; Position = UDim2.fromOffset(12, 24); Size = UDim2.new(1, -24, 0, 16) })
-		local Note = Local.Label(Row, ``, 11, { TextColor3 = C.Gold; TextXAlignment = Enum.TextXAlignment.Right; AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, -12, 0, 6); Size = UDim2.fromOffset(150, 14) })
-		Kit.Button({ text = `Send {YEN}`; textSize = 13; Size = UDim2.fromOffset(130, 28); Position = UDim2.fromOffset(12, 40); Parent = Row;
-			onClick = function() Pending = { UserId = P.UserId; Name = P.Name } Order = 0 local Keep = Pending Local.Wallet() Pending = Keep end })
-		Kit.Button({ text = `Invite to group`; style = `gold`; textSize = 13; Size = UDim2.fromOffset(150, 28); AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, -12, 0, 40); Parent = Row;
-			onClick = function()
-				local F = ReplicatedStorage:FindFirstChild(`NHParty`)
-				local R = F and F:FindFirstChild(`Invite`)
-				if R then local Ok, A, Msg = pcall(R.InvokeServer, R, P.UserId) Note.Text = (Ok and Msg) or `` end
-			end })
-		-- (homes) invite them to your dorm room (they get a text with a Visit button)
-		Kit.Button({ text = `Invite to my room`; textSize = 13; Size = UDim2.fromOffset(170, 28); Position = UDim2.fromOffset(12, 74); Parent = Row;
-			onClick = function()
-				local F = ReplicatedStorage:FindFirstChild(`NHHomes`)
-				local R = F and F:FindFirstChild(`Invite`)
-				if R then local Ok, A, Msg = pcall(R.InvokeServer, R, P.UserId) Note.Text = (Ok and tostring(Msg or ``)) or `` end
-			end })
+local function showAvatarHair(character)
+	local hidden = HairStashes[character]
+	if not hidden then
+		return
 	end
+	HairStashes[character] = nil
+	for _, d in ipairs(hidden:GetChildren()) do
+		d.Parent = character
+	end
+	hidden:Destroy()
 end
 
--- Style: pick a wallpaper, or use your own image / decal ID
-function Local.Style()
-	local Body = Local.Page(`Style`)
-	Local.Line(Body, `WALLPAPER`, 14, { Font = Fonts.Title; TextColor3 = SECTION })
-	Order += 1
-	local Grid = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 0); AutomaticSize = Enum.AutomaticSize.Y; LayoutOrder = Order }, Body)
-	new(`UIGridLayout`, { CellSize = UDim2.fromOffset(92, 150); CellPadding = UDim2.fromOffset(8, 8); SortOrder = Enum.SortOrder.LayoutOrder; HorizontalAlignment = Enum.HorizontalAlignment.Center }, Grid)
-	local Current = (State.Wallpaper and State.Wallpaper.Preset) or WALLPAPERS[1].Id
-	local Using = State.Wallpaper and State.Wallpaper.Image
-	local function save(Preset: string?, Image: number?)
-		local Wp = { Preset = Preset or Current; Image = Image }
-		State.Wallpaper = Wp
-		Local.ApplyWallpaper()
-		task.spawn(Local.Call, `SaveWallpaper`, Wp)
+-- drop a character's stashed avatar clothes / hair (ServerStorage) when it's gone
+local function forgetCharacter(character)
+	local st = Stashes[character]
+	if st then
+		Stashes[character] = nil
+		st.folder:Destroy()
 	end
-	for I, Wp in WALLPAPERS do
-		local Cell = new(`TextButton`, { Text = ``; AutoButtonColor = false; BackgroundTransparency = 1; LayoutOrder = I }, Grid)
-		local Swatch = new(`Frame`, { BackgroundColor3 = Color3.new(1, 1, 1); BorderSizePixel = 0; Size = UDim2.new(1, 0, 0, 124) }, Cell)
-		new(`UICorner`, { CornerRadius = UDim.new(0, 14) }, Swatch)
-		new(`UIGradient`, { Rotation = 90; Color = ColorSequence.new(Wp.Top, Wp.Bottom) }, Swatch)
-		new(`ImageLabel`, { BackgroundTransparency = 1; Image = Img.CrestFlat; ImageTransparency = 0.85; ScaleType = Enum.ScaleType.Fit; AnchorPoint = Vector2.new(0.5, 0.5);
-			Position = UDim2.fromScale(0.5, 0.6); Size = UDim2.fromScale(0.7, 0.5) }, Swatch)
-		local On = Wp.Id == Current and not Using
-		new(`UIStroke`, { Color = if On then C.Gold else Color3.new(1, 1, 1); Thickness = if On then 2 else 1; Transparency = if On then 0 else 0.8 }, Swatch)
-		Local.Label(Cell, Wp.Name, 12, { TextXAlignment = Enum.TextXAlignment.Center; Position = UDim2.fromOffset(0, 128); Size = UDim2.new(1, 0, 0, 16) })
-		Cell.Activated:Connect(function() Current = Wp.Id Using = nil save(Wp.Id, nil) Local.Style() end)
+	local hidden = HairStashes[character]
+	if hidden then
+		HairStashes[character] = nil
+		hidden:Destroy()
 	end
-	Local.Line(Body, `YOUR OWN IMAGE`, 14, { Font = Fonts.Title; TextColor3 = SECTION })
-	Local.Line(Body, `<i>Paste a Roblox image or decal ID. Only you see your wallpaper.</i>`, 15, { TextColor3 = HINT })
-	Order += 1
-	local _, InputApi = Kit.SearchBar({ placeholder = if Using then tostring(Using) else `Image ID`; Size = UDim2.new(1, 0, 0, 38); LayoutOrder = Order; Parent = Body })
-	Order += 1
-	local Row = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 38); LayoutOrder = Order }, Body)
-	Kit.Button({ text = `Use image`; style = `gold`; textSize = 14; Size = UDim2.new(0.5, -4, 1, 0); Parent = Row;
-		onClick = function()
-			local N = Local.Digits(InputApi:Get())
-			if N then Using = N save(Current, N) Local.Style() end
-		end })
-	Kit.Button({ text = `Clear image`; textSize = 14; Size = UDim2.new(0.5, -4, 1, 0); Position = UDim2.new(0.5, 4, 0, 0); Parent = Row;
-		onClick = function() Using = nil save(Current, nil) Local.Style() end })
+end
+Appearance.ForgetCharacter = forgetCharacter
+
+local function wearCatalogHair(character, data)
+	local acc = Appearance.LoadHair(data.HairId)
+	if not acc then
+		return false
+	end
+	local hum = character:FindFirstChildOfClass("Humanoid")
+	if not hum then
+		return false
+	end
+	local a = acc:Clone()
+	-- fitted for a player's head: scale it to this head (players: x1)
+	local k = headScale(character:FindFirstChild("Head"))
+	local ah = a:FindFirstChild("Handle")
+	if k ~= 1 and ah and ah:IsA("BasePart") then
+		local sm = ah:FindFirstChildOfClass("SpecialMesh")
+		if sm then sm.Scale = sm.Scale * k end
+		ah.Size = ah.Size * k
+		for _, at in ipairs(ah:GetDescendants()) do
+			if at:IsA("Attachment") then at.Position = at.Position * k end -- (Bones too: rigged hairs keep their skin on the mesh)
+		end
+	end
+	if data.TintHair then
+		local c = Appearance.HairColor(data)
+		local handle = a:FindFirstChild("Handle")
+		local mesh = handle and handle:FindFirstChildOfClass("SpecialMesh")
+		if mesh then
+			mesh.VertexColor = Vector3.new(c.R, c.G, c.B) * 1.6
+		elseif handle and handle:IsA("MeshPart") then
+			handle.TextureID = ""
+			handle.Color = c
+		end
+	end
+	local wantSize = ah and ah.Size
+	hum:AddAccessory(a)
+	-- AddAccessory sometimes rescales a new accessory by the model's scale (it did on the ScaleTo(0.9) NPC rig, not on
+	-- the player's character), which shrank every NPC's hair a second time so it sat small and high (owner,
+	-- 2026-11-03). Put it back to the size we meant and weld it again from the attachments (below).
+	if wantSize and ah and ah.Parent and math.abs(ah.Size.X - wantSize.X) > 0.005 then
+		local f = wantSize.X / ah.Size.X
+		local sm = ah:FindFirstChildOfClass("SpecialMesh")
+		if sm then sm.Scale = sm.Scale * f end
+		ah.Size = wantSize
+		for _, at in ipairs(ah:GetDescendants()) do
+			if at:IsA("Attachment") then at.Position = at.Position * f end
+		end
+		local w = ah:FindFirstChild("AccessoryWeld")
+		if w then w:Destroy() end
+	end
+	-- On the client (menu plinths, previews) AddAccessory doesn't weld: do it ourselves from the
+	-- matching attachments, or the hair falls out of the world.
+	local handle = a:FindFirstChild("Handle")
+	if handle and handle:IsA("BasePart") and not handle:FindFirstChild("AccessoryWeld") then
+		for _, hAtt in ipairs(handle:GetChildren()) do
+			if hAtt:IsA("Attachment") then
+				local cAtt
+				for _, p in ipairs(character:GetChildren()) do
+					local c = p:IsA("BasePart") and p:FindFirstChild(hAtt.Name)
+					if c and c:IsA("Attachment") then
+						cAtt = c
+						break
+					end
+				end
+				if cAtt then
+					handle.CFrame = cAtt.WorldCFrame * hAtt.CFrame:Inverse()
+					local w = Instance.new("Weld")
+					w.Name = "AccessoryWeld"
+					w.Part0, w.Part1 = handle, cAtt.Parent
+					w.C0, w.C1 = hAtt.CFrame, cAtt.CFrame
+					w.Parent = handle
+					break
+				end
+			end
+		end
+	end
+	return true
 end
 
----| open / close |---
+-- Painted eyes: hide the avatar's own face decals (remembered, restored for "Roblox face").
+local EYES_IRIS, EYES_MAIN, FACE_BROWS, FACE_MOUTH, EYES_VEINS = "NHEyesIris", "NHEyesMain", "NHBrows", "NHMouth", "NHEyesVeins"
+local FACE_MARKS, FACE_FORM = "NHMarks", "NHFormFace" -- under the eyes: race marks, the transformed face
+function Appearance.EyeLayers(data, character)
+	local form = character and Appearance.FormOf(character)
+	local style = Appearance.Eyes[data.Eyes]
+	local shape = style and style.Shape
+	if not shape and form and form.Key then
+		shape = EyeArt.Shapes[1].Id -- transformations still show on a "Roblox face" student
+	end
+	if not shape then
+		return nil
+	end
+	local key = form and form.Key or "base"
+	if form and form.Stage2 and character:GetAttribute("TransformationStage") == 2 then
+		key = form.Stage2
+	end
+	local raceTint = nil
+	if not form and data.RaceEyes and character then -- bloodline eyes: your race's eyes, untransformed
+		local race = Appearance.RaceOf(character)
+		local rf = race and Appearance.Forms[race]
+		if rf and rf.Key then
+			key, raceTint = rf.Key, rf.Tint
+		elseif race == "Priest" then
+			raceTint = Appearance.PriestIris
+		end
+	end
+	local art = EyeArt.Get(shape, data.EyeSet == 2 and "f" or "m", key)
+	if not art then
+		return nil
+	end
+	local tint = (form and form.Tint) or raceTint or (data.LookStyle == "Nightborn" and Appearance.NightbornIris) or Appearance.EyeColor(data)
+	return art, tint, shape, form and form.Key
+end
 
----| the Phone tool |---
+-- The painted face. On a classic head (a cylinder) it is drawn as SurfaceGuis on FACE_STRIPS thin
+-- invisible strips that wrap the head front, each showing its slice of the 1024px art (ImageRect), so it
+-- sits on the face like a decal but renders at full resolution at every graphics level (Decals get
+-- down-sampled on lower quality settings). Other heads (MeshPart / dynamic heads) fall back to Decals.
+-- CharacterPreview turns the strips back into Decals for its ViewportFrame.
+local FACE_PLATE, FACE_GUI = "NHFacePlate", "NHFace"
+local FACE_COVER = 0.84   -- face art width, as a fraction of the visible head width
+local FACE_STRIPS = 12    -- strips around the curve (each spans ~8 degrees: no visible facets)
+local FACE_LIFT = 0.006   -- studs off the skin (just enough to never z-fight)
+-- (1.99.0) the seams (the owner's "little slit" across the eyes and brows): Roblox draws a SurfaceGui's canvas onto its
+-- part with a light, half-see-through fringe along the canvas's edges. The strips' canvases ended exactly where the art
+-- did, so every joint between two strips drew that fringe across the eyes and brows (12 thin vertical lines; 1024 / 12 =
+-- 85.33 also put the joints between texels). Now each strip draws its own slice of the art on whole texels, one canvas
+-- pixel per texel, inside a canvas FACE_MARGIN texels wider on each side; the margins hold no art, so the fringe falls
+-- on nothing, and the neighbouring strips overlap there. The art itself reaches FACE_OVERLAP texel into the next strip's
+-- slice, so no hairline can open between the two.
+local FACE_MARGIN = 3     -- transparent texels round each strip's art (its canvas edges)
+local FACE_OVERLAP = 1    -- texels of art each strip shares with the next one (on its right)
+-- (1.99.0) faces over see-through accessories: Roblox draws the face's SurfaceGuis and alpha-blended pieces (the
+-- mourning and fascinator veils, the lace mask) in one transparent pass sorted by each part's distance, so a thin strip
+-- on the skin sorted nearer than a veil in front of it and the face was drawn over the veil. Each strip is now as deep as
+-- the head (its Front face, where the face is drawn, stays on the skin), so it sorts from the head's middle and anything
+-- worn in front of the face is drawn after it. Opaque pieces were never affected (the depth test hides the face).
+local FACE_VERSION = 7    -- strips built by this layout (an older face plate is rebuilt)
 
-function Local.Tool(): Tool?
-	for _, Holder in { Player.Character, Player:FindFirstChildOfClass(`Backpack`) } do
-		for _, T in (Holder and Holder:GetChildren()) or {} do
-			if T:IsA(`Tool`) and T:GetAttribute(`NHPhone`) then return T end
+local function classicHead(head)
+	local mesh = head:FindFirstChildOfClass("SpecialMesh")
+	if mesh and mesh.MeshType == Enum.MeshType.Head then
+		-- The classic head mesh's visible radius is 0.48 of its scaled width (not 0.5), so the art is sized
+		-- to that visible width and the strips sit on the real skin. Measured on 0.9-scale R6 heads.
+		local d = math.min(head.Size.Y, head.Size.Z)
+		local R = d * mesh.Scale.X * 0.48
+		return d * mesh.Scale.Y * 0.96, R -- visible width basis, cylinder radius
+	end
+	return nil
+end
+
+local function faceShell(head)
+	local base, R = classicHead(head)
+	if not base then
+		return nil
+	end
+	local W = base * FACE_COVER
+	local shell = head:FindFirstChild(FACE_PLATE)
+	if shell and shell:IsA("Folder") and math.abs((shell:GetAttribute("W") or 0) - W) < 1e-4
+		and math.abs((shell:GetAttribute("R") or 0) - R) < 1e-4 and shell:GetAttribute("V") == FACE_VERSION then
+		return shell
+	end
+	if shell then
+		shell:Destroy()
+	end
+	shell = Instance.new("Folder")
+	shell.Name = FACE_PLATE
+	shell:SetAttribute("W", W)
+	shell:SetAttribute("R", R)
+	shell:SetAttribute("V", FACE_VERSION)
+	local r = R + FACE_LIFT
+	local span = W / R
+	local function angleAt(u) -- the angle round the head of texel column u (image left, u = 0, on the head's +X side)
+		return (u / 1024 - 0.5) * span
+	end
+	for i = 0, FACE_STRIPS - 1 do
+		-- the art this strip draws (its slice on whole texels, a texel into the next one) and its canvas (the art plus
+		-- a transparent margin each side)
+		local u0, u1 = math.round(i * 1024 / FACE_STRIPS), math.round((i + 1) * 1024 / FACE_STRIPS)
+		if i < FACE_STRIPS - 1 then u1 += FACE_OVERLAP end
+		local c0, c1 = u0 - FACE_MARGIN, u1 + FACE_MARGIN
+		local a0, a1 = angleAt(c0), angleAt(c1)
+		local half = (a1 - a0) / 2
+		local chord = 2 * r * math.sin(half)
+		local inset = r * math.cos(half) -- each flat strip is a chord: its edges touch radius r, never poke past it
+		local perStud = (c1 - c0) / chord -- canvas pixels (texels) per stud
+		local depth = 2 * R -- the head's depth: the strip's centre sits at the head's middle (see FACE_VERSION)
+		local p = Instance.new("Part")
+		p.Name = "Strip" .. (i + 1)
+		p.Transparency = 1
+		p.CanCollide, p.CanQuery, p.CanTouch, p.Massless = false, false, false, true
+		p.CastShadow = false
+		p.Size = Vector3.new(chord, W, depth)
+		-- the Front (-Z) face, where the face is drawn, stays where the 0.01-thick strip's was: at the chord, 0.005 out
+		p.CFrame = head.CFrame * CFrame.Angles(0, (a0 + a1) / 2, 0) * CFrame.new(0, 0, -inset - 0.005 + depth / 2)
+		local w = Instance.new("WeldConstraint")
+		w.Part0, w.Part1 = head, p
+		w.Parent = p
+		local sg = Instance.new("SurfaceGui")
+		sg.Name = FACE_GUI
+		sg.Face = Enum.NormalId.Front
+		sg.SizingMode = Enum.SurfaceGuiSizingMode.PixelsPerStud
+		sg.PixelsPerStud = perStud
+		sg.LightInfluence = 1
+		sg.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+		sg:SetAttribute("Slice", i)
+		sg:SetAttribute("Art0", u0)
+		sg:SetAttribute("Art1", u1)
+		sg:SetAttribute("Canvas0", c0)
+		sg:SetAttribute("Canvas1", c1)
+		sg.Parent = p
+		p.Parent = shell
+	end
+	shell.Parent = head
+	return shell
+end
+
+local function applyEyes(head, data, character)
+	-- clear the old face (decal faces from earlier builds, and the strip images)
+	for _, n in ipairs({ EYES_IRIS, EYES_MAIN, FACE_BROWS, FACE_MOUTH, EYES_VEINS, FACE_MARKS, FACE_FORM }) do
+		local d = head:FindFirstChild(n)
+		if d then
+			d:Destroy()
+		end
+	end
+	local art, tint, shape, formName = Appearance.EyeLayers(data, character)
+	for _, d in ipairs(head:GetChildren()) do
+		if d:IsA("Decal") and d.Face == Enum.NormalId.Front then
+			if art then
+				if d:GetAttribute("NHFaceT") == nil then
+					d:SetAttribute("NHFaceT", d.Transparency)
+				end
+				d.Transparency = 1
+			elseif d:GetAttribute("NHFaceT") ~= nil then
+				d.Transparency = d:GetAttribute("NHFaceT")
+				d:SetAttribute("NHFaceT", nil)
+			end
+		end
+	end
+	if not art then
+		local plate = head:FindFirstChild(FACE_PLATE)
+		if plate then
+			plate:Destroy()
+		end
+		return false
+	end
+	-- the face layers, bottom to top: { name, texture, z, colour }
+	local layers = {}
+	local form = character and Appearance.FormOf(character)
+	local race = character and Appearance.RaceOf(character)
+	local mark = Appearance.Marks[data.Marks or 1]
+	local markTex = mark and mark.Style and Appearance.RaceAllows(mark, race) and EyeArt.Mark and EyeArt.Mark(mark.Style)
+	if markTex then
+		table.insert(layers, { FACE_MARKS, markTex, 1 })
+	end
+	if form and form.Key and EyeArt.FormFace then -- the menacing transformed face: sockets, glow, tears, creases
+		local fkey = (form.Stage2 and character:GetAttribute("TransformationStage") == 2) and form.Stage2 or form.Key
+		local formTex = EyeArt.FormFace(fkey)
+		if formTex then
+			table.insert(layers, { FACE_FORM, formTex, 1 })
+		end
+	end
+	if art.Veins and form and form.Veins then
+		table.insert(layers, { EYES_VEINS, art.Veins, 1, head.Color:Lerp(form.Veins, 0.5) }) -- veins take on the skin tone
+	end
+	table.insert(layers, { EYES_IRIS, art.Iris, 2, tint })
+	table.insert(layers, { EYES_MAIN, art.Main, 3 })
+	local brow = Appearance.Brows[data.Brows]
+	local browTex = brow and brow.Style and EyeArt.Brow(brow.Style, shape)
+	if browTex then
+		table.insert(layers, { FACE_BROWS, browTex, 4, Appearance.BrowColor(data) })
+	end
+	local mouthTex = formName and EyeArt.FormMouth(formName)
+	if not mouthTex then
+		local mo = Appearance.Mouths[data.Mouth]
+		if mo and not Appearance.RaceAllows(mo, race) then
+			mo = Appearance.Mouths[2] -- a race mouth on someone not of that race: plain mouth
+		end
+		mouthTex = mo and mo.Style and EyeArt.Mouth(mo.Style, data.Lips)
+	end
+	if mouthTex then
+		table.insert(layers, { FACE_MOUTH, mouthTex, 4 })
+	end
+
+	local shell = faceShell(head)
+	if shell then
+		local slice = 1024 / FACE_STRIPS
+		for _, sg in ipairs(shell:GetDescendants()) do
+			if sg:IsA("SurfaceGui") then
+				sg:ClearAllChildren()
+				local i = sg:GetAttribute("Slice") or 0
+				-- this strip's art and canvas, in texels (see FACE_MARGIN)
+				local art0 = sg:GetAttribute("Art0") or i * slice
+				local art1 = sg:GetAttribute("Art1") or (i + 1) * slice
+				local can0 = sg:GetAttribute("Canvas0") or art0
+				local can1 = sg:GetAttribute("Canvas1") or art1
+				local canW = math.max(1, can1 - can0)
+				for _, L in ipairs(layers) do
+					local im = Instance.new("ImageLabel")
+					im.Name = L[1]
+					im.BackgroundTransparency = 1
+					im.Size = UDim2.fromScale((art1 - art0) / canW, 1) -- one texel per canvas pixel
+					im.Position = UDim2.fromScale((art0 - can0) / canW, 0) -- inside the transparent margins
+					im.Image = L[2]
+					im.ImageRectOffset = Vector2.new(art0, 0)
+					im.ImageRectSize = Vector2.new(art1 - art0, 1024)
+					im.ImageColor3 = L[4] or Color3.new(1, 1, 1)
+					im.ZIndex = L[3]
+					im.Parent = sg
+				end
+			end
+		end
+	else
+		local plate = head:FindFirstChild(FACE_PLATE)
+		if plate then
+			plate:Destroy()
+		end
+		for _, L in ipairs(layers) do -- non-classic head: plain decals
+			local d = Instance.new("Decal")
+			d.Name = L[1]
+			d.Face = Enum.NormalId.Front
+			d.Texture = L[2]
+			d.ZIndex = L[3]
+			d.Color3 = L[4] or Color3.new(1, 1, 1)
+			d.Parent = head
+		end
+	end
+	return true
+end
+Appearance.ApplyEyes = applyEyes
+
+-- Late avatar loading: when a character is spawned by the main menu / save slots, Roblox can finish
+-- adding the avatar's clothes, accessories, BodyColors or face AFTER the look was applied. Keep the
+-- look in charge: tuck late avatar clothing into the stash, keep our skin colours, hide a late face.
+local Guards = setmetatable({}, { __mode = "k" }) -- [character] = { useAvatar, hairId, skin, painted }
+-- Race skin palettes (Lineage.Palette(raceId) -> {Color3} or nil). Vampire and Ghoul skins always land
+-- on one of their race's tones, in both outfit modes. The saved choice is kept as-is, so a race change
+-- (e.g. Vampire -> Human) frees the skin again; the clamp is applied here, on the server, every time.
+function Appearance.RaceOf(character)
+	if not character then
+		return nil
+	end
+	local player = Players:GetPlayerFromCharacter(character)
+	return (player and player:GetAttribute("Race")) or character:GetAttribute("Race")
+end
+
+function Appearance.RacePalette(race)
+	if not race then
+		return nil
+	end
+	local ok, Lineage = pcall(require, ReplicatedStorage:FindFirstChild("Lineage"))
+	if ok and type(Lineage) == "table" and Lineage.Palette then
+		local ok2, pal = pcall(Lineage.Palette, race)
+		if ok2 and type(pal) == "table" and #pal > 0 then
+			return pal
 		end
 	end
 	return nil
 end
 
-local Hooked = setmetatable({}, { __mode = `k` })
-function Local.Hook(T: Instance)
-	if not (T:IsA(`Tool`) and T:GetAttribute(`NHPhone`)) or Hooked[T] then return end
-	Hooked[T] = true
-	T.Equipped:Connect(function() Shared.Toggle(true) end)
-	T.Unequipped:Connect(function() Shared.Toggle(false) end)
+function Appearance.NearestColor(palette, c)
+	local best, bestD = palette[1], math.huge
+	for _, p in ipairs(palette) do
+		local d = (p.R - c.R) ^ 2 + (p.G - c.G) ^ 2 + (p.B - c.B) ^ 2
+		if d < bestD then
+			best, bestD = p, d
+		end
+	end
+	return best
+end
+-- (2.1.3) the skin tones a race may wear: its Lineage Palette (Vampire, Ghoul) or the natural tones
+function Appearance.SkinPalette(race)
+	return Appearance.RacePalette(race) or Appearance.NaturalSkins
+end
+function Appearance.AllowedSkin(race, c)
+	return Appearance.NearestColor(Appearance.SkinPalette(race), c)
 end
 
--- Y: take the phone out, or put it away
-function Local.Key()
-	local T = Local.Tool()
-	local Hum = Player.Character and Player.Character:FindFirstChildOfClass(`Humanoid`)
-	if T and Hum then
-		if T.Parent == Player.Character then Hum:UnequipTools() else Hum:EquipTool(T) end
+-- "Use my Roblox outfit" + a palette race: move the avatar's own body colours onto the palette,
+-- remembering the originals on the BodyColors (attributes NHOrig_*) so they come back without one.
+local function clampAvatarSkin(character, palette)
+	local bc = character:FindFirstChildOfClass("BodyColors")
+	if not bc then
+		if not palette then
+			return
+		end
+		bc = bodyColors(character)
+	end
+	for _, n in ipairs(BODY_PROPS) do
+		local orig = bc:GetAttribute("NHOrig_" .. n)
+		if palette then
+			if orig == nil then
+				orig = bc[n]
+				bc:SetAttribute("NHOrig_" .. n, orig)
+			end
+			bc[n] = Appearance.NearestColor(palette, orig)
+		elseif orig ~= nil then
+			bc[n] = orig
+			bc:SetAttribute("NHOrig_" .. n, nil)
+		end
+	end
+end
+
+local FACE_LAYER_NAMES = { [EYES_IRIS] = true, [EYES_MAIN] = true, [EYES_VEINS] = true, [FACE_BROWS] = true, [FACE_MOUTH] = true,
+	[FACE_MARKS] = true, [FACE_FORM] = true }
+local ApplyTokens = setmetatable({}, { __mode = "k" }) -- [character] = latest ApplyTo call
+
+local function guardLate(character, g)
+	Guards[character] = g
+	if character:GetAttribute("NHLookGuard") then
+		return
+	end
+	character:SetAttribute("NHLookGuard", true)
+	local function handle(d)
+		local look = Guards[character]
+		if not look or d.Parent ~= character then
+			return
+		end
+		if d.Name == UNIFORM_SHIRT or d.Name == UNIFORM_PANTS or d.Name == NH_HAIR then
+			return
+		end
+		if d:IsA("BodyColors") and look.avatarSkinPalette then
+			for _, n in ipairs(BODY_PROPS) do
+				d:SetAttribute("NHOrig_" .. n, d[n])
+				d[n] = Appearance.NearestColor(look.avatarSkinPalette, d[n])
+			end
+		end
+		if not look.useAvatar then
+			local st = Stashes[character]
+			if st then
+				for _, cls in ipairs(AVATAR_CLASSES) do
+					if d:IsA(cls) and not (look.clothesOnly and cls == "Accessory") then
+						d.Parent = st.folder
+						return
+					end
+				end
+			end
+			if d:IsA("BodyColors") and look.keepSkin then
+				for _, n in ipairs(BODY_PROPS) do
+					st = Stashes[character]
+					if st then
+						st.colors[n] = d[n] -- remember the avatar's own colours for when you switch back
+					end
+					d[n] = look.skin
+				end
+			end
+		elseif look.hairId > 0 and d:IsA("Accessory") and d.AccessoryType == Enum.AccessoryType.Hair then
+			hideAvatarHair(character)
+		end
+	end
+	character.ChildAdded:Connect(function(d)
+		task.defer(handle, d)
+	end)
+	-- Roblox's avatar loader can also just EDIT the existing BodyColors after the look is applied:
+	-- keep the uniform skin, or the race palette in "use my Roblox outfit" mode.
+	local watched = setmetatable({}, { __mode = "k" })
+	local function watchColors(bc)
+		if watched[bc] then
+			return
+		end
+		watched[bc] = true
+		bc.Changed:Connect(function(prop)
+			local look = Guards[character]
+			if not look or not table.find(BODY_PROPS, prop) or bc.Parent ~= character then
+				return
+			end
+			local v = bc[prop]
+			if look.avatarSkinPalette then
+				local near = Appearance.NearestColor(look.avatarSkinPalette, v)
+				if near ~= v then
+					bc:SetAttribute("NHOrig_" .. prop, v)
+					bc[prop] = near
+				end
+			elseif look.keepSkin and not look.useAvatar and v ~= look.skin then
+				local st = Stashes[character]
+				if st then
+					st.colors[prop] = v -- the avatar's own colour, for when you switch back
+				end
+				bc[prop] = look.skin
+			end
+		end)
+	end
+	for _, d in ipairs(character:GetChildren()) do
+		if d:IsA("BodyColors") then
+			watchColors(d)
+		end
+	end
+	character.ChildAdded:Connect(function(d)
+		if d:IsA("BodyColors") then
+			watchColors(d)
+		end
+	end)
+	-- Roblox's avatar loader removes existing Shirt/Pants when it applies the avatar's own. If it
+	-- takes the uniform off while the uniform look is active, put it straight back (no naked gap).
+	character.ChildRemoved:Connect(function(d)
+		if d.Name ~= UNIFORM_SHIRT and d.Name ~= UNIFORM_PANTS then
+			return
+		end
+		task.defer(function()
+			local look = Guards[character]
+			if not look or look.useAvatar or not character.Parent then
+				return
+			end
+			if not character:FindFirstChild(UNIFORM_SHIRT) and look.shirt then
+				local sh = Instance.new("Shirt")
+				sh.Name = UNIFORM_SHIRT
+				sh.ShirtTemplate = look.shirt
+				sh.Parent = character
+			end
+			if not character:FindFirstChild(UNIFORM_PANTS) and look.pants then
+				local pa = Instance.new("Pants")
+				pa.Name = UNIFORM_PANTS
+				pa.PantsTemplate = look.pants
+				pa.Parent = character
+			end
+		end)
+	end)
+	local head = character:FindFirstChild("Head")
+	if head then
+		head.ChildAdded:Connect(function(d)
+			task.defer(function()
+				local look = Guards[character]
+				if look and look.painted and d:IsA("Decal") and d.Face == Enum.NormalId.Front and d.Parent == head
+					and not FACE_LAYER_NAMES[d.Name] then
+					if d:GetAttribute("NHFaceT") == nil then
+						d:SetAttribute("NHFaceT", d.Transparency)
+					end
+					d.Transparency = 1
+				end
+			end)
+		end)
+	end
+end
+
+-- Put a cape on (index into Appearance.Capes; 1 = none). Scaled to the body, its neck bone on the top of the back.
+function Appearance.WearCape(character, index)
+	local old = character:FindFirstChild("NHCape")
+	if old then
+		old:Destroy()
+	end
+	local def = Appearance.Capes[index or 1]
+	if def and def.Admin then -- staff-only (a look saved before staff was taken away doesn't show it); previews have no player
+		local owner = game:GetService("Players"):GetPlayerFromCharacter(character)
+		if owner and not Appearance.IsStaff(owner) then
+			return
+		end
+	end
+	local torso = character:FindFirstChild("Torso")
+	local store = ReplicatedStorage:FindFirstChild("NHCapes")
+	local tpl = def and def.Model and store and store:FindFirstChild(def.Model)
+	if not (tpl and torso) then
+		return
+	end
+	local cape = tpl:Clone()
+	cape.Name = "NHCape"
+	cape:SetAttribute("CapeId", def.Id)
+	local body = cape.PrimaryPart
+	local k = torso.Size.Y / 2
+	for _, d in ipairs(cape:GetDescendants()) do
+		if d:IsA("BasePart") then
+			d.Size = d.Size * k
+			d.Anchored, d.CanCollide, d.CanQuery, d.CanTouch, d.Massless = false, false, false, false, true
+		elseif d:IsA("Bone") then
+			d.Position = d.Position * k
+		elseif d:IsA("Motor6D") then
+			d.C0 = d.C0 - d.C0.Position + d.C0.Position * k
+			d.C1 = d.C1 - d.C1.Position + d.C1.Position * k
+		end
+	end
+	local root = nil
+	for _, b in ipairs(body:GetChildren()) do
+		if b:IsA("Bone") then
+			root = b
+			break
+		end
+	end
+	-- owner-fitted (template attribute NH_TorsoFit: the cape body's CFrame on a 2x2x1 R6 torso), scaled to this torso
+	local fit = tpl:GetAttribute("NH_TorsoFit")
+	if typeof(fit) == "CFrame" then
+		body.CFrame = torso.CFrame * (fit - fit.Position + fit.Position * k)
 	else
-		Shared.Toggle()
+		local anchorAt = torso.CFrame * CFrame.new(0, torso.Size.Y / 2 - 0.1, torso.Size.Z / 4)
+		body.CFrame = anchorAt * CFrame.new(-(root and root.Position or Vector3.zero))
 	end
+	local weld = Instance.new("WeldConstraint")
+	weld.Part0, weld.Part1 = torso, body
+	weld.Parent = body
+	cape.Parent = character
 end
 
-function Shared.IsOpen(): boolean return Open end
+--------------------------------------------------------------------------
+-- NPC dress code (owner, 2026-11-03): NPCs in school wear only school clothes; people outside the school wear
+-- civilian clothes. Players are never touched. Where an NPC stands when its look goes on decides it: the school is
+-- its building and grounds (every region but the factions' turf); the turf (Config.Regions kind Turf: the Back Lot,
+-- the West Edge) is outside. Scheduled students are always in school clothes, and the model attribute
+-- NHDress = "School" | "Civilian" forces either. Anything that breaks the code is swapped for an everyday item that's
+-- allowed and suits the body (picked the same way every time for the same NPC); PE kit, cheer and formalwear stay
+-- only when an NPC's own look asks for them.
+--------------------------------------------------------------------------
+Appearance.SchoolTops = {
+	["red-vest"] = true, ["red-shirt"] = true, ["black-vest"] = true, ["black-shirt"] = true, ["navy-vest"] = true,
+	["forest-vest"] = true, ["charcoal-vest"] = true, ["vigil-vest"] = true, ["crimson-court-vest"] = true,
+	["navy-polo"] = true, ["forest-polo"] = true, ["ivory-polo"] = true, ["crimson-polo"] = true, ["delinquent-polo"] = true,
+	["black-blazer"] = true, ["charcoal-cardigan"] = true, ["varsity-jacket"] = true, ["gym-pe-shirt"] = true,
+	["path-rolled-sleeves"] = true, ["path-loose-tie"] = true, ["path-worn-blazer"] = true, -- (2.34)
+	["sailor-uniform"] = true, ["bolero-pinafore"] = true, ["cheer-uniform"] = true,
+}
+Appearance.SchoolBottoms = {
+	["uniform-trousers"] = true, ["charcoal-slacks"] = true, ["khaki-trousers"] = true, ["khaki-shorts"] = true,
+	["pleated-tartan-skirt"] = true, ["striped-joggers"] = true, ["sailor-skirt"] = true, ["chapel-skirt"] = true,
+	["pinafore-skirt"] = true, ["cheer-skirt"] = true,
+}
+local OUTSIDE_KINDS = { Turf = true }
+-- what a swap picks from (everyday wear; the rest is allowed but never chosen for an NPC)
+local SWAP = {
+	School = {
+		Tops = { "red-vest", "black-vest", "navy-vest", "forest-vest", "charcoal-vest", "red-shirt", "black-shirt", "navy-polo", "forest-polo", "ivory-polo" },
+		FemaleTops = { "sailor-uniform", "bolero-pinafore" },
+		Bottoms = { "uniform-trousers", "charcoal-slacks", "khaki-trousers" },
+		FemaleBottoms = { "pleated-tartan-skirt", "sailor-skirt", "pinafore-skirt", "chapel-skirt" },
+	},
+	Civilian = {
+		Tops = { "leather-jacket", "open-flannel", "blood-moon-hoodie", "the-hollow-band-tee" },
+		FemaleTops = { "cable-knit" },
+		Bottoms = { "dark-indigo-jeans", "black-jeans", "ripped-jeans", "cargo-boots", "black-jeans-boots" },
+		FemaleBottoms = { "plaid-mini", "black-skirt-fishnets" },
+	},
+}
 
-function Shared.Toggle(On: boolean?)
-	if not Ui then return end
-	if On == nil then On = not Open end
-	if On and Player:GetAttribute(`InMainMenu`) == true then return end
-	if On == Open then return end
-	Open = On
-	local Reduced = Kit.ReducedMotion()
-	if On then
-		local S = Local.Call(`Get`)
-		if S then State = S Local.ApplyWallpaper() end
-		if not Open then return end -- (audit) put away while the server answered: don't show it again
-		Local.ShowHome()
-		Ui.Body.Visible = true
-		Ui.Body.Position = UDim2.new(1, -22, 1, H + 40)
-		tween(Ui.Body, if Reduced then 0.01 else 0.35, { Position = UDim2.new(1, -22, 1, -18) })
-		pcall(Kit.PlaySound, `Tick`, 0.7, 0.9)
+-- "School" or "Civilian" for an NPC, from where it stands
+function Appearance.DressFor(character)
+	local forced = character:GetAttribute("NHDress")
+	if forced == "School" or forced == "Civilian" then
+		return forced
+	end
+	if character:GetAttribute("NHScheduled") then
+		return "School"
+	end
+	local ok, pos = pcall(function() return character:GetPivot().Position end)
+	local folder = workspace:FindFirstChild("Regions")
+	local okC, cfg = pcall(require, ReplicatedStorage:WaitForChild("Config"):WaitForChild("Regions"))
+	if not (ok and folder and okC) then
+		return "School"
+	end
+	local best, bestP = nil, -math.huge
+	for _, b in ipairs(folder:GetChildren()) do
+		local def = b:IsA("BasePart") and cfg.Defs[b:GetAttribute("RegionId") or ""]
+		if def then
+			local l = b.CFrame:PointToObjectSpace(pos)
+			local h = b.Size / 2
+			if math.abs(l.X) <= h.X and math.abs(l.Y) <= h.Y + 4 and math.abs(l.Z) <= h.Z and (def.Priority or 0) > bestP then
+				best, bestP = def, def.Priority or 0
+			end
+		end
+	end
+	return if best and OUTSIDE_KINDS[best.Kind] then "Civilian" else "School"
+end
+
+local function dressPick(list, ids, femaleIds, female, seed)
+	local pool = {}
+	for _, id in ipairs(ids) do table.insert(pool, id) end
+	if female then for _, id in ipairs(femaleIds) do table.insert(pool, id) end end
+	if #pool == 0 then
+		return nil
+	end
+	return Appearance.IndexOf(list, pool[(seed % #pool) + 1])
+end
+
+local NPC_FOLDERS = { Live = true, NHSchedule = true, NHAmbient = true, NHConcession = true }
+function Appearance.IsNpc(character)
+	if Players:GetPlayerFromCharacter(character) or not character:IsDescendantOf(workspace) then
+		return false
+	end
+	local menu = workspace:FindFirstChild("MenuScene")
+	if menu and character:IsDescendantOf(menu) then
+		return false
+	end
+	return character.Parent ~= nil and NPC_FOLDERS[character.Parent.Name] == true
+end
+
+function Appearance.DressCode(character, data)
+	local kind = Appearance.DressFor(character)
+	local want = kind == "School"
+	local set = SWAP[kind]
+	local female = Appearance.IsFemale(data)
+	local seed = 0
+	for i = 1, #character.Name do
+		seed = (seed * 31 + string.byte(character.Name, i)) % 1000003
+	end
+	local top = Appearance.Uniforms[data.Uniform]
+	if top and (Appearance.SchoolTops[top.Id] == true) ~= want then
+		data.Uniform = dressPick(Appearance.Uniforms, set.Tops, set.FemaleTops, female, seed) or data.Uniform
+	end
+	local bottom = Appearance.BottomsList[data.Bottoms]
+	if bottom and (Appearance.SchoolBottoms[bottom.Id] == true) ~= want then
+		data.Bottoms = dressPick(Appearance.BottomsList, set.Bottoms, set.FemaleBottoms, female, seed + 7) or data.Bottoms
+	end
+	return data
+end
+
+function Appearance.ApplyTo(character, data)
+	data = Appearance.Sanitize(data)
+	if Appearance.IsNpc(character) then
+		data = Appearance.DressCode(character, data) -- NPCs only (never players, previews or the menu's posed students)
+	elseif not Appearance.FormOf(character) then
+		-- (line matrix) what this character wears, for students' outfit remarks and the hangout dress codes
+		-- (StudentBrain.Talk, Social.Cliques.Dressed): "top|bottoms|acc,acc". A transformed form keeps the last one.
+		-- data.Acc is already the look's comma list of Config.Accessories ids (Sanitize joins it in slot order).
+		local avatar = data.UseAvatar == true
+		character:SetAttribute("NHWear", string.format("%s|%s|%s",
+			(not avatar and Appearance.IdOf("Uniform", data.Uniform)) or "",
+			(not avatar and Appearance.IdOf("Bottoms", data.Bottoms)) or "",
+			type(data.Acc) == "string" and data.Acc or ""))
+	end
+	local head = character:FindFirstChild("Head")
+	local torso = character:FindFirstChild("Torso") or character:FindFirstChild("UpperTorso")
+	if not (head and torso) then
+		return false
+	end
+	local token = (ApplyTokens[character] or 0) + 1
+	ApplyTokens[character] = token
+	local hairAcc = data.HairId > 0 and Appearance.LoadHair(data.HairId) or nil -- may yield
+	if ApplyTokens[character] ~= token or not character.Parent then
+		return false -- a newer apply started while we waited; it wins
+	end
+	-- nothing below yields, so two applies can never interleave
+	for _, c in ipairs(character:GetChildren()) do
+		if c.Name == LOOK or c.Name == NH_HAIR then
+			c:Destroy()
+		end
+	end
+	showAvatarHair(character)
+	-- body shape: the Female body's meshes replace any CharacterMesh on those parts (avatar packages included);
+	-- Standard removes ours (avatar meshes return on respawn)
+	local body = Appearance.Bodies[data.Body] or Appearance.Bodies[1]
+	local bodyMeshes = body.Meshes or (body.TorsoMesh and { Torso = body.TorsoMesh }) or nil
+	if data.Areas ~= "" then -- (training 1.81) each area's meshes from its own body
+		local areas = Appearance.AreaBodies(data)
+		local mixed = {}
+		for area, parts in pairs(Appearance.AreaParts) do
+			local ab = Appearance.Bodies[areas[area]] or body
+			local m = ab.Meshes or (ab.TorsoMesh and { Torso = ab.TorsoMesh }) or {}
+			for _, partName in ipairs(parts) do
+				mixed[partName] = m[partName]
+			end
+		end
+		bodyMeshes = next(mixed) and mixed or nil
+	end
+	for _, c in ipairs(character:GetChildren()) do
+		if c:IsA("CharacterMesh") and (c.Name == "NHBodyMesh" or (bodyMeshes and bodyMeshes[c.BodyPart.Name])) then
+			c:Destroy()
+		end
+	end
+	if bodyMeshes and torso.Name == "Torso" then
+		for partName, meshId in pairs(bodyMeshes) do
+			local cm = Instance.new("CharacterMesh")
+			cm.Name = "NHBodyMesh"
+			cm.BodyPart = Enum.BodyPart[partName]
+			cm.MeshId = meshId
+			cm.Parent = character
+		end
+	end
+	Appearance.WearCape(character, data.Cape)
+	do -- 3D accessories (UI.AccessoryWear): each piece on its R6 part, fitted to this body type
+		local wm = script.Parent:FindFirstChild("AccessoryWear")
+		local okW, AccWear = pcall(require, wm)
+		if wm and okW then
+			local okR, err = pcall(AccWear.Wear, character, data.Acc, (Appearance.Bodies[data.Body] or Appearance.Bodies[1]).Id, data.HairId)
+			if not okR then
+				warn("[Appearance] accessories: " .. tostring(err))
+			end
+		end
+	end
+	local folder = Instance.new("Folder")
+	folder.Name = LOOK
+
+	local palette = Appearance.RacePalette(Appearance.RaceOf(character))
+	local skin = Appearance.SkinColor(data)
+	if palette then
+		skin = Appearance.NearestColor(palette, skin) -- Vampire / Ghoul: always one of the race's tones
 	else
-		Local.StopGames()
-		tween(Ui.Body, if Reduced then 0.01 else 0.28, { Position = UDim2.new(1, -22, 1, H + 40) })
-		task.delay(0.3, function() if not Open and Ui then Ui.Body.Visible = false end end)
-		-- closing from inside the phone (Camera, Timetable...) puts the handset away too
-		local T = Local.Tool()
-		local Hum = Player.Character and Player.Character:FindFirstChildOfClass(`Humanoid`)
-		if T and Hum and T.Parent == Player.Character then Hum:UnequipTools() end
+		skin = Appearance.NearestColor(Appearance.NaturalSkins, skin) -- (2.1.3) every other race: a natural tone
+		if data.LookStyle == "Nightborn" then
+			skin = skin:Lerp(rgb(222, 224, 232), 0.45)
+		end
+	end
+	local catalogHair = hairAcc and true or false -- a failed lookup keeps your other hair (no bald spawn)
+
+	local formNow = Appearance.FormOf(character)
+	local formOutfit = formNow and Appearance.FormOutfit(formNow, data)
+	local raceKit = Appearance.RaceUniforms[Appearance.RaceOf(character) or ""]
+	local baseShirt = (raceKit and raceKit.Shirts[data.Uniform]) or Appearance.Uniforms[data.Uniform].Shirt
+	local basePants = (raceKit and data.Bottoms == 1 and raceKit.Pants) or Appearance.BottomsList[data.Bottoms].Template
+	-- transformed in your own top and bottoms (UI.FormVariants) when both have a variant; else the form outfit
+	if formNow and not data.UseAvatar then
+		local vShirt, vPants = Appearance.FormVariant(formNow, baseShirt), Appearance.FormVariant(formNow, basePants)
+		if vShirt and vPants then
+			formOutfit = { Shirt = vShirt, Pants = vPants }
+		end
+	end
+	local shirtTex = formOutfit and formOutfit.Shirt or baseShirt
+	local pantsTex = formOutfit and formOutfit.Pants or basePants
+	if data.UseAvatar and not formOutfit then
+		restore(character)
+		clampAvatarSkin(character, palette)
+		if catalogHair then
+			hideAvatarHair(character)
+		end
+	else
+		local clothesOnly = data.UseAvatar -- transformed in your own outfit: swap clothes, keep accessories
+		local st = Stashes[character]
+		if st and st.clothesOnly ~= clothesOnly then
+			restore(character)
+		end
+		clearUniform(character)
+		stash(character, clothesOnly)
+		if not data.UseAvatar then
+			local bc = bodyColors(character)
+			for _, n in ipairs(BODY_PROPS) do
+				bc[n] = skin -- the clothing textures cover the body; skin shows at the hands and neck
+			end
+		else
+			clampAvatarSkin(character, palette)
+			if catalogHair then
+				hideAvatarHair(character)
+			end
+		end
+		local shirt = Instance.new("Shirt")
+		shirt.Name = UNIFORM_SHIRT
+		shirt.ShirtTemplate = shirtTex
+		shirt.Parent = character
+		local pants = Instance.new("Pants")
+		pants.Name = UNIFORM_PANTS
+		pants.PantsTemplate = pantsTex
+		pants.Parent = character
+	end
+	if catalogHair then
+		wearCatalogHair(character, data)
+	end
+
+	-- look-style marks (shown in both modes)
+	local V, C = Vector3.new, CFrame.new
+	if data.LookStyle == "Chapel" then
+		part(folder, "CrossV", V(0.08, 0.34, 0.05), rgb(235, 205, 120), C(0.46, 0.4, -0.48), torso, nil, Enum.Material.Metal)
+		part(folder, "CrossH", V(0.24, 0.08, 0.05), rgb(235, 205, 120), C(0.46, 0.46, -0.48), torso, nil, Enum.Material.Metal)
+	end
+	local painted = applyEyes(head, data, character)
+	if data.LookStyle == "Nightborn" and not painted then -- painted eyes get crimson irises instead
+		part(folder, "EyeGlintL", V(0.14, 0.07, 0.02), rgb(220, 30, 50), C(-0.19, 0.08, -0.56), head, nil, Enum.Material.Neon)
+		part(folder, "EyeGlintR", V(0.14, 0.07, 0.02), rgb(220, 30, 50), C(0.19, 0.08, -0.56), head, nil, Enum.Material.Neon)
+	end
+	folder.Parent = character
+	character:SetAttribute("LookStyle", data.LookStyle) -- cosmetic; never race
+	local dressed = (not data.UseAvatar) or formOutfit ~= nil
+	guardLate(character, {
+		useAvatar = not dressed, hairId = catalogHair and data.HairId or 0, skin = skin, painted = painted,
+		keepSkin = not data.UseAvatar, clothesOnly = data.UseAvatar and formOutfit ~= nil,
+		avatarSkinPalette = data.UseAvatar and palette or nil,
+		shirt = dressed and shirtTex or nil, pants = dressed and pantsTex or nil,
+	})
+	return true
+end
+
+--------------------------------------------------------------------------
+-- server: validate, save through ProfileService (Services.Player.Data), apply on spawn
+--------------------------------------------------------------------------
+local function sameLook(a, b)
+	for k, v in pairs(a) do
+		if b[k] ~= v then
+			return false
+		end
+	end
+	for k in pairs(b) do
+		if a[k] == nil then
+			return false
+		end
+	end
+	return true
+end
+
+-- Is this player standing at a wardrobe station (any instance tagged NHWardrobe, within reach)?
+-- AtTag(p, "NHBarber") is the same check for the barber.
+Appearance.WardrobeReach = 14
+function Appearance.AtWardrobe(p)
+	return Appearance.AtTag(p, "NHWardrobe")
+end
+-- which look fields each place may change outside the creator: outfit at a wardrobe, hair at the barber
+Appearance.OutfitFields = { Uniform = true, Bottoms = true, Cape = true, Acc = true }
+Appearance.HairFields = { Hair = true, HairColor = true, HairHex = true, HairId = true, TintHair = true }
+function Appearance.AtTag(p, tag)
+	local ch = p.Character
+	local root = ch and ch:FindFirstChild("HumanoidRootPart")
+	if not root then
+		return false
+	end
+	for _, w in ipairs(game:GetService("CollectionService"):GetTagged(tag)) do
+		local pos = if w:IsA("BasePart") then w.Position elseif w:IsA("Model") then w:GetPivot().Position else nil
+		if pos and (pos - root.Position).Magnitude <= Appearance.WardrobeReach then
+			return true
+		end
+	end
+	return false
+end
+
+-- 2026-11-01 (owner): no "Use my Roblox outfit" and no Roblox face. Every look is the Nightmare High one.
+do
+	local rawSanitize = Appearance.Sanitize
+	Appearance.Sanitize = function(data)
+		local look = rawSanitize(data)
+		look.UseAvatar = false
+		local e = Appearance.Eyes[look.Eyes]
+		if not e or e.Shape == nil then
+			look.Eyes = 2
+		end
+		return look
 	end
 end
 
--- (1.39) open the phone straight to an app (the Midnight Bell notice board's "Read" prompt)
-function Shared.OpenApp(Id: string)
-	if not Ui then return end
-	if not Open then Shared.Toggle(true) end
-	if Open then Local.OpenApp(Id) end
-end
-
-function Shared.OnStart()
-	Local.Build()
-	task.spawn(function()
-		local B = ReplicatedStorage:WaitForChild(`NHNoticeBoard`, 60)
-		local R = B and B:WaitForChild(`Read`, 10)
-		if R then R.OnClientEvent:Connect(function(App) Shared.OpenApp(if typeof(App) == `string` then App else `Gazette`) end) end
-	end)
-	task.spawn(function()
-		local F = ReplicatedStorage:WaitForChild(`NHPhone`, 30)
-		if not F then return end
-		F:WaitForChild(`Changed`).OnClientEvent:Connect(function(S) if typeof(S) == `table` then State = S Local.ApplyWallpaper() Local.Badges() end end)
-		local S = Local.Call(`Get`)
-		if S then State = S Local.ApplyWallpaper() end
-		-- (audit) what was in the wallet when you joined counts as seen (the badge is for money that arrives now)
-		Local.Seen = Local.Seen or {}
-		if S and Local.Seen.InSeq == nil then Local.Seen.InSeq = Local.TopIn() end
-	end)
-	UserInputService.InputBegan:Connect(function(Input)
-		if Input.KeyCode ~= TOGGLE_KEY then return end
-		if Typing.Active() or Player:GetAttribute(`InMainMenu`) == true then return end
-		Local.Key()
-	end)
-	-- hook the Phone tool wherever it turns up (spawn, respawn)
-	local function watch(Holder: Instance?)
-		if not Holder then return end
-		for _, T in Holder:GetChildren() do Local.Hook(T) end
-		Holder.ChildAdded:Connect(Local.Hook)
+-- (height, 1.62) a look is built at today's size. Hair, marks and capes are placed in studs for the base body, so a
+-- student scaled to their height (Services.Player.Height) is put back to Config.Heights.Base while the look is built,
+-- then scaled back. Catalog hair is loaded first, so nothing yields while the body is at the base size.
+-- NPC students (class schedules, ambient students) get a height too, fixed by their name (the Human range), so the
+-- school doesn't look cloned. Their feet stay where they were placed.
+local NPC_HEIGHT = { NHSchedule = true, NHAmbient = true }
+do
+	local rawApply = Appearance.ApplyTo
+	Appearance.ApplyTo = function(character, data)
+		local okH, Heights = pcall(require, ReplicatedStorage:WaitForChild("Config"):WaitForChild("Heights"))
+		local base = okH and Heights.Base or 0.9
+		local ok, now = pcall(function() return character:GetScale() end)
+		local hum = character:FindFirstChildWhichIsA("Humanoid")
+		local function scaleKeep(s)
+			local ws, jp, jh = hum and hum.WalkSpeed, hum and hum.JumpPower, hum and hum.JumpHeight
+			character:ScaleTo(s)
+			if hum then hum.WalkSpeed, hum.JumpPower, hum.JumpHeight = ws, jp, jh end
+		end
+		local result
+		-- (1.70.0) a height also stretches the torso, legs and arms: take that off while the look is built, too
+		local st, sl, sa = 1, 1, 1
+		if okH and Heights.StretchOf then st, sl, sa = Heights.StretchOf(character) end
+		local stretched = math.abs(st - 1) > 1e-4 or math.abs(sl - 1) > 1e-4 or math.abs(sa - 1) > 1e-4
+		if not ok or (math.abs(now - base) < 1e-3 and not stretched) then
+			result = rawApply(character, data)
+		else
+			local look = Appearance.Sanitize(data)
+			if look.HairId and look.HairId > 0 then
+				pcall(Appearance.LoadHair, look.HairId) -- cached: the apply below won't wait for it
+			end
+			if stretched then Heights.SetStretch(character, 1, 1, 1) end
+			scaleKeep(base)
+			local okA, r = pcall(rawApply, character, data)
+			if character.Parent then
+				scaleKeep(now)
+				if stretched then Heights.SetStretch(character, st, sl, sa) end
+			end
+			if not okA then
+				error(r, 0)
+			end
+			result = r
+		end
+		if okH and RunService:IsServer() and character.Parent and NPC_HEIGHT[character.Parent.Name]
+			and character:GetAttribute("NHHeight") == nil then
+			-- seeded by the name and the look (class students are all called "Student", their looks differ)
+			local key = character.Name
+			local look = Appearance.Sanitize(data)
+			local keys = {}
+			for k in pairs(look) do
+				table.insert(keys, tostring(k))
+			end
+			table.sort(keys)
+			for _, k in ipairs(keys) do
+				key ..= "|" .. k .. "=" .. tostring(look[k])
+			end
+			local seed = 7
+			for i = 1, #key do
+				seed = (seed * 131 + string.byte(key, i)) % 1000003
+			end
+			local scale = Heights.Scale(nil, (seed % 9973) / 9973)
+			-- (2.3.0) a student with a build (Config.NpcBuilds: by clique and personality) is that height
+			local want = character:GetAttribute("NHHeightWant")
+			if type(want) == "number" and want == want then
+				scale = math.clamp(want, 0.86, 1.22)
+			end
+			local function feetY()
+				local cf, size = character:GetBoundingBox()
+				return cf.Position.Y - size.Y / 2
+			end
+			pcall(function()
+				local before = feetY()
+				-- (1.70.0) even for thickness and the head, then the torso, legs and arms are stretched
+				local w, kt, kl, ka = Heights.Proportions(scale)
+				scaleKeep((Heights.Normal or 1) * w) -- Average is a standard R6 body
+				Heights.SetStretch(character, kt, kl, ka)
+				character:PivotTo(character:GetPivot() + Vector3.new(0, before - feetY(), 0))
+				character:SetAttribute("NHHeight", scale)
+			end)
+		end
+		return result
 	end
-	task.spawn(function() watch(Player:WaitForChild(`Backpack`, 20)) end)
-	Player.CharacterAdded:Connect(function(Ch)
-		watch(Ch)
-		task.spawn(function() watch(Player:WaitForChild(`Backpack`, 20)) end)
-		if Open then Shared.Toggle(false) end
+end
+
+-- (2.3.0) an NPC's posture (Config.NpcBuilds: the joints' C1) is taken off while its look is built and scaled, then put
+-- back, so the height's scale and stretch never act on it
+do
+	local rawApply = Appearance.ApplyTo
+	Appearance.ApplyTo = function(character, data)
+		if not character:GetAttribute("NHPostureOn") then
+			return rawApply(character, data)
+		end
+		local NpcBuilds = require(ReplicatedStorage:WaitForChild("Config"):WaitForChild("NpcBuilds"))
+		NpcBuilds.ClearPosture(character)
+		local ok, r = pcall(rawApply, character, data)
+		if character.Parent then
+			NpcBuilds.SetPosture(character, true)
+		end
+		if not ok then
+			error(r, 0)
+		end
+		return r
+	end
+end
+
+function Appearance.StartServer()
+	assert(RunService:IsServer(), "Appearance.StartServer must run on the server")
+	if Appearance._started then
+		return
+	end
+	Appearance._started = true
+	local Data = require(game:GetService("ServerScriptService"):WaitForChild("Services"):WaitForChild("Player"):WaitForChild("Data"))
+	local folder = ReplicatedStorage:FindFirstChild(Appearance.RemotesName) or Instance.new("Folder")
+	folder.Name = Appearance.RemotesName
+	local setRE = folder:FindFirstChild("Set") or Instance.new("RemoteEvent")
+	setRE.Name = "Set"
+	setRE.Parent = folder
+	local checkRF = folder:FindFirstChild("CheckHair") or Instance.new("RemoteFunction")
+	checkRF.Name = "CheckHair"
+	checkRF.Parent = folder
+	folder.Parent = ReplicatedStorage
+
+	local function profileLook(p)
+		local profile = Data.GetProfile(p)
+		return profile and Appearance.Sanitize(profile.Appearance)
+	end
+	local function onCharacter(p, ch)
+		-- wait for the Roblox avatar (LoadCharacterAppearance) and the profile.
+		-- (2.1.3) with the StarterCharacter, HasAppearanceLoaded never turns true and CharacterAppearanceLoaded never
+		-- fires, so this waited its whole 6 s on every spawn (measured: the look came 6.1 s after spawning, 7.7 s after
+		-- Enter School). The avatar's own pieces land ~0.3 s after spawning (BodyColors with them): wait for those to
+		-- settle, 1.5 s at most. Anything later still gets stashed or recoloured by guardLate.
+		local t0 = os.clock()
+		local lastPiece = if ch:FindFirstChildOfClass("BodyColors") then os.clock() else nil
+		local pieceConn = ch.ChildAdded:Connect(function(d)
+			if d:IsA("BodyColors") or d:IsA("Clothing") or d:IsA("ShirtGraphic") or (d:IsA("Accessory") and d.Name ~= NH_HAIR) then
+				lastPiece = os.clock()
+			end
+		end)
+		while not p:HasAppearanceLoaded() and os.clock() - t0 < 1.5 and ch.Parent do
+			if lastPiece and os.clock() - lastPiece >= 0.25 then
+				break
+			end
+			task.wait(0.05)
+		end
+		pieceConn:Disconnect()
+		while not Data.GetProfile(p) and os.clock() - t0 < 15 and p.Parent do
+			task.wait(0.2)
+		end
+		local look = profileLook(p)
+		if look and p.Character == ch then
+			pcall(Appearance.ApplyTo, ch, look)
+		end
+		-- transformations swap the eyes live
+		local function reEyes()
+			local l = profileLook(p)
+			if l and p.Character == ch then
+				pcall(Appearance.ApplyTo, ch, l) -- outfit + eyes + mouth for the form
+			end
+		end
+		ch:GetAttributeChangedSignal("Transformation"):Connect(reEyes)
+		ch:GetAttributeChangedSignal("TransformationStage"):Connect(reEyes)
+	end
+	local function hook(p)
+		p:GetAttributeChangedSignal("Race"):Connect(function()
+			local look = profileLook(p)
+			if look and p.Character then
+				pcall(Appearance.ApplyTo, p.Character, look)
+			end
+		end)
+		p.CharacterAppearanceLoaded:Connect(function(ch)
+			task.defer(function()
+				local look = profileLook(p)
+				if look and p.Character == ch then
+					pcall(Appearance.ApplyTo, ch, look)
+				end
+			end)
+		end)
+		p.CharacterAdded:Connect(function(ch)
+			task.spawn(onCharacter, p, ch)
+		end)
+		p.CharacterRemoving:Connect(forgetCharacter)
+		if p.Character then
+			task.spawn(onCharacter, p, p.Character)
+		end
+	end
+	Players.PlayerAdded:Connect(hook)
+	for _, p in ipairs(Players:GetPlayers()) do
+		hook(p)
+	end
+	-- save slots: a profile can load (or change) after the character exists
+	-- one-time migration: a save that still uses list positions is rewritten with ids
+	local function migrate(p)
+		local profile = Data.GetProfile(p)
+		local stored = profile and profile.Appearance
+		if Appearance.IsLegacy(stored) then
+			pcall(Data.UpdateState, p, { type = "SetAppearance", appearance = Appearance.Encode(stored) })
+		end
+	end
+	for _, p in ipairs(Players:GetPlayers()) do
+		task.spawn(migrate, p)
+	end
+	Data.ProfileLoaded:Connect(function(p)
+		migrate(p)
+		local look = profileLook(p)
+		if look and p.Character then
+			pcall(Appearance.ApplyTo, p.Character, look)
+		end
 	end)
-	if Player.Character then watch(Player.Character) end
-	local Acc = 0
-	RunService.Heartbeat:Connect(function(Dt)
-		Acc += Dt
-		if Acc < 0.25 or not Ui then return end
-		Acc = 0
-		local InMenu = Player:GetAttribute(`InMainMenu`) == true
-		Ui.Gui.Enabled = not InMenu
-		if InMenu and Open then Shared.Toggle(false) end
-		local T, Day = Local.Clock()
-		Ui.BarTime.Text = T
-		if Open and Ui.Home.Visible then Local.Badges() end
-		-- the hotbar slot shows a note while your music plays (local only)
-		local T = Local.Tool()
-		if T then T.Name = if Music.Sound and Music.Sound.IsPlaying then `\u{266A} Phone` else `Phone` end
-		pcall(function() require(script.Parent.PhoneRadio).Tick() end) -- (2.30) Night FM (Controllers.Gui.PhoneRadio)
+
+	local last, lastCheck, lastLookup = {}, {}, {}
+	setRE.OnServerEvent:Connect(function(p, data)
+		local now = os.clock()
+		if last[p] and now - last[p] < 0.2 then
+			return -- rate limit
+		end
+		last[p] = now
+		if not Data.GetProfile(p) then
+			return
+		end
+		local look = Appearance.Sanitize(data)
+		look.Created = true
+		local saved = profileLook(p)
+		-- the wardrobe is a place: changes only from a locker-room wardrobe (CollectionService tag NHWardrobe),
+		-- the main-menu creator, or a student's very first look
+		if saved and saved.Created and p:GetAttribute("InMainMenu") ~= true then
+			local atWardrobe, atBarber = Appearance.AtWardrobe(p), Appearance.AtTag(p, "NHBarber")
+			for k, v in pairs(look) do
+				if saved[k] ~= nil and v ~= saved[k] and k ~= "Created" then
+					local ok = (Appearance.OutfitFields[k] and atWardrobe) or (Appearance.HairFields[k] and atBarber)
+					if not ok then
+						look[k] = saved[k] -- skin, eyes, body... are set in the creator; outfit and hair need the right place
+					end
+				end
+			end
+		end
+		if look.SkinHex ~= "" then -- (2.1.3) only your race's skin tones (Appearance.SkinPalette); others snap to the nearest
+			look.SkinHex = string.upper(Appearance.AllowedSkin(p:GetAttribute("Race"), Color3.fromHex(look.SkinHex)):ToHex())
+		end
+		do -- body types (2026-11-10): a trained build comes only from training or the admin desk (Appearance.SetBuild).
+			-- A client may only change gender (in the creator); the saved build and step carry over.
+			local build, step = Appearance.BodyBuild(saved and saved.Body or 1)
+			look.Body = Appearance.BodyFor(Appearance.BodyGender(look.Body), build, step) or (saved and saved.Body) or 1
+			look.Areas = saved and saved.Areas or "" -- (training 1.81) per-area bodies come only from Appearance.SetArea
+		end
+		if look.HairId > 0 and look.HairId ~= (saved and saved.HairId) and not Appearance.IsHairCached(look.HairId) then
+			-- a new, uncached id costs web calls: at most one per player every 1.5 s
+			if lastLookup[p] and now - lastLookup[p] < 1.5 then
+				look.HairId = saved and saved.HairId or 0
+			else
+				lastLookup[p] = now
+				Appearance.LoadHair(look.HairId)
+			end
+		end
+		if look.HairId > 0 and Appearance.IsKnownNotHair(look.HairId) then
+			look.HairId = 0 -- never save an id that isn't a hair (a lookup hiccup keeps it)
+		end
+		if look.Cape and look.Cape > 1 then
+			local prof = Data.GetProfile(p)
+			local owned = prof and type(prof.Identity) == "table" and type(prof.Identity.Capes) == "table" and prof.Identity.Capes or {}
+			local cape = Appearance.Capes[look.Cape]
+			if cape and cape.Admin then -- the admin capes (3D, staff-only): staff only, in Studio too; never bought
+				if not Appearance.IsStaff(p) then
+					look.Cape = 1
+				end
+			elseif not (cape and (table.find(owned, cape.Id) or RunService:IsStudio())) then -- free in Studio, like the shop
+				look.Cape = saved and saved.Cape or 1 -- not bought: keep what they had
+			end
+		end
+		do -- 3D accessories (1.79, Config.Accessories): owned (Identity.Accessories; free in Studio, like capes) and
+			-- your gender's (or Unisex); Admin items (the Headmaster's Circle) are staff only, in Studio too; an item
+			-- whose template isn't in the game yet is refused. A slot that fails keeps what was saved there.
+			local okA, AccCfg = pcall(require, ReplicatedStorage.Config.Accessories)
+			if okA then
+				local prof = Data.GetProfile(p)
+				local ident = prof and type(prof.Identity) == "table" and prof.Identity or {}
+				local owned = type(ident.Accessories) == "table" and ident.Accessories or {}
+				local staff = Appearance.IsStaff(p)
+				local want, had = AccCfg.Parse(look.Acc), AccCfg.Parse(saved and saved.Acc)
+				local keep = {}
+				for slot, id in pairs(want) do
+					local it = AccCfg.ById[id]
+					local ok
+					if it.Admin then
+						ok = staff
+					else
+						ok = (table.find(owned, id) ~= nil or RunService:IsStudio())
+							and (it.Gender == "Unisex" or it.Gender == Appearance.BodyGender(look.Body))
+					end
+					if ok and AccCfg.Ready(it) then
+						keep[slot] = id
+					elseif had[slot] and not (it.Admin and not staff) then
+						keep[slot] = had[slot]
+					end
+				end
+				-- (1.88) the hair no longer rules a piece out: a hair with no measured fit wears it untucked
+				-- (UI.AccessoryWear), so a hair change takes nothing off
+				look.Acc = AccCfg.Join(keep)
+				-- a cape and accessories that pass through each other (Config.Accessories.Conflicts): the one just
+				-- changed wins (a new cape takes the clashing pieces off; a new piece takes the cape off)
+				local capeDef = Appearance.Capes[look.Cape]
+				if capeDef and capeDef.Id ~= "none" then
+					local worn = AccCfg.Parse(look.Acc)
+					local capeNew = not saved or saved.Cape ~= look.Cape
+					for slot, id in pairs(worn) do
+						if AccCfg.CapeClash(capeDef.Id, AccCfg.ById[id]) then
+							if capeNew then
+								worn[slot] = nil
+							else
+								look.Cape = 1
+								break
+							end
+						end
+					end
+					look.Acc = AccCfg.Join(worn)
+				end
+			end
+		end
+		do -- clothes by gender (1.71): only your gender's pieces or Unisex ones; the admin kit is staff-only.
+			-- Switching gender swaps each piece for its counterpart; an unchanged saved piece is kept.
+			local staff = Appearance.IsStaff(p)
+			local switched = saved ~= nil and Appearance.BodyGender(saved.Body) ~= Appearance.BodyGender(look.Body)
+			if switched then
+				Appearance.DressForGender(look, staff)
+			end
+			local d = Appearance.GenderDefaults[Appearance.BodyGender(look.Body)] or {}
+			if not (saved and not switched and saved.Uniform == look.Uniform)
+				and not Appearance.ClothingAllows(Appearance.Uniforms[look.Uniform], look, staff) then
+				look.Uniform = (saved and not switched and saved.Uniform) or Appearance.Defaults.Uniform
+			end
+			if not (saved and not switched and saved.Bottoms == look.Bottoms)
+				and not Appearance.ClothingAllows(Appearance.BottomsList[look.Bottoms], look, staff) then
+				look.Bottoms = (saved and not switched and saved.Bottoms) or (d.Bottoms and Appearance.IndexOf(Appearance.BottomsList, d.Bottoms)) or Appearance.Defaults.Bottoms
+			end
+		end
+		do -- clothes: school tops must be owned, school bottoms need enrolment (Services.School.Enrollment)
+			local prof = Data.GetProfile(p)
+			local ident = prof and type(prof.Identity) == "table" and prof.Identity or {}
+			local owned = type(ident.Uniforms) == "table" and ident.Uniforms or {}
+			local enrolled = ident.Enrolled ~= false -- nil = an older student (counts as enrolled)
+			local u = Appearance.Uniforms[look.Uniform]
+			if Appearance.IsSchoolTop(look.Uniform) and not (u and Appearance.OwnsTop(owned, u.Id)) and not (saved and saved.Uniform == look.Uniform) then
+				look.Uniform = saved and saved.Uniform or Appearance.Defaults.Uniform
+			end
+			if Appearance.IsSchoolBottom(look.Bottoms) and not enrolled and not (saved and saved.Bottoms == look.Bottoms) then
+				look.Bottoms = saved and saved.Bottoms or Appearance.Defaults.Bottoms
+			end
+		end
+		if saved and saved.Created and sameLook(saved, look) then
+			return -- nothing changed: no save, no rebuild
+		end
+		Data.UpdateState(p, { type = "SetAppearance", appearance = Appearance.Encode(look) })
+		if p.Character then
+			pcall(Appearance.ApplyTo, p.Character, look)
+		end
+	end)
+	-- training / admin desk (2026-11-10): set a student's build ("Average", "Skinny", "Conditioned", "Heavy") and step.
+	-- Keeps their gender; saved through Data like every look change, then re-applied. Returns ok, body name / reason.
+	function Appearance.SetBuild(p, build, step)
+		local saved = profileLook(p)
+		if not saved then
+			return false, "No loaded slot"
+		end
+		if not table.find(Appearance.Builds, build) then
+			return false, "Unknown build"
+		end
+		local idx = Appearance.BodyFor(Appearance.BodyGender(saved.Body), build, tonumber(step) or 0)
+		if not idx then
+			return false, "No body for that build"
+		end
+		local look = table.clone(saved)
+		look.Body = idx
+		look.Areas = "" -- (training 1.81) the whole body, every area
+		Data.UpdateState(p, { type = "SetAppearance", appearance = Appearance.Encode(look) })
+		if p.Character then
+			pcall(Appearance.ApplyTo, p.Character, look)
+		end
+		return true, Appearance.Bodies[idx].Name
+	end
+	-- (training 1.81) training changes ONE area: "Torso", "Arms" or "Legs" to a path ("Average", "Conditioned",
+	-- "Heavy", "Lean") and step, keeping the other two areas and the gender. Never lowers an area that is already
+	-- at that path and a higher step. The look's Body follows the torso (accessories fit to it). Returns ok,
+	-- body name / reason, changed.
+	local PATH_BUILD = { Average = "Average", Conditioned = "Conditioned", Heavy = "Heavy", Lean = "Skinny", Skinny = "Skinny" }
+	function Appearance.SetArea(p, area, path, step)
+		local saved = profileLook(p)
+		if not saved then
+			return false, "No loaded slot", false
+		end
+		if not Appearance.AreaParts[area] then
+			return false, "Unknown area", false
+		end
+		local build = PATH_BUILD[path]
+		if not build then
+			return false, "Unknown path", false
+		end
+		local gender = Appearance.BodyGender(saved.Body)
+		local idx = Appearance.BodyFor(gender, build, tonumber(step) or 0)
+		if not idx then
+			return false, "No body for that path", false
+		end
+		local areas = Appearance.AreaBodies(saved)
+		local curBuild, curStep = Appearance.BodyBuild(areas[area])
+		local _, newStep = Appearance.BodyBuild(idx)
+		if areas[area] == idx or (curBuild == build and curStep >= newStep) then
+			return true, Appearance.Bodies[areas[area]].Name, false
+		end
+		areas[area] = idx
+		local look = table.clone(saved)
+		look.Areas = Appearance.EncodeAreas(areas)
+		look.Body = areas.Torso
+		Data.UpdateState(p, { type = "SetAppearance", appearance = Appearance.Encode(look) })
+		if p.Character then
+			pcall(Appearance.ApplyTo, p.Character, look)
+		end
+		return true, Appearance.Bodies[idx].Name, true
+	end
+	checkRF.OnServerInvoke = function(p, id)
+		local now = os.clock()
+		if lastCheck[p] and now - lastCheck[p] < 1 then
+			return false, "One moment..."
+		end
+		lastCheck[p] = now
+		id = tonumber(id)
+		if not id or id ~= math.floor(id) or id <= 0 or id >= 1e15 then
+			return false, "Enter a number"
+		end
+		local acc, name = Appearance.LoadHair(id)
+		return acc and true or false, name
+	end
+	Players.PlayerRemoving:Connect(function(p)
+		last[p], lastCheck[p], lastLookup[p] = nil, nil, nil
+		if p.Character then
+			forgetCharacter(p.Character)
+		end
 	end)
 end
 
-return Shared
+--------------------------------------------------------------------------
+-- client
+--------------------------------------------------------------------------
+Appearance.Current = table.clone(Appearance.Defaults)
+
+local function remotes()
+	return ReplicatedStorage:WaitForChild(Appearance.RemotesName, 10)
+end
+
+function Appearance.Fetch()
+	local ps = Players.LocalPlayer:WaitForChild("PlayerScripts")
+	local m = ps:WaitForChild("Controllers"):WaitForChild("StateController", 15)
+	local ok, sc = pcall(require, m)
+	local profile = ok and sc and sc.GetProfile(true)
+	Appearance.Current = Appearance.Sanitize(profile and profile.Appearance)
+	return Appearance.Current, not Appearance.Current.Created
+end
+
+local sendToken = 0
+function Appearance.Send(data)
+	local look = Appearance.Sanitize(data)
+	Appearance.Current = table.clone(look)
+	sendToken += 1
+	local my = sendToken
+	task.delay(0.25, function() -- coalesce quick clicks and colour drags
+		if my ~= sendToken then
+			return
+		end
+		local f = remotes()
+		if f then
+			f:WaitForChild("Set"):FireServer(Appearance.Encode(look)) -- ids, as it was when you clicked
+		end
+	end)
+end
+
+-- Cancel a pending Send (e.g. the profile changed under the Wardrobe before it went out)
+function Appearance.CancelSend()
+	sendToken += 1
+end
+
+function Appearance.CheckHair(id)
+	local f = remotes()
+	if not f then
+		return false, "Wardrobe is offline"
+	end
+	local ok, a, b = pcall(function()
+		return f:WaitForChild("CheckHair"):InvokeServer(id)
+	end)
+	if not ok then
+		return false, "Check failed"
+	end
+	return a, b
+end
+
+return Appearance
 ]==] })
 
 for _, It in Items do
