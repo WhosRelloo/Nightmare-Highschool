@@ -113,6 +113,16 @@ def _canvas_material(ob, image):
     nt.links.new(nm.outputs["Normal"], bs.inputs["Normal"])
     nt.links.new(tex(base + "_rough.png").outputs["Color"], bs.inputs["Roughness"])
     nt.links.new(tex(base + "_metal.png").outputs["Color"], bs.inputs["Metallic"])
+    if os.path.exists(base + "_emissive.png"):                 # neon: the colour glows through the emissive mask
+        col = next(n for n in nt.nodes if n.type == "TEX_IMAGE" and n.image and n.image.colorspace_settings.name != "Non-Color")
+        mul = nt.nodes.new("ShaderNodeMix")
+        mul.data_type = "RGBA"
+        mul.blend_type = "MULTIPLY"
+        mul.inputs["Factor"].default_value = 1.0
+        nt.links.new(col.outputs["Color"], mul.inputs["A"])
+        nt.links.new(tex(base + "_emissive.png").outputs["Color"], mul.inputs["B"])
+        nt.links.new(mul.outputs["Result"], bs.inputs["Emission Color"])
+        bs.inputs["Emission Strength"].default_value = 4.0
 
 
 P.canvas_material = _canvas_material

@@ -390,7 +390,25 @@ def mat_enamel(name="NH_Enamel", seed=6301):
     save(name, col, 0.0012 * (peel - 0.5) - 0.0005 * sc, tile, rough, np.zeros((N, N), np.float32), boost=1.0)
 
 
+def awning(name, a_rgb, b_rgb, seed):
+    """awning canvas: woven duck in two-colour stripes (0.5 stud each, along u), sun-faded, a few water stains; 4 studs a tile"""
+    tile = 4.0
+    us, vs = U * tile, V * tile
+    band = (np.floor(us / 0.5).astype(int) % 2 == 0)
+    weave = (np.sin(us * 2 * np.pi * 40) * np.sin(vs * 2 * np.pi * 40)) * 0.5 + 0.5
+    fade = fbm(4, 4, 4, seed + 1)
+    stain = smoothstep(0.75, 0.85, fbm(8, 3, 3, seed + 2))
+    col = np.where(band[..., None], lin(a_rgb), lin(b_rgb)) * (0.9 + 0.1 * weave[..., None]) * (0.92 + 0.12 * fade[..., None])
+    col = col * (1 - 0.12 * stain[..., None])
+    h = 0.0012 * weave
+    rough = np.clip(0.85 + 0.05 * (weave - 0.5), 0, 1)
+    save(name, col, h, tile, rough, np.zeros((N, N), np.float32), boost=1.0)
+
+
 SETS = {
+    "WF_AwningRed": lambda: awning("WF_AwningRed", (176, 34, 34), (236, 226, 200), 6401),
+    "WF_AwningGreen": lambda: awning("WF_AwningGreen", (44, 96, 64), (236, 226, 200), 6402),
+    "WF_AwningBlue": lambda: awning("WF_AwningBlue", (40, 72, 140), (240, 238, 230), 6403),
     "MAT_PaintedWood": mat_painted_wood,
     "MAT_Cotton": mat_cotton,
     "MAT_Denim": mat_denim,

@@ -99,6 +99,28 @@ fur or feather shader, then baked.
 
 The furniture and fabrics use tinted PBR sets: painted wood, cotton, denim, enamel and velvet.
 
+### Wickfield Square (props batch 51, `art/props/nh_props_batch51_square.py`)
+
+- **The Main Street shopfronts** come from one builder, so they match.
+  - **Shared design:** two storeys; a painted cast-iron front with fluted pilasters, panelled bulkheads and display
+    windows either side of a recessed glass door; a striped awning with a scalloped valance; the shop's PBR sign on the
+    upper facade (neon signs glow); a lit interior seen through the glass; a bracketed cornice.
+  - **Moonpie Diner:** blue clapboard, a red awning; a counter, stools, booths and a pie case inside.
+  - **Wick & Sons Hardware:** brick, a green awning; racks of stock and a key bench.
+  - **Reel Time Video:** butter clapboard, a blue awning; tape racks.
+  - **Suds Laundromat:** brick, a blue awning; washers and a folding table.
+  - **The Gazette office:** brick, no awning; desks, typewriters and a press.
+- **The church:** white clapboard with pointed-arch windows, red doors and a slate spire.
+  - **The clock** (a cream and gilt dial, "Wickfield 1851") is rigged: `StrikeMidnight` ticks it from 11:58 to midnight.
+  - **The bell** swings through three tolls (`BellToll`).
+  - **The rooster weathervane** turns (`VaneTurn`).
+- **The Founder's Statue:** Josiah Wick on a prancing horse, his book of rules held high, in weathered bronze with
+  verdigris, on a granite pedestal with the bronze plaque.
+  - Its `Prank` piece (a traffic-cone hat, toilet-paper ribbons, a roll on the book) is shown only after the Statue
+    prank.
+- **Signs** come from `art/hometown/logo_canvases.py`: each logo's own height map gives the relief, gilt is metal, and
+  neon has an emissive mask.
+
 ## 3. Custom art and logos (all original, made by Claude)
 
 Every sign and logo is original, drawn at 4x and baked into PBR (painted wood, enamel, neon tubes, brass letters and
