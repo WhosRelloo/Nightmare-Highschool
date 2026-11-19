@@ -380,6 +380,212 @@ def wick_house(M):
 
 
 BUILDERS["WickHouse"] = wick_house
+
+
+# ================================================================== the Alder Lane street kit
+from nh_props_batch3 import sphere, cone  # noqa: E402
+from nh_props_batch4 import lathe, prism, hoop  # noqa: E402
+
+
+def street_lamp(M):
+    """A cast-iron streetlamp, 13 studs: a fluted column on an octagonal base, a scrolled bracket, a four-sided lantern
+    with a glowing bulb, the town crest's oak leaf cast on the base"""
+    K = kit(M)
+    iron = material("WFLampIron", "NH_Iron", tint=(0.07, 0.085, 0.075), scale=0.45, rough_add=0.05, wear=0.45, wear_metal=True)
+    lathe("Base", [(0.95, 0), (0.95, 0.25), (0.8, 0.35), (0.8, 1.1), (0.62, 1.3), (0.5, 1.4), (0.42, 1.6), (0, 1.6)], iron, seg=8)
+    lathe("Column", [(0.36, 1.6), (0.3, 2.0), (0.28, 9.6), (0, 9.6)], iron, seg=24, flute=(12, 0.08))
+    lathe("Collar", [(0.42, 9.5), (0.48, 9.7), (0.38, 9.95), (0.46, 10.2), (0.3, 10.4), (0, 10.4)], iron, seg=24)
+    # scroll bracket under the lantern
+    for s in (-1, 1):
+        pts = [Vector((s * (0.3 + 0.55 * math.sin(t * math.pi * 0.9)), 0, 9.0 + 1.3 * t)) for t in (i / 12 for i in range(13))]
+        tube(f"Scroll{s}", pts, 0.06, iron)
+        hoop(f"Curl{s}", (s * 0.42, 0, 9.05), 0.16, "y", iron, thick=0.05)
+    # lantern: tapering, four glazed sides
+    lathe("LanBase", [(0.5, 10.4), (0.55, 10.55), (0.42, 10.7), (0, 10.7)], iron, seg=4)
+    for i in range(4):
+        a = math.pi / 4 + i * math.pi / 2
+        box(f"LanPost{i}", (0.07, 0.07, 1.5), (0.5 * math.cos(a), 0.5 * math.sin(a), 11.45), iron, bevel=0, rot=(0, 0, a))
+    lathe("LanRoof", [(0.85, 12.2), (0.82, 12.3), (0.35, 12.85), (0.12, 13.0), (0, 13.0)], iron, seg=4)
+    lathe("Finial", [(0.1, 13.0), (0.14, 13.15), (0.05, 13.35), (0.09, 13.45), (0, 13.7)], iron, seg=8)
+    set_group("Glass")
+    lathe("LanGlass", [(0.38, 10.7), (0.62, 12.2), (0, 12.2)], K["glass"], seg=4)
+    set_group("Glow")
+    sphere("Bulb", 0.22, (0, 0, 11.35), K["bulb"], seg=12, rings=8, scale=(1, 1, 1.4))
+    set_group("Main")
+    return (2, 2, 13.7)
+
+
+def mailbox(M):
+    """14 Alder Lane's mailbox: a navy steel box on a white post, the red flag up, brass letters on its side"""
+    K = kit(M)
+    navy = material("WFMailNavy", "NH_PaintedMetal", tint=(0.08, 0.13, 0.22), scale=1.0, wear=0.4, wear_metal=True)
+    red = material("WFFlagRed", "NH_PaintedMetal", tint=(0.42, 0.05, 0.04), scale=1.0, wear=0.3, wear_metal=True)
+    box("Post", (0.55, 0.55, 3.6), (0, 0, 1.8), K["trim"], bevel=0.05)
+    box("PostCap", (0.75, 0.75, 0.2), (0, 0, 3.66), K["trim"], bevel=0.04)
+    box("Arm", (2.6, 0.6, 0.3), (0.3, 0, 3.9), K["trim"], bevel=0.04)
+    box("Brace", (0.25, 0.45, 1.3), (-0.45, 0, 3.2), K["trim"], bevel=0.03, rot=(0, -0.7, 0))
+    # the box: a flat bottom and a round top, long axis along X, door at -X (the road)
+    L, R_ = 2.4, 0.55
+    prof = [(-R_, 0.0)] + [(R_ * math.cos(math.pi - a), 0.5 + R_ * math.sin(math.pi - a)) for a in (math.pi * i / 16 for i in range(17))] + [(R_, 0.0)]
+    pts = [(y, z) for y, z in prof]
+    me_pts = [(-y, z) for y, z in pts]
+    ob = prism("Box", [(z * 0 + yy, z) for yy, z in me_pts], 0.3, L, navy, plane="YZ", bevel=0.02)
+    ob.location = (0.3, 0, 4.05)
+    box("Door", (0.08, 1.16, 1.06), (0.3 - L / 2 - 0.04, 0, 4.05 + 0.52), navy, bevel=0.03)
+    box("Latch", (0.12, 0.25, 0.12), (0.3 - L / 2 - 0.1, 0, 4.05 + 0.3), K["brass"], bevel=0.02)
+    # the flag (up): an arm and a plate on the +Y side
+    box("FlagArm", (0.12, 0.06, 1.4), (0.75, 0.6, 4.75), red, bevel=0.01)
+    box("FlagPlate", (0.6, 0.06, 0.45), (0.95, 0.6, 5.25), red, bevel=0.02)
+    cyl("FlagPivot", 0.08, 0.1, (0.75, 0.6, 4.2), K["iron"], rot=(math.pi / 2, 0, 0), verts=12)
+    # the lettering plate on the -Y side (canvas)
+    set_group("Sign")
+    box("LetterPlate", (1.9, 0.02, 0.62), (0.3, -0.565, 4.05 + 0.42), K["place"], bevel=0)
+    set_group("Main")
+    return (3.2, 1.6, 5.6)
+
+
+def _pickets(prefix, x0, x1, K, h=3.6, w=0.38, gap=0.3, y=0.0):
+    n = int((x1 - x0) / (w + gap))
+    for i in range(n):
+        x = x0 + gap / 2 + w / 2 + i * (w + gap) + ((x1 - x0) - n * (w + gap)) / 2
+        prism(f"{prefix}{i}", [(x - w / 2, 0.15), (x + w / 2, 0.15), (x + w / 2, h - 0.35), (x, h), (x - w / 2, h - 0.35)], y, 0.12, K["trim"], plane="XZ")
+
+
+def picket_fence(M):
+    """an 8-stud run of white picket fence between two capped posts"""
+    K = kit(M)
+    for x in (-4.0, 4.0):
+        box(f"Post{x}", (0.5, 0.5, 4.3), (x, 0, 2.15), K["trim"], bevel=0.04)
+        box(f"PostCap{x}", (0.7, 0.7, 0.18), (x, 0, 4.35), K["trim"], bevel=0.04)
+        lathe(f"PostBall{x}", [(0.0, 4.44), (0.22, 4.55), (0.26, 4.72), (0.18, 4.9), (0, 4.98)], K["trim"], seg=16, loc=(x, 0, 0))
+    for z in (0.9, 2.9):
+        box(f"Rail{z}", (7.5, 0.22, 0.35), (0, 0.17, z), K["trim"], bevel=0.03)
+    _pickets("Pk", -3.75, 3.75, K, y=-0.03)
+    return (8.8, 0.8, 5.0)
+
+
+def picket_gate(M):
+    """the garden gate: two posts with a little arched header, the gate swings on its left hinges"""
+    K = kit(M)
+    for x in (-2.25, 2.25):
+        box(f"Post{x}", (0.55, 0.55, 5.4), (x, 0, 2.7), K["trim"], bevel=0.04)
+        lathe(f"PostBall{x}", [(0.0, 5.4), (0.24, 5.52), (0.28, 5.72), (0.2, 5.92), (0, 6.0)], K["trim"], seg=16, loc=(x, 0, 0))
+    arch = [(x, 4.9 + 0.55 * math.sin(math.pi * (x + 2.0) / 4.0)) for x in (-2.0 + 4.0 * i / 16 for i in range(17))]
+    prism("Arch", [(-2.0, 4.6)] + arch + [(2.0, 4.6)], 0.0, 0.3, K["trim"], plane="XZ", bevel=0.02)
+    set_group("Gate", hinge=(-1.95, 0, 0), swing=-1)
+    for z in (0.9, 2.7):
+        box(f"GRail{z}", (3.8, 0.2, 0.32), (0.0, 0.15, z), K["trim"], bevel=0.03)
+    box("GBrace", (0.22, 0.18, 2.2), (0.0, 0.15, 1.8), K["trim"], bevel=0.02, rot=(0, 0.9, 0))
+    _pickets("GPk", -1.9, 1.9, K, h=3.4, y=-0.02)
+    for z in (0.9, 2.7):
+        box(f"Hinge{z}", (0.5, 0.06, 0.16), (-1.75, 0.27, z), K["iron"], bevel=0.01)
+    box("GLatch", (0.35, 0.1, 0.12), (1.75, 0.27, 2.0), K["iron"], bevel=0.01)
+    set_group("Main")
+    return (5.2, 0.8, 6.0)
+
+
+def kennel(M):
+    """Biscuit's kennel: a little red-painted clapboard doghouse with a shingled gable roof, an arched doorway, a
+    hand-painted BISCUIT board over it, a blanket inside and his bowl out front"""
+    K = kit(M)
+    red = material("WFKennelRed", "NH_DeskWood", tint=(0.42, 0.11, 0.08), scale=0.25, rough_add=0.15, wear=0.5)
+    W, D, H = 4.2, 5.0, 3.0
+    # walls: horizontal boards (each its own slightly proud strip), with the doorway cut out of the front
+    for i in range(int(H / 0.38)):
+        z = 0.3 + i * 0.38 + 0.19
+        for nm, size, loc in (("B", (W, 0.18, 0.4), (0, D / 2, z)), ("L", (0.18, D, 0.4), (-W / 2, 0, z)), ("R", (0.18, D, 0.4), (W / 2, 0, z))):
+            box(f"Board{nm}{i}", size, loc, red, bevel=0.03, rot=(0.06 if nm == "B" else 0, 0.06 if nm in "LR" else 0, 0))
+        # front: leave the doorway (x -0.95..0.95, z < 2.4)
+        if z < 2.4:
+            for sx in (-1, 1):
+                box(f"BoardF{i}{sx}", (W / 2 - 0.95, 0.18, 0.4), (sx * (0.95 + (W / 2 - 0.95) / 2), -D / 2, z), red, bevel=0.03, rot=(-0.06, 0, 0))
+        else:
+            box(f"BoardF{i}", (W, 0.18, 0.4), (0, -D / 2, z), red, bevel=0.03, rot=(-0.06, 0, 0))
+    # the doorway arch and trim
+    ring_pts = [(0.95 * math.cos(a), 1.9 + 0.95 * math.sin(a)) for a in (math.pi * i / 20 for i in range(21))]
+    prism("DoorArchFill", [(1.15, 1.9), (1.15, 3.2), (-1.15, 3.2), (-1.15, 1.9)] + list(reversed(ring_pts)), -D / 2 - 0.02, 0.2, red, plane="XZ")
+    arc = [Vector((1.08 * math.cos(a), -D / 2 - 0.16, 1.9 + 1.08 * math.sin(a))) for a in (math.pi * i / 24 for i in range(25))]
+    tube("ArchTrim", arc, 0.13, K["trim"], square=True)
+    for sx in (-1, 1):
+        box(f"DoorTrim{sx}", (0.26, 0.26, 1.6), (sx * 1.08, -D / 2 - 0.16, 1.1), K["trim"], bevel=0.02)
+    box("Floor", (W, D, 0.3), (0, 0, 0.15), K["deck"], bevel=0.03)
+    for x in (-W / 2, W / 2):
+        for y in (-D / 2, D / 2):
+            box(f"Corner{x}{y}", (0.3, 0.3, H + 0.1), (x, y, 0.3 + H / 2), K["trim"], bevel=0.03)
+    # gables
+    zt = 0.3 + H
+    rise = 1.7
+    for y, nm in ((-D / 2, "F"), (D / 2, "B")):
+        prism(f"Gable{nm}", [(-W / 2, zt), (W / 2, zt), (0, zt + rise)], y, 0.18, red, plane="XZ")
+    # roof (shingle, tiled with plane UVs)
+    set_group("Roof")
+    pitch = math.atan2(rise, W / 2)
+    for s, nm in ((-1, "L"), (1, "R")):
+        ex = s * (W / 2 + 0.5)
+        ez = zt - 0.5 * math.tan(pitch)
+        bot = [(ex, -D / 2 - 0.5, ez), (ex, D / 2 + 0.5, ez), (0, D / 2 + 0.5, zt + rise), (0, -D / 2 - 0.5, zt + rise)]
+        top = [(x, y, z + 0.18) for x, y, z in bot]
+        ob = solid(f"Roof{nm}", bot, top, K["place"])
+        slope = Vector((-s * math.cos(pitch), 0, math.sin(pitch)))
+        _quad_uv(ob, (ex, -D / 2 - 0.5, ez), (0, 1, 0), tuple(slope), 3.0)
+        ob["nh_keep_uv"] = 1
+    set_group("Main")
+    box("RidgeCap", (0.35, D + 1.1, 0.22), (0, 0, zt + rise + 0.2), K["trim"], bevel=0.05)
+    # the name board over the door (canvas)
+    set_group("Sign")
+    box("NameBoard", (2.0, 0.06, 0.5), (0, -D / 2 - 0.2, zt + 0.42), K["place"], bevel=0)
+    set_group("Main")
+    box("NameBack", (2.14, 0.08, 0.62), (0, -D / 2 - 0.15, zt + 0.42), K["trim"], bevel=0.02)
+    # a plaid blanket inside, the bowl outside (red enamel with a white rim)
+    blanket = material("WFBlanket", base=(0.42, 0.2, 0.14), rough=0.95, wear=0.0, dirt=0.4)
+    box("Blanket", (2.8, 3.2, 0.14), (0.1, 0.6, 0.37), blanket, bevel=0.06, segments=3, rot=(0, 0, 0.08))
+    bowl = material("WFBowl", base=(0.6, 0.08, 0.06), rough=0.25, metal=0.0, wear=0.3, dirt=0.4)
+    lathe("Bowl", [(0.0, 0.0), (0.5, 0.0), (0.62, 0.32), (0.66, 0.36), (0.56, 0.36), (0.48, 0.1), (0, 0.1)], bowl, seg=28, loc=(1.6, -D / 2 - 1.2, 0))
+    lathe("Kibble", [(0.0, 0.1), (0.45, 0.1), (0.4, 0.26), (0.0, 0.3)], material("WFKibble", base=(0.42, 0.24, 0.12), rough=0.9, wear=0.0),
+          seg=20, loc=(1.6, -D / 2 - 1.2, 0), jitter=(0.06, 3))
+    return (W + 1.2, D + 3.0, zt + rise + 0.4)
+
+
+def hydrant(M):
+    """a squat red fire hydrant with chrome caps"""
+    red = material("WFHydrant", "NH_PaintedMetal", tint=(0.48, 0.06, 0.04), scale=1.0, wear=0.15, wear_metal=True, dirt=0.8)
+    chrome = material("WFChrome", base=(0.8, 0.8, 0.82), rough=0.18, metal=1.0, wear=0.2)
+    lathe("Body", [(0.75, 0), (0.75, 0.2), (0.55, 0.3), (0.5, 1.9), (0.62, 2.0), (0.62, 2.2), (0.5, 2.3), (0.45, 2.7), (0.2, 2.95), (0, 3.0)], red, seg=24)
+    lathe("Nut", [(0.14, 2.95), (0.14, 3.2), (0, 3.2)], chrome, seg=5)
+    for s, ax in ((-1, "x"), (1, "x"), (1, "y")):
+        if ax == "x":
+            cyl(f"Port{s}{ax}", 0.24, 0.4, (s * 0.62, 0, 1.6), chrome, rot=(0, math.pi / 2, 0), verts=16, bevel=0.03)
+        else:
+            cyl(f"Port{s}{ax}", 0.32, 0.4, (0, -0.62, 1.4), chrome, rot=(math.pi / 2, 0, 0), verts=16, bevel=0.03)
+    for i in range(6):
+        a = i * math.pi / 3
+        cyl(f"Bolt{i}", 0.06, 0.1, (0.62 * math.cos(a), 0.62 * math.sin(a), 0.22), chrome, verts=6, bevel=0)
+    return (1.6, 1.6, 3.2)
+
+
+def sidewalk(M):
+    """a 16-stud run of the street edge: concrete sidewalk (8 deep), a granite curb, the gutter and 8 studs of road"""
+    K = kit(M)
+    set_group("Walk")
+    box("Walk", (16, 8, 0.6), (0, 4.0, 0.3), K["place"], bevel=0)
+    set_group("Asphalt")
+    box("Road", (16, 8, 0.3), (0, -4.8, 0.15 - 0.6), K["place"], bevel=0)
+    set_group("Main")
+    curb = material("WFCurb", "NH_Limestone", tint=(0.55, 0.55, 0.56), scale=0.4, wear=0.4, dirt=1.0)
+    box("Curb", (16, 0.8, 1.0), (0, -0.4, 0.1), curb, bevel=0.08)
+    box("Gutter", (16, 1.0, 0.1), (0, -1.3, -0.4), curb, bevel=0.02)
+    # a storm drain grate at one end
+    for i in range(7):
+        box(f"Grate{i}", (0.12, 0.9, 0.08), (5.5 + i * 0.3, -1.3, -0.34), K["iron"], bevel=0)
+    return (16, 16.8, 1.0)
+
+
+BUILDERS.update({
+    "WFStreetLamp": street_lamp, "WFMailbox": mailbox, "WFPicketFence": picket_fence, "WFPicketGate": picket_gate,
+    "WFKennel": kennel, "WFHydrant": hydrant, "WFSidewalk": sidewalk,
+})
+TILES.update({"Walk": ("WF_Sidewalk", 8.0), "Asphalt": ("WF_Road", 12.0)})
+P.CANVAS.update({"WFMailbox_Sign": "WF_Mailbox14", "WFKennel_Sign": "WF_Biscuit"})
 for _n in BUILDERS:
     for _g, (_set, _t) in TILES.items():
         P.TILED[f"{_n}_{_g}"] = (_set, _t)
