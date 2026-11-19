@@ -2,6 +2,89 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.32.0] - 2026-11-18: The Permanent Record & Honours (Progression & Identity 2 of 4)
+
+The spec is `docs/expansion/14-Progression-and-Identity.md` §4. There was no separate plan file: the owner reshaped the
+menu's look during the build, so the work followed the spec directly.
+- **Studio backup:** `ServerStorage.NH_Backup.Phase5_pre_20261118`.
+- **Mirror:** `tools/phase5-2320/`.
+- **The Map place:** untouched.
+
+### Added
+- **The Permanent Record** (M, `Controllers.Gui.StatsPanel`, remade): the school's dossier on you, in its own PBR art.
+  - **The owner's brief:** "completely unique and new ui and icons ... PBR, high quality", "organized and easy to
+    understand", "wayyy higher quality and ON THEME", "animated", and "different variants based on ur race".
+  - **Your race's cover:**
+
+    | Race | Cover | Tooling and corners | Ambient effect |
+    |---|---|---|---|
+    | Human | oxblood leather | gilt tooling, iron corners | candlelight flicker |
+    | Priest | ivory vellum | gilt sunburst, brass corners | golden shimmer |
+    | Vampire | black leather with a crimson velvet inlay | blackened silver, garnet corners | the garnets pulse |
+    | Werewolf | clawed hide | iron tooling, bone corners | moonlight drift |
+    | Ghoul | grave-green leather with crackle | verdigris tooling, bone corners | grave wisps |
+    | Wraith | ash-blue leather | glowing pale-silver tooling | spectral glow |
+
+    Each race also has its own nameplate and emblem.
+  - **Organized the same way on every page:**
+    - nine leather index tabs, each in its own colour with its own icon
+    - on each page: a title, one line on what it shows, then sections (icon, heading, rule) of rows (label, value,
+      pips for ranks, a hint for what's next)
+    - anything not earned yet says how to earn it
+  - **Pages:**
+    - Student (the report card, with +1)
+    - Academics
+    - Attendance & Conduct
+    - Athletics
+    - Combat
+    - Factions & Cliques
+    - Paths (a card per path showing what the next tier needs; your titles with Equip)
+    - Honours
+    - Notable Entries
+  - **Animated:**
+    - the book lifts open
+    - pages turn between tabs
+    - a glint sweeps the nameplate
+    - newly earned honours stamp in
+    - the cover breathes
+- **The art:** `art/ui/hud/make_record_ui.py`, 68 pieces uploaded to group 15981569 (ids in `Config.RecordArt`).
+  - **Materials:** built from the school's Leather, Brass, Iron and Paper PBR sets.
+  - **The pieces:** six covers and nameplates, a parchment page, 18 index tabs, a card, buttons, a red-ink stamp,
+    struck medals (blind-pressed when not yet earned, a black-edged envelope when secret), pips, a close button, a
+    glint, and 25 icons (19 for the menu and 6 race emblems). No Seal icon.
+- **Honours** (`Config.Honours`, `Services.Player.Honours`): the first 30, in 7 groups (Academics, Conduct, Athletics,
+  Combat, Society, Story, and Secrets, which stay hidden until earned).
+  - **Read from:** the same facts as the Standing Paths.
+  - **Saved:** the day each was earned, granted once, with an "Honour earned" banner.
+- **Notable Entries** (`Services.Player.Record`): the school's log on you, newest first, 40 kept, each entry written
+  once.
+  - **What writes one:** path tiers, honours, main quests, the Ring title, and a return from suspension.
+  - **Older tiers:** tiers earned before 2.32 are written in when you join.
+- **The file:** `Record.FileFor` builds every tab on the server (the remote `NHProgress.File`).
+- **TestBridge:** `HonoursTest`, `RecordTest`.
+
+### Changed
+- **`Progression.Sanitize`** keeps `Honours`, `Record` and `RecordSeen`.
+- **`Paths.Facts`** adds the fields Honours need. Test facts never grant honours.
+
+### Checked
+- **Self-tests:**
+  - `HonoursTest`: none of the 30 on empty facts, all on full facts; granted once; the day saved.
+  - `RecordTest`: an entry is written once, 40 are kept, and 20 file numbers match their sources (0 bad).
+  - **Every earlier suite, all passing:** 25 in one session.
+- **Live (slot 2, restored after):**
+  - Every page opened in game, with the Werewolf and Vampire covers.
+  - No text overflows on any page.
+  - The 7 honours slot 2 had really earned were granted, and each was written into Entries.
+  - The nameplate glint and the race effects run.
+  - The header was resized and repositioned at the owner's request.
+- **Errors:** none from the changed scripts.
+- **Not checked:**
+  - a two-player run
+  - phone screens on a real phone
+  - the frame rate (skipped, at the owner's request)
+  - the Priest, Ghoul and Wraith covers in game (checked in the art previews)
+
 ## [2.31.0] - 2026-11-18: Standing Paths (Progression & Identity 1 of 4)
 
 The spec is `docs/expansion/14-Progression-and-Identity.md` §3; the plan is `docs/superpowers/plans/2026-11-18-standing-paths.md`.
