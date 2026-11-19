@@ -528,6 +528,276 @@ def WickSonsHardware():
     return L
 
 
+def star(L, cx, cy, r, k=0.42, n=5, rot=0.0):
+    return L.poly([(cx + r * (1 if i % 2 == 0 else k) * math.cos(-math.pi / 2 + rot + i * math.pi / n),
+                    cy + r * (1 if i % 2 == 0 else k) * math.sin(-math.pi / 2 + rot + i * math.pi / n)) for i in range(2 * n)])
+
+
+def mirror_pts(pts, cx):
+    return [(2 * cx - x, y) for x, y in reversed(pts)]
+
+
+# ================================================================== Pembrook Prep Pumas
+@logo
+def PembrookPumas():
+    L = Logo("PembrookPumas", 1024, 1024)
+    cx = 512
+    PUR, PUR2, SIL, INK, CREAM = "#4a2470", "#6e3aa0", "#d7dbe2", "#120c18", "#f1e9dc"
+    sh = [(cx, 70), (cx + 360, 160), (cx + 340, 560), (cx + 200, 820), (cx, 950)]
+    shield = L.poly(sh + mirror_pts(sh[1:-1], cx))
+    L.paint(L.grow(shield, 30), INK, height=0.4)
+    rim = L.grow(shield, 18)
+    L.paint(rim, L.vgrad("#f4f6fa", "#8a909c", 70, 950), height=0.6)
+    L.shade(np.clip(rim - shield, 0, 1), strength=0.5, blur=4)
+    L.paint(shield, L.vgrad(PUR2, "#2a1242", 70, 950), height=0.45)
+    L.grain(shield, 0.05, 2, seed=5)
+    band = L.poly([(cx - 330, 165), (cx + 330, 165), (cx + 325, 248), (cx - 325, 248)]) * shield
+    L.paint(band, L.vgrad("#eef0f4", "#9aa0aa", 165, 248), height=0.6)
+    L.paint(L.text("PEMBROOK PREP", "lucky", 62, cx, 210, spacing=4), PUR, height=0.7)
+    # the puma head: faceted, front on, snarling
+    hy = 560
+    TAN, TAN2, TAN3 = "#c8913f", "#e0b064", "#9a6528"
+    head = L.poly([(cx - 190, hy - 120), (cx - 120, hy - 190), (cx, hy - 205), (cx + 120, hy - 190), (cx + 190, hy - 120),
+                   (cx + 215, hy - 10), (cx + 170, hy + 110), (cx + 80, hy + 185), (cx, hy + 205), (cx - 80, hy + 185),
+                   (cx - 170, hy + 110), (cx - 215, hy - 10)])
+    for sx in (-1, 1):
+        e = L.poly([(cx + sx * 115, hy - 175), (cx + sx * 215, hy - 285), (cx + sx * 205, hy - 115)])
+        L.paint(L.grow(e, 9), INK, height=0.7)
+        L.paint(e, TAN3, height=0.75)
+        L.paint(L.poly([(cx + sx * 140, hy - 175), (cx + sx * 200, hy - 250), (cx + sx * 193, hy - 145)]), "#5a2c1c", height=0.72)
+    L.paint(L.grow(head, 10), INK, height=0.72)
+    L.paint(head, TAN, height=0.8)
+    for pts, col in (
+        ([(cx - 120, hy - 190), (cx, hy - 205), (cx + 120, hy - 190), (cx + 60, hy - 60), (cx, hy - 40), (cx - 60, hy - 60)], TAN2),
+        ([(cx - 190, hy - 120), (cx - 120, hy - 190), (cx - 60, hy - 60), (cx - 120, hy + 10), (cx - 215, hy - 10)], TAN3),
+        ([(cx + 190, hy - 120), (cx + 120, hy - 190), (cx + 60, hy - 60), (cx + 120, hy + 10), (cx + 215, hy - 10)], TAN3),
+        ([(cx - 215, hy - 10), (cx - 120, hy + 10), (cx - 90, hy + 120), (cx - 170, hy + 110)], TAN2),
+        ([(cx + 215, hy - 10), (cx + 120, hy + 10), (cx + 90, hy + 120), (cx + 170, hy + 110)], TAN2),
+    ):
+        L.paint(L.poly(pts) * head, col, height=0.82)
+    muz = L.poly([(cx - 110, hy + 20), (cx, hy - 10), (cx + 110, hy + 20), (cx + 120, hy + 110), (cx + 60, hy + 180),
+                  (cx, hy + 195), (cx - 60, hy + 180), (cx - 120, hy + 110)])
+    L.paint(muz, CREAM, height=0.85)
+    L.shade(muz, strength=0.25, blur=6)
+    nose = L.poly([(cx - 42, hy + 18), (cx + 42, hy + 18), (cx, hy + 62)])
+    L.paint(L.grow(nose, 4), INK, height=0.9)
+    L.paint(nose, "#3a2228", height=0.92)
+    mouth = L.poly([(cx - 85, hy + 95), (cx, hy + 80), (cx + 85, hy + 95), (cx + 55, hy + 170), (cx, hy + 182), (cx - 55, hy + 170)])
+    L.paint(L.grow(mouth, 5), INK, height=0.86)
+    L.paint(mouth, "#5a1426", height=0.84)
+    L.paint(L.ellipse(cx, hy + 150, 30, 18) * mouth, "#c04060", height=0.85)
+    for sx in (-1, 1):
+        L.paint(L.poly([(cx + sx * 62, hy + 92), (cx + sx * 34, hy + 90), (cx + sx * 50, hy + 142)]), "#fbf6ee", height=0.9)
+        L.paint(L.poly([(cx + sx * 46, hy + 172), (cx + sx * 24, hy + 176), (cx + sx * 38, hy + 138)]), "#fbf6ee", height=0.9)
+    L.paint(L.stroke_round([(cx, hy + 62), (cx, hy + 82)], 6), INK)
+    for sx in (-1, 1):
+        eye = L.poly([(cx + sx * 40, hy - 40), (cx + sx * 130, hy - 70), (cx + sx * 115, hy - 25), (cx + sx * 55, hy - 12)])
+        L.paint(L.grow(eye, 6), INK, height=0.86)
+        L.paint(eye, L.vgrad("#e8f070", "#7fb030", hy - 70, hy - 12), height=0.88)
+        L.paint(L.ellipse(cx + sx * 88, hy - 40, 7, 22) * eye, INK, height=0.9)
+        L.paint(L.poly([(cx + sx * 25, hy - 62), (cx + sx * 140, hy - 102), (cx + sx * 140, hy - 84), (cx + sx * 40, hy - 46)]), "#3a2414", height=0.9)
+        for k in range(3):
+            L.paint(L.ellipse(cx + sx * (60 + k * 18), hy + 60 + (k % 2) * 12, 4), "#8a6a4a", height=0.86)
+    rib = L.poly([(cx - 300, 790), (cx + 300, 790), (cx + 280, 880), (cx - 280, 880)])
+    L.paint(L.grow(rib, 8), INK, height=0.7)
+    L.paint(rib, L.vgrad("#eef0f4", "#9aa0aa", 790, 880), height=0.75)
+    word = L.text("PUMAS", "lucky", 96, cx, 838, spacing=10)
+    L.paint(L.grow(word, 4), INK, height=0.8)
+    L.paint(word, PUR, height=0.85)
+    for sx in (-1, 1):
+        st = star(L, cx + sx * 300, 360, 24)
+        L.paint(L.grow(st, 4), INK, height=0.6)
+        L.paint(st, SIL, height=0.7)
+    return L
+
+
+# ================================================================== Reel Time Video (lightbox)
+@logo
+def ReelTimeVideo():
+    L = Logo("ReelTimeVideo", 1536, 512)
+    RED, INK = "#e8402e", "#0c0d14"
+    box = L.rrect(20, 20, 1516, 492, 30)
+    L.paint(L.grow(box, 6), INK, height=0.3)
+    L.paint(box, L.vgrad("#2a56d6", "#14287a", 20, 492), height=0.4)
+    L.col += (np.exp(-((L.xx / SS - 768) ** 2 / 600 ** 2 + (L.yy / SS - 256) ** 2 / 260 ** 2)) * 50)[..., None] * box[..., None]
+    trim = np.clip(box - L.grow(box, -14), 0, 1)
+    L.paint(trim, L.vgrad("#e9edf5", "#7c8494", 20, 492), height=0.55)
+    rx, ry, rr = 250, 256, 170
+    reel = L.ellipse(rx, ry, rr)
+    L.paint(L.grow(reel, 8), INK, height=0.6)
+    L.paint(reel, L.vgrad("#f2f4f8", "#a4aab6", ry - rr, ry + rr), height=0.7)
+    L.shade(reel, strength=0.4, blur=6)
+    for k in range(6):
+        a = k * math.pi / 3 + math.pi / 6
+        L.paint(L.ellipse(rx + 92 * math.cos(a), ry + 92 * math.sin(a), 38), "#20263a", height=0.5)
+    L.paint(L.ellipse(rx, ry, 34), "#20263a", height=0.6)
+    for k in range(12):
+        a = k * math.pi / 6
+        L.paint(L.stroke_round([(rx + 148 * math.cos(a), ry + 148 * math.sin(a)), (rx + 160 * math.cos(a), ry + 160 * math.sin(a))], 6), INK, height=0.75)
+    L.paint(L.stroke_round([(rx, ry), (rx + 70, ry - 70)], 12), RED, height=0.8)
+    L.paint(L.stroke_round([(rx, ry), (rx + 25, ry - 120)], 9), INK, height=0.8)
+    L.paint(L.ellipse(rx, ry, 16), RED, height=0.82)
+    # REEL TIME, chunky with an offset shadow and a white outline; VIDEO RENTALS under it
+    word = L.text("REEL TIME", "lucky", 190, 960, 200, spacing=6)
+    L.paint(np.roll(np.roll(L.grow(word, 10), 10 * SS, 0), 8 * SS, 1) * box, INK, height=0.6)
+    L.paint(L.grow(word, 10), INK, height=0.7)
+    L.paint(L.grow(word, 5), "#ffffff", height=0.75)
+    L.paint(word, L.vgrad("#fff59a", "#ffb21e", 120, 280), height=0.85)
+    L.shade(word, strength=0.3, blur=3)
+    vid = L.text("VIDEO  ·  RENTALS", "lucky", 70, 960, 345, spacing=8)
+    L.paint(L.grow(vid, 5), INK, height=0.7)
+    L.paint(vid, "#ffffff", height=0.8)
+    # a film strip along the bottom
+    strip = L.rrect(470, 405, 1450, 465, 4)
+    L.paint(strip, "#15161c", height=0.6)
+    for k in range(40):
+        x = 480 + k * 24.5
+        L.paint(L.rrect(x, 412, x + 12, 420, 2) + L.rrect(x, 450, x + 12, 458, 2), "#e8e8e8", height=0.62)
+    return L
+
+
+# ================================================================== Suds Laundromat
+@logo
+def SudsLaundromat():
+    L = Logo("SudsLaundromat", 1536, 512)
+    INK = "#123c3a"
+    board = L.rrect(20, 20, 1516, 492, 200)
+    L.paint(L.grow(board, 8), "#0d2a28", height=0.3)
+    L.paint(board, L.vgrad("#d9f6ee", "#8fd3c1", 20, 492), height=0.4)
+    ring = np.clip(board - L.grow(board, -16), 0, 1)
+    L.paint(ring, L.vgrad("#ffffff", "#b7c2c8", 20, 492), height=0.55)
+    L.shade(ring, strength=0.4, blur=3)
+    wx, wy = 260, 256
+    door = L.ellipse(wx, wy, 165)
+    L.paint(L.grow(door, 8), INK, height=0.6)
+    L.paint(door, L.vgrad("#f4f7fa", "#8e98a4", wy - 165, wy + 165), height=0.7)
+    L.shade(door, strength=0.4, blur=5)
+    glass = L.ellipse(wx, wy, 120)
+    L.paint(glass, L.rgrad("#bfe9ff", "#3a86b8", wx - 30, wy - 40, 160), height=0.6)
+    wave = L.poly([(wx - 120 + i * 6, wy + 20 + 14 * math.sin(i * 0.35)) for i in range(41)] + [(wx + 120, wy + 130), (wx - 120, wy + 130)]) * glass
+    L.paint(wave, "#5fb3e0", height=0.62)
+    L.paint(L.m(lambda d, s: d.arc(((wx - 95) * s, (wy - 95) * s, (wx + 95) * s, (wy + 95) * s), 200, 250, fill=255, width=int(12 * s))), "#ffffff", alpha=0.8)
+    rng = np.random.default_rng(7)
+    for k in range(12):
+        bx, by, br = wx + 150 + rng.uniform(0, 200), wy + 70 - rng.uniform(0, 170), rng.uniform(14, 38)
+        bub = L.ellipse(bx, by, br)
+        L.paint(L.outline(bub, 3), INK, alpha=0.55)
+        L.paint(bub, L.rgrad("#ffffff", "#bdeee0", bx - br * 0.4, by - br * 0.4, br * 1.6), alpha=0.85, height=0.7)
+        L.paint(L.ellipse(bx - br * 0.35, by - br * 0.35, br * 0.22), "#ffffff", height=0.75)
+    word = L.text("Suds", "chela", 250, 940, 210)
+    L.paint(L.grow(word, 12), INK, height=0.7)
+    L.paint(L.grow(word, 6), "#ffffff", height=0.75)
+    L.paint(word, L.vgrad("#4fc7a8", "#1f8a72", 90, 320), height=0.85)
+    L.shade(word, strength=0.35, blur=3)
+    sub = L.text("LAUNDROMAT  ·  OPEN 24 HRS", "lucky", 56, 960, 400, spacing=5)
+    L.paint(L.grow(sub, 4), "#ffffff", height=0.7)
+    L.paint(sub, INK, height=0.8)
+    return L
+
+
+# ================================================================== The Wickfield Gazette (masthead on newsprint)
+@logo
+def WickfieldGazette():
+    L = Logo("WickfieldGazette", 2048, 512)
+    INK, PAPER = "#1a1612", "#efe8d6"
+    page = L.rrect(0, 0, 2048, 512, 2)
+    L.paint(page, PAPER, height=0.2)
+    L.grain(page, 0.05, 1.2, seed=8)
+    L.paint(np.clip(L.rrect(40, 40, 2008, 48, 0) + L.rrect(40, 56, 2008, 60, 0), 0, 1), INK, height=0.3)
+    L.paint(np.clip(L.rrect(40, 452, 2008, 456, 0) + L.rrect(40, 464, 2008, 472, 0), 0, 1), INK, height=0.3)
+    L.paint(L.text("The Wickfield Gazette", "balth", 168, 1024, 245), INK, height=0.6)
+    L.paint(L.text("ALL THE NEWS THAT FITS, AND SOME THAT DOESN’T", "georgia", 32, 1024, 400, spacing=4), INK, height=0.5)
+    L.paint(L.text("EST. 1851", "georgiab", 30, 170, 95), INK, height=0.5)
+    L.paint(L.text("FIVE CENTS", "georgiab", 30, 1878, 95), INK, height=0.5)
+    for sx in (-1, 1):
+        x = 1024 + sx * 905
+        L.paint(np.clip(L.ellipse(x, 250, 70) - L.ellipse(x, 250, 62), 0, 1), INK, height=0.5)
+        L.paint(L.poly([(x - 22, 228), (x + 22, 228), (x + 17, 285), (x - 17, 285)]), INK, height=0.55)
+        L.paint(L.poly([(x - 9, 240), (x + 9, 240), (x + 7, 274), (x - 7, 274)]), PAPER)
+        L.paint(L.poly([(x - 28, 228), (x, 200), (x + 28, 228)]), INK, height=0.55)
+    return L
+
+
+# ================================================================== The Founder's plaque (cast bronze)
+@logo
+def FounderPlaque():
+    L = Logo("FounderPlaque", 1024, 640)
+    INK = "#1c140c"
+    plate = L.rrect(20, 20, 1004, 620, 40)
+    L.paint(L.grow(plate, 6), INK, height=0.3)
+    L.paint(plate, L.vgrad("#b98a4a", "#6a4620", 20, 620), height=0.5)
+    L.grain(plate, 0.12, 2.5, seed=9)
+    rim = np.clip(plate - L.grow(plate, -26), 0, 1)
+    L.paint(rim, L.vgrad("#e2b56c", "#8a5e2a", 20, 620), height=0.75)
+    L.shade(rim, strength=0.5, blur=4)
+    for x, y in ((70, 70), (954, 70), (70, 570), (954, 570)):
+        b = L.ellipse(x, y, 20)
+        L.paint(b, "#d8a860", height=0.85)
+        L.shade(b, strength=0.6, blur=2)
+    raised = np.zeros((L.H, L.W), np.float32)
+    lines = [("JOSIAH WICK", "georgiab", 74, 140, 8), ("1803  –  1871", "georgia", 40, 215, 6),
+             ("FOUNDER OF WICKFIELD", "balth", 46, 300, 4),
+             ("Who never once broke a rule,", "georgiai", 44, 400, 0), ("and wished you wouldn’t either.", "georgiai", 44, 455, 0),
+             ("ERECTED BY GRATEFUL CITIZENS, 1901", "balth", 30, 545, 3)]
+    for t_, f_, px, y, sp in lines:
+        raised = np.maximum(raised, L.text(t_, f_, px, 512, y, spacing=sp))
+    raised = np.maximum(raised, L.rrect(300, 340, 724, 346, 2))
+    L.paint(L.grow(raised, 3), "#3a2410", height=0.6)
+    L.paint(raised, L.vgrad("#f0c47c", "#a87436", 100, 560), height=0.9)
+    L.shade(raised, strength=0.55, blur=1.5)
+    patina = np.clip(ndimage.gaussian_filter(np.clip(L.grow(raised, 5) - raised, 0, 1), 3 * SS) * 1.5, 0, 1) * plate
+    L.paint(patina, "#4f8a72", alpha=0.22)
+    return L
+
+
+# ================================================================== the admission envelope's wax crest (new, not the UI Seal)
+@logo
+def AdmissionWax():
+    L = Logo("AdmissionWax", 768, 768)
+    cx = cy = 384
+    pts = []
+    rng = np.random.default_rng(11)
+    nlo = rng.uniform(0, 2 * math.pi, 6)
+    for i in range(240):
+        a = 2 * math.pi * i / 240
+        r = 300 + sum(14 * math.sin(a * (k + 3) + nlo[k]) for k in range(6))
+        pts.append((cx + r * math.cos(a), cy + r * math.sin(a)))
+    blob = L.poly(pts)
+    L.paint(blob, L.rgrad("#b01a2c", "#5a0812", cx - 60, cy - 80, 360), height=0.45)
+    L.shade(blob, strength=0.45, blur=20)
+    disc = L.ellipse(cx, cy, 230)
+    L.paint(disc, L.rgrad("#8a1020", "#5c0812", cx, cy, 240), height=0.35)
+    L.shade(disc, light=(1, 1), strength=0.4, blur=6)
+    L.paint(np.clip(L.ellipse(cx, cy, 214) - L.ellipse(cx, cy, 200), 0, 1), "#b52236", height=0.55)
+    raised = np.zeros((L.H, L.W), np.float32)
+    # a crescent below, cradling a proper bell (crown, waist, flared lip), stars above
+    raised = np.maximum(raised, np.clip(L.ellipse(cx, cy + 20, 120) - L.ellipse(cx, cy - 4, 116), 0, 1) * (L.yy / SS > cy + 40))
+    prof = []
+    for i in range(81):
+        t = i / 80                                    # 0 crown top -> 1 lip
+        y = cy - 125 + 175 * t
+        if t < 0.18:
+            w = 58 * math.sqrt(max(0.0, 1 - ((0.18 - t) / 0.18) ** 2))
+        else:
+            u = (t - 0.18) / 0.82
+            w = 58 - 10 * math.sin(math.pi * min(1, u * 1.4)) * (u < 0.72) + 52 * max(0, u - 0.62) ** 1.5 * 4.0
+        prof.append((cx + w, y))
+    raised = np.maximum(raised, L.poly(prof + [(2 * cx - x, y) for x, y in reversed(prof)]))
+    raised = np.maximum(raised, L.rrect(cx - 112, cy + 44, cx + 112, cy + 56, 6))           # the lip band
+    raised = np.maximum(raised, np.clip(L.ellipse(cx, cy - 140, 18) - L.ellipse(cx, cy - 140, 9), 0, 1))
+    for k in range(5):
+        a = -math.pi / 2 + (k - 2) * 0.42
+        if k == 2:
+            continue
+        raised = np.maximum(raised, star(L, cx + 165 * math.cos(a), cy - 10 + 165 * math.sin(a), 11))
+    raised = np.maximum(raised, L.arc_text("NOCTE  DISCIMUS", "georgiab", 32, cx, cy, 178, a_mid=90, spacing=1.15, inside=True))
+    L.paint(raised, L.vgrad("#e0485c", "#9a1428", cy - 200, cy + 200), height=0.7)
+    L.shade(raised, strength=0.5, blur=2)
+    L.paint(L.ellipse(cx, cy + 66, 16), "#e0485c", height=0.72)
+    L.paint(ndimage.gaussian_filter(L.ellipse(cx - 130, cy - 170, 70, 26), 12 * SS), "#ffffff", alpha=0.35)
+    return L
+
+
 def sheet(names):
     ims = [Image.open(os.path.join(OUT, f"{n}_color.png")).convert("RGBA") for n in names]
     h = 360

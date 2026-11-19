@@ -189,6 +189,6 @@ Bell item, a line from the hall monitor.
 
 ## 11. Open questions
 
-1. **Placement:** `Workspace.Hometown` in this place (proposed), or a separate place with a teleport? A separate place
-   keeps the school's memory budget clean but adds a load screen.
+1. **Placement: decided.** The owner, 2026-11-18: "Wickfield should be a place in it". Wickfield is its own area
+   inside the NH Combat Test place (`Workspace.Hometown`), streamed in for the tutorial only. There's no teleport.
 2. **Existing players:** offer it as a Replay only (proposed), or play it once on next join?
