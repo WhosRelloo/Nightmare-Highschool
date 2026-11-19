@@ -83,7 +83,14 @@ only for the tutorial. **The Map place is never touched.**
 | WFMailbox | the flag | FlagDown, FlagUp |
 | WFPicketGate | the gate | GateOpen, GateSwingShut |
 
-**Still to come:** Biscuit and the goose are full creature rigs with locomotion and acting clips (§4).
+**The animals** (props batch 50, `art/props/nh_props_batch50_creatures.py`) are built like the beasts: a branching
+skeleton skinned into one smooth, sculpted body, soft parts as their own pieces, and markings painted by a procedural
+fur or feather shader, then baked.
+
+| Animal | Build | Clips |
+|---|---|---|
+| **Biscuit** (basset hound, 4.6 long, 1.7 at the shoulder) | long and low; crooked legs, the front paws turned out; a deep chest keel, a dewlap, flews and a wrinkled brow; red-rimmed droopy eyes with eyelids; teardrop ears nearly to the ground (2 bones each); a white-tipped tail; tricolour coat; red collar and a brass tag. 27 bones | Sleep (breathing, an ear twitch; loops), WakeStare, Sigh, Wuff, Trot (loops) |
+| **The goose** (Canada goose, 4 tall: comically big) | a plump body; a long black S-neck; the white chinstrap; a beige breast; barred brown wings (3 bones each); a black tail over a white rump; a black bill with a lower jaw that gapes; webbed feet | Idle (loops), Alert, Hiss, Charge (loops), Honk, Strut (the victory waddle; loops) |
 
 **PBR on the printed props:** every canvas also has `_canvas_normal`, `_canvas_rough` and `_canvas_metal` maps.
 - **Relief:** paper fibres, creases, ink lift, a raised wax seal, felt fuzz.
