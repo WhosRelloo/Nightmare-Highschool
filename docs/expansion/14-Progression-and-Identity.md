@@ -1,6 +1,7 @@
 # 14. Progression and Identity (Expansion Phase 3)
 
-**Status:** approved in chat 2026-11-18 (the design); this written spec waits for the owner's review.
+**Status:** approved 2026-11-18. **2.31 shipped** (plan: `docs/superpowers/plans/2026-11-18-standing-paths.md`; its
+deltas are §10 items 9 to 13). 2.32 is next.
 
 **Sources:** doc 02 §3.1 to §3.3, doc 06 §3, §4 and §6, doc 07 (`Progression`, `Phone`, `Homes`), and doc 08 Phase 3.
 This spec makes them buildable. §10 lists where it differs from them.
@@ -343,3 +344,15 @@ import. Until a model is in, the trophy shows its silhouette in the case.
 6. **The Trophy Case is a Locker tab**, not a separate screen.
 7. **No "students ask you for things" at tier 3** (it needs a favour system; §9).
 8. **Wardrobe unlocks:** seven, one per tier listed in §6.1, not one per tier for every path.
+9. **(2.31) The evaluator is its own module,** `Services.Player.Paths`, not code inside `Progression` (already 24 KB).
+   Its data still lives in `Progress`, and `Progression.Sanitize` now keeps `Paths` and `Tally` (it used to drop
+   unknown fields).
+10. **(2.31) The counters:** `Superlatives` replaces `Showdowns`. Showdown wins are already saved
+    (`Social.Showdowns.Won`); a won weekly superlative was saved nowhere.
+11. **(2.31) NPC recognition:** students (every clique, through `CliqueTalk.Generic`), Ezra and Vesper, and Ms.
+    Sallow, Mr. Pryce and Dr. Whitlock. Mr. Hale keeps his Orientation lines; clique leaders and coaches can gain lines
+    later.
+12. **(2.31) The tier-4 mention** is a PA line by day, or a SHOUT-OUT item (Broadcast kind `Notable`) on the Midnight
+    Broadcast when the station is on air or the PA has already spoken this segment.
+13. **(2.31) Checks** run on join, every 60 seconds, and on reputation, relationship, faction-rank and counter
+    changes.

@@ -78,7 +78,7 @@ run in the game VM.
   - `Paths.FactsOverride: { [Player]: F }` (tests only)
   - `Config.Paths.Order`, `Config.Paths.Paths[Path].Tiers[i] = { Name, Title?, Need = { { Text, Test } } }`
 
-- [ ] **Step 1: Back up and mirror.** In Edit, copy every module this plan changes into
+- [x] **Step 1: Back up and mirror.** In Edit, copy every module this plan changes into
   `ServerStorage.NH_Backup.Phase5_pre_20261118` (a "(2.30)" suffix where a copy exists). Then dump each into
   `pre/` and `live/`:
 
@@ -89,7 +89,7 @@ python -X utf8 -I harness/dump.py ServerScriptService.Services.Player.Progressio
 
   Expected: one "N bytes" line per path. (A wrong path makes `dump.py` loop forever: stop it and fix the path.)
 
-- [ ] **Step 2: Snapshot and restore cover the new data.** In `harness/snapshot.lua`, extend the encoded table with
+- [x] **Step 2: Snapshot and restore cover the new data.** In `harness/snapshot.lua`, extend the encoded table with
   `Progress = Prof.Progress; Titles = Prof.Social and Prof.Social.Titles or {}; Title = Prof.Social and
   Prof.Social.Title or ""; Phone = Prof.Phone`. In `restore.py`'s Luau, after the Relationships line, add:
 
@@ -105,7 +105,7 @@ python -X utf8 -I harness/dump.py ServerScriptService.Services.Player.Progressio
   Then start Play, run `python -X utf8 -I harness/gamevm.py start_play.lua`, take the snapshot
   (`python -X utf8 -I harness/gamevm.py snapshot.lua > harness/_slot2.json`; check it parses), and stop Play.
 
-- [ ] **Step 3: Write the failing test.** Append to TestBridge (before `return Shared`):
+- [x] **Step 3: Write the failing test.** Append to TestBridge (before `return Shared`):
 
 ```lua
 -- (2.31) Standing Paths: the evaluator on made-up facts, then grants on the live player (put back after)
@@ -114,10 +114,10 @@ function Commands.PathsTest(PlayerName: string)
 end
 ```
 
-- [ ] **Step 4: Run it, expect failure.** Install TestBridge, start Play, `start_play.lua`, then
+- [x] **Step 4: Run it, expect failure.** Install TestBridge, start Play, `start_play.lua`, then
   `python -X utf8 -I harness/bridge.py PathsTest '$P'`. Expected: an error (`Paths` is not a valid member).
 
-- [ ] **Step 5: `Progression.Sanitize` keeps the new fields.** In `Shared.Sanitize`, change the first line to
+- [x] **Step 5: `Progression.Sanitize` keeps the new fields.** In `Shared.Sanitize`, change the first line to
   `local Out = { Level = 1; Exp = 0; Points = 0; Stats = {}; FatedDay = -1; Paths = {}; Tally = {} }` and, before
   `return Out` at the end of the function, add:
 
@@ -138,7 +138,7 @@ end
 	end
 ```
 
-- [ ] **Step 6: Create `Config.Paths`.**
+- [x] **Step 6: Create `Config.Paths`.**
 
 ```lua
 --[[ (2.31) Standing Paths (docs/expansion/14-Progression-and-Identity.md §3.1). Read by Services.Player.Paths.
@@ -244,7 +244,7 @@ Paths.Mention = "Congratulations to {Name}, now {Article} {Tier}." -- (a plain s
 return Paths
 ```
 
-- [ ] **Step 7: Create `Services.Player.Paths`.**
+- [x] **Step 7: Create `Services.Player.Paths`.**
 
 ```lua
 --[[ (2.31) Standing Paths (server). Services.Player.Paths (docs/expansion/14-Progression-and-Identity.md §3).
@@ -550,7 +550,7 @@ return Shared
   (In the live part, `Honor` reaches Academic 3 only: its beasts, Orientation and met count are all zero, so
   `FirstGrants` is 2. **Expected values are in Step 9.**)
 
-- [ ] **Step 8: Install.** Stop Play. In Edit:
+- [x] **Step 8: Install.** Stop Play. In Edit:
 
 ```bash
 python -X utf8 -I harness/install.py live/ReplicatedStorage.Config.Paths.luau live/ServerScriptService.Services.Player.Paths.luau live/ServerScriptService.Services.Player.Progression.luau live/ServerScriptService.Services.Studio.TestBridge.luau
@@ -558,13 +558,13 @@ python -X utf8 -I harness/install.py live/ReplicatedStorage.Config.Paths.luau li
 
   Expected: four lines with sizes, no PARSE FAIL.
 
-- [ ] **Step 9: Run the test, expect pass.** Start Play, `start_play.lua`, `bridge.py PathsTest '$P'`. Expected:
+- [x] **Step 9: Run the test, expect pass.** Start Play, `start_play.lua`, `bridge.py PathsTest '$P'`. Expected:
   `ZeroAllOne true, MaxAllTop true, HonorStudent 3, UneasyByBeast 2, FactsLive true, FirstGrants 2, SecondGrants 0,
   GrantSignals 2, AfterDrop 3, TitleGiven true, Attr 3`. Then in the game VM check the slot's real tiers:
   `return HttpService:JSONEncode(require(SSS.Player.Paths).Facts(P))` (each field a number or boolean), and that
   `Progression.Get(P).Paths` holds whatever the real facts earn. Restore slot 2 (`restored`).
 
-- [ ] **Step 10: Commit.**
+- [x] **Step 10: Commit.**
 
 ```bash
 git add tools/phase5-2310 && git -c user.name=Rello commit -m "2.31 (1/6): Standing Paths: Config.Paths, the evaluator, saved tiers that never drop"
@@ -584,7 +584,7 @@ git add tools/phase5-2310 && git -c user.name=Rello commit -m "2.31 (1/6): Stand
 - Consumes: `Paths.Count(P, Key, N?)`, `Config.Paths.Tally`
 - Produces: `Progress.Tally.{DuelWins, Champion, Beasts, Escapes, Superlatives}` rising from the live signals
 
-- [ ] **Step 1: Failing test.** TestBridge:
+- [x] **Step 1: Failing test.** TestBridge:
 
 ```lua
 -- (2.31) the five counters, each from its real signal; put back after
@@ -607,8 +607,8 @@ function Commands.TallyTest(PlayerName: string)
 end
 ```
 
-- [ ] **Step 2: Run, expect failure:** install TestBridge, Play, `bridge.py TallyTest '$P'`. Expected all 0.
-- [ ] **Step 3: Hook the signals.** In `Paths.OnStart`, before the sweep loop:
+- [x] **Step 2: Run, expect failure:** install TestBridge, Play, `bridge.py TallyTest '$P'`. Expected all 0.
+- [x] **Step 3: Hook the signals.** In `Paths.OnStart`, before the sweep loop:
 
 ```lua
 	-- the counters the old signals didn't keep (Progress.Tally); they count from 2.31 on
@@ -631,9 +631,9 @@ end
 	end
 ```
 
-- [ ] **Step 4: Beasts.** In `Beasts.Shared.Reward`, as its first line:
+- [x] **Step 4: Beasts.** In `Beasts.Shared.Reward`, as its first line:
   `pcall(function() require(ServerScriptService.Services.Player.Paths).Count(P, \`Beasts\`) end) -- (2.31) Standing Paths`
-- [ ] **Step 5: Superlatives.** In `Local.Grant`, directly before `Social.TempTitles[D.Title] = Until`, add:
+- [x] **Step 5: Superlatives.** In `Local.Grant`, directly before `Social.TempTitles[D.Title] = Until`, add:
 
 ```lua
 			if Social.TempTitles[D.Title] ~= Until then -- (2.31) a superlative won (counted once per award and week)
@@ -641,9 +641,9 @@ end
 			end
 ```
 
-- [ ] **Step 6: Install** Paths, Beasts, Superlatives and TestBridge (Edit). **Run** `TallyTest`. Expected:
+- [x] **Step 6: Install** Paths, Beasts, Superlatives and TestBridge (Edit). **Run** `TallyTest`. Expected:
   `DuelWins 1, Champion 1, Escapes 1, Beasts 1`. Then run `PathsTest` again (still passing). Restore slot 2.
-- [ ] **Step 7: Commit** `2.31 (2/6): the counters (duels, the champion, beasts, escapes, superlatives)`.
+- [x] **Step 7: Commit** `2.31 (2/6): the counters (duels, the champion, beasts, escapes, superlatives)`.
 
 ---
 
@@ -660,7 +660,7 @@ end
   `Broadcast.Post(Kind, Text, Source)`
 - Produces: NHFx `PathTier { Path, Tier, Name, Of }`; Broadcast item Kind `Notable`
 
-- [ ] **Step 1: Failing test.** TestBridge:
+- [x] **Step 1: Failing test.** TestBridge:
 
 ```lua
 -- (2.31) reaching a tier: the banner event, and a broadcast mention from tier 4 (put back after)
@@ -672,8 +672,8 @@ function Commands.PathRewardTest(PlayerName: string)
 end
 ```
 
-- [ ] **Step 2: Run, expect failure** (`RewardTestForTests` is nil).
-- [ ] **Step 3: `Local.Reward` gives everything.** Replace it in Paths:
+- [x] **Step 2: Run, expect failure** (`RewardTestForTests` is nil).
+- [x] **Step 3: `Local.Reward` gives everything.** Replace it in Paths:
 
 ```lua
 -- what a tier gives: its title, a Moments banner (the newest tier of each path only), and from tier 4 a mention on
@@ -729,7 +729,7 @@ function Shared.RewardTestForTests(P: Player)
 end
 ```
 
-- [ ] **Step 4: The banner (client).** In Moments, next to `Fx.On(\`QuestBeat\`, Local.QuestBeat)`, add
+- [x] **Step 4: The banner (client).** In Moments, next to `Fx.On(\`QuestBeat\`, Local.QuestBeat)`, add
   `Fx.On(\`PathTier\`, Local.PathTier)`, and above the "P1-5 Clue Discovered" section:
 
 ```lua
@@ -744,18 +744,18 @@ function Local.PathTier(D)
 end
 ```
 
-- [ ] **Step 5: The `Notable` kicker.** `Config.Broadcast.Kickers` gains `Notable = \`SHOUT-OUT\``. In PhoneRadio's
+- [x] **Step 5: The `Notable` kicker.** `Config.Broadcast.Kickers` gains `Notable = \`SHOUT-OUT\``. In PhoneRadio's
   `Shared.Station`, the `Kick` table gains `Notable = \`SHOUT-OUT\``.
-- [ ] **Step 6: Install** Paths, Moments, Config.Broadcast, PhoneRadio and TestBridge (Edit). **Run**
+- [x] **Step 6: Install** Paths, Moments, Config.Broadcast, PhoneRadio and TestBridge (Edit). **Run**
   `PathRewardTest`. Expected: `Made` 13 (every tier above 1 of Academic 3, Social 4, Athletic 3 and Supernatural 3;
   Combat stays at 1; recount if Config changes), `Last` "Supernatural:4", `Mentions` 4 (one per path whose newest tier
   is 4+: Academic, Social, Athletic, Supernatural; at 21:30 the station is on air, so all are `Notable` posts), `Top`
   "Social" (tier 5 is the highest), `Academic` 4. Then run `PathsTest` and `TallyTest` again (passing).
-- [ ] **Step 7: See it.** In Play, from the client VM set nothing; in the game VM run `Paths.CheckNow(P)` with a
+- [x] **Step 7: See it.** In Play, from the client VM set nothing; in the game VM run `Paths.CheckNow(P)` with a
   `FactsOverride` that reaches Honor Student only, take a screenshot of the banner, save it as
   `review/path_banner.jpg`, and put the slot back (`PathsTest`'s restore pattern, or restore.py). Open Night FM's
   Station after a tier-4 test to see a SHOUT-OUT card.
-- [ ] **Step 8: Commit** `2.31 (3/6): reaching a tier: the title, a banner, and a shout-out from tier 4`.
+- [x] **Step 8: Commit** `2.31 (3/6): reaching a tier: the title, a banner, and a shout-out from tier 4`.
 
 ---
 
@@ -773,7 +773,7 @@ end
 - Produces: CliqueTalk moment `Path[<Path>][Attitude|Any]`; `ctx.PathTier(Path) -> number`; template fields
   `PathGreeting = { Path, Tier, Text }` (GiverTemplate) and `PathHub = { Path, Tier, Text }` (LeaderTemplate)
 
-- [ ] **Step 1: Failing test.** TestBridge:
+- [x] **Step 1: Failing test.** TestBridge:
 
 ```lua
 -- (2.31) NPCs and paths: the student pool, and each tree's line with a fake ctx at tier 3 and at tier 1
@@ -802,10 +802,10 @@ function Commands.RecognitionTest()
 end
 ```
 
-- [ ] **Step 2: Run, expect failure:** every pool 0, every `Differs` false. (First check which node opens each
+- [x] **Step 2: Run, expect failure:** every pool 0, every `Differs` false. (First check which node opens each
   tree: `GiverTemplate` and `LeaderTemplate` both build `Nodes.Hub`; if a template's opening node has another id,
   use that id in the test and in Step 5.)
-- [ ] **Step 3: The `Path` moment.** In `CliqueTalk.Generic`, add (≤ 60 characters a line):
+- [x] **Step 3: The `Path` moment.** In `CliqueTalk.Generic`, add (≤ 60 characters a line):
 
 ```lua
 	-- (2.31) a Standing Path at tier 3+ (the player's PathTop): StudentBrain greets with it now and then
@@ -818,7 +818,7 @@ end
 	};
 ```
 
-- [ ] **Step 4: StudentBrain.** In `greeting(S, Rec)`, directly before
+- [x] **Step 4: StudentBrain.** In `greeting(S, Rec)`, directly before
   `local Race = Pl and Pl:GetAttribute(\`Race\`)`, add:
 
 ```lua
@@ -826,7 +826,7 @@ end
 	if Top and math.random() < 0.25 then return `Path`, { Sub = Top }, daily(C) end
 ```
 
-- [ ] **Step 5: Dialogue.** In `Local.Context`, after `function ctx.Rep(...)`, add:
+- [x] **Step 5: Dialogue.** In `Local.Context`, after `function ctx.Rep(...)`, add:
 
 ```lua
 	function ctx.PathTier(Path: string) -- (2.31) Standing Paths (Services.Player.Paths)
@@ -849,45 +849,45 @@ end
   Add `PathGreeting = { Path, Tier, Text }?,` to its header comment. In LeaderTemplate's `Nodes.Hub.Text`, as its
   first line: `if L.PathHub and ctx.PathTier and ctx.PathTier(L.PathHub.Path) >= L.PathHub.Tier then return L.PathHub.Text end`
   (and `PathHub = { Path, Tier, Text }?,` in its header).
-- [ ] **Step 6: The five lines.** Add to each tree's table:
+- [x] **Step 6: The five lines.** Add to each tree's table:
   - Sallow: `PathGreeting = { Path = \`Academic\`; Tier = 3; Text = \`The honor student. Sit where I can see your working.\` };`
   - Pryce: `PathGreeting = { Path = \`Social\`; Tier = 3; Text = \`Ah, the star of the corridor! Enter to applause.\` };`
   - Whitlock: `PathGreeting = { Path = \`Supernatural\`; Tier = 3; Text = \`You've been reading the old records. Careful which ones.\` };`
   - Ezra: `PathHub = { Path = \`Academic\`; Tier = 3; Text = \`Honor Student now. The Vigil notices names like yours.\` };`
   - Vesper: `PathHub = { Path = \`Combat\`; Tier = 3; Text = \`Enforcer. The Court has been hearing your name.\` };`
-- [ ] **Step 7: Install** the ten files (Edit). **Run** `RecognitionTest`. Expected: every pool 3; every
+- [x] **Step 7: Install** the ten files (Edit). **Run** `RecognitionTest`. Expected: every pool 3; every
   `Differs` true, with each `At3` the line above.
-- [ ] **Step 8: Live.** In Play, after `PathsTest`'s pattern sets `Path_Academic = 3` and `PathTop = "Academic"` (a
+- [x] **Step 8: Live.** In Play, after `PathsTest`'s pattern sets `Path_Academic = 3` and `PathTop = "Academic"` (a
   `FactsOverride` reaching Honor Student, then `CheckNow`), stand by students for up to 2 minutes and read the
   bubbles (client VM: BillboardGui text under `workspace.Live`) for a `Path` line, then talk to Ms. Sallow. Screenshot
   `review/path_greeting.jpg`. Restore slot 2.
-- [ ] **Step 9: Commit** `2.31 (4/6): students, two faction leaders and three teachers recognise your path`.
+- [x] **Step 9: Commit** `2.31 (4/6): students, two faction leaders and three teachers recognise your path`.
 
 ---
 
 ### Task 5: Regression
 
-- [ ] **Step 1: Self-tests in one session:** `PathsTest`, `TallyTest`, `PathRewardTest`, `RecognitionTest`; 2.30
+- [x] **Step 1: Self-tests in one session:** `PathsTest`, `TallyTest`, `PathRewardTest`, `RecognitionTest`; 2.30
   (`BroadcastTest`, `CurfewTest`); 2.29 (`IncidentTest`, `RumourTest`, `RumourSafetyTest`); 2.28 (`StaffTest`,
   `StaffPlanTest`, `TimetableTest`, `SleepTest`); 2.27 (`RosterTest`, `Rostered`, `RelationshipCapTest`,
   `MemoryTest`); the cutscene suite (`CineJudgeTest`, `CineGraphTest`, `AfterHoursMigrateTest`, `CineVoteTest`).
-- [ ] **Step 2: Unchanged behaviour.**
+- [x] **Step 2: Unchanged behaviour.**
   - Level up (`AwardForTests`): the Bell Toll banner as before, and Level/EXP intact (`Progression.Get`).
   - Spend a point in M: still works and still saves (Sanitize change).
   - A real rejoin keeps `Progress.Paths` (stop Play, start, `Progression.Get(P).Paths` unchanged).
   - Duels, a beast kill and a superlative grant still pay as before.
   - Greetings still vary (intro, grudge, race, clique lines); talking to Hale still asks the roll-call question.
-- [ ] **Step 3: The console:** no errors from Paths, Progression, Beasts, Superlatives, Moments, StudentBrain,
+- [x] **Step 3: The console:** no errors from Paths, Progression, Beasts, Superlatives, Moments, StudentBrain,
   Dialogue or the five trees.
-- [ ] **Step 4:** restore slot 2 and check it, stop Play, `save_place`.
+- [x] **Step 4:** restore slot 2 and check it, stop Play, `save_place`.
 
 ### Task 6: Docs and release 2.31.0
 
-- [ ] **Step 1:** CHANGELOG `[2.31.0]` (stage only this hunk), README, Implementation-Status, a Discord game update
+- [x] **Step 1:** CHANGELOG `[2.31.0]` (stage only this hunk), README, Implementation-Status, a Discord game update
   (`updates/discord/game-updates/<date>-standing-paths.md`) and its index line.
-- [ ] **Step 2:** doc 14's status ("2.31 shipped") and §10's new deltas (below).
-- [ ] **Step 3:** vault copies (CHANGELOG entry, the post, doc 14) and the home-note line.
-- [ ] **Step 4:** commit, then merge `phase5-progression` into `main` with `--no-ff -F <file>`, stashing unrelated
+- [x] **Step 2:** doc 14's status ("2.31 shipped") and §10's new deltas (below).
+- [x] **Step 3:** vault copies (CHANGELOG entry, the post, doc 14) and the home-note line.
+- [x] **Step 4:** commit, then merge `phase5-progression` into `main` with `--no-ff -F <file>`, stashing unrelated
   working changes around it. Don't push.
 
 ## Spec deltas (record in doc 14 §10 at release)

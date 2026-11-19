@@ -2,6 +2,67 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.31.0] - 2026-11-18: Standing Paths (Progression & Identity 1 of 4)
+
+The spec is `docs/expansion/14-Progression-and-Identity.md` §3; the plan is `docs/superpowers/plans/2026-11-18-standing-paths.md`.
+- **Studio backup:** `ServerStorage.NH_Backup.Phase5_pre_20261118`: Progression, Beasts, Superlatives, Moments,
+  Config.Broadcast, PhoneRadio, CliqueTalk.Generic, StudentBrain, Dialogue, the two dialogue templates, five dialogue
+  trees and TestBridge.
+- **Mirror:** `tools/phase5-2310/`.
+- **The Map place:** untouched.
+
+### Added
+- **Standing Paths** (`Config.Paths`, `Services.Player.Paths`): five paths whose tiers are computed from data the game
+  already keeps.
+  - **Academic:** Freshman Nobody, Recognized Student, Honor Student, Academic Elite. Reads class levels, report-card
+    averages, the best attendance streak and Academics reputation.
+  - **Social:** Unknown, Recognized, Popular, Influential, School Legend. Reads classmates met, Popularity, clique
+    tiers, faction rank and weekly superlatives.
+  - **Combat:** Beginner, Street Fighter, Enforcer, Notorious, Feared. Reads takedowns, duel wins, Intimidation, clique
+    showdowns, beasts and the Ring's champion.
+  - **Athletic:** Rookie, Starter, Varsity, Captain: exactly your sports club rank.
+  - **Supernatural:** Unaware, Uneasy, Initiated, Keeper of Secrets. Reads Orientation, After Hours (and whether you
+    kept the file), lineage tier and beasts.
+- **Saved and never lost:** only the highest tier reached is saved (`Progress.Paths`), so a tier never drops. Checked
+  on join, every 60 seconds, and when reputation, a relationship, a faction rank or a counter changes.
+- **Five new counters** (`Progress.Tally`): duel wins, champion wins, beasts, escapes from a hall monitor, and weekly
+  superlatives won. They count from this release on.
+- **Reaching a tier gives you:**
+  - its title
+  - a "Standing" banner in the Moments style
+  - from tier 4, a mention: a PA line by day, or a SHOUT-OUT on the Midnight Broadcast at night
+- **People notice:**
+  - **Students:** with a path at tier 3 or above, a student may greet you with it ("That's the honor student.").
+  - **Staff and leaders:** Ms. Sallow, Mr. Pryce, Dr. Whitlock, Ezra and Vesper each have a line for your tier.
+- **TestBridge:** `PathsTest`, `TallyTest`, `PathRewardTest`, `RecognitionTest`.
+
+### Changed
+- **`Progression.Sanitize`** keeps `Paths` and `Tally`. It used to drop every field it didn't know, which would have
+  wiped them on the next EXP gain.
+- **Dialogue:** `ctx.PathTier(Path)`; the giver template takes `PathGreeting` and the leader template takes `PathHub`.
+- **Broadcast:** a new item kind, `Notable` (SHOUT-OUT), shown on Night FM's Station tab.
+
+### Checked
+- **Self-tests:**
+  - `PathsTest`: empty facts give every path tier 1; full facts give every top tier; Honor Student's facts give 3; one
+    beast gives Uneasy; 2 grants, then 0 on a second check; lower facts don't drop it; the title and attribute are set.
+  - `TallyTest`: each counter rises by 1 from its real signal.
+  - `PathRewardTest`: 13 grants, the newest Supernatural 4, 4 mentions, the top path Social.
+  - `RecognitionTest`: 3 lines per path for students; every tree's line changes at tier 3.
+- **Earlier releases, all passing:** 2.30, 2.29, 2.28, 2.27 and the cutscene suite (23 self-tests in one session).
+- **Live (slot 2, restored after):**
+  - Slot 2's own 10 takedowns earned Street Fighter on join.
+  - The Standing banner shows (`tools/phase5-2310/review/path_banner.jpg`).
+  - At lunch, a real student greeted slot 2 with "That's the honor student."
+  - Tiers survive a real rejoin, and EXP gains and point spending keep them.
+  - Mr. Hale still opens with his roll-call line.
+- **Errors:** none from the changed scripts.
+- **Not checked:**
+  - a two-player run
+  - phone screens
+  - the frame rate (skipped, at the owner's request)
+  - a weekly superlative counted live (the code path was reviewed; results arrive weekly)
+
 ## [2.30.0] - 2026-11-18: Broadcast & curfew (Living School 4 of 4)
 
 The spec is `docs/expansion/13-Living-School.md` §5; the plan is `docs/superpowers/plans/2026-11-18-broadcast-and-curfew.md`.
