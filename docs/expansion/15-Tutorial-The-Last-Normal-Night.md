@@ -43,6 +43,13 @@ so the bus into the fog feels like leaving home.
 | **The Ashby House** | the condemned house at the end of the lane, with a sagging porch, boarded windows and the portrait | the Supernatural prank |
 | **The bus stop** | a lone shelter on the edge of town in rain and fog, and the black school bus | the ending |
 
+**Your bedroom follows your character** (owner, 2026-11-18: "Make a wallpaper variant for girls too"):
+- **Male:** dusty-blue wallpaper with cream pinstripes and tiny crescent-and-star sprigs (`WF_Wallpaper`).
+- **Female:** the same pattern in dusty rose, with a little daisy hanging under each moon (`WF_WallpaperRose`).
+
+It's chosen by `Appearance.IsFemale` when the tutorial loads. Only the wallpaper piece's SurfaceAppearance changes; the
+room is the same mesh.
+
 Built at Roblox scale for R6 (1 stud per Blender unit, doors 7 to 8 studs tall), like every other prop in the game.
 It's placed in the NH Combat Test place as its own area away from the school (`Workspace.Hometown`), streamed in
 only for the tutorial. **The Map place is never touched.**

@@ -210,7 +210,80 @@ def road(name="WF_Road", seed=5401):
     save(name, col, h, tile, rough, np.zeros((N, N), np.float32), boost=1.2)
 
 
+# ------------------------------------------------------------------ interiors
+
+def wallpaper(name="WF_Wallpaper", seed=5501, base_rgb=(104, 128, 150), cream_rgb=(228, 216, 190), floral=False):
+    """dusty blue (or rose), cream pinstripes in pairs, a tiny cream crescent-and-star sprig between them (the rose
+    variant adds a five-petal flower under each moon); 4 studs a tile"""
+    tile = 4.0
+    us, vs = U * tile, V * tile
+    paper = fbm(200, 200, 2, seed + 1)
+    blot = fbm(6, 6, 3, seed + 2)
+    base = lin(base_rgb) * (0.94 + 0.08 * paper[..., None]) * (0.95 + 0.08 * blot[..., None])
+    sp = 0.5                                     # stripe pairs every half stud
+    f = us % sp
+    stripe = (np.abs(f - 0.04) < 0.012) | (np.abs(f - 0.08) < 0.006)
+    cream = lin(cream_rgb)
+    col = np.where(stripe[..., None], cream * (0.95 + 0.05 * paper[..., None]), base)
+    # sprigs: a crescent and a little star in every cell between the stripe pairs (alternate columns offset half a stud)
+    col_i = np.floor(us / sp).astype(int)
+    lx = us % sp
+    ly = (vs + 0.5 * (col_i % 2)) % 1.0
+    dx, dy = lx - 0.29, ly - 0.5
+    moon = ((dx ** 2 + dy ** 2) < 0.06 ** 2) & (((dx - 0.025) ** 2 + (dy - 0.015) ** 2) > 0.05 ** 2)
+    sx, sy = dx - 0.075, dy - 0.075
+    r = np.hypot(sx, sy)
+    a = np.arctan2(sy, sx)
+    star = r < 0.034 * (0.4 + 0.6 * np.abs(np.cos(2.5 * a)) ** 3)
+    sprig = moon | star
+    if floral:
+        fx, fy = dx + 0.02, dy + 0.2
+        fr = np.hypot(fx, fy)
+        fa = np.arctan2(fy, fx)
+        petals = fr < 0.045 * (0.55 + 0.45 * np.abs(np.cos(2.5 * fa)))
+        centre = fr < 0.012
+        stem = (np.abs(fx + 0.0) < 0.004) & (fy > 0.04) & (fy < 0.12)
+        sprig = sprig | (petals & ~centre) | stem
+        col = np.where(centre[..., None], lin((214, 168, 96)), col)
+    col = np.where(sprig[..., None], cream * 0.95, col)
+    # age: faint yellowing near the top and bottom of the tile is unwanted (tiles); keep it even, a few scuffs
+    scuff = smoothstep(0.82, 0.9, fbm(20, 20, 3, seed + 3))
+    col = col * (1 - 0.08 * scuff[..., None])
+    h = (paper - 0.5) * 0.001 + stripe * 0.0006 + sprig * 0.0008
+    rough = np.clip(0.85 - 0.1 * stripe, 0, 1)
+    save(name, col, h, tile, rough, np.zeros((N, N), np.float32), boost=1.0)
+
+
+def floor_oak(name="WF_FloorOak", seed=5601):
+    """honey oak boards, 0.6 wide, random lengths, satin finish worn in places; 6 studs a tile"""
+    tile, rows = 6.0, 10
+    w = tile / rows
+    rnd = np.random.default_rng(seed)
+    us, vs = U * tile, V * tile
+    k = np.floor(vs / w).astype(int) % rows
+    dv = vs - np.floor(vs / w) * w
+    cuts = np.sort(rnd.uniform(0, tile, (rows, 2)), 1).astype(np.float32)
+    seg = (us > cuts[k, 0]).astype(int) + (us > cuts[k, 1]).astype(int)
+    dj = np.minimum(np.abs(((us - cuts[k, 0] + tile / 2) % tile) - tile / 2), np.abs(((us - cuts[k, 1] + tile / 2) % tile) - tile / 2))
+    tone = rnd.uniform(0.85, 1.15, (rows, 3)).astype(np.float32)
+    t = tone[k, seg % 3]
+    grain = fbm(3, 120, 5, seed + 1, gain=0.6)
+    rays = fbm(40, 300, 2, seed + 2)
+    base = lin((178, 124, 70)) * t[..., None]
+    col = base * (0.78 + 0.4 * grain[..., None]) * (0.95 + 0.1 * rays[..., None])
+    seam = (dv < 0.012) | (dv > w - 0.012) | (dj < 0.01)
+    col = np.where(seam[..., None], col * 0.35, col)
+    wear = smoothstep(0.55, 0.8, fbm(4, 4, 4, seed + 3))
+    col = col * (1 + 0.1 * wear[..., None])
+    h = (grain - 0.5) * 0.002 - seam * 0.006
+    rough = np.clip(0.38 + 0.25 * wear + (grain - 0.5) * 0.1 + 0.4 * seam, 0, 1)
+    save(name, col, h, tile, rough, np.zeros((N, N), np.float32), boost=1.0)
+
+
 SETS = {
+    "WF_Wallpaper": wallpaper,
+    "WF_WallpaperRose": lambda: wallpaper("WF_WallpaperRose", 5502, base_rgb=(190, 142, 150), cream_rgb=(244, 230, 214), floral=True),
+    "WF_FloorOak": floor_oak,
     "WF_ClapCream": lambda: clapboard("WF_ClapCream", (232, 220, 196), 5001),
     "WF_ClapSage": lambda: clapboard("WF_ClapSage", (150, 168, 140), 5002),
     "WF_ClapButter": lambda: clapboard("WF_ClapButter", (228, 202, 130), 5003),
