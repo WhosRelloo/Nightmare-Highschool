@@ -2,7 +2,7 @@
 
 **Status:** approved 2026-11-18. **2.31 shipped** (plan: `docs/superpowers/plans/2026-11-18-standing-paths.md`; its
 deltas are §10 items 9 to 13). **2.32 shipped** (no separate plan: the owner reshaped the look during the build;
-deltas 14 to 18). 2.33 is next.
+deltas 14 to 18). **2.33 shipped** (deltas 19 to 22). 2.34 is next.
 
 **Sources:** doc 02 §3.1 to §3.3, doc 06 §3, §4 and §6, doc 07 (`Progression`, `Phone`, `Homes`), and doc 08 Phase 3.
 This spec makes them buildable. §10 lists where it differs from them.
@@ -366,3 +366,12 @@ import. Until a model is in, the trophy shows its silhouette in the case.
 17. **(2.32) The Decisions tab** stays out (as §9 says); the Student tab is the old report card on the new page.
 18. **(2.32) No plan file:** the menu's look changed several times at the owner's direction during the build, so the
     work followed this spec directly.
+19. **(2.33) The Trophy Case is in the Permanent Record** (the Honours page, now "Honours & Trophies"), not a Locker
+    tab: the Record already has the art, and every recognition is in one place.
+20. **(2.33) The trophy wall fills itself** in the order trophies are listed; there's no choosing in room-adjust mode
+    yet. It's three of the room's trophy shelves on the right wall (12 spots), placed by markers so the real, larger
+    dorms can move it.
+21. **(2.33) The Club Cup** is won by any ranked club game won (`Tally.MatchWins`), not only a weekly tournament
+    (there's no tournament system yet).
+22. **(2.33) The models are one piece each** (props batch 48), shown in a ViewportFrame in the case and as a clone on
+    the wall; nothing in the dorm template was moved, only the TrophyWall added.

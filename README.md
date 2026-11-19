@@ -19,6 +19,8 @@ This repo holds the project's **changelogs, update posts and design docs**. The 
 ![UI kit preview](docs/img/ui-kit-preview.jpg)
 
 ## Latest update
+**Trophies (2.33.0, 2026-11-18):** nine trophies to earn, each modelled in gilt, oak, leather and crimson enamel: the Club Cup, the Honour Roll Plaque, the Ring Belt, the Register (Chapter One) and five Path Medals. Watch them turn in the Trophy Case (M, Honours & Trophies) and see them on your dorm room's trophy wall. See [the game update](updates/discord/game-updates/2026-11-18-trophies.md) and [the spec](docs/expansion/14-Progression-and-Identity.md).
+
 **The Permanent Record (2.32.0, 2026-11-18):** M now opens the school's leather-bound file on you, remade in its own PBR art with a cover for your race (Human, Priest, Vampire, Werewolf, Ghoul, Wraith), each with its own slow effect. Nine tabs laid out the same way, 30 Honours to earn (two secret), and Notable Entries written in the school's voice. The book opens, pages turn, and new honours stamp in. See [the game update](updates/discord/game-updates/2026-11-18-the-permanent-record.md) and [the spec](docs/expansion/14-Progression-and-Identity.md).
 
 **Standing Paths (2.31.0, 2026-11-18):** you're becoming somebody. Five paths (Academic, Social, Combat, Athletic, Supernatural) climb as you play, from Freshman Nobody to Academic Elite or Beginner to Feared, and a tier never drops. Each tier gives you its title and a banner; tier 4 gets you named on the PA or the Midnight Broadcast; students and staff start to recognise you. See [the game update](updates/discord/game-updates/2026-11-18-standing-paths.md) and [the spec](docs/expansion/14-Progression-and-Identity.md).
