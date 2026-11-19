@@ -47,7 +47,17 @@ so the bus into the fog feels like leaving home.
 - **Male:** dusty-blue wallpaper with cream pinstripes and tiny crescent-and-star sprigs (`WF_Wallpaper`).
 - **Female:** the same pattern in dusty rose, with a little daisy hanging under each moon (`WF_WallpaperRose`).
 
-It's chosen by `Appearance.IsFemale` when the tutorial loads. Only the wallpaper piece's SurfaceAppearance changes; the
+It's chosen by `Appearance.IsFemale` when the tutorial loads.
+
+**Size and fit** (owner, 2026-11-19: "Make the bedroom bigger, and make sure nothing overlaps or clips into each other"):
+- **The house is 38 x 28 studs** (it was 30 x 22).
+- **The bedroom is 16.7 x 15.7 studs**, about 2.5 times the earlier floor area.
+- **Furniture** stands 0.27 studs off every wall, clear of the baseboards.
+- **The bedroom door** swings out into the hall.
+- **Every interior build runs a clip check** (`clip_check` in props batch 49):
+  - every item's mesh is tested against every other item's, and against the walls and trim, with modifiers applied;
+  - each item must stay inside the room;
+  - the build fails and names the parts if anything clips. Only the wallpaper piece's SurfaceAppearance changes; the
 room is the same mesh.
 
 Built at Roblox scale for R6 (1 stud per Blender unit, doors 7 to 8 studs tall), like every other prop in the game.

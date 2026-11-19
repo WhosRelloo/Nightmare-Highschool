@@ -3,9 +3,9 @@ Warm small-town autumn: painted clapboard, white trim, red brick, asphalt shingl
 
   "E:/Blender/blender.exe" --background --factory-startup --python art/props/nh_props_batch49_hometown.py -- <Prop|all> [--size 2048] [--samples 64] [--gpu]
 
-WickHouse  14 Alder Lane, the player's house: two storeys of cream lap siding on a brick foundation (30 x 22 studs, walls
+WickHouse  14 Alder Lane, the player's house: two storeys of cream lap siding on a brick foundation (38 x 28 studs, walls
            1.6 to 21.6), a shingled gable roof (ridge along X), a brick chimney on the right. The front (-Y): a full porch
-           (x -10 to 15, 7 deep) with turned posts, a railing, three steps up to the red front door, and a shed porch roof
+           (x -12 to 19, 7 deep) with turned posts, a railing, three steps up to the red front door, and a shed porch roof
            whose top runs under the bedroom window (upper right): the way out. The drainpipe at the porch roof's front
            right corner goes to the ground (the way down). Back (+Y): the kitchen door and window over the garden.
            Pieces: Siding / Roof / Brick (tiled: WF_ClapCream, WF_Shingle, WF_Brick), Main (baked trim, porch, doors,
@@ -164,7 +164,7 @@ def turned_post(name, x, y, z0, z1, K):
 
 def wick_house(M):
     K = kit(M)
-    W, D = 30.0, 22.0
+    W, D = 38.0, 28.0
     X0, X1, Y0, Y1 = -W / 2, W / 2, -D / 2, D / 2
     ZF, ZT = 1.6, 21.6             # floor (top of foundation), wall top
     T = 0.6                        # wall thickness
@@ -177,26 +177,26 @@ def wick_house(M):
                           ("L", (0.9, D, ZF), (X0, 0, ZF / 2)), ("R", (0.9, D, ZF), (X1, 0, ZF / 2))):
         box(f"Found{nm}", size, loc, K["place"], bevel=0)
     # the chimney (right side, outside the wall), up through the eaves
-    CX, CY = X1 + 1.3, 3.0
+    CX, CY = X1 + 1.3, 5.0
     box("ChimneyLow", (2.6, 4.0, ZT - 0.0), (CX, CY, ZT / 2), K["place"], bevel=0)
     box("ChimneyHigh", (2.2, 3.2, RIDGE + 3 - ZT), (CX - 0.2, CY, (ZT + RIDGE + 3) / 2), K["place"], bevel=0)
 
     # ---- walls (siding) with openings
     set_group("Siding")
-    front_holes = [(-6.0, -2.0, ZF, ZF + 8.0),                     # front door
-                   (-13.4, -9.4, ZF + 3.0, ZF + 8.0),                 # parlour window
-                   (2.5, 6.5, ZF + 3.0, ZF + 8.0), (9.5, 13.5, ZF + 3.0, ZF + 8.0),   # living room pair
-                   (-12.0, -8.0, ZF + 12.4, ZF + 17.4),               # upstairs left
-                   (-2.0, 0.5, ZF + 13.4, ZF + 16.4),                 # bathroom (small)
-                   (6.5, 11.0, ZF + 11.8, ZF + 17.0)]                 # THE BEDROOM WINDOW (low sill: steps out onto the porch roof)
+    front_holes = [(-8.0, -4.0, ZF, ZF + 8.0),                     # front door
+                   (-17.0, -13.0, ZF + 3.0, ZF + 8.0),                # parlour window
+                   (2.0, 6.0, ZF + 3.0, ZF + 8.0), (10.0, 14.0, ZF + 3.0, ZF + 8.0),   # living room pair
+                   (-15.0, -11.0, ZF + 12.4, ZF + 17.4),              # upstairs left
+                   (-4.0, -1.5, ZF + 13.4, ZF + 16.4),                # bathroom (small)
+                   (9.5, 14.0, ZF + 11.8, ZF + 17.0)]                 # THE BEDROOM WINDOW (low sill: steps out onto the porch roof)
     wall("WallF", "y", Y0, X0, X1, ZF, ZT, T, front_holes, K["place"])
-    back_holes = [(6.0, 9.5, ZF, ZF + 8.0),                           # kitchen door
-                  (0.5, 5.0, ZF + 3.6, ZF + 8.0),                     # kitchen window
-                  (-12.0, -8.0, ZF + 3.0, ZF + 8.0), (-12.0, -8.0, ZF + 12.4, ZF + 17.4), (4.0, 8.0, ZF + 12.4, ZF + 17.4)]
+    back_holes = [(8.0, 11.5, ZF, ZF + 8.0),                          # kitchen door
+                  (1.0, 5.5, ZF + 3.6, ZF + 8.0),                     # kitchen window
+                  (-15.0, -11.0, ZF + 3.0, ZF + 8.0), (-15.0, -11.0, ZF + 12.4, ZF + 17.4), (6.0, 10.0, ZF + 12.4, ZF + 17.4)]
     wall("WallB", "y", Y1, X0, X1, ZF, ZT, T, back_holes, K["place"])
-    side_holes = [(-4.0, 0.0, ZF + 3.0, ZF + 8.0), (-4.0, 0.0, ZF + 12.4, ZF + 17.4)]
+    side_holes = [(-5.0, -1.0, ZF + 3.0, ZF + 8.0), (-5.0, -1.0, ZF + 12.4, ZF + 17.4)]
     wall("WallL", "x", X0, Y0, Y1, ZF, ZT, T, side_holes, K["place"])
-    wall("WallR", "x", X1, Y0, Y1, ZF, ZT, T, [(-7.0, -3.0, ZF + 3.0, ZF + 8.0), (-7.0, -3.0, ZF + 12.4, ZF + 17.4)], K["place"])
+    wall("WallR", "x", X1, Y0, Y1, ZF, ZT, T, [(-9.0, -5.0, ZF + 3.0, ZF + 8.0), (-9.0, -5.0, ZF + 12.4, ZF + 17.4)], K["place"])
     # the gable ends (triangles of siding)
     for nm, x in (("L", X0), ("R", X1)):
         bot = [(x - T / 2, Y0, ZT), (x - T / 2, Y1, ZT), (x - T / 2, 0, RIDGE)]
@@ -218,7 +218,7 @@ def wick_house(M):
         ob["nh_keep_uv"] = 1
     # the porch's shed roof: from the wall at z 12.9 (under the bedroom sill) down to the porch front
     PY0, PY1 = Y0 - 7.0, Y0                 # porch depth
-    PX0, PX1 = -10.0, X1
+    PX0, PX1 = -12.0, X1
     PZW, PZF = ZF + 11.2, ZF + 9.0          # porch roof height at the wall / at the front edge
     bot = [(PX0 - 0.6, PY0 - 0.8, PZF - 0.15), (PX1 + 0.6, PY0 - 0.8, PZF - 0.15), (PX1 + 0.6, PY1, PZW), (PX0 - 0.6, PY1, PZW)]
     top = [(x, y, z + 0.3) for x, y, z in bot]
@@ -265,24 +265,24 @@ def wick_house(M):
         cyl(f"Pot{k}", 0.32, 1.0, (CX - 0.2, CY + k, RIDGE + 3.8), K["step"], verts=16, bevel=0.03)
 
     # windows
-    window("WinDoorParlour", "y", Y0, -1, -11.4, ZF + 3.0, 4.0, 5.0, K, shutters=True)
-    window("WinLiving1", "y", Y0, -1, 4.5, ZF + 3.0, 4.0, 5.0, K, shutters=True)
-    window("WinLiving2", "y", Y0, -1, 11.5, ZF + 3.0, 4.0, 5.0, K, shutters=True)
-    window("WinUpL", "y", Y0, -1, -10.0, ZF + 12.4, 4.0, 5.0, K, shutters=True)
-    window("WinBath", "y", Y0, -1, -0.75, ZF + 13.4, 2.5, 3.0, K)
-    window("WinBed", "y", Y0, -1, 8.75, ZF + 11.8, 4.5, 5.2, K, shutters=False, sash_group="BedSash")
-    window("WinKitchen", "y", Y1, 1, 2.75, ZF + 3.6, 4.5, 4.4, K)
-    window("WinBackL", "y", Y1, 1, -10.0, ZF + 3.0, 4.0, 5.0, K)
-    window("WinBackUL", "y", Y1, 1, -10.0, ZF + 12.4, 4.0, 5.0, K)
-    window("WinBackUR", "y", Y1, 1, 6.0, ZF + 12.4, 4.0, 5.0, K)
-    window("WinSideL", "x", X0, -1, -2.0, ZF + 3.0, 4.0, 5.0, K)
-    window("WinSideLU", "x", X0, -1, -2.0, ZF + 12.4, 4.0, 5.0, K)
-    window("WinSideR", "x", X1, 1, -5.0, ZF + 3.0, 4.0, 5.0, K)
-    window("WinSideRU", "x", X1, 1, -5.0, ZF + 12.4, 4.0, 5.0, K)
+    window("WinDoorParlour", "y", Y0, -1, -15.0, ZF + 3.0, 4.0, 5.0, K, shutters=True)
+    window("WinLiving1", "y", Y0, -1, 4.0, ZF + 3.0, 4.0, 5.0, K, shutters=True)
+    window("WinLiving2", "y", Y0, -1, 12.0, ZF + 3.0, 4.0, 5.0, K, shutters=True)
+    window("WinUpL", "y", Y0, -1, -13.0, ZF + 12.4, 4.0, 5.0, K, shutters=True)
+    window("WinBath", "y", Y0, -1, -2.75, ZF + 13.4, 2.5, 3.0, K)
+    window("WinBed", "y", Y0, -1, 11.75, ZF + 11.8, 4.5, 5.2, K, shutters=False, sash_group="BedSash")
+    window("WinKitchen", "y", Y1, 1, 3.25, ZF + 3.6, 4.5, 4.4, K)
+    window("WinBackL", "y", Y1, 1, -13.0, ZF + 3.0, 4.0, 5.0, K)
+    window("WinBackUL", "y", Y1, 1, -13.0, ZF + 12.4, 4.0, 5.0, K)
+    window("WinBackUR", "y", Y1, 1, 8.0, ZF + 12.4, 4.0, 5.0, K)
+    window("WinSideL", "x", X0, -1, -3.0, ZF + 3.0, 4.0, 5.0, K)
+    window("WinSideLU", "x", X0, -1, -3.0, ZF + 12.4, 4.0, 5.0, K)
+    window("WinSideR", "x", X1, 1, -7.0, ZF + 3.0, 4.0, 5.0, K)
+    window("WinSideRU", "x", X1, 1, -7.0, ZF + 12.4, 4.0, 5.0, K)
 
     # ---- the front door: a six-panel red door with a half-moon fanlight, casing, a brass knob, the house number
     set_group("Main")
-    dc, dw, dh = -4.0, 4.0, 8.0
+    dc, dw, dh = -6.0, 4.0, 8.0
     box("DoorCasL", (0.55, 0.3, dh + 0.6), (dc - dw / 2 - 0.27, Y0 - 0.42, ZF + dh / 2 + 0.3), K["trim"], bevel=0.04)
     box("DoorCasR", (0.55, 0.3, dh + 0.6), (dc + dw / 2 + 0.27, Y0 - 0.42, ZF + dh / 2 + 0.3), K["trim"], bevel=0.04)
     box("DoorHead", (dw + 1.6, 0.4, 0.7), (dc, Y0 - 0.45, ZF + dh + 0.6), K["trim"], bevel=0.05)
@@ -312,7 +312,7 @@ def wick_house(M):
     sx0, sx1 = dc - 3.0, dc + 3.0
     for s in range(3):                                                    # three stone steps
         box(f"Step{s}", (sx1 - sx0, 1.1, (s + 1) * deck_z / 3), ((sx0 + sx1) / 2, PY0 - 0.55 - (2 - s) * 1.1, (s + 1) * deck_z / 6), K["step"], bevel=0.05)
-    posts = [PX0 + 0.45, sx0 - 0.3, sx1 + 0.3, 6.0, PX1 - 0.45]
+    posts = [PX0 + 0.45, sx0 - 0.3, sx1 + 0.3, 7.0, PX1 - 0.45]
     for i, x in enumerate(posts):
         turned_post(f"Post{i}", x, PY0 + 0.45, deck_z, PZF - 0.1, K)
     box("PorchBeam", (PX1 - PX0 + 0.4, 0.9, 1.0), ((PX0 + PX1) / 2, PY0 + 0.45, PZF - 0.55), K["trim"], bevel=0.05)
@@ -363,7 +363,7 @@ def wick_house(M):
         box(f"BackSpout{x}", (0.42, 0.42, zov - 0.3), (x + 0.5 * (1 if x < 0 else -1) * 0, Y1 + OV + 0.3, (zov - 0.3) / 2 + 0.15), K["gutter"], bevel=0.05)
 
     # ---- the back door: half glass, a little stoop
-    bdc, bdw = 7.75, 3.5
+    bdc, bdw = 9.75, 3.5
     set_group("Main")
     box("BDoor", (bdw - 0.1, 0.22, 7.9), (bdc, Y1 + 0.05, ZF + 3.95), K["trim"], bevel=0.04)
     box("BDoorCasL", (0.5, 0.3, 8.5), (bdc - bdw / 2 - 0.25, Y1 + 0.42, ZF + 4.2), K["trim"], bevel=0.04)
@@ -580,167 +580,335 @@ def sidewalk(M):
     return (16, 16.8, 1.0)
 
 
+# ------------------------------------------------------------------ clip check: every item against every other one
+
+ITEMS = []        # (item name, first part index) in build order; parts after it belong to it until the next
+
+
+def item(name):
+    ITEMS.append((name, len(P.PARTS)))
+
+
+def clip_check(room_box, structure=("Room",), skip=("Floor",), eps=0.004):
+    """Fail the build if any two items' meshes intersect (BVH triangle overlap, with modifiers), or any item leaves the
+    room. Parts of the same item may touch. Structure items are tested against furniture, not against each other."""
+    from mathutils.bvhtree import BVHTree
+    dg = bpy.context.evaluated_depsgraph_get()
+    bounds = [(n, i) for n, i in ITEMS] + [(None, len(P.PARTS))]
+    owner = {}
+    for (n, a), (_, b) in zip(bounds, bounds[1:]):
+        for ob in P.PARTS[a:b]:
+            owner[ob.name] = n
+    bvh, bb = {}, {}
+    bpy.context.view_layer.update()
+    for ob in P.PARTS:
+        if ob.name not in owner or ob.name in skip:
+            continue
+        ev = ob.evaluated_get(dg)
+        me = ev.to_mesh()
+        mw = ob.matrix_world
+        verts = [mw @ v.co for v in me.vertices]
+        polys = [list(p.vertices) for p in me.polygons]
+        ev.to_mesh_clear()
+        if not verts:
+            continue
+        bvh[ob.name] = BVHTree.FromPolygons(verts, polys)
+        lo = Vector((min(v.x for v in verts), min(v.y for v in verts), min(v.z for v in verts)))
+        hi = Vector((max(v.x for v in verts), max(v.y for v in verts), max(v.z for v in verts)))
+        bb[ob.name] = (lo, hi)
+    bad = []
+    names = list(bvh)
+    (rx0, ry0, rz0), (rx1, ry1, rz1) = room_box
+    for n in names:
+        it = owner[n]
+        if it in structure:
+            continue
+        lo, hi = bb[n]
+        if lo.x < rx0 - eps or lo.y < ry0 - eps or lo.z < rz0 - eps or hi.x > rx1 + eps or hi.y > ry1 + eps or hi.z > rz1 + eps:
+            bad.append(f"{it}/{n} leaves the room ({tuple(round(c, 2) for c in lo)} .. {tuple(round(c, 2) for c in hi)})")
+    for i, a in enumerate(names):
+        for b in names[i + 1:]:
+            ia, ib = owner[a], owner[b]
+            if ia == ib or (ia in structure and ib in structure):
+                continue
+            (la, ha), (lb, hb) = bb[a], bb[b]
+            if la.x > hb.x or lb.x > ha.x or la.y > hb.y or lb.y > ha.y or la.z > hb.z or lb.z > ha.z:
+                continue
+            if bvh[a].overlap(bvh[b]):
+                bad.append(f"{ia}/{a} x {ib}/{b}")
+    print(f"[clip] {len(names)} parts, {len(set(owner.values()))} items, {len(bad)} problems")
+    for line in bad:
+        print("[clip]  ", line)
+    if bad:
+        raise SystemExit("clip check failed")
+
+
 # ================================================================== your bedroom (inside WickHouse, the same origin)
 
+BED_ROOM = dict(X0=2.0, X1=18.7, Y0=-13.7, Y1=2.0, Z0=12.0, Z1=21.2)   # inner faces of the room (house space)
+BED_WIN = (11.75, 4.5, 13.4, 5.2)                                       # the front window: centre x, width, sill z, height
+BED_SIDE = (-7.0, 4.0, 14.0, 5.0)                                       # the right-side window: centre y, width, sill z, height
+
+
 def bedroom(M):
-    """The player's bedroom, upper front right of WickHouse, built in the house's own space (place it at the house's
-    CFrame): x 1 to 14.7, y -10.7 to 0, floor at z 12, ceiling 21.2. The front window (x 6.5 to 11) is the way out.
-    The classic gag: pillows stuffed under the duvet in the shape of a sleeping kid. The wallpaper is WF_Wallpaper;
-    a female character gets WF_WallpaperRose on the same piece (docs/expansion/15 §2)."""
+    """The player's bedroom, upper front right of WickHouse (38 x 28), built in the house's own space (place it at the
+    house's CFrame): 16.7 x 15.7 studs, floor at z 12, ceiling 21.2. The front window is the way out onto the porch roof.
+    The classic gag: pillows stuffed under the duvet in the shape of a sleeping kid. Every item is clip-checked against
+    every other one when it builds. The wallpaper is WF_Wallpaper; a female character gets WF_WallpaperRose on the same
+    piece (docs/expansion/15 §2)."""
+    ITEMS.clear()
     K = kit(M)
     oak = material("WFOak", "NH_DeskWood", tint=(0.6, 0.42, 0.26), scale=0.25, rough_add=0.05, wear=0.4)
     paint_w = material("WFFurnWhite", base=(0.84, 0.82, 0.78), rough=0.5, wear=0.3, dirt=0.6)
     quilt = material("WFQuilt", base=(0.12, 0.2, 0.36), rough=0.92, wear=0.0, dirt=0.3)
     sheet = material("WFSheet", base=(0.86, 0.84, 0.8), rough=0.9, wear=0.0, dirt=0.3)
     cloth_r = material("WFCurtain", base=(0.5, 0.2, 0.12), rough=0.9, wear=0.0, dirt=0.4)
-    X0, X1, Y0, Y1, Z0, Z1 = 1.0, 14.7, -10.7, 0.0, 12.0, 21.2
-    # ---- floor, wallpaper, ceiling, mouldings
+    R = BED_ROOM
+    X0, X1, Y0, Y1, Z0, Z1 = R["X0"], R["X1"], R["Y0"], R["Y1"], R["Z0"], R["Z1"]
+    G = 0.27                          # furniture stands this far from a wall (clear of the baseboard)
+    wc, ww, wz, wh = BED_WIN
+    sc_, sw, sz_, sh = BED_SIDE
+    DOOR = (-7.8, -4.8)               # the bedroom door in the left wall (y range)
+    CLO = (14.6, 17.0)                # the closet in the back wall (x range)
+
+    # ---------------------------------------------------------------- the room (structure)
+    item("Room")
     set_group("Floor")
     box("Floor", (X1 - X0, Y1 - Y0, 0.4), ((X0 + X1) / 2, (Y0 + Y1) / 2, Z0 - 0.2), K["place"], bevel=0)
     set_group("Paper")
-    wall("PapF", "y", Y0 + 0.05, X0, X1, Z0, Z1, 0.1, [(6.5, 11.0, 13.4, 18.6)], K["place"])
-    wall("PapB", "y", Y1 - 0.05, X0, X1, Z0, Z1, 0.1, [(11.8, 14.2, Z0, Z0 + 7.4)], K["place"])
-    wall("PapL", "x", X0 + 0.05, Y0, Y1, Z0, Z1, 0.1, [(-3.6, -0.6, Z0, Z0 + 7.4)], K["place"])
-    wall("PapR", "x", X1 - 0.05, Y0, Y1, Z0, Z1, 0.1, [(-7.0, -3.0, 14.0, 19.0)], K["place"])
+    wall("PapF", "y", Y0 + 0.05, X0, X1, Z0, Z1, 0.1, [(wc - ww / 2, wc + ww / 2, wz, wz + wh)], K["place"])
+    wall("PapB", "y", Y1 - 0.05, X0, X1, Z0, Z1, 0.1, [(CLO[0], CLO[1], Z0, Z0 + 7.4)], K["place"])
+    wall("PapL", "x", X0 + 0.05, Y0, Y1, Z0, Z1, 0.1, [(DOOR[0], DOOR[1], Z0, Z0 + 7.4)], K["place"])
+    wall("PapR", "x", X1 - 0.05, Y0, Y1, Z0, Z1, 0.1, [(sc_ - sw / 2, sc_ + sw / 2, sz_, sz_ + sh)], K["place"])
     set_group("Main")
     box("Ceiling", (X1 - X0, Y1 - Y0, 0.2), ((X0 + X1) / 2, (Y0 + Y1) / 2, Z1 + 0.1), paint_w, bevel=0)
-    for nm, size, loc in (("F", (X1 - X0, 0.15, 0.55), ((X0 + X1) / 2, Y0 + 0.17, Z0 + 0.27)), ("B", (X1 - X0, 0.15, 0.55), ((X0 + X1) / 2, Y1 - 0.17, Z0 + 0.27)),
-                          ("L", (0.15, Y1 - Y0, 0.55), (X0 + 0.17, (Y0 + Y1) / 2, Z0 + 0.27)), ("R", (0.15, Y1 - Y0, 0.55), (X1 - 0.17, (Y0 + Y1) / 2, Z0 + 0.27))):
-        box(f"Base{nm}", size, loc, K["trim"], bevel=0.02)
-        box(f"Crown{nm}", (size[0], size[1], 0.4), (loc[0], loc[1], Z1 - 0.2), K["trim"], bevel=0.05)
-    c, w_, zs, h_ = 8.75, 4.5, 13.4, 5.2
-    for s_ in (-1, 1):
-        box(f"InCas{s_}", (0.4, 0.2, h_ + 0.4), (c + s_ * (w_ / 2 + 0.2), Y0 + 0.2, zs + h_ / 2), K["trim"], bevel=0.03)
-        box(f"RCas{s_}", (0.2, 0.4, 5.4), (X1 - 0.2, -5.0 + s_ * 2.2, 16.5), K["trim"], bevel=0.03)
-    box("InHead", (w_ + 1.0, 0.22, 0.45), (c, Y0 + 0.2, zs + h_ + 0.25), K["trim"], bevel=0.03)
-    box("InStool", (w_ + 1.0, 0.7, 0.14), (c, Y0 + 0.4, zs - 0.05), K["trim"], bevel=0.03)
-    box("RHead", (0.22, 5.0, 0.45), (X1 - 0.2, -5.0, 19.25), K["trim"], bevel=0.03)
-    box("RStool", (0.7, 5.0, 0.14), (X1 - 0.4, -5.0, 13.95), K["trim"], bevel=0.03)
-    # the closet (back wall) and the bedroom door (left wall, swings into the hall)
-    for s_ in (-1, 1):
-        box(f"DCas{s_}", (0.2, 0.45, 7.6), (X0 + 0.2, -2.1 + s_ * 1.72, Z0 + 3.8), K["trim"], bevel=0.03)
-        box(f"CCas{s_}", (0.45, 0.2, 7.6), (13.0 + s_ * 1.42, Y1 - 0.2, Z0 + 3.8), K["trim"], bevel=0.03)
-    box("DHead", (0.22, 3.9, 0.45), (X0 + 0.2, -2.1, Z0 + 7.6), K["trim"], bevel=0.03)
-    box("CHead", (3.3, 0.22, 0.45), (13.0, Y1 - 0.2, Z0 + 7.6), K["trim"], bevel=0.03)
-    box("Closet", (2.4, 0.15, 7.4), (13.0, Y1 - 0.1, Z0 + 3.7), paint_w, bevel=0.03)
-    for r in range(2):
-        box(f"ClosetPanel{r}", (1.8, 0.08, 2.8 if r else 3.2), (13.0, Y1 - 0.2, Z0 + (5.4 if r else 1.9)), paint_w, bevel=0.06)
-    cyl("ClosetKnob", 0.13, 0.2, (12.1, Y1 - 0.3, Z0 + 3.5), K["brass"], rot=(math.pi / 2, 0, 0), verts=12, bevel=0.05)
-    set_group("Door", hinge=(X0 + 0.1, -3.6, Z0), swing=1)
-    box("BedDoor", (0.15, 3.0, 7.4), (X0 + 0.1, -2.1, Z0 + 3.7), paint_w, bevel=0.03)
-    for r in range(2):
-        box(f"BedDoorPanel{r}", (0.08, 2.3, 2.8 if r else 3.2), (X0 + 0.2, -2.1, Z0 + (5.4 if r else 1.9)), paint_w, bevel=0.06)
-    cyl("BedDoorKnob", 0.13, 0.2, (X0 + 0.3, -1.0, Z0 + 3.5), K["brass"], rot=(0, math.pi / 2, 0), verts=12, bevel=0.05)
-    set_group("Main")
+    # baseboards (skipping the door and closet openings) and crown moulding
+    def run_x(nm, y, x0, x1, gaps):
+        cuts = [x0] + [g for gp in gaps for g in gp] + [x1]
+        for k_, (a, b) in enumerate(zip(cuts[::2], cuts[1::2])):
+            if b - a > 0.05:
+                box(f"Base{nm}{k_}", (b - a, 0.15, 0.55), ((a + b) / 2, y, Z0 + 0.275), K["trim"], bevel=0.02)
 
-    # ---- the bed (headboard to the back wall) and the decoy under the duvet
-    bx0, bx1, by0, by1 = 3.0, 7.6, -7.6, -0.25
+    def run_y(nm, x, y0, y1, gaps):
+        cuts = [y0] + [g for gp in gaps for g in gp] + [y1]
+        for k_, (a, b) in enumerate(zip(cuts[::2], cuts[1::2])):
+            if b - a > 0.05:
+                box(f"Base{nm}{k_}", (0.15, b - a, 0.55), (x, (a + b) / 2, Z0 + 0.275), K["trim"], bevel=0.02)
+    run_x("F", Y0 + 0.17, X0 + 0.1, X1 - 0.1, [])
+    run_x("B", Y1 - 0.17, X0 + 0.1, X1 - 0.1, [(CLO[0] - 0.45, CLO[1] + 0.45)])
+    run_y("L", X0 + 0.17, Y0 + 0.25, Y1 - 0.25, [(DOOR[0] - 0.45, DOOR[1] + 0.45)])
+    run_y("R", X1 - 0.17, Y0 + 0.25, Y1 - 0.25, [])
+    for nm, size, loc in (("F", (X1 - X0 - 0.2, 0.3, 0.4), ((X0 + X1) / 2, Y0 + 0.25, Z1 - 0.2)), ("B", (X1 - X0 - 0.2, 0.3, 0.4), ((X0 + X1) / 2, Y1 - 0.25, Z1 - 0.2)),
+                          ("L", (0.3, Y1 - Y0 - 0.8, 0.4), (X0 + 0.25, (Y0 + Y1) / 2, Z1 - 0.2)), ("R", (0.3, Y1 - Y0 - 0.8, 0.4), (X1 - 0.25, (Y0 + Y1) / 2, Z1 - 0.2))):
+        box(f"Crown{nm}", size, loc, K["trim"], bevel=0.05)
+    # window casings and stools
+    for s_ in (-1, 1):
+        box(f"InCas{s_}", (0.4, 0.2, wh + 0.4), (wc + s_ * (ww / 2 + 0.2), Y0 + 0.2, wz + wh / 2), K["trim"], bevel=0.03)
+        box(f"RCas{s_}", (0.2, 0.4, sh + 0.4), (X1 - 0.2, sc_ + s_ * (sw / 2 + 0.2), sz_ + sh / 2), K["trim"], bevel=0.03)
+    box("InHead", (ww + 1.0, 0.22, 0.45), (wc, Y0 + 0.2, wz + wh + 0.42), K["trim"], bevel=0.03)
+    box("InStool", (ww + 0.8, 0.6, 0.14), (wc, Y0 + 0.4, wz - 0.07), K["trim"], bevel=0.03)
+    box("RHead", (0.22, sw + 1.0, 0.45), (X1 - 0.2, sc_, sz_ + sh + 0.42), K["trim"], bevel=0.03)
+    box("RStool", (0.6, sw + 0.8, 0.14), (X1 - 0.4, sc_, sz_ - 0.07), K["trim"], bevel=0.03)
+    # the closet door (back wall) and the bedroom door (left wall; it swings out into the hall)
+    dmid, cmid = (DOOR[0] + DOOR[1]) / 2, (CLO[0] + CLO[1]) / 2
+    for s_ in (-1, 1):
+        box(f"DCas{s_}", (0.2, 0.45, 7.6), (X0 + 0.2, dmid + s_ * 1.72, Z0 + 3.8), K["trim"], bevel=0.03)
+        box(f"CCas{s_}", (0.45, 0.2, 7.6), (cmid + s_ * 1.42, Y1 - 0.2, Z0 + 3.8), K["trim"], bevel=0.03)
+    box("DHead", (0.22, 3.9, 0.45), (X0 + 0.2, dmid, Z0 + 7.75), K["trim"], bevel=0.03)
+    box("CHead", (3.3, 0.22, 0.45), (cmid, Y1 - 0.2, Z0 + 7.75), K["trim"], bevel=0.03)
+    box("Closet", (2.4, 0.15, 7.4), (cmid, Y1 - 0.05, Z0 + 3.7), paint_w, bevel=0.03)
+    for r in range(2):
+        box(f"ClosetPanel{r}", (1.8, 0.06, 2.8 if r else 3.2), (cmid, Y1 - 0.15, Z0 + (5.4 if r else 1.9)), paint_w, bevel=0.025)
+    cyl("ClosetKnob", 0.13, 0.2, (CLO[0] + 0.35, Y1 - 0.28, Z0 + 3.5), K["brass"], rot=(math.pi / 2, 0, 0), verts=12, bevel=0.05)
+    set_group("Door", hinge=(X0, DOOR[0], Z0), swing=-1)
+    box("BedDoor", (0.15, 3.0, 7.4), (X0 + 0.05, dmid, Z0 + 3.7), paint_w, bevel=0.03)
+    for r in range(2):
+        box(f"BedDoorPanel{r}", (0.06, 2.3, 2.8 if r else 3.2), (X0 + 0.15, dmid, Z0 + (5.4 if r else 1.9)), paint_w, bevel=0.025)
+    cyl("BedDoorKnob", 0.13, 0.2, (X0 + 0.28, DOOR[1] - 0.4, Z0 + 3.5), K["brass"], rot=(0, math.pi / 2, 0), verts=12, bevel=0.05)
+    set_group("Main")
+    # the ceiling light
+    lathe("CeilBase", [(0, Z1 - 0.001), (0.5, Z1 - 0.001), (0.45, Z1 - 0.12), (0, Z1 - 0.12)], K["brass"], seg=20, loc=((X0 + X1) / 2, (Y0 + Y1) / 2, 0))
+    set_group("Glass")
+    lathe("CeilBowl", [(0, Z1 - 0.9), (0.5, Z1 - 0.72), (0.7, Z1 - 0.36), (0.72, Z1 - 0.13), (0, Z1 - 0.13)],
+          material("WFFrosted", base=(0.95, 0.93, 0.88), rough=0.5, wear=0.0), seg=24, loc=((X0 + X1) / 2, (Y0 + Y1) / 2, 0))
+    set_group("Main")
+    # curtains on the front window: a rod on brackets in front of the casing head, two gathered panels to the sides
+    cyl("CurtainRod", 0.07, ww + 4.6, (wc, Y0 + 0.62, wz + wh + 0.85), K["brass"], rot=(0, math.pi / 2, 0), verts=12)
+    for s_ in (-1, 1):
+        box(f"RodBracket{s_}", (0.12, 0.42, 0.12), (wc + s_ * (ww / 2 + 1.9), Y0 + 0.4, wz + wh + 0.85), K["brass"], bevel=0.02)
+        for k in range(5):
+            cyl(f"Curtain{s_}{k}", 0.17, wh + 1.3, (wc + s_ * (ww / 2 + 0.75 + k * 0.3), Y0 + 0.62 + 0.06 * (k % 2), wz + wh + 0.78 - (wh + 1.3) / 2),
+                cloth_r, verts=10)
+        box(f"Tieback{s_}", (1.6, 0.18, 0.15), (wc + s_ * (ww / 2 + 1.35), Y0 + 0.86, wz + 1.6), K["brass"], bevel=0.04)
+
+    # ---------------------------------------------------------------- the bed, against the back wall, and its decoy
+    item("Bed")
+    bx0, bx1 = 4.4, 9.4
+    by1 = Y1 - G
+    by0 = by1 - 7.6
     for x in (bx0 + 0.2, bx1 - 0.2):
         box(f"HeadPost{x}", (0.4, 0.4, 4.2), (x, by1 - 0.2, Z0 + 2.1), oak, bevel=0.05)
         box(f"FootPost{x}", (0.4, 0.4, 2.6), (x, by0 + 0.2, Z0 + 1.3), oak, bevel=0.05)
-        lathe(f"HeadKnob{x}", [(0, Z0 + 4.2), (0.24, Z0 + 4.3), (0.22, Z0 + 4.5), (0, Z0 + 4.62)], oak, seg=16, loc=(x, by1 - 0.2, 0))
-    box("Headboard", (bx1 - bx0 - 0.4, 0.2, 2.0), ((bx0 + bx1) / 2, by1 - 0.2, Z0 + 2.9), oak, bevel=0.06)
-    box("Footboard", (bx1 - bx0 - 0.4, 0.2, 1.2), ((bx0 + bx1) / 2, by0 + 0.2, Z0 + 1.7), oak, bevel=0.05)
-    box("Rails", (bx1 - bx0 - 0.4, by1 - by0 - 0.4, 0.5), ((bx0 + bx1) / 2, (by0 + by1) / 2, Z0 + 0.9), oak, bevel=0.04)
-    box("Mattress", (bx1 - bx0 - 0.5, by1 - by0 - 0.5, 0.9), ((bx0 + bx1) / 2, (by0 + by1) / 2, Z0 + 1.6), sheet, bevel=0.18, segments=3)
-    box("Pillow", (3.2, 1.3, 0.55), ((bx0 + bx1) / 2, by1 - 1.1, Z0 + 2.25), sheet, bevel=0.25, segments=4, rot=(0.25, 0, 0.05))
-    box("Duvet", (bx1 - bx0 - 0.2, by1 - by0 - 2.0, 0.3), ((bx0 + bx1) / 2, (by0 + by1) / 2 - 0.8, Z0 + 2.15), quilt, bevel=0.14, segments=3)
-    for nm, r, loc, sc in (("Head", 0.55, ((bx0 + bx1) / 2 + 0.2, by1 - 2.2, Z0 + 2.4), (1.0, 0.9, 0.7)),
-                           ("Body", 0.75, ((bx0 + bx1) / 2, -4.3, Z0 + 2.35), (1.25, 2.3, 0.6)),
-                           ("Knee", 0.55, ((bx0 + bx1) / 2 + 0.5, -6.2, Z0 + 2.5), (1.2, 1.0, 0.75))):
+        lathe(f"HeadKnob{x}", [(0, Z0 + 4.2), (0.2, Z0 + 4.3), (0.19, Z0 + 4.5), (0, Z0 + 4.62)], oak, seg=16, loc=(x, by1 - 0.2, 0))
+    box("Headboard", (bx1 - bx0 - 0.4, 0.2, 1.8), ((bx0 + bx1) / 2, by1 - 0.2, Z0 + 3.0), oak, bevel=0.05)
+    box("Footboard", (bx1 - bx0 - 0.4, 0.2, 1.1), ((bx0 + bx1) / 2, by0 + 0.2, Z0 + 1.7), oak, bevel=0.05)
+    box("Rails", (bx1 - bx0 - 0.4, by1 - by0 - 0.8, 0.5), ((bx0 + bx1) / 2, (by0 + by1) / 2, Z0 + 0.9), oak, bevel=0.04)
+    mz = Z0 + 1.15 + 0.45
+    box("Mattress", (bx1 - bx0 - 0.6, by1 - by0 - 0.8, 0.9), ((bx0 + bx1) / 2, (by0 + by1) / 2, mz), sheet, bevel=0.18, segments=3)
+    top = mz + 0.45
+    box("Pillow", (3.0, 1.2, 0.5), ((bx0 + bx1) / 2, by1 - 1.15, top + 0.25), sheet, bevel=0.22, segments=4)
+    box("Duvet", (bx1 - bx0 - 0.6, by1 - by0 - 2.4, 0.3), ((bx0 + bx1) / 2, (by0 + by1) / 2 - 0.8, top + 0.15), quilt, bevel=0.13, segments=3)
+    dtop = top + 0.42
+    for nm, r, loc, sc in (("Head", 0.5, ((bx0 + bx1) / 2 + 0.2, by1 - 2.6, dtop), (1.0, 0.9, 0.55)),
+                           ("Body", 0.7, ((bx0 + bx1) / 2, (by0 + by1) / 2 - 0.4, dtop), (1.3, 2.4, 0.5)),
+                           ("Knee", 0.5, ((bx0 + bx1) / 2 + 0.6, by0 + 1.8, dtop + 0.05), (1.2, 1.0, 0.6))):
         sphere(f"Lump{nm}", r, loc, quilt, seg=20, rings=12, scale=sc)
-    box("DuvetFold", (bx1 - bx0 - 0.1, 0.7, 0.35), ((bx0 + bx1) / 2, -1.9, Z0 + 2.3), sheet, bevel=0.15, segments=3)
-    box("DuvetHang", (0.2, by1 - by0 - 2.2, 1.0), (bx1 + 0.05, (by0 + by1) / 2 - 0.8, Z0 + 1.75), quilt, bevel=0.08)
+    box("DuvetFold", (bx1 - bx0 - 0.6, 0.7, 0.3), ((bx0 + bx1) / 2, by1 - 2.15, top + 0.32), sheet, bevel=0.13, segments=3)
 
-    # ---- nightstand with the alarm clock (11:58) and a lamp
-    nx = 8.6
-    box("NightStand", (1.6, 1.4, 2.2), (nx + 0.8, -0.95, Z0 + 1.1), paint_w, bevel=0.05)
-    box("NSDrawer", (1.3, 0.06, 0.6), (nx + 0.8, -1.68, Z0 + 1.6), paint_w, bevel=0.04)
-    cyl("NSKnob", 0.08, 0.12, (nx + 0.8, -1.74, Z0 + 1.6), K["brass"], rot=(math.pi / 2, 0, 0), verts=10)
-    box("ClockBody", (0.9, 0.5, 0.48), (nx + 0.55, -1.1, Z0 + 2.45), material("WFClockBody", base=(0.08, 0.08, 0.09), rough=0.4, wear=0.1), bevel=0.06)
-    set_group("Clock")
-    box("ClockFace", (0.74, 0.02, 0.36), (nx + 0.55, -1.36, Z0 + 2.45), K["place"], bevel=0)
+    # ---------------------------------------------------------------- a bookshelf on the left wall, between the bed and the door
+    item("Bookshelf")
+    set_group("Shelf")
+    sx0, sx1 = X0 + G, X0 + G + 1.1
+    sy0, sy1 = DOOR[1] + 0.75, DOOR[1] + 0.75 + 3.0
+    box("ShelfSideA", (sx1 - sx0, 0.15, 6.0), ((sx0 + sx1) / 2, sy0 + 0.075, Z0 + 3.0), oak, bevel=0.03)
+    box("ShelfSideB", (sx1 - sx0, 0.15, 6.0), ((sx0 + sx1) / 2, sy1 - 0.075, Z0 + 3.0), oak, bevel=0.03)
+    box("ShelfBack", (0.08, sy1 - sy0 - 0.3, 6.0), (sx0 + 0.04, (sy0 + sy1) / 2, Z0 + 3.0), oak, bevel=0)
+    rng_ = __import__("random").Random(49)
+    book_cols = [(0.5, 0.1, 0.08), (0.12, 0.24, 0.4), (0.2, 0.34, 0.2), (0.62, 0.48, 0.2), (0.3, 0.16, 0.3), (0.82, 0.78, 0.66)]
+    book_mats = [material(f"WFSpine{k}", base=c_, rough=0.7, wear=0.25) for k, c_ in enumerate(book_cols)]
+    for k in range(5):
+        zb = Z0 + 0.1 + k * 1.45
+        box(f"Shelf{k}", (sx1 - sx0 - 0.1, sy1 - sy0 - 0.3, 0.12), ((sx0 + sx1) / 2 + 0.04, (sy0 + sy1) / 2, zb + 0.06), oak, bevel=0.02)
+        if k == 4:
+            break
+        y = sy0 + 0.2
+        while y < sy1 - 0.55:
+            t = rng_.uniform(0.14, 0.3)
+            h = rng_.uniform(0.85, 1.2)
+            if rng_.random() < 0.12:                          # a gap
+                y += 0.3
+                continue
+            box(f"Spine{k}_{round(y, 2)}", (0.8, t, h), (sx0 + 0.55, y + t / 2, zb + 0.125 + h / 2), book_mats[rng_.randrange(6)], bevel=0.015)
+            y += t + 0.012
+    lathe("ShelfTrophy", [(0, Z0 + 5.91 + 0.01), (0.22, Z0 + 5.92), (0.08, Z0 + 6.0), (0.06, Z0 + 6.3), (0.22, Z0 + 6.6), (0, Z0 + 6.62)], K["brass"],
+          seg=16, loc=((sx0 + sx1) / 2 + 0.05, sy0 + 0.8, 0))
     set_group("Main")
-    lathe("LampBase", [(0, Z0 + 2.2), (0.3, Z0 + 2.2), (0.28, Z0 + 2.3), (0.08, Z0 + 2.4), (0.06, Z0 + 3.2), (0, Z0 + 3.2)], K["brass"], seg=16, loc=(nx + 1.2, -0.7, 0))
-    lathe("LampShade", [(0.6, Z0 + 3.0), (0.38, Z0 + 3.75), (0.36, Z0 + 3.75), (0.58, Z0 + 3.02)], material("WFShade", base=(0.86, 0.78, 0.6), rough=0.9, wear=0.0),
-          seg=24, loc=(nx + 1.2, -0.7, 0))
 
-    # ---- the desk (left wall, front corner), chair, laptop, books, lamp, the backpack (one prank's evidence)
-    dx0, dx1, dy0, dy1 = X0 + 0.15, X0 + 2.6, -10.3, -5.4
-    box("DeskTop", (dx1 - dx0, dy1 - dy0, 0.2), ((dx0 + dx1) / 2, (dy0 + dy1) / 2, Z0 + 2.5), oak, bevel=0.04)
+    # ---------------------------------------------------------------- nightstand (right of the bed), the clock, a lamp
+    item("Nightstand")
+    nx0, nx1 = bx1 + 0.35, bx1 + 1.95
+    ny1 = Y1 - G
+    ny0 = ny1 - 1.4
+    nz = Z0 + 2.2
+    box("NightStand", (nx1 - nx0, ny1 - ny0, 2.2), ((nx0 + nx1) / 2, (ny0 + ny1) / 2, Z0 + 1.1), paint_w, bevel=0.05)
+    box("NSDrawer", (1.3, 0.06, 0.6), ((nx0 + nx1) / 2, ny0 - 0.02, Z0 + 1.6), paint_w, bevel=0.025)
+    cyl("NSKnob", 0.08, 0.12, ((nx0 + nx1) / 2, ny0 - 0.1, Z0 + 1.6), K["brass"], rot=(math.pi / 2, 0, 0), verts=10)
+    item("Clock")
+    box("ClockBody", (0.9, 0.5, 0.48), (nx0 + 0.55, ny0 + 0.45, nz + 0.25), material("WFClockBody", base=(0.08, 0.08, 0.09), rough=0.4, wear=0.1), bevel=0.06)
+    set_group("Clock")
+    box("ClockFace", (0.74, 0.02, 0.36), (nx0 + 0.55, ny0 + 0.19, nz + 0.25), K["place"], bevel=0)
+    set_group("Main")
+    item("BedLamp")
+    lx, ly = nx1 - 0.45, ny1 - 0.45
+    lathe("LampBase", [(0, nz + 0.01), (0.3, nz + 0.01), (0.28, nz + 0.1), (0.08, nz + 0.2), (0.06, nz + 1.0), (0, nz + 1.0)], K["brass"], seg=16, loc=(lx, ly, 0))
+    lathe("LampShade", [(0.42, nz + 0.85), (0.3, nz + 1.5), (0.28, nz + 1.5), (0.4, nz + 0.87)], material("WFShade", base=(0.86, 0.78, 0.6), rough=0.9, wear=0.0),
+          seg=24, loc=(lx, ly, 0))
+
+    # ---------------------------------------------------------------- the desk (left wall, front corner) and its things
+    item("Desk")
+    dx0, dx1 = X0 + G, X0 + G + 2.4
+    dy0, dy1 = Y0 + G, Y0 + G + 5.0
+    dz = Z0 + 2.6
+    box("DeskTop", (dx1 - dx0, dy1 - dy0, 0.2), ((dx0 + dx1) / 2, (dy0 + dy1) / 2, dz - 0.1), oak, bevel=0.04)
     for y in (dy0 + 0.15, dy1 - 0.15):
-        box(f"DeskLeg{y}", (dx1 - dx0 - 0.1, 0.18, 2.4), ((dx0 + dx1) / 2, y, Z0 + 1.2), oak, bevel=0.03)
-    box("DeskDrawer", (dx1 - dx0 - 0.2, 1.6, 0.6), ((dx0 + dx1) / 2, dy1 - 1.0, Z0 + 2.1), oak, bevel=0.03)
-    box("Laptop", (1.3, 1.0, 0.08), ((dx0 + dx1) / 2 + 0.2, -8.0, Z0 + 2.64), material("WFLaptop", base=(0.32, 0.33, 0.36), rough=0.35, metal=0.6, wear=0.2), bevel=0.03)
-    box("LaptopSticker", (0.35, 0.35, 0.01), ((dx0 + dx1) / 2 + 0.3, -7.8, Z0 + 2.685), material("WFSticker", base=(0.95, 0.65, 0.15), rough=0.4, wear=0.0), bevel=0.0)
+        box(f"DeskLeg{y}", (dx1 - dx0 - 0.1, 0.18, dz - 0.2 - Z0), ((dx0 + dx1) / 2, y, (Z0 + dz - 0.2) / 2), oak, bevel=0.03)
+    box("DeskDrawer", (dx1 - dx0 - 0.3, 1.6, 0.5), ((dx0 + dx1) / 2, dy1 - 1.1, dz - 0.46), oak, bevel=0.03)
+    item("Laptop")
+    box("Laptop", (1.3, 1.0, 0.08), ((dx0 + dx1) / 2 + 0.2, dy0 + 2.6, dz + 0.045), material("WFLaptop", base=(0.32, 0.33, 0.36), rough=0.35, metal=0.6, wear=0.2), bevel=0.03)
+    box("LaptopSticker", (0.35, 0.35, 0.01), ((dx0 + dx1) / 2 + 0.3, dy0 + 2.8, dz + 0.095), material("WFSticker", base=(0.95, 0.65, 0.15), rough=0.4, wear=0.0), bevel=0.0)
+    item("Books")
     hs = (0.22, 0.18, 0.26)
     for i, col_ in enumerate(((0.5, 0.1, 0.08), (0.12, 0.24, 0.4), (0.2, 0.34, 0.2))):
-        box(f"Book{i}", (0.9, 1.25, hs[i]), ((dx0 + dx1) / 2 - 0.1, -6.4, Z0 + 2.6 + sum(hs[:i]) + hs[i] / 2),
-            material(f"WFBook{i}", base=col_, rough=0.7, wear=0.3), bevel=0.02, rot=(0, 0, 0.1 * (i - 1)))
-    lathe("DeskLampBase", [(0, Z0 + 2.6), (0.3, Z0 + 2.6), (0.25, Z0 + 2.7), (0, Z0 + 2.72)], K["iron"], seg=16, loc=(dx0 + 0.6, -9.7, 0))
-    tube("DeskLampArm", [Vector((dx0 + 0.6, -9.7, Z0 + 2.7)), Vector((dx0 + 0.8, -9.5, Z0 + 3.9)), Vector((dx0 + 1.4, -9.1, Z0 + 3.7))], 0.05, K["iron"])
-    cone("DeskLampHead", 0.32, 0.12, 0.5, (dx0 + 1.5, -9.0, Z0 + 3.55), K["iron"], rot=(0.4, 0.6, 0))
-    cx_, cy_ = dx1 + 1.0, -7.8
+        box(f"Book{i}", (0.9, 1.25, hs[i]), ((dx0 + dx1) / 2 - 0.1, dy1 - 0.95, dz + 0.005 + sum(hs[:i]) + hs[i] / 2 + 0.002 * i),
+            material(f"WFBook{i}", base=col_, rough=0.7, wear=0.3), bevel=0.02, rot=(0, 0, 0.08 * (i - 1)))
+    item("DeskLamp")
+    lx2, ly2 = dx0 + 0.55, dy0 + 0.6
+    lathe("DeskLampBase", [(0, dz + 0.005), (0.3, dz + 0.005), (0.25, dz + 0.1), (0, dz + 0.12)], K["iron"], seg=16, loc=(lx2, ly2, 0))
+    tube("DeskLampArm", [Vector((lx2, ly2, dz + 0.1)), Vector((lx2 + 0.2, ly2 + 0.2, dz + 1.3)), Vector((lx2 + 0.8, ly2 + 0.6, dz + 1.1))], 0.05, K["iron"])
+    cone("DeskLampHead", 0.32, 0.12, 0.5, (lx2 + 0.95, ly2 + 0.7, dz + 0.95), K["iron"], rot=(0.4, 0.6, 0))
+    item("Chair")
+    cx_, cy_ = dx1 + 1.05, (dy0 + dy1) / 2
     box("ChairSeat", (1.4, 1.4, 0.2), (cx_, cy_, Z0 + 1.6), oak, bevel=0.05)
     for ox in (-0.55, 0.55):
         for oy in (-0.55, 0.55):
             box(f"ChairLeg{ox}{oy}", (0.15, 0.15, 1.5), (cx_ + ox, cy_ + oy, Z0 + 0.75), oak, bevel=0.02)
     box("ChairBack", (0.15, 1.4, 1.6), (cx_ + 0.62, cy_, Z0 + 2.5), oak, bevel=0.04)
+    # the backpack (green canvas, a W patch), leaning against the front wall by the chair
+    item("Backpack")
     bag = material("WFBackpack", base=(0.18, 0.3, 0.22), rough=0.9, wear=0.2, dirt=0.7)
-    box("Pack", (1.2, 0.7, 1.6), (cx_ + 0.2, cy_ - 1.4, Z0 + 0.8), bag, bevel=0.25, segments=3, rot=(0.15, 0, 0.3))
-    box("PackPocket", (0.9, 0.25, 0.7), (cx_ + 0.15, cy_ - 1.8, Z0 + 0.55), bag, bevel=0.12, segments=2, rot=(0.15, 0, 0.3))
-    box("PackPatch", (0.42, 0.05, 0.42), (cx_ + 0.15, cy_ - 1.95, Z0 + 0.6), material("WFPatch", base=(0.88, 0.7, 0.24), rough=0.8, wear=0.0), bevel=0.02, rot=(0.15, 0, 0.3))
-    tube("PackStrap", [Vector((cx_ - 0.3, cy_ - 1.1, Z0 + 1.5)), Vector((cx_ - 0.6, cy_ - 1.6, Z0 + 0.9)), Vector((cx_ - 0.4, cy_ - 1.9, Z0 + 0.15))], 0.08, bag, square=True)
+    px_, py_ = 6.65, Y0 + G + 0.45
+    box("Pack", (1.2, 0.7, 1.6), (px_, py_, Z0 + 0.82), bag, bevel=0.25, segments=3, rot=(0.12, 0, 0))
+    box("PackPocket", (0.9, 0.25, 0.7), (px_, py_ + 0.42, Z0 + 0.55), bag, bevel=0.1, segments=2, rot=(0.12, 0, 0))
+    box("PackPatch", (0.42, 0.05, 0.42), (px_, py_ + 0.56, Z0 + 0.6), material("WFPatch", base=(0.88, 0.7, 0.24), rough=0.8, wear=0.0), bevel=0.02, rot=(0.12, 0, 0))
+    tube("PackStrap", [Vector((px_ - 0.45, py_ + 0.2, Z0 + 1.4)), Vector((px_ - 0.7, py_ + 0.5, Z0 + 0.8)), Vector((px_ - 0.55, py_ + 0.55, Z0 + 0.12))], 0.07, bag, square=True)
 
-    # ---- the dresser (right wall, front) and a clothes pile by the closet
-    box("Dresser", (1.8, 3.0, 3.2), (X1 - 1.0, -9.0, Z0 + 1.6), oak, bevel=0.05)
+    # ---------------------------------------------------------------- the dresser (right wall, front corner)
+    item("Dresser")
+    rx1 = X1 - G
+    rx0 = rx1 - 1.8
+    ry0 = Y0 + G
+    ry1 = ry0 + 3.0
+    box("Dresser", (rx1 - rx0, ry1 - ry0, 3.2), ((rx0 + rx1) / 2, (ry0 + ry1) / 2, Z0 + 1.6), oak, bevel=0.05)
     for r in range(3):
-        box(f"DrDrawer{r}", (0.06, 2.6, 0.85), (X1 - 1.92, -9.0, Z0 + 0.6 + r * 1.0), oak, bevel=0.04)
+        box(f"DrDrawer{r}", (0.06, 2.6, 0.85), (rx0 - 0.02, (ry0 + ry1) / 2, Z0 + 0.6 + r * 1.0), oak, bevel=0.025)
         for s_ in (-1, 1):
-            cyl(f"DrKnob{r}{s_}", 0.08, 0.12, (X1 - 1.98, -9.0 + s_ * 0.8, Z0 + 0.6 + r * 1.0), K["brass"], rot=(0, math.pi / 2, 0), verts=10)
-    box("DrawerSock", (0.12, 0.6, 0.12), (X1 - 1.98, -8.4, Z0 + 2.5), material("WFSock", base=(0.8, 0.3, 0.25), rough=0.95, wear=0.0), bevel=0.05, rot=(0, 0.6, 0))
+            cyl(f"DrKnob{r}{s_}", 0.08, 0.12, (rx0 - 0.1, (ry0 + ry1) / 2 + s_ * 0.8, Z0 + 0.6 + r * 1.0), K["brass"], rot=(0, math.pi / 2, 0), verts=10)
+    box("DrawerSock", (0.4, 0.12, 0.6), (rx0 - 0.08, (ry0 + ry1) / 2 + 0.4, Z0 + 2.15), material("WFSock", base=(0.8, 0.3, 0.25), rough=0.95, wear=0.0), bevel=0.05)
+
+    # ---------------------------------------------------------------- the clothes pile by the closet: folded and dropped
+    item("Clothes")
     tee = material("WFTee", base=(0.65, 0.62, 0.55), rough=0.95, wear=0.0)
     jean = material("WFJean", base=(0.16, 0.22, 0.36), rough=0.95, wear=0.0)
-    for i, (m_, loc, sc) in enumerate(((jean, (11.6, -1.9, Z0 + 0.2), (1.4, 0.8, 0.3)), (tee, (12.4, -2.4, Z0 + 0.35), (1.0, 0.9, 0.35)),
-                                       (jean, (12.9, -1.7, Z0 + 0.25), (0.8, 0.5, 0.25)))):
-        sphere(f"Clothes{i}", 0.7, loc, m_, seg=16, rings=8, scale=sc)
+    hood = material("WFHoodie", base=(0.42, 0.12, 0.1), rough=0.95, wear=0.0)
+    kx, ky = CLO[0] - 0.6, Y1 - 2.4
+    # jeans: two legs crossing, a waistband
+    box("JeansL", (0.7, 2.6, 0.18), (kx - 0.2, ky - 0.2, Z0 + 0.09), jean, bevel=0.07, segments=2, rot=(0, 0, 0.35))
+    box("JeansR", (0.7, 2.4, 0.18), (kx + 0.45, ky - 0.4, Z0 + 0.27), jean, bevel=0.07, segments=2, rot=(0, 0, -0.25))
+    box("Waist", (1.5, 0.5, 0.2), (kx + 0.2, ky + 1.0, Z0 + 0.46), jean, bevel=0.08, segments=2, rot=(0, 0, 0.1))
+    # a hoodie flung over them, a tee half folded
+    box("HoodBody", (1.8, 1.6, 0.2), (kx + 0.9, ky + 0.2, Z0 + 0.66), hood, bevel=0.09, segments=3, rot=(0, 0, 0.5))
+    box("HoodSleeve", (0.5, 1.8, 0.16), (kx + 1.9, ky - 0.6, Z0 + 0.86), hood, bevel=0.07, segments=2, rot=(0, 0, -0.6))
+    sphere("HoodHood", 0.45, (kx + 0.3, ky + 1.0, Z0 + 0.95), hood, seg=16, rings=8, scale=(1.2, 1.0, 0.45))
+    box("Tee", (1.2, 1.0, 0.14), (kx - 1.2, ky + 0.6, Z0 + 0.07), tee, bevel=0.06, segments=2, rot=(0, 0, -0.2))
 
-    # ---- the braided rug, the ceiling light, the curtains
+    # ---------------------------------------------------------------- the braided rug (clear of the bed and the dresser)
+    item("Rug")
+    set_group("Rug")
     rug_cols = [(0.5, 0.18, 0.12), (0.78, 0.66, 0.42), (0.2, 0.32, 0.24), (0.5, 0.18, 0.12), (0.24, 0.3, 0.46), (0.78, 0.66, 0.42)]
     rug_mats = [material(f"WFRug{k}", base=rug_cols[k], rough=0.95, wear=0.0) for k in range(6)]
-    set_group("Rug")
+    rcx, rcy = 13.2, -6.4
     for i in range(12):
-        hoop(f"Rug{i}", (9.6, -5.6, Z0 + 0.08), 0.3 + i * 0.28, "Z", rug_mats[i % 6], thick=0.15)
+        hoop(f"Rug{i}", (rcx, rcy, Z0 + 0.076), 0.3 + i * 0.28, "Z", rug_mats[i % 6], thick=0.075)
     set_group("Main")
-    lathe("CeilBase", [(0, Z1 - 0.1), (0.5, Z1 - 0.1), (0.45, Z1 - 0.2), (0, Z1 - 0.2)], K["brass"], seg=20, loc=(8.0, -5.4, 0))
-    set_group("Glass")
-    lathe("CeilBowl", [(0, Z1 - 0.9), (0.5, Z1 - 0.7), (0.7, Z1 - 0.35), (0.72, Z1 - 0.2), (0, Z1 - 0.2)],
-          material("WFFrosted", base=(0.95, 0.93, 0.88), rough=0.5, wear=0.0), seg=24, loc=(8.0, -5.4, 0))
-    set_group("Main")
-    cyl("CurtainRod", 0.07, 6.6, (8.75, Y0 + 0.5, 19.2), K["brass"], rot=(0, math.pi / 2, 0), verts=12)
-    for s_ in (-1, 1):
-        for k in range(5):
-            cyl(f"Curtain{s_}{k}", 0.2, 6.4, (8.75 + s_ * (2.6 + k * 0.28), Y0 + 0.55 + 0.08 * (k % 2), 15.9), cloth_r, verts=10)
-        box(f"Tieback{s_}", (1.6, 0.6, 0.15), (8.75 + s_ * 3.1, Y0 + 0.6, 15.6), K["brass"], bevel=0.04)
 
-    # ---- the pennant (cut to its shape) over the bed, the posters (canvases) on the back wall
+    # ---------------------------------------------------------------- the pennant over the bed, posters on the back wall
+    item("Pennant")
     set_group("Pennant")
-    pl, ph, px0, pz0 = 4.0, 1.5, (bx0 + bx1) / 2 - 2.0, 17.6
+    pl, ph, px0, pz0 = 4.0, 1.5, (bx0 + bx1) / 2 - 2.0, Z0 + 5.4
     xh = px0 + pl * 150 / 2048
-    prism("Pennant", [(px0, pz0), (px0 + pl, pz0 + ph / 2), (px0, pz0 + ph)][::-1] if False else
-          [(px0, pz0), (xh, pz0), (px0 + pl, pz0 + ph / 2), (xh, pz0 + ph), (px0, pz0 + ph)], Y1 - 0.12, 0.04, K["place"], plane="XZ")
+    prism("Pennant", [(px0, pz0), (xh, pz0), (px0 + pl, pz0 + ph / 2), (xh, pz0 + ph), (px0, pz0 + ph)], Y1 - 0.13, 0.04, K["place"], plane="XZ")
+    item("Posters")
     set_group("PosterBand")
-    box("PosterBand", (2.0, 0.04, 3.0), (9.4, Y1 - 0.12, 16.8), K["place"], bevel=0)
+    box("PosterBand", (2.0, 0.04, 3.0), ((nx0 + nx1) / 2 + 1.4, Y1 - 0.13, Z0 + 4.8), K["place"], bevel=0)
     set_group("PosterMoon")
-    box("PosterMoon", (1.6, 0.04, 2.4), (2.0, Y1 - 0.12, 16.6), K["place"], bevel=0)
+    box("PosterMoon", (1.4, 0.04, 2.1), (X0 + 1.1, Y1 - 0.13, Z0 + 4.6), K["place"], bevel=0)
     set_group("Main")
-    for x, z, hw, hh in ((9.4, 16.8, 1.0, 1.5), (2.0, 16.6, 0.8, 1.2)):
+    for x, z, hw, hh in (((nx0 + nx1) / 2 + 1.4, Z0 + 4.8, 1.0, 1.5), (X0 + 1.1, Z0 + 4.6, 0.7, 1.05)):
         for cx2 in (-hw + 0.1, hw - 0.1):
-            box(f"Tack{x}{cx2}", (0.1, 0.06, 0.1), (x + cx2, Y1 - 0.15, z + hh - 0.1), K["iron"], bevel=0)
-    for gx in (px0 + 0.1, px0 + 0.1):
-        pass
-    return (X1 - X0 + 2, Y1 - Y0 + 2, Z1)
+            box(f"Tack{x}{cx2}", (0.1, 0.03, 0.1), (x + cx2, Y1 - 0.165, z + hh - 0.1), K["iron"], bevel=0)
 
+    clip_check(((X0 + 0.1, Y0 + 0.1, Z0), (X1 - 0.1, Y1 - 0.1, Z1)))
+    return (X1 - X0 + 2, Y1 - Y0 + 2, Z1)
 
 BUILDERS.update({
     "WFBedroom": bedroom,
@@ -759,7 +927,7 @@ P.PREVIEW_PAD.update({"WickHouse": 1.25})
 P.PREVIEW_PAD.update({"WFBedroom": 1.1})
 
 
-INSIDE = {"WFBedroom": ((13.4, -10.0, 18.6), (5.0, -1.5, 13.4), (8.0, -5.4, 20.4))}   # camera, target, lamp
+INSIDE = {"WFBedroom": ((17.6, -12.8, 18.8), (6.0, 0.5, 13.0), (10.35, -5.85, 20.0))}   # camera, target, lamp
 
 
 def inside_render(name, cam, target, lamp):
@@ -773,7 +941,7 @@ def inside_render(name, cam, target, lamp):
     d = Vector(target) - Vector(cam)
     co.rotation_euler = d.to_track_quat("-Z", "Y").to_euler()
     sc.camera = co
-    for k, (loc, e, col) in enumerate(((lamp, 900, (1.0, 0.85, 0.65)), ((8.75, -13.5, 16.0), 1500, (0.55, 0.62, 1.0)))):
+    for k, (loc, e, col) in enumerate(((lamp, 900, (1.0, 0.85, 0.65)), ((11.75, -16.5, 16.0), 1500, (0.55, 0.62, 1.0)))):
         ld = bpy.data.lights.new(f"InL{k}", "POINT")
         ld.energy = e
         ld.color = col
