@@ -217,6 +217,9 @@ function Local.Grant(P: Player, Winners: { [string]: any }, Until: number)
 		if D and Wn.Key == Key then
 			local Owned = table.find(Social.Titles, D.Title) ~= nil
 			if Owned and not Social.TempTitles[D.Title] then continue end -- already theirs for good
+			if Social.TempTitles[D.Title] ~= Until then -- (2.31) a superlative won (counted once per award and week)
+				pcall(function() require(game:GetService(`ServerScriptService`).Services.Player.Paths).Count(P, `Superlatives`) end)
+			end
 			Social.TempTitles[D.Title] = Until
 			if not Owned then Rep.AwardTitle(P, D.Title) end
 			local N = svc(`Features.Notifications`)

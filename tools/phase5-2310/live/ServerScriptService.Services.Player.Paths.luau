@@ -221,6 +221,24 @@ function Shared.OnStart()
 		Data.ProfileLoaded:Connect(function(P) task.delay(5, function() if P.Parent then pcall(Shared.CheckNow, P) end end) end)
 	end
 	Players.PlayerRemoving:Connect(function(P) Pending[P] = nil Shared.FactsOverride[P] = nil end)
+	-- the counters the old signals didn't keep (Progress.Tally); they count from 2.31 on
+	local function on(Path: string, Signal: string, Key: string)
+		local M = svc(Path)
+		local S = M and M[Signal]
+		if S and S.Connect then
+			S:Connect(function(P) if typeof(P) == `Instance` and P:IsA(`Player`) then Shared.Count(P, Key) end end)
+		else
+			warn(`[Paths] missing {Path}.{Signal}`)
+		end
+	end
+	on(`Quests.Duels`, `Won`, `DuelWins`)
+	on(`Quests.Duels`, `ChampionDefeated`, `Champion`)
+	on(`School.HallMonitor`, `Escaped`, `Escapes`)
+	-- and the signals that can change a tier, so it shows without waiting for the sweep
+	for _, S in { { `Social.Reputation`, `Changed` }, { `Social.Reputation`, `RelationshipChanged` }, { `Social.Factions`, `RankChanged` } } do
+		local M = svc(S[1])
+		if M and M[S[2]] then M[S[2]]:Connect(function(P) if typeof(P) == `Instance` and P:IsA(`Player`) then Shared.Check(P) end end) end
+	end
 	task.spawn(function()
 		while true do
 			task.wait(60)

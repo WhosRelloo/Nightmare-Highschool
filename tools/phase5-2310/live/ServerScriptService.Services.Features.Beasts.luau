@@ -974,6 +974,7 @@ end
 
 -- the killer's pay: Combat EXP, Yen, and a rare trophy into the Locker
 function Shared.Reward(P: Player, Def)
+	pcall(function() require(ServerScriptService.Services.Player.Paths).Count(P, `Beasts`) end) -- (2.31) Standing Paths
 	local R = Def.Reward or {}
 	pcall(function() require(ServerScriptService.Services.Player.Progression).Award(P, R.Exp or 0, `Combat`, Def.Name) end)
 	pcall(function() require(ServerScriptService.Services.Player.Data).UpdateState(P, { type = `UpdateYen`; amount = R.Yen or 0 }) end)

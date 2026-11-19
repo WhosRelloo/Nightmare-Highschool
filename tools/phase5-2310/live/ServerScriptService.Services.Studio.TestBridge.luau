@@ -1488,4 +1488,23 @@ function Commands.PathsTest(PlayerName: string)
 	return DeepCopy(require(ServerScriptService.Services.Player.Paths).SelfTestForTests(Players:FindFirstChild(PlayerName)))
 end
 
+-- (2.31) the five counters, each from its real signal; put back after
+function Commands.TallyTest(PlayerName: string)
+	local SSS = ServerScriptService.Services
+	local P = Players:FindFirstChild(PlayerName)
+	local Prog = require(SSS.Player.Progression)
+	local Before = table.clone(Prog.Get(P).Tally)
+	require(SSS.Quests.Duels).Won:Fire(P)
+	require(SSS.Quests.Duels).ChampionDefeated:Fire(P)
+	require(SSS.School.HallMonitor).Escaped:Fire(P, `Curfew`)
+	require(SSS.Features.Beasts).Reward(P, { Name = `Test beast`; Reward = {} })
+	task.wait(0.5)
+	local After = Prog.Get(P).Tally
+	local Out = {}
+	for _, K in { `DuelWins`, `Champion`, `Escapes`, `Beasts` } do Out[K] = (After[K] or 0) - (Before[K] or 0) end
+	local Pr = Prog.Get(P) Pr.Tally = Before
+	require(SSS.Player.Data).UpdateState(P, { type = `SetProgress`; progress = Pr })
+	return Out
+end
+
 return Shared
