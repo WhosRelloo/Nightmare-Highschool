@@ -2,6 +2,7 @@
 local Template = require(script.Parent.LeaderTemplate)
 
 return Template({
+	PathHub = { Path = `Combat`; Tier = 3; Text = `Enforcer. The Court has been hearing your name.` }; -- (2.31) Standing Paths
 	Intro = `Well. A new face in the Boiler Yard. Vesper Crane. The Court sees everything that happens after dark... and most of what happens before it.`;
 	About = `The Crimson Court runs this place when the lights go out. We mark our walls and we make the hall monitors look slow. Paint a sigil without being seen, give a monitor the slip, put someone on the floor. That's how you rise.`;
 	Lore = `The basement doors lock from the inside. Every night. Nobody on staff has a key. Funny, isn't it?`;

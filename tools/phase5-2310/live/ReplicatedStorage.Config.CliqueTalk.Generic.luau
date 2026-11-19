@@ -36,4 +36,12 @@ return {
 		Liked = { Any = { "{Snack}? Sure, thanks.", `Oh. Thanks!`, `That's nice of you.`, `Free food? I won't say no.` } };
 		Refuse = { Hostile = { `I'm not taking anything from you.`, `Keep it.`, `Is it poisoned? No thanks.` }; Wary = { `Uh, no thanks.`, `I'm good. Really.`, `Why are you giving me food?` } };
 	};
+	-- (2.31) a Standing Path at tier 3+ (the player's PathTop): StudentBrain greets with it now and then
+	Path = {
+		Academic = { Any = { `That's the honor student.`, `Top of the class, that one.`, `Heard you aced another test.` } };
+		Social = { Any = { `Everyone knows you, huh?`, "Oh, it's {Name}. Of course it is.", `You know everyone here.` } };
+		Combat = { Any = { `Don't start with that one.`, `I heard about you. Respect.`, `Easy. I'm not looking for trouble.` } };
+		Athletic = { Any = { "Good game last week, {Name}.", `There's the varsity star.`, `Saving a seat at the next match.` } };
+		Supernatural = { Any = { `You've seen things. I can tell.`, `You were out the night it rang.`, `People say you know about Mira.` } };
+	};
 }

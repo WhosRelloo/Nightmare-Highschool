@@ -1,1621 +1,1903 @@
 local Report = {}
 local Items = {}
-table.insert(Items, { Path = {"ServerScriptService", "Services", "Player", "Paths"}; Source = [==[
---[[ (2.31) Standing Paths (server). Services.Player.Paths (docs/expansion/14-Progression-and-Identity.md §3).
-	Tiers are computed from data the game already keeps (Config.Paths); only the highest tier reached is saved
-	(PlayerData.Progress.Paths, kept by Progression.Sanitize), so a tier never drops. Five counters the old signals
-	didn't keep live in Progress.Tally.
-	Checks: on join, a 60 s sweep, and a few signals (Check, debounced 2 s per player).
-	Player attributes: Path_<Path> = tier, PathTop = the path at tier 3+ with the highest tier (Config order breaks ties).
-	API: Evaluate(F), Facts(P), Tier(P, Path), Next(P), Check(P), CheckNow(P), Count(P, Key, N?), Granted (signal),
-	     SelfTestForTests(P), FactsOverride (tests) ]]
+table.insert(Items, { Path = {"ReplicatedStorage", "Config", "CliqueTalk", "Generic"}; Source = [==[
+-- CliqueTalk.Generic: students without a clique, and the fallback for any clique cell left empty (the line matrix)
+return {
+	Greet = {
+		Hostile = { `Get lost.`, `Not you.`, `Keep walking.`, `We're not friends.` };
+		Wary = { `...Hey.`, `Oh. It's you.`, `What do you want?`, `Hm. Hi, I guess.` };
+		Neutral = { `Hey.`, `Hi.`, `Sup.`, `How's it going?` };
+		Friendly = { "Hey, {Name}!", `Oh good, it's you.`, "{Name}! What's up?", `Hey you. Good day?` };
+		Respected = { "{Name}! Looking sharp.", `There's the legend.`, "Always good to see you, {Name}.", `Make way, everyone.` };
+	};
+	Bump = { Any = { `Watch it!`, `Whoa, sorry.`, `Excuse you.`, `Easy!` } };
+	Crowded = { Any = { `Personal space?`, `Little room, please.`, `You're kind of close.`, `Can I help you?` } };
+	Shoved = { Any = { `Hey! What was that?`, `Rude much?`, `Okay, ow.`, `Did you just shove me?` } };
+	FightSeen = { Any = { `Ooh, here we go.`, `Somebody stop them!`, `I'm not watching. Okay, I'm watching.`, `Someone's getting detention.` } };
+	Flee = { Any = { `Whoa, not near me!`, `Take it outside!`, `Nope. I'm out.`, `Someone get a teacher!` } };
+	Transformed = { Any = { `What IS that?`, `Stay back...`, `Okay, that's new.`, `Please don't eat me.` } };
+	Night = { Any = { `What are you doing out this late?`, `Stay in the light.`, `Late night, huh?`, `Careful out here.` } };
+	FullMoon = { Any = { `Full moon tonight. Be careful.`, `You feel that? Full moon.`, `Don't go near the oaks tonight.` } };
+	Race = {
+		Human = { Any = { `Just a normal kid, huh? Lucky.`, `Human, huh? Welcome to the weird school.`, `Human? Stick close to the lamps.` } };
+		Priest = { Any = { `Bless you. Or whatever you say.`, `Oh good, someone holy.`, `Keep that cross handy.` } };
+		Vampire = { Any = { `Is it colder near you?`, `Nice fangs. Real?`, `Up all night again? You okay?` } };
+		Werewolf = { Any = { `Nice ears.`, `Is that a tail?`, `You smell like the woods.` } };
+		Ghoul = { Any = { `You look... tired.`, `Did you sleep at all?`, `You seem really calm today.` } };
+		Wraith = { Any = { `I didn't hear you come up.`, `You walk really quietly.`, `Were you always here?` } };
+	};
+	Hurt = { Any = { `You okay? You look rough.`, `Go see the nurse.`, `Who did that to you?`, `Sit down before you fall down.` } };
+	Outfit = {
+		FullLook = { Any = { "{Clique} look, head to toe. Huh.", "{Clique} would claim you in that.", "{Clique} colours? Bold." } };
+		RivalLook = { Any = { "{Rival} colours? Here?", "{Rival} look? Brave.", "{Rival} look. People notice." } };
+		Likes = { Any = { "Nice {Piece}.", "Where'd you get the {Piece}?", "Okay, the {Piece} is cool." } };
+		Mocks = { Any = { "Is that a {Piece}? Really?", "Bold choice, the {Piece}.", "Hm. The {Piece}. Interesting." } };
+	};
+	DressCode = { Any = { `Members' corner. Dress the part.`, `Come back in our colours.`, `Not dressed like that, you're not.` } };
+	Fed = {
+		Loved = { Any = { "Oh, {Snack}? You're the best.", "{Snack}! How did you know?", "You're sharing {Snack}? Legend.", `My favourite. Thank you!` } };
+		Liked = { Any = { "{Snack}? Sure, thanks.", `Oh. Thanks!`, `That's nice of you.`, `Free food? I won't say no.` } };
+		Refuse = { Hostile = { `I'm not taking anything from you.`, `Keep it.`, `Is it poisoned? No thanks.` }; Wary = { `Uh, no thanks.`, `I'm good. Really.`, `Why are you giving me food?` } };
+	};
+	-- (2.31) a Standing Path at tier 3+ (the player's PathTop): StudentBrain greets with it now and then
+	Path = {
+		Academic = { Any = { `That's the honor student.`, `Top of the class, that one.`, `Heard you aced another test.` } };
+		Social = { Any = { `Everyone knows you, huh?`, "Oh, it's {Name}. Of course it is.", `You know everyone here.` } };
+		Combat = { Any = { `Don't start with that one.`, `I heard about you. Respect.`, `Easy. I'm not looking for trouble.` } };
+		Athletic = { Any = { "Good game last week, {Name}.", `There's the varsity star.`, `Saving a seat at the next match.` } };
+		Supernatural = { Any = { `You've seen things. I can tell.`, `You were out the night it rang.`, `People say you know about Mira.` } };
+	};
+}
+]==] })
+table.insert(Items, { Path = {"ServerScriptService", "Services", "AI", "StudentBrain"}; Source = [==[
+--[[
+	StudentBrain (server). Services.AI.StudentBrain  (1.86.2, from the Map place's Features.MapStudents 1.78.0-1.78.6)
+
+	The awareness and the little life of a background student, for any module that owns their routine (in NH Combat
+	Test that is Features.Schedules: classes, chairs, cliques, lunch, clubs). The host keeps deciding WHERE a student
+	goes; the brain decides how they walk there (Services.AI.Nav), what they notice (Services.AI.Senses), how they
+	react, what they say (voices and bubbles: Controllers.World.NpcLook, lines in StudentBrain.Lines), the fidgets, and
+	leaning only against a real wall.
+
+	Reactions (most urgent first; Danger cancels the routine, the host re-plans after):
+	  Danger      a fight, a transformed monster or a downed body close by: back away fast, then watch
+	  Gawk        a fight seen or heard further off: stop and watch until it's been quiet 6 s
+	  MakeWay     a student coming straight at them: step aside            (the bump hook, see Brain.OnBump)
+	  Space       someone standing right on top of them: step back          (the bump hook, see Brain.OnBump)
+	  Stared at, Followed, Glance: head turns and a word, never interrupting the walk
+	A seated student (S.Seated) only turns their head for anything but Danger.
+
+	API (S is the host's student table; the brain adds Agent, Senses and its own fields to it)
+	  Brain.Init(Host)               Host = { Pose(S, name?), Unseat(S), Replan(S), Students() -> {S}, Plan() -> {Kind, DayName, SegName} }
+	  Brain.Attach(S)                after the host spawned S.Model / S.Hum / S.Root (and S.Up): agent, senses, voice, the loop
+	  Brain.Detach(S)                before the host destroys the model
+	  Brain.GoTo(S, Goal, Valid, Opts?) -> ok     walk with Nav; pauses for reactions and carries on; Valid() false = stop
+	  Brain.Idle(S, Seconds, Valid)  wait there for a while: fidgets, a chat with a student beside them, a mutter
+	  Brain.LeanOnWall(S, Walk?)     lean only with a wall right behind (Walk: may step up to 9 studs to one) -> ok
+	  Brain.Urgent(S) -> string?     the reaction due now, if any
+	  Brain.OnBump                   nil, or function(S, Rec, Kind) -> handled  (see the hook in React.MakeWay / Space)
+	  Brain.Contact(Pl, Model, Speed, Dir) -> reacted   a bump Pl's client felt (contact feel: Features.ContactFeel
+	                                 checked it): the student reacts now, even if Senses never flagged an approach
+]]
+
+local CollectionService = game:GetService(`CollectionService`)
 local Players = game:GetService(`Players`)
 local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
+local RunService = game:GetService(`RunService`)
 local ServerScriptService = game:GetService(`ServerScriptService`)
-local Config = require(ReplicatedStorage.Config.Paths)
-local SignalPlus = require(ReplicatedStorage.Packages.SignalPlus)
+local ServerStorage = game:GetService(`ServerStorage`)
 
-local Shared = {}
-local Local = {}
-Shared.Granted = SignalPlus() -- (Player, Path, Tier, Name)
-Shared.FactsOverride = {} :: { [Player]: any }
-local Pending = {} :: { [Player]: boolean }
-local GRADE = { [`A+`] = 6; A = 5; B = 4; C = 3; D = 2; F = 1 }
+local Nav = require(ServerScriptService.Services.AI.Nav)
+local SchoolTime = require(game:GetService("ReplicatedStorage"):WaitForChild("Functions"):WaitForChild("SchoolTime")) -- (2.22.0) shared night windows
+local Senses = require(ServerScriptService.Services.AI.Senses)
+local Lines = require(script:WaitForChild(`Lines`))
+local Items = require(game:GetService(`ReplicatedStorage`).Config.Items) -- (inventory QOL batch 5) the clique foods
+-- (line matrix) clique x attitude x moment; a broken or missing Talk falls back to today's pools, never the whole brain
+local OkT, Talk = pcall(require, script:WaitForChild(`Talk`, 5))
+if not OkT or typeof(Talk) ~= `table` then
+	Talk = { Pick = function() return nil end; Attitude = function() return `Neutral` end; Outfit = function() return nil end }
+end
+local CliqueConfig = require(ReplicatedStorage.Config.Cliques)
+local Appearance = require(ReplicatedStorage.UI.Appearance)
+local Cliques = require(ServerScriptService.Services.Social.Cliques) -- (line matrix) the dress code, Cliques.Dressed
+local function Rep() return require(ServerScriptService.Services.Social.Reputation) end -- (2.27) lazy: no cycle at load
 
-local function svc(Path: string)
-	local Node = ServerScriptService.Services
-	for Seg in Path:gmatch(`[^%.]+`) do Node = Node and Node:FindFirstChild(Seg) end
-	if not Node then return nil end
-	local Ok, M = pcall(require, Node)
-	return if Ok then M else nil
+local Brain = {}
+local Host = nil
+local Started = false
+local Studio = RunService:IsStudio()
+local React = {}
+
+-- NUDGE HOOK (for Nudge_Left / Nudge_Right / Shove_Forward): set Brain.OnBump to a function(S, Rec, Kind) that
+-- plays the reaction and moves the student, and return true to skip the default step aside. Kind is "MakeWay"
+-- (someone walking straight at them) or "Space" (someone standing on top of them). Rec is the Senses record of
+-- the player (Rec.Player, Rec.Root, Rec.Pos, Rec.Speed, Rec.Dist).
+local NudgeMod = require(script:WaitForChild(`Nudges`))
+Brain.OnBump = NudgeMod.Handle :: ((any, any, string) -> boolean)? -- (1.86.3) the nudges
+
+---| helpers |---
+
+local function plan(): { [string]: any }
+	return (Host and Host.Plan and Host.Plan()) or { Kind = `Off` }
 end
 
----| the facts |---
+-- what the lines can talk about right now
+local function ctx(): { [string]: any }
+	local T = game:GetService(`Lighting`).ClockTime
+	local P = plan()
+	return {
+		Kind = P.Kind; Day = P.DayName or `today`; Period = P.SegName or `class`;
+		Moon = workspace:GetAttribute(`NHMoonPhase`) or ``;
+		Night = SchoolTime.InWindow(T, `Dark`) or workspace:GetAttribute(`NHMoonNight`) == true;
+	}
+end
 
-function Shared.Facts(P: Player)
-	if Shared.FactsOverride[P] then return Shared.FactsOverride[P] end
-	local Data = svc(`Player.Data`)
-	local Prof = Data and Data.GetProfile(P)
-	local Prog = svc(`Player.Progression`)
-	local Pr = Prog and Prog.Get(P)
-	if not (Prof and Pr) then return nil end
-	local F = { Subjects = {}; Rep = {}; CliqueTiers = {}; Tally = {} }
-	for _, K in Config.Tally do F.Tally[K] = Pr.Tally[K] or 0 end
-	for Subject, C in Prof.Classes or {} do
-		if typeof(C) == `table` then F.Subjects[Subject] = tonumber(C.Level) or 1 end
+local function bubble(S, Text: string, Mood: string?)
+	S.SaidAt = os.clock()
+	-- (2.0.0) the line's attitude (Hostile, Wary, Respected...): the clients' talking face takes its expression from it
+	-- (Controllers.Character.FaceTalk); nil = from the student's mood or the words
+	S.Model:SetAttribute(`NHSayMood`, Mood)
+	S.Model:SetAttribute(`NHSay`, Text)
+	S.Model:SetAttribute(`NHSayFor`, math.clamp(1.8 + #Text * 0.06, 2.4, 6))
+	S.Model:SetAttribute(`NHSayAt`, workspace:GetServerTimeNow())
+end
+
+-- say a line from a pool (not one they said lately). Force skips the "don't talk over yourself" wait (chats).
+local function say(S, Pool: { string }?, Cooldown: number?, Force: boolean?): boolean
+	if not Force and os.clock() - (S.SaidAt or -1e9) < (Cooldown or 8) then return false end
+	local Text = Pool and Lines.Pick(S, Pool, ctx())
+	if not (Text and S.Model) then return false end
+	bubble(S, Text)
+	return true
+end
+local function sayText(S, Text: string)
+	if not S.Model then return end
+	bubble(S, Lines.Fill(Text, ctx()))
+end
+
+-- say a line from the line matrix (StudentBrain.Talk: this student's clique, how they feel about Pl, the moment), or
+-- one from Fallback (today's pool) when the matrix has nothing. Opts: Sub (race / outfit verdict), Attitude, Piece.
+local function sayMatrix(S, Moment: string, Pl: Player?, Opts: { [string]: any }?, Cooldown: number?, Fallback: { string }?): boolean
+	if os.clock() - (S.SaidAt or -1e9) < (Cooldown or 8) or not S.Model then return false end
+	local O = table.clone(Opts or {})
+	O.Ctx = O.Ctx or ctx()
+	local Ok, Text = pcall(Talk.Pick, S, Moment, Pl, O)
+	if Ok and Text then
+		bubble(S, Text, O.Attitude)
+		return true
 	end
-	F.BestStreak = (typeof(Prof.Attendance) == `table` and tonumber(Prof.Attendance.BestStreak)) or 0
-	F.BestCard = 0
-	pcall(function()
-		local St = svc(`School.ReportCards`).State(P)
-		for _, Card in (St and St.Cards) or {} do F.BestCard = math.max(F.BestCard, GRADE[Card.Average or ``] or 0) end
-	end)
-	local Rep = svc(`Social.Reputation`)
-	for Cat in require(ReplicatedStorage.Config.Reputation).Categories do
-		F.Rep[Cat] = (Rep and Rep.Value(P, Cat)) or 0
+	return Fallback ~= nil and say(S, Fallback, Cooldown)
+end
+
+-- a shove (Nudges) gets its own line once the student turns to look at who did it
+local memo, remembers -- (2.27) declared below; OnShove and glance use them
+NudgeMod.OnShove = function(S, Rec)
+	local Pl = Rec and Rec.Player
+	if S.RosterId and Pl then -- (2.27) a shove is remembered: -12 and Fought, at most once per 30 s
+		local M = memo(S, Pl)
+		if os.clock() - (M.ShoveSaved or -1e9) >= 30 then
+			M.ShoveSaved = os.clock()
+			pcall(function() Rep().ChangeRelationship(Pl, S.RosterId, -12, nil, `Fought`) end)
+		end
 	end
-	F.Met = 0
-	pcall(function()
-		local Roster = svc(`Social.Roster`)
-		for Id, R in Rep.Get(P).Relationships do
-			if typeof(R) == `table` and R.Met == true and Roster.IsRostered(Id) then F.Met += 1 end
-		end
-	end)
-	pcall(function()
-		local Cl = svc(`Social.Cliques`)
-		for Id, V in Cl.Get(P) or {} do
-			if typeof(V) == `number` then F.CliqueTiers[Id] = Cl.Tier(V) end
-		end
-	end)
-	F.FactionRank = 1
-	pcall(function()
-		local Fa = svc(`Social.Factions`)
-		for Id in require(ReplicatedStorage.Config.Factions).Factions do
-			local E = Fa.Get(P, Id)
-			if E then F.FactionRank = math.max(F.FactionRank, Fa.RankIndex(E.Rank)) end
-		end
-	end)
-	F.Takedowns = (tonumber(Prof.Kills) or 0) + (tonumber(Prof.NPCKills) or 0)
-	F.Showdowns = 0
-	pcall(function() F.Showdowns = svc(`Social.CliqueShowdowns`).Summary(P).Beaten or 0 end)
-	F.ClubRank = `Rookie`
-	pcall(function()
-		local S = svc(`Sports.Clubs`).Get(P)
-		if S and S.Club then F.ClubRank = require(ReplicatedStorage.Config.Sports).RankFor(S.ClubExp) end
-	end)
-	local Q = svc(`Quests.Quests`)
-	F.Orientation = Q ~= nil and Q.IsDone(P, `Orientation`)
-	F.AfterHours = Q ~= nil and Q.IsDone(P, `AfterHours`)
-	F.FileKept = F.AfterHours and Q.Decided(P, `FileKept`) ~= `Lose`
-	F.LineageTier = 1
-	pcall(function() F.LineageTier = require(ReplicatedStorage.Lineage).Sanitize(Prof.Lineage).Tier or 1 end)
-	return F
+	sayMatrix(S, `Shoved`, Pl, nil, 0, Lines.MakeWay)
 end
 
----| the evaluator (pure) |---
-
-function Local.Passes(Tier, F): (boolean, { string })
-	local Missing = {}
-	for _, N in Tier.Need do
-		local Ok, R = pcall(N.Test, F)
-		if not (Ok and R) then table.insert(Missing, N.Text) end
+-- (contact feel) the bump line lands at the moment of contact, not on the approach: a sprinter's hit always gets the
+-- Sprint line, a brush the Bump line 60% of the time (as MakeWay did). Space already said its Crowded line, and a
+-- shove says Shoved once the student has turned round.
+NudgeMod.OnContact = function(S, Rec, Kind, Speed, Shove)
+	if Kind == `Space` or Shove then return end
+	if (Speed or 0) > 18 then
+		say(S, Lines.Sprint, 10)
+	elseif math.random() < 0.6 then
+		sayMatrix(S, `Bump`, Rec and Rec.Player, nil, 10, Lines.MakeWay)
 	end
-	return #Missing == 0, Missing
 end
 
--- the highest tier of each path whose conditions hold for these facts
-function Shared.Evaluate(F): { [string]: number }
-	local Out = {}
-	for _, Path in Config.Order do
-		local Best = 1
-		for I, Tier in Config.Paths[Path].Tiers do
-			if I > 1 and (Local.Passes(Tier, F)) then Best = I end
-		end
-		Out[Path] = Best
+-- what a student remembers about each player: how often they've met, when they last said hi, when they saw them fight
+function memo(S, Pl: Player?)
+	if not Pl then return {} end
+	S.Memory = S.Memory or {}
+	local M = S.Memory[Pl.UserId]
+	if not M then M = { Met = 0; Greeted = -1e9; Fought = -1e9 } S.Memory[Pl.UserId] = M end
+	return M
+end
+
+-- the time-of-day hello (today's pools), the matrix's fallback
+local function daily(C): { string }
+	local G = Lines.Greet
+	if C.Night then
+		if C.Moon == `Full` and math.random() < 0.6 then return G.FullMoon end
+		if C.Moon == `New` and math.random() < 0.4 then return G.NewMoon end
+		return G.Night
 	end
-	return Out
+	local H = game:GetService(`Lighting`).ClockTime
+	return if H < 11 then G.Morning elseif H >= 16.5 then G.Evening else G.Day
 end
 
----| saving |---
-
-function Local.Saved(P: Player): ({ [string]: number }?, any?)
-	local Prog = svc(`Player.Progression`)
-	local Pr = Prog and Prog.Get(P)
-	if not Pr then return nil, nil end
-	return Pr.Paths, Pr
+-- the right hello for this player, now: a line-matrix moment (nil = today's pool only), its options, and today's pool
+-- as the fallback. Order (the line matrix spec): saw you fight, your outfit, you're hurt, you're transformed, your race,
+-- their clique, met before, night, time of day.
+local function greeting(S, Rec): (string?, { [string]: any }?, { string })
+	local C = ctx()
+	local Pl = Rec and Rec.Player
+	local M = memo(S, Pl)
+	local G = Lines.Greet
+	if S.RosterId and Pl and os.clock() - (M.Fought or -1e9) >= 300 then -- (2.27) the saved memory, after a fresh fight
+		local Ok, E = pcall(function() return Rep().Entry(Pl, S.RosterId) end)
+		if Ok and E then
+			local T = S.Temper or `Warm`
+			if not E.Met and E.Value >= -19 then return `Intro`, nil, Lines.Intro[T] or Lines.Intro.Warm end
+			if (E.Flags.Fought or 0) >= 1 and E.Value < 0 then return nil, nil, G.Grudge[T] or G.Grudge.Warm end
+			if (E.Flags.Helped or 0) >= 2 and E.Value >= 10 then return nil, nil, G.Grateful[T] or G.Grateful.Warm end
+		end
+	end
+	if os.clock() - (M.Fought or -1e9) < 300 then
+		local OkA, A = pcall(Talk.Attitude, S, Pl)
+		return `Greet`, { Attitude = if OkA and A == `Hostile` then `Hostile` else `Wary` }, G.Wary
+	end
+	local Ch = Pl and Pl.Character
+	if Pl and os.clock() - (M.Outfit or -1e9) > 600 then
+		local Ok, Verdict, Piece = pcall(Talk.Outfit, S, Pl)
+		if Ok and Verdict and math.random() < (if S.Clique then 0.35 else 0.15) then
+			M.Outfit = os.clock()
+			return `Outfit`, { Sub = Verdict; Piece = Piece }, daily(C)
+		end
+	end
+	local Hum = Ch and Ch:FindFirstChildWhichIsA(`Humanoid`)
+	if Hum and Hum.MaxHealth > 0 and Hum.Health / Hum.MaxHealth < 0.35 and math.random() < 0.5 then
+		return `Hurt`, nil, daily(C)
+	end
+	local OkF, Form = false, nil
+	if Ch then OkF, Form = pcall(Appearance.FormOf, Ch) end
+	if OkF and Form then return `Transformed`, nil, Lines.ByNature(S, Lines.Monster, `Brave`) end
+	local Top = Pl and Pl:GetAttribute(`PathTop`) -- (2.31) a Standing Path at tier 3+: "That's the honor student."
+	if Top and math.random() < 0.25 then return `Path`, { Sub = Top }, daily(C) end
+	local Race = Pl and Pl:GetAttribute(`Race`)
+	if Race and math.random() < 0.3 then return `Race`, { Sub = Race }, G.Race[Race] or daily(C) end
+	local Def = S.Clique and CliqueConfig.Defs[S.Clique]
+	if Def then
+		-- strong feelings always show (a Hostile student never chirps "Hi."); the rest greet by their clique 60% of the time
+		local OkA, A = pcall(Talk.Attitude, S, Pl)
+		if not OkA or typeof(A) ~= `string` then A = `Neutral` end
+		local Strong = A == `Hostile` or A == `Wary` or A == `Respected`
+		if Strong or math.random() < 0.6 then
+			local O = if Strong then { Attitude = A } else nil
+			if C.Night and math.random() < 0.4 then -- (line matrix) the night still shows at the extremes
+				if C.Moon == `Full` then return `FullMoon`, O, G.FullMoon end
+				return `Night`, O, G.Night
+			end
+			local Tier = Pl and Pl:GetAttribute(`CliqueTier_{S.Clique}`)
+			return `Greet`, O, (Def.Reactions and Tier and Def.Reactions[Tier]) or daily(C)
+		end
+	end
+	if (M.Met or 0) >= 4 and math.random() < 0.6 then return nil, nil, G.Often end
+	if (M.Met or 0) >= 1 and math.random() < 0.7 then return nil, nil, G.Again end
+	if C.Night then
+		if C.Moon == `Full` and math.random() < 0.6 then return `FullMoon`, nil, G.FullMoon end
+		if C.Moon == `New` and math.random() < 0.4 then return nil, nil, G.NewMoon end
+		return `Night`, nil, G.Night
+	end
+	return nil, nil, daily(C)
 end
-function Local.Save(P: Player, Pr)
-	svc(`Player.Data`).UpdateState(P, { type = `SetProgress`; progress = Pr })
+
+-- (2.27) does this rostered student have something saved to say to Pl (an introduction, a grudge, thanks)?
+-- the same rules as greeting()'s saved-memory branch
+function remembers(S, Pl: Player?): boolean
+	if not (S.RosterId and Pl) then return false end
+	local Ok, E = pcall(function() return Rep().Entry(Pl, S.RosterId) end)
+	if not (Ok and E) then return false end
+	return (not E.Met and E.Value >= -19)
+		or ((E.Flags.Fought or 0) >= 1 and E.Value < 0)
+		or ((E.Flags.Helped or 0) >= 2 and E.Value >= 10)
 end
 
-function Shared.Tier(P: Player, Path: string): (number, string)
-	local Saved = Local.Saved(P)
-	local T = (Saved and Saved[Path]) or 1
-	local Def = Config.Paths[Path]
-	return T, Def and Def.Tiers[T] and Def.Tiers[T].Name or ``
+local function greet(S, Rec): boolean
+	local Pl = Rec and Rec.Player
+	local M = memo(S, Pl)
+	if os.clock() - (M.Greeted or -1e9) < 60 then return false end
+	local Moment, Opts, Pool = greeting(S, Rec)
+	local Said
+	if Moment == `Intro` then -- (2.27) they tell you their name, and now you've met
+		if os.clock() - (S.SaidAt or -1e9) < 6 then return false end
+		local Line = Pool[math.random(1, #Pool)]
+		sayText(S, (string.gsub(Line, "{First}", S.First or `me`))) -- (2.29) a plain pattern string, not an interpolation
+		Said = true
+		pcall(function() Rep().Meet(Pl, S.RosterId) end)
+	else
+		Said = if Moment then sayMatrix(S, Moment, Pl, Opts, 6, Pool) else say(S, Pool, 6)
+	end
+	if Said then
+		M.Greeted = os.clock()
+		M.Met = (M.Met or 0) + 1
+		return true
+	end
+	return false
 end
 
--- the closest next tier: the one with the fewest missing conditions
-function Shared.Next(P: Player)
-	local F = Shared.Facts(P)
-	if not F then return nil end
-	local Best = nil
-	for _, Path in Config.Order do
-		local T = Shared.Tier(P, Path)
-		local Tier = Config.Paths[Path].Tiers[T + 1]
-		if Tier then
-			local _, Missing = Local.Passes(Tier, F)
-			if not Best or #Missing < #Best.Missing then Best = { Path = Path; Tier = T + 1; Name = Tier.Name; Missing = Missing } end
+local function lookAt(S, P: Vector3?, Seconds: number?)
+	if not S.Model then return end
+	if P then
+		S.Model:SetAttribute(`NHLookAt`, P)
+		S.Model:SetAttribute(`NHLookUntil`, workspace:GetServerTimeNow() + (Seconds or 0.6))
+	else
+		S.Model:SetAttribute(`NHLookUntil`, nil)
+	end
+end
+
+local function step(S, Text: string)
+	if Studio and S.Model then S.Model:SetAttribute(`NHStep`, Text) end
+end
+
+local function mood(S, M: string, Hold: number?)
+	local Now = os.clock()
+	if not Hold and Now < (S.MoodHold or 0) then return end
+	if Hold then S.MoodHold = Now + Hold end
+	if S.Model and S.Model:GetAttribute(`NHMood`) ~= M then S.Model:SetAttribute(`NHMood`, M) end
+end
+
+local function headOf(Rec): Vector3?
+	local C = Rec and Rec.Player and Rec.Player.Character
+	local H = C and C:FindFirstChild(`Head`)
+	return H and H:IsA(`BasePart`) and H.Position or (Rec and Rec.Pos)
+end
+
+local function playerNear(P: Vector3, R: number): boolean
+	for _, Pl in Players:GetPlayers() do
+		local Root = Pl.Character and Pl.Character:FindFirstChild(`HumanoidRootPart`)
+		if Root and Root:IsA(`BasePart`) and (Root.Position - P).Magnitude < R then return true end
+	end
+	return false
+end
+
+local function pose(S, Name: string?)
+	if Host and Host.Pose then Host.Pose(S, Name) end
+end
+
+---| reactions |---
+
+-- the most urgent thing to react to right now. What triggered it is kept 0.8 s (S.Pending), so a reaction isn't
+-- lost when the moment has passed by the time the brain gets to it
+local function urgentNow(S, Snap): string?
+	if not Snap then return nil end
+	local T = Snap.Threat
+	if T and S.Root then
+		local Dist = (T.Pos - S.Root.Position).Magnitude
+		local Close = 10 + (1 - S.Bravery) * 12 -- brave ones let it get closer
+		if Dist < Close and T.Level > 0.15 then return `Danger` end
+		if T.Kind == `Fight` and Dist < 55 then return `Gawk` end
+	end
+	if S.Seated then return nil end -- a seated student only reacts to danger and fights
+	if Snap.Approaching and not S.Busy then return `MakeWay` end
+	if Snap.Crowding then return `Space` end
+	return nil
+end
+
+local function urgent(S, Snap): (string?, any)
+	local U = urgentNow(S, Snap)
+	if U then
+		S.Pending = { U = U; Snap = Snap; At = os.clock() }
+		return U, Snap
+	end
+	local P = S.Pending
+	if P and os.clock() - P.At < 0.8 then return P.U, P.Snap end
+	return nil, Snap
+end
+
+function Brain.Urgent(S): string?
+	return (urgent(S, S.Senses and S.Senses.Last))
+end
+
+local function watching(S): boolean
+	return S.WatchUntil ~= nil and os.clock() < S.WatchUntil and not S.Seated
+end
+
+-- somewhere 12-26 studs away from a point, on the floor, further from it
+local function awayFrom(S, From: Vector3): Vector3?
+	local My = S.Root.Position
+	local Base = Vector3.new(My.X - From.X, 0, My.Z - From.Z)
+	if Base.Magnitude < 0.1 then Base = S.Root.CFrame.LookVector * -1 end
+	Base = Base.Unit
+	for _, A in { 0, 35, -35, 70, -70, 110, -110 } do
+		local Dir = CFrame.Angles(0, math.rad(A), 0):VectorToWorldSpace(Base)
+		for _, R in { 26, 18, 12 } do
+			local F = Nav.Floor(My + Dir * R, 6)
+			if F and (F - From).Magnitude > (My - From).Magnitude then return F end
+		end
+	end
+	return nil
+end
+
+function React.Danger(S, Snap)
+	local T = Snap.Threat
+	if S.Seated and Host and Host.Unseat then Host.Unseat(S) end
+	mood(S, `Scared`, 6)
+	S.Model:SetAttribute(`NHActivity`, `Backing away ({T.Kind})`)
+	local C = ctx()
+	if T.From and T.From.Player and T.Kind == `Fight` then memo(S, T.From.Player).Fought = os.clock() end
+	local Pool = if T.Kind == `Monster` then (if C.Moon == `Full` and math.random() < 0.4 then Lines.MonsterFullMoon else Lines.ByNature(S, Lines.Monster, `Brave`))
+		elseif T.Kind == `Body` then Lines.Body
+		elseif C.Night and math.random() < 0.35 then Lines.FleeNight
+		else Lines.ByNature(S, Lines.Flee, `Brave`)
+	local Who = T.From and T.From.Player
+	local Moment = if T.Kind == `Monster` then `Transformed` elseif T.Kind == `Fight` then `Flee` else nil
+	if not (Moment and Who and sayMatrix(S, Moment, Who, nil, 8, nil)) then say(S, Pool, 8) end
+	S.Shaken = true
+	lookAt(S, T.Pos + Vector3.new(0, 2, 0), 2)
+	local To = awayFrom(S, T.Pos)
+	if To then
+		S.Agent:GoTo(To, { Speed = 13 + S.Bravery * 2; Arrive = 2.5 })
+	else
+		S.Agent:Shuffle(S.Root.Position - T.Pos, 1.2, 11)
+	end
+	S.WatchUntil = os.clock() + 8
+	S.WatchAt = T.Pos
+	S.Replan = true -- the routine starts again from here once it's over
+end
+
+---| (2.15.0, combat concept 19) crowds at fights |---
+-- Gawkers form a ring round a fight at a safe distance (each one just outside their own Danger distance), face it,
+-- and act the part: the brave chant and shout bets, the timid beg them to stop or say they're glad it isn't them,
+-- the rest call the state of the fight, and about a third hold a phone up to record it. A ring of three or more
+-- draws the nearest hall monitor (School.HallMonitor.Respond, once every 25 s per ring; the Map has no monitors).
+local Rings = {} :: { any }
+local GOLDEN = math.rad(137.5)
+local RECORD_POSE = CFrame.Angles(0, math.rad(35), math.rad(140)) -- the right arm up in front, phone to the fight
+
+local function ringFor(Center: Vector3)
+	local Now = os.clock()
+	for I = #Rings, 1, -1 do if Now - Rings[I].Last > 10 then table.remove(Rings, I) end end
+	for _, R in Rings do
+		if (R.Center - Center).Magnitude < 16 then
+			R.Center = R.Center:Lerp(Center, 0.3)
+			R.Last = Now
+			return R
+		end
+	end
+	local R = { Center = Center; Members = {}; Count = 0; Last = Now; Alerted = 0; Base = math.random() * math.pi * 2 }
+	table.insert(Rings, R)
+	return R
+end
+
+-- this student's spot in the ring: spread round it (golden angle), just outside the distance that would scare them off
+local function ringSpot(S, R): Vector3?
+	local Slot = R.Members[S]
+	if not Slot then R.Count += 1 Slot = R.Count R.Members[S] = Slot end
+	local Close = 10 + (1 - (S.Bravery or 0.5)) * 12 -- the Danger distance (urgentNow)
+	local Radius = Close + 2.5 + (Slot % 2) * 1.5
+	local A = R.Base + Slot * GOLDEN
+	local P = R.Center + Vector3.new(math.cos(A), 0, math.sin(A)) * Radius
+	return Nav.Floor(P, 6)
+end
+
+local function crowdCount(R): number
+	local N = 0
+	for S in R.Members do if S.Model and S.Model.Parent and watching(S) then N += 1 end end
+	return N
+end
+
+local function crowdLine(S)
+	local P, B = Lines.Crowd, S.Bravery or 0.5
+	local Pool = if B > 0.65 then (if math.random() < 0.5 then P.Chant else P.Bet)
+		elseif B < 0.35 then (if math.random() < 0.5 then P.Beg else P.Glad)
+		elseif S.CrowdPhone then P.Phone
+		else P.State
+	say(S, Pool, 9)
+end
+
+-- a phone held up at the fight while they watch (the fidget's phone, arm raised); it goes away when the watching ends
+local function holdPhone(S)
+	if S.CrowdPhone or S.Seated or not (Brain._MakePhone and Brain._Shoulder) then return end
+	local T, J = Brain._MakePhone(), Brain._Shoulder(S)
+	if not (T and J and S.Hum) then if T then T:Destroy() end return end
+	S.CrowdPhone = T
+	T.Parent = S.Model
+	pcall(function() S.Hum:EquipTool(T) end)
+	J.C0 = (J:GetAttribute(`NHBaseC0`) or J.C0) * RECORD_POSE
+	task.spawn(function()
+		while S.Model and S.Model.Parent and T.Parent and watching(S) do task.wait(0.3) end
+		if T.Parent then T:Destroy() end
+		if J.Parent then J.C0 = J:GetAttribute(`NHBaseC0`) or J.C0 end
+		S.CrowdPhone = nil
+	end)
+end
+
+function React.Gawk(S, Snap)
+	local T = Snap.Threat
+	mood(S, `Watching`, 4)
+	local Started = os.clock() > (S.WatchUntil or 0)
+	local R = ringFor(T.Pos)
+	if not S.Seated then
+		S.Model:SetAttribute(`NHActivity`, `Watching a fight`)
+		pose(S, nil)
+		local Spot = ringSpot(S, R)
+		if Spot and S.Root and (S.Root.Position - Spot).Magnitude > 3 then
+			S.Agent:GoTo(Spot, { Speed = 9 + (S.Bravery or 0.5) * 3; Arrive = 1.5 })
+		else
+			S.Agent:Stop()
+		end
+		S.Agent:Face(R.Center)
+		if Started and math.random() < 0.35 then holdPhone(S) end
+	end
+	lookAt(S, R.Center + Vector3.new(0, 2, 0), 1.2)
+	if Started then -- just started watching
+		if T.From and T.From.Player then memo(S, T.From.Player).Fought = os.clock() end
+		if T.Heard and math.random() < 0.5 then
+			say(S, Lines.Heard.Fight, 10)
+		else
+			sayMatrix(S, `FightSeen`, T.From and T.From.Player, nil, 10, Lines.ByNature(S, Lines.Gawk, `Brave`))
+		end
+	elseif math.random() < 0.12 then
+		crowdLine(S)
+	end
+	S.WatchUntil = os.clock() + 6
+	S.WatchAt = T.Pos
+	S.Shaken = true
+	if os.clock() - R.Alerted > 25 and crowdCount(R) >= 3 then
+		R.Alerted = os.clock()
+		task.spawn(function()
+			local School = ServerScriptService.Services:FindFirstChild(`School`)
+			local M = School and School:FindFirstChild(`HallMonitor`)
+			if not M then return end
+			local Ok, HM = pcall(require, M)
+			if Ok and typeof(HM) == `table` and HM.Respond then pcall(HM.Respond, R.Center) end
+		end)
+	end
+	task.wait(0.4)
+end
+
+function React.MakeWay(S, Snap)
+	local Rec = Snap.Approaching
+	if not (Rec and Rec.Pos) then return end
+	mood(S, `Wary`, 3)
+	lookAt(S, headOf(Rec), 1.5)
+	-- (contact feel) no line here any more: it comes at the moment of contact (NudgeMod.OnContact)
+	-- the bump hook (nudges): a handler that plays its own reaction and moves the student replaces the step aside
+	if Brain.OnBump then
+		local Ok, Handled = pcall(Brain.OnBump, S, Rec, `MakeWay`)
+		if Ok and Handled then return end
+	end
+	-- step to whichever side they aren't heading for
+	local Rel = Rec.Pos - S.Root.Position
+	local Side = Vector3.new(-Rel.Z, 0, Rel.X)
+	local V = Rec.Root and Rec.Root.AssemblyLinearVelocity or Vector3.zero
+	if Side:Dot(V) > 0 then Side = -Side end
+	S.Agent:Shuffle(Side, 0.55, 7)
+	S.Agent:Face(Rec.Pos)
+	task.wait(0.3)
+end
+
+function React.Space(S, Snap)
+	local Rec = Snap.Crowding
+	if not (Rec and Rec.Pos) then return end
+	mood(S, `Uneasy`, 5)
+	lookAt(S, headOf(Rec), 2.5)
+	sayMatrix(S, `Crowded`, Rec.Player, nil, 10, Lines.ByNature(S, Lines.Space, `Social`))
+	if Brain.OnBump then
+		local Ok, Handled = pcall(Brain.OnBump, S, Rec, `Space`)
+		if Ok and Handled then Rec.Near = 0 return end
+	end
+	S.Agent:Shuffle(S.Root.Position - Rec.Pos, 0.7, 4)
+	S.Agent:Face(Rec.Pos)
+	Rec.Near = 0
+	task.wait(0.4)
+end
+
+-- the gentle ones (never stop walking): staring back, glancing, feeling followed
+local function glance(S, Snap)
+	local Now = os.clock()
+	local Moving = S.Agent and S.Agent.Moving
+	if Snap and Snap.Staring then
+		local Rec = Snap.Staring
+		lookAt(S, headOf(Rec), 0.6)
+		if not Moving then
+			if S.Social >= 0.5 then
+				mood(S, `Friendly`)
+				if not greet(S, Rec) and Rec.Stare > 7 and not Rec.SaidStared then
+					Rec.SaidStared = say(S, Lines.Stared, 8)
+				end
+			elseif Rec.Stare > 6 and not S.Busy then
+				mood(S, `Shy`)
+				-- (2.27) a shy rostered student still speaks up when there's something saved to say: their name the first
+				-- time, a grudge, or thanks (the greeting picks which); otherwise they stay shy
+				if not (remembers(S, Rec.Player) and greet(S, Rec)) then say(S, Lines.Shy, 20) end
+			end
+		end
+		return
+	end
+	if Snap and Snap.Following then
+		mood(S, `Uneasy`)
+		if Now - (S.GlancedBack or 0) > 2.5 then
+			S.GlancedBack = Now
+			lookAt(S, headOf(Snap.Following), 0.9)
+			local M = memo(S, Snap.Following.Player)
+			M.Followed = (M.Followed or 0) + 1
+			say(S, if M.Followed > 2 then Lines.FollowedAgain else Lines.Followed, 12)
+		end
+		S.Hurry = Now + 6
+		return
+	end
+	if S.WatchUntil and Now < S.WatchUntil and S.WatchAt then
+		lookAt(S, S.WatchAt + Vector3.new(0, 2, 0), 0.6)
+		return
+	end
+	if S.Shaken and not (S.WatchUntil and Now < S.WatchUntil) and not (Snap and Snap.Threat) then
+		S.Shaken = false
+		say(S, Lines.Relief, 4)
+	end
+	if Snap and Snap.Focus and Snap.Focus.Aware > 0.45 and (Snap.Focus.Dist or 99) < 30 then
+		lookAt(S, headOf(Snap.Focus), 0.6)
+		local F = Snap.Focus
+		if F.Visible and (F.Dist or 99) < 7 and S.Social > 0.55 and not Moving and math.random() < 0.05 then greet(S, F) end
+		if F.Fighting and F.Player then memo(S, F.Player).Fought = Now end
+		return
+	end
+	if Snap and Snap.Heard and Snap.Heard.Kind == `Door` and Now - Snap.Heard.At < 1.5 then
+		lookAt(S, Snap.Heard.Pos, 1.2)
+		if Snap.Heard ~= S.LastHeard then
+			S.LastHeard = Snap.Heard
+			local C = ctx()
+			if math.random() < (if C.Night then 0.35 else 0.1) then say(S, if C.Night then Lines.Heard.DoorNight else Lines.Heard.Door, 15) end
+		end
+		return
+	end
+	if S.Partner and S.Partner.Root and not Moving then
+		lookAt(S, S.Partner.Root.Position + Vector3.new(0, 1.5, 0), 0.6)
+		return
+	end
+	if Now > (S.NextLookAround or 0) and S.Root then
+		S.NextLookAround = Now + math.random(25, 70) / 10
+		local Ang = math.rad(math.random(-70, 70))
+		local Dir = CFrame.Angles(0, Ang, 0):VectorToWorldSpace(S.Root.CFrame.LookVector)
+		lookAt(S, S.Root.Position + Dir * 12 + Vector3.new(0, math.random(-2, 3), 0), 1.4)
+	end
+	if S.Model and S.Model:GetAttribute(`NHMood`) ~= `Calm` and not (S.WatchUntil and Now < S.WatchUntil) then mood(S, `Calm`) end
+end
+
+---| walking |---
+
+-- walk with Nav. A reaction stops the walk; it carries on afterwards. Valid() false (the routine changed) stops it.
+function Brain.GoTo(S, Goal: Vector3, Valid: () -> boolean, Opts: { [string]: any }?): boolean
+	local Tries = 0
+	while Valid() and S.Agent and S.Root do
+		-- let a reaction (or watching a fight) finish first
+		local Since = os.clock()
+		while Valid() and (S.Reacting or watching(S) or Brain.Urgent(S)) and os.clock() - Since < 20 do task.wait(0.1) end
+		if not (Valid() and S.Agent and S.Root) then return false end
+		local Speed = (S.Speed or 6) * (if S.Hurry and os.clock() < S.Hurry then 1.35 else 1)
+		local Ok, Why = S.Agent:GoTo(Goal, {
+			Speed = (Opts and Opts.Speed) or Speed; Arrive = Opts and Opts.Arrive;
+			ShouldStop = function() return not Valid() or S.Reacting or watching(S) or Brain.Urgent(S) ~= nil end;
+		})
+		if Ok then return Valid() end
+		if Why ~= `cancelled` then step(S, `walk failed: {Why}`) return false end
+		Tries += 1
+		if Tries > 12 then return false end
+		task.wait(0.1)
+	end
+	return false
+end
+
+---| talk |---
+
+-- something to mutter: the day, the moon, the time, the part of the day, or (in a clique) the clique's own talk
+local function mutterPool(S): { string }
+	local C = ctx()
+	local Def = S.Clique and CliqueConfig.Defs[S.Clique]
+	if Def and Def.Lines and #Def.Lines > 0 and math.random() < 0.4 then return Def.Lines end
+	local M = Lines.Mutter
+	if C.Night then
+		if C.Moon == `Full` and math.random() < 0.5 then return M.FullMoon end
+		return M.Night
+	end
+	if math.random() < 0.2 then
+		if C.Day == `Monday` then return M.Monday end
+		if C.Day == `Friday` then return M.Friday end
+		if C.Day == `Saturday` or C.Day == `Sunday` then return M.Weekend end
+	end
+	return M[C.Kind] or M.Break
+end
+
+-- two students standing together take turns, look at whoever's talking, and break off for anything urgent
+local function chat(A, B)
+	-- (2.29) a rumour A knows and B doesn't comes first (Social.Rumours); anyone within 12 studs overhears it
+	local Lines2
+	local OkR, Ru = pcall(function() return require(ServerScriptService.Services.Social.Rumours) end)
+	local Rumour = OkR and Ru and A.RosterId and B.RosterId and Ru.ForChat(A.RosterId, B.RosterId)
+	if not Rumour and OkR and Ru and A.RosterId and B.RosterId then
+		Rumour = Ru.ForChat(B.RosterId, A.RosterId)
+		if Rumour then A, B = B, A end -- whoever knows it tells it (the pair's first speaker is just the lower index)
+	end
+	if Rumour then
+		Lines2 = { `A: Did you hear? {Ru.Text(Rumour)}`, `B: ` .. (Lines.Pick(B, Lines.RumourReply or { `No way.` }, ctx()) or `No way.`) }
+		Ru.Heard(B.RosterId, Rumour)
+		for _, P in Players:GetPlayers() do
+			local R = P.Character and P.Character:FindFirstChild(`HumanoidRootPart`)
+			if R and A.Root and (R.Position - A.Root.Position).Magnitude <= 12 then pcall(Ru.HeardByPlayer, P, Rumour) end
+		end
+	else
+		Lines2 = Lines.PickChat(A, ctx())
+	end
+	if not Lines2 then return end
+	A.Chatting, B.Chatting = true, true
+	A.Partner, B.Partner = B, A
+	if not A.Seated and A.Agent and B.Root then A.Agent:Face(B.Root.Position) end
+	if not B.Seated and B.Agent and A.Root then B.Agent:Face(A.Root.Position) end
+	for _, L in Lines2 do
+		if typeof(L) ~= `string` then continue end
+		local Who, Text = L:match(`^(%a):%s*(.+)$`)
+		local Speaker, Listener = if Who == `B` then B else A, if Who == `B` then A else B
+		if not (Speaker.Model and Listener.Model and Speaker.Root and Listener.Root) then break end
+		if Brain.Urgent(A) or Brain.Urgent(B) or A.Reacting or B.Reacting then break end
+		if (A.Agent and A.Agent.Moving) or (B.Agent and B.Agent.Moving) then break end
+		sayText(Speaker, Text or L)
+		lookAt(Listener, Speaker.Root.Position + Vector3.new(0, 1.5, 0), 3)
+		lookAt(Speaker, Listener.Root.Position + Vector3.new(0, 1.5, 0), 3)
+		task.wait(math.clamp(1.6 + #(Text or L) * 0.055, 2.2, 4.6))
+	end
+	A.Chatting, B.Chatting = false, false
+	A.Partner, B.Partner = nil, nil
+end
+
+---| fidgets |---
+
+local PHONE_POSE = CFrame.Angles(0, math.rad(45), math.rad(105))
+local PHONE_GRIP = CFrame.new(-0.248250008, -0.0295313597, 0, -0.0342340842, 0.942064762, -0.333679318, -0.821599126, 0.16357027, 0.546094596, 0.569036543, 0.292845726, 0.768400073)
+
+local function makePhone(): Tool?
+	local Tpl = ServerStorage:FindFirstChild(`NHPhoneModel`)
+	if not Tpl then return nil end
+	local Model = Tpl:Clone()
+	local Screen = Model:FindFirstChild(`Screen`, true)
+	local CF = Model:GetBoundingBox()
+	local Basis = if Screen and Screen:IsA(`BasePart`) then Screen.CFrame.Rotation + CF.Position else CF
+	local T = Instance.new(`Tool`)
+	T.Name = `Phone`
+	T.CanBeDropped = false
+	T.RequiresHandle = true
+	T.Grip = PHONE_GRIP
+	T:SetAttribute(`NHPhone`, true)
+	T:SetAttribute(`NHNpcPhone`, true)
+	local Handle = Instance.new(`Part`)
+	Handle.Name = `Handle`
+	Handle.Size = Vector3.new(0.3, 0.3, 0.3)
+	Handle.Transparency = 1
+	Handle.CanCollide, Handle.CanQuery, Handle.CanTouch, Handle.Massless = false, false, false, true
+	Handle.CFrame = Basis
+	Handle.Parent = T
+	for _, D in Model:GetDescendants() do
+		if D:IsA(`BasePart`) then
+			D.Anchored = false
+			D.CanCollide, D.CanQuery, D.CanTouch, D.Massless = false, false, false, true
+			local W = Instance.new(`WeldConstraint`)
+			W.Part0, W.Part1 = Handle, D
+			W.Parent = D
+		elseif D:IsA(`WeldConstraint`) or D:IsA(`Weld`) then
+			D:Destroy()
+		end
+	end
+	if Screen and Screen:IsA(`BasePart`) then
+		Screen.Material = Enum.Material.Neon
+		Screen.Color = Color3.fromRGB(60, 24, 40)
+	end
+	Model.Parent = T
+	return T
+end
+
+local shoulder
+-- (2.15.0) the crowd's phone (React.Gawk, defined above, reaches these through Brain)
+Brain._MakePhone = function() return makePhone() end
+Brain._Shoulder = function(S) return shoulder(S) end
+
+function shoulder(S): Motor6D?
+	local Torso = S.Model and S.Model:FindFirstChild(`Torso`)
+	local J = Torso and Torso:FindFirstChild(`Right Shoulder`)
+	return if J and J:IsA(`Motor6D`) then J else nil
+end
+
+local function busyNow(S): boolean
+	return S.Chatting or S.Reacting or not S.Model or (S.Agent and S.Agent.Moving) or Brain.Urgent(S) ~= nil
+end
+
+local function fidgetPhone(S, Valid)
+	local T = makePhone()
+	local J = shoulder(S)
+	if not (T and J and S.Hum) then if T then T:Destroy() end return end
+	T.Parent = S.Model
+	pcall(function() S.Hum:EquipTool(T) end)
+	J.C0 = (J:GetAttribute(`NHBaseC0`) or J.C0) * PHONE_POSE
+	if math.random() < 0.45 then say(S, Lines.Phone, 8) end
+	local Until = os.clock() + math.random(40, 90) / 10
+	while os.clock() < Until and not busyNow(S) and T.Parent and Valid() do
+		local Arm = S.Model:FindFirstChild(`Right Arm`)
+		if Arm then lookAt(S, Arm.Position + Vector3.new(0, -0.4, 0), 0.6) end
+		task.wait(0.25)
+	end
+	if T.Parent then T:Destroy() end
+	if J.Parent then J.C0 = J:GetAttribute(`NHBaseC0`) or J.C0 end
+end
+
+local function fidget(S, Valid)
+	if busyNow(S) or not S.Root then return end
+	local C = ctx()
+	local Sleepy = C.Kind == `BeforeSchool` or C.Night
+	local Pool = if S.Seated then { { `LookUp`, 0.3 }, { `LookBehind`, 0.3 }, { `Phone`, if C.Kind == `Class` then 0 else 0.3 } }
+		else {
+			{ `Phone`, if S.Partner then 0.12 else 0.32 };
+			{ `Stretch`, if Sleepy then 0.28 else 0.12 };
+			{ `LookUp`, 0.14 };
+			{ `LookBehind`, if C.Night then 0.3 else 0.12 };
+			{ `Shift`, if S.Leaning then 0 else 0.25 };
+		}
+	local Total = 0
+	for _, P in Pool do Total += P[2] end
+	local R = math.random() * Total
+	local Kind = Pool[#Pool][1]
+	for _, P in Pool do R -= P[2] if R <= 0 then Kind = P[1] break end end
+	step(S, `fidget: {Kind}`)
+	if Kind == `Phone` then
+		fidgetPhone(S, Valid)
+	elseif Kind == `Stretch` then
+		S.Model:SetAttribute(`NHFidget`, `Stretch`)
+		S.Model:SetAttribute(`NHFidgetAt`, workspace:GetServerTimeNow())
+		if Sleepy and math.random() < 0.5 then say(S, Lines.Yawn, 6) end
+		lookAt(S, S.Root.Position + S.Root.CFrame.LookVector * 6 + Vector3.new(0, 9, 0), 1.4)
+		task.wait(1.6)
+	elseif Kind == `LookUp` then
+		lookAt(S, S.Root.Position + S.Root.CFrame.LookVector * 25 + S.Root.CFrame.RightVector * math.random(-12, 12) + Vector3.new(0, 30, 0), 2.2)
+		task.wait(2.2)
+	elseif Kind == `LookBehind` then
+		local Side = if math.random() < 0.5 then 1 else -1
+		lookAt(S, S.Root.Position - S.Root.CFrame.LookVector * 4 + S.Root.CFrame.RightVector * 10 * Side + Vector3.new(0, 1.5, 0), 1.3)
+		if C.Night and math.random() < 0.25 then say(S, Lines.Mutter.Night, 10) end
+		task.wait(1.4)
+	else -- shift their weight: turn a little, ease into it
+		local From = S.Root.CFrame
+		local To = From * CFrame.Angles(0, math.rad(math.random(15, 35) * (if math.random() < 0.5 then 1 else -1)), 0)
+		for I = 1, 8 do
+			if not S.Root.Parent or busyNow(S) then break end
+			S.Root.CFrame = From:Lerp(To, I / 8)
+			task.wait(0.05)
+		end
+	end
+end
+
+---| leaning |---
+-- Owner (1.78.6): "they should only have this pose when they are leaning on a wall". A student only leans with a
+-- solid, upright wall right behind them (never a door: it could open behind them); they turn their back to it and
+-- step back to about a stud off it. No wall near: no lean.
+local LeanP = RaycastParams.new()
+LeanP.FilterType = Enum.RaycastFilterType.Exclude
+LeanP.RespectCanCollide = true
+
+local function isDoor(I: Instance): boolean
+	local M = I:FindFirstAncestorOfClass(`Model`)
+	while M do
+		if CollectionService:HasTag(M, `NHDoor`) then return true end
+		M = M:FindFirstAncestorOfClass(`Model`)
+	end
+	return false
+end
+
+local function wallNear(S, Reach: number): (Vector3?, Vector3?)
+	local R = S.Root
+	if not R then return nil, nil end
+	local Ex = {}
+	for _, N in { `NHSchedule`, `NHStudents`, `NHAmbient`, `Live`, `School NPC Spots`, `NHFx`, `NHNavDebug` } do local F = workspace:FindFirstChild(N) if F then table.insert(Ex, F) end end
+	for _, Pl in Players:GetPlayers() do if Pl.Character then table.insert(Ex, Pl.Character) end end
+	LeanP.FilterDescendantsInstances = Ex
+	local Best, BestD = nil, math.huge
+	local Look = R.CFrame.LookVector
+	for I = 0, 11 do
+		local Dir = CFrame.Angles(0, math.rad(I * 30), 0):VectorToWorldSpace(Vector3.new(Look.X, 0, Look.Z).Unit)
+		local Hits = 0
+		local First = nil
+		for _, H in { -0.4, 1.0 } do -- waist and shoulder height
+			local Hit = workspace:Raycast(R.Position + Vector3.new(0, H, 0), Dir * Reach, LeanP)
+			if Hit and Hit.Instance.Transparency < 0.5 and math.abs(Hit.Normal.Y) < 0.25 and not isDoor(Hit.Instance) then
+				Hits += 1
+				First = First or Hit
+			end
+		end
+		if Hits == 2 and First then
+			local D = (Vector3.new(First.Position.X, 0, First.Position.Z) - Vector3.new(R.Position.X, 0, R.Position.Z)).Magnitude
+			if D < BestD then Best, BestD = First, D end
+		end
+	end
+	if not Best then return nil, nil end
+	return Best.Position, Vector3.new(Best.Normal.X, 0, Best.Normal.Z).Unit
+end
+
+function Brain.LeanOnWall(S, Walk: boolean?, Valid: (() -> boolean)?): boolean
+	if not (S.Root and S.Agent) or S.Seated then return false end
+	Valid = Valid or function() return true end
+	local At, Normal = wallNear(S, 4)
+	if not At then
+		if not Walk then return false end
+		At, Normal = wallNear(S, 9)
+		if not (At and Normal) then return false end
+		if not Brain.GoTo(S, At + Normal * 1.6, Valid, { Speed = (S.Speed or 6) * 0.8; Arrive = 0.8 }) then return false end
+		At, Normal = wallNear(S, 4)
+		if not (At and Normal) then return false end
+	end
+	S.Agent:Face(S.Root.Position + Normal * 5)
+	local R = S.Root
+	local Gap = Vector3.new(R.Position.X - At.X, 0, R.Position.Z - At.Z):Dot(Normal)
+	local Back = Gap - 1.15
+	if Back > 0.15 then
+		S.Agent:Shuffle(-Normal, Back / 2.5, 2.5)
+		S.Agent:Face(S.Root.Position + Normal * 5)
+	end
+	local Behind = workspace:Raycast(S.Root.Position, -Normal * 2.2, LeanP)
+	if not (Behind and math.abs(Behind.Normal.Y) < 0.25 and not isDoor(Behind.Instance)) then return false end
+	pose(S, `Lean`)
+	S.Leaning = true
+	step(S, `leaning on a wall`)
+	return true
+end
+
+---| idling |---
+
+-- the nearest other student standing still within reach, free to talk
+local function neighbour(S, Reach: number)
+	local Best, BestD = nil, Reach
+	for _, O in (Host and Host.Students and Host.Students()) or {} do
+		if O ~= S and O.Model and O.Root and O.Idling and not O.Chatting and not O.Reacting and not (O.Agent and O.Agent.Moving)
+			and (O.Seated ~= nil) == (S.Seated ~= nil) then
+			local D = (O.Root.Position - S.Root.Position).Magnitude
+			if D < BestD then Best, BestD = O, D end
 		end
 	end
 	return Best
 end
 
-function Local.Mirror(P: Player, Saved)
-	local Top, TopTier = nil, 2
-	for _, Path in Config.Order do
-		local T = Saved[Path] or 1
-		P:SetAttribute(`Path_{Path}`, if T > 1 then T else nil)
-		if T > TopTier then Top, TopTier = Path, T end
+-- stay here a while: fidget now and then, talk with a student beside you, mutter (only with a player near enough
+-- to see and hear it). Returns when the time is up or Valid() is false.
+function Brain.Idle(S, Seconds: number, Valid: () -> boolean)
+	local Until = os.clock() + Seconds
+	S.Idling = true
+	S.NextChat = math.max(S.NextChat or 0, os.clock() + math.random(30, 90) / 10)
+	S.NextFidget = math.max(S.NextFidget or 0, os.clock() + math.random(20, 60) / 10)
+	local InClass = plan().Kind == `Class`
+	while os.clock() < Until and Valid() and S.Model and S.Root do
+		if S.Reacting or busyNow(S) then task.wait(0.25) continue end
+		local Near = playerNear(S.Root.Position, 60)
+		if os.clock() >= S.NextFidget then
+			S.NextFidget = os.clock() + math.random(60, 140) / 10
+			if Near and not S.Chatting then fidget(S, Valid) end
+		end
+		if os.clock() >= S.NextChat then
+			S.NextChat = os.clock() + math.random(120, 280) / 10 * (if InClass then 3 else 1)
+			if Near then
+				local O = neighbour(S, 7)
+				if O and O.Index > S.Index and not InClass then
+					chat(S, O)
+				elseif math.random() < (if InClass then 0.15 else 0.55) then
+					say(S, mutterPool(S), 10)
+				end
+			end
+		end
+		task.wait(0.25)
 	end
-	P:SetAttribute(`PathTop`, Top)
+	S.Idling = false
+	if S.Leaning then S.Leaning = false end
 end
 
--- grants every tier between the saved one and what the facts hold now; never lowers one
-function Shared.CheckNow(P: Player): { { Path: string, Tier: number } }
-	local Made = {}
-	local F = Shared.Facts(P)
-	local Saved, Pr = Local.Saved(P)
-	if not (F and Saved and Pr) then return Made end
-	local Now = Shared.Evaluate(F)
-	for _, Path in Config.Order do
-		local Old = Saved[Path] or 1
-		for T = Old + 1, Now[Path] do
-			Saved[Path] = T
-			table.insert(Made, { Path = Path; Tier = T })
+---| the loop |---
+
+local function loop(S, Model)
+	while S.Model == Model and Model.Parent do
+		if S.Senses then
+			local Snap = S.Senses:Due() and S.Senses:Tick() or S.Senses.Last
+			pcall(glance, S, Snap)
+			local U, USnap = urgent(S, Snap)
+			if U and React[U] and not S.Reacting then
+				S.Pending = nil
+				S.Reacting = true
+				if S.Leaning then pose(S, nil) S.Leaning = false end
+				step(S, `reacting: {U}`)
+				local Ok, Err = pcall(React[U], S, USnap)
+				if not Ok then warn(`[StudentBrain] {U}: {Err}`) end
+				S.Reacting = false
+				if S.Replan and not watching(S) then
+					S.Replan = false
+					if Host and Host.Replan then pcall(Host.Replan, S) end
+				end
+			elseif S.Replan and not watching(S) and not U then
+				S.Replan = false
+				if Host and Host.Replan then pcall(Host.Replan, S) end
+			end
+		end
+		task.wait(0.1)
+	end
+end
+
+function Brain.Attach(S)
+	if not (S.Model and S.Hum and S.Root) then return end
+	local M = S.Model
+	M:SetAttribute(`NHVoice`, S.Voice or 1) -- Controllers.World.NpcLook: the pitch within the voice set
+	M:SetAttribute(`NHVoiceSet`, S.VoiceSet or `Boy`)
+	M:SetAttribute(`NHPersonality`, string.format(`brave %.1f, social %.1f`, S.Bravery or 0.5, S.Social or 0.5))
+	M:SetAttribute(`NHBrain`, true) -- Controllers.World.Chatter leaves these to the brain's own lines
+	local Torso = M:FindFirstChild(`Torso`)
+	for _, J in { `Right Shoulder`, `Left Shoulder` } do
+		local Joint = Torso and Torso:FindFirstChild(J)
+		if Joint and Joint:IsA(`Motor6D`) then Joint:SetAttribute(`NHBaseC0`, Joint.C0) end
+	end
+	S.Agent = Nav.Agent(M, { Speed = S.Speed or 6; Name = `Student{S.Index}` })
+	S.Agent.Up = S.Up or 3
+	S.Senses = Senses.Perceiver(M, { Bravery = S.Bravery or 0.5; ViewRange = 60 + (S.Social or 0.5) * 20 })
+	S.Reacting, S.Chatting, S.Idling, S.Leaning, S.Replan, S.Pending = false, false, false, false, false, nil
+	S.NudgeWaiting, S.NudgeHit = nil, nil -- (contact feel) a record reused after a despawn starts clean
+	task.spawn(loop, S, M)
+end
+
+-- (contact feel) a bump the player's client felt and Features.ContactFeel checked (Model is a live student, the player
+-- is next to it, Speed is no more than the server saw them move). The impact goes into the nudges' ram memory; then
+-- the student reacts now, unless they're seated, fleeing or busy with another reaction. If a MakeWay is already
+-- waiting for this brush, the report ends the wait and that handler reacts.
+-- (inventory QOL batch 5) a player offers this student a snack (Features.Inventory.Feed). They turn to the player and
+-- answer in their clique's voice (the "Fed" moment): Loved (their clique loves it), Liked, or Refuse (Hostile, or Wary
+-- with no loved food). Returns the verdict and the student's clique, or nil if Model isn't a student.
+function Brain.Fed(Pl: Player, Model: Model, It): (string?, string?)
+	local S = nil
+	for _, X in (Host and Host.Students and Host.Students()) or {} do
+		if X.Model == Model then S = X break end
+	end
+	if not (S and S.Model and S.Root) then return nil end
+	local Foods = S.Clique and Items.CliqueFood[S.Clique]
+	local Loved = Foods ~= nil and table.find(Foods, It.Id) ~= nil
+	local OkA, Attitude = pcall(Talk.Attitude, S, Pl)
+	Attitude = if OkA then Attitude else `Neutral`
+	local Verdict = if Attitude == `Hostile` or (Attitude == `Wary` and not Loved) then `Refuse` elseif Loved then `Loved` else `Liked`
+	local Root = Pl.Character and Pl.Character:FindFirstChild(`HumanoidRootPart`)
+	if Root then lookAt(S, Root.Position + Vector3.new(0, 1.5, 0), 3) end
+	local C = ctx()
+	C.Snack = It.Name
+	sayMatrix(S, `Fed`, Pl, { Sub = Verdict; Ctx = C; Attitude = if Verdict == `Refuse` then Attitude else nil }, 0)
+	if S.RosterId and Verdict ~= `Refuse` then -- (2.27) a snack they took is remembered, at most once per 10 minutes
+		local M = memo(S, Pl)
+		if os.clock() - (M.FedSaved or -1e9) >= 600 then
+			M.FedSaved = os.clock()
+			pcall(function() Rep().ChangeRelationship(Pl, S.RosterId, if Verdict == `Loved` then 8 else 5, nil, `Helped`) end)
 		end
 	end
-	if #Made > 0 then
-		Pr.Paths = Saved
-		Local.Save(P, Pr)
-		for I, G in Made do
-			local Tier = Config.Paths[G.Path].Tiers[G.Tier]
-			local Last = I == #Made or Made[I + 1].Path ~= G.Path -- the newest tier of this path in this check
-			Local.Reward(P, G.Path, G.Tier, Tier, Last)
-			Shared.Granted:Fire(P, G.Path, G.Tier, Tier.Name)
-		end
-	end
-	Local.Mirror(P, Saved)
-	return Made
+	return Verdict, S.Clique
 end
 
--- what a tier gives: its title, a Moments banner (the newest tier of each path only), and from tier 4 a mention on
--- the PA by day or the Midnight Broadcast by night (Services.World.Broadcast; the PA speaks at most once a segment)
-function Local.Reward(P: Player, Path: string, T: number, Tier, Last: boolean)
-	local Rep = svc(`Social.Reputation`)
-	if Tier.Title and Rep then pcall(Rep.AwardTitle, P, Tier.Title) end
-	if not Last then return end
-	local Fx = svc(`Features.Fx`)
-	if Fx then pcall(Fx.Fire, P, `PathTier`, { Path = Path; Tier = T; Name = Tier.Name; Of = #Config.Paths[Path].Tiers }) end
-	if T >= 4 then
-		local First = P.DisplayName
-		pcall(function() local Id = svc(`Player.Identity`) First = Id.Get(P).First or First end)
-		local Article = if Tier.Name:match(`^[AEIOU]`) then `an` else `a`
-		local Text = Config.Mention:gsub("{Name}", First):gsub("{Article}", Article):gsub("{Tier}", Tier.Name)
-		local Bc = svc(`World.Broadcast`)
-		if Bc then
-			local OnAir = false
-			pcall(function() OnAir = Bc.Station(P).OnAir end)
-			if OnAir or not Bc.PA(Text) then Bc.Post(`Notable`, Text, `Paths`) end
-		end
-	end
-	Shared.LastReward = { Player = P; Path = Path; Tier = T }
+-- (2.29) tests: one pair chat between two students (the rumour path runs if either knows one)
+function Brain.ChatForTests(A, B) chat(A, B) end
+
+-- (2.27) tests: the greeting this student would pick for Pl now (the moment, nil for a plain pool, and the pool)
+function Brain.GreetingForTests(S, Pl: Player)
+	local Moment, _, Pool = greeting(S, { Player = Pl })
+	return Moment, Pool
 end
 
-function Shared.Check(P: Player)
-	if Pending[P] then return end
-	Pending[P] = true
-	task.delay(2, function()
-		Pending[P] = nil
-		if P.Parent then pcall(Shared.CheckNow, P) end
-	end)
-end
-
----| counters (Progress.Tally) |---
-
-function Shared.Count(P: Player, Key: string, N: number?)
-	if not table.find(Config.Tally, Key) then return end
-	local Prog = svc(`Player.Progression`)
-	local Pr = Prog and Prog.Get(P)
-	if not Pr then return end
-	Pr.Tally[Key] = (Pr.Tally[Key] or 0) + (N or 1)
-	Local.Save(P, Pr)
-	Shared.Check(P)
-end
-
----| start |---
-
-function Shared.OnStart()
-	local Data = svc(`Player.Data`)
-	if Data and Data.ProfileLoaded then
-		Data.ProfileLoaded:Connect(function(P) task.delay(5, function() if P.Parent then pcall(Shared.CheckNow, P) end end) end)
+function Brain.Contact(Pl: Player, Model: Model, Speed: number, Dir: Vector3): boolean
+	local S = nil
+	for _, X in (Host and Host.Students and Host.Students()) or {} do
+		if X.Model == Model then S = X break end
 	end
-	Players.PlayerRemoving:Connect(function(P) Pending[P] = nil Shared.FactsOverride[P] = nil end)
-	-- the counters the old signals didn't keep (Progress.Tally); they count from 2.31 on
-	local function on(Path: string, Signal: string, Key: string)
-		local M = svc(Path)
-		local S = M and M[Signal]
-		if S and S.Connect then
-			S:Connect(function(P) if typeof(P) == `Instance` and P:IsA(`Player`) then Shared.Count(P, Key) end end)
-		else
-			warn(`[Paths] missing {Path}.{Signal}`)
-		end
-	end
-	on(`Quests.Duels`, `Won`, `DuelWins`)
-	on(`Quests.Duels`, `ChampionDefeated`, `Champion`)
-	on(`School.HallMonitor`, `Escaped`, `Escapes`)
-	-- and the signals that can change a tier, so it shows without waiting for the sweep
-	for _, S in { { `Social.Reputation`, `Changed` }, { `Social.Reputation`, `RelationshipChanged` }, { `Social.Factions`, `RankChanged` } } do
-		local M = svc(S[1])
-		if M and M[S[2]] then M[S[2]]:Connect(function(P) if typeof(P) == `Instance` and P:IsA(`Player`) then Shared.Check(P) end end) end
-	end
+	if not (S and S.Root and S.Model) then return false end
+	NudgeMod.Remember(Pl, Speed, Dir)
+	local Root = Pl.Character and Pl.Character:FindFirstChild(`HumanoidRootPart`)
+	if not (Root and Root:IsA(`BasePart`)) then return false end
+	local Rec = { Player = Pl; Root = Root; Pos = Root.Position; Speed = Speed;
+		Dist = (Root.Position - S.Root.Position).Magnitude }
+	if S.Seated then return false end
+	if S.NudgeWaiting then S.NudgeHit = Rec return true end
+	if S.Reacting or not NudgeMod.Ready(S, Rec) then return false end
+	-- the loop's own set-up for a reaction (the walk, Brain.GoTo, and the loop's reactions wait while Reacting)
+	S.Pending = nil
+	S.Reacting = true
+	if S.Leaning then pose(S, nil) S.Leaning = false end
+	step(S, `reacting: Contact`)
 	task.spawn(function()
-		while true do
-			task.wait(60)
-			for _, P in Players:GetPlayers() do pcall(Shared.CheckNow, P) end
-		end
+		mood(S, `Wary`, 3)
+		local Ok, Err = pcall(NudgeMod.Handle, S, Rec, `Contact`)
+		if not Ok then warn(`[StudentBrain] Contact: {Err}`) end
+		S.Reacting = false
 	end)
+	return true
 end
 
----| tests |---
-
-function Local.ZeroFacts()
-	local F = { Subjects = {}; Rep = { Popularity = 0; Intimidation = 0; Trust = 0; Academics = 0 }; CliqueTiers = {}; Tally = {};
-		BestStreak = 0; BestCard = 0; Met = 0; FactionRank = 1; Takedowns = 0; Showdowns = 0; ClubRank = `Rookie`;
-		Orientation = false; AfterHours = false; FileKept = false; LineageTier = 1 }
-	for _, K in Config.Tally do F.Tally[K] = 0 end
-	return F
-end
-function Local.MaxFacts()
-	local F = Local.ZeroFacts()
-	for _, S in { `History`, `Mathematics`, `Chemistry`, `English` } do F.Subjects[S] = 5 end
-	F.BestStreak, F.BestCard, F.Met, F.FactionRank, F.Takedowns, F.Showdowns = 30, 6, 24, 5, 200, 2
-	F.Rep = { Popularity = 100; Intimidation = 100; Trust = 100; Academics = 100 }
-	F.CliqueTiers = { Vigil = `Respected`; Court = `Friendly` }
-	F.ClubRank, F.Orientation, F.AfterHours, F.FileKept, F.LineageTier = `Captain`, true, true, true, 3
-	F.Tally = { DuelWins = 5; Champion = 1; Beasts = 12; Escapes = 1; Superlatives = 1 }
-	return F
+function Brain.Detach(S)
+	if S.Agent then pcall(function() S.Agent:Stop() end) end
+	if S.Senses and S.Senses.Destroy then pcall(function() S.Senses:Destroy() end) end
+	S.Agent, S.Senses = nil, nil
+	S.NudgeWaiting, S.NudgeHit = nil, nil
 end
 
-function Shared.SelfTestForTests(P: Player)
-	local R = {}
-	-- the evaluator on made-up facts
-	local Z, M = Shared.Evaluate(Local.ZeroFacts()), Shared.Evaluate(Local.MaxFacts())
-	R.ZeroAllOne, R.MaxAllTop = true, true
-	for _, Path in Config.Order do
-		if Z[Path] ~= 1 then R.ZeroAllOne = false end
-		if M[Path] ~= #Config.Paths[Path].Tiers then R.MaxAllTop = false end
+---| dress codes (line matrix) |---
+
+-- walk into a clique's hangout out of its colours and the nearest of its students (30 studs) says so: once a visit,
+-- at most every 120 s for each player. A hangout box is a floating marker in some places (Combat Test's sit 11 to 16
+-- studs up while the floor is near 1), so it counts by its X/Z footprint, from 20 studs under its bottom face to 6
+-- over its top face, not by its height.
+local Visits = {} :: { [Player]: { In: string?, Told: number } }
+
+local function hangoutOf(Root: BasePart): string?
+	local Folder = workspace:FindFirstChild(`Regions`)
+	if not Folder then return nil end
+	for Id, Def in CliqueConfig.Defs do
+		local Box = Def.Hangout and Folder:FindFirstChild(Def.Hangout)
+		if Box and Box:IsA(`BasePart`) then
+			local L = Box.CFrame:PointToObjectSpace(Root.Position)
+			local H = Box.Size / 2
+			if math.abs(L.X) <= H.X and math.abs(L.Z) <= H.Z and L.Y >= -H.Y - 20 and L.Y <= H.Y + 6 then return Id end
+		end
 	end
-	local Honor = Local.ZeroFacts()
-	Honor.Subjects = { History = 4; Mathematics = 4; Chemistry = 4; English = 2 }
-	Honor.BestStreak, Honor.BestCard = 10, 4
-	R.HonorStudent = Shared.Evaluate(Honor).Academic -- 3
-	local Uneasy = Local.ZeroFacts() Uneasy.Tally.Beasts = 1
-	R.UneasyByBeast = Shared.Evaluate(Uneasy).Supernatural -- 2
-	R.FactsLive = Shared.Facts(P) ~= nil
-	-- grants on the live player: from 1 to Honor Student, once; then lower facts never drop it
-	local Saved, Pr = Local.Saved(P)
-	if not (Saved and Pr) then R.NoProfile = true return R end
-	local Before = table.clone(Saved)
-	local Rep = svc(`Social.Reputation`)
-	local Social = Rep.Get(P)
-	local TitlesBefore, TitleBefore = table.clone(Social.Titles), Social.Title
-	Pr.Paths = {} Local.Save(P, Pr)
-	local Grants = 0
-	local Con = Shared.Granted:Connect(function(Pl) if Pl == P then Grants += 1 end end)
-	Shared.FactsOverride[P] = Honor
-	local First = Shared.CheckNow(P)
-	local Second = Shared.CheckNow(P)
-	Shared.FactsOverride[P] = Local.ZeroFacts()
-	Shared.CheckNow(P)
-	task.wait(0.1) -- (SignalPlus delivers on a later frame)
-	R.AfterDrop = Shared.Tier(P, `Academic`) -- still 3
-	R.FirstGrants, R.SecondGrants, R.GrantSignals = #First, #Second, Grants -- 2, 0, 2 (Academic 2 and 3)
-	R.TitleGiven = table.find(Rep.Get(P).Titles, `Honor Student`) ~= nil
-	R.Attr = P:GetAttribute(`Path_Academic`) -- 3
-	Con:Disconnect()
-	Shared.FactsOverride[P] = nil
-	-- put everything back
-	local _, Pr2 = Local.Saved(P)
-	Pr2.Paths = Before Local.Save(P, Pr2)
-	Social.Titles = TitlesBefore Social.Title = TitleBefore Rep.Sync(P)
-	Local.Mirror(P, Before)
-	return R
+	return nil
 end
 
-function Shared.RewardTestForTests(P: Player)
-	local Saved, Pr = Local.Saved(P)
-	local Before = table.clone(Saved)
-	local Rep = svc(`Social.Reputation`)
-	local Social = Rep.Get(P)
-	local TitlesBefore, TitleBefore = table.clone(Social.Titles), Social.Title
-	local Bc = svc(`World.Broadcast`)
-	local Items0 = #Bc.Items()
-	Bc.PATestReset()
-	Pr.Paths = {} Local.Save(P, Pr)
-	local F = Local.MaxFacts()
-	F.Rep.Intimidation, F.Takedowns, F.Showdowns, F.Tally.Beasts = 0, 0, 0, 0 -- only Combat stays at 1
-	Shared.FactsOverride[P] = F
-	Shared.LastReward = nil
-	local Made = Shared.CheckNow(P)
-	local R = { Made = #Made; Last = Shared.LastReward and `{Shared.LastReward.Path}:{Shared.LastReward.Tier}` or `none`;
-		Mentions = #Bc.Items() - Items0; Top = P:GetAttribute(`PathTop`); Academic = P:GetAttribute(`Path_Academic`) }
-	Shared.FactsOverride[P] = nil
-	local _, Pr2 = Local.Saved(P)
-	Pr2.Paths = Before Local.Save(P, Pr2)
-	Social.Titles = TitlesBefore Social.Title = TitleBefore Rep.Sync(P)
-	Local.Mirror(P, Before)
-	return R
+local function dressCheck(P: Player)
+	local Root = P.Character and P.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?
+	local V = Visits[P] or { Told = -1e9 }
+	Visits[P] = V
+	local Id = Root and hangoutOf(Root)
+	if Id == V.In then return end
+	V.In = Id
+	if not (Id and Root) or os.clock() - V.Told < 120 then return end
+	local Ok, Dressed = pcall(Cliques.Dressed, P, Id)
+	if not Ok or Dressed then return end
+	local Best, BestD = nil, 30
+	for _, S in (Host and Host.Students and Host.Students()) or {} do
+		if S.Clique == Id and S.Root and S.Model and not S.Reacting then
+			local D = (S.Root.Position - Root.Position).Magnitude
+			if D < BestD then Best, BestD = S, D end
+		end
+	end
+	if Best and sayMatrix(Best, `DressCode`, P, nil, 0, nil) then
+		V.Told = os.clock()
+		lookAt(Best, Root.Position + Vector3.new(0, 1.5, 0), 2)
+	end
 end
 
-return Shared
+local function dressWatch()
+	local Warned = false
+	while true do
+		task.wait(1)
+		for _, P in Players:GetPlayers() do
+			local Ok, Err = pcall(dressCheck, P) -- one bad player or student never stops the watch for the server
+			if not Ok and not Warned then
+				Warned = true
+				warn("[StudentBrain] dressWatch: " .. tostring(Err))
+			end
+		end
+		for P in Visits do
+			if not P.Parent then Visits[P] = nil end
+		end
+	end
+end
+
+function Brain.Init(H)
+	Host = H
+	if Started then return end
+	Started = true
+	Nav.Init()
+	Senses.Init()
+	task.spawn(dressWatch) -- (line matrix) hangout dress codes
+end
+
+return Brain
 ]==] })
-table.insert(Items, { Path = {"StarterPlayer", "StarterPlayerScripts", "Controllers", "Gui", "Moments"}; Source = [==[
+table.insert(Items, { Path = {"ServerScriptService", "Services", "Social", "Dialogue"}; Source = [==[
 --[[
-	Moments (client). Controllers.Gui.Moments  -- VFX Batch 2 "core feedback" (vault: Docs/VFX-Design-Bible.md)
+	Dialogue (server authoritative, reusable)
 
-	One queue, at most one Moment banner on screen at a time (style guide: "Moment" tier). Each beat replaces
-	its old toast, so nothing shows twice.
+	Trees live in ServerStorage.Dialogue.<NpcId> and are plain data:
+		{
+			Start = function(ctx) -> node id,
+			Nodes = {
+				[Id] = {
+					Text = "..." or function(ctx) -> string,
+					Choices = { { Text = "..." or fn, If = fn(ctx)?, Do = fn(ctx) -> next id?, Next = id? } },
+					-- or Choices = function(ctx) -> list (for shared menus)
+				},
+			},
+		}
+	The client only ever receives the current line and the choices that passed their If check.
+	Every choice is re-validated here (session, index, distance to the NPC) before its Do runs,
+	so outcomes (joining, relationship, reputation) can't be forged.
 
-		P0-8  School Bell & Period Card   ReplicatedStorage.SchoolClock "Period" changes (never on join)
-		P1-4  Quest Beat banner           NHFx "QuestBeat" { Type = Start|Stage|Complete|Fail, Title, Text, Category, Story }
-		P1-5  Clue Discovered             NHFx "Clue" { Name, Case, Pos? }  ink sparkles + a "+CLUE" slip into the Journal
-		P1-6  Level-up "Bell Toll"        NHFx "LevelUp" { UserId, Level, Points }  (sent to players within 80 studs)
-		P1-8  Purchase granted            NHFx "Purchase" { Title, Text }
-		P1-9  "Roll call" respawn         client-only: any player's CharacterAdded after a death (never the menu spawn)
-
-	Everything follows the settings through Controllers.Fx (shake, reduced flashing / motion, effects quality),
-	and pauses while the player is in the main menu or mid tier-up (character attribute NH_Evolving).
-
-	Dialogue: quests are accepted by choosing a reply, so a quest banner usually fires while the dialogue box
-	(PlayerGui.Dialogue.Box, bottom of the screen) is open. Banners wait up to DIALOGUE_HOLD seconds for the
-	conversation to end; if it is still open, or opens while a banner is up, the banner lifts to sit just
-	above the box so it never covers the replies.
+	ctx helpers: Player, NpcId, Npc, FactionId, Met(), Meet(), Value(), State(), Rel(n, reason),
+	Rep(category), AddRep(category, n), Standing(), Rank(), Member(), RivalMember(), CanJoin(),
+	Join(), Leave(), Once(key) (true once per in-game day), Mission(), MissionDef, Faction.
+	Quests: Offers(), QuestDef(id), StartQuest(id), QuestStatus(id), JustCompleted (quests this
+	conversation finished, e.g. a delivery), Has(item), StartChampion(), Decide(id, choice) / Decided(id) (2.24.0).
 ]]
 
+---| Services |---
+
 local Players = game:GetService(`Players`)
+local HttpService = game:GetService(`HttpService`)
 local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
-local SoundService = game:GetService(`SoundService`)
-local TweenService = game:GetService(`TweenService`)
-local Lighting = game:GetService(`Lighting`)
-local TextService = game:GetService(`TextService`)
-local RunService = game:GetService(`RunService`)
-local GuiService = game:GetService(`GuiService`)
+local ServerStorage = game:GetService(`ServerStorage`)
+local ServerScriptService = game:GetService(`ServerScriptService`)
 
-local Kit = require(ReplicatedStorage:WaitForChild(`UI`):WaitForChild(`Components`))
-local Fx = require(script.Parent.Parent:WaitForChild(`Fx`))
-local Classes = require(ReplicatedStorage.Config.Classes)
-local SchoolTime = require(ReplicatedStorage.Functions.SchoolTime)
+---| Modules |---
 
-local Player = Players.LocalPlayer
-local Theme = Kit.Theme
-local C = Theme.Colors
-local Fonts = Theme.Fonts
+local Packets = require(ReplicatedStorage.Remotes.Packets)
+local RepConfig = require(ReplicatedStorage.Config.Reputation)
+local FactionConfig = require(ReplicatedStorage.Config.Factions)
+local Cast = require(ReplicatedStorage.Config.Npcs)
+local QuestConfig = require(ReplicatedStorage.Config.Quests)
 
-local GOLD = C.Gold
-local IRON = C.Chalk
-local FAIL = C.Danger
-local INK_BLUE = Color3.fromRGB(92, 128, 210)
-local VIOLET = Color3.fromRGB(120, 92, 190)
+local Reputation = require(ServerScriptService.Services.Social.Reputation)
+local Factions = require(ServerScriptService.Services.Social.Factions)
+local SchoolClock = require(ServerScriptService.Services.School.SchoolClock)
+local Quests = require(ServerScriptService.Services.Quests.Quests)
+local Duels = require(ServerScriptService.Services.Quests.Duels)
 
--- Roblox-licensed Pro Sound Effects (Creator Store), routed to the Effects volume.
-local SOUNDS = {
-	Bell = { Id = `rbxassetid://9113584435`, Volume = 0.32, Length = 2.4 },      -- Brass Hand Bell 7
-	Stamp = { Id = `rbxassetid://9119907907`, Volume = 0.45, Length = 0.5 },     -- palm on wood (kit Stamp)
-	Chime = { Id = `rbxassetid://9114058995`, Volume = 0.25, Length = 0.8 },     -- desk bell (kit Confirm)
-	Tick = { Id = `rbxassetid://9120300134`, Volume = 0.3, Length = 0.4 },       -- typewriter key (kit Tick)
-}
-
--- Which period changes ring the bell (the start and end of the school day's blocks).
-local RING_KINDS = { Class = true; Passing = true; Break = true; Lunch = true; AfterSchool = true }
-local CARD_KINDS = { Class = true; Passing = true; Break = true; Lunch = true; AfterSchool = true; BeforeSchool = true }
+local MAX_DISTANCE = 16
+local Sessions = {} :: { [Player]: any }
 
 local Local = {}
 local Shared = {}
 
----| sound |---
-
-function Local.Sound(Name: string, VolumeScale: number?)
-	local Def = SOUNDS[Name]
-	if not Def then return end
-	local S = Instance.new(`Sound`)
-	S.Name = `NHMoment{Name}`
-	S.SoundId = Def.Id
-	S.Volume = Def.Volume * (VolumeScale or 1)
-	local Master = SoundService:FindFirstChild(`NH_Master`)
-	local Group = Master and Master:FindFirstChild(`NH_Effects`)
-	if Group and Group:IsA(`SoundGroup`) then S.SoundGroup = Group end
-	S.Parent = SoundService
-	S:Play()
-	task.delay(Def.Length, function()
-		if not S.Parent then return end
-		TweenService:Create(S, TweenInfo.new(0.35), { Volume = 0 }):Play()
-		task.delay(0.4, function() S:Destroy() end)
-	end)
+function Local.Tree(NpcId: string)
+	local Name = Cast[NpcId] and Cast[NpcId].Dialogue or NpcId
+	local Module = ServerStorage:FindFirstChild(`Dialogue`) and ServerStorage.Dialogue:FindFirstChild(Name)
+	return Module and require(Module)
 end
 
----| screen |---
+function Local.Context(Player: Player, NpcId: string, JustCompleted: { string }?)
+	local Npc = Cast[NpcId] or RepConfig.Npcs[NpcId]
+	local FactionId = Npc and Npc.Faction
+	local Faction = FactionId and FactionConfig.Factions[FactionId]
+	local ctx = { Player = Player; NpcId = NpcId; Npc = Npc; FactionId = FactionId; Faction = Faction; MissionDef = Faction and Faction.Mission }
 
-local Gui: ScreenGui? = nil
-local function gui(): ScreenGui
-	if Gui and Gui.Parent then return Gui end
-	local G = Instance.new(`ScreenGui`)
-	G.Name = `NHMoments`
-	G.ResetOnSpawn = false
-	G.DisplayOrder = 11 -- above toasts (10), below menus
-	G.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	Kit.AutoScale(G)
-	G.Parent = Player:WaitForChild(`PlayerGui`)
-	Gui = G
-	return G
+	function ctx.Met() local _, _, Met = Reputation.Relationship(Player, NpcId) return Met end
+	function ctx.Meet() Reputation.Meet(Player, NpcId) end
+	function ctx.Value() return (Reputation.Relationship(Player, NpcId)) end
+	function ctx.State() local _, State = Reputation.Relationship(Player, NpcId) return State end
+	function ctx.Rel(Amount: number, Reason: string?) Reputation.ChangeRelationship(Player, NpcId, Amount, Reason) end
+	function ctx.Rep(Category: string) return Reputation.Value(Player, Category) end
+	function ctx.PathTier(Path: string) -- (2.31) Standing Paths (Services.Player.Paths)
+		local Ok, T = pcall(function() return require(ServerScriptService.Services.Player.Paths).Tier(Player, Path) end)
+		return if Ok and typeof(T) == `number` then T else 1
+	end
+	function ctx.AddRep(Category: string, Amount: number) Reputation.Add(Player, Category, Amount) end
+	function ctx.Standing() local F = Factions.Get(Player, FactionId) return F and F.Standing or 0 end
+	function ctx.Rank() local F = Factions.Get(Player, FactionId) return F and F.Rank or `Outsider` end
+	function ctx.Member() local F = Factions.Get(Player, FactionId) return F ~= nil and F.Member end
+	function ctx.RivalMember()
+		for _, RivalId in Faction and Faction.Rivals or {} do
+			local R = Factions.Get(Player, RivalId)
+			if R and R.Member then return true end
+		end
+		return false
+	end
+	function ctx.CanJoin() return Factions.CanJoin(Player, FactionId) end
+	function ctx.Join() return Factions.Join(Player, FactionId) end
+	function ctx.Leave() return Factions.Leave(Player, FactionId) end
+	function ctx.Mission() return Factions.GetMissionProgress(Player, FactionId) end
+	function ctx.MissionStatus() return Factions.MissionStatus(Player, FactionId) end
+	function ctx.Once(Key: string): boolean
+		local Social = Reputation.Get(Player)
+		if not Social then return false end
+		Social.DialogueDaily = if typeof(Social.DialogueDaily) == `table` then Social.DialogueDaily else {}
+		local Day = SchoolClock.GetState().Day
+		local Id = `{NpcId}:{Key}`
+		return Social.DialogueDaily[Id] ~= Day
+	end
+	ctx.JustCompleted = JustCompleted or (Sessions[Player] and Sessions[Player].JustCompleted) or {}
+	function ctx.Offers() return Quests.Offers(Player, NpcId, true) end
+	function ctx.DressLine(Clique: string): string? -- (line matrix) a clique giver turns you away for your clothes
+		local Ok, Line = pcall(function()
+			return require(game:GetService(`ServerScriptService`).Services.AI.StudentBrain.Talk).Line(Clique, `DressCode`, Player)
+		end)
+		return if Ok then Line else nil
+	end
+	function ctx.QuestDef(Id: string) return QuestConfig.Quests[Id] end
+	function ctx.StartQuest(Id: string) return Quests.Start(Player, Id) end
+	function ctx.QuestStatus(Id: string) return Quests.Status(Player, Id) end
+	function ctx.QuestActive(Id: string) return Quests.IsActive(Player, Id) end
+	function ctx.Objective(Id: string) return Quests.CurrentObjective(Player, Id) end
+	function ctx.Has(Item: string) return Quests.HasItem(Player, Item) end
+	-- (2.24.0) Decision objectives: an answer chosen here is saved (Quests.Decisions[Id]) and completes the stage
+	function ctx.Decide(Id: string, Choice: string) return Quests.Decide(Player, Id, Choice) end
+	function ctx.Decided(Id: string) return Quests.Decided(Player, Id) end
+	function ctx.StartChampion() return Duels.StartChampion(Player) end
+	-- (1.35) clique membership (Social.CliqueMembership): this NPC's clique, if they lead one of the joinable six
+	ctx.CliqueId = (Npc and Npc.Clique) or (function() for _, D in QuestConfig.Quests do if D.Dare and D.Giver == NpcId then return D.Clique end end return nil end)()
+	local function Membership() local Ok, M = pcall(require, game:GetService(`ServerScriptService`).Services.Social.CliqueMembership) return Ok and M or nil end
+	function ctx.CliqueMember() local M = Membership() return M ~= nil and ctx.CliqueId ~= nil and M.IsMember(Player, ctx.CliqueId) end
+	function ctx.CliqueCanJoin() local M = Membership() if not (M and ctx.CliqueId) then return false, `NotJoinable` end return M.CanJoin(Player, ctx.CliqueId) end
+	function ctx.CliqueJoin() local M = Membership() return M ~= nil and ctx.CliqueId ~= nil and (M.Join(Player, ctx.CliqueId)) == true end
+	function ctx.CliqueLeave() local M = Membership() return M ~= nil and (M.Leave(Player)) == true end
+	function ctx.CliqueLine(Key: string) local C = require(ReplicatedStorage.Config.Cliques).Defs[ctx.CliqueId or ``] return C and C[Key] end
+	function ctx.Joinable() local C = require(ReplicatedStorage.Config.Cliques) return ctx.CliqueId ~= nil and table.find(C.Membership.Joinable, ctx.CliqueId) ~= nil end
+	function ctx.QuestData(Id: string) return Quests.DataFor(Player, Id) end
+	ctx.Vars = Sessions[Player] and Sessions[Player].Vars or {} -- per-conversation scratch (e.g. which quest)
+	function ctx.UseOnce(Key: string)
+		local Social = Reputation.Get(Player)
+		if not Social then return end
+		Social.DialogueDaily = if typeof(Social.DialogueDaily) == `table` then Social.DialogueDaily else {}
+		Social.DialogueDaily[`{NpcId}:{Key}`] = SchoolClock.GetState().Day
+	end
+	return ctx
 end
 
-local function uiScale(): number
-	local U = gui():FindFirstChild(`NHAutoScale`)
-	return if U and U:IsA(`UIScale`) and U.Scale > 0 then U.Scale else 1
+function Local.Resolve(Value: any, ctx): any
+	if typeof(Value) == `function` then return Value(ctx) end
+	return Value
 end
 
----| queue: one Moment at a time |---
-
-local Queue = {} :: { () -> () }
-local Pumping = false
-local MAX_QUEUE = 6
-local DIALOGUE_HOLD = 6 -- seconds a banner waits for an open conversation to end
-
-function Local.Blocked(): boolean
-	if Player:GetAttribute(`InMainMenu`) == true then return true end
-	local Char = Player.Character
-	return Char ~= nil and Char:GetAttribute(`NH_Evolving`) == true
+function Local.Close(Player: Player, Silent: boolean?)
+	local S = Sessions[Player]
+	if not S then return end
+	Sessions[Player] = nil
+	if not Silent and Player.Parent then
+		Packets.DialogueEvent:FireClient(Player, { Type = `Close`; Id = S.Id })
+	end
 end
 
-function Local.Enqueue(Fn: () -> ())
-	if #Queue >= MAX_QUEUE then table.remove(Queue, 1) end
-	table.insert(Queue, Fn)
-	if Pumping then return end
-	Pumping = true
-	task.spawn(function()
-		while #Queue > 0 do
-			local Waited = 0
-			while Local.Blocked() and Waited < 30 do
-				Waited += task.wait(0.25)
+function Local.Show(Player: Player, S, NodeId: string?)
+	local Node = NodeId and S.Tree.Nodes[NodeId]
+	if not Node then
+		Local.Close(Player)
+		return
+	end
+
+	local ctx = Local.Context(Player, S.NpcId)
+	-- (audit) a node whose Text / Choices / If errored left the client stuck on Waiting: close the talk instead
+	local Ok, Text, Offered, Labels = pcall(function()
+		local T = Local.Resolve(Node.Text, ctx)
+		local AllChoices = Local.Resolve(Node.Choices, ctx) or {}
+		local O, L = {}, {}
+		for _, Choice in AllChoices do
+			if not Choice.If or Choice.If(ctx) then
+				table.insert(O, Choice)
+				table.insert(L, Local.Resolve(Choice.Text, ctx))
 			end
-			local Held = 0
-			while Player:GetAttribute(`InDialogue`) == true and Held < DIALOGUE_HOLD do
-				Held += task.wait(0.25)
-			end
-			local Next = table.remove(Queue, 1)
-			local Ok, Err = pcall(Next)
-			if not Ok then warn(`[Moments] {Err}`) end
 		end
-		Pumping = false
+		return T, O, L
 	end)
-end
-
----| the banner |---
-
-local WIDTH = 580
-local BANNER_POS = UDim2.new(0.5, 0, 0.745, 0)
-local DIALOGUE_GAP = 10 -- px between a lifted banner and the top of the dialogue box
-
--- top edge in screen pixels (a ScreenGui that keeps the top inset measures from below it)
-function Local.ScreenTop(G: GuiObject): number
-	local Sg = G:FindFirstAncestorWhichIsA(`ScreenGui`)
-	local Inset = if Sg and Sg.IgnoreGuiInset then 0 else GuiService:GetGuiInset().Y
-	return G.AbsolutePosition.Y + Inset
-end
-
--- the dialogue box while a conversation is on screen
-function Local.DialogueBox(): GuiObject?
-	if Player:GetAttribute(`InDialogue`) ~= true then return nil end
-	local D = Player.PlayerGui:FindFirstChild(`Dialogue`)
-	local Box = D and D:FindFirstChild(`Box`)
-	if not (Box and Box:IsA(`GuiObject`) and Box.Visible) then return nil end
-	if D:IsA(`ScreenGui`) and not D.Enabled then return nil end
-	return Box
-end
-
--- keep a banner clear of the dialogue box: lift it just above the box, and back down once the box is gone.
--- Run every frame while the banner is up, so it also follows a box that opens, grows or closes mid-banner.
-function Local.Fit(Root: GuiObject)
-	local Box = Local.DialogueBox()
-	local Offset = Root.Position.Y.Offset
-	local Want = 0
-	if Box then
-		local Bottom = Local.ScreenTop(Root) + Root.AbsoluteSize.Y -- AbsolutePosition is always the top-left corner
-		local Over = Bottom - (Local.ScreenTop(Box) - DIALOGUE_GAP)
-		Want = math.min(0, Offset - Over / uiScale())
+	if not Ok then
+		warn(`[Dialogue] {S.NpcId}.{NodeId}: {Text}`)
+		Local.Close(Player)
+		return
 	end
-	if math.abs(Want - Offset) > 0.5 then
-		Root.Position = UDim2.new(BANNER_POS.X.Scale, BANNER_POS.X.Offset, BANNER_POS.Y.Scale, Want)
+	if #Offered == 0 then
+		table.insert(Offered, { Text = `Goodbye.` })
+		table.insert(Labels, `Goodbye.`)
 	end
-end
 
--- wrapped height of a text block in design px (falls back to an estimate)
-function Local.Measure(Text: string, FontArg: any, Size: number, Width: number): number -- (audit) a param named Font hid the Font datatype
-	local Ok, H = pcall(function()
-		local Params = Instance.new(`GetTextBoundsParams`)
-		Params.Text = Text
-		Params.Size = Size
-		Params.Width = Width
-		Params.Font = if typeof(FontArg) == `EnumItem` then Font.fromEnum(FontArg) else FontArg
-		return TextService:GetTextBoundsAsync(Params).Y
-	end)
-	if Ok and typeof(H) == `number` and H > 0 then return math.ceil(H) end
-	return math.ceil(#Text / 52) * math.ceil(Size * 1.3)
-end
+	S.NodeId = NodeId
+	S.Offered = Offered
 
---[[ Opts: Caption, Title, Text, Color, Icon (a Theme.Images key: IconBanner*, Bell, IconNib), Glyph (short text on the icon), Hold, Sound
-	Yields until the banner has gone. ]]
-function Local.Banner(Opts)
-	local Color = Opts.Color or GOLD
-	local HasText = Opts.Text ~= nil and Opts.Text ~= ``
-	local X = 98
-	local BodyTop = if Opts.Caption then 60 else 50
-	local BodySize = Theme.Sizes.TextSmall + 2
-	-- story text is never cut off: the banner grows to fit the wrapped body
-	local BodyH = if HasText then Local.Measure(Opts.Text, Fonts.Body, BodySize, WIDTH - X - 22) else 0
-	local Height = math.max(76, if HasText then BodyTop + BodyH + 16 else (if Opts.Caption then 70 else 62))
-	local Long = BodyH > BodySize * 2
-
-	local Root = Instance.new(`Frame`)
-	Root.Name = `MomentBanner`
-	Root.AnchorPoint = Vector2.new(0.5, 1)
-	Root.Position = BANNER_POS -- low centre, above the health bar and clear of the toast stack
-	Root.Size = UDim2.fromOffset(WIDTH, Height)
-	Root.BackgroundTransparency = 1
-	Kit.Decorate(Root, { ornamentScale = 0.5, bgTransparency = 0.06, frameColor = Color:Lerp(C.Iron, 0.35) })
-
-	local IconKey = Opts.Icon or `IconNoteMilestone`
-	local Seal = Kit.Image(IconKey, {
-		Name = `Seal`; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.new(0, 52, 0.5, 0);
-		Size = UDim2.fromOffset(60, 60); ImageColor3 = if Theme.Baked and Theme.Baked[IconKey] then Color3.new(1, 1, 1) else Color; ZIndex = 8; Parent = Root;
+	local Npc = S.Npc
+	local Faction = Npc.Faction and FactionConfig.Factions[Npc.Faction]
+	local State = nil
+	if RepConfig.Npcs[S.NpcId] then
+		State = select(2, Reputation.Relationship(Player, S.NpcId))
+	end
+	Packets.DialogueEvent:FireClient(Player, {
+		Type = `Node`;
+		Id = S.Id;
+		Speaker = Npc.Name;
+		Role = Npc.Role;
+		Relationship = State;
+		Color = Faction and Faction.Color or Npc.Color or Color3.fromRGB(240, 240, 240);
+		Text = Text;
+		Choices = Labels;
+		Model = S.Model; -- (1.35.1) who's talking: the client frames them (Gui.Dialogue talk cinematic)
 	})
-	if Opts.Glyph then
-		Kit.Text({
-			Name = `Glyph`; Text = Opts.Glyph; Font = Fonts.Title; TextSize = if #Opts.Glyph > 2 then 17 else 24;
-			TextColor3 = C.Ink; TextStrokeTransparency = 1; TextXAlignment = Enum.TextXAlignment.Center;
-			Size = UDim2.fromScale(1, 1); ZIndex = 9; Parent = Seal;
-		})
+end
+
+function Local.InRange(Player: Player, S): boolean
+	local Character = Player.Character
+	local Root = Character and Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?
+	local NpcRoot = S.Model and S.Model.Parent and S.Model:FindFirstChild(`HumanoidRootPart`) :: BasePart?
+	if not Root or not NpcRoot then return false end
+	local NpcHumanoid = S.Model:FindFirstChildWhichIsA(`Humanoid`)
+	if not NpcHumanoid or NpcHumanoid.Health <= 0 or NpcHumanoid:GetAttribute(`Downed`) then return false end
+	return (Root.Position - NpcRoot.Position).Magnitude <= MAX_DISTANCE
+end
+
+---| API |---
+
+function Shared.Start(Player: Player, NpcId: string, Model: Model): boolean
+	local Tree = Local.Tree(NpcId)
+	local Npc = Cast[NpcId] or RepConfig.Npcs[NpcId]
+	if not Tree or not Npc then return false end
+
+	Local.Close(Player)
+	local S = { Id = HttpService:GenerateGUID(false); NpcId = NpcId; Npc = Npc; Tree = Tree; Model = Model; Vars = {} }
+	if not Local.InRange(Player, S) then return false end
+	Sessions[Player] = S
+
+	-- Quests first: talking can finish objectives (meet someone, deliver something).
+	local Ok, Completed = pcall(Quests.OnTalk, Player, NpcId)
+	if not Ok then
+		warn(`[Dialogue] quests: {Completed}`)
+		Completed = {}
 	end
+	S.JustCompleted = Completed
 
-	if Opts.Caption then
-		Kit.Text({
-			Name = `Caption`; Text = string.upper(Opts.Caption); Font = Fonts.Title; TextSize = Theme.Sizes.TextTiny;
-			TextColor3 = Color:Lerp(C.Text, 0.25); TextXAlignment = Enum.TextXAlignment.Left;
-			Position = UDim2.fromOffset(X, 12); Size = UDim2.new(1, -X - 22, 0, 16); ZIndex = 8; Parent = Root;
-		})
-	end
-	local Title = Kit.Text({
-		Name = `Title`; Text = Opts.Title or ``; Font = Fonts.Title; TextSize = 25;
-		TextColor3 = Color:Lerp(C.Text, 0.55); TextXAlignment = Enum.TextXAlignment.Left;
-		TextTruncate = Enum.TextTruncate.AtEnd;
-		Position = UDim2.fromOffset(X, if Opts.Caption then 28 else 18); Size = UDim2.new(1, -X - 22, 0, 30);
-		ZIndex = 8; Parent = Root;
-	})
-	Kit.Emboss(Title, Color:Lerp(C.Ink, 0.4), 1.4)
-	if HasText then
-		Kit.Text({
-			Name = `Body`; Text = Opts.Text; Font = Fonts.Body; TextSize = BodySize;
-			TextColor3 = C.Text; TextXAlignment = Enum.TextXAlignment.Left; TextYAlignment = Enum.TextYAlignment.Top;
-			TextWrapped = true;
-			Position = UDim2.fromOffset(X, BodyTop); Size = UDim2.new(1, -X - 22, 0, BodyH + 4);
-			ZIndex = 8; Parent = Root;
-		})
-	end
-
-	-- single gold sheen across the title
-	local Sheen = Instance.new(`UIGradient`)
-	Sheen.Transparency = NumberSequence.new({
-		NumberSequenceKeypoint.new(0, 0); NumberSequenceKeypoint.new(0.45, 0); NumberSequenceKeypoint.new(0.5, 0.6);
-		NumberSequenceKeypoint.new(0.55, 0); NumberSequenceKeypoint.new(1, 0);
-	})
-	Sheen.Offset = Vector2.new(-1, 0)
-
-	Root.Parent = gui()
-	Local.Fit(Root)
-	local FitConn = RunService.RenderStepped:Connect(function() Local.Fit(Root) end)
-	Kit.FadeIn(Root, 0.25)
-	if not Fx.Reduced() then
-		local Slide = Instance.new(`UIScale`)
-		Slide.Scale = 0.92
-		Slide.Parent = Root
-		TweenService:Create(Slide, TweenInfo.new(0.3, Enum.EasingStyle.Back), { Scale = 1 }):Play()
-		task.delay(0.08, function()
-			if Seal.Parent then Fx.Pop(Seal, 1.6, 0.18) end
-		end)
-		Sheen.Parent = Title
-		TweenService:Create(Sheen, TweenInfo.new(0.9, Enum.EasingStyle.Sine), { Offset = Vector2.new(1, 0) }):Play()
-	end
-	if Opts.Sound then Local.Sound(Opts.Sound) end
-	task.delay(0.1, function() Local.Sound(`Stamp`, 0.6) end)
-
-	local Hold = Opts.Hold or (if Long then 4.5 else 2.6)
-	task.wait(0.25 + Hold)
-	local Out = Kit.FadeOut(Root, 0.4)
-	if Out then Out.Completed:Wait() else task.wait(0.4) end
-	FitConn:Disconnect()
-	Root:Destroy()
-end
-
----| P0-8 School Bell & Period Card |---
-
-function Local.ClockRim()
-	local Hud = Player.PlayerGui:FindFirstChild(`ClockHud`)
-	local Panel = Hud and Hud:FindFirstChild(`Panel`)
-	if not Panel then return end
-	local Rim = Kit.Slice(`FrameThin`, GOLD, { Name = `BellRim`; SliceScale = 0.45; ZIndex = 9; ImageTransparency = 0; Parent = Panel })
-	Rim.Size = UDim2.fromScale(1, 1)
-	local Tw = TweenService:Create(Rim, TweenInfo.new(1.1, Enum.EasingStyle.Sine), { ImageTransparency = 1 })
-	Tw.Completed:Connect(function() Rim:Destroy() end)
-	Tw:Play()
-end
-
-function Local.PulseWaypoint()
-	local W = Player.PlayerGui:FindFirstChild(`ClassWaypoint`)
-	if not (W and W:IsA(`BillboardGui`) and W.Enabled) then return end
-	local Base = W.Size
-	task.spawn(function()
-		for _ = 1, 2 do
-			if not W.Parent then return end
-			local Up = TweenService:Create(W, TweenInfo.new(0.18, Enum.EasingStyle.Quad), { Size = UDim2.new(Base.X.Scale, Base.X.Offset * 1.25, Base.Y.Scale, Base.Y.Offset * 1.25) })
-			Up:Play()
-			Up.Completed:Wait()
-			local Down = TweenService:Create(W, TweenInfo.new(0.3, Enum.EasingStyle.Sine), { Size = Base })
-			Down:Play()
-			Down.Completed:Wait()
-		end
-	end)
-end
-
-function Local.Bell(Clock: Instance)
-	local Epoch = Clock:GetAttribute(`Epoch`)
-	if not Epoch then return end
-	local State = SchoolTime.GetState(Epoch, workspace:GetServerTimeNow())
-	local Seg = State.Segment
-	if not CARD_KINDS[Seg.Kind] then return end
-	local Ring = RING_KINDS[Seg.Kind] == true
-
-	local Caption, Title, Text
-	local Until = SchoolTime.FormatClock(Seg.End)
-	if Seg.Kind == `Class` then
-		local Class = Classes.Periods[Seg.Name]
-		Caption = `The bell rings`
-		Title = Seg.Name
-		if Class then
-			local Room = Classes.Rooms and Classes.Rooms[Class.Room] or Class.Room
-			Text = `{Class.Subject} · {Room} · until {Until}`
-		else
-			Text = `Until {Until}`
-		end
-	elseif Seg.Kind == `BeforeSchool` then
-		Caption, Title, Text = `The gates open`, `Before School`, `Homeroom at {SchoolTime.FormatClock(Seg.End)}`
-	elseif Seg.Kind == `AfterSchool` then
-		Caption, Title, Text = `The bell rings`, `Classes are over`, `After school until {Until}`
-	else
-		Caption, Title, Text = `The bell rings`, Seg.Name, `Until {Until}`
-	end
-
-	-- the bell itself rings at once, even if a banner is still showing
-	if Ring then
-		Local.Sound(`Bell`)
-		Local.ClockRim()
-		if Seg.Kind == `Class` then task.delay(0.7, Local.PulseWaypoint) end
-	end
-	Local.Enqueue(function()
-		Local.Banner({ Caption = Caption; Title = Title; Text = Text; Icon = `Bell`; Color = GOLD; Hold = 2.5 })
-	end)
-end
-
-function Local.StartBell()
-	local Clock = ReplicatedStorage:WaitForChild(`SchoolClock`)
-	local Last = Clock:GetAttribute(`Period`) -- the value at join is a baseline, never a ring
-	Clock:GetAttributeChangedSignal(`Period`):Connect(function()
-		local Now = Clock:GetAttribute(`Period`)
-		if Now == Last then return end
-		local First = Last == nil
-		Last = Now
-		if First or Local.Blocked() then return end
-		Local.Bell(Clock)
-	end)
-end
-
----| P1-4 Quest beats |---
-
-function Local.RaceColor(): Color3
-	local Ok, Col = pcall(function()
-		local Lineage = require(ReplicatedStorage.Lineage)
-		local Race = Player:GetAttribute(`Race`)
-		local R = Race and Lineage.Races and Lineage.Races[Race]
-		return R and R.Color
-	end)
-	return if Ok and typeof(Col) == `Color3` then Col else C.Crimson
-end
-
-function Local.QuestBeat(D)
-	if typeof(D) ~= `table` then return end
-	local Color = if D.Category == `Main` then GOLD elseif D.Category == `Rite` then Local.RaceColor() else IRON
-	if D.Type == `Start` then
-		Local.Enqueue(function()
-			Local.Banner({ Caption = if D.Category == `Main` then `New main quest` else `New quest`; Title = D.Title; Text = D.Text; Color = Color; Icon = `IconBannerQuestNew`; Sound = `Chime` })
-		end)
-	elseif D.Type == `Stage` then
-		Local.Enqueue(function()
-			Local.Banner({ Caption = `New objective`; Title = D.Title; Text = D.Text; Color = Color; Icon = `IconBannerQuestStep`; Hold = 2.2 })
-		end)
-	elseif D.Type == `Complete` then
-		Local.Enqueue(function()
-			Local.Banner({ Caption = `Quest complete`; Title = D.Title; Text = D.Text; Color = Color; Icon = `IconBannerQuestDone`; Sound = `Chime` })
-			if typeof(D.Story) == `string` and D.Story ~= `` then
-				Local.Banner({ Caption = `Epilogue`; Title = D.Title; Text = D.Story; Color = C.Chalk; Icon = `IconNib`; Hold = math.clamp(#D.Story * 0.055, 4, 9) })
-			end
-		end)
-	elseif D.Type == `Fail` then
-		Local.Enqueue(function()
-			Local.Banner({ Caption = `Quest failed`; Title = D.Title; Text = D.Text; Color = FAIL; Icon = `IconBannerQuestFailed`; Hold = 3.2 })
-		end)
-	end
-end
-
----| (2.31) Standing Path tier |---
-
-function Local.PathTier(D)
-	if typeof(D) ~= `table` or typeof(D.Name) ~= `string` then return end
-	Local.Enqueue(function()
-		Local.Banner({ Caption = `Standing: {D.Path or ``}`; Title = string.upper(D.Name); Text = `The {D.Path} path, tier {D.Tier} of {D.Of}.`;
-			Color = GOLD; Icon = `IconBannerQuestDone`; Sound = `Chime`; Hold = 3.2 })
-	end)
-end
-
----| P1-5 Clue Discovered |---
-
-function Local.ClueWorld(Pos: Vector3)
-	Fx.Burst(Pos, {
-		Texture = Fx.Tex.Shards; Flipbook = `Grid2x2`; Count = 16;
-		Color = ColorSequence.new(GOLD, INK_BLUE); Size = 0.35;
-		Speed = NumberRange.new(1, 3); Spread = 70; Accel = Vector3.new(0, 2.5, 0);
-		Lifetime = NumberRange.new(0.7, 1.3); LightEmission = 0.8;
-	})
-	Fx.Light(Pos, GOLD, 1.6, 10, 1)
-	-- flash the found object, then fade (never a hard pop)
-	local Params = OverlapParams.new()
-	local Best, BestD = nil, math.huge
-	for _, P in workspace:GetPartBoundsInRadius(Pos, 2, Params) do
-		if P:GetAttribute(`QuestObject`) then
-			local Dd = (P.Position - Pos).Magnitude
-			if Dd < BestD then Best, BestD = P, Dd end
-		end
-	end
-	if Best then
-		local H = Instance.new(`Highlight`)
-		H.Name = `NHClueFlash`
-		H.FillColor = GOLD
-		H.OutlineColor = GOLD
-		H.FillTransparency = 0.55
-		H.OutlineTransparency = 0
-		H.DepthMode = Enum.HighlightDepthMode.Occluded
-		H.Adornee = Best
-		H.Parent = Best
-		local Tw = TweenService:Create(H, TweenInfo.new(1.3, Enum.EasingStyle.Sine), { FillTransparency = 1; OutlineTransparency = 1 })
-		Tw.Completed:Connect(function() H:Destroy() end)
-		Tw:Play()
-	end
-end
-
-function Local.TextWidth(Text: string, Size: number): number
-	local Ok, W = pcall(function()
-		local F = Fonts.Title
-		return TextService:GetTextSize(Text, Size, if typeof(F) == `EnumItem` then F else Enum.Font.Garamond, Vector2.new(2000, 100)).X
-	end)
-	return if Ok and typeof(W) == `number` then W else #Text * Size * 0.55
-end
-
-function Local.ClueSlip(D)
-	local Root = gui()
-	local Label = `+ CLUE  ·  {D.Name or `Clue`}`
-	local Slip = Kit.Plate({ text = Label; color = GOLD; textSize = 19; frameColor = GOLD:Lerp(C.Iron, 0.4) })
-	Slip.Name = `ClueSlip`
-	Slip.AnchorPoint = Vector2.new(0.5, 0.5)
-	Slip.Position = UDim2.new(0.5, 0, 0.6, 0)
-	Slip.Size = UDim2.fromOffset(math.clamp(Local.TextWidth(Label, 19) + 60, 220, 560), 44)
-	Slip.ZIndex = 20
-	Slip.Parent = Root
-	local Sub = Kit.Text({
-		Name = `Case`; Text = `Added to your case file{if D.Case then ` (` .. D.Case .. `)` else ``}`; Font = Fonts.Body;
-		TextSize = Theme.Sizes.TextSmall; TextColor3 = C.Text; TextXAlignment = Enum.TextXAlignment.Center;
-		AnchorPoint = Vector2.new(0.5, 0); Position = UDim2.new(0.5, 0, 1, 6); Size = UDim2.fromOffset(420, 20); ZIndex = 20; Parent = Slip;
-	})
-	Kit.FadeIn(Slip, 0.2)
-	Fx.Pop(Slip, 1.4, 0.22)
-	Local.Sound(`Tick`)
-	task.delay(0.12, function() Local.Sound(`Stamp`, 0.5) end)
-	task.wait(1.4)
-	Sub:Destroy()
-
-	-- fly to the Journal button (left edge), shrinking
-	local Journal = Player.PlayerGui:FindFirstChild(`QuestJournal`)
-	local Toggle = Journal and Journal:FindFirstChild(`Toggle`)
-	local Scale = uiScale()
-	local Target
-	if Toggle and Toggle:IsA(`GuiObject`) and Toggle.Visible then
-		-- both screens use the same inset, so absolute px / our design scale = our offset
-		local Abs = Toggle.AbsolutePosition + Toggle.AbsoluteSize / 2
-		Target = UDim2.fromOffset(Abs.X / Scale, Abs.Y / Scale)
-	else
-		Target = UDim2.new(0, 90, 0.5, 78)
-	end
-	local Time = if Fx.Reduced() then 0.25 else 0.55
-	local Fly = TweenService:Create(Slip, TweenInfo.new(Time, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { Position = Target })
-	local U = Instance.new(`UIScale`)
-	U.Parent = Slip
-	TweenService:Create(U, TweenInfo.new(Time, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { Scale = 0.35 }):Play()
-	Fly:Play()
-	Fly.Completed:Wait()
-	if Toggle and Toggle:IsA(`GuiObject`) then Fx.Pop(Toggle, 1.2, 0.25) end
-	local Out = Kit.FadeOut(Slip, 0.15)
-	if Out then Out.Completed:Wait() end
-	Slip:Destroy()
-end
-
-function Local.Clue(D)
-	if typeof(D) ~= `table` then return end
-	if typeof(D.Pos) == `Vector3` then Local.ClueWorld(D.Pos) end
-	Local.Enqueue(function() Local.ClueSlip(D) end)
-end
-
----| P1-6 Level-up "Bell Toll" |---
-
-function Local.LevelUp(D)
-	if typeof(D) ~= `table` then return end
-	local Who = Players:GetPlayerByUserId(D.UserId or 0)
-	local Char = Who and Who.Character
-	local Root = Char and Char:FindFirstChild(`HumanoidRootPart`) :: BasePart?
-	local Mine = Who == Player
-	if Root and (Mine or Fx.Near(Root.Position, 80)) then
-		local Feet = Root.Position - Vector3.new(0, 2.8, 0)
-		Fx.Burst(Feet, {
-			Texture = Fx.Tex.Ember; Count = 40; Color = ColorSequence.new(Color3.fromRGB(255, 226, 150), GOLD);
-			Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.5), NumberSequenceKeypoint.new(1, 0) });
-			Speed = NumberRange.new(6, 11); Spread = 14; Accel = Vector3.new(0, 3, 0); Drag = 1.2;
-			Lifetime = NumberRange.new(0.8, 1.4); LightEmission = 1;
-		})
-		Fx.Ring(Feet + Vector3.new(0, 0.1, 0), GOLD, 9, nil, 0.6)
-		Fx.Light(Root.Position, GOLD, 2, 12, 1.2)
-	end
-	if not Mine then return end
-	Local.Sound(`Bell`, 0.8)
-	Fx.Shake(0.6, 0.35)
-	Local.Enqueue(function()
-		Local.Banner({
-			Caption = `Level up`; Title = `Level {D.Level or `?`}`; Color = GOLD; Icon = `IconBannerLevelUp`; Glyph = tostring(D.Level or ``);
-			Text = if D.Points and D.Points > 0 then `+{D.Points} stat points. Open your record (M) to spend them.` else nil;
-		})
-	end)
-end
-
----| P1-8 Purchase granted |---
-
-function Local.Purchase(D)
-	if typeof(D) ~= `table` then return end
-	Local.Enqueue(function()
-		Local.Banner({ Caption = `Purchase complete`; Title = D.Title or `Thank you!`; Text = D.Text; Color = GOLD; Icon = `IconBannerPurchase`; Sound = `Chime` })
-	end)
-end
-
----| P1-17 tier-up: the "Evolved" banner, after the cutscene |---
-
--- The server fires this as the cutscene starts; the queue holds it while NH_Evolving is set, so it lands after.
-function Local.Evolved(D)
-	if typeof(D) ~= `table` then return end
-	task.wait(0.5) -- let the NH_Evolving flag arrive first
-	local Roman = { `I`, `II`, `III` }
-	local Ok, Col = pcall(function()
-		return require(ReplicatedStorage:WaitForChild(`Functions`):WaitForChild(`RaceFX`)).Color(D.Race)
-	end)
-	Local.Enqueue(function()
-		Local.Banner({
-			Caption = `Evolved`; Title = D.Name or `Evolved`; Color = if Ok and typeof(Col) == `Color3` then Col else C.Crimson;
-			Text = `Tier {Roman[D.Tier or 0] or tostring(D.Tier)} {D.Race or ``}`; Icon = `IconBannerEvolved`; Sound = `Chime`;
-		})
-	end)
-end
-
----| P1-9 "Roll call" respawn |---
-
-function Local.OwnRespawn()
-	local Veil = Instance.new(`Frame`)
-	Veil.Name = `RollCallVeil`
-	Veil.BorderSizePixel = 0
-	Veil.BackgroundColor3 = C.Ink
-	Veil.BackgroundTransparency = 0
-	Veil.Size = UDim2.new(1, 0, 1, 80)
-	Veil.Position = UDim2.fromOffset(0, -60)
-	Veil.ZIndex = 30
-	Veil.Parent = gui()
-	local Tw = TweenService:Create(Veil, TweenInfo.new(0.5, Enum.EasingStyle.Sine), { BackgroundTransparency = 1 })
-	Tw.Completed:Connect(function() Veil:Destroy() end)
-	Tw:Play()
-	-- colour comes back over 0.8 s
-	local CC = Instance.new(`ColorCorrectionEffect`)
-	CC.Name = `NHRollCall`
-	CC.Saturation = -0.85
-	CC.Parent = Lighting
-	local Back = TweenService:Create(CC, TweenInfo.new(0.8, Enum.EasingStyle.Sine), { Saturation = 0 })
-	Back.Completed:Connect(function() CC:Destroy() end)
-	task.delay(0.3, function() Back:Play() end)
-end
-
-function Local.OtherRespawn(Char: Model)
-	local Root = Char:WaitForChild(`HumanoidRootPart`, 5) :: BasePart?
-	if not Root then return end
-	task.wait(0.1)
-	if not Fx.Near(Root.Position, 80) then return end
-	local Feet = Root.Position - Vector3.new(0, 2.8, 0)
-	Fx.Burst(Feet + Vector3.new(0, 1, 0), {
-		Texture = Fx.Tex.Smoke; Flipbook = `Grid4x4`; Count = 10; Color = VIOLET;
-		Size = NumberSequence.new({ NumberSequenceKeypoint.new(0, 1.2), NumberSequenceKeypoint.new(1, 2.4) });
-		Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.45), NumberSequenceKeypoint.new(1, 1) });
-		Speed = NumberRange.new(1, 2.5); Spread = 180; Lifetime = NumberRange.new(0.8, 1.2); LightEmission = 0.2; Drag = 2;
-	})
-	Fx.Ring(Feet + Vector3.new(0, 0.1, 0), C.Chalk, 6, nil, 0.5)
-end
-
-function Local.WatchRespawns(P: Player)
-	local WasInSchool = false
-	local function onCharacter(Char: Model)
-		local InSchool = P:GetAttribute(`InMainMenu`) ~= true
-		local Play = WasInSchool and InSchool
-		WasInSchool = InSchool
-		if not Play then return end
-		if P == Player then
-			Local.OwnRespawn()
-		else
-			task.spawn(Local.OtherRespawn, Char)
-		end
-	end
-	if P.Character then WasInSchool = P:GetAttribute(`InMainMenu`) ~= true end
-	P.CharacterAdded:Connect(onCharacter)
-end
-
----| start |---
-
-function Shared.OnStart()
-	Fx.On(`QuestBeat`, Local.QuestBeat)
-	Fx.On(`PathTier`, Local.PathTier) -- (2.31) Standing Paths
-	Fx.On(`Clue`, Local.Clue)
-	Fx.On(`LevelUp`, Local.LevelUp)
-	Fx.On(`Purchase`, Local.Purchase)
-	Fx.On(`Evolved`, Local.Evolved)
-	task.spawn(Local.StartBell)
-	for _, P in Players:GetPlayers() do Local.WatchRespawns(P) end
-	Players.PlayerAdded:Connect(Local.WatchRespawns)
-end
-
--- other client systems can queue a Moment banner (VFX P2-1 full moon, ...): Opts = { Title, Text?, Caption?, Color?, Icon?, Glyph?, Sound?, Hold? }
-function Shared.Banner(Opts) Local.Enqueue(function() Local.Banner(Opts) end) end
-
--- testing hooks (Studio command bar / test scripts)
-Shared.Test = {
-	Banner = function(Opts) Local.Enqueue(function() Local.Banner(Opts) end) end;
-	Bell = function() Local.Bell(ReplicatedStorage:WaitForChild(`SchoolClock`)) end;
-	QuestBeat = Local.QuestBeat; Clue = Local.Clue; LevelUp = Local.LevelUp; Purchase = Local.Purchase;
-	Respawn = Local.OwnRespawn;
-}
-
-return Shared
-]==] })
-table.insert(Items, { Path = {"ReplicatedStorage", "Config", "Broadcast"}; Source = [==[
---[[ (2.30) Broadcast wording (World.Broadcast). The PA speaks only of real state (doc 13 §5.2), at most once per school
-	segment (emergencies aside). The station (Night FM "Midnight Broadcast") is on air 21:00 to 03:00. ]]
-return {
-	PA = {
-		BeforeSchool = { "Good morning, students. Homeroom begins at eight. Do not be late; the register is kept." };
-		Substitute = { "A substitute will cover {Subject} today. Mind your manners." };
-		Lunch = { "The lunch period has begun. Mrs. Okada's stand is open by the west doors." };
-		AfterSchool = { "Classes are dismissed. Clubs meet now. The building closes at ten." };
-		Curfew = { "Curfew is now in force. All students to the dorms. The halls are patrolled." };
-		Rumble = { "Students are to clear {Place} at once. Staff are on their way." };
-	};
-	Transmissions = {
-		"...and the roll is read. Holt. Mira Holt. ...No answer. No answer. No answer.",
-		"A voice on the static, very calm: 'Answer the bell, and you will be kept.'",
-		"Somewhere under the music, a register being read. One name too many.",
-		"Static, and a girl humming the school hymn a beat behind the choir.",
-	};
-	Kickers = { Announcement = `ANNOUNCEMENT`; IncidentReport = `CAMPUS REPORT`; CallerLine = `CALLER LINE`; Transmission = `TRANSMISSION`; Notable = `SHOUT-OUT` }; -- (2.31) Notable: a Standing Path tier 4+
-	MaxItems = 40;
-	StationFrom = 21; StationTo = 3; -- hours (wraps past midnight)
-	CurfewHour = 22;
-	Chime = `rbxassetid://9114058995`; -- the desk bell (the kit's Confirm and Moments' Chime)
-	-- (2.30) Night FM's voices (the owner's clips, art/sfx/NightFM): the station's host, the hall monitors' bulletins, the
-	-- PSA and the lore. World.Broadcast.Voice picks one when you tune in (the Station tab), then the next after VoiceGap
-	-- seconds of music while you stay tuned. Id 0 = not uploaded: that clip is skipped. From/To are hours, a [From, To)
-	-- window that may wrap past midnight.
-	Voice = {
-		FirstTune = { Id = 111499524031786; Len = 28; Who = `Night FM`; Title = `You're listening to Night FM` }; -- the first time you ever tune in after dark
-		WelcomeBack = { Id = 134125591548166; Len = 16; Who = `Night FM`; Title = `And we're back` }; -- your first tune-in of a later night
-		PSA = { Id = 97206902894473; Len = 23; Who = `Public service`; Title = `Stay inside, stay out of trouble`; From = 20; To = 23 };
-		Hello = { Id = 77658749464340; Len = 10; Who = `Night FM`; Title = `A special hello`; From = 21; To = 3 };
-		Quiet = { Id = 75710916882636; Len = 15; Who = `Night FM`; Title = `A suspiciously quiet day`; From = 15; To = 3; QuietOnly = true }; -- only with no campus report today
-		Lore1 = { Id = 100641239050743; Len = 33; Who = `Night FM`; Title = `About Mira Holt`; From = 23; To = 3 };
-		Lore2 = { Id = 107164773510555; Len = 20; Who = `Night FM`; Title = `The photograph from 1887`; From = 23; To = 3 };
-		SignOff = { Id = 138187748818510; Len = 18; Who = `Night FM`; Title = `Signing off`; From = 2.5; To = 3 }; -- the last half hour
-		HallMonitor1 = { Id = 91112498069449; Len = 19; Who = `Hall monitor`; Title = `The dress code remains in effect`; From = 6; To = 12 };
-		Afternoon = { Id = 105987665107075; Len = 16; Who = `Night FM`; Title = `The afternoon is rolling along`; From = 12; To = 18 };
-		HallMonitor2 = { Id = 115752323853903; Len = 19; Who = `Hall monitor`; Title = `After hours, the halls are patrolled`; From = 15; To = 21 };
-	};
-	VoiceGap = 45;
-}
-]==] })
-table.insert(Items, { Path = {"StarterPlayer", "StarterPlayerScripts", "Controllers", "Gui", "PhoneRadio"}; Source = [==[
---[[ (2.30) PhoneRadio (client). Controllers.Gui.PhoneRadio: Night FM, remade as a music app in the school's dress
-	(the owner's reference, 2026-11-18: a Spotify-like home, library and now-playing, with a floating tab bar).
-	Tabs: Home (greeting, chips, the Midnight Broadcast banner, recent tracks), Library (saved + recent, add by ID),
-	Station (Midnight Broadcast, 21:00-03:00: caller lines, campus reports, transmissions; World.Broadcast), and the
-	Now Playing sheet (cover, title, creator, like, waveform scrubber, loop / prev / play / next / volume).
-	Art: "The Midnight Wireless" (owner: "wayy higher quality ... UNIQUE designs ... PBR textures, easy to read"), baked by
-	art/ui/hud/make_nightfm_ui.py and staged in art/group-upload-nightfm (group 15981569): lacquer, gilt bezels, amethyst
-	enamel, 12 painted covers, 16 bold icons. Until an id in ART is set, that piece falls back to the kit look (never the Seal).
-	Voices (the owner's clips, Config.Broadcast.Voice): tuning in to the Station tab plays the host, the hall monitors, the
-	PSA or the lore (World.Broadcast.Voice picks), with the music ducked under it, and the next one after a gap while you stay.
-	Driven by Controllers.Gui.Phone: Open(Ctx), Tick(). ]]
-local Players = game:GetService(`Players`)
-local MarketplaceService = game:GetService(`MarketplaceService`)
-local UserInputService = game:GetService(`UserInputService`)
-
-local Shared = {}
-local Ctx = nil
-local Ui = nil
-local Tab = `Home`
-local Chip = `All`
-local Info = {} :: { [number]: { Title: string, Creator: string } }
-
-local PURPLE = Color3.fromRGB(150, 95, 230)
-local PURPLE_DEEP = Color3.fromRGB(46, 22, 78)
-local COVERS = { `IconAppRadio`, `IconCandle`, `Crest`, `IconBannerFullMoon`, `IconBannerBlueMoon`, `IconBannerCrimsonMoon`, `IconNib`, `Bell`, `IconCardBack` } -- (owner: no Seal icon)
-local GRADS = {
-	{ Color3.fromRGB(120, 60, 200), Color3.fromRGB(150, 30, 60) }, { Color3.fromRGB(70, 40, 150), Color3.fromRGB(20, 10, 40) },
-	{ Color3.fromRGB(170, 70, 140), Color3.fromRGB(60, 20, 90) }, { Color3.fromRGB(90, 30, 40), Color3.fromRGB(150, 95, 230) },
-}
-
--- (2.30) Night FM's PBR art (art/group-upload-nightfm, group 15981569). 0 = not imported: the kit look stands in.
-local ART = {
-	FmBackdrop = 127584299102551; FmCard = 113509808470918; FmChip = 99474149194088; FmChipOn = 135428344116127; FmKnob = 121754044071543; FmKnobOn = 87400242169148; FmTabBar = 139401041948754; FmOnAir = 119760735963337; FmBanner = 120062098656401; FmCoverFrame = 102140831342487;
-	FmCover01 = 115207179383792; FmCover02 = 129339770425808; FmCover03 = 78521782695502; FmCover04 = 85842377440992; FmCover05 = 120254835544079; FmCover06 = 125971269956977; FmCover07 = 100458599549919; FmCover08 = 84310157061916; FmCover09 = 120827498837397; FmCover10 = 96216876489409; FmCover11 = 116184429450292; FmCover12 = 81335875522563;
-	FmIconPlay = 107934318677097; FmIconPause = 103299744726376; FmIconPrev = 71254529174801; FmIconNext = 76973076777397; FmIconLoop = 119391678462515; FmIconQueue = 136134569814000; FmIconHeart = 115051670439309; FmIconHeartFull = 118215613287012; FmIconSearch = 102419618933770; FmIconBell = 119998418603355; FmIconHome = 138834344537959; FmIconLibrary = 109630327095017; FmIconStation = 96986282526360; FmIconBack = 127715630347481; FmIconPlus = 104299352902905; FmIconVolume = 92169605654444;
-}
-local function art(Name: string): string?
-	local Id = ART[Name]
-	if type(Id) == `string` then return Id end -- (a local preview: rbxasset://)
-	return if Id and Id > 0 then `rbxassetid://` .. Id else nil
-end
-local ICON_GOLD = Color3.fromRGB(240, 206, 130)
--- a 9-slice plate from the art (Rect in pixels of the source, Scale shrinks the corners to fit the phone)
-local SLICES = { FmCard = { Rect.new(44, 44, 148, 148), 0.3 }; FmChip = { Rect.new(30, 30, 162, 34), 0.47 }; FmChipOn = { Rect.new(30, 30, 162, 34), 0.47 };
-	FmTabBar = { Rect.new(60, 60, 452, 68), 0.45 }; FmOnAir = { Rect.new(34, 34, 222, 38), 0.36 } }
-local function sliced(Img, Name: string): boolean
-	local A = art(Name)
-	if not A then return false end
-	Img.Image = A
-	Img.ScaleType = Enum.ScaleType.Slice
-	Img.SliceCenter = SLICES[Name][1]
-	Img.SliceScale = SLICES[Name][2]
-	Img.BackgroundTransparency = 1
+	local ctx = Local.Context(Player, NpcId, Completed)
+	Local.Show(Player, S, Tree.Start(ctx))
 	return true
 end
 
-local function new(Class: string, Props, Parent: Instance?)
-	local I = Instance.new(Class)
-	for K, V in Props do I[K] = V end
-	if Parent then I.Parent = Parent end
-	return I
+function Shared.IsTalking(Player: Player): boolean
+	return Sessions[Player] ~= nil
 end
-local function corner(I, R) new(`UICorner`, { CornerRadius = if R then UDim.new(0, R) else UDim.new(1, 0) }, I) end
-local function T() return Ctx.Theme end
-local function label(Parent, Text, Size, Props)
-	local L = new(`TextLabel`, { BackgroundTransparency = 1; Text = Text; TextSize = Size; Font = T().Fonts.Body; TextColor3 = T().Colors.Text;
-		TextXAlignment = Enum.TextXAlignment.Left; RichText = true; TextTruncate = Enum.TextTruncate.AtEnd }, Parent)
-	for K, V in Props or {} do L[K] = V end
-	return L
-end
-local function hash(N: number): number return (N * 2654435761) % 4294967296 end
 
--- (2.30) the station's voice: one clip at a time, the music ducked under it
-local Voice = { Sound = nil :: Sound?; Now = nil :: any; Busy = false; NextAt = 0; Ducked = nil :: number? }
-local function duck(On: boolean)
-	local M = Ctx and Ctx.Music and Ctx.Music.Sound
-	if On then
-		if M and not Voice.Ducked then Voice.Ducked = M.Volume M.Volume = M.Volume * 0.3 end
+function Shared.Close(Player: Player)
+	Local.Close(Player)
+end
+
+-- Testing (TestBridge): current node + offered choice labels, and choosing by index.
+function Shared.PeekForTests(Player: Player)
+	local S = Sessions[Player]
+	if not S then return nil end
+	local Labels = {}
+	local ctx = Local.Context(Player, S.NpcId)
+	for _, Choice in S.Offered do table.insert(Labels, Local.Resolve(Choice.Text, ctx)) end
+	return { Node = S.NodeId; Choices = Labels; Id = S.Id }
+end
+
+function Local.OnAction(Player: Player, Message)
+	local S = Sessions[Player]
+	if not S or typeof(Message) ~= `table` or Message.Id ~= S.Id then return end
+
+	if Message.Close then
+		Local.Close(Player, true)
+		return
+	end
+
+	local Index = Message.Choice
+	local Choice = typeof(Index) == `number` and S.Offered and S.Offered[Index]
+	if not Choice then return end
+	if not Local.InRange(Player, S) then
+		Local.Close(Player)
+		return
+	end
+
+	local ctx = Local.Context(Player, S.NpcId)
+	-- Re-check the condition: state may have changed since the menu was shown.
+	if Choice.If and not Choice.If(ctx) then
+		Local.Show(Player, S, S.NodeId)
+		return
+	end
+
+	local NextId = Choice.Next
+	if Choice.Do then
+		local Ok, Result = pcall(Choice.Do, ctx)
+		if not Ok then
+			warn(`[Dialogue] {S.NpcId}.{S.NodeId}: {Result}`)
+		elseif typeof(Result) == `string` then
+			NextId = Result
+		end
+	end
+
+	if Sessions[Player] ~= S then return end -- closed meanwhile
+	if NextId then
+		Local.Show(Player, S, NextId)
 	else
-		if M and Voice.Ducked then M.Volume = Voice.Ducked end
-		Voice.Ducked = nil
+		Local.Close(Player)
 	end
 end
-function Shared.StopVoice()
-	if Voice.Sound then Voice.Sound:Destroy() Voice.Sound = nil end
-	Voice.Now = nil
-	duck(false)
-	Voice.NextAt = os.clock() + 20
+
+function Shared.ChooseForTests(Player: Player, Index: number)
+	local S = Sessions[Player]
+	if not S then return false end
+	Local.OnAction(Player, { Id = S.Id; Choice = Index })
+	return true
 end
--- tuning in: ask the station for the next voice (nothing while one plays, or before the gap is up)
-function Shared.TuneIn(Force: boolean?)
-	if Voice.Busy or (Voice.Sound and Voice.Now) then return end
-	if not Force and os.clock() < Voice.NextAt then return end
-	Voice.Busy = true
+
+function Shared.OnStart()
+	Packets.DialogueAction.OnServerEvent:Connect(function(Player, Message)
+		local Ok, Err = pcall(Local.OnAction, Player, Message)
+		if not Ok then warn(`[Dialogue] {Err}`) end
+	end)
+	Players.PlayerRemoving:Connect(function(Player) Sessions[Player] = nil end)
+
 	task.spawn(function()
-		local V = Ctx and Ctx.Call(`Voice`)
-		Voice.Busy = false
-		if not (V and V.Id) then Voice.NextAt = os.clock() + 60 return end
-		local S = new(`Sound`, { Name = `NightFMVoice`; SoundId = if typeof(V.Id) == `string` then V.Id else `rbxassetid://{V.Id}`; Volume = 0.9 }, game:GetService(`SoundService`))
-		Voice.Sound, Voice.Now = S, V
-		duck(true)
-		S.Ended:Connect(function()
-			if Voice.Sound ~= S then return end
-			S:Destroy()
-			Voice.Sound, Voice.Now = nil, nil
-			duck(false)
-			Voice.NextAt = os.clock() + (V.Gap or 45)
-			Shared.Refresh()
-			task.delay((V.Gap or 45) + 0.5, function() -- still tuned in? the next voice
-				if Ui and Ui.Root and Ui.Root.Parent and Tab == `Station` then Shared.TuneIn() end
-			end)
-		end)
-		S:Play()
-		pcall(Ctx.Kit.PlaySound, `Tick`, 0.4, 0.7) -- the dial clicking over
-		Shared.Refresh()
-	end)
-end
-
-local function titleOf(Id: number): (string, string)
-	local I = Info[Id]
-	if I then return I.Title, I.Creator end
-	Info[Id] = { Title = `Track {Id}`; Creator = `Night FM` }
-	task.spawn(function()
-		local Ok, P = pcall(MarketplaceService.GetProductInfo, MarketplaceService, Id, Enum.InfoType.Asset)
-		if Ok and P then
-			Info[Id] = { Title = P.Name or `Track {Id}`; Creator = (P.Creator and P.Creator.Name) or `Unknown` }
-			Shared.Refresh()
+		while true do
+			task.wait(1)
+			for Player, S in Sessions do
+				if not Player.Parent or not Local.InRange(Player, S) then
+					Local.Close(Player)
+				end
+			end
 		end
 	end)
-	return Info[Id].Title, Info[Id].Creator
-end
-
--- a cover: one of the kit's emblems on a gradient, picked by the track id (the same track, the same cover)
-local function cover(Parent, Id: number, Size: number)
-	local H = hash(Id)
-	local Plate = art(string.format(`FmCover%02d`, H % 12 + 1))
-	if Plate then
-		local F = new(`ImageLabel`, { BackgroundTransparency = 1; Image = Plate; ScaleType = Enum.ScaleType.Crop; Size = UDim2.fromOffset(Size, Size) }, Parent)
-		corner(F, math.floor(Size / 6))
-		return F
-	end
-	local G = GRADS[H % #GRADS + 1]
-	local F = new(`Frame`, { BackgroundColor3 = Color3.new(1, 1, 1); BorderSizePixel = 0; Size = UDim2.fromOffset(Size, Size) }, Parent)
-	corner(F, math.floor(Size / 6))
-	new(`UIGradient`, { Rotation = 35 + H % 90; Color = ColorSequence.new(G[1], G[2]) }, F)
-	new(`ImageLabel`, { BackgroundTransparency = 1; Image = T().Images.Glow; ImageTransparency = 0.55; Size = UDim2.fromScale(1, 1) }, F)
-	new(`ImageLabel`, { BackgroundTransparency = 1; Image = T().Images[COVERS[(H // 7) % #COVERS + 1]]; ScaleType = Enum.ScaleType.Fit;
-		AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromScale(0.62, 0.62) }, F)
-	return F
-end
-
--- a round button on the kit's orb ring, with a glyph
-local function roundBtn(Parent, Icon: string, Glyph: string, Size: number, Filled: boolean?, Fn)
-	local Knob, Img = art(if Filled then `FmKnobOn` else `FmKnob`), art(`FmIcon` .. Icon)
-	if Knob and Img then
-		local B = new(`ImageButton`, { Image = Knob; BackgroundTransparency = 1; AutoButtonColor = true; Size = UDim2.fromOffset(Size, Size) }, Parent)
-		new(`ImageLabel`, { Name = `Icon`; BackgroundTransparency = 1; Image = Img; ImageColor3 = if Filled then Color3.new(1, 1, 1) else ICON_GOLD;
-			AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromScale(0.6, 0.6) }, B)
-		B.Activated:Connect(function() pcall(Ctx.Kit.PlaySound, `Tick`, 0.5, 1.3) Fn() end)
-		return B
-	end
-	local B = new(`TextButton`, { Text = Glyph; Font = T().Fonts.Title; TextSize = math.floor(Size * 0.42); TextColor3 = if Filled then Color3.new(1, 1, 1) else T().Colors.Gold;
-		BackgroundColor3 = if Filled then PURPLE else T().Colors.Ink; BackgroundTransparency = if Filled then 0 else 0.25; AutoButtonColor = true; Size = UDim2.fromOffset(Size, Size) }, Parent)
-	corner(B)
-	new(`UIStroke`, { Color = if Filled then Color3.fromRGB(210, 180, 255) else T().Colors.GoldDeep; Thickness = 1; Transparency = 0.35 }, B)
-	-- (a UIGradient here would tint the glyph as well, so filled buttons are a solid fill)
-	B.Activated:Connect(function() pcall(Ctx.Kit.PlaySound, `Tick`, 0.5, 1.3) Fn() end)
-	return B
-end
--- swap a round button's icon (art) or glyph (stand-in), and optionally its colour
-local function setIcon(B, Icon: string, Glyph: string, Color: Color3?)
-	local I = B:FindFirstChild(`Icon`)
-	if I then
-		I.Image = art(`FmIcon` .. Icon) or I.Image
-		if Color then I.ImageColor3 = Color end
-	else
-		B.Text = Glyph
-		if Color then B.TextColor3 = Color end
-	end
-end
-
-local function chip(Parent, Text: string, Active: boolean, Fn)
-	local Img = Instance.new(`ImageButton`)
-	if sliced(Img, if Active then `FmChipOn` else `FmChip`) then
-		Img.AutomaticSize = Enum.AutomaticSize.X
-		Img.Size = UDim2.fromOffset(0, 30)
-		Img.Parent = Parent
-		new(`UIPadding`, { PaddingLeft = UDim.new(0, 15); PaddingRight = UDim.new(0, 15) }, Img)
-		new(`TextLabel`, { BackgroundTransparency = 1; Text = Text; Font = T().Fonts.Title; TextSize = 14; AutomaticSize = Enum.AutomaticSize.X; Size = UDim2.fromScale(0, 1);
-			TextColor3 = if Active then Color3.new(1, 1, 1) else Color3.fromRGB(225, 210, 190) }, Img)
-		Img.Activated:Connect(Fn)
-		return Img
-	end
-	Img:Destroy()
-	local B = new(`TextButton`, { Text = Text; Font = T().Fonts.Body; TextSize = 13; TextColor3 = if Active then Color3.new(1, 1, 1) else T().Colors.TextDim;
-		BackgroundColor3 = if Active then PURPLE else T().Colors.Ink; BackgroundTransparency = if Active then 0 else 0.3; AutomaticSize = Enum.AutomaticSize.X; Size = UDim2.fromOffset(0, 28) }, Parent)
-	corner(B)
-	new(`UIPadding`, { PaddingLeft = UDim.new(0, 14); PaddingRight = UDim.new(0, 14) }, B)
-	new(`UIStroke`, { Color = if Active then Color3.fromRGB(210, 180, 255) else T().Colors.IronDim; Transparency = 0.4 }, B)
-	B.Activated:Connect(Fn)
-	return B
-end
-
--- a track row: cover, title, creator, a round play button (the reference's list)
-local function row(Parent, Id: number, Order: number)
-	local Carded = art(`FmCard`) ~= nil
-	local R = new(`TextButton`, { Text = ``; BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, if Carded then 62 else 52); LayoutOrder = Order }, Parent)
-	if Carded then sliced(new(`ImageLabel`, { Size = UDim2.fromScale(1, 1) }, R), `FmCard`) end
-	local X0, Y0 = if Carded then 9 else 0, if Carded then 9 else 4
-	local C = cover(R, Id, 44) C.Position = UDim2.fromOffset(X0, Y0)
-	local Title, By = titleOf(Id)
-	label(R, Title, 15, { Font = T().Fonts.Title; TextColor3 = Color3.fromRGB(245, 236, 222); Position = UDim2.fromOffset(X0 + 54, Y0 + 4); Size = UDim2.new(1, -(X0 + 112), 0, 18) })
-	label(R, By, 13, { TextColor3 = Color3.fromRGB(196, 184, 206); Position = UDim2.fromOffset(X0 + 54, Y0 + 24); Size = UDim2.new(1, -(X0 + 112), 0, 16) })
-	local Playing = Ctx.Music.Id == Id and Ctx.Music.Sound and Ctx.Music.Sound.IsPlaying
-	local B = roundBtn(R, if Playing then `Pause` else `Play`, if Playing then `\u{23F8}` else `\u{25B6}`, 34, false, function()
-		if Ctx.Music.Id == Id and Ctx.Music.Sound then
-			if Ctx.Music.Sound.IsPlaying then Ctx.Music.Sound:Pause() else Ctx.Music.Sound:Resume() end
-		else Ctx.Play(Id) end
-		Shared.Render()
-	end)
-	B.Position = if Carded then UDim2.new(1, -46, 0, 13) else UDim2.new(1, -38, 0, 9)
-	R.Activated:Connect(function() if Ctx.Music.Id ~= Id then Ctx.Play(Id) end Shared.NowPlaying() end)
-	return R
-end
-
-local function body(Parent)
-	local S = new(`ScrollingFrame`, { BackgroundTransparency = 1; BorderSizePixel = 0; Position = UDim2.fromOffset(0, 0); Size = UDim2.new(1, 0, 1, -74);
-		CanvasSize = UDim2.new(); AutomaticCanvasSize = Enum.AutomaticSize.Y; ScrollBarThickness = 2; ScrollBarImageColor3 = T().Colors.IronDim }, Parent)
-	new(`UIListLayout`, { SortOrder = Enum.SortOrder.LayoutOrder; Padding = UDim.new(0, 8) }, S)
-	new(`UIPadding`, { PaddingLeft = UDim.new(0, 16); PaddingRight = UDim.new(0, 16); PaddingTop = UDim.new(0, 12); PaddingBottom = UDim.new(0, 12) }, S)
-	return S
-end
-
-local function heading(Parent, Text, Order, Right, RightFn)
-	local F = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 24); LayoutOrder = Order }, Parent)
-	label(F, Text, 17, { Font = T().Fonts.Title; TextColor3 = T().Colors.Gold; Size = UDim2.new(1, -80, 1, 0) })
-	if Right then
-		local B = new(`TextButton`, { Text = Right .. ` \u{203A}`; Font = T().Fonts.Title; TextSize = 13; TextColor3 = Color3.fromRGB(205, 190, 215); BackgroundTransparency = 1;
-			AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, 0, 0, 0); Size = UDim2.fromOffset(80, 24); TextXAlignment = Enum.TextXAlignment.Right }, F)
-		B.Activated:Connect(RightFn)
-	end
-end
-
-function Shared.Home(Parent)
-	local S = body(Parent)
-	-- greeting with avatar, search and bell (the reference's header)
-	local Head = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 86); LayoutOrder = 1 }, S)
-	local Av = new(`ImageLabel`, { BackgroundColor3 = T().Colors.Ink; Size = UDim2.fromOffset(40, 40) }, Head)
-	corner(Av) new(`UIStroke`, { Color = T().Colors.Gold; Transparency = 0.3 }, Av)
-	task.spawn(function()
-		local Ok, Url = pcall(Players.GetUserThumbnailAsync, Players, Players.LocalPlayer.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size100x100)
-		if Ok then Av.Image = Url end
-	end)
-	local B1 = roundBtn(Head, `Search`, `\u{1F50D}`, 36, false, function() Tab = `Library` Shared.Render() end) B1.Position = UDim2.new(1, -82, 0, 2)
-	local B2 = roundBtn(Head, `Bell`, `\u{1F514}`, 36, false, function() Tab = `Station` Shared.Render() end) B2.Position = UDim2.new(1, -38, 0, 2)
-	local Hour = game:GetService(`Lighting`).ClockTime -- the school's clock (SchoolClock syncs Lighting), not the real one
-	local Hi = if Hour < 12 then `Good morning` elseif Hour < 18 then `Good afternoon` else `Good evening`
-	label(Head, `{Hi}, {Players.LocalPlayer.DisplayName}`, 22, { Font = T().Fonts.Title; Position = UDim2.fromOffset(0, 50); Size = UDim2.new(1, 0, 0, 30) })
-	-- chips
-	local Chips = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 30); LayoutOrder = 2 }, S)
-	new(`UIListLayout`, { FillDirection = Enum.FillDirection.Horizontal; Padding = UDim.new(0, 6) }, Chips)
-	for _, Name in { `All`, `Recent`, `Saved`, `Station` } do
-		chip(Chips, Name, Chip == Name, function()
-			if Name == `Station` then Tab = `Station` else Chip = Name end
-			Shared.Render()
-		end)
-	end
-	-- the banner: tonight on Night FM (the reference's "For you" card)
-	heading(S, `Tonight`, 3)
-	local St = Ctx.Station or { OnAir = false }
-	local Banner = new(`Frame`, { BackgroundColor3 = Color3.new(1, 1, 1); BorderSizePixel = 0; Size = UDim2.new(1, 0, 0, 132); LayoutOrder = 4 }, S)
-	corner(Banner, 16)
-	new(`UIGradient`, { Rotation = 20; Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(110, 50, 190)), ColorSequenceKeypoint.new(1, Color3.fromRGB(140, 30, 60)) }) }, Banner)
-	new(`ImageLabel`, { BackgroundTransparency = 1; Image = T().Images.PanelBg; ImageTransparency = 0.85; ScaleType = Enum.ScaleType.Crop; Size = UDim2.fromScale(1, 1) }, Banner)
-	local BArt = art(`FmBanner`)
-	if BArt then -- the painted bell tower and wireless mast under the moon (the left is left clear for the words)
-		new(`ImageLabel`, { BackgroundTransparency = 1; Image = BArt; ScaleType = Enum.ScaleType.Crop; Size = UDim2.fromScale(1, 1) }, Banner)
-		new(`UIStroke`, { Color = ICON_GOLD; Transparency = 0.45; Thickness = 1.5 }, Banner)
-	else
-		new(`ImageLabel`, { BackgroundTransparency = 1; Image = T().Images.IconAppRadio; ScaleType = Enum.ScaleType.Fit; AnchorPoint = Vector2.new(1, 0.5); Position = UDim2.new(1, -10, 0.5, 0); Size = UDim2.fromOffset(104, 104) }, Banner)
-	end
-	label(Banner, `Midnight Broadcast`, 19, { Font = T().Fonts.Title; TextColor3 = Color3.new(1, 0.97, 0.92); Position = UDim2.fromOffset(14, 12); Size = UDim2.new(0.62, 0, 0, 24) })
-	label(Banner, if St.OnAir then `On air now: callers, campus reports, and things on the static.` else `Off air until 9 PM. The school talks after dark.`, 13,
-		{ TextWrapped = true; TextTruncate = Enum.TextTruncate.None; TextColor3 = Color3.fromRGB(240, 232, 248); TextYAlignment = Enum.TextYAlignment.Top; Position = UDim2.fromOffset(14, 40); Size = UDim2.new(0.5, 0, 0, 50) })
-	local Go = new(`TextButton`, { Text = if St.OnAir then `Tune in` else `See tonight`; Font = T().Fonts.Title; TextSize = 13; TextColor3 = Color3.new(1, 1, 1);
-		BackgroundColor3 = Color3.new(1, 1, 1); BackgroundTransparency = 0.82; Position = UDim2.fromOffset(14, 92); Size = UDim2.fromOffset(110, 28) }, Banner)
-	corner(Go)
-	local GoArt = new(`ImageLabel`, { Size = UDim2.fromScale(1, 1) }, Go)
-	if sliced(GoArt, `FmChipOn`) then Go.BackgroundTransparency = 1 GoArt.ZIndex = 0 Go.TextTransparency = 1
-		new(`TextLabel`, { BackgroundTransparency = 1; Text = Go.Text; Font = T().Fonts.Title; TextSize = 14; TextColor3 = Color3.new(1, 1, 1); ZIndex = 2; Size = UDim2.fromScale(1, 1) }, Go)
-	else GoArt:Destroy() new(`UIStroke`, { Color = Color3.new(1, 1, 1); Transparency = 0.5 }, Go) end
-	Go.Activated:Connect(function() Tab = `Station` Shared.Render() end)
-	-- the list
-	local Ids = if Chip == `Saved` then (Ctx.State.Liked or {}) else (Ctx.State.Recent or {})
-	heading(S, if Chip == `Saved` then `Saved` else `Recently played`, 5, `Show all`, function() Tab = `Library` Shared.Render() end)
-	if #Ids == 0 then label(S, `<i>Nothing here yet. Add a track by its audio ID in your library.</i>`, 13, { TextWrapped = true; TextTruncate = Enum.TextTruncate.None; TextColor3 = T().Colors.TextDim; Size = UDim2.new(1, 0, 0, 34); LayoutOrder = 6 }) end
-	for K, Id in Ids do if K <= 6 then row(S, Id, 10 + K) end end
-end
-
-function Shared.Library(Parent)
-	local S = body(Parent)
-	label(S, `Your library`, 22, { Font = T().Fonts.Title; Size = UDim2.new(1, 0, 0, 30); LayoutOrder = 1 })
-	local Chips = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 30); LayoutOrder = 2 }, S)
-	new(`UIListLayout`, { FillDirection = Enum.FillDirection.Horizontal; Padding = UDim.new(0, 6) }, Chips)
-	for _, Name in { `All`, `Saved`, `Recent` } do chip(Chips, Name, Chip == Name, function() Chip = Name Shared.Render() end) end
-	local Input, Api = Ctx.Kit.SearchBar({ placeholder = `Add a track: audio ID, then Enter`; Size = UDim2.new(1, 0, 0, 38); LayoutOrder = 3; Parent = S;
-		onSubmit = function(Text) local N = tonumber((Text or ``):match(`%d+`)) if N then Ctx.Play(N) Shared.NowPlaying() end end })
-	local Seen, Ids = {}, {}
-	local function add(List) for _, Id in List or {} do if not Seen[Id] then Seen[Id] = true table.insert(Ids, Id) end end end
-	if Chip ~= `Recent` then add(Ctx.State.Liked) end
-	if Chip ~= `Saved` then add(Ctx.State.Recent) end
-	if #Ids == 0 then label(S, `<i>Nothing yet.</i>`, 15, { TextColor3 = Color3.fromRGB(205, 192, 218); Size = UDim2.new(1, 0, 0, 20); LayoutOrder = 4 }) end
-	for K, Id in Ids do row(S, Id, 10 + K) end
-end
-
-function Shared.Station(Parent)
-	local S = body(Parent)
-	local St = Ctx.Station or { OnAir = false; Items = {}; LastRead = 0 }
-	label(S, `Midnight Broadcast`, 22, { Font = T().Fonts.Title; Size = UDim2.new(1, 0, 0, 30); LayoutOrder = 1 })
-	local Badge = new(`TextLabel`, { Text = if St.OnAir then `\u{25CF}  ON AIR` else `OFF AIR  \u{00B7}  9 PM to 3 AM`; Font = T().Fonts.Title; TextSize = 12;
-		TextColor3 = Color3.new(1, 1, 1); BackgroundColor3 = if St.OnAir then T().Colors.Crimson else T().Colors.Iron; AutomaticSize = Enum.AutomaticSize.X;
-		Size = UDim2.fromOffset(0, 24); LayoutOrder = 2 }, S)
-	corner(Badge) new(`UIPadding`, { PaddingLeft = UDim.new(0, 12); PaddingRight = UDim.new(0, 12) }, Badge)
-	if St.OnAir and art(`FmOnAir`) then -- the crimson enamel lamp
-		local Lamp = new(`ImageLabel`, { ZIndex = 0; Size = UDim2.new(1, 24, 1, 4); Position = UDim2.fromOffset(-12, -2) }, Badge)
-		sliced(Lamp, `FmOnAir`)
-		Badge.BackgroundTransparency = 1
-		Badge.TextTransparency = 1 -- (it still sizes the badge) the words ride above the lamp
-		new(`TextLabel`, { BackgroundTransparency = 1; Text = Badge.Text; Font = Badge.Font; TextSize = 13; TextColor3 = Color3.new(1, 1, 1); ZIndex = 2; Size = UDim2.fromScale(1, 1) }, Badge)
-	end
-	if Voice.Now then -- who's on the air right now (the voice playing), with a stop
-		local V = Voice.Now
-		local Card = new(if art(`FmCard`) then `ImageLabel` else `Frame`, { BackgroundColor3 = PURPLE_DEEP; BackgroundTransparency = 0.15; Size = UDim2.new(1, 0, 0, 66); LayoutOrder = 3 }, S)
-		corner(Card, 12)
-		if art(`FmCard`) then sliced(Card, `FmCard`) Card.ImageColor3 = Color3.fromRGB(215, 185, 255) else new(`UIStroke`, { Color = PURPLE; Transparency = 0.3 }, Card) end
-		local Pad = if art(`FmCard`) then 12 else 10
-		label(Card, `<font color="#{Color3.fromRGB(255, 120, 130):ToHex()}">\u{25CF}</font>  ON THE AIR  \u{00B7}  {string.upper(V.Who or `Night FM`)}`, 11,
-			{ Font = T().Fonts.Title; TextColor3 = Color3.fromRGB(215, 190, 255); Position = UDim2.fromOffset(Pad, 10); Size = UDim2.new(1, -(Pad + 56), 0, 14) })
-		label(Card, V.Title or ``, 16, { Font = T().Fonts.Title; TextColor3 = Color3.fromRGB(248, 240, 228); Position = UDim2.fromOffset(Pad, 28); Size = UDim2.new(1, -(Pad + 56), 0, 22) })
-		local Stop = roundBtn(Card, `Pause`, `\u{23F9}`, 38, false, function() Shared.StopVoice() Shared.Refresh() end)
-		Stop.AnchorPoint = Vector2.new(1, 0.5) Stop.Position = UDim2.new(1, -(Pad - 2), 0.5, 0)
-	elseif St.OnAir or Voice.NextAt > 0 then -- (nothing playing) a dial to tune in again
-		local Go = new(`TextButton`, { Text = `\u{1F4FB}  Tune in`; Font = T().Fonts.Title; TextSize = 14; TextColor3 = Color3.new(1, 1, 1); BackgroundColor3 = PURPLE;
-			AutoButtonColor = true; Size = UDim2.fromOffset(120, 32); LayoutOrder = 3 }, S)
-		corner(Go)
-		local GoArt = new(`ImageLabel`, { Size = UDim2.fromScale(1, 1) }, Go)
-		if sliced(GoArt, `FmChipOn`) then Go.BackgroundTransparency = 1 GoArt.ZIndex = 0 Go.TextTransparency = 1
-			new(`TextLabel`, { BackgroundTransparency = 1; Text = `Tune in`; Font = T().Fonts.Title; TextSize = 14; TextColor3 = Color3.new(1, 1, 1); ZIndex = 2; Size = UDim2.fromScale(1, 1) }, Go)
-		else GoArt:Destroy() end
-		Go.Activated:Connect(function() Shared.TuneIn(true) end)
-	end
-	local Kick = { Announcement = `ANNOUNCEMENT`; IncidentReport = `CAMPUS REPORT`; CallerLine = `CALLER LINE`; Transmission = `TRANSMISSION`; Notable = `SHOUT-OUT` }
-	local Items = St.Items or {}
-	if #Items == 0 then label(S, `<i>Quiet tonight. Nothing on the line yet.</i>`, 15, { TextColor3 = Color3.fromRGB(205, 192, 218); Size = UDim2.new(1, 0, 0, 20); LayoutOrder = 4 }) end
-	local Newest = 0
-	for K = #Items, 1, -1 do
-		local It = Items[K]
-		Newest = math.max(Newest, It.Id)
-		local Card = new(if art(`FmCard`) then `ImageLabel` else `Frame`, { BackgroundColor3 = T().Colors.Ink; BackgroundTransparency = 0.3; AutomaticSize = Enum.AutomaticSize.Y; Size = UDim2.new(1, 0, 0, 0); LayoutOrder = 100 - K + 10 }, S)
-		corner(Card, 12)
-		if art(`FmCard`) then
-			sliced(Card, `FmCard`) -- the card is the lacquer plate itself (a child plate would join the list layout)
-			if It.Kind == `Transmission` then Card.ImageColor3 = Color3.fromRGB(255, 170, 170) end
-		else
-			new(`UIStroke`, { Color = if It.Kind == `Transmission` then T().Colors.Crimson else T().Colors.IronDim; Transparency = 0.4 }, Card)
-		end
-		new(`UIPadding`, { PaddingLeft = UDim.new(0, 12); PaddingRight = UDim.new(0, 12); PaddingTop = UDim.new(0, 8); PaddingBottom = UDim.new(0, 10) }, Card)
-		new(`UIListLayout`, { SortOrder = Enum.SortOrder.LayoutOrder; Padding = UDim.new(0, 4) }, Card)
-		label(Card, (if It.Id > (St.LastRead or 0) then `<font color="#{T().Colors.Gold:ToHex()}">\u{25CF} NEW</font>  ` else ``) .. (Kick[It.Kind] or It.Kind), 11,
-			{ Font = T().Fonts.Title; TextColor3 = Color3.fromRGB(200, 170, 255); Size = UDim2.new(1, 0, 0, 14); LayoutOrder = 1 })
-		label(Card, It.Text, 14, { TextWrapped = true; TextTruncate = Enum.TextTruncate.None; AutomaticSize = Enum.AutomaticSize.Y; Size = UDim2.new(1, 0, 0, 18); LayoutOrder = 2;
-			Font = if It.Kind == `Transmission` then T().Fonts.Title else T().Fonts.Body })
-	end
-	if Newest > (St.LastRead or 0) then task.spawn(Ctx.Call, `StationRead`, Newest) end
-end
-
--- the now playing sheet (the reference's third screen)
-function Shared.NowPlaying()
-	if not Ui then return end
-	if Ui.Sheet then Ui.Sheet:Destroy() end
-	local Id = Ctx.Music.Id
-	if not Id then return end
-	local Sheet = new(`Frame`, { Name = `NowPlaying`; BackgroundColor3 = Color3.new(1, 1, 1); Size = UDim2.fromScale(1, 1); ZIndex = 20 }, Ui.Root)
-	new(`UIGradient`, { Rotation = 90; Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(80, 40, 140)), ColorSequenceKeypoint.new(0.6, Color3.fromRGB(40, 20, 70)), ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 12, 30)) }) }, Sheet)
-	Ui.Sheet = Sheet
-	if art(`FmBackdrop`) then -- the lacquer wall under a violet wash
-		new(`ImageLabel`, { BackgroundTransparency = 1; Image = art(`FmBackdrop`); ImageTransparency = 0.25; ScaleType = Enum.ScaleType.Crop; Size = UDim2.fromScale(1, 1) }, Sheet)
-	end
-	local Back = roundBtn(Sheet, `Back`, `\u{2039}`, 36, false, function() Sheet:Destroy() Ui.Sheet = nil end) Back.Position = UDim2.fromOffset(14, 10)
-	label(Sheet, `Now Playing`, 15, { Font = T().Fonts.Title; TextColor3 = Color3.fromRGB(230, 214, 240); TextXAlignment = Enum.TextXAlignment.Center; Position = UDim2.fromOffset(60, 10); Size = UDim2.new(1, -120, 0, 36) })
-	-- the neighbours peek in from the sides, as in the reference
-	local Recent = Ctx.State.Recent or {}
-	local At = table.find(Recent, Id) or 1
-	local Prev, Next = Recent[At + 1], Recent[At - 1]
-	if Prev then local P = cover(Sheet, Prev, 170) P.Position = UDim2.new(0, -130, 0, 82) if P:IsA(`ImageLabel`) then P.ImageTransparency = 0.45 else P.BackgroundTransparency = 0.4 end end
-	if Next then local N = cover(Sheet, Next, 170) N.Position = UDim2.new(1, -40, 0, 82) if N:IsA(`ImageLabel`) then N.ImageTransparency = 0.45 else N.BackgroundTransparency = 0.4 end end
-	local Big = cover(Sheet, Id, 220) Big.AnchorPoint = Vector2.new(0.5, 0) Big.Position = UDim2.new(0.5, 0, 0, 62)
-	local Fr = art(`FmCoverFrame`)
-	if Fr then
-		new(`ImageLabel`, { BackgroundTransparency = 1; Image = Fr; Size = UDim2.new(1, 12, 1, 12); Position = UDim2.fromOffset(-6, -6); ZIndex = 2 }, Big)
-	else
-		new(`UIStroke`, { Color = Color3.fromRGB(210, 180, 255); Transparency = 0.5; Thickness = 1 }, Big)
-	end
-	local Title, By = titleOf(Id)
-	label(Sheet, By, 14, { TextColor3 = Color3.fromRGB(214, 200, 228); Position = UDim2.fromOffset(22, 296); Size = UDim2.new(1, -90, 0, 18) })
-	local TitleL = label(Sheet, Title, 22, { Font = T().Fonts.Title; Position = UDim2.fromOffset(22, 316); Size = UDim2.new(1, -90, 0, 28) })
-	local Liked = table.find(Ctx.State.Liked or {}, Id) ~= nil
-	local Heart Heart = roundBtn(Sheet, if Liked then `HeartFull` else `Heart`, if Liked then `\u{2665}` else `\u{2661}`, 40, false, function()
-		local L = table.clone(Ctx.State.Liked or {})
-		local K = table.find(L, Id)
-		if K then table.remove(L, K) else table.insert(L, 1, Id) end
-		Ctx.State.Liked = L
-		setIcon(Heart, if K then `Heart` else `HeartFull`, if K then `\u{2661}` else `\u{2665}`, if K then (if Heart:FindFirstChild(`Icon`) then ICON_GOLD else T().Colors.Gold) else Color3.fromRGB(235, 70, 90))
-		task.spawn(Ctx.Call, `SaveLiked`, L)
-	end)
-	Heart.Position = UDim2.new(1, -62, 0, 302)
-	if Liked then setIcon(Heart, `HeartFull`, `\u{2665}`, Color3.fromRGB(235, 70, 90)) end
-	-- the waveform: bars from the track id, the played part lit; click or drag to seek
-	local Wave = new(`TextButton`, { Text = ``; BackgroundTransparency = 1; Position = UDim2.fromOffset(22, 360); Size = UDim2.new(1, -44, 0, 44) }, Sheet)
-	local Bars = {}
-	local N = 46
-	for K = 1, N do
-		local Hh = 0.25 + ((hash(Id + K * 31) % 1000) / 1000) * 0.75
-		local B = new(`Frame`, { BorderSizePixel = 0; BackgroundColor3 = Color3.fromRGB(120, 105, 140); AnchorPoint = Vector2.new(0, 0.5);
-			Position = UDim2.new((K - 1) / N, 1, 0.5, 0); Size = UDim2.new(1 / N, -2, Hh, 0) }, Wave)
-		corner(B, 2)
-		Bars[K] = B
-	end
-	local Cur = label(Sheet, `0:00`, 13, { TextColor3 = Color3.fromRGB(214, 200, 228); Position = UDim2.fromOffset(22, 406); Size = UDim2.fromOffset(60, 14) })
-	local Len = label(Sheet, `0:00`, 13, { TextColor3 = Color3.fromRGB(214, 200, 228); TextXAlignment = Enum.TextXAlignment.Right; Position = UDim2.new(1, -82, 0, 406); Size = UDim2.fromOffset(60, 14) })
-	local function seek(X: number)
-		local S = Ctx.Music.Sound
-		if not (S and S.TimeLength > 0) then return end
-		local A = math.clamp((X - Wave.AbsolutePosition.X) / Wave.AbsoluteSize.X, 0, 1)
-		S.TimePosition = A * S.TimeLength
-	end
-	Wave.InputBegan:Connect(function(Inp)
-		if Inp.UserInputType == Enum.UserInputType.MouseButton1 or Inp.UserInputType == Enum.UserInputType.Touch then seek(Inp.Position.X) end
-	end)
-	-- controls
-	local Row = new(`Frame`, { BackgroundTransparency = 1; Position = UDim2.fromOffset(18, 436); Size = UDim2.new(1, -36, 0, 70) }, Sheet)
-	local function place(B, X) B.AnchorPoint = Vector2.new(0.5, 0.5) B.Position = UDim2.new(X, 0, 0.5, 0) end
-	local Loop = roundBtn(Row, `Loop`, `\u{1F501}`, 38, false, function() if Ctx.Music.Sound then Ctx.Music.Sound.Looped = not Ctx.Music.Sound.Looped end end) place(Loop, 0.08)
-	place(roundBtn(Row, `Prev`, `\u{23EE}`, 44, false, function() if Prev then Ctx.Play(Prev) Shared.NowPlaying() elseif Ctx.Music.Sound then Ctx.Music.Sound.TimePosition = 0 end end), 0.29)
-	local Pl Pl = roundBtn(Row, `Pause`, `\u{23F8}`, 64, true, function()
-		local S = Ctx.Music.Sound
-		if not S then return end
-		if S.IsPlaying then S:Pause() else S:Resume() end
-	end) place(Pl, 0.5)
-	place(roundBtn(Row, `Next`, `\u{23ED}`, 44, false, function() if Next then Ctx.Play(Next) Shared.NowPlaying() end end), 0.71)
-	place(roundBtn(Row, `Queue`, `\u{266A}`, 38, false, function() Sheet:Destroy() Ui.Sheet = nil Tab = `Library` Shared.Render() end), 0.92)
-	Ctx.Kit.Slider({ label = `Volume`; min = 0; max = 100; step = 5; value = if Ctx.Music.Sound then math.floor(Ctx.Music.Sound.Volume * 100) else 50;
-		Size = UDim2.new(1, -44, 0, 34); Position = UDim2.fromOffset(22, 520); Parent = Sheet;
-		onChanged = function(V) if Ctx.Music.Sound then Ctx.Music.Sound.Volume = V / 100 end end })
-	Ui.NP = { Bars = Bars; Cur = Cur; Len = Len; Play = Pl; Loop = Loop; Title = TitleL; Id = Id }
-end
-
--- the floating tab bar (the reference's pill): Home, Library, Station
-function Shared.TabBar(Parent)
-	local Bar = new(`Frame`, { BackgroundColor3 = T().Colors.Ink; BackgroundTransparency = 0.1; AnchorPoint = Vector2.new(0.5, 1); Position = UDim2.new(0.5, 0, 1, -12); Size = UDim2.fromOffset(186, 56); ZIndex = 10 }, Parent)
-	corner(Bar)
-	local BarArt = art(`FmTabBar`)
-	if BarArt then
-		Bar.BackgroundTransparency = 1
-		local Plate = new(`ImageLabel`, { ZIndex = 9; Size = UDim2.fromScale(1, 1) }, Bar)
-		sliced(Plate, `FmTabBar`)
-		Plate.Parent = Bar.Parent
-		Plate.AnchorPoint, Plate.Position, Plate.Size = Bar.AnchorPoint, Bar.Position, Bar.Size
-	else
-		new(`UIStroke`, { Color = T().Colors.GoldDeep; Transparency = 0.45 }, Bar)
-	end
-	new(`UIListLayout`, { FillDirection = Enum.FillDirection.Horizontal; HorizontalAlignment = Enum.HorizontalAlignment.Center; VerticalAlignment = Enum.VerticalAlignment.Center; Padding = UDim.new(0, 10) }, Bar)
-	for _, Def in { { `Home`, `\u{2302}` }, { `Library`, `\u{266A}` }, { `Station`, `\u{1F4FB}` } } do
-		local B = roundBtn(Bar, Def[1], Def[2], 46, Tab == Def[1], function() Tab = Def[1] Shared.Render() end)
-		B.ZIndex = 11
-	end
-	if Ctx.Music.Id then -- a mini player above the bar
-		local Mini = new(`TextButton`, { Text = ``; BackgroundColor3 = PURPLE_DEEP; AnchorPoint = Vector2.new(0.5, 1); Position = UDim2.new(0.5, 0, 1, -74); Size = UDim2.new(1, -24, 0, 46); ZIndex = 10 }, Parent)
-		corner(Mini, 12)
-		if art(`FmCard`) then
-			local Plate = new(`ImageLabel`, { ZIndex = 10; Size = UDim2.fromScale(1, 1) }, Mini)
-			sliced(Plate, `FmCard`)
-			Plate.ImageColor3 = Color3.fromRGB(215, 185, 255)
-			Mini.BackgroundTransparency = 1
-		else
-			new(`UIStroke`, { Color = PURPLE; Transparency = 0.5 }, Mini)
-		end
-		local C = cover(Mini, Ctx.Music.Id, 34) C.Position = UDim2.fromOffset(6, 6) C.ZIndex = 11
-		local Title = titleOf(Ctx.Music.Id)
-		label(Mini, Title, 14, { Font = T().Fonts.Title; ZIndex = 11; Position = UDim2.fromOffset(48, 0); Size = UDim2.new(1, -100, 1, 0) })
-		Mini.Activated:Connect(Shared.NowPlaying)
-	end
-end
-
--- a redraw soon after names arrive (one for several), unless the now playing sheet is up (it updates itself)
-local RefreshQueued = false
-local StationAt = 0 -- (2.30) when the Station tab last fetched
-function Shared.Refresh()
-	if RefreshQueued then return end
-	RefreshQueued = true
-	task.delay(0.3, function()
-		RefreshQueued = false
-		if Ui and Ui.Root and Ui.Root.Parent and not (Ui.Sheet and Ui.Sheet.Parent) then Shared.Render() end
-	end)
-end
-
-function Shared.Render()
-	if not (Ui and Ui.Root and Ui.Root.Parent) then return end
-	for _, Ch in Ui.Root:GetChildren() do if Ch ~= Ui.Bg and Ch.Name ~= `NowPlaying` then Ch:Destroy() end end
-	local Page = new(`Frame`, { BackgroundTransparency = 1; Size = UDim2.fromScale(1, 1) }, Ui.Root)
-	if Tab == `Station` then
-		if os.clock() - StationAt > 5 then -- (fetch, then redraw once: the redraw doesn't fetch again within 5 s)
-			StationAt = os.clock()
-			task.spawn(function() Ctx.Station = Ctx.Call(`Station`) or Ctx.Station if Tab == `Station` and Page.Parent then Page:Destroy() Shared.Render() end end)
-		end
-		Shared.TuneIn() -- (the voices; it waits out the gap and never talks over itself)
-	end
-	if Tab == `Home` then Shared.Home(Page) elseif Tab == `Library` then Shared.Library(Page) else Shared.Station(Page) end
-	Shared.TabBar(Page)
-end
-
-function Shared.Open(C)
-	Ctx = C
-	local App = C.App
-	for _, Ch in App:GetChildren() do if Ch.Name ~= `Grain` then Ch:Destroy() end end
-	App.Visible = true
-	local Root = new(`Frame`, { Name = `NightFM`; BackgroundTransparency = 1; Size = UDim2.fromScale(1, 1); ClipsDescendants = true }, App)
-	local Bg = new(`Frame`, { Name = `Bg`; BackgroundColor3 = Color3.new(1, 1, 1); Size = UDim2.fromScale(1, 1) }, Root)
-	new(`UIGradient`, { Rotation = 90; Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(58, 28, 96)), ColorSequenceKeypoint.new(0.45, Color3.fromRGB(26, 16, 36)), ColorSequenceKeypoint.new(1, Color3.fromRGB(14, 10, 18)) }) }, Bg)
-	new(`ImageLabel`, { BackgroundTransparency = 1; Image = art(`FmBackdrop`) or C.Theme.Images.PanelBg; ImageTransparency = if art(`FmBackdrop`) then 0 else 0.9; ScaleType = Enum.ScaleType.Crop; Size = UDim2.fromScale(1, 1) }, Bg)
-	-- a back-to-home control in the corner (the phone's Home)
-	Ui = { Root = Root; Bg = Bg }
-	task.spawn(function() Ctx.Station = Ctx.Call(`Station`) if Ui and Tab == `Home` then Shared.Render() end end)
-	Shared.Render()
-	-- the phone's back: a thin gold chevron over the page, top-left of the status area
-	local Back = new(`TextButton`, { Text = `\u{2039}`; Font = C.Theme.Fonts.Title; TextSize = 26; TextColor3 = C.Theme.Colors.Gold; BackgroundTransparency = 1; Position = UDim2.fromOffset(4, -2); Size = UDim2.fromOffset(26, 30); ZIndex = 30 }, Root)
-	Back.Activated:Connect(function() C.Home() end)
-end
-
--- tests: point the art at local files (Studio's content folder) to preview it before the ids are in
-function Shared.UseArt(Map) for K, V in Map do ART[K] = V end end
-
-function Shared.Tick()
-	if not (Ui and Ui.Root and Ui.Root.Parent) then return end
-	local NP = Ui.NP
-	local S = Ctx.Music.Sound
-	if NP and Ui.Sheet and Ui.Sheet.Parent and S then
-		local A = if S.TimeLength > 0 then S.TimePosition / S.TimeLength else 0
-		local Lit = math.floor(A * #NP.Bars + 0.5)
-		for K, B in NP.Bars do B.BackgroundColor3 = if K <= Lit then Color3.fromRGB(205, 165, 255) else Color3.fromRGB(110, 96, 130) end
-		local function mmss(X) X = math.floor(X) return string.format(`%d:%02d`, X // 60, X % 60) end
-		NP.Cur.Text = mmss(S.TimePosition) NP.Len.Text = mmss(S.TimeLength)
-		setIcon(NP.Play, if S.IsPlaying then `Pause` else `Play`, if S.IsPlaying then `\u{23F8}` else `\u{25B6}`)
-		setIcon(NP.Loop, `Loop`, `\u{1F501}`, if S.Looped then Color3.fromRGB(205, 165, 255) else (if NP.Loop:FindFirstChild(`Icon`) then ICON_GOLD else Ctx.Theme.Colors.Gold))
-		NP.Title.Text = (titleOf(NP.Id))
-	end
 end
 
 return Shared
+]==] })
+table.insert(Items, { Path = {"ServerStorage", "Dialogue", "GiverTemplate"}; Source = [==[
+--[[
+	Shared tree for ordinary students who give quests (no saved relationship).
+	L = {
+		Greeting = string | fn(ctx),
+		PathGreeting = { Path, Tier, Text }?,   -- (2.31) said first once the student has that Standing Path tier
+		Talk = { { Ask, Answer } },            -- small talk
+		Extra = { choice, ... }?,              -- NPC-specific replies (may use If / Do)
+		Nodes = { [id] = node }?,              -- nodes those replies lead to
+		Bye = string,
+	}
+]]
+
+local QuestChoices = require(script.Parent.QuestChoices)
+
+return function(L)
+	local Nodes = {}
+	local QuestMenu = QuestChoices(Nodes, `Hub`)
+	local Bye = { Text = L.Bye or `See you.` }
+
+	for Id, Node in L.Nodes or {} do Nodes[Id] = Node end
+
+	local TalkChoices = {}
+	for Index, Pair in L.Talk or {} do
+		Nodes[`Talk{Index}`] = { Text = Pair.Answer; Choices = { { Text = `Huh.`; Next = `Hub` }, Bye } }
+		table.insert(TalkChoices, { Text = Pair.Ask; Next = `Talk{Index}` })
+	end
+
+	-- (1.35) clique leaders (the joinable six): "I want to join you." / "I'm out." (Social.CliqueMembership)
+	local Refuse = {
+		NotRespected = `Earn it first. Come back when my people respect you.`;
+		NotBeaten = `Respect's one thing. You haven't beaten me yet. Ask me for a showdown.`;
+		OtherClique = `You already run with another crowd. Leave them first.`;
+		AlreadyMember = `You're already one of us.`;
+	}
+	for Code, Line in Refuse do Nodes[`CJ_{Code}`] = { Text = Line; Choices = { { Text = `Fair enough.`; Next = `Hub` }, Bye } } end
+	Nodes.CJ_Unknown = { Text = `...Not now.`; Choices = { { Text = `Okay.`; Next = `Hub` }, Bye } }
+	Nodes.CJ_Joined = { Text = function(ctx) return ctx.CliqueLine(`Joined`) or `Welcome.` end; Choices = { { Text = `Thanks.`; Next = `Hub` }, Bye } }
+	Nodes.CJ_Confirm = {
+		Text = `You want out? You know what that means. Walk away now and we're done. For good.`;
+		Choices = {
+			{ Text = `I'm sure. I'm out.`; Do = function(ctx) return if ctx.CliqueLeave() then `CJ_Left` else `Hub` end };
+			{ Text = `Forget I said anything.`; Next = `Hub` };
+		};
+	}
+	Nodes.CJ_Left = { Text = function(ctx) return ctx.CliqueLine(`Betrayed`) or `Get out.` end; Choices = { Bye } }
+	local MemberChoices = {
+		{
+			Text = `I want to join you.`;
+			If = function(ctx) return ctx.Joinable and ctx.Joinable() and not ctx.CliqueMember() end;
+			Do = function(ctx)
+				local Ok, Code = ctx.CliqueCanJoin()
+				if Ok then return if ctx.CliqueJoin() then `CJ_Joined` else `Hub` end
+				return if Nodes[`CJ_{Code}`] then `CJ_{Code}` else `CJ_Unknown`
+			end;
+		};
+		{ Text = `I'm out.`; If = function(ctx) return ctx.Joinable and ctx.Joinable() and ctx.CliqueMember() end; Next = `CJ_Confirm` };
+	}
+
+	Nodes.Hub = {
+		Text = function(ctx) -- (2.31) a Standing Path line first, once the student has earned it
+			local PG = L.PathGreeting
+			if PG and ctx.PathTier and ctx.PathTier(PG.Path) >= PG.Tier then return PG.Text end
+			if typeof(L.Greeting) == `function` then return L.Greeting(ctx) end
+			return L.Greeting
+		end;
+		Choices = function(ctx)
+			local List = {}
+			for _, Choice in QuestMenu.Choices(ctx) do table.insert(List, Choice) end
+			for _, Choice in MemberChoices do table.insert(List, Choice) end
+			for _, Choice in L.Extra or {} do table.insert(List, Choice) end
+			for _, Choice in TalkChoices do table.insert(List, Choice) end
+			table.insert(List, Bye)
+			return List
+		end;
+	}
+
+	return {
+		Start = function(ctx)
+			return QuestMenu.Start(ctx) or `Hub`
+		end;
+		Nodes = Nodes;
+	}
+end
+]==] })
+table.insert(Items, { Path = {"ServerStorage", "Dialogue", "LeaderTemplate"}; Source = [==[
+--[[
+	Shared dialogue tree for faction leaders. Each leader module passes its own lines (L) and
+	gets back a full tree (see Services.Social.Dialogue for the format).
+
+	L = {
+		Intro, About, Lore, Hostile, Apology, Insulted, LeaveConfirm, Left, Joined,
+		Hub = { Rival, Acquaintance, Friendly, Trusted, Hostile }, HubMember = fn(ctx), PathHub = { Path, Tier, Text }? ((2.31) a Standing Path line first),
+		Join = { RivalMember, NotNoticed, Initiation = fn(ctx), Cooldown, AlreadyMember },
+		Mission = fn(ctx, Count), MissionDone,
+		Ask = { About, Join, Work, Lore, Sorry, Insult, Leave, Bye } -- player lines
+	}
+]]
+
+local QuestChoices = require(script.Parent.QuestChoices)
+
+return function(L)
+	local Ask = L.Ask
+	local Nodes = {}
+	local QuestMenu = QuestChoices(Nodes, `Hub`)
+
+	local function Back(Text: string?)
+		return { Text = Text or `Back.`; Next = `Hub` }
+	end
+	local Bye = { Text = Ask.Bye }
+
+	local function Friendly(ctx)
+		local State = ctx.State()
+		return State == `Friendly` or State == `Trusted` or ctx.Member()
+	end
+
+	Nodes.Intro = {
+		Text = L.Intro;
+		Choices = {
+			{ Text = Ask.About; Next = `About` };
+			{ Text = `Just looking around.`; Next = `Hub` };
+		};
+	}
+
+	Nodes.Hub = {
+		Text = function(ctx)
+			if L.PathHub and ctx.PathTier and ctx.PathTier(L.PathHub.Path) >= L.PathHub.Tier then return L.PathHub.Text end -- (2.31)
+			if ctx.Member() then return L.HubMember(ctx) end
+			return L.Hub[ctx.State()] or L.Hub.Acquaintance
+		end;
+		Choices = function(ctx)
+			local List = table.clone(Nodes.Hub.Base)
+			local Bye = table.remove(List) -- keep Goodbye last
+			for _, Choice in QuestMenu.Choices(ctx) do table.insert(List, Choice) end
+			table.insert(List, Bye)
+			return List
+		end;
+		Base = {
+			{ Text = Ask.About; Next = `About` };
+			{
+				Text = Ask.Join;
+				If = function(ctx) return not ctx.Member() end;
+				Do = function(ctx)
+					local Ok, Code = ctx.CanJoin()
+					if Ok then return if ctx.Join() then `Joined` else `Hub` end
+					return `Join_{Code}`
+				end;
+			};
+			{ Text = Ask.Work; If = function(ctx) return ctx.Member() end; Next = `Mission` };
+			{ Text = Ask.Lore; If = Friendly; Next = `Lore` };
+			{
+				Text = Ask.Sorry;
+				If = function(ctx) return ctx.Value() < 0 and ctx.Once(`Apology`) end;
+				Do = function(ctx)
+					ctx.UseOnce(`Apology`)
+					ctx.Rel(8, `They accepted your apology.`)
+					return `Apology`
+				end;
+			};
+			{
+				Text = Ask.Insult;
+				If = function(ctx) return not ctx.Member() end;
+				Do = function(ctx)
+					ctx.Rel(-10, `You insulted them.`)
+					return `Insulted`
+				end;
+			};
+			{ Text = Ask.Leave; If = function(ctx) return ctx.Member() end; Next = `LeaveConfirm` };
+			Bye;
+		};
+	}
+
+	Nodes.About = { Text = L.About; Choices = { Back(`I see.`), Bye } }
+	Nodes.Lore = { Text = L.Lore; Choices = { Back(`...Right.`), Bye } }
+	Nodes.Apology = { Text = L.Apology; Choices = { Back(), Bye } }
+	Nodes.Insulted = { Text = L.Insulted; Choices = { Bye } }
+	Nodes.Joined = { Text = L.Joined; Choices = { Back(`Thank you.`), Bye } }
+
+	for Code, Line in L.Join do
+		Nodes[`Join_{Code}`] = { Text = Line; Choices = { Back(`Fine.`), Bye } }
+	end
+	Nodes.Join_Unknown = { Text = `...Not now.`; Choices = { Back(), Bye } }
+	-- (1.35) one crowd at a time (Social.CliqueMembership)
+	Nodes.Join_CliqueMember = Nodes.Join_CliqueMember or { Text = `You already run with another crowd. Come back when you've left them.`; Choices = { Back(`Fine.`), Bye } }
+
+	Nodes.Mission = {
+		Text = function(ctx)
+			local Done, Count = ctx.MissionStatus()
+			if Done then return L.MissionDone end
+			return L.Mission(ctx, Count)
+		end;
+		Choices = { Back(`On it.`), Bye };
+	}
+
+	Nodes.LeaveConfirm = {
+		Text = L.LeaveConfirm;
+		Choices = {
+			{ Text = `Yes. I'm out.`; Do = function(ctx) return if ctx.Leave() then `Left` else `Hub` end };
+			Back(`No, forget it.`);
+		};
+	}
+	Nodes.Left = { Text = L.Left; Choices = { Bye } }
+
+	Nodes.Hostile = {
+		Text = L.Hostile;
+		Choices = {
+			{
+				Text = Ask.Sorry;
+				If = function(ctx) return ctx.Once(`Apology`) end;
+				Do = function(ctx)
+					ctx.UseOnce(`Apology`)
+					ctx.Rel(8, `They accepted your apology.`)
+					return if ctx.State() == `Hostile` then `Hostile` else `Apology`
+				end;
+			};
+			Bye;
+		};
+	}
+
+	return {
+		Start = function(ctx)
+			local First = not ctx.Met()
+			ctx.Meet()
+			if First then return `Intro` end
+			local Thanks = QuestMenu.Start(ctx)
+			if Thanks then return Thanks end
+			if ctx.State() == `Hostile` then return `Hostile` end
+			return `Hub`
+		end;
+		Nodes = Nodes;
+	}
+end
+]==] })
+table.insert(Items, { Path = {"ServerStorage", "Dialogue", "Sallow"}; Source = [==[
+-- Ms. Sallow (2.28). Mathematics, Room 102. Exact, dry; keeps a ruler she never uses.
+local Template = require(script.Parent.GiverTemplate)
+
+return Template({
+	PathGreeting = { Path = `Academic`; Tier = 3; Text = `The honor student. Sit where I can see your working.` }; -- (2.31) Standing Paths
+	Greeting = `You're early, or you're late. Which?`;
+	Bye = `Mind the margins.`;
+	Talk = {
+		{ Ask = `What are we doing in class?`; Answer = `Proofs. Everything in this school wants proving.` };
+		{ Ask = `Why do you carry a ruler?`; Answer = `Lines should be straight. Very little here is.` };
+		{ Ask = `Did you teach Mira Holt?`; Answer = `The register says I didn't. The register is usually right.` };
+	};
+})
+]==] })
+table.insert(Items, { Path = {"ServerStorage", "Dialogue", "Pryce"}; Source = [==[
+-- Mr. Pryce (2.28). English, Room 104. Theatrical; reads the register as if it were a play; kind to the quiet ones.
+local Template = require(script.Parent.GiverTemplate)
+
+return Template({
+	PathGreeting = { Path = `Social`; Tier = 3; Text = `Ah, the star of the corridor! Enter to applause.` }; -- (2.31) Standing Paths
+	Greeting = `Ah! Enter, stage left.`;
+	Bye = `Exit, pursued by homework.`;
+	Talk = {
+		{ Ask = `What are we reading?`; Answer = `Ghost stories. This term they're the only honest kind.` };
+		{ Ask = `Why do you read the register like that?`; Answer = `Every name deserves to be said properly. Some only get the once.` };
+		{ Ask = `Any advice?`; Answer = `Speak up in class. The quiet ones get forgotten here.` };
+	};
+})
+]==] })
+table.insert(Items, { Path = {"ServerStorage", "Dialogue", "Whitlock"}; Source = [==[
+-- Dr. Whitlock (2.28). History, Room 105. The school's own historian: knows the False Explanation by heart, believes it.
+local Template = require(script.Parent.GiverTemplate)
+
+return Template({
+	PathGreeting = { Path = `Supernatural`; Tier = 3; Text = `You've been reading the old records. Careful which ones.` }; -- (2.31) Standing Paths
+	Greeting = `History is happening, you know. Sit down for it.`;
+	Bye = `Mind the dates.`;
+	Talk = {
+		{ Ask = `How old is the school?`; Answer = `Founded 1887. A fire at the north gate that same year. Tragic. Well documented.` };
+		{ Ask = `What happened to the students in the fire?`; Answer = `Transferred. It's all in the records. Every one of them.` };
+		{ Ask = `Who's in the old painting?`; Answer = `The Class of 1887. All present and accounted for.` };
+	};
+})
+]==] })
+table.insert(Items, { Path = {"ServerStorage", "Dialogue", "Ezra"}; Source = [==[
+-- Ezra Vale, Vigil Captain. Found in the Library Archive.
+local Template = require(script.Parent.LeaderTemplate)
+
+return Template({
+	PathHub = { Path = `Academic`; Tier = 3; Text = `Honor Student now. The Vigil notices names like yours.` }; -- (2.31) Standing Paths
+	Intro = `Shh. The Archive is closed after hours, which is exactly why we're here. Ezra Vale. I keep the Vigil.`;
+	About = `The Vigil keeps the lamps lit. We read what this school files away, and we keep watch when the halls go dark. Pass your classes and come to Night Study, and people here will learn your name. Skipping class won't help you.`;
+	Lore = `The bell in the east wing rings at hours nobody scheduled. We write every one down. One day the pattern will mean something.`;
+	Hostile = `We have nothing to say to each other. The door is behind you.`;
+	Apology = `...Fine. Everyone gets one bad night.`;
+	Insulted = `Then go burn your candle with the Court. Mind the door on your way out.`;
+	Joined = `Then take a candle. Keep it lit, and keep your eyes open. Welcome to the Vigil.`;
+	LeaveConfirm = `Leaving? Your candle goes out with you, and so does half of what you've earned here. You're sure?`;
+	Left = `Then I hope you never need us.`;
+
+	Hub = {
+		Hostile = `You've got nerve showing your face in here.`;
+		Rival = `Keep your voice down and your hands where I can see them.`;
+		Acquaintance = `Need something? Keep it quiet.`;
+		Friendly = `Good to see you. The candles are holding tonight.`;
+		Trusted = `There you are. I saved you a seat by the lamp.`;
+	};
+	HubMember = function(ctx)
+		return `{ctx.Rank()}. Anything to report from the halls?`
+	end;
+
+	Join = {
+		RivalMember = `You wear the Court's colours and you want a seat at this table? Cut ties with Vesper first.`;
+		NotNoticed = `Nobody here knows your name yet. Pass a few classes, sit in on Night Study, then ask me again.`;
+		Initiation = function(ctx)
+			return `Show me you can do the work. {ctx.Faction.Initiation.Text} Then we'll talk.`
+		end;
+		Cooldown = `You walked out on us. Give it a day before you knock again.`;
+		AlreadyMember = `You're already one of us.`;
+	};
+
+	Mission = function(ctx, Count)
+		local M = ctx.MissionDef
+		return `{M.Name}. {M.Text} You've managed {Count} of 3 today.`
+	end;
+	MissionDone = `You already earned your Lamplighter title. The lamps burn brighter for it.`;
+
+	Ask = {
+		About = `What is the Vigil?`;
+		Join = `I want in.`;
+		Work = `Any work for me?`;
+		Lore = `Seen anything strange lately?`;
+		Sorry = `About last time... I'm sorry.`;
+		Insult = `Your candle club is a joke.`;
+		Leave = `I'm done with the Vigil.`;
+		Bye = `See you around.`;
+	};
+})
+]==] })
+table.insert(Items, { Path = {"ServerStorage", "Dialogue", "Vesper"}; Source = [==[
+-- Vesper Crane, Regent of the Crimson Court. Found in the Boiler Yard.
+local Template = require(script.Parent.LeaderTemplate)
+
+return Template({
+	PathHub = { Path = `Combat`; Tier = 3; Text = `Enforcer. The Court has been hearing your name.` }; -- (2.31) Standing Paths
+	Intro = `Well. A new face in the Boiler Yard. Vesper Crane. The Court sees everything that happens after dark... and most of what happens before it.`;
+	About = `The Crimson Court runs this place when the lights go out. We mark our walls and we make the hall monitors look slow. Paint a sigil without being seen, give a monitor the slip, put someone on the floor. That's how you rise.`;
+	Lore = `The basement doors lock from the inside. Every night. Nobody on staff has a key. Funny, isn't it?`;
+	Hostile = `Nothing to discuss. Walk away while you still can.`;
+	Apology = `Cute. I'll let it slide. Once.`;
+	Insulted = `Careful. People who talk like that find a sigil on their locker.`;
+	Joined = `Then you're ours. Wear the crimson, and never apologise for it.`;
+	LeaveConfirm = `Walking out on the Court? Half of what you've earned stays here with me. Sure?`;
+	Left = `Run along, then. The night remembers.`;
+
+	Hub = {
+		Hostile = `You've got a death wish, wandering down here.`;
+		Rival = `Smells like candle wax. What do you want?`;
+		Acquaintance = `Make it quick. The boilers get loud.`;
+		Friendly = `Ah, you again. Pull up a crate.`;
+		Trusted = `My favourite troublemaker. Sit.`;
+	};
+	HubMember = function(ctx)
+		return `{ctx.Rank()}. Bring me good news.`
+	end;
+
+	Join = {
+		RivalMember = `Still got Vigil wax on your sleeves? Blow out their candle first.`;
+		NotNoticed = `Nobody's whispering your name yet. Give them a reason to.`;
+		Initiation = function(ctx)
+			return `Prove it. {ctx.Faction.Initiation.Text} The marked walls are all over campus.`
+		end;
+		Cooldown = `You left. Come crawling back tomorrow, maybe.`;
+		AlreadyMember = `You're already wearing our colours.`;
+	};
+
+	Mission = function(ctx, Count)
+		local M = ctx.MissionDef
+		return `{M.Name}. {M.Text} This period: {Count} of 3.`
+	end;
+	MissionDone = `Night Prowler. I keep hearing your name in the halls. Good.`;
+
+	Ask = {
+		About = `What is the Crimson Court?`;
+		Join = `I want in.`;
+		Work = `Got a job for me?`;
+		Lore = `Heard any rumours?`;
+		Sorry = `About last time... my bad.`;
+		Insult = `You're just kids playing vampire.`;
+		Leave = `I'm leaving the Court.`;
+		Bye = `Later.`;
+	};
+})
 ]==] })
 table.insert(Items, { Path = {"ServerScriptService", "Services", "Studio", "TestBridge"}; Source = [==[
 --[[
@@ -3133,6 +3415,31 @@ function Commands.PathRewardTest(PlayerName: string)
 	local P = Players:FindFirstChild(PlayerName)
 	local Paths = require(SSS.Player.Paths)
 	return DeepCopy(Paths.RewardTestForTests(P))
+end
+
+-- (2.31) NPCs and paths: the student pool, and each tree's line with a fake ctx at tier 3 and at tier 1
+function Commands.RecognitionTest()
+	local Talk = require(ServerScriptService.Services.AI.StudentBrain.Talk)
+	local Out = { Pools = {} }
+	for _, Path in { `Academic`, `Social`, `Combat`, `Athletic`, `Supernatural` } do
+		local Pool = Talk.Pool(nil, `Path`, `Neutral`, Path)
+		Out.Pools[Path] = Pool and #Pool or 0
+	end
+	local Trees = game:GetService(`ServerStorage`).Dialogue
+	local function fake(Tier: number)
+		return { PathTier = function() return Tier end; Member = function() return false end; State = function() return `Acquaintance` end;
+			Decided = function() return nil end; Objective = function() return nil end }
+	end
+	Out.Lines = {}
+	for _, Name in { `Sallow`, `Pryce`, `Whitlock`, `Ezra`, `Vesper` } do
+		local Tree = require(Trees[Name]) -- the templates return { Start, Nodes }
+		local Hub = Tree.Nodes and Tree.Nodes.Hub
+		local T = Hub and Hub.Text
+		local At3 = if typeof(T) == `function` then T(fake(3)) else T
+		local At1 = if typeof(T) == `function` then T(fake(1)) else T
+		Out.Lines[Name] = { Differs = At3 ~= At1; At3 = At3 }
+	end
+	return Out
 end
 
 return Shared

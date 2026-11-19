@@ -1515,4 +1515,29 @@ function Commands.PathRewardTest(PlayerName: string)
 	return DeepCopy(Paths.RewardTestForTests(P))
 end
 
+-- (2.31) NPCs and paths: the student pool, and each tree's line with a fake ctx at tier 3 and at tier 1
+function Commands.RecognitionTest()
+	local Talk = require(ServerScriptService.Services.AI.StudentBrain.Talk)
+	local Out = { Pools = {} }
+	for _, Path in { `Academic`, `Social`, `Combat`, `Athletic`, `Supernatural` } do
+		local Pool = Talk.Pool(nil, `Path`, `Neutral`, Path)
+		Out.Pools[Path] = Pool and #Pool or 0
+	end
+	local Trees = game:GetService(`ServerStorage`).Dialogue
+	local function fake(Tier: number)
+		return { PathTier = function() return Tier end; Member = function() return false end; State = function() return `Acquaintance` end;
+			Decided = function() return nil end; Objective = function() return nil end }
+	end
+	Out.Lines = {}
+	for _, Name in { `Sallow`, `Pryce`, `Whitlock`, `Ezra`, `Vesper` } do
+		local Tree = require(Trees[Name]) -- the templates return { Start, Nodes }
+		local Hub = Tree.Nodes and Tree.Nodes.Hub
+		local T = Hub and Hub.Text
+		local At3 = if typeof(T) == `function` then T(fake(3)) else T
+		local At1 = if typeof(T) == `function` then T(fake(1)) else T
+		Out.Lines[Name] = { Differs = At3 ~= At1; At3 = At3 }
+	end
+	return Out
+end
+
 return Shared

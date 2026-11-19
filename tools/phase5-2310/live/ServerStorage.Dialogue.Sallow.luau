@@ -2,6 +2,7 @@
 local Template = require(script.Parent.GiverTemplate)
 
 return Template({
+	PathGreeting = { Path = `Academic`; Tier = 3; Text = `The honor student. Sit where I can see your working.` }; -- (2.31) Standing Paths
 	Greeting = `You're early, or you're late. Which?`;
 	Bye = `Mind the margins.`;
 	Talk = {

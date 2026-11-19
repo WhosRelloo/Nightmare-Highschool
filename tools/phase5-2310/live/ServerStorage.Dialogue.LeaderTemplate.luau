@@ -4,7 +4,7 @@
 
 	L = {
 		Intro, About, Lore, Hostile, Apology, Insulted, LeaveConfirm, Left, Joined,
-		Hub = { Rival, Acquaintance, Friendly, Trusted, Hostile }, HubMember = fn(ctx),
+		Hub = { Rival, Acquaintance, Friendly, Trusted, Hostile }, HubMember = fn(ctx), PathHub = { Path, Tier, Text }? ((2.31) a Standing Path line first),
 		Join = { RivalMember, NotNoticed, Initiation = fn(ctx), Cooldown, AlreadyMember },
 		Mission = fn(ctx, Count), MissionDone,
 		Ask = { About, Join, Work, Lore, Sorry, Insult, Leave, Bye } -- player lines
@@ -38,6 +38,7 @@ return function(L)
 
 	Nodes.Hub = {
 		Text = function(ctx)
+			if L.PathHub and ctx.PathTier and ctx.PathTier(L.PathHub.Path) >= L.PathHub.Tier then return L.PathHub.Text end -- (2.31)
 			if ctx.Member() then return L.HubMember(ctx) end
 			return L.Hub[ctx.State()] or L.Hub.Acquaintance
 		end;

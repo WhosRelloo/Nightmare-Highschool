@@ -791,8 +791,8 @@ function Commands.RecognitionTest()
 	end
 	Out.Lines = {}
 	for _, Name in { `Sallow`, `Pryce`, `Whitlock`, `Ezra`, `Vesper` } do
-		local Nodes = require(Trees[Name])
-		local Hub = Nodes.Hub or Nodes.Start
+		local Tree = require(Trees[Name]) -- the templates return { Start, Nodes }
+		local Hub = Tree.Nodes and Tree.Nodes.Hub
 		local T = Hub and Hub.Text
 		local At3 = if typeof(T) == `function` then T(fake(3)) else T
 		local At1 = if typeof(T) == `function` then T(fake(1)) else T

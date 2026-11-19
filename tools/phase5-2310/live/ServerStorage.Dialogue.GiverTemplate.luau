@@ -2,6 +2,7 @@
 	Shared tree for ordinary students who give quests (no saved relationship).
 	L = {
 		Greeting = string | fn(ctx),
+		PathGreeting = { Path, Tier, Text }?,   -- (2.31) said first once the student has that Standing Path tier
 		Talk = { { Ask, Answer } },            -- small talk
 		Extra = { choice, ... }?,              -- NPC-specific replies (may use If / Do)
 		Nodes = { [id] = node }?,              -- nodes those replies lead to
@@ -56,7 +57,12 @@ return function(L)
 	}
 
 	Nodes.Hub = {
-		Text = L.Greeting;
+		Text = function(ctx) -- (2.31) a Standing Path line first, once the student has earned it
+			local PG = L.PathGreeting
+			if PG and ctx.PathTier and ctx.PathTier(PG.Path) >= PG.Tier then return PG.Text end
+			if typeof(L.Greeting) == `function` then return L.Greeting(ctx) end
+			return L.Greeting
+		end;
 		Choices = function(ctx)
 			local List = {}
 			for _, Choice in QuestMenu.Choices(ctx) do table.insert(List, Choice) end

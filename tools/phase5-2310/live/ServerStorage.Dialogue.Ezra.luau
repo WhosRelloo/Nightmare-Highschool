@@ -2,6 +2,7 @@
 local Template = require(script.Parent.LeaderTemplate)
 
 return Template({
+	PathHub = { Path = `Academic`; Tier = 3; Text = `Honor Student now. The Vigil notices names like yours.` }; -- (2.31) Standing Paths
 	Intro = `Shh. The Archive is closed after hours, which is exactly why we're here. Ezra Vale. I keep the Vigil.`;
 	About = `The Vigil keeps the lamps lit. We read what this school files away, and we keep watch when the halls go dark. Pass your classes and come to Night Study, and people here will learn your name. Skipping class won't help you.`;
 	Lore = `The bell in the east wing rings at hours nobody scheduled. We write every one down. One day the pattern will mean something.`;

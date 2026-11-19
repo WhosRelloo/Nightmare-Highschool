@@ -200,6 +200,8 @@ local function greeting(S, Rec): (string?, { [string]: any }?, { string })
 	local OkF, Form = false, nil
 	if Ch then OkF, Form = pcall(Appearance.FormOf, Ch) end
 	if OkF and Form then return `Transformed`, nil, Lines.ByNature(S, Lines.Monster, `Brave`) end
+	local Top = Pl and Pl:GetAttribute(`PathTop`) -- (2.31) a Standing Path at tier 3+: "That's the honor student."
+	if Top and math.random() < 0.25 then return `Path`, { Sub = Top }, daily(C) end
 	local Race = Pl and Pl:GetAttribute(`Race`)
 	if Race and math.random() < 0.3 then return `Race`, { Sub = Race }, G.Race[Race] or daily(C) end
 	local Def = S.Clique and CliqueConfig.Defs[S.Clique]

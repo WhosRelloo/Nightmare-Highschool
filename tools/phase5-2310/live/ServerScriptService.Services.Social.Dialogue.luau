@@ -69,6 +69,10 @@ function Local.Context(Player: Player, NpcId: string, JustCompleted: { string }?
 	function ctx.State() local _, State = Reputation.Relationship(Player, NpcId) return State end
 	function ctx.Rel(Amount: number, Reason: string?) Reputation.ChangeRelationship(Player, NpcId, Amount, Reason) end
 	function ctx.Rep(Category: string) return Reputation.Value(Player, Category) end
+	function ctx.PathTier(Path: string) -- (2.31) Standing Paths (Services.Player.Paths)
+		local Ok, T = pcall(function() return require(ServerScriptService.Services.Player.Paths).Tier(Player, Path) end)
+		return if Ok and typeof(T) == `number` then T else 1
+	end
 	function ctx.AddRep(Category: string, Amount: number) Reputation.Add(Player, Category, Amount) end
 	function ctx.Standing() local F = Factions.Get(Player, FactionId) return F and F.Standing or 0 end
 	function ctx.Rank() local F = Factions.Get(Player, FactionId) return F and F.Rank or `Outsider` end
