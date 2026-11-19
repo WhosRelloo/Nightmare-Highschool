@@ -115,7 +115,47 @@ def condemned():
     Q.save(L, "WF_Condemned")
 
 
+Q.PBR["WF_Timetable"] = dict(rough=0.2, ink_rough=0.25, ink_lift=0.1, strength=1.5)
+
+
+def timetable():
+    """the bus stop's timetable behind its scratched perspex: Wickfield Transit, Route 4, the last bus 10:40 PM; someone has
+    written underneath in marker 'there's another one. don't get on it.'"""
+    L = H.Logo("WF_Timetable", 768, 1024)
+    W, Hh = 768, 1024
+    L.paint(L.rrect(0, 0, W, Hh, 0), "#f4f2ea")
+    L.paint(L.rrect(0, 0, W, 150, 0), "#1f4a32")
+    L.paint(L.text("WICKFIELD TRANSIT", "georgiab", 48, W / 2, 60, spacing=4), "#f4ead2")
+    L.paint(L.text("ROUTE 4  ·  ALDER LANE – TOWN SQUARE – PEMBROOK", "georgia", 22, W / 2, 115, spacing=2), "#e3b23c")
+    times = ["6:10 AM", "7:05 AM", "8:00 AM", "9:15 AM", "11:30 AM", "1:45 PM", "3:20 PM", "4:40 PM", "6:05 PM", "8:30 PM", "10:40 PM"]
+    for i, t in enumerate(times):
+        y = 200 + i * 52
+        L.paint(L.rrect(60, y - 22, W - 60, y + 22, 4), "#e8e4d8" if i % 2 else "#f4f2ea")
+        L.paint(L.text(t, "georgiab", 30, 200, y), "#1a1612")
+        L.paint(L.text("Mon – Sat" if i < 10 else "LAST BUS", "georgia", 24, 540, y), "#1a1612" if i < 10 else "#b8201a")
+    L.paint(L.text("No service after 10:40 PM.", "georgiai", 28, W / 2, 810), "#3a3230")
+    INK = "#1a1a2a"
+    m = L.text("there's another one.", "chela", 40, W / 2, 890)
+    L.paint(m * (Q.noise(L, 0.5, 600) > -0.5), INK)
+    m = L.text("don't get on it.", "chela", 40, W / 2, 945)
+    L.paint(m * (Q.noise(L, 0.5, 601) > -0.5), "#b8201a")
+    # scratches on the perspex
+    rng = np.random.default_rng(602)
+    for _ in range(40):
+        x0, y0 = rng.uniform(0, W), rng.uniform(0, Hh)
+        a = rng.uniform(0, math.pi)
+        ln = rng.uniform(20, 160)
+        L.paint(L.line([(x0, y0), (x0 + ln * math.cos(a), y0 + ln * math.sin(a))], 1), "#ffffff", alpha=0.35)
+    Q.save(L, "WF_Timetable")
+
+
 if __name__ == "__main__":
-    portrait(False)
-    portrait(True)
-    condemned()
+    want = sys.argv[1:]
+    for fn in (lambda: portrait(False), lambda: portrait(True), condemned, timetable):
+        pass
+    if not want:
+        portrait(False)
+        portrait(True)
+        condemned()
+    if not want or "timetable" in want:
+        timetable()

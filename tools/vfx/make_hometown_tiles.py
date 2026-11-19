@@ -406,6 +406,7 @@ def awning(name, a_rgb, b_rgb, seed):
 
 
 SETS = {
+    "WF_ClapGrey": lambda: clapboard("WF_ClapGrey", (116, 112, 104), 5005),
     "WF_AwningRed": lambda: awning("WF_AwningRed", (176, 34, 34), (236, 226, 200), 6401),
     "WF_AwningGreen": lambda: awning("WF_AwningGreen", (44, 96, 64), (236, 226, 200), 6402),
     "WF_AwningBlue": lambda: awning("WF_AwningBlue", (40, 72, 140), (240, 238, 230), 6403),

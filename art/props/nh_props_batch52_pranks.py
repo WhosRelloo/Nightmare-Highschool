@@ -457,6 +457,176 @@ def bleachers(M):
     return (L_ + 1, 9.0, 7.6)
 
 
+
+# ================================================================== the Ashby House and Mrs Ashby's portrait
+
+def portrait_ashby(M):
+    """Mrs Ashby's portrait: an ornate gilt frame (a moulded profile swept round, corner cartouches), the oil canvas, and the
+    irises: two dark discs riding just in front of the painted eye whites (their own pieces, a bone each) so they follow you.
+    Clips: EyesFollow (they track left to right across the room, a beat late, loops), Stare (they snap to centre and hold)"""
+    K = kit(M)
+    gilt = material("FrameGilt", base=(0.95, 0.74, 0.36), rough=0.3, metal=1.0, wear=0.5, dirt=1.0)
+    CW, CH = 3.0, 4.0                       # canvas size (768 x 1024 at 256 px a stud)
+    Z0 = 4.0
+    set_group("Canvas")
+    box("Canvas", (CW, 0.02, CH), (0, 0.0, Z0 + CH / 2), K["place"], bevel=0)
+    set_group("Main")
+    box("Backing", (CW + 0.2, 0.1, CH + 0.2), (0, 0.08, Z0 + CH / 2), material("FrameBack", base=(0.15, 0.1, 0.06), rough=0.9, wear=0.0), bevel=0)
+    # the frame: a profile (cove, bead, ogee) swept round the rectangle
+    prof = [(0.0, 0.0), (0.12, -0.05), (0.2, -0.22), (0.32, -0.28), (0.42, -0.2), (0.5, -0.32), (0.6, -0.12), (0.62, 0.0)]
+    pts = [(-CW / 2, Z0), (CW / 2, Z0), (CW / 2, Z0 + CH), (-CW / 2, Z0 + CH)]
+    for k in range(4):
+        a, b = Vector((pts[k][0], 0, pts[k][1])), Vector((pts[(k + 1) % 4][0], 0, pts[(k + 1) % 4][1]))
+        d = (b - a).normalized()
+        out = Vector((d.z, 0, -d.x))                       # outward from the canvas
+        L_ = (b - a).length
+        for (o0, y0), (o1, y1) in zip(prof, prof[1:]):
+            q = [a + out * o0 - d * o0, b + out * o0 + d * o0, b + out * o1 + d * o1, a + out * o1 - d * o1]
+            bot = [Vector((p.x, y0 - 0.02, p.z)) if i < 2 else Vector((p.x, y1 - 0.02, p.z)) for i, p in enumerate(q)]
+            top = [p + Vector((0, 0.12, 0)) for p in bot]
+            solid(f"Frame{k}_{o0}", [tuple(p) for p in bot], [tuple(p) for p in top], gilt)
+    for sx in (-1, 1):                                      # corner cartouches and a crest on top
+        for sz in (0, 1):
+            sphere(f"Corner{sx}{sz}", 0.32, (sx * (CW / 2 + 0.3), -0.3, Z0 + sz * CH + (0.3 if sz else -0.3)), gilt, seg=14, rings=8, scale=(1.2, 0.6, 1.2))
+    prism("Crest", [(-0.9, Z0 + CH + 0.4), (0.9, Z0 + CH + 0.4), (0.5, Z0 + CH + 0.9), (0.0, Z0 + CH + 1.2), (-0.5, Z0 + CH + 0.9)], -0.25, 0.15, gilt, plane="XZ", bevel=0.03)
+    box("NamePlate", (1.1, 0.05, 0.25), (0, -0.35, Z0 - 0.42), gilt, bevel=0.02)
+    # the irises (eye centres from art/hometown/ashby_canvases.py EYES, on the 768 x 1024 canvas)
+    bones = {}
+    own = {}
+    for side, (dx, ey) in (("L", (-62, 395)), ("R", (62, 395))):
+        x = dx / 256.0
+        z = Z0 + CH - ey / 256.0
+        set_group(f"Iris{side}")
+        cyl(f"Iris{side}", 0.075, 0.015, (x, -0.02, z), material("IrisDark", base=(0.12, 0.08, 0.05), rough=0.25, wear=0.0), rot=(math.pi / 2, 0, 0), verts=20)
+        cyl(f"Pupil{side}", 0.04, 0.015, (x, -0.032, z), material("PupilBlack", base=(0.01, 0.01, 0.01), rough=0.15, wear=0.0), rot=(math.pi / 2, 0, 0), verts=16)
+        sphere(f"Glint{side}", 0.012, (x - 0.02, -0.042, z + 0.02), K["bulb"], seg=6, rings=4)
+        bones[f"Iris{side}"] = ((x, -0.03, z), (x, -0.3, z), None)
+        own[f"Iris{side}"] = f"Iris{side}"
+    set_group("Main")
+    B49.RIG["WFPortraitAshby"] = dict(bones=bones, own=own)
+    return (CW + 2, 1.0, Z0 + CH + 1.4)
+
+
+def _look(t):
+    """where the eyes look (x offset in studs, within the white): a slow sweep that holds at each end, a beat late"""
+    u = math.sin(2 * math.pi * (t - 0.15) / 6.0)
+    return 0.07 * math.tanh(2.2 * u)
+
+
+PORTRAIT_CLIPS = {
+    "EyesFollow": dict(length=6.0, loop=True, keys={
+        "IrisL": lambda t: ("x", 0, (_look(t), 0, 0)), "IrisR": lambda t: ("x", 0, (_look(t - 0.08), 0, 0))}),
+    "Stare": dict(length=0.6, keys={
+        "IrisL": lambda t: ("x", 0, (0.07 * (1 - back_out(t / 0.15, 2.0)), 0, 0)), "IrisR": lambda t: ("x", 0, (0.07 * (1 - back_out(t / 0.17, 2.0)), 0, 0))}),
+}
+
+
+def ashby_house(M):
+    """the condemned Ashby House: two storeys of grey weathered clapboard (tiled), a corner turret with a conical slate roof,
+    a steep main gable, every window boarded with crossed planks, a porch whose roof sags and whose left post has given
+    way, the front door with the CONDEMNED notice (it creaks open: DoorCreak), an upstairs shutter hanging by one hinge
+    (ShutterBang, loops), a lightning-split chimney, dead vines"""
+    K = kit(M)
+    W_, D_, H_ = 26.0, 22.0, 20.0
+    X0, X1 = -W_ / 2, W_ / 2
+    trim = wmat("AshTrim", "NH_PaintedWood", (0.62, 0.6, 0.55), 0.3, wear=0.8, dirt=1.0)
+    plank = material("Plank", "NH_DeskWood", tint=(0.42, 0.36, 0.28), scale=0.3, rough_add=0.2, wear=0.6, dirt=1.0)
+    slate = material("AshSlate", "NH_Slate", tint=(0.09, 0.09, 0.11), scale=0.35, rough_mul=0.6, rough_add=0.3, normal=0.6, wear=0.2)
+    rotten = material("RotWood", "NH_DeskWood", tint=(0.25, 0.2, 0.15), scale=0.3, rough_add=0.3, wear=0.7, dirt=1.0)
+    door = (-2.0, 2.0)
+    wins = [(x - 1.8, x + 1.8, z0, z0 + 5.0) for x in (-8.0, 8.0) for z0 in (3.0, 12.5)] + [(-1.8, 1.8, 12.5, 17.5)]
+    set_group("Siding")
+    wall("Front", "y", 0.0, X0, X1, 0.0, H_, 0.6, [(door[0], door[1], 1.6, 9.4)] + wins, K["place"])
+    wall("SideL", "x", X0, 0.0, D_, 0.0, H_, 0.6, [], K["place"])
+    wall("SideR", "x", X1, 0.0, D_, 0.0, H_, 0.6, [], K["place"])
+    wall("Back", "y", D_, X0, X1, 0.0, H_, 0.6, [], K["place"])
+    solid("Gable", [(X0, -0.3, H_), (X1, -0.3, H_), (0, -0.3, H_ + 10)], [(X0, 0.3, H_), (X1, 0.3, H_), (0, 0.3, H_ + 10)], K["place"])
+    set_group("Main")
+    for nm, s_ in (("L", -1), ("R", 1)):                       # the steep main roof, slate
+        solid(f"Roof{nm}", [(s_ * (W_ / 2 + 1.0), -1.0, H_ - 1.0), (0, -1.0, H_ + 10.3), (0, D_ + 1.0, H_ + 10.3), (s_ * (W_ / 2 + 1.0), D_ + 1.0, H_ - 1.0)],
+              [(s_ * (W_ / 2 + 1.0), -1.0, H_ - 0.6), (0, -1.0, H_ + 10.7), (0, D_ + 1.0, H_ + 10.7), (s_ * (W_ / 2 + 1.0), D_ + 1.0, H_ - 0.6)], slate)
+    # the turret on the right front corner: an octagonal tower, a conical roof, a finial
+    tx, ty = X1, 0.0
+    lathe("Turret", [(0, 0.0), (4.0, 0.0), (4.0, H_ + 3.0), (0, H_ + 3.0)], wmat("TurretGrey", "NH_PaintedWood", (0.2, 0.19, 0.18), 0.3, wear=0.7, dirt=1.0), seg=8, loc=(tx, ty, 0))
+    lathe("TurretRoof", [(0, H_ + 3.0), (4.6, H_ + 3.0), (4.4, H_ + 3.4), (0.15, H_ + 12.0), (0, H_ + 12.0)], slate, seg=8, loc=(tx, ty, 0))
+    lathe("Finial", [(0, H_ + 12.0), (0.15, H_ + 12.1), (0.25, H_ + 12.6), (0.05, H_ + 13.6), (0, H_ + 13.8)], K["iron"], seg=8, loc=(tx, ty, 0))
+    for k in range(3):                                         # a ring of turret windows, boarded
+        a = math.pi * (1.1 + 0.4 * k)
+        px, py = tx + 4.05 * math.cos(a), ty + 4.05 * math.sin(a)
+        box(f"TWin{k}", (1.8, 0.2, 3.0), (px, py, 14.5), material("TWinDark", base=(0.02, 0.02, 0.03), rough=0.4, wear=0.0), bevel=0, rot=(0, 0, a + math.pi / 2))
+        box(f"TBoardA{k}", (2.3, 0.15, 0.4), (px, py, 14.5), plank, bevel=0.03, rot=(0.0, 0.6, a + math.pi / 2))
+        box(f"TBoardB{k}", (2.3, 0.15, 0.4), (px, py, 14.5), plank, bevel=0.03, rot=(0.0, -0.6, a + math.pi / 2))
+    # the windows: dark inside, frames, two or three planks nailed across each
+    for k, (a, b, z0, z1) in enumerate(wins):
+        c = (a + b) / 2
+        box(f"Dark{k}", (b - a, 0.1, z1 - z0), (c, 0.3, (z0 + z1) / 2), material("WinDark", base=(0.02, 0.02, 0.025), rough=0.5, wear=0.0), bevel=0)
+        for x in (a, b):
+            box(f"Frame{k}{x}", (0.35, 0.35, z1 - z0 + 0.4), (x, -0.2, (z0 + z1) / 2), trim, bevel=0.03)
+        box(f"Head{k}", (b - a + 1.0, 0.45, 0.45), (c, -0.25, z1 + 0.25), trim, bevel=0.04)
+        for j, (zz, ang) in enumerate(((z0 + 1.0, 0.25), ((z0 + z1) / 2, -0.15), (z1 - 1.0, 0.1))):
+            box(f"Board{k}{j}", (b - a + 0.8, 0.18, 0.55), (c, -0.45, zz), plank, bevel=0.04, rot=(0, ang, 0))
+            for nx in (a - 0.2, b + 0.2):
+                box(f"Nail{k}{j}{nx}", (0.06, 0.06, 0.06), (nx, -0.55, zz + ang * (nx - c)), K["iron"], bevel=0)
+    # the door (its own piece) and its frame, the notice
+    for x in door:
+        box(f"DoorFrame{x}", (0.4, 0.4, 8.2), (x, -0.2, 5.5), trim, bevel=0.03)
+    box("DoorHead", (5.0, 0.5, 0.5), (0, -0.25, 9.65), trim, bevel=0.04)
+    set_group("Door")
+    box("Door", (3.9, 0.25, 7.7), (0, 0.05, 5.5), rotten, bevel=0.04)
+    for z in (3.0, 5.5, 8.0):
+        box(f"DoorRail{z}", (3.6, 0.1, 0.25), (0, -0.12, z), rotten, bevel=0.02)
+    cyl("Knocker", 0.22, 0.06, (0, -0.18, 6.4), K["iron"], rot=(math.pi / 2, 0, 0), verts=16, bevel=0.02)
+    set_group("DoorNotice")
+    box("Notice", (1.5, 0.02, 2.0), (0.0, -0.18, 4.3), K["place"], bevel=0)
+    set_group("Main")
+    # the porch: a deck, steps, three posts (the left one broken), the porch roof sagging toward it
+    box("Deck", (W_ - 4, 6.0, 0.4), (0, -3.0, 1.4), rotten, bevel=0.03, rot=(0.0, 0.03, 0))
+    for k in range(3):
+        box(f"Step{k}", (5.0, 1.0, 0.45 * (k + 1)), (0, -6.5 - (2 - k) * 1.0, 0.225 * (k + 1)), rotten, bevel=0.03, rot=(0, 0, 0.04 * (k - 1)))
+    for x, h, lean in ((-10.0, 4.5, 0.35), (0.0 + 3.5, 8.6, 0.0), (10.0, 8.6, 0.0)):
+        box(f"PorchPost{x}", (0.5, 0.5, h), (x, -5.7, 1.6 + h / 2), trim, bevel=0.03, rot=(0, lean, 0))
+    box("PostStump", (0.5, 0.5, 1.0), (-10.0, -5.7, 2.1), trim, bevel=0.03)
+    solid("PorchRoof", [(-11.5, -6.5, 8.6), (11.5, -6.5, 10.5), (11.5, 0.0, 11.5), (-11.5, 0.0, 11.0)],
+          [(-11.5, -6.5, 8.9), (11.5, -6.5, 10.8), (11.5, 0.0, 11.8), (-11.5, 0.0, 11.3)], slate)
+    for x in range(-9, 10, 2):                                   # a railing with gaps where balusters fell out
+        if x in (-5, 1, 7):
+            continue
+        box(f"Baluster{x}", (0.15, 0.15, 2.4), (x, -5.7, 2.8), trim, bevel=0, rot=(0, 0.08 * ((x * 7) % 3 - 1), 0))
+    box("PorchRail", (20.0, 0.25, 0.2), (0, -5.7, 4.0), trim, bevel=0.03, rot=(0, 0.02, 0))
+    # the hanging shutter (its own piece) on the upper left window
+    set_group("Shutter")
+    a, b, z0, z1 = wins[1]
+    box("ShutterPanel", (1.6, 0.15, 5.0), (a - 1.0, -0.45, (z0 + z1) / 2), trim, bevel=0.03)
+    for k in range(10):
+        box(f"Louvre{k}", (1.3, 0.1, 0.3), (a - 1.0, -0.55, z0 + 0.4 + k * 0.45), trim, bevel=0, rot=(0.5, 0, 0))
+    set_group("Main")
+    # the chimney, split
+    for sx, tilt in ((-0.6, -0.12), (0.6, 0.1)):
+        box(f"Chimney{sx}", (1.2, 2.4, 8.0), (-8.0 + sx, 10.0, H_ + 5.5), material("AshBrick", "NH_Limestone", tint=(0.4, 0.22, 0.18), scale=0.3, wear=0.5, dirt=1.0), bevel=0.05, rot=(0, tilt, 0))
+    # dead vines up the front
+    import random as _r
+    rr = _r.Random(91)
+    vine = material("DeadVine", base=(0.12, 0.09, 0.06), rough=0.9, wear=0.0)
+    for k in range(5):
+        x = rr.uniform(X0 + 1, X1 - 1)
+        pts_ = [Vector((x + rr.uniform(-0.5, 0.5) * i * 0.3, -0.42, i * 1.8)) for i in range(8)]
+        tube(f"Vine{k}", pts_, 0.06, vine)
+    B49.RIG["WFAshbyHouse"] = dict(
+        bones={"Door": ((door[0] + 0.05, 0.05, 1.6), (door[0] + 0.05, 0.05, 2.6), None),
+               "Shutter": ((a - 1.8, -0.45, z1 - 0.3), (a - 0.2, -0.45, z1 - 0.3), None)},
+        own={"Door": "Door", "DoorNotice": "Door", "Shutter": "Shutter"})
+    return (W_ + 10, D_ + 10, H_ + 14)
+
+
+ASHBY_CLIPS = {
+    # the door creaks open by itself: a hesitation, a few inches, a stop, then it swings the rest of the way
+    "DoorCreak": dict(length=3.0, keys={"Door": lambda t: ("z", -(18 * ease(t / 0.9) + 72 * ease((t - 1.6) / 1.2)), (0, 0, 0))}),
+    # the shutter, hanging by its top hinge, swings in the wind and bangs against the siding; loops
+    "ShutterBang": dict(length=3.0, loop=True, keys={
+        "Shutter": lambda t: ("y", -14 - 12 * math.sin(2 * math.pi * t / 3.0) + 9 * math.exp(-((t % 3.0 - 2.25) / 0.06) ** 2), (0, 0, 0))}),
+}
+
+
 BUILDERS["WFChetTruck"] = chet_truck
 B49.CLIPS["WFChetTruck"] = CHET_CLIPS
 P.RIGS["WFChetTruck"] = lambda objs: B49.rig_pieces("WFChetTruck", objs)
@@ -464,6 +634,14 @@ B49.CLIP_CAM["WFChetTruck"] = {c: ((14.0, -12.0, 7.0), (0, 0, 2.5)) for c in CHE
 BUILDERS.update({"WFHallOfFame": hall_of_fame, "WFJuniorHigh": junior_high, "WFTeamBus": team_bus, "WFMascotHead": mascot_head,
                  "WFScoreboard": scoreboard, "WFBleachers": bleachers})
 P.CANVAS.update({"WFTeamBus_Crest": "WF_CrestPumas", "WFScoreboard_Labels": "WF_ScoreLabels"})
+BUILDERS.update({"WFPortraitAshby": portrait_ashby, "WFAshbyHouse": ashby_house})
+P.CANVAS.update({"WFPortraitAshby_Canvas": "WF_PortraitAshby", "WFAshbyHouse_DoorNotice": "WF_Condemned"})
+P.TILED["WFAshbyHouse_Siding"] = ("WF_ClapGrey", 8.0)
+for _n, _c in (("WFPortraitAshby", PORTRAIT_CLIPS), ("WFAshbyHouse", ASHBY_CLIPS)):
+    B49.CLIPS[_n] = _c
+    P.RIGS[_n] = (lambda n: (lambda objs: B49.rig_pieces(n, objs)))(_n)
+B49.CLIP_CAM["WFPortraitAshby"] = {c: ((0.0, -4.5, 6.6), (0, 0, 6.6)) for c in PORTRAIT_CLIPS}
+B49.CLIP_CAM["WFAshbyHouse"] = {"DoorCreak": ((6.0, -16.0, 7.0), (0, 0, 5.0)), "ShutterBang": ((-2.0, -16.0, 16.0), (-10.0, 0, 15.0))}
 B49.CLIPS["WFHallOfFame"] = HOF_CLIPS
 B49.CLIPS["WFJuniorHigh"] = JHS_CLIPS
 P.RIGS["WFHallOfFame"] = lambda objs: B49.rig_pieces("WFHallOfFame", objs)
