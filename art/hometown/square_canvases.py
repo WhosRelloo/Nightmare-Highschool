@@ -118,9 +118,93 @@ def the_plan():
     Q.save(L, "WF_ThePlan")
 
 
+Q.PBR["WF_HallFameRow"] = dict(rough=0.4, ink_rough=0.35, ink_lift=0.3, strength=3.0, gilt=True)
+Q.PBR["WF_HallFameTitle"] = dict(rough=0.4, ink_rough=0.3, ink_lift=0.4, strength=3.5, gilt=True)
+Q.PBR["WF_SchoolName"] = dict(rough=0.45, ink_rough=0.3, ink_lift=0.45, strength=4.0, gilt=True)
+
+HONOUREES = [("1962", "Margaret Holloway", "Spelling Bee, 41 years unbeaten"), ("1971", "Dennis Okafor", "Most Library Books Returned On Time"),
+             ("1978", "Patricia Wren", "Perfect Attendance, K through 8"), ("1984", "Gordon Feldt", "Regional Science Fair: The Potato Battery"),
+             ("1991", "Lucy Abernathy", "Student Council, Six Terms"), ("1997", "Thomas Kade", "Never Once Ran In The Halls"),
+             ("2006", "Priya Sandoval", "State Mathletes, First Place"), ("2015", "Samuel Wick IV", "Most Polite, Founder's Award")]
+
+
+def hall_rows():
+    """eight brass name plates on walnut, one canvas per row (each row is a flip panel on the board): the year, the name,
+    the achievement; plus the blank brass plate the rows flip round to (the game writes your name on it)"""
+    for i, (yr, nm, what) in enumerate(HONOUREES + [("", "", "")]):
+        L = H.Logo(f"WF_HallFameRow{i}" if yr else "WF_HallFameBlank", 1536, 192)
+        wood = L.rrect(0, 0, 1536, 192, 0)
+        L.paint(wood, L.vgrad("#4a2c18", "#2e1a0e", 0, 192))
+        L.grain(wood, 0.12, 4, seed=500 + i)
+        plate = L.rrect(24, 22, 1512, 170, 10)
+        L.paint(L.grow(plate, 4), "#1c120a")
+        L.paint(plate, L.vgrad("#f2d58c", "#a8782e", 22, 170))
+        L.shade(plate, light=(-1, -1), strength=0.35, blur=4)
+        for x in (52, 1484):
+            L.paint(L.ellipse(x, 96, 10), "#6a4a1e")
+            L.paint(L.ellipse(x - 2, 94, 5), "#f8e4a8")
+        if yr:
+            L.paint(L.text(yr, "georgiab", 70, 170, 96, spacing=4), "#2a1c0c")
+            L.paint(L.text(nm, "georgiab", 60, 700, 78), "#2a1c0c")
+            L.paint(L.text(what, "georgiai", 36, 700, 134), "#3a2812")
+            L.paint(L.rrect(290, 40, 293, 152, 0), "#6a4a1e")
+        Q.save(L, L.name)
+
+
+def hall_title():
+    L = H.Logo("WF_HallFameTitle", 1536, 384)
+    wood = L.rrect(0, 0, 1536, 384, 0)
+    L.paint(wood, L.vgrad("#4a2c18", "#2e1a0e", 0, 384))
+    L.grain(wood, 0.12, 4, seed=520)
+    t = L.text("HALL OF FAME", "georgiab", 128, 768, 175, spacing=14)
+    L.paint(L.grow(t, 5), "#1c120a")
+    L.paint(t, L.vgrad("#fbe6a8", "#b8893a", 100, 250))
+    L.shade(t, strength=0.4, blur=2)
+    L.paint(L.text("WICKFIELD JUNIOR HIGH  ·  EXCELLENCE SINCE 1924", "georgia", 34, 768, 300, spacing=6), "#e8cf8c")
+    for sx in (-1, 1):
+        L.paint(H.star(L, 768 + sx * 690, 175, 34), L.vgrad("#fbe6a8", "#b8893a", 135, 215))
+    Q.save(L, "WF_HallFameTitle")
+
+
+def school_name():
+    """the cast-stone panel over the school's entrance: WICKFIELD JUNIOR HIGH SCHOOL in raised gilt capitals"""
+    L = H.Logo("WF_SchoolName", 2048, 320)
+    stone = L.rrect(0, 0, 2048, 320, 0)
+    L.paint(stone, L.vgrad("#d8d0bc", "#b8ae98", 0, 320))
+    L.col *= (1 + 0.08 * Q.noise(L, 3, 530)[..., None])
+    L.paint(np.clip(L.rrect(20, 20, 2028, 300, 6) - L.rrect(30, 30, 2018, 290, 6), 0, 1), "#9a907a")
+    t = L.text("WICKFIELD JUNIOR HIGH SCHOOL", "georgiab", 84, 1024, 150, spacing=8)
+    L.paint(np.roll(np.roll(t, 4 * H.SS, 0), 3 * H.SS, 1), "#6a604c")
+    L.paint(t, L.vgrad("#fbe6a8", "#b8893a", 90, 210))
+    L.paint(L.text("MDCCCCXXIV", "georgia", 36, 1024, 260, spacing=10), "#6a604c")
+    Q.save(L, "WF_SchoolName")
+
+
+Q.PBR["WF_ScoreLabels"] = dict(rough=0.7, ink_rough=0.6, ink_lift=0.2, strength=2.0)
+
+
+def score_labels():
+    """the scoreboard's painted face: WICKFIELD WICKS banner, HOME and GUESTS over the two bulb grids (left empty, dark),
+    QUARTER and DOWN in the middle"""
+    L = H.Logo("WF_ScoreLabels", 2048, 976)
+    pg = L.rrect(0, 0, 2048, 976, 0)
+    L.paint(pg, L.vgrad("#1f4a32", "#123020", 0, 976))
+    L.grain(pg, 0.06, 2, seed=540)
+    L.paint(L.rrect(0, 0, 2048, 150, 0), "#e3b23c")
+    L.paint(L.text("WICKFIELD WICKS", "lucky", 110, 1024, 80, spacing=16), "#1f4a32")
+    for cx, t in ((480, "HOME"), (1568, "GUESTS")):
+        L.paint(L.text(t, "lucky", 90, cx, 230, spacing=10), "#f4ead2")
+        L.paint(L.rrect(cx - 330, 300, cx + 330, 900, 18), "#0a140e")
+    L.paint(L.text("QTR", "lucky", 60, 1024, 380, spacing=6), "#f4ead2")
+    L.paint(L.rrect(964, 420, 1084, 560, 10), "#0a140e")
+    L.paint(L.text("DOWN", "lucky", 60, 1024, 660, spacing=6), "#f4ead2")
+    L.paint(L.rrect(964, 700, 1084, 840, 10), "#0a140e")
+    Q.save(L, "WF_ScoreLabels")
+
+
 if __name__ == "__main__":
     import sys as _s
     want = _s.argv[1:]
-    for fn in (dial, the_plan):
+    for fn in (dial, the_plan, hall_rows, hall_title, school_name, score_labels):
         if not want or fn.__name__ in want:
             fn()
