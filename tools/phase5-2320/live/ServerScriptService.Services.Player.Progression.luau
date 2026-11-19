@@ -55,7 +55,7 @@ end
 ---| Data |---
 
 function Shared.Sanitize(Raw: any)
-	local Out = { Level = 1; Exp = 0; Points = 0; Stats = {}; FatedDay = -1; Paths = {}; Tally = {} }
+	local Out = { Level = 1; Exp = 0; Points = 0; Stats = {}; FatedDay = -1; Paths = {}; Tally = {}; Honours = {}; Record = {}; RecordSeen = {} }
 	for _, S in Config.Stats do Out.Stats[S.Id] = 0 end
 	if typeof(Raw) ~= `table` then return Out end
 	local function num(V, Min, Max) return if typeof(V) == `number` and V == V then math.clamp(math.floor(V), Min, Max) else nil end
@@ -78,6 +78,28 @@ function Shared.Sanitize(Raw: any)
 		for _, K in PathsCfg.Tally do
 			local N = num(Raw.Tally[K], 0, 10 ^ 7)
 			if N then Out.Tally[K] = N end
+		end
+	end
+	-- (2.32) the Permanent Record: Honours earned ({ [Id] = day }), Notable Entries (newest first, 40), the keys written
+	local HonCfg = require(ReplicatedStorage.Config.Honours)
+	if typeof(Raw.Honours) == `table` then
+		for Id, Day in Raw.Honours do
+			if HonCfg.ById[Id] and typeof(Day) == `number` then Out.Honours[Id] = math.floor(Day) end
+		end
+	end
+	if typeof(Raw.Record) == `table` then
+		for _, E in Raw.Record do
+			if #Out.Record >= 40 then break end
+			if typeof(E) == `table` and typeof(E.Text) == `string` and typeof(E.Key) == `string` then
+				table.insert(Out.Record, { Day = if typeof(E.Day) == `number` then math.floor(E.Day) else 0; When = tostring(E.When or ``):sub(1, 30);
+					Key = E.Key:sub(1, 60); Text = E.Text:sub(1, 160) })
+			end
+		end
+	end
+	if typeof(Raw.RecordSeen) == `table` then
+		local N = 0
+		for K, V in Raw.RecordSeen do
+			if typeof(K) == `string` and V == true and N < 200 then Out.RecordSeen[K:sub(1, 60)] = true N += 1 end
 		end
 	end
 	return Out

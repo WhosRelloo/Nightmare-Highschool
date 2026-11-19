@@ -38,10 +38,26 @@ function Shared.Facts(P: Player)
 	if not (Prof and Pr) then return nil end
 	local F = { Subjects = {}; Rep = {}; CliqueTiers = {}; Tally = {} }
 	for _, K in Config.Tally do F.Tally[K] = Pr.Tally[K] or 0 end
+	F.Passed, F.APlus = 0, false -- (2.32) for Honours: subjects with a pass, an A+ ever
 	for Subject, C in Prof.Classes or {} do
-		if typeof(C) == `table` then F.Subjects[Subject] = tonumber(C.Level) or 1 end
+		if typeof(C) == `table` then
+			F.Subjects[Subject] = tonumber(C.Level) or 1
+			if (tonumber(C.Passes) or 0) >= 1 then F.Passed += 1 end
+			if C.BestGrade == `A+` then F.APlus = true end
+		end
 	end
 	F.BestStreak = (typeof(Prof.Attendance) == `table` and tonumber(Prof.Attendance.BestStreak)) or 0
+	F.Streak = (typeof(Prof.Attendance) == `table` and tonumber(Prof.Attendance.Streak)) or 0
+	-- (2.32) conduct: detentions served, and days since the last violation on the record
+	F.DetentionsServed, F.DaysClean, F.Today = 0, 10 ^ 6, 0
+	pcall(function() F.Today = svc(`School.SchoolClock`).GetState().Day or 0 end)
+	pcall(function()
+		local D = svc(`School.Discipline`).GetData(P)
+		F.DetentionsServed = tonumber(D.DetentionsServed) or 0
+		for _, R in D.Recent or {} do
+			if typeof(R) == `table` and typeof(R.Day) == `number` then F.DaysClean = math.min(F.DaysClean, F.Today - R.Day) end
+		end
+	end)
 	F.BestCard = 0
 	pcall(function()
 		local St = svc(`School.ReportCards`).State(P)
@@ -51,11 +67,14 @@ function Shared.Facts(P: Player)
 	for Cat in require(ReplicatedStorage.Config.Reputation).Categories do
 		F.Rep[Cat] = (Rep and Rep.Value(P, Cat)) or 0
 	end
-	F.Met = 0
+	F.Met, F.Trusted = 0, 0
 	pcall(function()
 		local Roster = svc(`Social.Roster`)
 		for Id, R in Rep.Get(P).Relationships do
-			if typeof(R) == `table` and R.Met == true and Roster.IsRostered(Id) then F.Met += 1 end
+			if typeof(R) == `table` and R.Met == true and Roster.IsRostered(Id) then
+				F.Met += 1
+				if (tonumber(R.Value) or 0) >= 50 then F.Trusted += 1 end -- (2.32) Trusted (Config.Reputation: 50 and up)
+			end
 		end
 	end)
 	pcall(function()
@@ -75,16 +94,20 @@ function Shared.Facts(P: Player)
 	F.Takedowns = (tonumber(Prof.Kills) or 0) + (tonumber(Prof.NPCKills) or 0)
 	F.Showdowns = 0
 	pcall(function() F.Showdowns = svc(`Social.CliqueShowdowns`).Summary(P).Beaten or 0 end)
-	F.ClubRank = `Rookie`
+	F.ClubRank, F.InClub = `Rookie`, false
 	pcall(function()
 		local S = svc(`Sports.Clubs`).Get(P)
-		if S and S.Club then F.ClubRank = require(ReplicatedStorage.Config.Sports).RankFor(S.ClubExp) end
+		if S and S.Club then F.InClub = true F.ClubRank = require(ReplicatedStorage.Config.Sports).RankFor(S.ClubExp) end
 	end)
 	local Q = svc(`Quests.Quests`)
 	F.Orientation = Q ~= nil and Q.IsDone(P, `Orientation`)
 	F.AfterHours = Q ~= nil and Q.IsDone(P, `AfterHours`)
 	F.FileKept = F.AfterHours and Q.Decided(P, `FileKept`) ~= `Lose`
 	F.LineageTier = 1
+	F.Tuned = false -- (2.32) Night FM's introduction heard (Features.Phone)
+	pcall(function() F.Tuned = svc(`Features.Phone`).Tuned(P) == true end)
+	F.StrikeGrade = nil -- (2.32) the Strikethrough's best grade (Quests.CineGrades)
+	pcall(function() local G = Q.CineGrades(P) F.StrikeGrade = G and G.Strikethrough and G.Strikethrough.Best end)
 	pcall(function() F.LineageTier = require(ReplicatedStorage.Lineage).Sanitize(Prof.Lineage).Tier or 1 end)
 	return F
 end
@@ -183,6 +206,9 @@ function Shared.CheckNow(P: Player): { { Path: string, Tier: number } }
 		end
 	end
 	Local.Mirror(P, Saved)
+	if not Shared.FactsOverride[P] then -- (2.32) the same facts earn Honours (never test facts)
+		pcall(function() svc(`Player.Honours`).CheckFacts(P, F) end)
+	end
 	return Made
 end
 
@@ -269,7 +295,8 @@ end
 function Local.ZeroFacts()
 	local F = { Subjects = {}; Rep = { Popularity = 0; Intimidation = 0; Trust = 0; Academics = 0 }; CliqueTiers = {}; Tally = {};
 		BestStreak = 0; BestCard = 0; Met = 0; FactionRank = 1; Takedowns = 0; Showdowns = 0; ClubRank = `Rookie`;
-		Orientation = false; AfterHours = false; FileKept = false; LineageTier = 1 }
+		Orientation = false; AfterHours = false; FileKept = false; LineageTier = 1;
+		Passed = 0; APlus = false; Streak = 0; DetentionsServed = 0; DaysClean = 10 ^ 6; Today = 0; InClub = false; Trusted = 0; Tuned = false }
 	for _, K in Config.Tally do F.Tally[K] = 0 end
 	return F
 end
@@ -283,6 +310,9 @@ function Local.MaxFacts()
 	F.Tally = { DuelWins = 5; Champion = 1; Beasts = 12; Escapes = 1; Superlatives = 1 }
 	return F
 end
+
+function Shared.ZeroFactsForTests() return Local.ZeroFacts() end -- (2.32) for the Honours test
+function Shared.MaxFactsForTests() return Local.MaxFacts() end
 
 function Shared.SelfTestForTests(P: Player)
 	local R = {}
