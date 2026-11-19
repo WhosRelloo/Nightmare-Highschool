@@ -2,6 +2,59 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.33.0] - 2026-11-18: Trophies (Progression & Identity 3 of 4)
+
+The spec is `docs/expansion/14-Progression-and-Identity.md` §5.
+- **Mirror:** `tools/phase5-2330/`.
+- **The Map place:** untouched.
+
+### Added
+- **Nine earned trophies**, modelled in PBR (`art/props/nh_props_batch48_trophies.py`, props batch 48) and imported
+  as `ReplicatedStorage.NHTrophies` (one MeshPart each, with a SurfaceAppearance of colour, normal, roughness and
+  metal from group 15981569):
+
+  | Trophy | What it looks like | How it's won |
+  |---|---|---|
+  | The Club Cup | a fluted gilt loving cup on an oak plinth | win a ranked club game |
+  | Honour Roll Plaque | an oak shield with a gilt laurel round an open book | a report card averaging A or better |
+  | The Ring Belt | a tooled black leather championship belt with a gilt centre plate | beat the Ring's champion |
+  | The Register | the school register open on a lectern, one name struck through | finish Chapter One (After Hours) |
+  | Medal of the Academic, Social, Combat, Athletic and Supernatural Path | struck gilt medals, one per path | reach that path's top tier |
+
+- **`Services.Player.Trophies`:** each trophy is an item (`Config.Items.Trophies`, kept in the Locker), granted once
+  when its rule holds on the same facts as the Standing Paths.
+  - **When you win one:** a "Trophy won" banner and a Notable Entry.
+  - **The new counter:** `Progress.Tally.MatchWins`, counted by `Sports.Matches` when a ranked club game is won.
+- **The Trophy Case** (the Record's Honours page, now "Honours & Trophies"): each trophy turns slowly in its own 3D
+  window. The ones not won yet are dark silhouettes with how to win them.
+- **The dorm's trophy wall:** three shelves on the room's right wall, 12 spots in all, built by
+  `tools/phase5-2330/build_trophy_wall.luau`. Won trophies stand there as their 3D models, scaled to their slot.
+  The old shelf keeps the beast trophies.
+- **TestBridge:** `TrophyTest`.
+
+### Changed
+- **`Features.Homes`:** earned trophies go on the wall (`WallSpot1..12`), and `RefreshTrophies(P)` puts a new one
+  up at once.
+- **`Paths.CheckNow`** also checks trophies after honours.
+
+### Checked
+- **Self-tests:**
+  - `TrophyTest`: 9 rules, none on empty facts, all on full facts.
+  - **Every earlier suite, all passing:** 26 in one session.
+- **Live (slot 2, restored after):**
+  - The Register was granted from slot 2's real progress.
+  - The Trophy Case shows The Register textured and turning, and the rest as silhouettes.
+  - On the dorm wall, The Register stands on shelf slot 1, facing into the room.
+  - All nine models render with their textures in game.
+- **Not checked:**
+  - a two-player run
+  - phone screens
+  - the frame rate (skipped, at the owner's request)
+  - a screenshot of the wall (the game's camera controller holds the camera)
+  - the Club Cup earned from a real ranked game (the counter's one line is in `Match:End`)
+- **Note:** the test room's dorm is small. The owner says the real dorms will be bigger, and the wall follows its
+  spot markers.
+
 ## [2.32.0] - 2026-11-18: The Permanent Record & Honours (Progression & Identity 2 of 4)
 
 The spec is `docs/expansion/14-Progression-and-Identity.md` §4. There was no separate plan file: the owner reshaped the
