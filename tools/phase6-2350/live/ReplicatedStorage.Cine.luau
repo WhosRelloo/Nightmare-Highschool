@@ -148,6 +148,15 @@ local function noisePreset(spec, fov)
 		local lens = fov > 45 and "wide" or (fov < 20 and "tele" or "normal")
 		name = "handheld_" .. lens .. "_strong"
 	end
+	-- (2.35.0) feel presets: the peak handheld amplitude a seamless cut asks for, on the lens's own preset
+	local FEEL = { calm = 0.08, tense = 0.25, chase = 0.6 }
+	if FEEL[name] then
+		local lens = fov > 45 and "wide" or (fov < 20 and "tele" or "normal")
+		local fp = NOISE["handheld_" .. lens .. (if name == "chase" then "_strong" else "_mild")]
+		local peak = 0
+		for _, l in fp.x do peak += 0.5 * l[1] end
+		return { p = fp, gain = FEEL[name] / math.max(peak, 1e-6) }
+	end
 	local p = NOISE[name]
 	if not p then return nil end
 	return { p = p, gain = gain }
@@ -423,6 +432,14 @@ local function evalCamera(c, sh, tau, aspect, cacheBySubject, useNoise)
 		end
 	end
 	return cf, fov, { subject = s, u = u }
+end
+
+-- (2.35.0) the camera a cut shows at time t, without handheld noise (the seamless glide aims at shot 1's first frame)
+function Cine.cameraAt(cut, t)
+	local c = compile(cut)
+	local sh = shotAt(c, t)
+	local cf, fov = evalCamera(c, sh, t - sh.start, viewportAspect(workspace.CurrentCamera), {}, false)
+	return cf, fov
 end
 
 -- ---------------------------------------------------------------- overlay (letterbox, fades, cards)

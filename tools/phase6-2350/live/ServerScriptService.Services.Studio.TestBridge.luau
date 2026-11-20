@@ -996,6 +996,32 @@ end
 
 ---| (2.25.0) interactive cuts: the judge and the graph |---
 
+-- (2.35.0) CineSeam: the glide's length, keys and lint
+function Commands.CineSeamTest()
+	local Seam = require(ReplicatedStorage.Functions.CineSeam)
+	local Fails = {}
+	local function check(C, Msg) if not C then table.insert(Fails, Msg) end end
+	local A = CFrame.lookAt(Vector3.new(0, 5, 10), Vector3.new(0, 5, 0))
+	local Near = A * CFrame.new(1, 0, -1)
+	local Far = CFrame.lookAt(Vector3.new(14, 5, -6), Vector3.new(0, 5, 0))
+	check(math.abs(Seam.Length(A, A) - 0.6) < 1e-6, "zero move glides 0.6 s")
+	check(Seam.Length(A, Far) <= 1.0 and Seam.Length(A, Far) > Seam.Length(A, Near), "longer move glides longer, at most 1.0 s")
+	check(math.abs(Seam.Length(A, Far, true) - 0.2) < 1e-6, "Reduce Motion: 0.2 s dissolve")
+	local K = Seam.Keys(A, 70, Far, 40, 0.8)
+	check(#K == 3 and K[1].t == 0 and math.abs(K[3].t - 0.8) < 1e-6, "three keys over the length")
+	check((K[1].pos - A.Position).Magnitude < 1e-4 and (K[3].pos - Far.Position).Magnitude < 1e-4, "keys start and end on the cameras")
+	check(K[1].fov == 70 and K[3].fov == 40, "fov carried")
+	local Mid = (A.Position + Far.Position) / 2
+	check((K[2].pos - Mid).Magnitude > 0.3, "the middle key bends the path")
+	check(Seam.Lint(A, Near) == nil, "a short glide passes lint")
+	check(Seam.Lint(A, CFrame.lookAt(Vector3.new(0, 5, -30), Vector3.new(0, 5, 0))) ~= nil, "a long glide is flagged")
+	check(math.abs(Seam.Ease(0)) < 1e-9 and math.abs(Seam.Ease(1) - 1) < 1e-9 and math.abs(Seam.Ease(0.5) - 0.5) < 1e-9, "smootherstep")
+	local Cine = require(ReplicatedStorage.Cine)
+	local Cf, Fov = Cine.cameraAt({ shots = { { dur = 2, camera = { cframe = Far, lens = 50 } } } }, 1)
+	check((Cf.Position - Far.Position).Magnitude < 1e-4 and math.abs(Fov - Cine.mmToFov(50)) < 1e-4, "cameraAt evaluates a shot")
+	return #Fails == 0 and "CineSeamTest OK" or table.concat(Fails, "; ")
+end
+
 local function CineJudge() return require(game:GetService(`ReplicatedStorage`).Functions.CineJudge) end
 
 -- every scoring rule on fixed inputs; returns { Passed, Failed = { "name: got X, want Y" } }
