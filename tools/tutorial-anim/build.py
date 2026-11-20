@@ -276,6 +276,30 @@ def end_pose(q, p):
     return tilt(q), np.array([0.0, 0.0, float(p[2])])
 
 
+SETTLE_FRAMES = 10          # the _End clip: this many frames of the last motion dying out (0.82 per frame), then a 2-frame hold
+
+
+def end_settle(clip):
+    """the piece's _End clip: frame k (0..SETTLE_FRAMES) is the piece's last frame continued with the decaying velocity
+    (Clip.frame's extrapolation), two more repeat the last. Every frame gets the one transform that takes the LAST frame's
+    ground offset and heading out (turn about up by -yaw, move its torso X/Y to 0, height kept), so frame 0 is exactly
+    end_pose() and the root re-seat (end_offset) is the same for all of them."""
+    src = Clip(clip.name, clip.q, clip.p, loop=False)                  # a loop piece must extrapolate, not wrap
+    last = src.n - 1
+    qs, ps = [], []
+    for k in range(SETTLE_FRAMES + 1):
+        q, p = src.frame(last + k)
+        qs.append(np.array(q, dtype=float))
+        ps.append(np.array(p, dtype=float))
+    qs += [qs[-1].copy(), qs[-1].copy()]
+    ps += [ps[-1].copy(), ps[-1].copy()]
+    ext = Clip(clip.name + "_End", np.array(qs), np.array(ps), loop=False)
+    phi = -yaw_of(src.q[last, 0])
+    c, s = math.cos(phi), math.sin(phi)
+    x, y = src.p[last, 0, 0], src.p[last, 0, 1]
+    return ext.aligned(phi, -(c * x - s * y), -(s * x + c * y), name=clip.name + "_End")
+
+
 class Piece:
     def __init__(self, name, loop=False):
         self.name, self.loop = name, loop
@@ -615,10 +639,7 @@ def main():
             c = pc.clip(loop=pc.loop)
             write_lua(c)
             built.append((c, pc))
-            eq, ep = end_pose(c.q[-1][0], c.p[-1][0])
-            endq, endp = c.q[-1].copy(), c.p[-1].copy()
-            endq[0], endp[0] = eq, ep
-            write_lua(Clip(f"{c.name}_End", np.array([endq, endq]), np.array([endp, endp]), loop=False))
+            write_lua(end_settle(c))
             e = {"Piece": pc.name, "Length": round((c.n - 1) / FPS, 3)}
             if pc.loop:
                 e.update(Loop=True, Entry=round(pc.entry, 3), Exit=round(pc.exit, 3))

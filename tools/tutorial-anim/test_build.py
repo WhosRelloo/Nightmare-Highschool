@@ -44,5 +44,38 @@ class GameClip(unittest.TestCase):
         self.assertTrue(np.allclose(np.linalg.norm(c.q, axis=2), 1.0, atol=1e-4))
 
 
+class EndSettle(unittest.TestCase):
+    def synthetic(self, n=20):
+        """a torso turning and walking, and the left arm swinging at constant speed"""
+        q = np.zeros((n, len(B.JOINTS), 4)); p = np.zeros((n, len(B.JOINTS), 3))
+        for f in range(n):
+            for j in range(len(B.JOINTS)):
+                q[f, j] = [0, 0, 0, 1]
+            q[f, 0] = B.qmul(B.zq(0.3 + 0.02 * f), np.array([math.sin(0.05), 0, 0, math.cos(0.05)]))
+            p[f, 0] = [1.0 + 0.05 * f, -2.0 + 0.03 * f, 0.6]
+            a = 0.04 * f
+            q[f, 2] = [math.sin(a / 2), 0, 0, math.cos(a / 2)]
+        return B.Clip("Synth", q, p, loop=False)
+
+    def test_frame_zero_is_the_end_pose_and_the_limb_stays(self):
+        c = self.synthetic()
+        s = B.end_settle(c)
+        eq, ep = B.end_pose(c.q[-1][0], c.p[-1][0])
+        self.assertTrue(np.allclose(s.q[0][0], eq, atol=1e-6) or np.allclose(s.q[0][0], -eq, atol=1e-6))
+        self.assertTrue(np.allclose(s.p[0][0], ep, atol=1e-6))
+        self.assertTrue(np.allclose(s.q[0][2], c.q[-1][2], atol=1e-6) or np.allclose(s.q[0][2], -c.q[-1][2], atol=1e-6))
+
+    def test_limb_speed_decays_to_zero_and_the_last_two_frames_match(self):
+        c = self.synthetic()
+        s = B.end_settle(c)
+        self.assertEqual(s.n, B.SETTLE_FRAMES + 3)
+        v = [B.qang(s.q[k][2], s.q[k + 1][2]) for k in range(s.n - 1)]
+        for k in range(B.SETTLE_FRAMES - 1):
+            self.assertLess(v[k + 1], v[k], v)                # strictly slowing across the settle
+        self.assertGreater(v[0], 0.5 * 0.04)                  # it does start at about the clip's own speed
+        self.assertAlmostEqual(v[-1], 0.0, places=5)  # acos near 1 is only good to ~1e-7
+        self.assertTrue(np.allclose(s.q[-1], s.q[-2]) and np.allclose(s.p[-1], s.p[-2]))
+
+
 if __name__ == "__main__":
     unittest.main()

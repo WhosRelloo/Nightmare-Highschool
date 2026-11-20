@@ -13,6 +13,7 @@ local Player = Players.LocalPlayer
 local Shared = {}
 local Held = false
 local EndTrack: AnimationTrack? = nil
+local HoldConn: RBXScriptConnection? = nil
 local SpeedWas: number? = nil
 
 local function controls()
@@ -106,7 +107,6 @@ function Shared.Reseat(Piece: string, Offset: { X: number, Z: number, Yaw: numbe
 	A.AnimationId = Resolve(Piece .. `_End`) or ``
 	local T = Animator:LoadAnimation(A)
 	T.Priority = Enum.AnimationPriority.Action4
-	T.Looped = true -- the _End clip is 2 frames (0.033 s) of one pose: it must hold until Release, or the body falls to idle
 	-- the _End pose (offset taken out) must take effect in the same engine step in which the root moves under the body.
 	-- Order in a step: PreAnimation -> animation evaluation -> PreSimulation -> physics -> render. :Play() takes effect at the
 	-- next evaluation, a CFrame write at once, so the write is armed on PreSimulation (after that evaluation, before render).
@@ -120,10 +120,22 @@ function Shared.Reseat(Piece: string, Offset: { X: number, Z: number, Yaw: numbe
 		task.spawn(Waiting)
 	end)
 	coroutine.yield()
+	-- the _End clip is a short settle (the piece's last motion dying out, then two identical frames): hold the final pose
+	-- from one frame before its end until Release, so the body neither falls to idle nor freezes mid-motion
+	local Hold: RBXScriptConnection
+	Hold = RunService.PreAnimation:Connect(function()
+		if T.TimePosition >= T.Length - 1 / 30 or not T.IsPlaying then
+			Hold:Disconnect()
+			T.TimePosition = math.max(T.TimePosition, T.Length - 1 / 30)
+			T:AdjustSpeed(0)
+		end
+	end)
+	HoldConn = Hold
 	EndTrack = T
 end
 
 function Shared.Release()
+	if HoldConn then HoldConn:Disconnect() HoldConn = nil end
 	if EndTrack then EndTrack:Stop(0.25) EndTrack = nil end -- the game's idle/walk blends back in (spec §2.2)
 	local Ctl = controls()
 	if Ctl then Ctl:Enable() end
