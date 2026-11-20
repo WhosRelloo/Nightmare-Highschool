@@ -6,8 +6,10 @@
   WF_PortraitAshbySmile  the same, smiling: a thin, far-too-wide smile (the game swaps the canvas when you look back)
   WF_Condemned           the council's notice nailed to the door: CONDEMNED, UNSAFE STRUCTURE, KEEP OUT, by order of the
                          Wickfield Building Inspector, 1987, faded and rain-streaked
+  WF_Timetable           the bus stop timetable, Route 4, last bus 10:40 PM, and a marker warning underneath
+  WF_BusBlind            the black bus's destination blind: route 13, NIGHTMARE HIGH in amber
 
-  python art/hometown/ashby_canvases.py
+  python art/hometown/ashby_canvases.py [portrait|condemned|timetable|blind|side|plate|sign|band]
 """
 import math
 import os
@@ -149,13 +151,130 @@ def timetable():
     Q.save(L, "WF_Timetable")
 
 
+Q.PBR["WF_BusBlind"] = dict(rough=0.35, ink_rough=0.3, ink_lift=0.05, strength=1.0)
+
+
+def bus_blind():
+    """the black bus's destination blind: a worn roller of black linen, amber letters lit from behind, route 13 in a box,
+    NIGHTMARE HIGH; the roll's creases and a faint second destination (WICKFIELD) bleeding through from the last turn"""
+    L = H.Logo("WF_BusBlind", 1792, 256)
+    W, Hh = 1792, 256
+    L.paint(L.rrect(0, 0, W, Hh, 0), "#0b0a0c")
+    Q.fibres(L, 700, 0.04)
+    L.paint(L.text("WICKFIELD", "georgiab", 120, W / 2 + 120, 128 - 210, spacing=10), "#e3a040", alpha=0.08)
+    L.paint(L.rrect(40, 40, 240, 216, 10), "#e8a43a")
+    L.paint(L.rrect(52, 52, 228, 204, 6), "#0b0a0c")
+    L.paint(L.text("13", "georgiab", 120, 140, 132), "#f2b552")
+    glow = L.text("NIGHTMARE HIGH", "georgiab", 128, W / 2 + 110, 132, spacing=12)
+    L.paint(glow, "#f2b552")
+    L.paint(L.text("NIGHTMARE HIGH", "georgiab", 128, W / 2 + 110, 132, spacing=12) * (Q.noise(L, 0.6, 700) > 0.55), "#6a3a10", alpha=0.6)
+    for x in (430, 980, 1500):     # roller creases
+        L.paint(L.rrect(x, 0, x + 3, Hh, 1), "#000000", alpha=0.6)
+        L.paint(L.rrect(x + 3, 0, x + 5, Hh, 1), "#3a3436", alpha=0.4)
+    Q.save(L, "WF_BusBlind")
+
+
+Q.PBR["WF_BusSide"] = dict(rough=0.3, ink_rough=0.18, ink_lift=0.2, strength=2.0)
+Q.PBR["WF_BusPlate"] = dict(rough=0.4, ink_rough=0.25, ink_lift=0.5, strength=4.0)
+Q.PBR["WF_BusSign"] = dict(rough=0.35, ink_rough=0.3, ink_lift=0.08, strength=1.5)
+Q.PBR["WF_ShelterBand"] = dict(rough=0.4, ink_rough=0.35, ink_lift=0.05, strength=1.2)
+
+
+def _gold(L, txt, font, px, x, y, spacing=0):
+    """gold leaf lettering: a dark drop shadow, a deep gold body, a pale highlight along the top edge"""
+    L.paint(L.text(txt, font, px, x + px * 0.04, y + px * 0.05, spacing=spacing), "#000000", alpha=0.85)
+    m = L.text(txt, font, px, x, y, spacing=spacing)
+    L.paint(m, "#a8782a")
+    L.paint(m * (L.text(txt, font, px, x, y - px * 0.035, spacing=spacing) < 0.5), "#f6dc8a")
+    L.paint(m * (Q.noise(L, 0.4, 801) > 0.6), "#6a4a1a", alpha=0.5)
+
+
+def bus_side():
+    """the letterboard over the black bus's windows: NIGHTMARE HIGHSCHOOL in gold leaf, a crimson pin line above and
+    below with curled ends, the fleet number 13 at each end"""
+    L = H.Logo("WF_BusSide", 2560, 256)
+    W, Hh = 2560, 256
+    L.paint(L.rrect(0, 0, W, Hh, 0), "#09080a")
+    Q.fibres(L, 802, 0.03)
+    for y in (34, 222):
+        L.paint(L.rrect(150, y - 3, W - 150, y + 3, 3), "#8a0f18")
+        for x in (150, W - 150):
+            L.paint(L.ellipse(x, y, 14), "#8a0f18")
+            L.paint(L.ellipse(x, y, 8), "#09080a")
+    _gold(L, "NIGHTMARE HIGHSCHOOL", "georgiab", 118, W / 2, 132, spacing=14)
+    for x in (78, W - 78):
+        _gold(L, "13", "georgiab", 64, x, 132)
+    Q.save(L, "WF_BusSide")
+
+
+def bus_plate():
+    """the bus's plate: black enamel, a crimson rim, raised silver NH 1313 and a line of small text that should not exist"""
+    L = H.Logo("WF_BusPlate", 1024, 512)
+    W, Hh = 1024, 512
+    L.paint(L.rrect(0, 0, W, Hh, 40), "#b8b4ac")
+    L.paint(L.rrect(14, 14, W - 14, Hh - 14, 32), "#7a0c14")
+    L.paint(L.rrect(30, 30, W - 30, Hh - 30, 24), "#0c0b0d")
+    L.paint(L.text("NIGHT TRANSPORT", "georgiab", 44, W / 2, 86, spacing=10), "#c9c3b6")
+    L.paint(L.text("NH 1313", "georgiab", 168, W / 2 + 6, 284, spacing=10), "#000000", alpha=0.8)
+    L.paint(L.text("NH 1313", "georgiab", 168, W / 2, 276, spacing=10), "#d8d4cc")
+    L.paint(L.text("NO RETURN SERVICE", "georgia", 36, W / 2, 440, spacing=8), "#9a948a")
+    for x, y in ((80, 80), (W - 80, 80), (80, Hh - 80), (W - 80, Hh - 80)):
+        L.paint(L.ellipse(x, y, 18), "#8a867e")
+        L.paint(L.ellipse(x, y, 6), "#3a3836")
+    Q.age_paper(L, 803, folds=(), tape=False)
+    Q.save(L, "WF_BusPlate")
+
+
+def bus_sign():
+    """the stop's flag: enamelled steel, a white top band (BUS STOP), the route 4 roundel, WICKFIELD TRANSIT and the
+    oak leaf; chipped at the corners and a sticker someone has half peeled off"""
+    L = H.Logo("WF_BusSign", 768, 1024)
+    W, Hh = 768, 1024
+    L.paint(L.rrect(0, 0, W, Hh, 60), "#1f4a32")
+    L.paint(L.rrect(16, 16, W - 16, Hh - 16, 48), "#f2eee2", alpha=1.0)
+    L.paint(L.rrect(30, 30, W - 30, Hh - 30, 40), "#1f4a32")
+    L.paint(L.rrect(30, 30, W - 30, 250, 40), "#f2eee2")
+    L.paint(L.text("BUS", "georgiab", 96, W / 2, 95, spacing=16), "#1f4a32")
+    L.paint(L.text("STOP", "georgiab", 96, W / 2, 195, spacing=16), "#1f4a32")
+    L.paint(L.ellipse(W / 2, 500, 175), "#f2eee2")
+    L.paint(L.ellipse(W / 2, 500, 150), "#e3b23c")
+    L.paint(L.text("4", "georgiab", 230, W / 2, 512), "#1a1612")
+    L.paint(L.text("WICKFIELD", "georgiab", 70, W / 2, 770, spacing=6), "#f2eee2")
+    L.paint(L.text("TRANSIT", "georgiab", 70, W / 2, 850, spacing=18), "#f2eee2")
+    L.paint(L.text("Alder Lane", "georgiai", 40, W / 2, 930), "#e3b23c")
+    rng = np.random.default_rng(804)
+    for x, y in ((40, 40), (W - 40, 40), (40, Hh - 40), (W - 40, Hh - 40), (W - 40, 520), (60, 700)):
+        for _ in range(4):
+            L.paint(L.ellipse(x + rng.uniform(-14, 14), y + rng.uniform(-14, 14), rng.uniform(3, 8)), "#5a3a26", alpha=0.85)
+    L.paint(L.rrect(520, 640, 690, 720, 8), "#c8c2b0")                   # the peeled sticker
+    L.paint(L.text("GO PUMAS", "georgiab", 26, 600, 680), "#7a1a12", alpha=0.6)
+    Q.save(L, "WF_BusSign")
+
+
+def shelter_band():
+    """the shelter's fascia: WICKFIELD TRANSIT, the stop's name, the route roundel"""
+    L = H.Logo("WF_ShelterBand", 2560, 256)
+    W, Hh = 2560, 256
+    L.paint(L.rrect(0, 0, W, Hh, 0), "#1f4a32")
+    L.paint(L.rrect(0, 18, W, 24, 0), "#e3b23c")
+    L.paint(L.rrect(0, Hh - 24, W, Hh - 18, 0), "#e3b23c")
+    L.paint(L.text("WICKFIELD TRANSIT", "georgiab", 84, 860, 132, spacing=8), "#f2eee2")
+    L.paint(L.text("ALDER LANE STOP", "georgia", 60, 1820, 132, spacing=6), "#e3b23c")
+    L.paint(L.ellipse(W - 140, 128, 84), "#f2eee2")
+    L.paint(L.ellipse(W - 140, 128, 70), "#e3b23c")
+    L.paint(L.text("4", "georgiab", 100, W - 140, 134), "#1a1612")
+    L.paint(L.ellipse(140, 128, 84), "#f2eee2")
+    L.paint(L.ellipse(140, 128, 70), "#e3b23c")
+    L.paint(L.text("4", "georgiab", 100, 140, 134), "#1a1612")
+    for k in range(30):
+        x = 40 + k * 86
+        L.paint(L.rrect(x, 30, x + 4, Hh - 30, 2), "#0a1a10", alpha=0.18)  # rain streaks
+    Q.save(L, "WF_ShelterBand")
+
+
 if __name__ == "__main__":
     want = sys.argv[1:]
-    for fn in (lambda: portrait(False), lambda: portrait(True), condemned, timetable):
-        pass
-    if not want:
-        portrait(False)
-        portrait(True)
-        condemned()
-    if not want or "timetable" in want:
-        timetable()
+    jobs = {"portrait": lambda: (portrait(False), portrait(True)), "condemned": condemned, "timetable": timetable, "blind": bus_blind, "side": bus_side, "plate": bus_plate, "sign": bus_sign, "band": shelter_band}
+    for k, fn in jobs.items():
+        if not want or k in want:
+            fn()
