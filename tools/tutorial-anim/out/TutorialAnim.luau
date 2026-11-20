@@ -3,25 +3,25 @@
 -- A chain is a list of PIECES. A one-shot piece is several clips already blended into one; a Loop piece holds
 -- until its cue. Every switch between pieces lands on an identical frame (switch instantly, no fade): a loop is entered at Entry and left at
 -- Exit (seconds into the loop), so the blends are all baked and nothing pops. Hold: freeze on the last frame.
--- The KeyframeSequences are in ServerStorage.NHTutorialAnims for the owner to publish; put the ids in Ids.
+-- The KeyframeSequences (and <Piece>_End poses) are in ReplicatedStorage.NHCineClips.Tutorial.
 
 local TutorialAnim = {}
 
 TutorialAnim.Ids = {
 	["ColdOpen1"] = "",
 	["Drainpipe1"] = "",
-	["Drainpipe2_SneakLoop"] = "",
-	["BiscuitStirs1_SneakLoop"] = "",
+	["Drainpipe2_GameCrouch"] = "",
+	["BiscuitStirs1_GameCrouchWalk"] = "",
 	["BiscuitStirs2"] = "",
-	["BiscuitStirs3_SneakLoop"] = "",
-	["FenceOver1_SneakLoop"] = "",
+	["BiscuitStirs3_GameCrouchWalk"] = "",
+	["FenceOver1_GameCrouchWalk"] = "",
 	["FenceOver2"] = "",
 	["ThePlan1"] = "",
 	["Getaway1_RunLookBack"] = "",
 	["Getaway2"] = "",
 	["Getaway3_LookAroundNervous"] = "",
 	["HomeAgain1"] = "",
-	["HomeAgain2_SneakLoop"] = "",
+	["HomeAgain2_GameCrouchWalk"] = "",
 	["HomeAgain3"] = "",
 	["HomeAgain4_SleepLoop"] = "",
 	["HomeAgain5"] = "",
@@ -45,87 +45,92 @@ TutorialAnim.Ids = {
 
 TutorialAnim.Chains = {
 	ColdOpen = {
-		{ Piece = "ColdOpen1", Length = 3.633, Hold = true },
+		{ Piece = "ColdOpen1", Length = 3.633, Hold = true, EndOffset = { X = -0.9255, Z = -0.044, Yaw = -72.291 } },
 	},
 	Drainpipe = {
-		{ Piece = "Drainpipe1", Length = 2.867 },
-		{ Piece = "Drainpipe2_SneakLoop", Length = 1.667, Loop = true, Entry = 1.433, Exit = 0.0 },
+		{ Piece = "Drainpipe1", Length = 2.933, EndOffset = { X = -0.1705, Z = 0.3113, Yaw = 19.228 } },
+		{ Piece = "Drainpipe2_GameCrouch", Length = 2.833, Loop = true, Entry = 0.633, Exit = 0.0, EndOffset = { X = -0.1767, Z = 0.3011, Yaw = 18.681 } },
 	},
 	BiscuitStirs = {
-		{ Piece = "BiscuitStirs1_SneakLoop", Length = 1.667, Loop = true, Entry = 0.0, Exit = 0.433 },
-		{ Piece = "BiscuitStirs2", Length = 5.7 },
-		{ Piece = "BiscuitStirs3_SneakLoop", Length = 1.667, Loop = true, Entry = 0.567, Exit = 0.0 },
+		{ Piece = "BiscuitStirs1_GameCrouchWalk", Length = 1.333, Loop = true, Entry = 0.0, Exit = 0.467, EndOffset = { X = -0.0123, Z = -0.2034, Yaw = -21.855 } },
+		{ Piece = "BiscuitStirs2", Length = 5.6, EndOffset = { X = 0.0314, Z = -0.1836, Yaw = -28.866 } },
+		{ Piece = "BiscuitStirs3_GameCrouchWalk", Length = 1.333, Loop = true, Entry = 0.3, Exit = 0.0, EndOffset = { X = 0.0188, Z = -0.1951, Yaw = -25.654 } },
 	},
 	FenceOver = {
-		{ Piece = "FenceOver1_SneakLoop", Length = 1.667, Loop = true, Entry = 0.0, Exit = 0.667 },
-		{ Piece = "FenceOver2", Length = 2.967 },
+		{ Piece = "FenceOver1_GameCrouchWalk", Length = 1.333, Loop = true, Entry = 0.0, Exit = 0.467, EndOffset = { X = -0.0123, Z = -0.2034, Yaw = -21.855 } },
+		{ Piece = "FenceOver2", Length = 2.9, EndOffset = { X = -1.5586, Z = -0.4214, Yaw = -100.683 } },
 	},
 	ThePlan = {
-		{ Piece = "ThePlan1", Length = 8.167 },
+		{ Piece = "ThePlan1", Length = 8.167, EndOffset = { X = -0.184, Z = -2.1859, Yaw = -39.048 } },
 	},
 	Getaway = {
-		{ Piece = "Getaway1_RunLookBack", Length = 2.233, Loop = true, Entry = 0.0, Exit = 1.933 },
-		{ Piece = "Getaway2", Length = 8.1 },
-		{ Piece = "Getaway3_LookAroundNervous", Length = 4.467, Loop = true, Entry = 1.8, Exit = 0.0 },
+		{ Piece = "Getaway1_RunLookBack", Length = 2.233, Loop = true, Entry = 0.0, Exit = 1.933, EndOffset = { X = -0.0883, Z = -0.3516, Yaw = 13.415 } },
+		{ Piece = "Getaway2", Length = 8.1, EndOffset = { X = -2.3239, Z = -6.871, Yaw = -24.622 } },
+		{ Piece = "Getaway3_LookAroundNervous", Length = 4.467, Loop = true, Entry = 1.8, Exit = 0.0, EndOffset = { X = -2.2942, Z = -6.9044, Yaw = -11.821 } },
 	},
 	HomeAgain = {
-		{ Piece = "HomeAgain1", Length = 2.7 },
-		{ Piece = "HomeAgain2_SneakLoop", Length = 1.667, Loop = true, Entry = 0.3, Exit = 0.533 },
-		{ Piece = "HomeAgain3", Length = 4.9 },
-		{ Piece = "HomeAgain4_SleepLoop", Length = 1.7, Loop = true, Entry = 0.167, Exit = 0.033 },
-		{ Piece = "HomeAgain5", Length = 1.2 },
-		{ Piece = "HomeAgain6_LieLookAround", Length = 12.5, Loop = true, Entry = 5.467, Exit = 0.0 },
+		{ Piece = "HomeAgain1", Length = 2.7, EndOffset = { X = -0.0593, Z = -0.0846, Yaw = -20.127 } },
+		{ Piece = "HomeAgain2_GameCrouchWalk", Length = 1.333, Loop = true, Entry = 0.3, Exit = 0.533, EndOffset = { X = -0.0736, Z = -0.094, Yaw = -16.916 } },
+		{ Piece = "HomeAgain3", Length = 4.867, EndOffset = { X = -0.5598, Z = 1.8135, Yaw = -10.351 } },
+		{ Piece = "HomeAgain4_SleepLoop", Length = 1.7, Loop = true, Entry = 0.167, Exit = 0.033, EndOffset = { X = -0.5602, Z = 1.8135, Yaw = -10.365 } },
+		{ Piece = "HomeAgain5", Length = 1.2, EndOffset = { X = -0.5641, Z = 1.8124, Yaw = -10.779 } },
+		{ Piece = "HomeAgain6_LieLookAround", Length = 12.5, Loop = true, Entry = 5.467, Exit = 0.0, EndOffset = { X = -0.5582, Z = 1.8075, Yaw = -10.37 } },
 	},
 	Excuses = {
-		{ Piece = "Excuses1_LieLookAround", Length = 12.5, Loop = true, Entry = 0.0, Exit = 4.133 },
-		{ Piece = "Excuses2", Length = 15.233 },
+		{ Piece = "Excuses1_LieLookAround", Length = 12.5, Loop = true, Entry = 0.0, Exit = 4.133, EndOffset = { X = 0.0292, Z = 0.4564, Yaw = -2.141 } },
+		{ Piece = "Excuses2", Length = 15.233, EndOffset = { X = 0.1354, Z = -1.9423, Yaw = -8.63 } },
 	},
 	ParentsWaiting = {
-		{ Piece = "ParentsWaiting1_ParentSit", Length = 6.4, Loop = true, Entry = 0.0, Exit = 2.8 },
-		{ Piece = "ParentsWaiting2", Length = 3.067 },
-		{ Piece = "ParentsWaiting3_ParentSit", Length = 6.4, Loop = true, Entry = 3.8, Exit = 0.067 },
-		{ Piece = "ParentsWaiting4", Length = 30.967 },
-		{ Piece = "ParentsWaiting5_ParentSit", Length = 6.4, Loop = true, Entry = 0.567, Exit = 0.0 },
+		{ Piece = "ParentsWaiting1_ParentSit", Length = 6.4, Loop = true, Entry = 0.0, Exit = 2.8, EndOffset = { X = -0.0151, Z = -0.5023, Yaw = 0.452 } },
+		{ Piece = "ParentsWaiting2", Length = 3.067, EndOffset = { X = -0.0103, Z = -0.5252, Yaw = 0.422 } },
+		{ Piece = "ParentsWaiting3_ParentSit", Length = 6.4, Loop = true, Entry = 3.8, Exit = 0.067, EndOffset = { X = -0.0131, Z = -0.5142, Yaw = 0.307 } },
+		{ Piece = "ParentsWaiting4", Length = 30.967, EndOffset = { X = -0.0073, Z = -0.5289, Yaw = -0.657 } },
+		{ Piece = "ParentsWaiting5_ParentSit", Length = 6.4, Loop = true, Entry = 0.567, Exit = 0.0, EndOffset = { X = -0.0084, Z = -0.5109, Yaw = -0.724 } },
 	},
 	Breakfast = {
-		{ Piece = "Breakfast1_TableIdle", Length = 4.167, Loop = true, Entry = 0.0, Exit = 0.467 },
-		{ Piece = "Breakfast2", Length = 6.433 },
-		{ Piece = "Breakfast3_TableIdle", Length = 4.167, Loop = true, Entry = 1.133, Exit = 0.0 },
+		{ Piece = "Breakfast1_TableIdle", Length = 4.167, Loop = true, Entry = 0.0, Exit = 0.467, EndOffset = { X = -0.0153, Z = -0.2294, Yaw = -0.947 } },
+		{ Piece = "Breakfast2", Length = 6.433, EndOffset = { X = -0.0218, Z = -0.2219, Yaw = -0.997 } },
+		{ Piece = "Breakfast3_TableIdle", Length = 4.167, Loop = true, Entry = 1.133, Exit = 0.0, EndOffset = { X = -0.0161, Z = -0.2258, Yaw = -0.893 } },
 	},
 	MomSlidesEnvelope = {
-		{ Piece = "MomSlidesEnvelope1_ParentSit", Length = 6.4, Loop = true, Entry = 0.0, Exit = 2.867 },
-		{ Piece = "MomSlidesEnvelope2", Length = 1.9 },
-		{ Piece = "MomSlidesEnvelope3_ParentSit", Length = 6.4, Loop = true, Entry = 0.633, Exit = 0.0 },
+		{ Piece = "MomSlidesEnvelope1_ParentSit", Length = 6.4, Loop = true, Entry = 0.0, Exit = 2.867, EndOffset = { X = -0.0151, Z = -0.5023, Yaw = 0.452 } },
+		{ Piece = "MomSlidesEnvelope2", Length = 1.9, EndOffset = { X = -0.0225, Z = -0.4205, Yaw = 0.885 } },
+		{ Piece = "MomSlidesEnvelope3_ParentSit", Length = 6.4, Loop = true, Entry = 0.633, Exit = 0.0, EndOffset = { X = -0.023, Z = -0.3996, Yaw = 0.786 } },
 	},
 	TheBus = {
-		{ Piece = "TheBus1_WaitBored", Length = 10.667, Loop = true, Entry = 0.0, Exit = 5.133 },
-		{ Piece = "TheBus2", Length = 4.0 },
+		{ Piece = "TheBus1_WaitBored", Length = 10.667, Loop = true, Entry = 0.0, Exit = 5.133, EndOffset = { X = -0.0118, Z = 0.0769, Yaw = 1.548 } },
+		{ Piece = "TheBus2", Length = 4.0, EndOffset = { X = -0.1218, Z = -1.2967, Yaw = -9.195 } },
 	},
 }
 
 -- Play a chain on an Animator. cues[k] (optional) is a function that yields until the loop at step k may end
 -- (no cue: the loop plays once). Every switch lands on an identical frame, so pieces switch instantly (no fade: a fade
 -- in from weight 0 would show the rig's default pose for a moment), and the time a switch overshoots its exact point
--- by is carried into the next piece, so even a fast loop never skips. ids: piece name -> animation id (published asset
--- ids in game; the KeyframeSequences' PreviewId attributes in Studio). Returns the tracks.
-function TutorialAnim.Play(animator: Animator, chain: string, ids: { [string]: string }, cues: { [number]: () -> () }?)
+-- by is carried into the next piece, so even a fast loop never skips. resolve: piece name -> animation id (the director passes `Ctx.Clip`);
+-- onSwitch: called as each piece starts (the body check marks the switches). Returns the tracks.
+function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) -> string?, cues: { [number]: () -> () }?, onSwitch: ((string) -> ())?)
 	local RunService = game:GetService("RunService")
 	local steps = TutorialAnim.Chains[chain]
 	assert(steps, "no tutorial chain " .. chain)
 	local loaded = {}
 	for _, st in steps do
-		local a = Instance.new("Animation")
-		a.AnimationId = ids[st.Piece]
-		local t = animator:LoadAnimation(a)
-		t.Priority = Enum.AnimationPriority.Action
-		loaded[st.Piece] = t
+		local id = resolve(st.Piece) or ""
+		if id ~= "" then
+			local a = Instance.new("Animation")
+			a.AnimationId = id
+			local t = animator:LoadAnimation(a)
+			t.Priority = Enum.AnimationPriority.Action
+			loaded[st.Piece] = t
+		end
 	end
 	local prev: AnimationTrack? = nil
 	local over = 0
 	for k, st in steps do
 		local t = loaded[st.Piece]
+		if not t then continue end
 		t.Looped = st.Loop == true
 		t:Play(0)
+		if onSwitch then onSwitch(st.Piece) end
 		t.TimePosition = if st.Loop then ((st.Entry or 0) + over) % st.Length else math.max(0, over)
 		if prev then prev:Stop(0) end
 		prev = t

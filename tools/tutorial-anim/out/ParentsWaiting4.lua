@@ -964,9 +964,14 @@ for line in string.gmatch(DATA, "[^\n]+") do
 	end
 	kf.Parent = seq
 end
-local root = game.ServerStorage
-local folder = root:FindFirstChild("NHTutorialAnims") or Instance.new("Folder")
-folder.Name = "NHTutorialAnims"
+local root = game.ReplicatedStorage:FindFirstChild("NHCineClips")
+if not root then
+	root = Instance.new("Folder")
+	root.Name = "NHCineClips"
+	root.Parent = game.ReplicatedStorage
+end
+local folder = root:FindFirstChild("Tutorial") or Instance.new("Folder")
+folder.Name = "Tutorial"
 folder.Parent = root
 local old = folder:FindFirstChild(seq.Name)
 if old then old:Destroy() end

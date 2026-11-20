@@ -9,20 +9,20 @@ and the head comes last. **Re-seat**: the turn and ground shift baked into B's t
 |---|---|---|---|---|---|---|---|
 | ColdOpen | PeekOut -> ClimbThrough | 2.33 | 2.32 | 2.23 | 0.00 | 0.97 s staged | 17 deg, 0.6 st |
 | Drainpipe | WallClimbDown -> HangDrop | 1.30 | 0.75 | 1.83 | 0.47 | 0.70 s staged | 69 deg, 1.3 st |
-| Drainpipe | HangDrop -> SneakLoop | 0.82 | 0.72 | 1.03 | 0.97 | 0.70 s staged | 36 deg, 0.7 st |
-| BiscuitStirs | SneakLoop -> LookBackNervous | 0.74 | 0.78 | 0.93 | 0.00 | 0.77 s staged | -9 deg, 0.7 st |
-| BiscuitStirs | LookBackNervous -> SneakRight | 1.10 | 1.11 | 3.77 | 0.00 | 0.90 s staged | -185 deg, 0.3 st |
-| BiscuitStirs | SneakRight -> SneakLoop | 0.70 | 0.57 | 1.00 | 0.13 | 0.63 s staged | -4 deg, 0.0 st |
-| FenceOver | SneakLoop -> ClimbThrough | 1.87 | 1.81 | 1.27 | 0.77 | 0.97 s staged | 3 deg, 0.5 st |
+| Drainpipe | HangDrop -> GameCrouch | 1.11 | 1.02 | 1.03 | 0.10 | 0.83 s staged | 40 deg, 0.4 st |
+| BiscuitStirs | GameCrouchWalk -> LookBackNervous | 1.21 | 1.19 | 1.03 | 0.00 | 0.90 s staged | -18 deg, 0.4 st |
+| BiscuitStirs | LookBackNervous -> SneakRight | 1.10 | 1.11 | 3.77 | 0.00 | 0.90 s staged | -194 deg, 0.5 st |
+| BiscuitStirs | SneakRight -> GameCrouchWalk | 0.55 | 0.44 | 0.90 | 1.27 | 0.50 s | -4 deg, 0.0 st |
+| FenceOver | GameCrouchWalk -> ClimbThrough | 2.15 | 1.99 | 1.07 | 0.83 | 0.97 s staged | -12 deg, 0.8 st |
 | ThePlan | FastStop -> Think | 0.49 | 0.43 | 0.87 | 0.27 | 1.23 s | -46 deg, 2.0 st |
 | ThePlan | Think -> PointForward | 0.28 | 0.24 | 3.17 | 0.30 | 0.63 s | -43 deg, 2.2 st |
 | Getaway | RunLookBack -> HedgeDive | 0.28 | 0.47 | 0.07 | 0.03 | 0.50 s | 15 deg, 0.3 st |
 | Getaway | HedgeDive -> GetUpProne | 1.93 | 1.00 | 1.00 | 0.07 | 1.10 s staged | 5 deg, 9.1 st |
 | Getaway | GetUpProne -> LookAroundNervous | 0.38 | 0.37 | 6.47 | 1.43 | 0.50 s | -21 deg, 7.3 st |
-| HomeAgain | PullUpLedge -> SneakLoop | 2.84 | 2.36 | 2.10 | 1.37 | 0.97 s staged | -13 deg, 0.4 st |
-| HomeAgain | SneakLoop -> LieDown | 0.71 | 0.62 | 0.97 | 0.43 | 0.63 s staged | -22 deg, 0.3 st |
-| HomeAgain | LieDown -> SleepLoop | 0.82 | 0.75 | 4.33 | 1.30 | 0.90 s staged | -19 deg, 1.3 st |
-| HomeAgain | SleepLoop -> LieLookAround | 1.51 | 1.49 | 0.63 | 4.87 | 0.97 s staged | -18 deg, 1.5 st |
+| HomeAgain | PullUpLedge -> GameCrouchWalk | 2.89 | 2.48 | 2.10 | 1.03 | 0.97 s staged | 5 deg, 0.1 st |
+| HomeAgain | GameCrouchWalk -> LieDown | 0.88 | 0.74 | 1.10 | 0.60 | 0.90 s staged | -11 deg, 0.3 st |
+| HomeAgain | LieDown -> SleepLoop | 0.82 | 0.75 | 4.33 | 1.30 | 0.90 s staged | -9 deg, 1.3 st |
+| HomeAgain | SleepLoop -> LieLookAround | 1.51 | 1.49 | 0.63 | 4.87 | 0.97 s staged | -8 deg, 1.4 st |
 | Excuses | LieLookAround -> StandUpFromBack | 1.07 | 0.91 | 4.77 | 1.87 | 1.03 s staged | -3 deg, 2.1 st |
 | Excuses | StandUpFromBack -> ExcuseAsk | 0.23 | 0.21 | 6.70 | 0.20 | 0.63 s | -14 deg, 2.1 st |
 | Excuses | ExcuseAsk -> ExcuseShrug | 0.32 | 0.27 | 2.13 | 0.00 | 0.43 s | -4 deg, 2.0 st |
@@ -43,20 +43,20 @@ and the head comes last. **Re-seat**: the turn and ground shift baked into B's t
 | Piece | Made of | Length | Loop (entry / exit) |
 |---|---|---|---|
 | ColdOpen1 | PeekOut + ClimbThrough | 3.63 s | holds |
-| Drainpipe1 | WallClimbDown + HangDrop + SneakLoop | 2.87 s |  |
-| Drainpipe2_SneakLoop | SneakLoop | 1.67 s | loop (1.43 / 0.00 s) |
-| BiscuitStirs1_SneakLoop | SneakLoop | 1.67 s | loop (0.00 / 0.43 s) |
-| BiscuitStirs2 | LookBackNervous + SneakRight + SneakLoop | 5.70 s |  |
-| BiscuitStirs3_SneakLoop | SneakLoop | 1.67 s | loop (0.57 / 0.00 s) |
-| FenceOver1_SneakLoop | SneakLoop | 1.67 s | loop (0.00 / 0.67 s) |
-| FenceOver2 | ClimbThrough | 2.97 s |  |
+| Drainpipe1 | WallClimbDown + HangDrop + GameCrouch | 2.93 s |  |
+| Drainpipe2_GameCrouch | GameCrouch | 2.83 s | loop (0.63 / 0.00 s) |
+| BiscuitStirs1_GameCrouchWalk | GameCrouchWalk | 1.33 s | loop (0.00 / 0.47 s) |
+| BiscuitStirs2 | LookBackNervous + SneakRight + GameCrouchWalk | 5.60 s |  |
+| BiscuitStirs3_GameCrouchWalk | GameCrouchWalk | 1.33 s | loop (0.30 / 0.00 s) |
+| FenceOver1_GameCrouchWalk | GameCrouchWalk | 1.33 s | loop (0.00 / 0.47 s) |
+| FenceOver2 | ClimbThrough | 2.90 s |  |
 | ThePlan1 | FastStop + Think + PointForward | 8.17 s |  |
 | Getaway1_RunLookBack | RunLookBack | 2.23 s | loop (0.00 / 1.93 s) |
 | Getaway2 | HedgeDive + GetUpProne + LookAroundNervous | 8.10 s |  |
 | Getaway3_LookAroundNervous | LookAroundNervous | 4.47 s | loop (1.80 / 0.00 s) |
-| HomeAgain1 | PullUpLedge + SneakLoop | 2.70 s |  |
-| HomeAgain2_SneakLoop | SneakLoop | 1.67 s | loop (0.30 / 0.53 s) |
-| HomeAgain3 | LieDown + SleepLoop | 4.90 s |  |
+| HomeAgain1 | PullUpLedge + GameCrouchWalk | 2.70 s |  |
+| HomeAgain2_GameCrouchWalk | GameCrouchWalk | 1.33 s | loop (0.30 / 0.53 s) |
+| HomeAgain3 | LieDown + SleepLoop | 4.87 s |  |
 | HomeAgain4_SleepLoop | SleepLoop | 1.70 s | loop (0.17 / 0.03 s) |
 | HomeAgain5 | LieLookAround | 1.20 s |  |
 | HomeAgain6_LieLookAround | LieLookAround | 12.50 s | loop (5.47 / 0.00 s) |
@@ -84,7 +84,8 @@ and the head comes last. **Re-seat**: the turn and ground shift baked into B's t
 | ClimbThrough | Climbing Down | Climb Through Fence And Jump Down |
 | WallClimbDown | Climbing Down Wall | Climbing Down A Wall |
 | HangDrop | Freehang Drop | Freehang Drop To Standing |
-| SneakLoop | Sneaking Forward | Sneaking Forward Quickly |
+| GameCrouch | game: Crouch |
+| GameCrouchWalk | game: CrouchWalk |
 | LookBackNervous | Look Over Shoulder | Quick Nervous Look Over Right Shoulder |
 | SneakRight | Crouched Sneaking Right | Crouched Cover Sneaking Right |
 | FastStop | Run To Stop | Fast Stop From Full Run |
@@ -111,11 +112,3 @@ and the head comes last. **Re-seat**: the turn and ground shift baked into B's t
 | WaitBored | Bored | Standing Around Bored Idle |
 | BusArrives | Reacting | Being Surprised And Looking Right |
 | BoardBus | Ascending Stairs | Walking Up A Set Of Stairs |
-
-## Measured in Studio
-
-`chaincheck.luau` played every chain on an R6 dummy at 60 fps (NH Combat Test, 2026-11-20); the full output is in
-`review/chaincheck_result.txt`. Every runtime switch peaks below the chain's own p99 except the two entries into the
-sneak loop (`Drainpipe1`, `HomeAgain1`), whose frames were checked offline and are identical to the loop on its own at
-that phase (the peak is the stride). Baked blends: the "blend peak vs sources" figures printed by `build.py`, all within
-1.18x or under 45 st/s².

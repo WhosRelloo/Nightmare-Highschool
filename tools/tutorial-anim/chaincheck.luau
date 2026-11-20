@@ -8,7 +8,7 @@
 local CHAINS = __CHAINS__
 local ONLY = __ONLY__
 local BLENDS = __BLENDS__
-local FOLDER = game.ServerStorage.NHTutorialAnims
+local FOLDER = game.ReplicatedStorage.NHCineClips.Tutorial
 local DT = 1 / 60
 
 local Players = game:GetService("Players")

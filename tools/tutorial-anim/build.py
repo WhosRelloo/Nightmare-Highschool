@@ -29,7 +29,7 @@ PLUGIN = sys.argv[1] if len(sys.argv) > 1 else os.path.expandvars(r"%LOCALAPPDAT
 JOINTS = ["Torso", "Head", "Left Arm", "Right Arm", "Left Leg", "Right Leg"]
 WEIGHT = {"Torso": 2.0, "Head": 0.4, "Left Arm": 0.8, "Right Arm": 0.8, "Left Leg": 1.2, "Right Leg": 1.2}
 FPS = 30.0
-FOLDER = "NHTutorialAnims"                  # game.ServerStorage.<FOLDER>: KeyframeSequences for the owner to publish
+FOLDER = "Tutorial"                         # game.ReplicatedStorage.NHCineClips.<FOLDER>: the clips (and their _End poses)
 STAGED_AT = 0.55                            # weighted radians: above this the blend is staged (torso leads, head last)
 # staged blend: (start, end) of each joint's own ease inside the window, as fractions of it
 STAGE = {"Torso": (0.0, 0.7), "Left Leg": (0.08, 0.8), "Right Leg": (0.12, 0.84), "Left Arm": (0.16, 0.9),
@@ -206,6 +206,12 @@ def seam_loop(c, secs=0.35):
     c.q[-1], c.p[-1] = c.q[0].copy(), c.p[0].copy()
 
 
+def load_game(name):
+    """a clip sampled from the game's own animation (extract_game.luau): Motor6D.Transform per joint per frame"""
+    d = json.load(open(os.path.join(HERE, "game", f"{name}.json"), encoding="utf-8"))
+    return [(f["t"], {j: MX.M(f[j]) for j in JOINTS}) for f in d["frames"]]
+
+
 def seat(qa, pa, qb, pb):
     """(phi, tx, ty): the re-seat that puts B's torso on A's heading and ground position"""
     phi = yaw_of(qa[0]) - yaw_of(qb[0])
@@ -251,6 +257,24 @@ def blend(A, i, B, j, gap, secs=None):
 
 
 # ------------------------------------------------------------------ the pieces of a chain
+
+def yaw_matrix(a):
+    """the HumanoidRootPart-space rotation about up (Y) by a radians"""
+    c, s = math.cos(a), math.sin(a)
+    return np.array([[c, 0, s], [0, 1, 0], [-s, 0, c]])
+
+
+def end_offset(q, p):
+    """the root move that puts the HumanoidRootPart under the torso's last ground position and heading. Torso pose space
+    is X sideways, Y forward/back, Z up; under the R6 RootJoint (C0 rotation (-1,0,0; 0,0,1; 0,1,0)) that is HRP
+    (-X, Z, Y). A turn about pose Z is a turn about HRP Y with the same sign."""
+    return {"X": round(float(-p[0]), 4), "Z": round(float(p[1]), 4), "Yaw": round(math.degrees(yaw_of(q)), 3)}
+
+
+def end_pose(q, p):
+    """the same torso with its ground offset and heading taken out (tilt and height kept): the _End clip's pose"""
+    return tilt(q), np.array([0.0, 0.0, float(p[2])])
+
 
 class Piece:
     def __init__(self, name, loop=False):
@@ -474,7 +498,12 @@ for line in string.gmatch(DATA, "[^\\n]+") do
 	end
 	kf.Parent = seq
 end
-local root = game.ServerStorage
+local root = game.ReplicatedStorage:FindFirstChild("NHCineClips")
+if not root then
+	root = Instance.new("Folder")
+	root.Name = "NHCineClips"
+	root.Parent = game.ReplicatedStorage
+end
 local folder = root:FindFirstChild("{FOLDER}") or Instance.new("Folder")
 folder.Name = "{FOLDER}"
 folder.Parent = root
@@ -492,26 +521,31 @@ PLAYER = '''
 -- Play a chain on an Animator. cues[k] (optional) is a function that yields until the loop at step k may end
 -- (no cue: the loop plays once). Every switch lands on an identical frame, so pieces switch instantly (no fade: a fade
 -- in from weight 0 would show the rig's default pose for a moment), and the time a switch overshoots its exact point
--- by is carried into the next piece, so even a fast loop never skips. ids: piece name -> animation id (published asset
--- ids in game; the KeyframeSequences' PreviewId attributes in Studio). Returns the tracks.
-function TutorialAnim.Play(animator: Animator, chain: string, ids: { [string]: string }, cues: { [number]: () -> () }?)
+-- by is carried into the next piece, so even a fast loop never skips. resolve: piece name -> animation id (the director passes `Ctx.Clip`);
+-- onSwitch: called as each piece starts (the body check marks the switches). Returns the tracks.
+function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) -> string?, cues: { [number]: () -> () }?, onSwitch: ((string) -> ())?)
 	local RunService = game:GetService("RunService")
 	local steps = TutorialAnim.Chains[chain]
 	assert(steps, "no tutorial chain " .. chain)
 	local loaded = {}
 	for _, st in steps do
-		local a = Instance.new("Animation")
-		a.AnimationId = ids[st.Piece]
-		local t = animator:LoadAnimation(a)
-		t.Priority = Enum.AnimationPriority.Action
-		loaded[st.Piece] = t
+		local id = resolve(st.Piece) or ""
+		if id ~= "" then
+			local a = Instance.new("Animation")
+			a.AnimationId = id
+			local t = animator:LoadAnimation(a)
+			t.Priority = Enum.AnimationPriority.Action
+			loaded[st.Piece] = t
+		end
 	end
 	local prev: AnimationTrack? = nil
 	local over = 0
 	for k, st in steps do
 		local t = loaded[st.Piece]
+		if not t then continue end
 		t.Looped = st.Loop == true
 		t:Play(0)
+		if onSwitch then onSwitch(st.Piece) end
 		t.TimePosition = if st.Loop then ((st.Entry or 0) + over) % st.Length else math.max(0, over)
 		if prev then prev:Stop(0) end
 		prev = t
@@ -558,9 +592,13 @@ def main():
     cat = [x for x in json.load(open(os.path.join(HERE, "mixamo_catalog.json"), encoding="utf-8")) if x["Type"] == "Motion"]
     clips = {}
     for name, c in spec["clips"].items():
-        _, d = MX.load_anim(rbxm, c["src"], cat)
-        clip = Clip.from_frames(name, MX.convert(d, inplace=c.get("inplace", False)), c.get("loop", False))
-        if clip.loop:
+        if "game" in c:
+            frames = load_game(c["game"])
+        else:
+            _, d = MX.load_anim(rbxm, c["src"], cat)
+            frames = MX.convert(d, inplace=c.get("inplace", False))
+        clip = Clip.from_frames(name, frames, c.get("loop", False))
+        if clip.loop and "game" not in c:
             seam_loop(clip)
         clips[name] = clip
     os.makedirs(os.path.join(HERE, "out"), exist_ok=True)
@@ -577,20 +615,27 @@ def main():
             c = pc.clip(loop=pc.loop)
             write_lua(c)
             built.append((c, pc))
+            eq, ep = end_pose(c.q[-1][0], c.p[-1][0])
+            endq, endp = c.q[-1].copy(), c.p[-1].copy()
+            endq[0], endp[0] = eq, ep
+            write_lua(Clip(f"{c.name}_End", np.array([endq, endq]), np.array([endp, endp]), loop=False))
             e = {"Piece": pc.name, "Length": round((c.n - 1) / FPS, 3)}
             if pc.loop:
                 e.update(Loop=True, Entry=round(pc.entry, 3), Exit=round(pc.exit, 3))
             if pc.hold:
                 e["Hold"] = True
+            e["EndOffset"] = end_offset(c.q[-1][0], c.p[-1][0])
             plan[chain].append(e)
 
     def lua_val(v):
+        if isinstance(v, dict):
+            return "{ " + ", ".join(f"{k} = {x}" for k, x in v.items()) + " }"
         return "true" if v is True else (f'"{v}"' if isinstance(v, str) else str(v))
     mod = ["--!strict", "-- Generated by tools/tutorial-anim/build.py: the tutorial's animation chains (doc 15 §5).",
            "-- A chain is a list of PIECES. A one-shot piece is several clips already blended into one; a Loop piece holds",
            "-- until its cue. Every switch between pieces lands on an identical frame (switch instantly, no fade): a loop is entered at Entry and left at",
            "-- Exit (seconds into the loop), so the blends are all baked and nothing pops. Hold: freeze on the last frame.",
-           "-- The KeyframeSequences are in ServerStorage.NHTutorialAnims for the owner to publish; put the ids in Ids.",
+           "-- The KeyframeSequences (and <Piece>_End poses) are in ReplicatedStorage.NHCineClips.Tutorial.",
            "", "local TutorialAnim = {}", "", "TutorialAnim.Ids = {"]
     for c, _ in built:
         mod.append(f'\t["{c.name}"] = "",')
@@ -630,7 +675,7 @@ def main():
         rows.append(f'| {c.name} | {" + ".join(pc.parts)} | {(c.n - 1) / FPS:.2f} s | {lp} |')
     rows += ["", "## Source clips", "", "| Clip | RoMixamo catalog |", "|---|---|"]
     for n in clips:
-        rows.append(f'| {n} | {spec["clips"][n]["src"]} |')
+        rows.append(f'| {n} | {spec["clips"][n].get("src") or "game: " + spec["clips"][n]["game"]} |')
     open(os.path.join(HERE, "REPORT.md"), "w", encoding="utf-8").write("\n".join(rows) + "\n")
     print(f"{len(clips)} source clips -> {len(built)} pieces over {len(plan)} chains, {len(logs)} handoffs")
     for r in logs:
