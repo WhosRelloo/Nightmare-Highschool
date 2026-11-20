@@ -112,3 +112,74 @@ and the head comes last. **Re-seat**: the turn and ground shift baked into B's t
 | WaitBored | Bored | Standing Around Bored Idle |
 | BusArrives | Reacting | Being Surprised And Looking Right |
 | BoardBus | Ascending Stairs | Walking Up A Set Of Stairs |
+
+## Measured in Studio
+
+`out/_chaincheck.luau` played every chain on an R6 dummy at 60 fps in NH Combat Test; the full output is in
+`review/chaincheck_result.txt`. A runtime switch passes at or under its chain's own p99 or under 45 st/s2.
+
+```
+BiscuitStirs: 524 frames, the clips' own motion p99 140 st/s2
+  switch BiscuitStirs1_GameCrouchWalk -> BiscuitStirs2       peak    35 (0.25x) ok
+  baked  GameCrouchWalk -> LookBackNervous                   peak   241 (1.71x) (baked)
+  baked  LookBackNervous -> SneakRight                       peak   225 (1.60x) (baked)
+  baked  SneakRight -> GameCrouchWalk                        peak   371 (2.64x) (baked)
+  switch BiscuitStirs2 -> BiscuitStirs3_GameCrouchWalk       peak    18 (0.13x) ok
+Breakfast: 914 frames, the clips' own motion p99 103 st/s2
+  switch Breakfast1_TableIdle -> Breakfast2                  peak    11 (0.11x) ok
+  baked  TableIdle -> TableAsk                               peak   376 (3.64x) (baked)
+  baked  TableAsk -> TableIdle                               peak    67 (0.64x) (baked)
+  switch Breakfast2 -> Breakfast3_TableIdle                  peak    10 (0.09x) ok
+ColdOpen: 217 frames, the clips' own motion p99 258 st/s2
+  baked  PeekOut -> ClimbThrough                             peak   168 (0.65x) (baked)
+Drainpipe: 345 frames, the clips' own motion p99 243 st/s2
+  baked  WallClimbDown -> HangDrop                           peak   432 (1.78x) (baked)
+  baked  HangDrop -> GameCrouch                              peak   397 (1.63x) (baked)
+  switch Drainpipe1 -> Drainpipe2_GameCrouch                 peak     2 (0.01x) ok
+Excuses: 1911 frames, the clips' own motion p99 98 st/s2
+  switch Excuses1_LieLookAround -> Excuses2                  peak    17 (0.17x) ok
+  baked  LieLookAround -> StandUpFromBack                    peak    90 (0.92x) (baked)
+  baked  StandUpFromBack -> ExcuseAsk                        peak    85 (0.87x) (baked)
+  baked  ExcuseAsk -> ExcuseShrug                            peak   181 (1.86x) (baked)
+  baked  ExcuseShrug -> ExcuseShame                          peak   315 (3.23x) (baked)
+FenceOver: 282 frames, the clips' own motion p99 280 st/s2
+  switch FenceOver1_GameCrouchWalk -> FenceOver2             peak    35 (0.12x) ok
+  baked  GameCrouchWalk -> ClimbThrough                      peak   302 (1.08x) (baked)
+Getaway: 1003 frames, the clips' own motion p99 505 st/s2
+  switch Getaway1_RunLookBack -> Getaway2                    peak   345 (0.68x) ok
+  baked  RunLookBack -> HedgeDive                            peak   990 (1.96x) (baked)
+  baked  HedgeDive -> GetUpProne                             peak   317 (0.63x) (baked)
+  baked  GetUpProne -> LookAroundNervous                     peak   187 (0.37x) (baked)
+  switch Getaway2 -> Getaway3_LookAroundNervous              peak    23 (0.05x) ok
+HomeAgain: 1565 frames, the clips' own motion p99 200 st/s2
+  baked  PullUpLedge -> GameCrouchWalk                       peak   222 (1.11x) (baked)
+  switch HomeAgain1 -> HomeAgain2_GameCrouchWalk             peak    18 (0.09x) ok
+  switch HomeAgain2_GameCrouchWalk -> HomeAgain3             peak    39 (0.20x) ok
+  baked  GameCrouchWalk -> LieDown                           peak    98 (0.49x) (baked)
+  baked  LieDown -> SleepLoop                                peak    61 (0.30x) (baked)
+  switch HomeAgain3 -> HomeAgain4_SleepLoop                  peak    12 (0.06x) ok
+  switch HomeAgain4_SleepLoop -> HomeAgain5                  peak    11 (0.06x) ok
+  baked  SleepLoop -> LieLookAround                          peak    75 (0.37x) (baked)
+  switch HomeAgain5 -> HomeAgain6_LieLookAround              peak     9 (0.04x) ok
+MomSlidesEnvelope: 1054 frames, the clips' own motion p99 23 st/s2
+  switch MomSlidesEnvelope1_ParentSit -> MomSlidesEnvelope2  peak    17 (0.74x) ok
+  baked  ParentSit -> TablePoint                             peak   189 (8.34x) (baked)
+  baked  TablePoint -> ParentSit                             peak    63 (2.79x) (baked)
+  switch MomSlidesEnvelope2 -> MomSlidesEnvelope3_ParentSit  peak    11 (0.50x) ok
+ParentsWaiting: 3522 frames, the clips' own motion p99 45 st/s2
+  switch ParentsWaiting1_ParentSit -> ParentsWaiting2        peak    17 (0.38x) ok
+  baked  ParentSit -> ParentHeadShake                        peak    67 (1.49x) (baked)
+  baked  ParentHeadShake -> ParentSit                        peak    66 (1.46x) (baked)
+  switch ParentsWaiting2 -> ParentsWaiting3_ParentSit        peak    12 (0.26x) ok
+  switch ParentsWaiting3_ParentSit -> ParentsWaiting4        peak     7 (0.16x) ok
+  baked  ParentSit -> ParentTalkSit                          peak    40 (0.89x) (baked)
+  baked  ParentTalkSit -> ParentSit                          peak    42 (0.94x) (baked)
+  switch ParentsWaiting4 -> ParentsWaiting5_ParentSit        peak     9 (0.21x) ok
+TheBus: 1187 frames, the clips' own motion p99 95 st/s2
+  switch TheBus1_WaitBored -> TheBus2                        peak    43 (0.45x) ok
+  baked  WaitBored -> BusArrives                             peak   234 (2.47x) (baked)
+  baked  BusArrives -> BoardBus                              peak   177 (1.87x) (baked)
+ThePlan: 490 frames, the clips' own motion p99 300 st/s2
+  baked  FastStop -> Think                                   peak   121 (0.40x) (baked)
+  baked  Think -> PointForward                               peak   169 (0.56x) (baked)
+```

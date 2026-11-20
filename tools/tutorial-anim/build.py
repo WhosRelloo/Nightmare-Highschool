@@ -676,6 +676,12 @@ def main():
     rows += ["", "## Source clips", "", "| Clip | RoMixamo catalog |", "|---|---|"]
     for n in clips:
         rows.append(f'| {n} | {spec["clips"][n].get("src") or "game: " + spec["clips"][n]["game"]} |')
+    res = os.path.join(HERE, "review", "chaincheck_result.txt")
+    if os.path.exists(res):                                    # the Studio body check (run out/_chaincheck.luau with rbxc.py)
+        rows += ["", "## Measured in Studio", "",
+                 "`out/_chaincheck.luau` played every chain on an R6 dummy at 60 fps in NH Combat Test; the full output is in",
+                 "`review/chaincheck_result.txt`. A runtime switch passes at or under its chain's own p99 or under 45 st/s2.", "",
+                 "```", open(res, encoding="utf-8").read().rstrip(), "```"]
     open(os.path.join(HERE, "REPORT.md"), "w", encoding="utf-8").write("\n".join(rows) + "\n")
     print(f"{len(clips)} source clips -> {len(built)} pieces over {len(plan)} chains, {len(logs)} handoffs")
     for r in logs:
