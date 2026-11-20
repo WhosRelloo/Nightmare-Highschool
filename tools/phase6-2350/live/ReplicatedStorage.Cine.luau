@@ -148,19 +148,18 @@ local function noisePreset(spec, fov)
 		local lens = fov > 45 and "wide" or (fov < 20 and "tele" or "normal")
 		name = "handheld_" .. lens .. "_strong"
 	end
-	-- (2.35.0) feel presets: the peak handheld amplitude a seamless cut asks for, on the lens's own preset
+	-- (2.35.0) feel presets (spec 2026-11-20 §4.1): two layered octaves (0.4 and 1.1 Hz) on rotation; the x channel's
+	-- peak (sum of 0.5 * amp * gain) equals the feel's degrees: calm 0.08, tense 0.25, chase 0.6
 	local FEEL = { calm = 0.08, tense = 0.25, chase = 0.6 }
 	if FEEL[name] then
-		local lens = fov > 45 and "wide" or (fov < 20 and "tele" or "normal")
-		local fp = NOISE["handheld_" .. lens .. (if name == "chase" then "_strong" else "_mild")]
-		local peak = 0
-		for _, l in fp.x do peak += 0.5 * l[1] end
-		return { p = fp, gain = FEEL[name] / math.max(peak, 1e-6) }
+		local fp = { x = { { 1.0, 0.4 }, { 0.5, 1.1 } }, y = { { 0.7, 0.4 }, { 0.35, 1.1 } }, z = {} }
+		return { p = fp, gain = FEEL[name] / (0.5 * (1.0 + 0.5)) }
 	end
 	local p = NOISE[name]
 	if not p then return nil end
 	return { p = p, gain = gain }
 end
+Cine.noisePresetForTests = noisePreset
 
 -- ---------------------------------------------------------------- subjects
 local function subjectInfo(spec, cache)

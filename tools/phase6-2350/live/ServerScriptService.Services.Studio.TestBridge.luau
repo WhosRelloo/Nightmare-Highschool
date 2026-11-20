@@ -1019,6 +1019,18 @@ function Commands.CineSeamTest()
 	local Cine = require(ReplicatedStorage.Cine)
 	local Cf, Fov = Cine.cameraAt({ shots = { { dur = 2, camera = { cframe = Far, lens = 50 } } } }, 1)
 	check((Cf.Position - Far.Position).Magnitude < 1e-4 and math.abs(Fov - Cine.mmToFov(50)) < 1e-4, "cameraAt evaluates a shot")
+	for Feel, Deg in { calm = 0.08, tense = 0.25, chase = 0.6 } do
+		local Np = Cine.noisePresetForTests(Feel, 40)
+		check(Np ~= nil, Feel .. " resolves through the feel branch")
+		if Np then
+			local Peak = 0
+			for _, L in Np.p.x do Peak += 0.5 * L[1] * Np.gain end
+			check(math.abs(Peak - Deg) < 1e-6, Feel .. " peak is " .. Deg .. " deg")
+			check(#Np.p.x == 2 and Np.p.x[1][2] == 0.4 and Np.p.x[2][2] == 1.1, Feel .. " octaves are 0.4 and 1.1 Hz")
+		end
+	end
+	check(Seam.Lint(A, CFrame.lookAt(A.Position, A.Position + Vector3.new(0, 0, 1))) ~= nil, "a pure turn over 90 deg is flagged")
+	check(Seam.Length(A, CFrame.lookAt(Vector3.new(500, 5, 500), Vector3.new(0, 5, 0))) == 1.0, "a very large move glides exactly 1.0 s")
 	return #Fails == 0 and "CineSeamTest OK" or table.concat(Fails, "; ")
 end
 
