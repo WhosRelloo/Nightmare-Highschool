@@ -55,7 +55,7 @@ end
 ---| Data |---
 
 function Shared.Sanitize(Raw: any)
-	local Out = { Level = 1; Exp = 0; Points = 0; Stats = {}; FatedDay = -1; Paths = {}; Tally = {}; Honours = {}; Record = {}; RecordSeen = {} }
+	local Out = { Level = 1; Exp = 0; Points = 0; Stats = {}; FatedDay = -1; Paths = {}; Tally = {}; Honours = {}; Record = {}; RecordSeen = {}; Origin = {} }
 	for _, S in Config.Stats do Out.Stats[S.Id] = 0 end
 	if typeof(Raw) ~= `table` then return Out end
 	local function num(V, Min, Max) return if typeof(V) == `number` and V == V then math.clamp(math.floor(V), Min, Max) else nil end
@@ -102,6 +102,11 @@ function Shared.Sanitize(Raw: any)
 			if typeof(K) == `string` and V == true and N < 200 then Out.RecordSeen[K:sub(1, 60)] = true N += 1 end
 		end
 	end
+	-- (2.35.0) the tutorial's resume point (Services.World.Tutorial): "<CutId>:<Segment>"
+	Out.Origin = {}
+	if typeof(Raw.Origin) == `table` and typeof(Raw.Origin.Checkpoint) == `string` then
+		Out.Origin.Checkpoint = Raw.Origin.Checkpoint:sub(1, 60)
+	end
 	return Out
 end
 
@@ -112,6 +117,15 @@ end
 
 function Local.Save(Player: Player, P)
 	Data.UpdateState(Player, { type = `SetProgress`; progress = P })
+end
+
+-- (2.35.0) the tutorial's resume point; Get returns a sanitised copy, so the write goes through Save
+function Shared.SetCheckpoint(Player: Player, Value: string?)
+	local P = Shared.Get(Player)
+	if not P then return end
+	P.Origin = P.Origin or {}
+	P.Origin.Checkpoint = if Value then Value:sub(1, 60) else nil
+	Local.Save(Player, P)
 end
 
 ---| Effects |---

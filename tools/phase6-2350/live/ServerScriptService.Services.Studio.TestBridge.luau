@@ -978,6 +978,33 @@ function Commands.PlayCut(PlayerName: string, CutId: string, Skippable: boolean?
 	return CineService().Play({ Players:FindFirstChild(PlayerName) }, CutId, { Skippable = Skippable == true })
 end
 
+-- (2.35.0) a seamless cut holds without anchoring, protects, and writes the checkpoint
+function Commands.SeamlessHoldTest(PlayerName: string)
+	local Player = Players:FindFirstChild(PlayerName)
+	local Cine = CineService()
+	local Tut = require(ServerScriptService.Services.World.Tutorial)
+	assert(Tut.Enter(Player), "enter")
+	local Id = Cine.Play({ Player }, "__SeamlessTest", {})
+	local C = Player.Character
+	local Out = {
+		Session = Id ~= nil;
+		Anchored = C.HumanoidRootPart.Anchored;
+		Protected = C:GetAttribute("Protected") == true;
+		InCine = C:GetAttribute("NHInCine") == true;
+		Checkpoint = Tut.CheckpointOf(Player);
+		Tutorial = Player:GetAttribute("NHTutorial") == true;
+		Group = C.HumanoidRootPart.CollisionGroup;
+	}
+	Cine.EndForTests(Player)
+	Tut.Leave(Player)
+	Out.AfterTutorial = Player:GetAttribute("NHTutorial")
+	return Out
+end
+
+function Commands.TutorialEnter(PlayerName: string) return require(ServerScriptService.Services.World.Tutorial).Enter(Players:FindFirstChild(PlayerName)) end
+function Commands.TutorialLeave(PlayerName: string) require(ServerScriptService.Services.World.Tutorial).Leave(Players:FindFirstChild(PlayerName)) return true end
+function Commands.Origin(PlayerName: string) return DeepCopy(require(ServerScriptService.Services.Player.Progression).Get(Players:FindFirstChild(PlayerName)).Origin) end
+
 -- this player's saved cut state ({ [CutId] = "Started" | "Seen" }) and the live sessions
 function Commands.CineState(PlayerName: string)
 	local Player = Players:FindFirstChild(PlayerName)

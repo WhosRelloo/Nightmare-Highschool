@@ -28,7 +28,18 @@ return {
 		Strikethrough = { Name = `The Strikethrough`; Length = 56; Set = `Strike`; Replay = true; Interactive = true; Rewards = { S = 15; A = 10; B = 5 } };
 		-- (2.25.0) a test cut for the interactive director (TestBridge / harness only; never in a quest)
 		__QteTest = { Name = `QTE test`; Length = 30; Set = `Hall`; Replay = true; Interactive = true; Hidden = true };
+		-- (2.35.0) seamless (spec 2026-11-20): the real character acts, the camera glides in and out, nothing anchors
+		__SeamlessTest = { Name = `Seamless test`; Length = 8; Set = `BusStop`; Seamless = true; Replay = true; Hidden = true };
+		TutorialBus = { Name = `The Bus`; Length = 34; Set = `BusStop`; Seamless = true; Replay = true };
+		TutorialSneak = { Name = `Sneaking Out`; Length = 90; Set = `Garden`; Seamless = true; Replay = true };
 	};
+	-- (2.35.0) per-scene grades for seamless cuts, eased over 1 s (spec §4.1)
+	Looks = {
+		Night = { contrast = 0.1; saturation = -0.12; tint = { 214, 228, 240 }; bloom = { intensity = 0.55; size = 40; threshold = 0.92 } };
+		Morning = { contrast = 0.06; saturation = 0.04; tint = { 255, 238, 214 }; bloom = { intensity = 0.4; size = 32; threshold = 0.95 } };
+		BusStop = { contrast = 0.14; saturation = -0.28; tint = { 206, 220, 232 }; bloom = { intensity = 0.7; size = 48; threshold = 0.9 } };
+	};
+	GradeEase = 1.0;
 	TimeoutPad = 5;    -- doc 04 §6: Length + 5 s, then Done is forced
 	StartGrace = 15;   -- how long a client may take to get ready (the main menu finishing) before the timer starts anyway
 	GroupLead = 1.5;   -- a group cut starts this long after the server sends it, so every client starts together

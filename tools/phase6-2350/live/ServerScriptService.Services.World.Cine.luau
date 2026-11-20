@@ -80,6 +80,21 @@ end
 
 ---| The real character during a cut |---
 
+-- (2.35.0) a seamless cut: the player's own client drives their character (it walks to marks, plays the chain), so
+-- nothing anchors and speed isn't zeroed here; they're protected and marked in a cut, and the client locks input
+function Local.HoldSeamless(Player: Player): (() -> ())?
+	local Character = Player.Character
+	if not (Character and Character:FindFirstChildOfClass(`Humanoid`)) then return nil end
+	local WasProtected = Character:GetAttribute(`Protected`)
+	Character:SetAttribute(`Protected`, true)
+	Character:SetAttribute(`NHInCine`, true)
+	return function()
+		if not Character.Parent then return end
+		Character:SetAttribute(`NHInCine`, nil)
+		Character:SetAttribute(`Protected`, WasProtected)
+	end
+end
+
 function Local.Hold(Player: Player): (() -> ())?
 	local Character = Player.Character
 	local Humanoid = Character and Character:FindFirstChildOfClass(`Humanoid`)
@@ -337,6 +352,9 @@ function Local.OnSeg(S, Player: Player, V, M)
 	if not Ok then return end
 	S.Seg = M.Name
 	S.SegStartAt = tonumber(M.At) or workspace:GetServerTimeNow()
+	if Config.Cuts[S.CutId] and Config.Cuts[S.CutId].Seamless and typeof(M.Name) == `string` then
+		pcall(function() require(script.Parent.Tutorial).Checkpoint(Player, S.CutId, M.Name) end)
+	end
 end
 
 -- the grade, once, when the client reaches the end of the cut; saved as the best, and the first viewing pays a bonus
@@ -380,12 +398,13 @@ function Shared.Play(List: { Player }, CutId: string, Opts: any?): string?
 		local StartedBefore = Shared.Started(Player, CutId)
 		-- (Cuts[Id].Arrive) a story cut that ends where you are now: the first time, you're placed on that mark (the
 		-- prologue seats you in Room 102); a replay leaves you where you stand
-		local Arrive = not SeenBefore and not Opts.Skippable and Local.SetMark(Cut.Set, Cut.Arrive)
+		local Arrive = not Cut.Seamless and not SeenBefore and not Opts.Skippable and Local.SetMark(Cut.Set, Cut.Arrive)
 		-- set marks sit on the floor; a character's pivot is its root, 3 studs up
 		if Arrive and Player.Character then pcall(function() Player.Character:PivotTo(Arrive.CFrame * CFrame.new(0, 3, 0)) end) end
-		local Release = Local.Hold(Player)
+		local Release = if Cut.Seamless then Local.HoldSeamless(Player) else Local.Hold(Player)
 		if not Release then continue end
 		Local.Mark(Player, CutId, `Started`) -- saved before it plays: a disconnect mid-cut replays on rejoin
+		if Cut.Seamless then pcall(function() require(script.Parent.Tutorial).Checkpoint(Player, CutId, `Start`) end) end
 		S.Viewers[Player] = { SeenBefore = SeenBefore; StartedBefore = StartedBefore; Release = Release;
 			Points = 0; Max = 0; Perfects = 0; Judged = {} }
 		ByPlayer[Player] = S.Id
@@ -404,7 +423,7 @@ function Shared.Play(List: { Player }, CutId: string, Opts: any?): string?
 		local Skippable = S.Skippable or (not S.Group and (V.SeenBefore or V.StartedBefore))
 		Local.Send(Player, { Kind = `Play`; Session = S.Id; Id = CutId; StartAt = StartAt; Skippable = Skippable;
 			Group = S.Group; Viewers = Ids; Need = Local.Need(S); Votes = Local.Votes(S); Name = Local.NameOf(Player);
-			Interactive = S.Graph ~= nil; Solo = not S.Group; Flags = Local.FlagsFor(Player, Cut) })
+			Seamless = Cut.Seamless == true; Interactive = S.Graph ~= nil; Solo = not S.Group; Flags = Local.FlagsFor(Player, Cut) })
 		-- the client may take a moment to get ready (the menu finishing); the real timer starts when it says Began
 		Local.ArmTimeout(S, Player, Config.StartGrace + Cut.Length + Config.TimeoutPad)
 		Shared.Began:Fire(Player, CutId)
@@ -436,6 +455,13 @@ function Local.OnMessage(Player: Player, Message)
 		if Cut and Cut.Replay and Shared.Seen(Player, Id) and not ByPlayer[Player] then
 			Shared.Play({ Player }, Id, { Skippable = true })
 		end
+		return
+	end
+
+	-- (2.35.0) a walk-and-talk beat holds crouch (spec §3 move.crouch): the server's Crouch service owns the state
+	if Message.Kind == `BeatCrouch` and Player:GetAttribute(`NHTutorial`) == true then
+		local Crouch = require(ServerScriptService.Services.Player.Crouch)
+		if Message.On == true then Crouch.Crouch(Player) else Crouch.Stand(Player) end
 		return
 	end
 
@@ -550,6 +576,12 @@ function Shared.VoteSelfTestForTests(Player: Player)
 	if not Ok then Out.Error = tostring(Err) end
 	Out.Messages = SentTo
 	return Out
+end
+
+function Shared.EndForTests(Player: Player)
+	local Id = ByPlayer[Player]
+	local S = Id and Sessions[Id]
+	if S then Local.End(S, Player, `Skipped`) end
 end
 
 function Shared.SessionsForTests()
