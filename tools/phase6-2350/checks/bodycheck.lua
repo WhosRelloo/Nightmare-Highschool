@@ -22,10 +22,10 @@ local WasAnchored = Root.Anchored
 Root.Anchored = true -- continuity check: falls/collisions at the test spot must not contaminate it
 Actor.Begin()
 for _, St in TA.Chains[Chain] do St._at = nil end
-local Tracks = Actor.Chain(Chain, resolve, nil, function(Piece) table.insert(Marks, { at = #Samples, name = "switch " .. Piece }) end)
+local Tracks, Clock = Actor.Chain(Chain, resolve, nil, function(Piece) table.insert(Marks, { at = #Samples, name = "switch " .. Piece }) end)
 local Last = TA.Chains[Chain][#TA.Chains[Chain]]
 table.insert(Marks, { at = #Samples, name = "reseat " .. Last.Piece })
-Actor.Reseat(Last.Piece, Last.EndOffset, resolve)
+Actor.Reseat(Last.Piece, Last.EndOffset, resolve, Clock, Last.Length)
 task.wait(0.6)
 Actor.Release()
 Conn:Disconnect()

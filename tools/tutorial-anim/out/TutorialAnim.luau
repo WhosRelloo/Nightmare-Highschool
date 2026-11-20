@@ -107,7 +107,8 @@ TutorialAnim.Chains = {
 -- (no cue: the loop plays once). Every switch lands on an identical frame, so pieces switch instantly (no fade: a fade
 -- in from weight 0 would show the rig's default pose for a moment), and the time a switch overshoots its exact point
 -- by is carried into the next piece, so even a fast loop never skips. resolve: piece name -> animation id (the director passes `Ctx.Clip`);
--- onSwitch: called as each piece starts (the body check marks the switches). Returns the tracks.
+-- onSwitch: called as each piece starts (the body check marks the switches). Returns the tracks and a clock: a function giving
+-- the current time on the last piece's own clock (its start os.clock() plus the carried overshoot; a stopped track's TimePosition resets).
 function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) -> string?, cues: { [number]: () -> () }?, onSwitch: ((string) -> ())?)
 	local RunService = game:GetService("RunService")
 	local steps = TutorialAnim.Chains[chain]
@@ -125,11 +126,16 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 	end
 	local prev: AnimationTrack? = nil
 	local over = 0
+	local clockStart, clockOver = os.clock(), 0
+	local current = 0
 	for k, st in steps do
 		local t = loaded[st.Piece]
 		if not t then continue end
 		t.Looped = st.Loop == true
 		t:Play(0)
+		clockStart, clockOver = os.clock(), over
+		current = k
+		RunService.PreAnimation:Once(function() if current == k then clockStart = os.clock() end end) -- the track is first drawn on the next step, so its clock starts there
 		if onSwitch then onSwitch(st.Piece) end
 		t.TimePosition = if st.Loop then ((st.Entry or 0) + over) % st.Length else math.max(0, over)
 		if prev then prev:Stop(0) end
@@ -157,7 +163,8 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 			-- piece's tail is the next loop's own frames, so the loop just starts that much earlier in its cycle
 			local started = os.clock()
 			local dt = 1 / 60
-			while os.clock() - started < st.Length - dt do dt = RunService.Heartbeat:Wait() end
+			local early = not steps[k + 1] and not st.Hold               -- the last piece hands over early: the _End clip is cued under it (CineActor.Reseat)
+			while os.clock() - started < st.Length - (if early then 0.1 else dt) do dt = RunService.Heartbeat:Wait() end
 			over = (os.clock() - started) - st.Length
 			if st.Hold then
 				t.TimePosition = st.Length
@@ -165,7 +172,7 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 			end
 		end
 	end
-	return loaded
+	return loaded, function() return os.clock() - clockStart + clockOver end
 end
 
 return TutorialAnim

@@ -57,23 +57,39 @@ class EndSettle(unittest.TestCase):
             q[f, 2] = [math.sin(a / 2), 0, 0, math.cos(a / 2)]
         return B.Clip("Synth", q, p, loop=False)
 
-    def test_frame_zero_is_the_end_pose_and_the_limb_stays(self):
+    def test_end_pose_sits_after_the_lead_and_the_limb_stays(self):
         c = self.synthetic()
         s = B.end_settle(c)
+        L = B.SETTLE_LEAD
         eq, ep = B.end_pose(c.q[-1][0], c.p[-1][0])
-        self.assertTrue(np.allclose(s.q[0][0], eq, atol=1e-6) or np.allclose(s.q[0][0], -eq, atol=1e-6))
-        self.assertTrue(np.allclose(s.p[0][0], ep, atol=1e-6))
-        self.assertTrue(np.allclose(s.q[0][2], c.q[-1][2], atol=1e-6) or np.allclose(s.q[0][2], -c.q[-1][2], atol=1e-6))
+        self.assertTrue(np.allclose(s.q[L][0], eq, atol=1e-6) or np.allclose(s.q[L][0], -eq, atol=1e-6))
+        self.assertTrue(np.allclose(s.p[L][0], ep, atol=1e-6))
+        self.assertTrue(np.allclose(s.q[L][2], c.q[-1][2], atol=1e-6) or np.allclose(s.q[L][2], -c.q[-1][2], atol=1e-6))
 
-    def test_limb_speed_decays_to_zero_and_the_last_two_frames_match(self):
+    def test_lead_frames_are_the_pieces_own_frames_under_the_same_transform(self):
         c = self.synthetic()
         s = B.end_settle(c)
-        self.assertEqual(s.n, B.SETTLE_FRAMES + 3)
+        L, last = B.SETTLE_LEAD, c.n - 1
+        phi = -B.yaw_of(c.q[last, 0])
+        co, si = math.cos(phi), math.sin(phi)
+        x, y = c.p[last, 0, 0], c.p[last, 0, 1]
+        ref = c.aligned(phi, -(co * x - si * y), -(si * x + co * y))
+        for k in range(L):
+            src = last - L + k
+            self.assertTrue(np.allclose(s.p[k], ref.p[src], atol=1e-6), k)
+            for j in range(len(B.JOINTS)):
+                self.assertTrue(np.allclose(s.q[k][j], ref.q[src][j], atol=1e-6) or np.allclose(s.q[k][j], -ref.q[src][j], atol=1e-6), (k, j))
+
+    def test_limb_speed_decays_to_zero_after_the_lead_and_the_last_two_frames_match(self):
+        c = self.synthetic()
+        s = B.end_settle(c)
+        L = B.SETTLE_LEAD
+        self.assertEqual(s.n, L + B.SETTLE_FRAMES + 3)
         v = [B.qang(s.q[k][2], s.q[k + 1][2]) for k in range(s.n - 1)]
-        for k in range(B.SETTLE_FRAMES - 1):
-            self.assertLess(v[k + 1], v[k], v)                # strictly slowing across the settle
-        self.assertGreater(v[0], 0.5 * 0.04)                  # it does start at about the clip's own speed
-        self.assertAlmostEqual(v[-1], 0.0, places=5)  # acos near 1 is only good to ~1e-7
+        for k in range(L, L + B.SETTLE_FRAMES - 1):
+            self.assertLess(v[k + 1], v[k], v)
+        self.assertGreater(v[L], 0.5 * 0.04)
+        self.assertAlmostEqual(v[-1], 0.0, places=5)
         self.assertTrue(np.allclose(s.q[-1], s.q[-2]) and np.allclose(s.p[-1], s.p[-2]))
 
 

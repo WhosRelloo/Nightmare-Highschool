@@ -276,17 +276,19 @@ def end_pose(q, p):
     return tilt(q), np.array([0.0, 0.0, float(p[2])])
 
 
+SETTLE_LEAD = 3             # the _End clip starts with this many of the piece's own last frames, so the seam can land mid-motion
 SETTLE_FRAMES = 10          # the _End clip: this many frames of the last motion dying out (0.82 per frame), then a 2-frame hold
 
 
 def end_settle(clip):
-    """the piece's _End clip: frame k (0..SETTLE_FRAMES) is the piece's last frame continued with the decaying velocity
+    """the piece's _End clip: frames 0..SETTLE_LEAD-1 are the piece's own last frames before the end; then frame k (0..SETTLE_FRAMES) is the piece's last frame continued with the decaying velocity
     (Clip.frame's extrapolation), two more repeat the last. Every frame gets the one transform that takes the LAST frame's
     ground offset and heading out (turn about up by -yaw, move its torso X/Y to 0, height kept), so frame 0 is exactly
     end_pose() and the root re-seat (end_offset) is the same for all of them."""
     src = Clip(clip.name, clip.q, clip.p, loop=False)                  # a loop piece must extrapolate, not wrap
     last = src.n - 1
-    qs, ps = [], []
+    qs = [src.q[last - SETTLE_LEAD + k].copy() for k in range(SETTLE_LEAD)]
+    ps = [src.p[last - SETTLE_LEAD + k].copy() for k in range(SETTLE_LEAD)]
     for k in range(SETTLE_FRAMES + 1):
         q, p = src.frame(last + k)
         qs.append(np.array(q, dtype=float))
@@ -546,7 +548,8 @@ PLAYER = '''
 -- (no cue: the loop plays once). Every switch lands on an identical frame, so pieces switch instantly (no fade: a fade
 -- in from weight 0 would show the rig's default pose for a moment), and the time a switch overshoots its exact point
 -- by is carried into the next piece, so even a fast loop never skips. resolve: piece name -> animation id (the director passes `Ctx.Clip`);
--- onSwitch: called as each piece starts (the body check marks the switches). Returns the tracks.
+-- onSwitch: called as each piece starts (the body check marks the switches). Returns the tracks and a clock: a function giving
+-- the current time on the last piece's own clock (its start os.clock() plus the carried overshoot; a stopped track's TimePosition resets).
 function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) -> string?, cues: { [number]: () -> () }?, onSwitch: ((string) -> ())?)
 	local RunService = game:GetService("RunService")
 	local steps = TutorialAnim.Chains[chain]
@@ -564,11 +567,16 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 	end
 	local prev: AnimationTrack? = nil
 	local over = 0
+	local clockStart, clockOver = os.clock(), 0
+	local current = 0
 	for k, st in steps do
 		local t = loaded[st.Piece]
 		if not t then continue end
 		t.Looped = st.Loop == true
 		t:Play(0)
+		clockStart, clockOver = os.clock(), over
+		current = k
+		RunService.PreAnimation:Once(function() if current == k then clockStart = os.clock() end end) -- the track is first drawn on the next step, so its clock starts there
 		if onSwitch then onSwitch(st.Piece) end
 		t.TimePosition = if st.Loop then ((st.Entry or 0) + over) % st.Length else math.max(0, over)
 		if prev then prev:Stop(0) end
@@ -596,7 +604,8 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 			-- piece's tail is the next loop's own frames, so the loop just starts that much earlier in its cycle
 			local started = os.clock()
 			local dt = 1 / 60
-			while os.clock() - started < st.Length - dt do dt = RunService.Heartbeat:Wait() end
+			local early = not steps[k + 1] and not st.Hold               -- the last piece hands over early: the _End clip is cued under it (CineActor.Reseat)
+			while os.clock() - started < st.Length - (if early then 0.1 else dt) do dt = RunService.Heartbeat:Wait() end
 			over = (os.clock() - started) - st.Length
 			if st.Hold then
 				t.TimePosition = st.Length
@@ -604,7 +613,7 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 			end
 		end
 	end
-	return loaded
+	return loaded, function() return os.clock() - clockStart + clockOver end
 end
 '''
 

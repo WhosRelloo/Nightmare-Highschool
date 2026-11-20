@@ -100,26 +100,34 @@ function Shared.Chain(Chain: string, Resolve: (string) -> string?, Cues: any?, O
 	return TA.Play(Animator, Chain, Resolve, Cues, switched)
 end
 
-function Shared.Reseat(Piece: string, Offset: { X: number, Z: number, Yaw: number }, Resolve: (string) -> string?)
+function Shared.Reseat(Piece: string, Offset: { X: number, Z: number, Yaw: number }, Resolve: (string) -> string?, Clock: (() -> number)?, Length: number?)
 	local _, _, Root, Animator = parts()
 	if not (Root and Animator) then return end
 	local A = Instance.new(`Animation`)
 	A.AnimationId = Resolve(Piece .. `_End`) or ``
 	local T = Animator:LoadAnimation(A)
 	T.Priority = Enum.AnimationPriority.Action4
-	-- the _End pose (offset taken out) must take effect in the same engine step in which the root moves under the body.
-	-- Order in a step: PreAnimation -> animation evaluation -> PreSimulation -> physics -> render. :Play() takes effect at the
-	-- next evaluation, a CFrame write at once, so the write is armed on PreSimulation (after that evaluation, before render).
-	T:Play(0)
+	-- A track's first evaluation after :Play() is at time 0, and a TimePosition write is only drawn one step later. So the
+	-- _End clip is played at near-zero weight under the chain's last track (which Play hands over 0.1 s before its end, so
+	-- it is still drawing), seeked on the next step to where the chain's clock will be on the step after (the clip leads with
+	-- 3 of the piece's own frames, so it lands where the piece was), and on that step given full weight with the root write
+	-- (after the evaluation, before render).
+	T:Play(0, 0.001)
+	local Waiting = coroutine.running()
+	RunService.PreAnimation:Once(function(Dt: number)
+		if Clock and Length then T.TimePosition = math.max(0, 3 / 30 + (Clock() - Length)) end
+		RunService.PreAnimation:Once(function()
+			T:AdjustWeight(1, 0)
+			RunService.PreSimulation:Once(function()
+				Root.CFrame = Root.CFrame * CFrame.new(Offset.X, 0, Offset.Z) * CFrame.Angles(0, math.rad(Offset.Yaw), 0)
+				task.spawn(Waiting)
+			end)
+		end)
+	end)
+	coroutine.yield()
 	for _, Other in Animator:GetPlayingAnimationTracks() do
 		if Other ~= T and Other.Priority == Enum.AnimationPriority.Action then Other:Stop(0) end
 	end
-	local Waiting = coroutine.running()
-	RunService.PreSimulation:Once(function()
-		Root.CFrame = Root.CFrame * CFrame.new(Offset.X, 0, Offset.Z) * CFrame.Angles(0, math.rad(Offset.Yaw), 0)
-		task.spawn(Waiting)
-	end)
-	coroutine.yield()
 	-- the _End clip is a short settle (the piece's last motion dying out, then two identical frames): hold the final pose
 	-- from one frame before its end until Release, so the body neither falls to idle nor freezes mid-motion
 	local Hold: RBXScriptConnection
