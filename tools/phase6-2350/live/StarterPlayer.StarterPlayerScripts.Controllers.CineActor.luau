@@ -73,8 +73,8 @@ function Shared.Chain(Chain: string, Resolve: (string) -> string?, Cues: any?, O
 	local _, _, _, Animator = parts()
 	assert(Animator, `no Animator`)
 	local TA = require(ReplicatedStorage.Config.TutorialAnim)
-	-- the first piece eases in over 0.25 s (weight 0 -> 1) so the arms don't snap from the game's idle to the chain's pose;
-	-- later switches are identical frames, so they stay instant (a fade there would show the rig's default pose)
+	-- the first piece eases in over 0.4 s (smootherstep weight 0 -> 1, written each frame) so the arms don't snap from the
+	-- game's idle to the chain's pose; this is a blend. Later switches are identical frames and stay instant.
 	local First = true
 	local function switched(Piece: string)
 		if First then
@@ -83,13 +83,12 @@ function Shared.Chain(Chain: string, Resolve: (string) -> string?, Cues: any?, O
 			for _, T in Animator:GetPlayingAnimationTracks() do
 				if T.Animation and T.Animation.AnimationId == Id then
 					T:AdjustWeight(0.001, 0)
-					task.spawn(function()
-						local T0 = os.clock()
-						while os.clock() - T0 < 0.25 do
-							RunService.Heartbeat:Wait()
-							T:AdjustWeight(math.max(0.001, (os.clock() - T0) / 0.25), 0)
-						end
-						T:AdjustWeight(1, 0)
+					local T0 = os.clock()
+					local Conn: RBXScriptConnection
+					Conn = RunService.PreAnimation:Connect(function()
+						local A = math.min(1, (os.clock() - T0) / 0.4)
+						T:AdjustWeight(math.max(0.001, A * A * A * (A * (A * 6 - 15) + 10)), 0)
+						if A >= 1 then Conn:Disconnect() end
 					end)
 					break
 				end
@@ -107,15 +106,20 @@ function Shared.Reseat(Piece: string, Offset: { X: number, Z: number, Yaw: numbe
 	A.AnimationId = Resolve(Piece .. `_End`) or ``
 	local T = Animator:LoadAnimation(A)
 	T.Priority = Enum.AnimationPriority.Action4
-	-- the _End pose (offset taken out) takes over and the root moves under the body in the SAME rendered frame. A track's
-	-- pose lands one engine step after :Play(), while a CFrame write lands at once; writing both in one step shows the
-	-- root move for a frame (measured: 1.3 st jump, twice). So play, wait one Stepped, then move the root.
+	T.Looped = true -- the _End clip is 2 frames (0.033 s) of one pose: it must hold until Release, or the body falls to idle
+	-- the _End pose (offset taken out) must take effect in the same engine step in which the root moves under the body.
+	-- Order in a step: PreAnimation -> animation evaluation -> PreSimulation -> physics -> render. :Play() takes effect at the
+	-- next evaluation, a CFrame write at once, so the write is armed on PreSimulation (after that evaluation, before render).
 	T:Play(0)
-	RunService.Stepped:Wait()
-	Root.CFrame = Root.CFrame * CFrame.new(Offset.X, 0, Offset.Z) * CFrame.Angles(0, math.rad(Offset.Yaw), 0)
 	for _, Other in Animator:GetPlayingAnimationTracks() do
 		if Other ~= T and Other.Priority == Enum.AnimationPriority.Action then Other:Stop(0) end
 	end
+	local Waiting = coroutine.running()
+	RunService.PreSimulation:Once(function()
+		Root.CFrame = Root.CFrame * CFrame.new(Offset.X, 0, Offset.Z) * CFrame.Angles(0, math.rad(Offset.Yaw), 0)
+		task.spawn(Waiting)
+	end)
+	coroutine.yield()
 	EndTrack = T
 end
 

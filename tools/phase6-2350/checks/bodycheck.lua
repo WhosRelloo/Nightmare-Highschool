@@ -14,15 +14,12 @@ local Samples, Marks = {}, {}
 local Conn = RunService.RenderStepped:Connect(function()
 	local P = {}
 	for _, N in Parts do table.insert(P, C[N].Position) table.insert(P, (C[N].CFrame * CFrame.new(0, -1, 0)).Position) end
-	local Prev = Samples[#Samples]
-	if Prev then
-		local Same = true
-		for j = 1, #P do if P[j] ~= Prev[j] then Same = false break end end
-		if Same then return end -- a render frame where the rig did not update is not a body frame (a track start costs one)
-	end
 	table.insert(Samples, P)
 end)
 local Chain = "TheBus"
+local Root = C.HumanoidRootPart
+local WasAnchored = Root.Anchored
+Root.Anchored = true -- continuity check: falls/collisions at the test spot must not contaminate it
 Actor.Begin()
 for _, St in TA.Chains[Chain] do St._at = nil end
 local Tracks = Actor.Chain(Chain, resolve, nil, function(Piece) table.insert(Marks, { at = #Samples, name = "switch " .. Piece }) end)
@@ -32,6 +29,7 @@ Actor.Reseat(Last.Piece, Last.EndOffset, resolve)
 task.wait(0.6)
 Actor.Release()
 Conn:Disconnect()
+Root.Anchored = WasAnchored
 local Acc = {}
 for i = 3, #Samples do
 	local M = 0
@@ -54,4 +52,12 @@ for _, Mk in Marks do
 	Pass = Pass and Ok
 	table.insert(Lines, string.format("%s peak %.0f (p99 %.0f) %s", Mk.name, Peak, P99, Ok and "ok" or "POP"))
 end
+local Dup = 0
+local ReseatAt = Marks[#Marks].at
+for i = 3, ReseatAt do -- the held _End pose after the re-seat is static by design, so only count up to it
+	local Same = true
+	for j = 1, #Samples[i] do if Samples[i][j] ~= Samples[i - 1][j] then Same = false break end end
+	if Same then Dup += 1 end
+end
+table.insert(Lines, "duplicate frames before the re-seat (identical consecutive samples): " .. Dup)
 return (Pass and "BODY OK\n" or "BODY POP\n") .. table.concat(Lines, "\n")
