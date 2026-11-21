@@ -56,6 +56,42 @@ RunService:BindToRenderStep(Name, Enum.RenderPriority.Last.Value, function()
 	if Path then LastPath = Path end
 	table.insert(Rows, { cf = Cam.CFrame; fov = Cam.FieldOfView; phase = Player:GetAttribute("NHCineSeam") or "Play"; t = os.clock(); look = look() })
 end)
+-- GARDEN (task 11): TutorialSneak. "sneak" crouch-walks Start -> FenceZone; "fail" walks at Biscuit, stands up within 7 studs (a
+-- BeatCrouch Off), waits out Hide and goes on to the fence. Variant (TRIGGER replay; mark the cut Seen first):
+--   sed 's/^local ID = "__SeamlessTest"/local ID = "TutorialSneak"/; s/^local GARDEN = nil/local GARDEN = "sneak"/' camcheck.lua
+local GARDEN = nil
+if GARDEN then
+	local Char = Player.Character
+	local Hum = Char:FindFirstChildOfClass("Humanoid")
+	local Root = Char.HumanoidRootPart
+	Root.CFrame = CFrame.lookAt(Vector3.new(3994, 3, 4104), Vector3.new(4012, 3, 4081))
+	Root.AssemblyLinearVelocity = Vector3.zero
+	local Marks = workspace:WaitForChild("NHCineSets"):WaitForChild("Garden")
+	local Fence, Bis = Marks:WaitForChild("FenceZone").Position, Marks:WaitForChild("Biscuit").Position
+	workspace:WaitForChild("Hometown"):WaitForChild("Garden"):WaitForChild("WFBiscuit")
+	local Stood, Returned, Began = false, false, false
+	task.wait(1.1)
+	-- driven only while a beat runs
+	RunService:BindToRenderStep(Name .. "Walk", Enum.RenderPriority.Input.Value + 1, function()
+		local Ph = Player:GetAttribute("NHCineSeam")
+		if Ph ~= nil then Began = true end
+		if not (Ph == "Beat" or Ph == "BeatIn") then return end -- from standing still: the In blend is the seam under test (the player walking is the player's own acceleration)
+		local P = Player:GetAttribute("NHCinePath") or ""
+		local Goal = Fence
+		if GARDEN == "fail" and not Returned then
+			if P == "Garden" then
+				Goal = Bis
+				if (Root.Position - Bis).Magnitude < 7 and not Stood then
+					Stood = true
+					game.ReplicatedStorage.NHCine:FireServer({ Kind = "BeatCrouch"; On = false })
+				end
+			elseif P:match("Hide") then Returned = true end
+		end
+		local D = (Goal - Root.Position) * Vector3.new(1, 0, 1)
+		if D.Magnitude > 0.5 then Hum:Move(D.Unit, false) end
+	end)
+	task.wait(0.4)
+end
 local Walking = false
 local Holding = false
 if WALK then
@@ -100,7 +136,7 @@ repeat
 until (Started and Player:GetAttribute("NHCineSeam") == nil and os.clock() - T0 > 3) or os.clock() - T0 > 50
 task.wait(1.2)
 RunService:UnbindFromRenderStep(Name)
-if WALK then pcall(function() RunService:UnbindFromRenderStep(Name .. "Walk") end) end
+if WALK or GARDEN then pcall(function() RunService:UnbindFromRenderStep(Name .. "Walk") end) end
 
 -- one channel's acceleration at sample i (vectors or numbers)
 local function second(i, get)

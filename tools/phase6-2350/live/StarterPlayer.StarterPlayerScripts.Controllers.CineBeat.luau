@@ -35,7 +35,8 @@ local WALK = 12              -- the walk speed Sprint's Release writes (ActionMa
 local SPRINTING = 20         -- at or above this WalkSpeed you're sprinting (sprint writes 25 / 40.5)
 local STICK_RATE = 480       -- right stick at full tilt: 480 "pixels" a second = 120 degrees a second of nudge
 local DEADZONE = 0.15
-local KINDS = { t = true; idle = true; enter = true; near = true; prompt = true }
+local STANDING = 0.8        -- seconds standing before a held crouch is asserted again
+local KINDS = { t = true; idle = true; enter = true; near = true; prompt = true; fail = true }
 
 local function controls()
 	local Ok, C = pcall(function() return require(Player.PlayerScripts:WaitForChild(`PlayerModule`)):GetControls() end)
@@ -51,22 +52,39 @@ end
 
 local function parse(On: any): (string?, string?, string?)
 	if typeof(On) ~= `string` then return nil, nil, nil end
-	if On == `start` then return `start`, nil, nil end
+	if On == `start` or On == `fail` then return On, nil, nil end
 	local Kind, A, B = On:match(`^(%a+):([^:]+):?(.*)$`)
 	return Kind, A, B
 end
 
 function Shared.ValidTrigger(On: any): boolean
 	local Kind, A = parse(On)
-	if Kind == `start` then return true end
+	if Kind == `start` or Kind == `fail` then return true end
 	if not (Kind and KINDS[Kind]) then return false end
 	if (Kind == `t` or Kind == `idle`) and tonumber(A) == nil then return false end
 	return true
 end
 
-local function trigger(On: string?, Ctx, Clock: number, Root: BasePart, Idle: number, Results): boolean
+-- (task 11) a beat's `ends` is one { on, next } table or a list of them (the first whose trigger holds wins); an entry's
+-- keepCrouch = true hands the game's crouch on to whatever comes next (a beat that crouches too, a cut that carries the
+-- crouch walk on) instead of standing the player up at this beat's end
+local function endsOf(Spec): { any }
+	local E = Spec.ends
+	if typeof(E) ~= `table` then return {} end
+	if E.on ~= nil then return { E } end
+	return E
+end
+Shared.EndsOf = endsOf
+
+local function trigger(On: string?, Ctx, Clock: number, Root: BasePart, Idle: number, Results, Cut): boolean
 	local Kind, A, B = parse(On)
 	if Kind == `start` then return Clock >= 0 end
+	-- (task 11) `fail`: the cut's Built.Fail was set (a cue's soft failure); it is cleared when it fires
+	if Kind == `fail` then
+		local Built = Cut and Cut.Built
+		if Built and Built.Fail == true then Built.Fail = nil return true end
+		return false
+	end
 	if Kind == `t` then return Clock >= (tonumber(A) or math.huge) end
 	if Kind == `idle` then return Idle >= (tonumber(A) or math.huge) end
 	if Kind == `enter` then
@@ -95,11 +113,13 @@ function Shared.TravelOf(Spec, Ctx, Root: BasePart): Vector3
 		local D = M and flat(M.Position - Root.Position)
 		if D then return D end
 	end
-	local Kind, A = parse(Spec.ends and Spec.ends.on)
-	if Kind == `enter` and A then
-		local M = Ctx.Mark(A)
-		local D = M and flat(M.Position - Root.Position)
-		if D then return D end
+	for _, E in endsOf(Spec) do
+		local Kind, A = parse(E.on)
+		if Kind == `enter` and A then
+			local M = Ctx.Mark(A)
+			local D = M and flat(M.Position - Root.Position)
+			if D then return D end
+		end
 	end
 	return flat(Root.CFrame.LookVector) or Vector3.new(0, 0, -1)
 end
@@ -167,9 +187,15 @@ function Shared.Run(Cut, SegName: string, Spec, Ctx, Entry: any?, Out: any?, Loo
 	local C = Player.Character
 	local Hum = C and C:FindFirstChildOfClass(`Humanoid`)
 	local Root = C and C:FindFirstChild(`HumanoidRootPart`) :: BasePart?
-	if not (Hum and Root) then return Spec.ends and Spec.ends.next end
-	if not (Spec.ends and Shared.ValidTrigger(Spec.ends.on)) then
-		warn(`[CineBeat] {Cut.Id}.{SegName}: ends.on {tostring(Spec.ends and Spec.ends.on)} is missing or unreadable; the beat ends only with the cut`)
+	local Ends = endsOf(Spec)
+	if not (Hum and Root) then return Ends[1] and Ends[1].next end
+	local AnyEnd = false
+	for _, E in Ends do
+		if Shared.ValidTrigger(E.on) then AnyEnd = true
+		else warn(`[CineBeat] {Cut.Id}.{SegName}: ends.on {tostring(E.on)} is unreadable`) end
+	end
+	if not AnyEnd then
+		warn(`[CineBeat] {Cut.Id}.{SegName}: no readable ends.on; the beat ends only with the cut`)
 	end
 	local Cam = workspace.CurrentCamera
 	local Move = Spec.move or {}
@@ -196,14 +222,15 @@ function Shared.Run(Cut, SegName: string, Spec, Ctx, Entry: any?, Out: any?, Loo
 	local NoSprint, Crouched = false, false
 	local Ctl, MoveWas = nil, nil
 	local Unbound = false
-	local function cleanup()
+	local function cleanup(KeepCrouch: boolean?)
 		if not Unbound then Unbound = true pcall(function() RunService:UnbindFromRenderStep(BIND) end) end
 		if SpeedConn then SpeedConn:Disconnect() SpeedConn = nil end
 		-- only our own speed goes back (the server, a stun or crouch may have written theirs since)
 		if Applied and Hum.Parent and math.abs(Hum.WalkSpeed - Applied) < 1e-3 then Hum.WalkSpeed = SpeedBase end
 		Applied = nil
 		if NoSprint then Player:SetAttribute(`NHBeatNoSprint`, nil) NoSprint = false end
-		if Crouched then Remote:FireServer({ Kind = `BeatCrouch`; On = false }) Crouched = false end
+		if Crouched and not KeepCrouch then Remote:FireServer({ Kind = `BeatCrouch`; On = false }) end
+		Crouched = false
 		if Ctl and MoveWas then (Ctl :: any).moveFunction = MoveWas end
 		Ctl, MoveWas = nil, nil
 	end
@@ -260,12 +287,13 @@ function Shared.Run(Cut, SegName: string, Spec, Ctx, Entry: any?, Out: any?, Loo
 	local Finished = false
 	local Next: string? = nil
 	local GradeDone = false
+	local SawCrouch, StandSince = false, nil :: number?
 
-	local function finish(To: string?)
+	local function finish(To: string?, KeepCrouch: boolean?)
 		if Finished then return end
 		Finished = true
 		Next = To
-		cleanup()
+		cleanup(KeepCrouch)
 		if coroutine.status(Thread) == `suspended` then task.spawn(Thread) end
 	end
 
@@ -333,26 +361,48 @@ function Shared.Run(Cut, SegName: string, Spec, Ctx, Entry: any?, Out: any?, Loo
 			if Head then Dof.FocusDistance = (CF.Position - Head.Position).Magnitude end
 		end
 		for I, L in Spec.lines or {} do
-			if not Fired[`L` .. I] and trigger(L.on, Ctx, Clock, Root, Rig.Idle, Results) then
+			if not Fired[`L` .. I] and trigger(L.on, Ctx, Clock, Root, Rig.Idle, Results, Cut) then
 				Fired[`L` .. I] = true
 				say(L)
 			end
 		end
 		for I, Q in Spec.cues or {} do
-			if not Fired[`C` .. I] and trigger(Q.on, Ctx, Clock, Root, Rig.Idle, Results) then
-				Fired[`C` .. I] = true
+			-- a cue with `every` (seconds) is asked again while its trigger holds (the cue itself decides whether it matters:
+			-- standing up near a sleeping dog); otherwise it fires once
+			local Last = Fired[`C` .. I]
+			if (Last == nil or (Q.every and Clock - (Last :: number) >= Q.every)) and trigger(Q.on, Ctx, Clock, Root, Rig.Idle, Results, Cut) then
+				Fired[`C` .. I] = Clock
 				local Fn = Cut.Built and Cut.Built.cues and Cut.Built.cues[Q.run]
 				if typeof(Fn) == `function` then task.spawn(Fn, Ctx) end
 			end
 		end
-		if Spec.prompt and not Fired.Prompt and trigger(Spec.prompt.on or `start`, Ctx, Clock, Root, Rig.Idle, Results) then
+		if Spec.prompt and not Fired.Prompt and trigger(Spec.prompt.on or `start`, Ctx, Clock, Root, Rig.Idle, Results, Cut) then
 			Fired.Prompt = true
 			local Ok, Err = pcall(openPrompt)
 			if not Ok then warn(`[CineBeat] prompt: {Err}`) end
 		end
-		if Spec.ends and trigger(Spec.ends.on, Ctx, Clock, Root, Rig.Idle, Results) then
-			-- the camera was written this frame; the continuation (next segment, or the blend out) starts in this frame
-			finish(Spec.ends.next or `__end`)
+		for _, E in Ends do
+			if not Finished and trigger(E.on, Ctx, Clock, Root, Rig.Idle, Results, Cut) then
+				-- the camera was written this frame; the continuation (next segment, or the blend out) starts in this frame
+				finish(E.next or `__end`, E.keepCrouch == true)
+			end
+		end
+		if Finished then return end
+		-- a speed of 0 means stand still (the server's crouch writes its own walk speed over ours)
+		if Applied == 0 and Hum.WalkSpeed ~= 0 then Hum.WalkSpeed = 0 end
+		-- (task 11) the game's crouch is held: when it drops (and it was up) and stays down for STANDING seconds (a beat's own
+		-- cues judge a stand-up first: standing near a sleeping dog is a soft fail, not something to undo), crouch again and say so
+		if Crouched then
+			if Hum:GetAttribute(`Crouch`) == true then
+				SawCrouch, StandSince = true, nil
+			elseif SawCrouch then
+				StandSince = StandSince or Clock
+				if Clock - StandSince >= STANDING then
+					SawCrouch, StandSince = false, nil
+					Remote:FireServer({ Kind = `BeatCrouch`; On = true })
+					pcall(UI.Subtitle, ``, `Stay low.`, 1.2)
+				end
+			end
 		end
 	end
 	local function step()
@@ -362,7 +412,7 @@ function Shared.Run(Cut, SegName: string, Spec, Ctx, Entry: any?, Out: any?, Loo
 		local Ok, Err = pcall(frame)
 		if not Ok then
 			warn(`[CineBeat] {Cut.Id}.{SegName}: {Err}`)
-			finish(Spec.ends and Spec.ends.next or `__end`) -- the beat's own cleanup; the cut carries on (or ends) from here
+			finish(Ends[1] and Ends[1].next or `__end`) -- the beat's own cleanup; the cut carries on (or ends) from here
 		end
 	end
 

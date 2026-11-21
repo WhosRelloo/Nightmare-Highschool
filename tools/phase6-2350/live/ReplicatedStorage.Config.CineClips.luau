@@ -23,4 +23,13 @@ return {
 	BusEngineIdle = `rbxassetid://92379746659066`; -- loop
 	BusPullAway = `rbxassetid://113739044717474`;
 	BusWipersSweep = `rbxassetid://121682498815960`; -- loop
+	-- (2.35.0) Biscuit (WFBiscuit, an AnimationController rig) and the garden gate, group uploads; BiscuitSleep and BiscuitTrot loop
+	BiscuitSleep = `rbxassetid://95274201499517`; -- loop (the base loop)
+	BiscuitTrot = `rbxassetid://101982272082907`; -- loop
+	BiscuitWuff = `rbxassetid://116754381892948`;
+	BiscuitWakeStare = `rbxassetid://104742093696031`;
+	BiscuitSigh = `rbxassetid://131075439249040`;
+	GateOpen = `rbxassetid://127810787589543`;
+	GateSwingShut = `rbxassetid://100841390179835`;
+	WickHouseSashOpen = `rbxassetid://104192943449659`;
 }

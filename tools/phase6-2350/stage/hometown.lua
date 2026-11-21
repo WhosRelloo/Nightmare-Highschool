@@ -84,8 +84,27 @@ set("BusStop", {
 	CamDriver = CFrame.new(1.6, 6.6, 0.2),
 	CamAway = CFrame.new(22, 2.6, -0.5),    CamLookAway = CFrame.new(-30, 4, -5.6),
 })
+-- (task 11) the garden's lawn: the imported props have no ground of their own, and the player walks from the house to the
+-- fence and over it (the far side too). Placeholder grass until the real map has a back garden.
+do
+	local Folder = H:FindFirstChild("Garden") or Instance.new("Folder")
+	Folder.Name = "Garden"
+	Folder.Parent = H
+	local Lawn = Folder:FindFirstChild("WFGardenLawn") or Instance.new("Part")
+	Lawn.Name = "WFGardenLawn"
+	Lawn.Anchored = true
+	Lawn.Size = Vector3.new(90, 1, 90)
+	Lawn.CFrame = ORIGIN * CFrame.new(0, -0.5, 95)
+	Lawn.Material = Enum.Material.Grass
+	Lawn.Color = Color3.fromRGB(58, 84, 52)
+	Lawn.TopSurface, Lawn.BottomSurface = Enum.SurfaceType.Smooth, Enum.SurfaceType.Smooth
+	Lawn.Parent = Folder
+end
+-- FenceZone: where you stop at the gate to climb (z 82: the gate's collision face is at z 80.3 and your root needs about 1 stud
+-- more, so a mark nearer than that can't be walked to)
+-- LightWindow: the bedroom window (the house's BedSash, 3994.3 / 7.1 / 4113.2 in the world), a hair in front of it
 set("Garden", {
-	Start = CFrame.new(-6, 0, 104), Biscuit = CFrame.new(14, 0, 93), FenceZone = CFrame.new(12, 0, 81),
-	LightWindow = CFrame.new(0, 14, 108), Hide = CFrame.new(4, 0, 92),
+	Start = CFrame.new(-6, 0, 104), Biscuit = CFrame.new(14, 0, 93), FenceZone = CFrame.new(12, 0, 82),
+	LightWindow = CFrame.new(-5.66, 7.11, 113.0), Hide = CFrame.new(4, 0, 92),
 })
 return table.concat(Report, "\n")
