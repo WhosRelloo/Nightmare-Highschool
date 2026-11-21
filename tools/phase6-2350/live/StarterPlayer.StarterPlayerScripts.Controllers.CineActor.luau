@@ -41,16 +41,20 @@ end
 function Shared.Begin()
 	if Held then return end
 	Held = true
+	-- (task 7) a Release during the ease-out (Skip, or a cut that ends at once) wins: only Release bumps ChainGen, so
+	-- if it moved, the ease stops and the controls are NOT disabled (it used to leave them off with Held = false)
+	local My = ChainGen
 	local _, Hum = parts()
 	if Hum then
 		SpeedWas = Hum.WalkSpeed
 		local T0, S0 = os.clock(), Hum.WalkSpeed
-		while os.clock() - T0 < 0.3 do                       -- input eases out (spec §2.1): 0.3 s
+		while os.clock() - T0 < 0.3 and ChainGen == My do  -- input eases out (spec §2.1): 0.3 s
 			Hum.WalkSpeed = S0 * (1 - (os.clock() - T0) / 0.3)
 			RunService.Heartbeat:Wait()
 		end
 		Hum.WalkSpeed = SpeedWas :: number
 	end
+	if ChainGen ~= My then return end
 	local Ctl = controls()
 	if Ctl then Ctl:Disable() end
 end

@@ -15,6 +15,7 @@
 
 	API: Show(Opts), Hide(), Subtitle(Speaker, Text, Seconds, Color?), Card(Title, Sub, Seconds), Veil(Alpha, Seconds),
 	     Votes(Votes, Need, Voted), SetSkippable(bool), Ring(), OnSkip(fn)
+     (2.35.0) FadeHud(On, Seconds) (seamless cuts: no bars, the HUD fades), Dip(Seconds, AtBlack?) (seamless skip)
      (2.25.0) PromptShow(P, Opts), PromptHit(), PromptMeter(f), PromptHold(down), PromptHide(Outcome?), GradeCard(G, Perfects, Prompts, s)
 ]]
 local Players = game:GetService(`Players`)
@@ -163,35 +164,42 @@ end
 
 ---| everything else off while a cut plays |---
 
-function Local.HideOthers()
-	local PG = Player:WaitForChild(`PlayerGui`)
-	local function hide(G: Instance)
-		if G == Ui.Gui or not G:IsA(`LayerCollector`) or Hidden[G] ~= nil then return end
-		Hidden[G] = (G :: any).Enabled
-		;(G :: any).Enabled = false
+-- (2.35.0) Fade (seconds, seamless cuts): a ScreenGui whose top level holds CanvasGroups (the UI kit's panels) fades
+-- them out and is switched off at the end; any other GUI, and the core GUI, toggles at the midpoint. Without Fade
+-- everything goes at once (the cut veils to black first).
+local HudToken = 0
+local CanvasWas = {} :: { [CanvasGroup]: number }
+-- a faded restore still in flight: what each GUI / core setting goes back to (a new hide uses these as the originals,
+-- not the half-restored state)
+local PendingGui = {} :: { [Instance]: boolean }
+local PendingCore: { [any]: any }? = nil
+
+local function topGroups(G: Instance): { CanvasGroup }
+	local Out = {}
+	for _, Ch in G:GetChildren() do if Ch:IsA(`CanvasGroup`) then table.insert(Out, Ch) end end
+	return Out
+end
+
+local function coreOff()
+	if PendingCore then
+		for K, V in PendingCore do SavedCore[K] = V end
+		PendingCore = nil
 	end
-	for _, G in PG:GetChildren() do hide(G) end
-	table.insert(Conns, PG.ChildAdded:Connect(function(G) if On then task.defer(function() if On then hide(G) end end) end end))
 	for _, T in CORE do
+		if SavedCore[T] ~= nil then pcall(StarterGui.SetCoreGuiEnabled, StarterGui, T, false) continue end
 		local Ok, V = pcall(StarterGui.GetCoreGuiEnabled, StarterGui, T)
 		SavedCore[T] = if Ok then V else true
 		pcall(StarterGui.SetCoreGuiEnabled, StarterGui, T, false)
 	end
 	pcall(function()
-		SavedCore.ChatWindow = TextChatService.ChatWindowConfiguration.Enabled
-		SavedCore.ChatInput = TextChatService.ChatInputBarConfiguration.Enabled
+		if SavedCore.ChatWindow == nil then SavedCore.ChatWindow = TextChatService.ChatWindowConfiguration.Enabled end
+		if SavedCore.ChatInput == nil then SavedCore.ChatInput = TextChatService.ChatInputBarConfiguration.Enabled end
 		TextChatService.ChatWindowConfiguration.Enabled = false
 		TextChatService.ChatInputBarConfiguration.Enabled = false
 	end)
 end
 
-function Local.RestoreOthers()
-	for _, Cn in Conns do Cn:Disconnect() end
-	table.clear(Conns)
-	for G, Was in Hidden do
-		if G.Parent then pcall(function() (G :: any).Enabled = Was end) end
-	end
-	table.clear(Hidden)
+local function coreBack()
 	for T, V in SavedCore do
 		if typeof(T) == `EnumItem` then pcall(StarterGui.SetCoreGuiEnabled, StarterGui, T, V) end
 	end
@@ -200,6 +208,78 @@ function Local.RestoreOthers()
 		if SavedCore.ChatInput ~= nil then TextChatService.ChatInputBarConfiguration.Enabled = SavedCore.ChatInput end
 	end)
 	table.clear(SavedCore)
+end
+
+function Local.HideOthers(Fade: number?)
+	HudToken += 1
+	local Token = HudToken
+	local F = if Fade and Fade > 0 and not reduced() then Fade else 0
+	local PG = Player:WaitForChild(`PlayerGui`)
+	local function hide(G: Instance, Now: boolean?)
+		if G == Ui.Gui or not G:IsA(`LayerCollector`) or Hidden[G] ~= nil then return end
+		if PendingGui[G] ~= nil then Hidden[G] = PendingGui[G] PendingGui[G] = nil else Hidden[G] = (G :: any).Enabled end
+		if F <= 0 or Now or not Hidden[G] then (G :: any).Enabled = false return end
+		local Groups = topGroups(G)
+		for _, CG in Groups do
+			if CanvasWas[CG] == nil then CanvasWas[CG] = CG.GroupTransparency end
+			tween(CG, F, { GroupTransparency = 1 }, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+		end
+		task.delay(if #Groups > 0 then F else F / 2, function()
+			if Token == HudToken and Hidden[G] ~= nil and G.Parent then (G :: any).Enabled = false end
+		end)
+	end
+	for _, G in PG:GetChildren() do hide(G) end
+	table.clear(PendingGui)
+	table.insert(Conns, PG.ChildAdded:Connect(function(G) if On then task.defer(function() if On then hide(G, true) end end) end end))
+	if F > 0 then
+		task.delay(F / 2, function() if Token == HudToken then coreOff() end end)
+	else
+		coreOff()
+	end
+end
+
+function Local.RestoreOthers(Fade: number?)
+	HudToken += 1
+	local Token = HudToken
+	local F = if Fade and Fade > 0 and not reduced() then Fade else 0
+	for _, Cn in Conns do Cn:Disconnect() end
+	table.clear(Conns)
+	for G, Was in Hidden do
+		if not G.Parent then continue end
+		local Groups = topGroups(G)
+		if F > 0 and Was and #Groups > 0 then
+			pcall(function() (G :: any).Enabled = true end)
+			for _, CG in Groups do
+				local To = CanvasWas[CG] or 0
+				tween(CG, F, { GroupTransparency = To }, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut)
+			end
+		elseif F > 0 and Was then
+			PendingGui[G] = true
+			task.delay(F / 2, function()
+				if Token == HudToken and PendingGui[G] then
+					PendingGui[G] = nil
+					if G.Parent then pcall(function() (G :: any).Enabled = true end) end
+				end
+			end)
+		else
+			for _, CG in Groups do if CanvasWas[CG] then CG.GroupTransparency = CanvasWas[CG] end end
+			pcall(function() (G :: any).Enabled = Was end)
+		end
+	end
+	table.clear(Hidden)
+	table.clear(CanvasWas)
+	if F > 0 and next(SavedCore) then
+		PendingCore = table.clone(SavedCore)
+		table.clear(SavedCore)
+		task.delay(F / 2, function()
+			if Token ~= HudToken or not PendingCore then return end
+			for K, V in PendingCore do SavedCore[K] = V end
+			PendingCore = nil
+			coreBack()
+		end)
+	else
+		coreBack()
+	end
 end
 
 ---| skip input |---
@@ -227,6 +307,7 @@ function Shared.Show(Opts)
 	Ui.Gui.Enabled = true
 	Ui.Group = Opts.Group == true
 	Ui.Voted = false
+	Ui.Bars = true
 	local Share = barShare()
 	local T = if reduced() then 0.01 else 0.7
 	Ui.Top.Size = UDim2.fromScale(1, 0)
@@ -284,7 +365,7 @@ function Shared.Subtitle(Speaker: string, Text: string, Seconds: number, Color: 
 	Ui.Seal.ImageColor3 = Color or C.Wax
 	Ui.Sub.Size = UDim2.new(0.62, 0, 0, Sz * 2 + 54)
 	local Reduced = reduced()
-	local Rest = UDim2.new(0.5, 0, 1 - barShare(), -14)
+	local Rest = if Ui.Bars == false then UDim2.new(0.5, 0, 1, -24) else UDim2.new(0.5, 0, 1 - barShare(), -14)
 	if Ui.Sub.GroupTransparency > 0.9 then
 		Ui.Sub.Position = if Reduced then Rest else Rest + UDim2.fromOffset(0, 10)
 		tween(Ui.Sub, 0.3, { GroupTransparency = 0; Position = Rest })
@@ -505,6 +586,50 @@ function Shared.Hide(Seconds: number?)
 	task.delay(T + 0.05, function()
 		if not On and Ui and Ui.Veil.BackgroundTransparency >= 0.99 then Ui.Gui.Enabled = false end
 	end)
+end
+
+-- (2.35.0) seamless cuts: no bars; the rest of the HUD fades out and back in (spec §2.1 / §4.1). The cut's own pieces
+-- (subtitles, card, skip, prompts) still show; Off puts everything back like Hide, faded.
+function Shared.FadeHud(Show: boolean, Seconds: number)
+	if not Ui then Local.Build() end
+	if Show then
+		On = true
+		Local.HideOthers(Seconds)
+		Ui.Gui.Enabled = true
+		Ui.Group = false
+		Ui.Voted = false
+		Ui.Bars = false
+		Ui.Top.Size = UDim2.fromScale(1, 0)
+		Ui.Bottom.Size = UDim2.fromScale(1, 0)
+		Ui.Sub.Position = UDim2.new(0.5, 0, 1, -24)
+		Ui.Sub.GroupTransparency = 1
+		Ui.Card.GroupTransparency = 1
+	else
+		if Ui.Prompt then Ui.Prompt:Destroy() Ui.Prompt = nil end
+		On = false
+		Ui.Skip.Visible = false
+		tween(Ui.Sub, 0.2, { GroupTransparency = 1 })
+		tween(Ui.Card, 0.2, { GroupTransparency = 1 })
+		Local.RestoreOthers(Seconds)
+		task.delay(Seconds + 0.05, function()
+			if not On and Ui and Ui.Veil.BackgroundTransparency >= 0.99 then Ui.Gui.Enabled = false end
+		end)
+	end
+end
+
+-- (2.35.0) the one black in a seamless cut: skip's jump to the end state (spec §2.3). AtBlack (optional) runs while the
+-- screen is fully black (the actor placed, the camera handed back), then the veil lifts.
+function Shared.Dip(Seconds: number, AtBlack: (() -> ())?)
+	if not Ui then Local.Build() end
+	Ui.Gui.Enabled = true
+	Shared.Veil(1, Seconds / 2)
+	task.wait(Seconds / 2)
+	Ui.Veil.BackgroundTransparency = 0
+	if AtBlack then
+		local Ok, Err = pcall(AtBlack)
+		if not Ok then warn(`[CineUI] Dip: {Err}`) end
+	end
+	Shared.Veil(0, Seconds / 2)
 end
 
 function Shared.IsOn(): boolean return On end

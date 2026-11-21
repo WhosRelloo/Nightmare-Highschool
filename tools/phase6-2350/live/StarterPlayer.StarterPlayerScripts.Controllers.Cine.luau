@@ -696,9 +696,11 @@ function Local.Play(Message)
 	local Cut = { Id = Message.Id; Session = Message.Session; Def = Def; Live = true; Conns = {}; Sounds = {}; Actors = {};
 		Restore = {}; Clock = 0; Fired = 1; Group = Message.Group == true; Token = {} }
 	Current = Cut
+	-- (2.35.0) a seamless cut (spec §2) starts from the live view: no black, no clones of you, no hidden world
+	Cut.Seamless = Message.Seamless == true
 	-- black first: the menu's "The bell is ringing..." hands straight over to the cut
 	local Gui = UI()
-	Gui.Veil(1, 0)
+	if not Cut.Seamless then Gui.Veil(1, 0) end
 	if not Local.Ready(Config.StartGrace - 2) or Current ~= Cut then
 		if Current == Cut then Local.Finish(Cut, `NotReady`) end
 		return
@@ -708,6 +710,7 @@ function Local.Play(Message)
 	Cut.Folder.Parent = workspace
 	local Ctx = Local.Context(Cut, Message)
 	for _, Spec in Def.Actors or {} do
+		if Cut.Seamless and Spec.From == `Self` then continue end -- your real character acts (Controllers.CineActor)
 		local Ok, A = pcall(Local.MakeActor, Cut, Spec)
 		if Ok and A then Cut.Actors[Spec.Name] = A elseif not Ok then warn(`[Cine] actor {Spec.Name}: {A}`) end
 	end
@@ -731,7 +734,7 @@ function Local.Play(Message)
 	Cut.Solo = not Cut.Group
 	Cut.Scale = 1
 	Cut.PromptCount = 0
-	Local.HideLive(Cut)
+	if not Cut.Seamless then Local.HideLive(Cut) end
 	if not CameraLease.Take(LEASE, function()
 		if Cut.Live and Current == Cut then return true end
 		return Cut.EndingAt ~= nil and os.clock() - Cut.EndingAt < 3
@@ -739,12 +742,19 @@ function Local.Play(Message)
 		Local.Finish(Cut, `NoCamera`)
 		return
 	end
-	Gui.Show({ Skippable = Message.Skippable; Group = Cut.Group; Votes = Message.Votes; Need = Message.Need })
-	Gui.Veil(1, 0)
+	if Cut.Seamless then
+		Gui.FadeHud(true, 0.4)
+		Gui.SetSkippable(Message.Skippable == true)
+		Player:SetAttribute(`NHCineSeam`, `In`)
+		task.spawn(function() require(script.Parent.CineActor).Begin() end)
+	else
+		Gui.Show({ Skippable = Message.Skippable; Group = Cut.Group; Votes = Message.Votes; Need = Message.Need })
+		Gui.Veil(1, 0)
+	end
 	-- a group cut runs on the server's clock (late joiners start mid-way through the first segment)
 	local Start = if Cut.Group then math.max(0, workspace:GetServerTimeNow() - (Message.StartAt or 0)) else 0
 	Local.PlaySegment(Cut, Cut.Graph.start, Start)
-	if not Built.keepBlack then Gui.Veil(0, if Start > 0 then 0.2 else 0.8) end
+	if not Cut.Seamless and not Built.keepBlack then Gui.Veil(0, if Start > 0 then 0.2 else 0.8) end
 	send({ Kind = `Began`; Session = Cut.Session; At = Message.StartAt })
 end
 
@@ -769,7 +779,20 @@ function Local.PlaySegment(Cut, Name: string, Start: number?)
 	Cut.Path = (Cut.Path or ``) .. (if Cut.Path then `>` else ``) .. Name
 	Player:SetAttribute(`NHCinePath`, Cut.Path) -- tests read the path taken
 	Start = Start or 0
-	Cut.Events = table.clone(Seg.events or {})
+	-- (2.35.0) a seamless cut's start segment opens with the glide from the live camera; its events (and prompt) shift
+	-- by the glide's length
+	local Shots = Local.Strip(Cut, Seg.shots)
+	local Shift = 0
+	if Cut.Seamless and not Cut.Glided and Name == Cut.Graph.start then
+		Cut.Glided = true
+		Shots = Local.GlideIn(Cut, Shots)
+		Shift = Cut.GlideLen or 0
+	end
+	Cut.Events = {}
+	for _, E in Seg.events or {} do
+		if Shift > 0 then E = table.clone(E) E.t = (E.t or 0) + Shift end
+		table.insert(Cut.Events, E)
+	end
 	table.sort(Cut.Events, function(A, B) return (A.t or 0) < (B.t or 0) end)
 	Cut.Fired = 1
 	while Cut.Fired <= #Cut.Events and (Cut.Events[Cut.Fired].t or 0) < Start - 0.05 do
@@ -780,7 +803,8 @@ function Local.PlaySegment(Cut, Name: string, Start: number?)
 	local Def = Cut.Def
 	local Lib = CineLib()
 	local Last = os.clock()
-	Cut.Handle = Lib.play({ name = `{Cut.Id}.{Name}`; letterbox = LETTERBOX; grade = Cut.Built.grade; shots = Local.Strip(Cut, Seg.shots) }, {
+	-- a seamless cut has no bars, so its shots are framed for the full screen (and the glide aims at that framing)
+	Cut.Handle = Lib.play({ name = `{Cut.Id}.{Name}`; letterbox = if Cut.Seamless then nil else LETTERBOX; grade = Cut.Built.grade; shots = Shots }, {
 		start = Start; overlay = false; autoStop = false;
 		onFrame = function(H)
 			if not Cut.Live or Cut.Seg ~= Name then return end
@@ -797,12 +821,62 @@ function Local.PlaySegment(Cut, Name: string, Start: number?)
 			end
 			local Cam = workspace.CurrentCamera
 			for _, A in Cut.Actors do pcall(Local.StepActor, A, Dt, H.time, Cam) end
-			if Node.prompt and not Cut.Prompt and H.time >= Node.prompt.at then Local.OpenPrompt(Cut, Name, Node.prompt) end
+			if Node.prompt and not Cut.Prompt and H.time >= Node.prompt.at + Shift then Local.OpenPrompt(Cut, Name, Node.prompt) end
 		end;
 		onDone = function() if Cut.Live and Cut.Seg == Name then Local.SegmentDone(Cut, Name) end end;
 	})
 	Cut.Handle._restoreCameraType = nil
 	if Cut.Interactive then send({ Kind = `Seg`; Session = Cut.Session; Name = Name; At = workspace:GetServerTimeNow() - Start }) end
+end
+
+-- (2.35.0) the glide in (spec §2.1): from the live camera's CFrame and FOV into shot 1's first frame (no noise), along
+-- CineSeam's curved keys with an ease-in-out, 0.6-1.0 s (0.2 s with Reduce Motion). NHCineSeam goes In -> Cut at its end.
+function Local.GlideIn(Cut, Shots)
+	local Seam = require(ReplicatedStorage.Functions.CineSeam)
+	local Lib = CineLib()
+	local Cam = workspace.CurrentCamera
+	local FromCF, FromFov = Cam.CFrame, Cam.FieldOfView
+	local ToCF, ToFov = Lib.cameraAt({ letterbox = nil; shots = { Shots[1] } }, 0)
+	local Lint = Seam.Lint(FromCF, ToCF)
+	if Lint then warn(`[Cine] {Cut.Id}: {Lint}`) end
+	local Len = Seam.Length(FromCF, ToCF, Cut.Ctx.Reduced)
+	local Glide = { name = `GlideIn`; dur = Len; dof = Shots[1].dof; subject = Shots[1].subject;
+		camera = { keys = Seam.Keys(FromCF, FromFov, ToCF, ToFov, Len); ease = `inout` } }
+	Cut.GlideLen = Len
+	task.delay(Len, function() if Cut.Live then Player:SetAttribute(`NHCineSeam`, `Cut`) end end)
+	local Out = { Glide }
+	for _, S in Shots do table.insert(Out, S) end
+	return Out
+end
+
+-- (2.35.0) the glide out onto the live Custom camera (spec delta 3): the camera module reads Camera.CFrame back every
+-- frame, so before it runs we put back its own last CFrame; after it runs we save that and write the blend. The
+-- endpoint is whatever the Custom camera renders: the release can't jump. Someone else taking the camera mid-blend
+-- (a new lease) ends it at once.
+function Local.BlendOut(Cut, FromCF: CFrame, FromFov: number, Seconds: number)
+	local Seam = require(ReplicatedStorage.Functions.CineSeam)
+	local Cam = workspace.CurrentCamera
+	local Own: CFrame? = nil
+	local OwnFov: number? = nil
+	local T0 = os.clock()
+	local Pre, Post = `NHCineBlendPre`, `NHCineBlendPost`
+	local Stolen = false
+	RunService:BindToRenderStep(Pre, Enum.RenderPriority.Camera.Value - 1, function()
+		if Stolen then return end
+		if Own then Cam.CFrame = Own end
+		if OwnFov then Cam.FieldOfView = OwnFov end
+	end)
+	RunService:BindToRenderStep(Post, Enum.RenderPriority.Camera.Value + 1, function()
+		if Stolen or CameraLease.Held() then Stolen = true return end
+		Own, OwnFov = Cam.CFrame, Cam.FieldOfView
+		local E = Seam.Ease((os.clock() - T0) / Seconds)
+		Cam.CFrame = Seam.Blend(FromCF, Own :: CFrame, E)
+		Cam.FieldOfView = FromFov + ((OwnFov :: number) - FromFov) * E
+	end)
+	while os.clock() - T0 < Seconds and not Stolen do RunService.RenderStepped:Wait() end
+	RunService:UnbindFromRenderStep(Post)
+	RunService.RenderStepped:Wait()                          -- one frame where Pre still restores the module's own CFrame
+	RunService:UnbindFromRenderStep(Pre)
 end
 
 function Local.SegmentDone(Cut, Name: string)
@@ -875,9 +949,39 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 	Cut.EndingAt = os.clock()
 	if Current == Cut then Current = nil end
 	local Gui = UI()
-	-- out through black, never a pop back to the gameplay camera (doc 04 §4)
+	local Seamless = Cut.Seamless == true
+	local Blended = Seamless and How == `Done`
+	local function actor() return require(script.Parent:WaitForChild(`CineActor`)) end
+	if Blended then
+		-- (2.35.0) out without black (spec §2.2): control comes back as the glide onto the Custom camera starts
+		local Cam = workspace.CurrentCamera
+		local FromCF, FromFov = Cam.CFrame, Cam.FieldOfView
+		if Cut.Handle then pcall(function() Cut.Handle:stop() end) end
+		Player:SetAttribute(`NHCineSeam`, `Out`)
+		pcall(function() actor().Release() end)
+		CameraLease.Release(LEASE)
+		Local.BlendOut(Cut, FromCF, FromFov, if Cut.Ctx and Cut.Ctx.Reduced then 0.2 else 0.8)
+		Player:SetAttribute(`NHCineSeam`, nil)
+		Gui.FadeHud(false, 0.4)
+	end
+	-- out through black, never a pop back to the gameplay camera (doc 04 §4); a seamless skip dips (spec §2.3)
 	local Black = How ~= `Done` and How ~= `NotReady`
-	if Black then Gui.Veil(1, 0.25) task.wait(0.25) end
+	if Seamless and not Blended then
+		Player:SetAttribute(`NHCineSeam`, nil)
+		pcall(function() actor().Release() end)
+	end
+	local Dipped = false
+	if Black and Seamless and How == `Skipped` then
+		-- the jump to the end state happens at full black: the cut stops, the camera goes back to the gameplay camera
+		Dipped = true
+		Gui.Dip(0.25, function()
+			if Cut.Handle then pcall(function() Cut.Handle:stop() end) end
+			CameraLease.Release(LEASE)
+			if not CameraLease.Held() and workspace.CurrentCamera.CameraType ~= Enum.CameraType.Custom then CameraLease.Restore() end
+		end)
+	elseif Black then
+		Gui.Veil(1, 0.25) task.wait(0.25)
+	end
 	if Cut.Handle then pcall(function() Cut.Handle:stop() end) end
 	for _, Cn in Cut.Conns do Cn:Disconnect() end
 	for _, S in Cut.Sounds do pcall(function() S:Destroy() end) end
@@ -893,8 +997,12 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 	CameraLease.Release(LEASE)
 	-- belt and braces: nobody else holds the camera, so it must be the normal one now
 	if not CameraLease.Held() and workspace.CurrentCamera.CameraType ~= Enum.CameraType.Custom then CameraLease.Restore() end
-	Gui.Hide(0.45)
-	Gui.Veil(0, 0.6)
+	if Seamless and (Blended or Dipped) then
+		if Dipped then Gui.FadeHud(false, 0.4) end
+	else
+		Gui.Hide(0.45)
+		Gui.Veil(0, 0.6)
+	end
 	if not Quiet and (How == `Done` or How == `NotReady` or How == `Error` or How == `NoCamera`) then
 		send({ Kind = `Done`; Session = Cut.Session })
 	end
