@@ -36,6 +36,31 @@ if Conduct then
 	if State == "warning" then Check(Conduct.Level.Text == "Warning · 3 pts", "warning level text: " .. Conduct.Level.Text) end
 	if State == "suspended" then Check(Conduct.Level.Text == "Suspended", "suspended text") end
 end
+-- (2.36.1) the art path: once the art is uploaded the pieces are images, and the seal is tinted by level
+local BT = require(game.ReplicatedStorage.Functions.BellTower)
+local Art = require(game.ReplicatedStorage.Config.BellTowerArt)
+if BT.Image(Art, "TowerPlate") then
+	local Plate = Panel:FindFirstChild("Head") and Panel.Head:FindFirstChild("Plate")
+	Check(Plate ~= nil and Plate:IsA("ImageLabel"), "art path: Head.Plate is not an ImageLabel")
+	local QT0 = PG:FindFirstChild("QuestTracker")
+	local T0 = QT0 and QT0:FindFirstChild("Tracker")
+	Check(T0 ~= nil and T0:IsA("ImageLabel"), "art path: QuestTracker.Tracker is not an ImageLabel")
+	local Level = ({ warning = "Warning", owed = "Detention", active = "Detention", suspended = "Suspension" })[State]
+	local Seal = Conduct and Conduct:FindFirstChild("Seal")
+	if Level then
+		Check(Seal ~= nil and Seal:IsA("ImageLabel") and Seal.Visible, "art path: no visible Seal image for " .. State)
+		if Seal and Seal:IsA("ImageLabel") then
+			local Want, Got = BT.Tints[Level], Seal.ImageColor3
+			Check(math.abs(Got.R - Want.R) + math.abs(Got.G - Want.G) + math.abs(Got.B - Want.B) < 0.01,
+				"art path: Seal.ImageColor3 " .. tostring(Got) .. " is not Tints." .. Level)
+			if State == "suspended" then
+				Check(Seal.Image == BT.Image(Art, "SealBroken"), "art path: suspended Seal.Image " .. Seal.Image .. " is not SealBroken")
+			else
+				Check(Seal.Image == BT.Image(Art, "Seal"), "art path: Seal.Image " .. Seal.Image .. " is not Seal")
+			end
+		end
+	end
+end
 -- the hand follows the clock
 local Dial = Panel:FindFirstChild("Head") and Panel.Head:FindFirstChild("Dial")
 if Dial then

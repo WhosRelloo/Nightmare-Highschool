@@ -6,12 +6,13 @@ local BellTower = {}
 BellTower.MIN_TEXT = 20 -- the owner's floor for game text, in design px
 
 -- Conduct seal tints (ImageColor3 over the greyscale Seal)
-BellTower.Tints = {
+local Tints: { [string]: Color3 } = { -- (2.36.1) typed for strict mode
 	Warning = Color3.fromRGB(255, 168, 72);
 	Detention = Color3.fromRGB(219, 31, 41);
 	Probation = Color3.fromRGB(107, 15, 26);
 	Suspension = Color3.fromRGB(51, 43, 48);
 }
+BellTower.Tints = Tints
 
 function BellTower.Image(Art: { [string]: any }, Key: string): string?
 	local Id = Art[Key]

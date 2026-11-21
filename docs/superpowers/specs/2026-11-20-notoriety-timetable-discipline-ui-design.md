@@ -1,7 +1,7 @@
 # The Bell Tower: notoriety, timetable, discipline and quest HUD (design)
 
-**Status:** design approved in chat on 2026-11-20 (direction A, Sections 1 and 2). This written spec is waiting for the owner's
-review. R1's code is built (below).
+**Status:** design approved in chat on 2026-11-20 (direction A, Sections 1 and 2). The owner approved this written spec on
+2026-11-20. R1's code is built (below).
 **R1 status:** R1 built in 2.36.0 (plan `docs/superpowers/plans/2026-11-20-belltower-r1-cluster.md`). The 9 art ids are in
 `Config.BellTowerArt`, so R1 runs on the new art (kit fallbacks remain for any id set to 0). Not yet seen: the phone layout from §7's R1 acceptance.
 **Spec delta:** ClockHud and QuestTracker were rebuilt in place instead of getting a new `Controllers.Gui.BellTower`,

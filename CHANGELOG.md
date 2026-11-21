@@ -2,6 +2,33 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.36.1] - 2026-11-21: The Bell Tower, R1 follow-ups
+
+The small items the final R1 review deferred. Mirror: `tools/belltower-r1/`. The Map place: untouched.
+
+### Fixed
+- **Lead Card pips:** at a need of 5 or 6 the fang pips and the count reached the `J` key. The `Pips` frame now runs to 4 px before the key (`UDim2.new(1, -130, 1, 0)`, not 60% of the foot), and pips are 26 px for a need over 4 (34 px otherwise). The largest objective Count today is 4.
+- **Lead Card follow lag:** the card moved on the 0.25 s tracker poll, so it could overlap the growing clock cluster for a moment (one `bt_hud active` flake). `Local.Follow` now also runs on the cluster `Panel`'s AbsoluteSize and AbsolutePosition signals and on ClockHud's `Enabled` (connected once, found lazily). With ShowClock off the card goes back to its default desktop Y (200).
+- **Detection meter label:** raised to `BellTower.MIN_TEXT` (20 px).
+- **Test slot drift:** `harness/start_play.lua` set the time to 09:57, in Break with Period 3 fifteen real seconds away, so Play runs booked real Absents on slot 2, and `restore.py` kept them. It now sets 12:30 (After School). A run at 12:30 added no Discipline entry. **Owner:** slot 2's history already holds those extra Absents (15 Absents in its last 16 entries, the newest on day 12665 at 9:57 AM). They are test noise, not play.
+
+### Changed
+- **`Functions.BellTower.Tints`** is typed `{ [string]: Color3 }` (strict mode).
+- **Spec header:** records the owner's approval of the written spec on 2026-11-20.
+- **Checks:**
+  - `bt_hud*.lua` (all five states) assert the art path when `TowerPlate` has an id: Plate and Tracker are ImageLabels, and the Seal is `Seal` (or `SealBroken` when suspended), tinted `Tints[level]`.
+  - `bt_contracts.lua`'s ShowClock check was a tautology. It now runs the real `UI.Settings` handler (`Settings.Apply("ShowClock")`, not saved) and checks the card's default Y.
+  - New `bt_pips.lua` covers needs 3 to 6.
+
+### Checked
+- `bt_pure` PASS (Edit VM).
+- In one Play run (start_play, snapshot, checks, restore.py in Play, stop): `bt_hud` owed, warning, clear, active and suspended all PASS. `bt_contracts`: hidden true, card at default Y 200, shown again, card under the cluster. `bt_pips` PASS.
+- Phone in the kit's Studio preview (`NHTouchTest`, `NHPhonePreview` 844 x 390): the card goes to the left column under the compass ([screenshot](docs/img/belltower-r1-phone-preview.jpg)).
+- **Not checked:**
+  - Studio's device emulator (a real phone-size viewport). The preview keeps the desktop viewport and doesn't build TouchControls, so no-overlap with the touch buttons and the true phone scale aren't verified.
+  - `bt_pips` measures a copy of the live Pips row filled by the same rule (read from QuestTracker's source), not the live tracker: the check runner gets its own module copies, with no profile.
+  - Filled fang pips on screen; two players; the longest quest title; the BellRim flash.
+
 ## [2.36.0] - 2026-11-21: The Bell Tower, R1: the clock, conduct and quest cluster
 
 R1 of `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-design.md`. The plan is

@@ -223,7 +223,7 @@ function Local.Build()
 	local Pips = Instance.new(`Frame`)
 	Pips.Name = `Pips`
 	Pips.BackgroundTransparency = 1
-	Pips.Size = UDim2.new(0.6, 0, 1, 0)
+	Pips.Size = UDim2.new(1, -130, 1, 0) -- (2.36.1) up to the J key (Key spans -126 to -96), not 60% of the foot
 	Pips.Parent = Foot
 	local PipRow = Instance.new(`UIListLayout`)
 	PipRow.FillDirection = Enum.FillDirection.Horizontal
@@ -269,8 +269,8 @@ function Local.Build()
 		Parent = Gui;
 	})
 	local EyeLabel = Components.Text({
-		Name = `Label`; Text = ``; Font = Theme.Fonts.Title; TextSize = Theme.Sizes.TextBody;
-		TextColor3 = C.Text; Size = UDim2.new(1, 0, 0, 22); Parent = EyeApi.Content;
+		Name = `Label`; Text = ``; Font = Theme.Fonts.Title; TextSize = BellTower.MIN_TEXT; -- (2.36.1) the house floor
+		TextColor3 = C.Text; Size = UDim2.new(1, 0, 0, 24); Parent = EyeApi.Content;
 	})
 	-- Iron-framed meter (kit look). Names Track / Track.Fill are what the update code uses.
 	local Track = Instance.new(`Frame`)
@@ -384,12 +384,14 @@ function Local.SetPips(List: { boolean }?, Have: number, Need: number)
 	Ui.PipKey = Key
 	for _, K in Ui.Pips:GetChildren() do if K:IsA(`GuiObject`) then K:Destroy() end end
 	if not List then return end
+	-- (2.36.1) five or six pips plus the count only fit before the J key at 26 px
+	local Px = if Need > 4 then 26 else 34
 	for I, Filled in List do
 		local Img = Instance.new(`ImageLabel`)
 		Img.Name = `Pip{I}`
 		Img.LayoutOrder = I
 		Img.BackgroundTransparency = 1
-		Img.Size = UDim2.fromOffset(34, 34)
+		Img.Size = UDim2.fromOffset(Px, Px)
 		Img.Image = BellTower.Image(Art, if Filled then `PipFang` else `PipEmpty`) or ``
 		Img.Parent = Ui.Pips
 	end
@@ -407,14 +409,26 @@ function Local.SetPips(List: { boolean }?, Have: number, Need: number)
 end
 
 -- (2.36) hang the card under the clock cluster (it grows with the PA line, the plate and the conduct row)
+-- (2.36.1) the cluster's size change moves the card at once (the 0.25 s poll let it overlap for a moment);
+-- with ShowClock off the card goes back to its default desktop Y.
+local DEFAULT_Y = 200
+local Hooked: Instance? = nil
 function Local.Follow()
-	if Ui.Card.AnchorPoint.X < 0.5 then return end -- phones keep their left-column spot
 	local Hud = Player.PlayerGui:FindFirstChild(`ClockHud`)
-	local Panel = Hud and Hud:IsA(`ScreenGui`) and Hud.Enabled and Hud:FindFirstChild(`Panel`)
-	if not (Panel and Panel:IsA(`GuiObject`)) then return end
-	local U = Ui.Gui:FindFirstChild(`NHAutoScale`)
-	local Scale = if U and U:IsA(`UIScale`) and U.Scale > 0 then U.Scale else 1
-	local Want = math.floor((Panel.AbsolutePosition.Y + Panel.AbsoluteSize.Y) / Scale + 12)
+	local Panel = Hud and Hud:IsA(`ScreenGui`) and Hud:FindFirstChild(`Panel`)
+	if Panel and Panel:IsA(`GuiObject`) and Hooked ~= Panel then
+		Hooked = Panel -- found lazily, connected once (a rebuilt ClockHud gets a new Panel and is hooked again)
+		Panel:GetPropertyChangedSignal(`AbsoluteSize`):Connect(Local.Follow)
+		Panel:GetPropertyChangedSignal(`AbsolutePosition`):Connect(Local.Follow)
+		Hud:GetPropertyChangedSignal(`Enabled`):Connect(Local.Follow)
+	end
+	if Ui.Card.AnchorPoint.X < 0.5 then return end -- phones keep their left-column spot
+	local Want = DEFAULT_Y
+	if Hud and Hud:IsA(`ScreenGui`) and Hud.Enabled and Panel and Panel:IsA(`GuiObject`) then
+		local U = Ui.Gui:FindFirstChild(`NHAutoScale`)
+		local Scale = if U and U:IsA(`UIScale`) and U.Scale > 0 then U.Scale else 1
+		Want = math.floor((Panel.AbsolutePosition.Y + Panel.AbsoluteSize.Y) / Scale + 12)
+	end
 	Local.DesktopY = Want
 	if math.abs(Ui.Card.Position.Y.Offset - Want) > 1 then Ui.Card.Position = UDim2.new(1, -24, 0, Want) end
 end
