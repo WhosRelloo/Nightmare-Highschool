@@ -5,7 +5,8 @@
 --   bridge.py PlayCut $P '"TutorialSneak"' true         (mode skipfence: skippable, so the Skip below is accepted)
 -- MODE "sneak": crouch-walk Start -> FenceZone (never within 8 studs of Biscuit); MODE "fail": walk toward Biscuit, stand up
 -- (BeatCrouch Off) within 7 studs, wait out Hide, then on to the fence; MODE "skipfence": as sneak, but 0.6 s into the Fence segment
--- (before FenceOver2 stands you) send a Skip: you must not be left crouched. Samples every frame and reports:
+-- (before FenceOver2 stands you) send a Skip: you must not be left crouched. MODE "timeout": the same but no Skip is sent: the caller
+-- shrinks Config.Cine Length/TimeoutPad on the server (a Script in ServerScriptService) so the server times the cut out mid-vault. Samples every frame and reports:
 --   * path (Garden>Fence, or Garden>Hide>Garden>Fence)
 --   * Biscuit (ruling I3): the player's cast copy exists BEFORE the cut, and has a clip playing on every frame before the cut, during it,
 --     in its Out phase and after it (0 frames of N with none, per bucket)
@@ -162,7 +163,7 @@ local L = {}
 for N, C in Seen do table.insert(L, N .. " " .. C) end
 table.sort(L)
 add("clips seen during the cut: " .. table.concat(L, ", "))
-if MODE ~= "skipfence" then
+if MODE == "sneak" or MODE == "fail" then
 	check((MODE == "fail" and CrouchBeat == 0) or (CrouchBeat > 0 and CrouchHeld >= CrouchBeat * 0.95), string.format("crouch held %d of %d Garden-beat frames (before any stand-up)", CrouchHeld, CrouchBeat))
 	local W1 = median(Ws1)
 	check(W1 ~= nil and math.abs(W1 - 7) < 0.4, string.format("walk speed on the Garden beat %s (want the game's crouch speed 7), %d moving frames", tostring(W1), #Ws1))
@@ -180,11 +181,11 @@ elseif MODE == "fail" then
 	check(Stood, "stood up near him")
 end
 local Last = Rows[#Rows]
-if MODE == "skipfence" then
+if MODE == "skipfence" or MODE == "timeout" then
 	-- I2: the skip landed before FenceOver2 stood you; you must not be left crouched
 	local Crouched = false
 	for _, R in Rows do if R.path and R.path:match("Fence$") and R.seam and R.crouch then Crouched = true break end end
-	check(SkipAt ~= nil and Crouched, "the skip was sent while you were still crouched in the Fence segment")
+	check((MODE == "timeout" or SkipAt ~= nil) and Crouched, "the skip was sent (or the timeout came) while you were still crouched in the Fence segment")
 	check(not Last.crouch, string.format("after the skip: crouch %s (want false)", tostring(Last.crouch)))
 	check(Last.seam == nil and Last.ws > 12, string.format("after the skip: seam %s, walk speed %.1f (want nil, > 12)", tostring(Last.seam), Last.ws))
 	-- (fix round 2) the skip puts you on the far side: at least 1 stud past the fence's far face, standing, facing away from the house
