@@ -58,10 +58,10 @@ TutorialAnim.Chains = {
 	},
 	FenceOver = {
 		{ Piece = "FenceOver1_GameCrouchWalk", Length = 1.333, Loop = true, Entry = 0.0, Exit = 0.467, EndOffset = { X = -0.0123, Z = -0.2034, Yaw = -21.855 } },
-		{ Piece = "FenceOver2", Length = 2.9, EndOffset = { X = -1.5586, Z = -0.4214, Yaw = -100.683 } },
+		{ Piece = "FenceOver2", Length = 3.3, EndOffset = { X = -1.5568, Z = -0.4289, Yaw = -100.364 } },
 	},
 	ThePlan = {
-		{ Piece = "ThePlan1", Length = 8.167, EndOffset = { X = -0.184, Z = -2.1859, Yaw = -39.048 } },
+		{ Piece = "ThePlan1", Length = 8.567, EndOffset = { X = -0.1803, Z = -2.1769, Yaw = -39.258 } },
 	},
 	Getaway = {
 		{ Piece = "Getaway1_RunLookBack", Length = 2.233, Loop = true, Entry = 0.0, Exit = 1.933, EndOffset = { X = -0.0883, Z = -0.3516, Yaw = 13.415 } },
@@ -78,7 +78,7 @@ TutorialAnim.Chains = {
 	},
 	Excuses = {
 		{ Piece = "Excuses1_LieLookAround", Length = 12.5, Loop = true, Entry = 0.0, Exit = 4.133, EndOffset = { X = 0.0292, Z = 0.4564, Yaw = -2.141 } },
-		{ Piece = "Excuses2", Length = 15.233, EndOffset = { X = 0.1354, Z = -1.9423, Yaw = -8.63 } },
+		{ Piece = "Excuses2", Length = 15.633, EndOffset = { X = 0.1342, Z = -1.9306, Yaw = -8.517 } },
 	},
 	ParentsWaiting = {
 		{ Piece = "ParentsWaiting1_ParentSit", Length = 6.4, Loop = true, Entry = 0.0, Exit = 2.8, EndOffset = { X = -0.0151, Z = -0.5023, Yaw = 0.452 } },
@@ -99,7 +99,7 @@ TutorialAnim.Chains = {
 	},
 	TheBus = {
 		{ Piece = "TheBus1_WaitBored", Length = 10.667, Loop = true, Entry = 0.0, Exit = 5.133, EndOffset = { X = -0.0118, Z = 0.0769, Yaw = 1.548 } },
-		{ Piece = "TheBus2", Length = 4.0, EndOffset = { X = -0.1218, Z = -1.2967, Yaw = -9.195 } },
+		{ Piece = "TheBus2", Length = 4.4, EndOffset = { X = -0.1025, Z = -1.3941, Yaw = -7.274 } },
 	},
 }
 
@@ -107,8 +107,10 @@ TutorialAnim.Chains = {
 -- (no cue: the loop plays once). Every switch lands on an identical frame, so pieces switch instantly (no fade: a fade
 -- in from weight 0 would show the rig's default pose for a moment), and the time a switch overshoots its exact point
 -- by is carried into the next piece, so even a fast loop never skips. resolve: piece name -> animation id (the director passes `Ctx.Clip`);
--- onSwitch: called as each piece starts (the body check marks the switches). Returns the tracks and a clock: a function giving
--- the current time on the last piece's own clock (its start os.clock() plus the carried overshoot; a stopped track's TimePosition resets).
+-- onSwitch: called as each piece starts (the body check marks the switches). Returns the tracks.
+-- A Hold piece, and the chain's last one-shot (which build.py ends at rest: its motion dies out, then 2 identical frames),
+-- play to their end and HOLD the final frame (speed 0) until the caller stops them (CineActor.Reseat / Release); Play
+-- returns once that hold is in place. A chain that ends on a loop returns with the loop still cycling.
 function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) -> string?, cues: { [number]: () -> () }?, onSwitch: ((string) -> ())?)
 	local RunService = game:GetService("RunService")
 	local steps = TutorialAnim.Chains[chain]
@@ -124,18 +126,37 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 			loaded[st.Piece] = t
 		end
 	end
+	-- freeze t on its final pose: from `from` to its Length every frame is that pose (a settled end's 2 identical frames;
+	-- a Hold's last frame). Checked before every animation step: once the drawn time is in that span it just stops there
+	-- (no time write, so nothing jumps); if this step's dt would carry it past its Length first (a frame hitch, or a low
+	-- frame rate stepping over the span), it stops and is put on `at` (a non-looped track that ends falls to idle).
+	-- Resumes the caller on the Heartbeat after the freeze, so the caller's next writes land with the frozen pose.
+	local function holdAt(t: AnimationTrack, from: number, at: number)
+		local thread = coroutine.running()
+		local conn: RBXScriptConnection
+		conn = RunService.PreAnimation:Connect(function(dt: number)
+			local tp = t.TimePosition
+			if tp >= from or not t.IsPlaying then
+				conn:Disconnect()
+				t:AdjustSpeed(0)
+			elseif tp + 1.25 * dt >= t.Length then
+				conn:Disconnect()
+				t:AdjustSpeed(0)
+				t.TimePosition = at
+			else
+				return
+			end
+			RunService.Heartbeat:Once(function() task.spawn(thread) end)
+		end)
+		coroutine.yield()
+	end
 	local prev: AnimationTrack? = nil
 	local over = 0
-	local clockStart, clockOver = os.clock(), 0
-	local current = 0
 	for k, st in steps do
 		local t = loaded[st.Piece]
 		if not t then continue end
 		t.Looped = st.Loop == true
 		t:Play(0)
-		clockStart, clockOver = os.clock(), over
-		current = k
-		RunService.PreAnimation:Once(function() if current == k then clockStart = os.clock() end end) -- the track is first drawn on the next step, so its clock starts there
 		if onSwitch then onSwitch(st.Piece) end
 		t.TimePosition = if st.Loop then ((st.Entry or 0) + over) % st.Length else math.max(0, over)
 		if prev then prev:Stop(0) end
@@ -158,21 +179,20 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 					before = after
 				end
 			end
+		elseif st.Hold then
+			holdAt(t, st.Length, st.Length)                         -- the authored freeze-frame
+		elseif not steps[k + 1] then
+			holdAt(t, st.Length - 2 / 30, st.Length - 1 / 60)       -- the settled end: its 2 identical final frames
 		else
 			-- hand over within the last tick (a one-shot can't play past its last frame: it would stall there); the
 			-- piece's tail is the next loop's own frames, so the loop just starts that much earlier in its cycle
 			local started = os.clock()
 			local dt = 1 / 60
-			local early = not steps[k + 1] and not st.Hold               -- the last piece hands over early: the _End clip is cued under it (CineActor.Reseat)
-			while os.clock() - started < st.Length - (if early then 0.1 else dt) do dt = RunService.Heartbeat:Wait() end
+			while os.clock() - started < st.Length - dt do dt = RunService.Heartbeat:Wait() end
 			over = (os.clock() - started) - st.Length
-			if st.Hold then
-				t.TimePosition = st.Length
-				t:AdjustSpeed(0)
-			end
 		end
 	end
-	return loaded, function() return os.clock() - clockStart + clockOver end
+	return loaded
 end
 
 return TutorialAnim

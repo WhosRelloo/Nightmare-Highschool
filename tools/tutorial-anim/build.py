@@ -276,30 +276,31 @@ def end_pose(q, p):
     return tilt(q), np.array([0.0, 0.0, float(p[2])])
 
 
-SETTLE_LEAD = 3             # the _End clip starts with this many of the piece's own last frames, so the seam can land mid-motion
-SETTLE_FRAMES = 10          # the _End clip: this many frames of the last motion dying out (0.82 per frame), then a 2-frame hold
+SETTLE_FRAMES = 10          # a chain's last one-shot piece ends with this many frames of its last motion dying out (0.82 per frame), then a 2-frame hold
 
 
-def end_settle(clip):
-    """the piece's _End clip: frames 0..SETTLE_LEAD-1 are the piece's own last frames before the end; then frame k (0..SETTLE_FRAMES) is the piece's last frame continued with the decaying velocity
-    (Clip.frame's extrapolation), two more repeat the last. Every frame gets the one transform that takes the LAST frame's
-    ground offset and heading out (turn about up by -yaw, move its torso X/Y to 0, height kept), so frame 0 is exactly
-    end_pose() and the root re-seat (end_offset) is the same for all of them."""
-    src = Clip(clip.name, clip.q, clip.p, loop=False)                  # a loop piece must extrapolate, not wrap
-    last = src.n - 1
-    qs = [src.q[last - SETTLE_LEAD + k].copy() for k in range(SETTLE_LEAD)]
-    ps = [src.p[last - SETTLE_LEAD + k].copy() for k in range(SETTLE_LEAD)]
-    for k in range(SETTLE_FRAMES + 1):
-        q, p = src.frame(last + k)
+def settle(clip):
+    """the piece with SETTLE_FRAMES of its last motion dying out (Clip.frame's extrapolation, 0.82 per frame) and a
+    2-frame hold appended, under its own root (no re-seat): the piece itself ends at rest, so the re-seat switches a
+    still pose to an identical still pose and no frame-level timing slack can show"""
+    src = Clip(clip.name, clip.q, clip.p, loop=False)
+    qs, ps = list(src.q.copy()), list(src.p.copy())
+    for k in range(1, SETTLE_FRAMES + 1):
+        q, p = src.frame(src.n - 1 + k)
         qs.append(np.array(q, dtype=float))
         ps.append(np.array(p, dtype=float))
     qs += [qs[-1].copy(), qs[-1].copy()]
     ps += [ps[-1].copy(), ps[-1].copy()]
-    ext = Clip(clip.name + "_End", np.array(qs), np.array(ps), loop=False)
-    phi = -yaw_of(src.q[last, 0])
-    c, s = math.cos(phi), math.sin(phi)
-    x, y = src.p[last, 0, 0], src.p[last, 0, 1]
-    return ext.aligned(phi, -(c * x - s * y), -(s * x + c * y), name=clip.name + "_End")
+    return Clip(clip.name, np.array(qs), np.array(ps), loop=False)
+
+
+def end_clip(clip):
+    """the piece's _End clip: its final frame as a still pose (two identical frames, 1/30 s), the torso's ground offset
+    and heading taken out (end_pose; tilt and height kept), every limb's local pose as it is. Played with the root
+    re-seated by end_offset() of the same frame, the body doesn't move."""
+    q, p = clip.q[-1].copy(), clip.p[-1].copy()
+    q[0], p[0] = end_pose(q[0], p[0])
+    return Clip(clip.name + "_End", np.array([q, q.copy()]), np.array([p, p.copy()]), loop=False)
 
 
 class Piece:
@@ -309,6 +310,7 @@ class Piece:
         self.entry = 0.0                                       # loops: the phase the piece before lands on
         self.exit = 0.0                                        # loops: the phase the piece after starts from
         self.hold = False
+        self.settled = False                                   # the chain's last one-shot: ends at rest (settle())
         self.parts = []                                        # what it's made of, for the report
 
     def add(self, q, p):
@@ -422,6 +424,14 @@ def build_chain(name, steps, clips):
             if "hold" in st:
                 piece.hold = True
             cur, cur_off, cur_min = B, start - (j + h + 1), j + h + 1
+    # the chain ends at rest: its last piece, if it is a one-shot that isn't a Hold, gets the settle. A Hold already ends
+    # frozen (as authored); a loop that comes last keeps cycling until the caller re-seats (it has no end to settle into,
+    # and frames appended to it would break its seam), and the piece before it must still end on the loop's entry frame.
+    last = pieces[-1] if pieces else None
+    if last is not None and not last.loop and not last.hold:
+        s = settle(last.clip())
+        last.q, last.p = list(s.q), list(s.p)
+        last.settled = True
     return pieces, log
 
 
@@ -548,8 +558,10 @@ PLAYER = '''
 -- (no cue: the loop plays once). Every switch lands on an identical frame, so pieces switch instantly (no fade: a fade
 -- in from weight 0 would show the rig's default pose for a moment), and the time a switch overshoots its exact point
 -- by is carried into the next piece, so even a fast loop never skips. resolve: piece name -> animation id (the director passes `Ctx.Clip`);
--- onSwitch: called as each piece starts (the body check marks the switches). Returns the tracks and a clock: a function giving
--- the current time on the last piece's own clock (its start os.clock() plus the carried overshoot; a stopped track's TimePosition resets).
+-- onSwitch: called as each piece starts (the body check marks the switches). Returns the tracks.
+-- A Hold piece, and the chain's last one-shot (which build.py ends at rest: its motion dies out, then 2 identical frames),
+-- play to their end and HOLD the final frame (speed 0) until the caller stops them (CineActor.Reseat / Release); Play
+-- returns once that hold is in place. A chain that ends on a loop returns with the loop still cycling.
 function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) -> string?, cues: { [number]: () -> () }?, onSwitch: ((string) -> ())?)
 	local RunService = game:GetService("RunService")
 	local steps = TutorialAnim.Chains[chain]
@@ -565,18 +577,37 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 			loaded[st.Piece] = t
 		end
 	end
+	-- freeze t on its final pose: from `from` to its Length every frame is that pose (a settled end's 2 identical frames;
+	-- a Hold's last frame). Checked before every animation step: once the drawn time is in that span it just stops there
+	-- (no time write, so nothing jumps); if this step's dt would carry it past its Length first (a frame hitch, or a low
+	-- frame rate stepping over the span), it stops and is put on `at` (a non-looped track that ends falls to idle).
+	-- Resumes the caller on the Heartbeat after the freeze, so the caller's next writes land with the frozen pose.
+	local function holdAt(t: AnimationTrack, from: number, at: number)
+		local thread = coroutine.running()
+		local conn: RBXScriptConnection
+		conn = RunService.PreAnimation:Connect(function(dt: number)
+			local tp = t.TimePosition
+			if tp >= from or not t.IsPlaying then
+				conn:Disconnect()
+				t:AdjustSpeed(0)
+			elseif tp + 1.25 * dt >= t.Length then
+				conn:Disconnect()
+				t:AdjustSpeed(0)
+				t.TimePosition = at
+			else
+				return
+			end
+			RunService.Heartbeat:Once(function() task.spawn(thread) end)
+		end)
+		coroutine.yield()
+	end
 	local prev: AnimationTrack? = nil
 	local over = 0
-	local clockStart, clockOver = os.clock(), 0
-	local current = 0
 	for k, st in steps do
 		local t = loaded[st.Piece]
 		if not t then continue end
 		t.Looped = st.Loop == true
 		t:Play(0)
-		clockStart, clockOver = os.clock(), over
-		current = k
-		RunService.PreAnimation:Once(function() if current == k then clockStart = os.clock() end end) -- the track is first drawn on the next step, so its clock starts there
 		if onSwitch then onSwitch(st.Piece) end
 		t.TimePosition = if st.Loop then ((st.Entry or 0) + over) % st.Length else math.max(0, over)
 		if prev then prev:Stop(0) end
@@ -599,21 +630,20 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 					before = after
 				end
 			end
+		elseif st.Hold then
+			holdAt(t, st.Length, st.Length)                         -- the authored freeze-frame
+		elseif not steps[k + 1] then
+			holdAt(t, st.Length - 2 / 30, st.Length - 1 / 60)       -- the settled end: its 2 identical final frames
 		else
 			-- hand over within the last tick (a one-shot can't play past its last frame: it would stall there); the
 			-- piece's tail is the next loop's own frames, so the loop just starts that much earlier in its cycle
 			local started = os.clock()
 			local dt = 1 / 60
-			local early = not steps[k + 1] and not st.Hold               -- the last piece hands over early: the _End clip is cued under it (CineActor.Reseat)
-			while os.clock() - started < st.Length - (if early then 0.1 else dt) do dt = RunService.Heartbeat:Wait() end
+			while os.clock() - started < st.Length - dt do dt = RunService.Heartbeat:Wait() end
 			over = (os.clock() - started) - st.Length
-			if st.Hold then
-				t.TimePosition = st.Length
-				t:AdjustSpeed(0)
-			end
 		end
 	end
-	return loaded, function() return os.clock() - clockStart + clockOver end
+	return loaded
 end
 '''
 
@@ -648,7 +678,7 @@ def main():
             c = pc.clip(loop=pc.loop)
             write_lua(c)
             built.append((c, pc))
-            write_lua(end_settle(c))
+            write_lua(end_clip(c))
             e = {"Piece": pc.name, "Length": round((c.n - 1) / FPS, 3)}
             if pc.loop:
                 e.update(Loop=True, Entry=round(pc.entry, 3), Exit=round(pc.exit, 3))
@@ -712,12 +742,28 @@ def main():
                  "`out/_chaincheck.luau` played every chain on an R6 dummy at 60 fps in NH Combat Test; the full output is in",
                  "`review/chaincheck_result.txt`. A runtime switch passes at or under its chain's own p99 or under 45 st/s2.", "",
                  "```", open(res, encoding="utf-8").read().rstrip(), "```"]
+    # the settle audit: the chain's last piece dies out at rest; its deceleration must stay within the piece's own motion
+    settles = []
+    for c, pc in built:
+        if pc.settled:
+            a = accel([(c.q[k], c.p[k]) for k in range(c.n)])
+            k0 = c.n - SETTLE_FRAMES - 3                       # the settle's frames, plus the junction into it
+            own = float(np.percentile(a[1:k0], 99)) if k0 > 2 else 1.0
+            settles.append((c.name, float(a[k0:].max()), own))
+    rows += ["", "## Settles (each chain's last one-shot ends at rest)", "",
+             f"{SETTLE_FRAMES} frames of the last motion dying out (0.82 per frame), then a 2-frame hold. Peak: the largest",
+             "acceleration over the settle and the junction into it; own p99: the piece's own motion before it.", "",
+             "| Piece | Settle peak (st/s2) | Own p99 | |", "|---|---|---|---|"]
+    for n, pk, own in settles:
+        rows.append(f"| {n} | {pk:.0f} | {own:.0f} | {'ok' if pk <= own or pk <= GENTLE else 'adds motion'} |")
     open(os.path.join(HERE, "REPORT.md"), "w", encoding="utf-8").write("\n".join(rows) + "\n")
     print(f"{len(clips)} source clips -> {len(built)} pieces over {len(plan)} chains, {len(logs)} handoffs")
     for r in logs:
         ratio = r["peak"] / r["src_peak"]
         print(f'  {r["chain"]:18s} {r["a"]:>18s} -> {r["b"]:<18s} cut {r["cut"]:.2f} window {r["window"]:.2f}{" staged" if r["staged"] else "       "}'
               f'  blend peak {r["peak"]:5.0f} vs sources {r["src_peak"]:5.0f} ({ratio:.2f}x){"" if ratio <= 1.15 or r["peak"] <= GENTLE else "  <-- adds motion"}')
+    for n, pk, own in settles:
+        print(f'  settle {n:28s} peak {pk:5.0f} vs the piece own p99 {own:5.0f}{"" if pk <= own or pk <= GENTLE else "  <-- adds motion"}')
 
 
 if __name__ == "__main__":

@@ -20,10 +20,10 @@ local CHAINS = {
 	},
 	FenceOver = {
 		{ Piece = "FenceOver1_GameCrouchWalk", Length = 1.333, Loop = true, Entry = 0.0, Exit = 0.467, EndOffset = { X = -0.0123, Z = -0.2034, Yaw = -21.855 } },
-		{ Piece = "FenceOver2", Length = 2.9, EndOffset = { X = -1.5586, Z = -0.4214, Yaw = -100.683 } },
+		{ Piece = "FenceOver2", Length = 3.3, EndOffset = { X = -1.5568, Z = -0.4289, Yaw = -100.364 } },
 	},
 	ThePlan = {
-		{ Piece = "ThePlan1", Length = 8.167, EndOffset = { X = -0.184, Z = -2.1859, Yaw = -39.048 } },
+		{ Piece = "ThePlan1", Length = 8.567, EndOffset = { X = -0.1803, Z = -2.1769, Yaw = -39.258 } },
 	},
 	Getaway = {
 		{ Piece = "Getaway1_RunLookBack", Length = 2.233, Loop = true, Entry = 0.0, Exit = 1.933, EndOffset = { X = -0.0883, Z = -0.3516, Yaw = 13.415 } },
@@ -40,7 +40,7 @@ local CHAINS = {
 	},
 	Excuses = {
 		{ Piece = "Excuses1_LieLookAround", Length = 12.5, Loop = true, Entry = 0.0, Exit = 4.133, EndOffset = { X = 0.0292, Z = 0.4564, Yaw = -2.141 } },
-		{ Piece = "Excuses2", Length = 15.233, EndOffset = { X = 0.1354, Z = -1.9423, Yaw = -8.63 } },
+		{ Piece = "Excuses2", Length = 15.633, EndOffset = { X = 0.1342, Z = -1.9306, Yaw = -8.517 } },
 	},
 	ParentsWaiting = {
 		{ Piece = "ParentsWaiting1_ParentSit", Length = 6.4, Loop = true, Entry = 0.0, Exit = 2.8, EndOffset = { X = -0.0151, Z = -0.5023, Yaw = 0.452 } },
@@ -61,7 +61,7 @@ local CHAINS = {
 	},
 	TheBus = {
 		{ Piece = "TheBus1_WaitBored", Length = 10.667, Loop = true, Entry = 0.0, Exit = 5.133, EndOffset = { X = -0.0118, Z = 0.0769, Yaw = 1.548 } },
-		{ Piece = "TheBus2", Length = 4.0, EndOffset = { X = -0.1218, Z = -1.2967, Yaw = -9.195 } },
+		{ Piece = "TheBus2", Length = 4.4, EndOffset = { X = -0.1025, Z = -1.3941, Yaw = -7.274 } },
 	},
 }
 local ONLY = nil
