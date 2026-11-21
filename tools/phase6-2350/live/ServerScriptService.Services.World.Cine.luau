@@ -51,6 +51,7 @@ Shared.Finished = SignalPlus() -- (Player, CutId, How)
 local Remote: RemoteEvent = nil
 local Sessions = {} :: { [string]: any }
 local ByPlayer = {} :: { [Player]: string } -- the session each player is watching
+local BeatCrouched = {} :: { [Player]: boolean } -- (fix round 1) crouched by a walk-and-talk beat (BeatCrouch)
 local Rate = {} :: { [Player]: { At: number, N: number } }
 
 ---| Saved state (Quests block: Cine = { [CutId] = "Started" | "Seen" }) |---
@@ -336,6 +337,18 @@ end
 function Local.OnSeg(S, Player: Player, V, M)
 	if typeof(M.Name) ~= `string` then return end
 	local Seamless = Config.Cuts[S.CutId] ~= nil and Config.Cuts[S.CutId].Seamless == true
+	-- (fix round 1) a beat has no timeout because the player drives it (spec §4.3): entering one invalidates the pending
+	-- timer (ArmTimeout's token); the next segment that isn't a beat arms a fresh Length + TimeoutPad. Leaving Wickfield
+	-- stays the safety net.
+	if Seamless and not S.Group and V and not V.Ended then
+		if M.Beat == true then
+			V.Timer = {}
+			V.InBeat = true
+		elseif V.InBeat then
+			V.InBeat = nil
+			Local.ArmTimeout(S, Player, Config.Cuts[S.CutId].Length + Config.TimeoutPad)
+		end
+	end
 	if S.Graph == nil then
 		-- (2.35.0) a seamless cut without a prompt graph (shots only, or shots and beats): nothing to judge, but every
 		-- segment the client reaches is a resume checkpoint (the server can't build the cut, so the name is only bounded)
@@ -443,6 +456,16 @@ function Shared.Play(List: { Player }, CutId: string, Opts: any?): string?
 	return S.Id
 end
 
+-- (fix round 1) stands a player a beat crouched (the beat's end, Tutorial.Leave, leaving the game); a crouch of their
+-- own is left alone
+function Shared.EndBeatCrouch(Player: Player)
+	if not BeatCrouched[Player] then return end
+	BeatCrouched[Player] = nil
+	local C = Player.Character
+	local H = C and C:FindFirstChildWhichIsA(`Humanoid`)
+	if H then pcall(require(ServerScriptService.Services.Player.Crouch).Stand, H) end
+end
+
 function Shared.IsWatching(Player: Player, CutId: string?): boolean
 	local Id = ByPlayer[Player]
 	local S = Id and Sessions[Id]
@@ -469,9 +492,18 @@ function Local.OnMessage(Player: Player, Message)
 	end
 
 	-- (2.35.0) a walk-and-talk beat holds crouch (spec §3 move.crouch): the server's Crouch service owns the state
-	if Message.Kind == `BeatCrouch` and Player:GetAttribute(`NHTutorial`) == true then
-		local Crouch = require(ServerScriptService.Services.Player.Crouch)
-		if Message.On == true then Crouch.Crouch(Player) else Crouch.Stand(Player) end
+	-- (fix round 1) Crouch takes the Character (Crouch) and the Humanoid (Stand). Crouching needs NHTutorial; standing a
+	-- beat's crouch back up doesn't (Tutorial.Leave calls Shared.EndBeatCrouch too)
+	if Message.Kind == `BeatCrouch` then
+		if Message.On == true then
+			local C = Player.Character
+			if Player:GetAttribute(`NHTutorial`) == true and C then
+				local Ok, Did = pcall(require(ServerScriptService.Services.Player.Crouch).Crouch, C)
+				if Ok and Did then BeatCrouched[Player] = true end
+			end
+		else
+			Shared.EndBeatCrouch(Player)
+		end
 		return
 	end
 
@@ -482,6 +514,7 @@ function Local.OnMessage(Player: Player, Message)
 	if Message.Kind == `Began` then
 		if not V.BeganAt then
 			V.BeganAt = Now
+			if V.InBeat then return end -- (fix round 1) a cut that opens on a beat: no timer until its first non-beat segment
 			local Late = math.max(0, workspace:GetServerTimeNow() - (tonumber(Message.At) or workspace:GetServerTimeNow()))
 			Local.ArmTimeout(S, Player, math.max(1, Cut.Length - (if S.Group then Late else 0)) + Config.TimeoutPad)
 		end
@@ -533,6 +566,7 @@ function Shared.OnStart()
 		local S = Id and Sessions[Id]
 		if S then Local.End(S, Player, `Left`) end
 		Rate[Player] = nil
+		BeatCrouched[Player] = nil
 	end)
 end
 

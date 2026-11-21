@@ -22,7 +22,7 @@ local Started = false
 repeat
 	task.wait(0.1)
 	if Player:GetAttribute("NHCineSeam") ~= nil then Started = true end
-until (Started and Player:GetAttribute("NHCineSeam") == nil and os.clock() - T0 > 3) or os.clock() - T0 > 20
+until (Started and Player:GetAttribute("NHCineSeam") == nil and os.clock() - T0 > 3) or os.clock() - T0 > 35
 task.wait(0.8)
 RunService:UnbindFromRenderStep(Name)
 Player:SetAttribute("NHReducedMotion", Was)

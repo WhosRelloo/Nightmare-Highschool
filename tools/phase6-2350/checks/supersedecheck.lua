@@ -20,7 +20,7 @@ local function hudOn(): number
 end
 Remote:FireServer({ Kind = "Replay"; Id = "__SeamlessTest" })
 local T0 = os.clock()
-repeat task.wait() until Player:GetAttribute("NHCineSeam") == "Out" or os.clock() - T0 > 20
+repeat task.wait() until Player:GetAttribute("NHCineSeam") == "Out" or os.clock() - T0 > 35
 local OutAt = os.clock()
 Remote:FireServer({ Kind = "Done"; Session = Sessions[1] and Sessions[1].Id })
 Remote:FireServer({ Kind = "Replay"; Id = "__SeamlessTest" })
@@ -31,7 +31,7 @@ task.wait(2.0)
 local Mid = { seam = Player:GetAttribute("NHCineSeam"); cam = Cam.CameraType.Name; hud = hudOn() }
 -- let the new cut play out
 local T1 = os.clock()
-repeat task.wait(0.1) until Player:GetAttribute("NHCineSeam") == nil and os.clock() - T1 > 1 or os.clock() - T1 > 15
+repeat task.wait(0.1) until Player:GetAttribute("NHCineSeam") == nil and os.clock() - T1 > 1 or os.clock() - T1 > 30
 task.wait(1.0)
 Conn:Disconnect()
 local End = { seam = Player:GetAttribute("NHCineSeam"); cam = Cam.CameraType.Name; hud = hudOn() }

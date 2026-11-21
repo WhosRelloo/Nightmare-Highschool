@@ -47,6 +47,8 @@ function Shared.Leave(Player: Player)
 	if Cn then Cn:Disconnect() end
 	Inside[Player] = nil
 	Player:SetAttribute(`NHTutorial`, nil)
+	-- (task 8 fix round 1) a walk-and-talk beat's crouch doesn't outlive Wickfield
+	pcall(function() require(script.Parent.Cine).EndBeatCrouch(Player) end)
 	setGroup(Player.Character, `Default`)
 end
 

@@ -2,8 +2,8 @@
 -- type when a call ends, so the cut is started and watched inside this call). Plays __SeamlessTest through the server
 -- (a client Replay; mark it Seen first: bridge.py CineMark $P '"__SeamlessTest"' '"Seen"'), records the camera and the
 -- look (grade, bloom, DOF, exposure) every frame after everything else has written them, and checks:
---   * the glide in (In), the handoff from Main's shots into the Walk beat (BeatIn, task 8) and the blend out (Out, here
---     from the beat's rig): position, angular and FOV acceleration, each within FACTOR x 1.5 of
+--   * the glide in (In), the handoff from Main's shots into the Walk beat (BeatIn, task 8), the glide out of the beat
+--     into Close's shot (BeatOut, task 8 fix round 1) and the blend out (Out): position, angular and FOV acceleration, each within FACTOR x 1.5 of
 --     its own phase median, on the phase's frames and the frames either side;
 --   * the release: the first frame after Out against a constant-velocity prediction from the two frames before it
 --     (0.01 stud, 0.1 deg);
@@ -80,7 +80,7 @@ local Started = false
 repeat
 	task.wait(0.1)
 	if Player:GetAttribute("NHCineSeam") ~= nil then Started = true end
-until (Started and Player:GetAttribute("NHCineSeam") == nil and os.clock() - T0 > 3) or os.clock() - T0 > 20
+until (Started and Player:GetAttribute("NHCineSeam") == nil and os.clock() - T0 > 3) or os.clock() - T0 > 35
 task.wait(1.2)
 RunService:UnbindFromRenderStep(Name)
 if WALK then pcall(function() RunService:UnbindFromRenderStep(Name .. "Walk") end) end
@@ -107,7 +107,7 @@ local CHANNELS = {
 local FACTOR = 2.5
 local Report, Pass = {}, true
 local Ratios = {}
-for _, Phase in { "In", "BeatIn", "Out" } do
+for _, Phase in { "In", "BeatIn", "BeatOut", "Out" } do
 	local Idx = {}
 	for i = 3, #Rows do if Rows[i].phase == Phase then table.insert(Idx, i) end end
 	if #Idx < 5 then Pass = false table.insert(Report, Phase .. ": not seen") continue end
@@ -152,7 +152,7 @@ end
 do
 	local Keys = { "contrast", "saturation", "brightness", "tint", "bloom", "dof", "exposure" }
 	local Span = {}
-	for _, Phase in { "In", "BeatIn", "Out" } do
+	for _, Phase in { "In", "BeatIn", "BeatOut", "Out" } do
 		local A, B
 		for i = 1, #Rows do if Rows[i].phase == Phase then A = A or Rows[i].t B = Rows[i].t end end
 		Span[Phase] = if A then math.max(B - A, 0.1) else nil
@@ -167,6 +167,7 @@ do
 		for i = 2, #Rows do
 			local Ph = if Rows[i].phase == "In" or Rows[i - 1].phase == "In" then "In"
 				elseif Rows[i].phase == "BeatIn" or Rows[i - 1].phase == "BeatIn" then "BeatIn"
+				elseif Rows[i].phase == "BeatOut" or Rows[i - 1].phase == "BeatOut" then "BeatOut"
 				elseif Rows[i].phase == "Out" or Rows[i - 1].phase == "Out" then "Out" else nil
 			if Ph and Span[Ph] then
 				local Allowed = math.min(0.9, 2 * 1.875 * (Rows[i].t - Rows[i - 1].t) / Span[Ph])

@@ -48,10 +48,16 @@ function Shared.Begin()
 	if Hum then
 		SpeedWas = Hum.WalkSpeed
 		local T0, S0 = os.clock(), Hum.WalkSpeed
+		-- (task 8 fix round 1) a speed someone else writes during the ease (the server standing a beat's crouch back up:
+		-- 7 -> 14.4 replicating in) becomes the speed handed back; restoring the stale one left you at crouch speed
+		local Wrote: number? = nil
 		while os.clock() - T0 < 0.3 and ChainGen == My do  -- input eases out (spec §2.1): 0.3 s
-			Hum.WalkSpeed = S0 * (1 - (os.clock() - T0) / 0.3)
+			if Wrote and math.abs(Hum.WalkSpeed - Wrote) > 1e-3 then SpeedWas = Hum.WalkSpeed end
+			Wrote = S0 * (1 - (os.clock() - T0) / 0.3)
+			Hum.WalkSpeed = Wrote :: number
 			RunService.Heartbeat:Wait()
 		end
+		if Wrote and math.abs(Hum.WalkSpeed - Wrote) > 1e-3 then SpeedWas = Hum.WalkSpeed end
 		Hum.WalkSpeed = SpeedWas :: number
 	end
 	if ChainGen ~= My then return end

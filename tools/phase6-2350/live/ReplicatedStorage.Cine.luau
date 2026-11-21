@@ -533,6 +533,8 @@ local function applyGrade(g, w, baseExposure)
 		Lighting.ExposureCompensation = base + (g.exposure - base) * w
 	end
 end
+-- (2.35.0) a seamless cut that opens on a walk-and-talk beat eases its grade in over the beat's entry (Controllers.CineBeat)
+Cine.applyGrade = applyGrade
 
 -- ---------------------------------------------------------------- play
 local Handle = {}
