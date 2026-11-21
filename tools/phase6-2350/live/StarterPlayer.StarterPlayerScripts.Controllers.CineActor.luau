@@ -4,6 +4,11 @@
 	The player's own character as a seamless cut's actor: input eases out, it walks to marks (never a teleport), it plays
 	TutorialAnim chains over its normal Animate, and at the end its root is re-seated under the body on the same frame
 	the _End pose takes over, so nothing moves; then the game's idle/walk blends back in.
+	Only a chain that ends on a one-shot is re-seated (build.py ends that piece at rest, so the re-seat is a still pose to an
+	identical still pose). A chain that ends on a LOOP (Drainpipe, BiscuitStirs, Getaway, HomeAgain, ParentsWaiting,
+	Breakfast, MomSlidesEnvelope) hands back through Release WITHOUT a re-seat (controller ruling): those loops are in
+	place (GameCrouch is the game's own crouch), so there is nothing to re-seat and the loop fades into the game's anims.
+	Release also stops a chain that is still running (the Skip path).
 ]]
 local Players = game:GetService(`Players`)
 local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
@@ -18,6 +23,7 @@ local Pending: AnimationTrack? = nil                        -- a Reseat's _End t
 local PendingAnim: Animation? = nil
 local ChainTracks: { [string]: AnimationTrack }? = nil      -- the last Chain's tracks (its last piece held at its end)
 local Gen = 0                                               -- cancellation token: Release and every Reseat bump it
+local ChainGen = 0                                          -- a running Chain's token: only Release bumps it
 local SpeedWas: number? = nil
 
 local function controls()
@@ -103,7 +109,9 @@ function Shared.Chain(Chain: string, Resolve: (string) -> string?, Cues: any?, O
 		end
 		if OnSwitch then OnSwitch(Piece) end
 	end
-	local Tracks = TA.Play(Animator, Chain, Resolve, Cues, switched)
+	local My = ChainGen
+	local Tracks = TA.Play(Animator, Chain, Resolve, Cues, switched, function() return ChainGen ~= My end)
+	if ChainGen ~= My then return Tracks end                -- released while it ran: Play stopped its tracks (Stop(0))
 	ChainTracks = Tracks
 	return Tracks
 end
@@ -175,6 +183,7 @@ end
 -- chain's held last piece) fades out over 0.25 s and the game's idle/walk blends back in (spec §2.2).
 function Shared.Release()
 	Gen += 1
+	ChainGen += 1                                           -- a Chain still running stops its tracks at its next step
 	if Pending then drop(Pending, PendingAnim, 0) Pending, PendingAnim = nil, nil end
 	if EndTrack then drop(EndTrack, EndAnim, 0.25) EndTrack, EndAnim = nil, nil end
 	for _, Other in ChainTracks or {} do

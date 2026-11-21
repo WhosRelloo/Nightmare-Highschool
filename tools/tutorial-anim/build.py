@@ -562,8 +562,13 @@ PLAYER = '''
 -- A Hold piece, and the chain's last one-shot (which build.py ends at rest: its motion dies out, then 2 identical frames),
 -- play to their end and HOLD the final frame (speed 0) until the caller stops them (CineActor.Reseat / Release); Play
 -- returns once that hold is in place. A chain that ends on a loop returns with the loop still cycling.
-function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) -> string?, cues: { [number]: () -> () }?, onSwitch: ((string) -> ())?)
+-- isCancelled (optional) is checked in every wait; once it returns true, Play stops all its tracks (Stop(0)) and returns
+-- (CineActor.Release: the Skip path).
+function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) -> string?, cues: { [number]: () -> () }?, onSwitch: ((string) -> ())?, isCancelled: (() -> boolean)?)
 	local RunService = game:GetService("RunService")
+	local function cancelled(): boolean
+		return isCancelled ~= nil and isCancelled()
+	end
 	local steps = TutorialAnim.Chains[chain]
 	assert(steps, "no tutorial chain " .. chain)
 	local loaded = {}
@@ -587,7 +592,9 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 		local conn: RBXScriptConnection
 		conn = RunService.PreAnimation:Connect(function(dt: number)
 			local tp = t.TimePosition
-			if tp >= from or not t.IsPlaying then
+			if cancelled() then
+				conn:Disconnect()
+			elseif tp >= from or not t.IsPlaying then
 				conn:Disconnect()
 				t:AdjustSpeed(0)
 			elseif tp + 1.25 * dt >= t.Length then
@@ -601,9 +608,14 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 		end)
 		coroutine.yield()
 	end
+	local function stopAll()
+		for _, t in loaded do t:Stop(0) end
+		return loaded
+	end
 	local prev: AnimationTrack? = nil
 	local over = 0
 	for k, st in steps do
+		if cancelled() then return stopAll() end
 		local t = loaded[st.Piece]
 		if not t then continue end
 		t.Looped = st.Loop == true
@@ -614,12 +626,24 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 		prev = t
 		over = 0
 		if st.Loop then
-			if cues and cues[k] then cues[k]() else task.wait(st.Length) end
+			local cued = false                                      -- the cue (or one pass) runs aside, so a cancel isn't stuck behind it
+			if cues and cues[k] then
+				local cue = cues[k]
+				task.spawn(function() cue() cued = true end)
+			else
+				local t0 = os.clock()
+				task.spawn(function() while os.clock() - t0 < st.Length do RunService.Heartbeat:Wait() end cued = true end)
+			end
+			while not cued do
+				if cancelled() then return stopAll() end
+				RunService.Heartbeat:Wait()
+			end
 			if steps[k + 1] then
 				local exit = st.Exit or 0
 				local before = t.TimePosition
 				while true do                                       -- leave on the exit phase, carrying the overshoot
 					RunService.Heartbeat:Wait()
+					if cancelled() then return stopAll() end
 					local after = t.TimePosition
 					local passed = (after - exit) % st.Length
 					local span = (after - before) % st.Length
@@ -639,10 +663,14 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 			-- piece's tail is the next loop's own frames, so the loop just starts that much earlier in its cycle
 			local started = os.clock()
 			local dt = 1 / 60
-			while os.clock() - started < st.Length - dt do dt = RunService.Heartbeat:Wait() end
+			while os.clock() - started < st.Length - dt do
+				dt = RunService.Heartbeat:Wait()
+				if cancelled() then return stopAll() end
+			end
 			over = (os.clock() - started) - st.Length
 		end
 	end
+	if cancelled() then return stopAll() end
 	return loaded
 end
 '''
