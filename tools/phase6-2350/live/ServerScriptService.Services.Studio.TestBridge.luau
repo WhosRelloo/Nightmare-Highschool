@@ -1638,4 +1638,30 @@ function Commands.TodayTest(PlayerName: string) -- (2.34) the Today card's serve
 	return DeepCopy({ Ok = typeof(T) == `table`; Today = T })
 end
 
+-- (2.35.0) walk-and-talk camera goals (spec 2026-11-20 §3): CineRigs is pure
+function Commands.CineRigsTest()
+	local Rigs = require(ReplicatedStorage.Functions.CineRigs)
+	local Fails = {}
+	local function check(C, M) if not C then table.insert(Fails, M) end end
+	local P = CFrame.new(0, 3, 0)                   -- the player at the origin, facing -Z
+	local Travel = Vector3.new(0, 0, -1)
+	local F, FFov = Rigs.Target("Follow", P, nil, Travel, { lens = 35 })
+	check(F.Position.Z > 0 and F.LookVector.Z < 0, "Follow sits behind and looks the way you go")
+	local L = Rigs.Target("Lead", P, nil, Travel, { lens = 28 })
+	check(L.Position.Z < 0 and L.LookVector.Z > 0 and L.Position.Y < 4.5, "Lead sits ahead, looks back, at hip height")
+	local S = Rigs.Target("Side", P, nil, Travel, { lens = 35 })
+	check(math.abs(S.Position.X) > 4 and math.abs(S.LookVector.X) > 0.8, "Side runs beside you")
+	local Fr = Rigs.Target("Frame", P, Vector3.new(0, 4, -20), Travel, { lens = 35 })
+	check(Fr.LookVector:Dot((Vector3.new(0, 4, -20) - Fr.Position).Unit) > 0.9, "Frame looks toward the point of interest")
+	local Also = Rigs.Target("Follow", P, Vector3.new(8, 3, -6), Travel, { lens = 35 })
+	check(Also.LookVector.X > F.LookVector.X, "Follow drifts toward the second subject")
+	local St = { yaw = 0, pitch = 0 }
+	local N = Rigs.Nudge(St, Vector2.new(400, 0), 0.016)
+	check(math.abs(N.X) <= 25.0001, "nudge clamps to 25 degrees")
+	for _ = 1, 60 do N = Rigs.Nudge(St, Vector2.zero, 1 / 60) end
+	check(math.abs(N.X) < 2, "nudge springs back within about 0.6 s")
+	check(math.abs(FFov - require(ReplicatedStorage.Cine).mmToFov(35)) < 1e-4, "lens to FOV")
+	return #Fails == 0 and "CineRigsTest OK" or table.concat(Fails, "; ")
+end
+
 return Shared

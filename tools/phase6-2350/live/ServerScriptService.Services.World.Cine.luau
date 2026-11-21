@@ -334,7 +334,17 @@ end
 
 -- solo: the client says where it is now (it branches on its own); only real moves along the graph are accepted
 function Local.OnSeg(S, Player: Player, V, M)
-	if not S.Graph or S.Group or typeof(M.Name) ~= `string` or not S.Graph.segments[M.Name] then return end
+	if typeof(M.Name) ~= `string` then return end
+	local Seamless = Config.Cuts[S.CutId] ~= nil and Config.Cuts[S.CutId].Seamless == true
+	if S.Graph == nil then
+		-- (2.35.0) a seamless cut without a prompt graph (shots only, or shots and beats): nothing to judge, but every
+		-- segment the client reaches is a resume checkpoint (the server can't build the cut, so the name is only bounded)
+		if Seamless and not S.Group and #M.Name <= 40 and M.Name:match(`^[%w_]+$`) then
+			pcall(function() require(script.Parent.Tutorial).Checkpoint(Player, S.CutId, M.Name) end)
+		end
+		return
+	end
+	if S.Group or not S.Graph.segments[M.Name] then return end
 	local Cur = S.Seg
 	local Ok = Judge.Follows(S.Graph, Cur, M.Name)
 	if not Ok then
@@ -352,7 +362,7 @@ function Local.OnSeg(S, Player: Player, V, M)
 	if not Ok then return end
 	S.Seg = M.Name
 	S.SegStartAt = tonumber(M.At) or workspace:GetServerTimeNow()
-	if Config.Cuts[S.CutId] and Config.Cuts[S.CutId].Seamless and typeof(M.Name) == `string` then
+	if Seamless then
 		pcall(function() require(script.Parent.Tutorial).Checkpoint(Player, S.CutId, M.Name) end)
 	end
 end

@@ -739,8 +739,22 @@ function Local.Play(Message)
 	-- (2.25.0) every cut is a graph of segments; a plain cut is one segment, Main
 	Cut.Built = Built
 	Cut.Interactive = typeof(Def.Graph) == `table`
-	Cut.Graph = if Cut.Interactive then Def.Graph else { start = `Main`; segments = { Main = { len = Local.ShotsLength(Built.shots or {}) } } }
+	if Cut.Interactive then
+		Cut.Graph = Def.Graph
+	elseif typeof(Built.segments) == `table` then
+		-- (2.35.0) the segments form without a prompt graph (doc 12 §3: Build returns { start, segments }): each
+		-- segment's next is its own (a shots segment's next, or a beat's ends.next)
+		local Nodes = {}
+		for N, S in Built.segments do
+			Nodes[N] = { len = if S.beat then 0 else Local.ShotsLength(S.shots or {}); next = S.next }
+		end
+		Cut.Graph = { start = Built.start or `Main`; segments = Nodes }
+	else
+		Cut.Graph = { start = `Main`; segments = { Main = { len = Local.ShotsLength(Built.shots or {}) } } }
+	end
 	Built.segments = Built.segments or { Main = { shots = Built.shots; events = Built.events } }
+	local StartSeg = Built.segments[Cut.Graph.start]
+	local OpensOnBeat = StartSeg ~= nil and StartSeg.beat ~= nil
 	Cut.Solo = not Cut.Group
 	Cut.Scale = 1
 	Cut.PromptCount = 0
@@ -756,7 +770,8 @@ function Local.Play(Message)
 		Gui.FadeHud(true, 0.4)
 		Gui.SetSkippable(Message.Skippable == true)
 		Player:SetAttribute(`NHCineSeam`, `In`)
-		task.spawn(function() require(script.Parent.CineActor).Begin() end)
+		-- a cut that opens on a walk-and-talk beat keeps the controls on (spec §3): Begin waits for its first shots
+		if not OpensOnBeat then task.spawn(function() require(script.Parent.CineActor).Begin() end) end
 	else
 		Gui.Show({ Skippable = Message.Skippable; Group = Cut.Group; Votes = Message.Votes; Need = Message.Need })
 		Gui.Veil(1, 0)
@@ -780,6 +795,8 @@ function Local.PlaySegment(Cut, Name: string, Start: number?)
 	local Seg = Cut.Built.segments[Name]
 	local Node = Cut.Graph.segments[Name]
 	if not (Seg and Node) then warn(`[Cine] no segment {Name}`) Local.Finish(Cut, `Error`) return end
+	-- (2.35.0) a walk-and-talk beat (spec §3): the player keeps moving, a rig frames them (Controllers.CineBeat)
+	if Seg.beat then Local.PlayBeat(Cut, Name, Seg, Node) return end
 	if Cut.Handle then pcall(function() Cut.Handle:stop() end) end -- (no camera type restore: the next shot cuts in this frame)
 	pcall(function() Prompt().Cancel() end)
 	Player:SetAttribute(`NHCinePrompt`, nil)
@@ -795,8 +812,17 @@ function Local.PlaySegment(Cut, Name: string, Start: number?)
 	local Shift = 0
 	local LookIn = nil
 	local Dissolve = false
-	if Cut.Seamless and not Cut.Glided and Name == Cut.Graph.start then
+	-- (2.35.0) shots after a beat glide in from the beat's camera the same way (spec §3 Endings: the handoff uses §2), and
+	-- take the controls then (a beat leaves them on)
+	local FromBeat = Cut.FromBeat == true
+	if Cut.Seamless and ((not Cut.Glided and Name == Cut.Graph.start) or FromBeat) then
 		Cut.Glided = true
+		Cut.FromBeat = nil
+		Cut.BeatRig = nil
+		if FromBeat then
+			Player:SetAttribute(`NHCineSeam`, `In`)
+			task.spawn(function() require(script.Parent.CineActor).Begin() end)
+		end
 		if Cut.Ctx.Reduced then
 			-- Reduce Motion (spec §2.1): no camera move at all; a 0.2 s fade through black, the cut's camera put in at black
 			Dissolve = true
@@ -807,7 +833,7 @@ function Local.PlaySegment(Cut, Name: string, Start: number?)
 		else
 			Shots = Local.GlideIn(Cut, Shots)
 			Shift = Cut.GlideLen or 0
-			LookIn = Shift
+			LookIn = if Cut.BeatLook then nil else Shift -- a beat already carries the look: it stays on
 		end
 	end
 	Cut.Events = {}
@@ -826,6 +852,8 @@ function Local.PlaySegment(Cut, Name: string, Start: number?)
 	local Lib = CineLib()
 	local Last = os.clock()
 	Cut.LastShot = Shots[#Shots] -- the blend out keeps this shot's camera moving (BlendOut's From end)
+	-- the look a beat carried: put back the exposure and drop it in the frame this player puts the same grade back on
+	if Cut.BeatLook then Local.DropLook(Cut.BeatLook, true) Cut.BeatLook = nil end
 	-- a seamless cut has no bars, so its shots are framed for the full screen (and the glide aims at that framing)
 	Cut.Handle = Lib.play({ name = `{Cut.Id}.{Name}`; letterbox = if Cut.Seamless then nil else LETTERBOX; grade = Cut.Built.grade; shots = Shots }, {
 		start = Start; overlay = false; autoStop = false; lookIn = LookIn;
@@ -854,7 +882,103 @@ function Local.PlaySegment(Cut, Name: string, Start: number?)
 		UI().Veil(0, 0.1)
 		task.delay(0.1, function() if Cut.Live then Player:SetAttribute(`NHCineSeam`, `Cut`) end end)
 	end
-	if Cut.Interactive then send({ Kind = `Seg`; Session = Cut.Session; Name = Name; At = workspace:GetServerTimeNow() - Start }) end
+	-- (2.35.0) seamless cuts report every segment too: the server writes the resume checkpoint (Tutorial.Checkpoint)
+	if Cut.Interactive or Cut.Seamless then send({ Kind = `Seg`; Session = Cut.Session; Name = Name; At = workspace:GetServerTimeNow() - Start }) end
+end
+
+-- (2.35.0) a beat segment (spec §3). Controls stay on (no CineActor.Begin; shots before it hand them back). The way in
+-- blends from the camera that was showing: the last shot carried on (as the blend out does), the live gameplay camera
+-- following your root when the cut opens on this beat (that blend IS the glide in), or the previous beat's rig. The look
+-- (grade, DOF) of the shots before carries through the beat. When it ends, its rig keeps stepping (Cut.BeatRig) for
+-- the blend out or the next shots' glide in.
+function Local.PlayBeat(Cut, Name: string, Seg, Node)
+	local Cam = workspace.CurrentCamera
+	pcall(function() Prompt().Cancel() end)
+	Player:SetAttribute(`NHCinePrompt`, nil)
+	Cut.Seg = Name
+	Cut.Prompt = nil
+	Cut.Scale = 1
+	Cut.Path = (Cut.Path or ``) .. (if Cut.Path then `>` else ``) .. Name
+	Player:SetAttribute(`NHCinePath`, Cut.Path)
+	if Cut.Interactive or Cut.Seamless then send({ Kind = `Seg`; Session = Cut.Session; Name = Name; At = workspace:GetServerTimeNow() }) end
+	local Entry = nil
+	local CF0, Fov0 = Cam.CFrame, Cam.FieldOfView
+	if Cut.Handle then
+		-- from shots: keep the look, stop the player (stop() writes the gameplay FOV: put the shot's back for this frame)
+		local Look = nil
+		pcall(function() Look = Cut.Handle:detachLook() end)
+		pcall(function() Cut.Handle:stop() end)
+		Cut.Handle = nil
+		Cam.CFrame, Cam.FieldOfView = CF0, Fov0
+		if Look and (#Look.effects > 0 or Look.restoreExposure) then
+			if Cut.BeatLook then Local.DropLook(Look, false) else Cut.BeatLook = Look end
+		end
+		local Track = if Cut.LastShot then { Probe = { letterbox = nil; shots = { Cut.LastShot } }; T = Cut.LastShot.dur or 0 } else nil
+		Entry = { From = Local.Carry(CF0, Fov0, Track); Phase = `BeatIn` }
+		Cut.LastShot = nil
+		if Cut.Seamless then pcall(function() require(script.Parent.CineActor).Release() end) end -- controls back on
+	elseif Cut.BeatRig then
+		local Rig = Cut.BeatRig
+		Entry = { From = function() return Rig.Step() end; Phase = `BeatIn` }
+	elseif Cut.Seamless and not Cut.Glided and Name == Cut.Graph.start then
+		-- the cut opens on this beat: from the live camera, carried along with a walking player (GlideTrack's follow)
+		Cut.Glided = true
+		local Root = Player.Character and Player.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?
+		local RootFrom = Root and Root.Position
+		if Root and Local.RootAtRender and (Local.RootAtRender - Root.Position).Magnitude < 4 then RootFrom = Local.RootAtRender end
+		Entry = { From = function()
+			if Root and Root.Parent and RootFrom then return CF0 + (Root.Position - RootFrom), Fov0 end
+			return CF0, Fov0
+		end; Phase = `In` }
+	end
+	Cut.BeatRig = nil
+	if Entry and Cut.Ctx.Reduced then
+		-- Reduce Motion: no camera move; a 0.2 s fade through black, the rig's camera put in at black
+		UI().Veil(1, 0.1)
+		task.wait(0.1)
+		UI().Veil(1, 0)
+		if not Cut.Live or Cut.Seg ~= Name then return end
+		task.delay(0.05, function() UI().Veil(0, 0.1) end)
+		Entry = nil
+	end
+	local Out = {}
+	task.spawn(function()
+		local Ok, Next = pcall(require(script.Parent.CineBeat).Run, Cut, Name, Seg.beat, Cut.Ctx, Entry, Out, Cut.BeatLook)
+		if not Ok then warn(`[Cine] beat {Name}: {Next}`) Next = nil end
+		if not (Cut.Live and Cut.Seg == Name) then return end
+		Cut.BeatRig = Out.Rig
+		Next = Next or Node.next
+		if Next then
+			Cut.FromBeat = true
+			Local.PlaySegment(Cut, Next)
+		else
+			task.spawn(Local.EndGraph, Cut)
+		end
+	end)
+end
+
+-- the camera a blend starts from, still moving. Track = a shot: re-evaluated at its end time on its live subject, and
+-- its motion since FromCF was taken is carried onto FromCF (the blend leaves with the old camera's own velocity);
+-- Track.Fn = a beat's rig, stepped on
+function Local.Carry(FromCF: CFrame, FromFov: number, Track: any?): () -> (CFrame, number)
+	if not Track then return function() return FromCF, FromFov end end
+	if Track.Fn then
+		return function()
+			local Ok, A, B = pcall(Track.Fn)
+			if Ok and typeof(A) == `CFrame` and typeof(B) == `number` then return A, B end
+			return FromCF, FromFov
+		end
+	end
+	local Lib = CineLib()
+	local Ok0, L0, L0Fov = pcall(Lib.cameraAt, Track.Probe, Track.T)
+	if not Ok0 or typeof(L0) ~= `CFrame` then return function() return FromCF, FromFov end end
+	return function()
+		local Ok, L, LFov = pcall(Lib.cameraAt, Track.Probe, Track.T)
+		if not Ok or typeof(L) ~= `CFrame` then return FromCF, FromFov end
+		local Turn = L.Rotation * (L0 :: CFrame).Rotation:Inverse()
+		return CFrame.new(FromCF.Position + (L.Position - (L0 :: CFrame).Position)) * Turn * FromCF.Rotation,
+			FromFov + ((LFov :: number) - (L0Fov :: number))
+	end
 end
 
 -- (2.35.0) the glide in (spec §2.1): from the live camera's CFrame and FOV into shot 1's first frame (no noise), along
@@ -951,20 +1075,8 @@ end
 function Local.BlendOut(Cut, FromCF: CFrame, FromFov: number, Seconds: number, Look: any?, GameFov: number?, Track: any?): boolean
 	local Seam = require(ReplicatedStorage.Functions.CineSeam)
 	local Cam = workspace.CurrentCamera
-	local Lib = CineLib()
-	local L0: CFrame?, L0Fov: number? = nil, nil
-	if Track then
-		local Ok, A, B = pcall(Lib.cameraAt, Track.Probe, Track.T)
-		if Ok and typeof(A) == `CFrame` then L0, L0Fov = A, B end
-	end
-	local function from(): (CFrame, number)
-		if not L0 then return FromCF, FromFov end
-		local Ok, L, LFov = pcall(Lib.cameraAt, Track.Probe, Track.T)
-		if not Ok or typeof(L) ~= `CFrame` then return FromCF, FromFov end
-		local Turn = L.Rotation * (L0 :: CFrame).Rotation:Inverse()
-		return CFrame.new(FromCF.Position + (L.Position - (L0 :: CFrame).Position)) * Turn * FromCF.Rotation,
-			FromFov + ((LFov :: number) - (L0Fov :: number))
-	end
+	-- (2.35.0) Local.Carry; Track.Fn (a beat's rig) instead of a shot keeps the From end following you
+	local from = Local.Carry(FromCF, FromFov, Track)
 	local Own: CFrame? = nil
 	local OwnFov: number? = GameFov
 	local T0 = os.clock()
@@ -1076,6 +1188,10 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 			pcall(function() Look = Cut.Handle:detachLook() end) -- the look eases out over the blend, not popped by stop()
 			pcall(function() Cut.Handle:stop() end)
 		end
+		if Cut.BeatLook then -- (2.35.0) a cut that ends on a beat: the look it carried eases out the same way
+			if Look then Local.DropLook(Look, false) end
+			Look, Cut.BeatLook = Cut.BeatLook, nil
+		end
 		Player:SetAttribute(`NHCineSeam`, `Out`)
 		pcall(function() actor().Release() end)
 		local Stolen = false
@@ -1097,7 +1213,9 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 			-- hand the blend the gameplay FOV as the camera module's own (the module never writes FOV itself)
 			local GameFov = Cam.FieldOfView
 			Cam.CFrame, Cam.FieldOfView = FromCF, FromFov
-			local Track = if Cut.LastShot then { Probe = { letterbox = nil; shots = { Cut.LastShot } }; T = Cut.LastShot.dur or 0 } else nil
+			local Rig = Cut.BeatRig
+			local Track = if Rig then { Fn = function() return Rig.Step() end }
+				elseif Cut.LastShot then { Probe = { letterbox = nil; shots = { Cut.LastShot } }; T = Cut.LastShot.dur or 0 } else nil
 			Stolen = Local.BlendOut(Cut, FromCF, FromFov, 0.8, Look, GameFov, Track)
 		end
 		-- (fix round 1) a cut that started during the blend owns the attribute, the HUD and the "Cine" lease now
@@ -1119,6 +1237,7 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 		Dipped = true
 		Gui.Dip(0.25, function()
 			if Cut.Handle then pcall(function() Cut.Handle:stop() end) end
+			if Cut.BeatLook then Local.DropLook(Cut.BeatLook, true) Cut.BeatLook = nil end
 			CameraLease.Release(LEASE)
 			if not CameraLease.Held() and workspace.CurrentCamera.CameraType ~= Enum.CameraType.Custom then CameraLease.Restore() end
 		end)
@@ -1126,6 +1245,8 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 		Gui.Veil(1, 0.25) task.wait(0.25)
 	end
 	if Cut.Handle then pcall(function() Cut.Handle:stop() end) end
+	if Cut.BeatLook then Local.DropLook(Cut.BeatLook, true) Cut.BeatLook = nil end
+	Cut.BeatRig = nil
 	for _, Cn in Cut.Conns do Cn:Disconnect() end
 	for _, S in Cut.Sounds do pcall(function() S:Destroy() end) end
 	for Part, CF in Cut.Restore do if Part.Parent then Part.CFrame = CF end end

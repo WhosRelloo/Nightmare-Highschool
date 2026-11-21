@@ -29,7 +29,7 @@ return {
 		-- (2.25.0) a test cut for the interactive director (TestBridge / harness only; never in a quest)
 		__QteTest = { Name = `QTE test`; Length = 30; Set = `Hall`; Replay = true; Interactive = true; Hidden = true };
 		-- (2.35.0) seamless (spec 2026-11-20): the real character acts, the camera glides in and out, nothing anchors
-		__SeamlessTest = { Name = `Seamless test`; Length = 8; Set = `BusStop`; Seamless = true; Replay = true; Hidden = true };
+		__SeamlessTest = { Name = `Seamless test`; Length = 14; Set = `BusStop`; Seamless = true; Replay = true; Hidden = true };
 		TutorialBus = { Name = `The Bus`; Length = 34; Set = `BusStop`; Seamless = true; Replay = true };
 		TutorialSneak = { Name = `Sneaking Out`; Length = 90; Set = `Garden`; Seamless = true; Replay = true };
 	};
