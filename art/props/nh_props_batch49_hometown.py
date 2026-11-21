@@ -1643,6 +1643,33 @@ CLIPS["WFPicketGate"] = {"GateOpen": dict(length=1.4, keys={"Gate": lambda t: ("
 RIG["WickHouse"] = dict(bones={"Sash": ((11.75, -14.12, 13.4), (11.75, -14.12, 14.4), None)}, own={"BedSash": "Sash"})
 CLIPS["WickHouse"] = {"SashOpen": dict(length=1.0, keys={"Sash": lambda t: ("x", 0, (0, 0, 2.45 * ease(t / 0.9)))})}
 
+# (2.35.0) RIGID props: Studio's skinned import laid multi-piece rigs out wrong at rest (the black bus, the Wick house;
+# cause never found). A rigid prop exports its pieces as plain meshes (no armature) and writes
+# anim/<Prop>_rigid.json (bone heads, piece -> bone, piece centres); tools/phase6-2350/stage/rigid_rig.py joins it
+# with Motor6Ds in Studio and builds its clips from anim/<Prop>.json (written by the last skinned build).
+RIGID = {"WickHouse"}
+
+
+def write_rigid(name):
+    import json
+    spec = RIG[name]
+    bones = {"Root": ((0, 0, 0), (0, 0, 1), None)}
+    bones.update(spec["bones"])
+    centres = {}
+    for ob in bpy.data.objects:
+        if ob.type == "MESH" and (ob.name == name or ob.name.startswith(name + "_")) and len(ob.data.vertices):
+            pts = [ob.matrix_world @ v.co for v in ob.data.vertices]
+            lo = Vector((min(p.x for p in pts), min(p.y for p in pts), min(p.z for p in pts)))
+            hi = Vector((max(p.x for p in pts), max(p.y for p in pts), max(p.z for p in pts)))
+            centres[ob.name] = list((lo + hi) / 2)
+    own = spec["own"]
+    pieces = {pn: own.get(pn[len(name) + 1:], "Root") if pn != name else "Root" for pn in centres}
+    out = {"prop": name, "axes": "Blender (x, y, z up), units = Blender m",
+           "bones": {bn: {"head": list(h), "parent": p or ("Root" if bn != "Root" else None)} for bn, (h, t, p) in bones.items()},
+           "pieces": pieces, "centres": centres}
+    with open(os.path.join(ANIM_DIR, f"{name}_rigid.json"), "w", encoding="utf-8") as fh:
+        json.dump(out, fh, indent=1)
+
 CLIP_CAM = {   # per clip review cameras (cam, target)
     "WFBedroom": {"CurtainBillow": ((14.5, 0.8, 18.0), (11.75, -13.0, 15.5)), "DuvetReveal": ((12.0, -8.0, 18.0), (6.9, -2.2, 14.0)),
                   "DoorOpen": ((12.0, -1.0, 17.0), (2.0, -6.3, 14.5))},
@@ -1653,7 +1680,8 @@ CLIP_CAM = {   # per clip review cameras (cam, target)
 }
 
 for _p in RIG:
-    P.RIGS[_p] = (lambda p: (lambda objs: rig_pieces(p, objs)))(_p)
+    if _p not in RIGID:
+        P.RIGS[_p] = (lambda p: (lambda objs: rig_pieces(p, objs)))(_p)
 
 INSIDE = {"WFBedroom": ((17.6, -12.8, 18.8), (6.0, 0.5, 13.0), (10.35, -5.85, 20.0)),
           "WFKitchen": ((1.2, 1.2, 8.6), (11.0, 10.0, 3.5), (8.8, 6.0, 9.0), ((3.25, 17.5, 8.0), 2500, (1.0, 0.92, 0.75)))}   # camera, target, lamp
@@ -1688,5 +1716,7 @@ if __name__ == "__main__":
         P.run(n)
         if n in INSIDE:
             inside_render(n, *INSIDE[n])
-        if n in CLIPS:
+        if n in RIGID:
+            write_rigid(n)
+        elif n in CLIPS:
             clip_strips(n, *((INSIDE[n][0], INSIDE[n][1]) if n in INSIDE else (None, None)))
