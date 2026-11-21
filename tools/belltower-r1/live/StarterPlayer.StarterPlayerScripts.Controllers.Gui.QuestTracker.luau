@@ -20,6 +20,11 @@ local Components = require(ReplicatedStorage.UI.Components)
 local QuestConfig = require(ReplicatedStorage.Config.Quests)
 local Cases = require(ReplicatedStorage.Config.Cases)
 local StateController = require(script.Parent.Parent.StateController)
+local UserInputService = game:GetService(`UserInputService`)
+local BellTower = require(ReplicatedStorage:WaitForChild(`Functions`):WaitForChild(`BellTower`)) -- (2.36)
+local Art = require(ReplicatedStorage.Config:WaitForChild(`BellTowerArt`)) -- (2.36)
+local PAPER_INK = Color3.fromRGB(43, 29, 18)
+local PAPER_CRIMSON = Color3.fromRGB(110, 14, 24)
 
 local Player = Players.LocalPlayer
 local C = Theme.Colors
@@ -127,17 +132,55 @@ function Local.Build()
 	Gui.Parent = Player:WaitForChild(`PlayerGui`)
 	Components.AutoScale(Gui, { phoneScale = 0.5 })
 
-	-- Tracker card (under the clock, top right)
-	local Card, CardApi = Components.Panel({
-		ornament = `ornate`; ornamentScale = 0.6; -- matches the clock chip above it
-		Name = `Tracker`;
-		AnchorPoint = Vector2.new(1, 0);
-		Position = UDim2.new(1, -30, 0, 200); -- lines up with ClockHud; keeps the drop shadow on screen (phones: Local.PhonePlace)
-		Size = UDim2.fromOffset(380, 140); -- fits 3 objective lines at TextBody plus the footer
-		Visible = false;
-		Parent = Gui;
-	})
-	local Content = CardApi.Content
+	-- (2.36) The Lead Card (Bell Tower): parchment in a brass clip, or the kit's ornate panel while the art isn't uploaded.
+	local CardArt = BellTower.Image(Art, `LeadCard`)
+	local OnPaper = CardArt ~= nil
+	local Card: GuiObject, Content: GuiObject
+	if OnPaper then
+		local Img = Instance.new(`ImageLabel`)
+		Img.Name = `Tracker`
+		Img.BackgroundTransparency = 1
+		Img.Image = CardArt :: string
+		Img.ScaleType = Enum.ScaleType.Slice
+		Img.SliceCenter = Art.Slices.LeadCard.Center
+		Img.SliceScale = Art.Slices.LeadCard.Scale
+		Img.AnchorPoint = Vector2.new(1, 0)
+		Img.Position = UDim2.new(1, -24, 0, 200)
+		Img.Size = UDim2.new(0, 470, 0, 0)
+		Img.AutomaticSize = Enum.AutomaticSize.Y
+		Img.Visible = false
+		Img.Parent = Gui
+		Card = Img
+		local F = Instance.new(`Frame`)
+		F.Name = `Content`
+		F.BackgroundTransparency = 1
+		F.Size = UDim2.new(1, 0, 0, 0)
+		F.AutomaticSize = Enum.AutomaticSize.Y
+		F.Parent = Img
+		local Pad = Instance.new(`UIPadding`)
+		Pad.PaddingTop = UDim.new(0, 16)
+		Pad.PaddingBottom = UDim.new(0, 20)
+		Pad.PaddingLeft = UDim.new(0, 70) -- clear of the brass clip
+		Pad.PaddingRight = UDim.new(0, 56) -- clear of the ribbon
+		Pad.Parent = F
+		Content = F
+	else
+		local Api
+		Card, Api = Components.Panel({
+			ornament = `ornate`; ornamentScale = 0.6;
+			Name = `Tracker`;
+			AnchorPoint = Vector2.new(1, 0);
+			Position = UDim2.new(1, -24, 0, 200);
+			Size = UDim2.fromOffset(420, 176);
+			Visible = false;
+			Parent = Gui;
+		})
+		Content = Api.Content
+	end
+	local List = Instance.new(`UIListLayout`)
+	List.SortOrder = Enum.SortOrder.LayoutOrder
+	List.Padding = UDim.new(0, 4)
+	List.Parent = Content
 	-- phones: the left column under the compass (the right side holds the touch buttons)
 	local function PhonePlace()
 		if Components.Phone and Components.Phone() then
@@ -145,33 +188,73 @@ function Local.Build()
 			Card.Position = UDim2.new(0, 24, 0, 120)
 		else
 			Card.AnchorPoint = Vector2.new(1, 0)
-			Card.Position = UDim2.new(1, -30, 0, 200)
+			Card.Position = UDim2.new(1, -24, 0, Card.Position.Y.Offset)
 		end
 	end
 	PhonePlace()
 	if Components.PreviewChanged then Components.PreviewChanged:Connect(PhonePlace) end
 	if workspace.CurrentCamera then workspace.CurrentCamera:GetPropertyChangedSignal(`ViewportSize`):Connect(PhonePlace) end
+	local Ink = if OnPaper then PAPER_INK else C.Text
 	local Name = Components.Text({
-		Name = `QuestName`; Text = ``; Font = Theme.Fonts.Title; TextSize = Theme.Sizes.TextHeader;
-		TextColor3 = C.Gold; TextXAlignment = Enum.TextXAlignment.Left;
-		Size = UDim2.new(1, 0, 0, 26); Position = UDim2.fromOffset(0, 0); Parent = Content;
+		Name = `QuestName`; Text = ``; Font = Theme.Fonts.Title; TextSize = 24;
+		TextColor3 = C.Gold; TextXAlignment = Enum.TextXAlignment.Left; LayoutOrder = 1;
+		Size = UDim2.new(1, 0, 0, 30); Parent = Content;
 	})
-	Components.Emboss(Name, Color3.fromRGB(150, 118, 70), 1.4)
+	if not OnPaper then Components.Emboss(Name, Color3.fromRGB(150, 118, 70), 1.4) end
 	local Objective = Components.Text({
-		Name = `Objective`; Text = ``; Font = Theme.Fonts.Body; TextSize = Theme.Sizes.TextBody;
-		TextColor3 = C.Text; TextWrapped = true; TextXAlignment = Enum.TextXAlignment.Left;
-		TextYAlignment = Enum.TextYAlignment.Top; RichText = true;
-		Size = UDim2.new(1, 0, 0, 64); Position = UDim2.fromOffset(0, 28); Parent = Content;
-	})
-	local Footer = Components.Text({
-		Name = `Footer`; Text = `[J] Journal`; Font = Theme.Fonts.Body; TextSize = Theme.Sizes.TextSmall;
-		TextColor3 = C.TextDim; TextXAlignment = Enum.TextXAlignment.Right;
-		Size = UDim2.new(1, 0, 0, 20); Position = UDim2.new(0, 0, 1, -20); Parent = Content;
+		Name = `Objective`; Text = ``; Font = Theme.Fonts.Body; TextSize = BellTower.MIN_TEXT;
+		TextColor3 = Ink; TextWrapped = true; TextXAlignment = Enum.TextXAlignment.Left;
+		TextYAlignment = Enum.TextYAlignment.Top; RichText = true; LayoutOrder = 2;
+		Size = UDim2.new(1, 0, 0, 0); AutomaticSize = Enum.AutomaticSize.Y; Parent = Content;
 	})
 	local Timer = Components.Text({
-		Name = `Timer`; Text = ``; Font = Theme.Fonts.BodyBold; TextSize = Theme.Sizes.TextSmall;
-		TextColor3 = C.Danger; TextXAlignment = Enum.TextXAlignment.Left;
-		Size = UDim2.new(0.5, 0, 0, 20); Position = UDim2.new(0, 0, 1, -20); Parent = Content;
+		Name = `Timer`; Text = ``; Font = Theme.Fonts.BodyBold; TextSize = BellTower.MIN_TEXT;
+		TextColor3 = if OnPaper then PAPER_CRIMSON else C.Danger; TextXAlignment = Enum.TextXAlignment.Left;
+		LayoutOrder = 3; Visible = false; Size = UDim2.new(1, 0, 0, 24); Parent = Content;
+	})
+	-- the foot: fang pips on the left, the J Journal key on the right
+	local Foot = Instance.new(`Frame`)
+	Foot.Name = `Foot`
+	Foot.LayoutOrder = 4
+	Foot.BackgroundTransparency = 1
+	Foot.Size = UDim2.new(1, 0, 0, 36)
+	Foot.Parent = Content
+	local Pips = Instance.new(`Frame`)
+	Pips.Name = `Pips`
+	Pips.BackgroundTransparency = 1
+	Pips.Size = UDim2.new(0.6, 0, 1, 0)
+	Pips.Parent = Foot
+	local PipRow = Instance.new(`UIListLayout`)
+	PipRow.FillDirection = Enum.FillDirection.Horizontal
+	PipRow.VerticalAlignment = Enum.VerticalAlignment.Center
+	PipRow.SortOrder = Enum.SortOrder.LayoutOrder
+	PipRow.Padding = UDim.new(0, 2)
+	PipRow.Parent = Pips
+	local Keyboard = UserInputService.KeyboardEnabled
+	local Key = Instance.new(`TextLabel`)
+	Key.Name = `Key`
+	Key.AnchorPoint = Vector2.new(1, 0.5)
+	Key.Position = UDim2.new(1, -96, 0.5, 0)
+	Key.Size = UDim2.fromOffset(30, 30)
+	Key.BackgroundColor3 = C.Ink
+	Key.Font = Theme.Fonts.Title
+	Key.TextSize = BellTower.MIN_TEXT
+	Key.TextColor3 = C.Gold
+	Key.Text = `J`
+	Key.Visible = Keyboard
+	Key.Parent = Foot
+	local KeyCorner = Instance.new(`UICorner`)
+	KeyCorner.CornerRadius = UDim.new(0, 4)
+	KeyCorner.Parent = Key
+	local KeyStroke = Instance.new(`UIStroke`)
+	KeyStroke.Color = C.GoldDeep
+	KeyStroke.Thickness = 2
+	KeyStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	KeyStroke.Parent = Key
+	local Footer = Components.Text({
+		Name = `Footer`; Text = `Journal`; Font = Theme.Fonts.Body; TextSize = BellTower.MIN_TEXT;
+		TextColor3 = if OnPaper then PAPER_INK else C.TextDim; TextXAlignment = Enum.TextXAlignment.Right;
+		AnchorPoint = Vector2.new(1, 0.5); Position = UDim2.new(1, 0, 0.5, 0); Size = UDim2.fromOffset(90, 26); Parent = Foot;
 	})
 
 	-- Detection meter (top centre, only inside stealth zones)
@@ -219,7 +302,7 @@ function Local.Build()
 	Marker.Parent = Gui
 	-- Engraved plate marker (kit look); the update code writes Marker.Label.Text.
 	local MarkerLabel = Components.Text({
-		Name = `Label`; Text = ``; Font = Theme.Fonts.Title; TextSize = 18; TextXAlignment = Enum.TextXAlignment.Center;
+		Name = `Label`; Text = ``; Font = Theme.Fonts.Title; TextSize = BellTower.MIN_TEXT; TextXAlignment = Enum.TextXAlignment.Center;
 		TextColor3 = C.Gold; TextStrokeTransparency = 0.3; Size = UDim2.fromScale(1, 1);
 		BackgroundTransparency = 0.15; BackgroundColor3 = C.Ink; Parent = Marker;
 	})
@@ -227,6 +310,7 @@ function Local.Build()
 
 	return {
 		Gui = Gui; Card = Card; Name = Name; Objective = Objective; Timer = Timer; Footer = Footer;
+		Pips = Pips; PipKey = ``; OnPaper = OnPaper; HasPips = BellTower.Image(Art, `PipFang`) ~= nil and BellTower.Image(Art, `PipEmpty`) ~= nil;
 		Eye = Eye; EyeLabel = EyeLabel; Fill = Fill; Marker = Marker; MarkerLabel = MarkerLabel;
 	}
 end
@@ -279,16 +363,58 @@ function Local.Target(Q, Id: string, State, Obj): (BasePart?, string?)
 	return Best, nil
 end
 
-function Local.ObjectiveLine(Q, Id: string, State, Obj): string
+function Local.ObjectiveLine(Q, Id: string, State, Obj, WithCount: boolean): string
 	local Need = Obj.Count or 1
 	local Have = (State.Counts or {})[Obj.Id] or 0
 	local Text = Obj.Text
-	if Need > 1 then Text ..= `  ({Have}/{Need})` end
+	if WithCount and Need > 1 then Text ..= `  ({Have}/{Need})` end
 	if Obj.Item and State.Items and State.Items[Obj.Item] == `Dropped` then
 		local Item = QuestConfig.Items[Obj.Item]
-		Text = `<font color="#{C.Danger:ToHex()}">You dropped the {Item and Item.Name or Obj.Item}! Pick it back up.</font>`
+		local Red = if Ui and Ui.OnPaper then PAPER_CRIMSON else C.Danger
+		Text = `<font color="#{Red:ToHex()}">You dropped the {Item and Item.Name or Obj.Item}! Pick it back up.</font>`
 	end
 	return Text
+end
+
+-- (2.36) fang pips for a counted objective; rebuilt only when the count changes
+function Local.SetPips(List: { boolean }?, Have: number, Need: number)
+	local Key = if List then `{Have}/{Need}` else ``
+	if Ui.PipKey == Key then return end
+	Ui.PipKey = Key
+	for _, K in Ui.Pips:GetChildren() do if K:IsA(`GuiObject`) then K:Destroy() end end
+	if not List then return end
+	for I, Filled in List do
+		local Img = Instance.new(`ImageLabel`)
+		Img.Name = `Pip{I}`
+		Img.LayoutOrder = I
+		Img.BackgroundTransparency = 1
+		Img.Size = UDim2.fromOffset(34, 34)
+		Img.Image = BellTower.Image(Art, if Filled then `PipFang` else `PipEmpty`) or ``
+		Img.Parent = Ui.Pips
+	end
+	local Count = Instance.new(`TextLabel`)
+	Count.Name = `Count`
+	Count.LayoutOrder = 99
+	Count.BackgroundTransparency = 1
+	Count.AutomaticSize = Enum.AutomaticSize.X
+	Count.Size = UDim2.fromOffset(0, 30)
+	Count.Font = Theme.Fonts.Body
+	Count.TextSize = BellTower.MIN_TEXT
+	Count.TextColor3 = if Ui.OnPaper then PAPER_INK else C.Text
+	Count.Text = `  {Have}/{Need}`
+	Count.Parent = Ui.Pips
+end
+
+-- (2.36) hang the card under the clock cluster (it grows with the PA line, the plate and the conduct row)
+function Local.Follow()
+	if Ui.Card.AnchorPoint.X < 0.5 then return end -- phones keep their left-column spot
+	local Hud = Player.PlayerGui:FindFirstChild(`ClockHud`)
+	local Panel = Hud and Hud:IsA(`ScreenGui`) and Hud.Enabled and Hud:FindFirstChild(`Panel`)
+	if not (Panel and Panel:IsA(`GuiObject`)) then return end
+	local U = Ui.Gui:FindFirstChild(`NHAutoScale`)
+	local Scale = if U and U:IsA(`UIScale`) and U.Scale > 0 then U.Scale else 1
+	local Want = math.floor((Panel.AbsolutePosition.Y + Panel.AbsoluteSize.Y) / Scale + 12)
+	if math.abs(Ui.Card.Position.Y.Offset - Want) > 1 then Ui.Card.Position = UDim2.new(1, -24, 0, Want) end
 end
 
 function Local.UpdateTracker()
@@ -305,8 +431,14 @@ function Local.UpdateTracker()
 
 	Ui.Card.Visible = true
 	Ui.Name.Text = Def.Name
-	Ui.Name.TextColor3 = if Def.Category == `Main` then C.Gold else C.Text
-	Ui.Objective.Text = Local.ObjectiveLine(Q, Id, State, Obj)
+	Ui.Name.TextColor3 = if Ui.OnPaper then (if Def.Category == `Main` then PAPER_CRIMSON else PAPER_INK)
+		else (if Def.Category == `Main` then C.Gold else C.Text)
+	local Need = Obj.Count or 1
+	local Have = (State.Counts or {})[Obj.Id] or 0
+	local PipList = if Ui.HasPips then BellTower.Pips(Have, Need) else nil
+	Ui.Objective.Text = Local.ObjectiveLine(Q, Id, State, Obj, PipList == nil)
+	Local.SetPips(PipList, Have, Need)
+	Local.Follow()
 
 	if State.Deadline then
 		local Left = math.max(0, State.Deadline - workspace:GetServerTimeNow())
@@ -314,6 +446,7 @@ function Local.UpdateTracker()
 	else
 		Ui.Timer.Text = ``
 	end
+	Ui.Timer.Visible = Ui.Timer.Text ~= ``
 
 	local Target, Override = Local.Target(Q, Id, State, Obj)
 	local Root = Player.Character and Player.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?
