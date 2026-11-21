@@ -13,6 +13,7 @@ local RunService = game:GetService(`RunService`)
 local Player = Players.LocalPlayer
 local Shared = {}
 local Cast: { [string]: Model } = {}
+local Pristine: { [string]: Model } = {} -- (task 10) a source's untouched copy, taken before the first cast hides it; every cast clones this
 local HiddenSources: { [Model]: boolean } = {}
 -- a hidden model's watchers (fix round 1): parts, decals, sounds, tools and accessories that arrive after the hide are
 -- hidden too. Keyed by model; disconnected on restore, on the model's removal and when NHTutorial clears.
@@ -70,6 +71,12 @@ local function applyOne(D: Instance, Hide: boolean, Ghost: boolean)
 	end
 end
 
+-- true while a cine dip (a skip, or Tutorial.Leave ending a cut) has yet to reach full black
+local function DipBlack(): boolean
+	local Ok, Dipping = pcall(function() return require(Player.PlayerScripts.Controllers.Gui.CineUI).Dipping() end)
+	return Ok and Dipping == true
+end
+
 local function unwatch(C: Model)
 	local L = Watching[C]
 	if not L then return end
@@ -89,6 +96,8 @@ local function hideCharacter(C: Model, Hide: boolean, Ghost: boolean?)
 					task.defer(function() if Watching[C] and D:IsDescendantOf(C) then applyOne(D, true, Ghosts[C] == true) end end)
 				end);
 				C.Destroying:Connect(function() unwatch(C) end);
+				-- (task 10) removed from the world without being destroyed (a character that left, a model re-parented to nil)
+				C.AncestryChanged:Connect(function(_, Parent) if Parent == nil then unwatch(C) end end);
 			}
 		end
 	else
@@ -115,7 +124,14 @@ function Shared.Cast(Name: string): Model?
 	local Folder = workspace:FindFirstChild(`NHHometownCast`) or Instance.new(`Folder`)
 	Folder.Name = `NHHometownCast`
 	Folder.Parent = workspace
-	local M = Src:Clone()
+	-- (task 10) cloned from a pristine copy kept from the first cast: a source that is already hidden (an earlier cast's
+	-- NH* state, LocalTransparencyModifier 1, no collide) must never be what a re-cast clones
+	local Base = Pristine[Name]
+	if not Base then
+		Base = Src:Clone()
+		Pristine[Name] = Base
+	end
+	local M = Base:Clone()
 	M.Parent = Folder
 	hideCharacter(Src, true, true)
 	HiddenSources[Src] = true
@@ -145,12 +161,23 @@ function Shared.OnStart()
 				hideCharacter(Other.Character, false)
 			end
 		end
-		local F = workspace:FindFirstChild(`NHHometownCast`)
-		if F then F:Destroy() end
-		for Src in HiddenSources do hideCharacter(Src, false) end
-		table.clear(HiddenSources)
 		for C in table.clone(Watching) do hideCharacter(C, false) end -- anything still watched (a character that left the list)
-		table.clear(Cast)
+		-- (task 10) the cast goes at full black: Tutorial.Leave ends the cine session (a dip to black) just before it clears
+		-- NHTutorial, and a cast folder destroyed at once popped the bus out in view. Wait out a seamless blend-out
+		-- (NHCineSeam) and a dip's way to black, then put the sources back and destroy the cast together (no double model)
+		task.spawn(function()
+			task.wait(0.2) -- the End message that starts the dip arrives first; give its Finish a beat to begin
+			local T0 = os.clock()
+			while os.clock() - T0 < 3 and (Player:GetAttribute(`NHCineSeam`) ~= nil or DipBlack()) do RunService.Heartbeat:Wait() end
+			if Player:GetAttribute(`NHTutorial`) == true then return end -- entered again meanwhile: the new tutorial owns the cast
+			local F = workspace:FindFirstChild(`NHHometownCast`)
+			if F then F:Destroy() end
+			for Src in HiddenSources do hideCharacter(Src, false) end
+			table.clear(HiddenSources)
+			table.clear(Cast)
+			for _, P in Pristine do P:Destroy() end
+			table.clear(Pristine)
+		end)
 	end))
 end
 

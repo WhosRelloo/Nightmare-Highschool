@@ -13,6 +13,13 @@
 -- WALK = true: the player walks (Humanoid:Move after the control module, every frame) until the cut disables the
 -- controls. Make that variant with: sed 's/^local WALK = false/local WALK = true/' camcheck.lua > camcheck_walk.lua
 local WALK = false
+-- ID: the cut to watch. PHASES: the seamless phases that cut has (a cut with Def.EndHold, like TutorialBus, has "In" only: it never
+-- blends out). HOLD: the cut ends held (Def.EndHold): instead of the release check, the camera must stay frozen on the held
+-- frame and NHCineHold must be set. TutorialBus variant:
+--   sed 's/^local ID = "__SeamlessTest"/local ID = "TutorialBus"/; s/^local PHASES = .*/local PHASES = { "In" }/; s/^local HOLD = false/local HOLD = true/'
+local ID = "__SeamlessTest"
+local PHASES = { "In", "BeatIn", "BeatOut", "Out" }
+local HOLD = false
 -- TURN (degrees): before the cut, the gameplay camera is swung this far round the player (the Custom camera keeps it),
 -- so the glide has a big turn to make. Variant: sed 's/^local TURN = 0/local TURN = 120/'
 local TURN = 0
@@ -80,7 +87,7 @@ if TURN ~= 0 then
 	task.wait(0.6)
 end
 local SpeedAtFire = Player.Character.HumanoidRootPart.AssemblyLinearVelocity.Magnitude
-game.ReplicatedStorage:WaitForChild("NHCine"):FireServer({ Kind = "Replay"; Id = "__SeamlessTest" })
+game.ReplicatedStorage:WaitForChild("NHCine"):FireServer({ Kind = "Replay"; Id = ID })
 local T0 = os.clock()
 local Started = false
 repeat
@@ -113,7 +120,7 @@ local CHANNELS = {
 local FACTOR = 2.5
 local Report, Pass = {}, true
 local Ratios = {}
-for _, Phase in { "In", "BeatIn", "BeatOut", "Out" } do
+for _, Phase in PHASES do
 	local Idx = {}
 	for i = 3, #Rows do if Rows[i].phase == Phase then table.insert(Idx, i) end end
 	if #Idx < 5 then Pass = false table.insert(Report, Phase .. ": not seen") continue end
@@ -138,7 +145,25 @@ end
 -- the release: the first frame after Out, against the two frames before it carried on at constant velocity
 local LastOut
 for i = #Rows, 1, -1 do if Rows[i].phase == "Out" then LastOut = i break end end
-if LastOut and Rows[LastOut + 1] and LastOut > 1 then
+if HOLD then
+	-- a cut that ends held: no glide out. The last second of frames (after NHCineSeam went nil) must be one frozen frame, the
+	-- camera still Scriptable and NHCineHold set (the title stays up)
+	local Tail = {}
+	for i = #Rows, 1, -1 do
+		if Rows[i].phase ~= "Play" then break end
+		table.insert(Tail, Rows[i])
+	end
+	local Drift, Ang = 0, 0
+	for _, R in Tail do
+		Drift = math.max(Drift, (R.cf.Position - Tail[1].cf.Position).Magnitude)
+		Ang = math.max(Ang, math.deg(math.acos(math.clamp(R.cf.LookVector:Dot(Tail[1].cf.LookVector), -1, 1))))
+	end
+	local Held = Player:GetAttribute("NHCineHold") == true
+	local Ok = #Tail >= 10 and Drift <= 0.001 and Ang <= 0.01 and Held and Cam.CameraType == Enum.CameraType.Scriptable
+	Pass = Pass and Ok
+	table.insert(Report, string.format("hold: %d frozen frames, drift %.5f studs, %.4f deg, NHCineHold %s, camera %s %s",
+		#Tail, Drift, Ang, tostring(Held), tostring(Cam.CameraType), Ok and "ok" or "NOT HELD"))
+elseif LastOut and Rows[LastOut + 1] and LastOut > 1 then
 	local P0, A, B = Rows[LastOut - 1], Rows[LastOut], Rows[LastOut + 1]
 	local K = math.max(B.t - A.t, 1e-4) / math.max(A.t - P0.t, 1e-4)
 	local PredPos = A.cf.Position + (A.cf.Position - P0.cf.Position) * K
@@ -158,7 +183,7 @@ end
 do
 	local Keys = { "contrast", "saturation", "brightness", "tint", "bloom", "dof", "exposure" }
 	local Span = {}
-	for _, Phase in { "In", "BeatIn", "BeatOut", "Out" } do
+	for _, Phase in PHASES do
 		local A, B
 		for i = 1, #Rows do if Rows[i].phase == Phase then A = A or Rows[i].t B = Rows[i].t end end
 		Span[Phase] = if A then math.max(B - A, 0.1) else nil
@@ -171,10 +196,10 @@ do
 		if Swing < 1e-3 then continue end
 		local Worst = 0
 		for i = 2, #Rows do
-			local Ph = if Rows[i].phase == "In" or Rows[i - 1].phase == "In" then "In"
-				elseif Rows[i].phase == "BeatIn" or Rows[i - 1].phase == "BeatIn" then "BeatIn"
-				elseif Rows[i].phase == "BeatOut" or Rows[i - 1].phase == "BeatOut" then "BeatOut"
-				elseif Rows[i].phase == "Out" or Rows[i - 1].phase == "Out" then "Out" else nil
+			local Ph = nil
+			for _, Name in PHASES do
+				if Rows[i].phase == Name or Rows[i - 1].phase == Name then Ph = Name break end
+			end
 			if Ph and Span[Ph] then
 				local Allowed = math.min(0.9, 2 * 1.875 * (Rows[i].t - Rows[i - 1].t) / Span[Ph])
 				local Step = math.abs(Rows[i].look[Key] - Rows[i - 1].look[Key]) / Swing

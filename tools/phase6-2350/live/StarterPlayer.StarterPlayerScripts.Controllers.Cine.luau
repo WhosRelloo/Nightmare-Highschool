@@ -54,6 +54,7 @@ local LETTERBOX = 2.28 -- the frame the bars leave on 16:9 (CineUI's 11% bars): 
 local Shared = {}
 local Local = {}
 local Current = nil -- the cut playing now
+local HeldCut = nil -- (task 10) a cut with Def.EndHold that played out: its last frame and title stay up until ReleaseHold
 local Remote: RemoteEvent? = nil
 
 local function UI() return require(script.Parent:WaitForChild(`Gui`):WaitForChild(`CineUI`)) end
@@ -542,7 +543,7 @@ function Local.Fire(Cut, E)
 		Local.SwingBell(Cut)
 	end
 	if E.sound then Local.Sound(Cut, E.sound) end
-	if E.card then pcall(function() UI().Card(E.card.title, E.card.sub, E.card.dur or 3) end) end
+	if E.card then pcall(function() UI().Card(E.card.title, E.card.sub, E.card.dur or 3, E.card.hold) end) end
 	if E.veil then pcall(function() UI().Veil(E.veil.alpha, E.veil.dur or 0.5) end) end
 	if E.fx then Local.Fx(Cut, E.fx) end
 	if E.move then Local.Move(Cut, E.move) end
@@ -703,6 +704,17 @@ function Local.Context(Cut, Message)
 		local A = Cut.Actors[N]
 		return A and A.Model:FindFirstChild(Part)
 	end
+	-- (task 10) a cut's own loops (a bus driving in) stop when it ends; its cleanups (tracks it loaded) run at Finish
+	function Ctx.Alive(): boolean return Cut.Live == true end
+	function Ctx.OnEnd(Fn: () -> ())
+		Cut.Cleanups = Cut.Cleanups or {}
+		table.insert(Cut.Cleanups, Fn)
+	end
+	-- runs when the cut is over for good: at Finish, or, for a cut that ends held (Def.EndHold), when the hold is released
+	function Ctx.OnRelease(Fn: () -> ())
+		Cut.AfterHold = Cut.AfterHold or {}
+		table.insert(Cut.AfterHold, Fn)
+	end
 	function Ctx.Prop(N: string, Props) return Local.Prop(Cut, N, Props) end
 	function Ctx.Hold(Who: string, N: string, Size: Vector3, Color: Color3, Offset: CFrame)
 		return Local.Hold(Cut, Cut.Actors[Who], N, Size, Color, Offset)
@@ -731,6 +743,7 @@ function Local.Play(Message)
 		Gui.Veil(1, 0)
 		Player:SetAttribute(`NHCineSeam`, nil) -- (an earlier seamless cut's blend may have been cut short by this one)
 	end
+	if HeldCut then Local.ReleaseHold() end -- the tutorial's title hold ends when the next cut starts (the Prologue)
 	if not Local.Ready(Config.StartGrace - 2) or Current ~= Cut then
 		if Current == Cut then Local.Finish(Cut, `NotReady`) end
 		return
@@ -798,7 +811,7 @@ function Local.Play(Message)
 	if not Cut.Seamless then Local.HideLive(Cut) end
 	if not CameraLease.Take(LEASE, function()
 		if Cut.Live and Current == Cut then return true end
-		return Cut.EndingAt ~= nil and os.clock() - Cut.EndingAt < 3
+		return (Cut.EndingAt ~= nil and os.clock() - Cut.EndingAt < 3) or HeldCut == Cut
 	end) then
 		Local.Finish(Cut, `NoCamera`)
 		return
@@ -1235,9 +1248,18 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 	if Current == Cut then Current = nil end
 	local Gui = UI()
 	local Seamless = Cut.Seamless == true
-	local Blended = Seamless and How == `Done`
+	-- (task 10) Def.EndHold: the tutorial's last cut ends on its title; there is no glide out. The frame freezes where it is, the
+	-- title card stays, the player stays held, until ReleaseHold (the next cut, leaving Wickfield, a respawn)
+	local Hold = Seamless and How == `Done` and Cut.Def.EndHold == true
+	local Blended = Seamless and How == `Done` and not Hold
 	local function actor() return require(script.Parent:WaitForChild(`CineActor`)) end
 	local Superseded = false
+	if Hold then
+		HeldCut = Cut
+		Player:SetAttribute(`NHCineSeam`, nil)
+		Player:SetAttribute(`NHCineHold`, true)
+		pcall(function() Gui.SetSkippable(false) end) -- nothing left to skip
+	end
 	if Blended then
 		-- (2.35.0) out without black (spec §2.2): control comes back as the glide onto the Custom camera starts
 		local Cam = workspace.CurrentCamera
@@ -1290,7 +1312,7 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 	end
 	-- out through black, never a pop back to the gameplay camera (doc 04 §4); a seamless skip dips (spec §2.3)
 	local Black = How ~= `Done` and How ~= `NotReady`
-	if Seamless and not Blended then
+	if Seamless and not Blended and not Hold then
 		Player:SetAttribute(`NHCineSeam`, nil)
 		pcall(function() actor().Release() end)
 	end
@@ -1307,10 +1329,18 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 	elseif Black then
 		Gui.Veil(1, 0.25) task.wait(0.25)
 	end
-	if Cut.Handle then pcall(function() Cut.Handle:stop() end) end
-	if Cut.BeatLook then Local.DropLook(Cut.BeatLook, true) Cut.BeatLook = nil end
+	if not Hold then
+		if Cut.Handle then pcall(function() Cut.Handle:stop() end) end
+		if Cut.BeatLook then Local.DropLook(Cut.BeatLook, true) Cut.BeatLook = nil end
+	end
 	Cut.BeatRig = nil
 	for _, Cn in Cut.Conns do Cn:Disconnect() end
+	for _, Fn in Cut.Cleanups or {} do pcall(Fn) end
+	Cut.Cleanups = nil
+	if not Hold then
+		for _, Fn in Cut.AfterHold or {} do pcall(Fn) end
+		Cut.AfterHold = nil
+	end
 	for _, S in Cut.Sounds do pcall(function() S:Destroy() end) end
 	for Part, CF in Cut.Restore do if Part.Parent then Part.CFrame = CF end end
 	if Cut.ClockWas then
@@ -1320,18 +1350,20 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 	if Cut.Folder then Cut.Folder:Destroy() end
 	Local.ShowLive(Cut)
 	Cut.EndingAt = nil
-	if not Superseded then
+	if not Superseded and not Hold then
 		pcall(function() UI().ClearSubtitle() end)
 		CameraLease.Release(LEASE)
 		-- belt and braces: nobody else holds the camera, so it must be the normal one now
 		if not CameraLease.Held() and workspace.CurrentCamera.CameraType ~= Enum.CameraType.Custom then CameraLease.Restore() end
 	end
-	if Cut.DayHold then
-		local Hold = Cut.DayHold
+	if Cut.DayHold and not Hold then
+		local Name = Cut.DayHold
 		Cut.DayHold = nil
-		pcall(function() require(script.Parent:WaitForChild(`World`):WaitForChild(`DayCycle`)).HoldExposure(Hold, false) end)
+		pcall(function() require(script.Parent:WaitForChild(`World`):WaitForChild(`DayCycle`)).HoldExposure(Name, false) end)
 	end
-	if Seamless and (Blended or Dipped) then
+	if Hold then
+		-- nothing else changes: the HUD stays away, the camera and the card stay (ReleaseHold puts everything back)
+	elseif Seamless and (Blended or Dipped) then
 		if Dipped then Gui.FadeHud(false, 0.4) end
 	else
 		Gui.Hide(0.45)
@@ -1341,6 +1373,34 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 		send({ Kind = `Done`; Session = Cut.Session })
 	end
 end
+
+-- (task 10) ends an EndHold cut's hold: the title away, the controls back, the camera and the look handed back. Under a
+-- veil when there is one (the next cut's black), else a quick fade.
+function Local.ReleaseHold()
+	local Cut = HeldCut
+	if not Cut then return end
+	HeldCut = nil
+	Player:SetAttribute(`NHCineHold`, nil)
+	for _, Fn in Cut.AfterHold or {} do pcall(Fn) end
+	Cut.AfterHold = nil
+	pcall(function() UI().ClearCard(0.2) end)
+	pcall(function() require(script.Parent:WaitForChild(`CineActor`)).Release() end)
+	if Cut.Handle then pcall(function() Cut.Handle:stop() end) Cut.Handle = nil end
+	if Cut.BeatLook then Local.DropLook(Cut.BeatLook, true) Cut.BeatLook = nil end
+	if Current == nil then
+		CameraLease.Release(LEASE)
+		if not CameraLease.Held() and workspace.CurrentCamera.CameraType ~= Enum.CameraType.Custom then CameraLease.Restore() end
+	end
+	if Cut.DayHold then
+		local Name = Cut.DayHold
+		Cut.DayHold = nil
+		pcall(function() require(script.Parent:WaitForChild(`World`):WaitForChild(`DayCycle`)).HoldExposure(Name, false) end)
+	end
+	pcall(function() UI().ClearSubtitle() end)
+	if Current == nil then pcall(function() UI().FadeHud(false, 0.4) end) end
+end
+function Shared.ReleaseHold() Local.ReleaseHold() end
+function Shared.IsHeld(): boolean return HeldCut ~= nil end
 
 ---| API |---
 
@@ -1428,6 +1488,14 @@ function Shared.OnStart()
 	-- a respawn ends the cut here too (CameraLease drops every lease then)
 	Player.CharacterAdded:Connect(function()
 		if Current then task.spawn(Local.Finish, Current, `Died`, true) end
+		if HeldCut then Local.ReleaseHold() end
+	end)
+	-- leaving Wickfield ends a title hold too (Tutorial.Leave clears NHTutorial)
+	Player:GetAttributeChangedSignal(`NHTutorial`):Connect(function()
+		if Player:GetAttribute(`NHTutorial`) ~= true and HeldCut then
+			-- leaving Wickfield under a held title: a dip to black, the hold ends at full black (never a pop to gameplay)
+			task.spawn(function() UI().Dip(0.3, function() Local.ReleaseHold() end) end)
+		end
 	end)
 end
 

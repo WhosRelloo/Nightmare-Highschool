@@ -93,7 +93,7 @@ if Hometown then
 		and M.Body.CanCollide == true and M.Body.CanQuery == true and M.Body.CanTouch == false)
 	check("3f second call returns same clone", H.Cast("__CastProbe") == M)
 	Player:SetAttribute("NHTutorial", nil)
-	task.wait(0.2)
+	task.wait(0.8) -- (task 10) the cast goes at full black: the handler waits 0.2 s, then for any dip
 	check("3g cast folder destroyed on clear", workspace:FindFirstChild("NHHometownCast") == nil)
 	check("3h source restored on clear", SP.LocalTransparencyModifier == 0 and near(SS.Volume, 0.4))
 	check("3i source collide/query/touch back to their originals", SP.CanCollide == true and SP.CanQuery == true and SP.CanTouch == false

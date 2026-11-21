@@ -51,6 +51,7 @@ local function new(Class: string, Props, Parent: Instance?)
 	return I
 end
 
+local CardToken = 0 -- (task 10) a newer card or ClearCard cancels an older card's pending fade-out
 local function tween(I: Instance, T: number, Props, Style: Enum.EasingStyle?, Dir: Enum.EasingDirection?)
 	local Tw = TweenService:Create(I, TweenInfo.new(T, Style or Enum.EasingStyle.Quart, Dir or Enum.EasingDirection.Out), Props)
 	Tw:Play()
@@ -398,18 +399,28 @@ function Shared.ClearSubtitle()
 	tween(Ui.Sub, 0.2, { GroupTransparency = 1 })
 end
 
-function Shared.Card(Title: string, Sub: string?, Seconds: number)
+-- Hold (task 10, a cut that ends on its title): the card stays up until ClearCard (no fade-out, no slow zoom)
+function Shared.Card(Title: string, Sub: string?, Seconds: number, Hold: boolean?)
 	if not Ui then return end
+	CardToken += 1
+	local My = CardToken
 	Ui.CardTitle.Text = Title
 	Ui.CardSub.Text = Sub or ``
 	local Reduced = reduced()
-	Ui.CardScale.Scale = if Reduced then 1 else 0.96
+	Ui.CardScale.Scale = if Reduced or Hold then 1 else 0.96
 	Ui.Card.GroupTransparency = 1
 	tween(Ui.Card, 0.9, { GroupTransparency = 0 }, Enum.EasingStyle.Sine)
+	if Hold then return end
 	if not Reduced then tween(Ui.CardScale, Seconds, { Scale = 1.03 }, Enum.EasingStyle.Sine) end
 	task.delay(math.max(0.5, Seconds - 0.8), function()
-		if Ui then tween(Ui.Card, 0.8, { GroupTransparency = 1 }, Enum.EasingStyle.Sine) end
+		if Ui and CardToken == My then tween(Ui.Card, 0.8, { GroupTransparency = 1 }, Enum.EasingStyle.Sine) end
 	end)
+end
+
+-- puts a held card away (and cancels a pending fade-out of an earlier one)
+function Shared.ClearCard(Seconds: number?)
+	CardToken += 1
+	if Ui then tween(Ui.Card, Seconds or 0.4, { GroupTransparency = 1 }, Enum.EasingStyle.Sine) end
 end
 
 function Shared.Veil(Alpha: number, Seconds: number)
@@ -622,6 +633,7 @@ end
 function Shared.Dip(Seconds: number, AtBlack: (() -> ())?)
 	if not Ui then Local.Build() end
 	Ui.Gui.Enabled = true
+	Local.Dipping = true
 	Shared.Veil(1, Seconds / 2)
 	task.wait(Seconds / 2)
 	Ui.Veil.BackgroundTransparency = 0
@@ -629,8 +641,12 @@ function Shared.Dip(Seconds: number, AtBlack: (() -> ())?)
 		local Ok, Err = pcall(AtBlack)
 		if not Ok then warn(`[CineUI] Dip: {Err}`) end
 	end
+	Local.Dipping = false -- (task 10) black reached and its work done: what waited for black (Hometown's cast) may go
 	Shared.Veil(0, Seconds / 2)
 end
+
+-- true from a dip's start until it is at full black (and its AtBlack has run)
+function Shared.Dipping(): boolean return Local.Dipping == true end
 
 function Shared.IsOn(): boolean return On end
 

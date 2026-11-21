@@ -3,25 +3,38 @@ local ORIGIN = CFrame.new(4000, 0, 4000) -- Wickfield's corner, away from the sc
 local H = workspace:FindFirstChild("Hometown") or Instance.new("Folder")
 H.Name = "Hometown"
 H.Parent = workspace
-local function take(name, into, cf)
+-- (task 10) the Blender import came in at 100x (the bus is 2100 studs long): each model is fitted to its real size in studs,
+-- measured from its longest bounding-box side, so a later re-import at the right scale is left alone (scale 1)
+local function take(name, into, cf, longest)
 	local M = workspace:FindFirstChild(name, true)
 	if not M then return name .. " MISSING" end
 	local Folder = H:FindFirstChild(into) or Instance.new("Folder")
 	Folder.Name = into
 	Folder.Parent = H
 	M.Parent = Folder
+	local _, Size = M:GetBoundingBox()
+	M:ScaleTo(M:GetScale() * longest / math.max(Size.X, Size.Y, Size.Z))
 	M:PivotTo(ORIGIN * cf)
+	-- (task 10) nothing may fall in Play: a rigged model (a RootPart, its mesh parts on Motor6Ds) is held by its root alone (its
+	-- joints still animate); a plain model has every part anchored
+	-- (task 10) StreamingEnabled: a model is only complete on a client near it, and Hometown.Cast clones the whole thing (the
+	-- bus 60 studs away, the dog), so Wickfield's models are Persistent (sent whole to every client)
+	if M:IsA("Model") then M.ModelStreamingMode = Enum.ModelStreamingMode.Persistent end
+	local Root = M:FindFirstChild("RootPart")
+	for _, D in M:GetDescendants() do
+		if D:IsA("BasePart") then D.Anchored = (Root == nil) or D == Root end
+	end
 	return name .. " ok"
 end
 local Report = {
 	-- the stop faces -Y in Blender = -Z in Roblox; the road runs along X in front of it
-	take("WFBusStop", "BusStop", CFrame.new(0, 0, 0)),
-	take("WFBlackBus", "BlackBus", CFrame.new(-30, 0, -5.6) * CFrame.Angles(0, math.rad(-90), 0)),
-	take("WFWickHouse", "Garden", CFrame.new(0, 0, 120)),
-	take("WFKennel", "Garden", CFrame.new(14, 0, 96)),
-	take("WFBiscuit", "Garden", CFrame.new(14, 0, 93)),
-	take("WFPicketFence", "Garden", CFrame.new(0, 0, 80)),
-	take("WFPicketGate", "Garden", CFrame.new(12, 0, 80)),
+	take("WFBusStop", "BusStop", CFrame.new(0, 0, 0), 20),
+	take("WFBlackBus", "BlackBus", CFrame.new(30, 0.3, -5.6) * CFrame.Angles(0, math.rad(90), 0), 21),
+	take("WFWickHouse", "Garden", CFrame.new(0, 0, 120), 20.7),
+	take("WFKennel", "Garden", CFrame.new(14, 0, 96), 7.4),
+	take("WFBiscuit", "Garden", CFrame.new(14, 0, 93), 6.4),
+	take("WFPicketFence", "Garden", CFrame.new(0, 0, 80), 8.7),
+	take("WFPicketGate", "Garden", CFrame.new(12, 0, 80), 6.0),
 }
 local Sets = workspace:FindFirstChild("NHCineSets") or Instance.new("Folder")
 Sets.Name = "NHCineSets"
@@ -44,13 +57,21 @@ local function set(name, marks)
 end
 set("BusStop", {
 	Stand = CFrame.new(1.5, 0.75, -1.6),                                    -- by the kerb, facing the road (-Z)
-	BusStart = CFrame.new(-60, 0, -5.6) * CFrame.Angles(0, math.rad(-90), 0),
-	BusStop = CFrame.new(-2, 0, -5.6) * CFrame.Angles(0, math.rad(-90), 0),  -- the doors line up with Stand
-	BusAway = CFrame.new(90, 0, -5.6) * CFrame.Angles(0, math.rad(-90), 0),
-	Door = CFrame.new(1.5, 0.75, -3.4),
+	-- (task 10) the bus faces -X (its doors, on its +Z side, face the stop; the driver sits on the far side) and the road
+	-- runs along X in front of the stop: it comes in from +X. Its doors (pivot + (-5.0, 0, +2.53)) land on Stand's X.
+	BusStart = CFrame.new(64.5, 0.3, -5.6) * CFrame.Angles(0, math.rad(90), 0),
+	BusStop = CFrame.new(6.5, 0.3, -5.6) * CFrame.Angles(0, math.rad(90), 0),  -- the doors line up with Stand
+	BusAway = CFrame.new(-85.5, 0.3, -5.6) * CFrame.Angles(0, math.rad(90), 0),
+	Door = CFrame.new(1.5, 2.4, -3.1),                                       -- the doorway, mid-height (the doors' own Z)
 	Board = CFrame.new(1.5, 2.9, -6.2),
-	CamWide = CFrame.new(-14, 2.2, 6),  CamLookWide = CFrame.new(-6, 4, -5),
-	CamDoor = CFrame.new(6, 3.4, -1.0), CamDriver = CFrame.new(0, 8.5, -16),
+	Driver = CFrame.new(1.7, 5.3, -7.0),                                     -- the driver's head, seen through the doorway
+	-- cameras: the arrival from the left end of the stop looking along the road at the bus coming in; the doors from the
+	-- pavement at the right; the driver from above the player's head through the doorway; the leaving from beyond the
+	-- bus's tail so it recedes (the pull-away runs the bus along -X, never past a camera)
+	CamWide = CFrame.new(-16, 2.4, -2),     CamLookWide = CFrame.new(4, 3.5, -5.6),
+	CamDoor = CFrame.new(6, 2.3, -0.5),
+	CamDriver = CFrame.new(1.6, 6.6, 0.2),
+	CamAway = CFrame.new(22, 2.6, -0.5),    CamLookAway = CFrame.new(-30, 4, -5.6),
 })
 set("Garden", {
 	Start = CFrame.new(-6, 0, 104), Biscuit = CFrame.new(14, 0, 93), FenceZone = CFrame.new(12, 0, 81),
