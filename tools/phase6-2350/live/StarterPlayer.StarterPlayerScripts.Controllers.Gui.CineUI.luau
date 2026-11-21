@@ -426,6 +426,7 @@ end
 function Shared.Veil(Alpha: number, Seconds: number)
 	if not Ui then Local.Build() end
 	Ui.Gui.Enabled = true
+	Local.VeilTarget = Alpha -- (task 12 fix round 1) what the latest claim wants: 1 black, 0 clear
 	Local.VeilGen = (Local.VeilGen or 0) + 1 -- (task 12) every veil call claims the veil: a dip lifts its own only if nothing claimed it since
 	if Seconds <= 0 then Ui.Veil.BackgroundTransparency = 1 - Alpha return end
 	tween(Ui.Veil, Seconds, { BackgroundTransparency = 1 - Alpha }, Enum.EasingStyle.Sine)
@@ -638,16 +639,20 @@ function Shared.Dip(Seconds: number, AtBlack: (() -> ())?)
 	Shared.Veil(1, Seconds / 2)
 	local Mine = Local.VeilGen -- (task 12) this dip's claim on the veil
 	task.wait(Seconds / 2)
-	Ui.Veil.BackgroundTransparency = 0
-	if Local.VeilGen ~= Mine then tween(Ui.Veil, 0.01, { BackgroundTransparency = 0 }) end -- (task 12) a newer veil's tween would drag this black back up: replace it
+	-- (task 12 fix round 1) force black only if the latest claim on the veil still wants black: a newer lift (a shorter dip that
+	-- already finished, a Veil(0, t)) must not be undone, or nobody lifts it again
+	if Local.VeilGen == Mine or Local.VeilTarget == 1 then
+		Ui.Veil.BackgroundTransparency = 0
+		if Local.VeilGen ~= Mine then tween(Ui.Veil, 0.01, { BackgroundTransparency = 0 }) end -- a newer veil's tween would drag this black back up: replace it
+	end
 	if AtBlack then
 		local Ok, Err = pcall(AtBlack)
 		if not Ok then warn(`[CineUI] Dip: {Err}`) end
 	end
 	Local.Dips = math.max(0, (Local.Dips or 1) - 1) -- (task 10) black reached and its work done: what waited for black (Hometown's cast) may go
-	-- (task 12) lift only if no newer veil or dip claimed it meanwhile (a Skip inside the fence dip or the hold's timeout dip, a
-	-- Prologue Play inside the timeout dip): the newer owner decides when the screen clears
-	if Local.VeilGen == Mine then Shared.Veil(0, Seconds / 2) end
+	-- lift unless a newer BLACK claim is still pending (a Skip inside the fence dip or the hold's timeout dip, a Prologue Play
+	-- inside the timeout dip): that owner decides when the screen clears. A newer lift claim means the screen is ours to clear.
+	if Local.VeilGen == Mine or Local.VeilTarget == 0 then Shared.Veil(0, Seconds / 2) end
 end
 
 -- true from a dip's start until it is at full black (and its AtBlack has run)

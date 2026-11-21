@@ -285,25 +285,37 @@ for _, R in Rows do if R.phase == "Beat" then Beat += 1 end end
 -- (task 12) house-style numbers from the engine's own camera (no video capture on this machine): the stand-in for motion_audit's
 -- camera still fraction, horizon roll and moving holds (skill 3: alive camera, still < 10 % on action beats, roll 0 on ground beats)
 do
-	local N, Still, Run, LongRun, RunT0, Dur, StillDur = 0, 0, 0, 0, nil, 0, 0
-	local RollMin, RollMax = 1e9, -1e9
+	-- (fix round 1, M4) only pairs of consecutive frames inside ONE phase of the cut (never a phase boundary, never the held
+	-- title / the gameplay camera, phase "Play"); per phase and overall
+	local Tot = { n = 0, dur = 0, still = 0, run = 0, long = 0, rmin = 1e9, rmax = -1e9 }
+	local By, Order = {}, {}
+	local function bucket(Name)
+		if not By[Name] then By[Name] = { n = 0, dur = 0, still = 0, run = 0, long = 0, rmin = 1e9, rmax = -1e9 } table.insert(Order, Name) end
+		return By[Name]
+	end
+	local function add(Bk, Dt, IsStill, Roll)
+		Bk.n += 1 Bk.dur += Dt
+		Bk.rmin, Bk.rmax = math.min(Bk.rmin, Roll), math.max(Bk.rmax, Roll)
+		if IsStill then Bk.still += Dt Bk.run += Dt Bk.long = math.max(Bk.long, Bk.run) else Bk.run = 0 end
+	end
 	for i = 2, #Rows do
 		local A, B = Rows[i - 1], Rows[i]
-		if B.phase ~= "Play" or A.phase ~= "Play" then
+		if A.phase == B.phase and B.phase ~= "Play" then
 			local Dt = math.max(B.t - A.t, 1e-4)
 			local Dp = (B.cf.Position - A.cf.Position).Magnitude
 			local Da = math.deg(2 * math.asin(math.clamp((B.cf.LookVector - A.cf.LookVector).Magnitude / 2, 0, 1)))
-			N += 1 Dur += Dt
+			local IsStill = Dp < 0.003 and Da < 0.03
 			local Roll = math.deg(math.asin(math.clamp(B.cf.RightVector.Y, -1, 1)))
-			RollMin, RollMax = math.min(RollMin, Roll), math.max(RollMax, Roll)
-			if Dp < 0.003 and Da < 0.03 then
-				Still += 1 StillDur += Dt Run += Dt
-				LongRun = math.max(LongRun, Run)
-			else Run = 0 end
+			add(Tot, Dt, IsStill, Roll)
+			add(bucket(B.phase), Dt, IsStill, Roll)
 		end
 	end
-	table.insert(Report, string.format("motion (engine camera, cut frames only): %d frames over %.1f s, still %.1f %% of the time (a hold with pos < 0.003 st and < 0.03 deg a frame), longest still run %.2f s, horizon roll %.2f to %.2f deg",
-		N, Dur, 100 * StillDur / math.max(Dur, 1e-4), LongRun, RollMin, RollMax))
+	local function line(Name, Bk)
+		return string.format("%s: %d pairs %.1f s, still %.1f %%, longest still run %.2f s, roll %.2f to %.2f deg", Name, Bk.n, Bk.dur, 100 * Bk.still / math.max(Bk.dur, 1e-4), Bk.long, Bk.rmin, Bk.rmax)
+	end
+	table.insert(Report, "motion (engine camera; same-phase frame pairs only; still = under 0.003 st and 0.03 deg a frame)")
+	table.insert(Report, "  " .. line("all", Tot))
+	for _, Name in Order do table.insert(Report, "  " .. line(Name, By[Name])) end
 end
 table.insert(Report, string.format("path %s; Beat frames %d", tostring(LastPath), Beat))
 return (Pass and "CAM OK\n" or "CAM JERK\n") .. table.concat(Report, "\n")

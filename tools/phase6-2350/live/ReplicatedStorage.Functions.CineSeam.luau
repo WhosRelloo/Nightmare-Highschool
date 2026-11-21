@@ -56,8 +56,32 @@ function Seam.Lint(FromCF: CFrame, ToCF: CFrame): string?
 	return nil
 end
 
+-- the camera's roll about its own look: its right vector against a level horizon looking the same way
+local function rollOf(CF: CFrame): number
+	local Base = CFrame.lookAt(Vector3.zero, CF.LookVector)
+	return math.atan2(CF.RightVector:Dot(Base.UpVector), CF.RightVector:Dot(Base.RightVector))
+end
+
+-- (task 12 fix round 1) the rotation between two cameras with a LEVEL horizon: a plain quaternion slerp between two level
+-- orientations that differ in both yaw and pitch tilts the horizon in between (measured: up to -3.1 deg one way in the glide in,
+-- -1.6 in the blend out; house style wants roll 0 on ground beats). The look direction slerps on its great circle; the roll is the
+-- two ends' own rolls eased. Rotation only (position 0). Falls back to the quaternion slerp for looks within 0.5 deg of
+-- parallel or opposed, or near straight up/down.
+function Seam.Rot(A: CFrame, B: CFrame, E: number): CFrame
+	local La, Lb = A.LookVector, B.LookVector
+	local Dot = math.clamp(La:Dot(Lb), -1, 1)
+	local Theta = math.acos(Dot)
+	if Theta < math.rad(0.5) or Theta > math.pi - math.rad(0.5) or math.abs(La.Y) > 0.999 or math.abs(Lb.Y) > 0.999 then
+		return A.Rotation:Lerp(B.Rotation, E)
+	end
+	local Look = (La * math.sin((1 - E) * Theta) + Lb * math.sin(E * Theta)) / math.sin(Theta)
+	local Ra, Rb = rollOf(A), rollOf(B)
+	return CFrame.lookAt(Vector3.zero, Look) * CFrame.Angles(0, 0, Ra + (Rb - Ra) * E)
+end
+
 function Seam.Blend(A: CFrame, B: CFrame, E: number): CFrame
-	return A:Lerp(B, math.clamp(E, 0, 1))
+	E = math.clamp(E, 0, 1)
+	return CFrame.new(A.Position:Lerp(B.Position, E)) * Seam.Rot(A, B, E)
 end
 
 return Seam

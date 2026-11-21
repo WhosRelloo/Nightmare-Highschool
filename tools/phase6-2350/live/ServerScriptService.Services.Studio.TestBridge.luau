@@ -1068,6 +1068,25 @@ function Commands.CineSeamTest()
 	end
 	check(Seam.Lint(A, CFrame.lookAt(A.Position, A.Position + Vector3.new(0, 0, 1))) ~= nil, "a pure turn over 90 deg is flagged")
 	check(Seam.Length(A, CFrame.lookAt(Vector3.new(500, 5, 500), Vector3.new(0, 5, 0))) == 1.0, "a very large move glides exactly 1.0 s")
+	-- (task 12 fix round 1) a blend between two LEVEL cameras that differ in yaw and pitch keeps a level horizon (a plain CFrame
+	-- Lerp tilts it) and is exact at both ends
+	do
+		local P = CFrame.lookAt(Vector3.new(0, 5, 0), Vector3.new(0, 5, -10))
+		local Q = CFrame.lookAt(Vector3.new(6, 4, -3), Vector3.new(30, -4, 5))
+		local Worst, WorstOld = 0, 0
+		for I = 0, 20 do
+			local E = I / 20
+			local Cf = Seam.Blend(P, Q, E)
+			Worst = math.max(Worst, math.abs(math.deg(math.asin(math.clamp(Cf.RightVector.Y, -1, 1)))))
+			local Old = P:Lerp(Q, E)
+			WorstOld = math.max(WorstOld, math.abs(math.deg(math.asin(math.clamp(Old.RightVector.Y, -1, 1)))))
+		end
+		check(Worst < 0.01, string.format("Blend keeps the horizon level (worst roll %.3f deg)", Worst))
+		check(WorstOld > 1, string.format("(the old quaternion lerp tilted it %.2f deg)", WorstOld))
+		check((Seam.Blend(P, Q, 0).LookVector - P.LookVector).Magnitude < 1e-4 and (Seam.Blend(P, Q, 1).LookVector - Q.LookVector).Magnitude < 1e-4 and (Seam.Blend(P, Q, 1).Position - Q.Position).Magnitude < 1e-4, "Blend is exact at both ends")
+		local Tilt = P * CFrame.Angles(0, 0, math.rad(12))
+		check(math.abs(math.deg(math.asin(math.clamp(Seam.Blend(Tilt, Tilt, 0.5).RightVector.Y, -1, 1))) - math.deg(math.asin(math.clamp(Tilt.RightVector.Y, -1, 1)))) < 0.01, "a tilted camera blended with itself keeps its own roll")
+	end
 	return #Fails == 0 and "CineSeamTest OK" or table.concat(Fails, "; ")
 end
 

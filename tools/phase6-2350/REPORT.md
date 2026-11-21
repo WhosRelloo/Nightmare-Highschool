@@ -41,9 +41,9 @@ Lint note: `[Cine] ... [fix] shot 1 turns ... from the gameplay camera` appeared
 |---|---|---|
 | Solo | PASS | Both cuts run end to end: sneak (Garden>Fence, with skip and timeout variants) and bus (arrive, board, hold, timeout release); all checks above |
 | Two players | NOT RUN: OWNER | The MCP drives one client (no multi-client mode in start_stop_play; rbxc runs Edit/Server/Client of one session). Hometown's hiding has 33 single-player rows and the collision group was verified; see manual steps below |
-| Death mid-beat | PASS | Killed 4 s into the Garden beat: respawned on `Start` (checkpoint `TutorialSneak:Garden`, 3994,3,4104), camera Custom and behind the player (look dot 0.83, 12.6 st). The cut is not restarted (state Started, not Seen) |
-| Rejoin | PASS | Stop and Play again: Origin.Checkpoint `TutorialSneak:Fence` persisted; TutorialEnter put the player on FenceZone (4012,3,4082). Needed Tutorial.Resume (added) |
-| Reduce Motion on | PASS (camera) | reducecheck OK: In/Out are 0.2 s dips (0 visible camera changes, veil peak 1.00); the code strips handheld and Dutch for Ctx.Reduced. Handheld absence not measured numerically |
+| Death mid-beat | PASS | Killed 4 s into the Garden beat: respawned on `Start` (checkpoint `TutorialSneak:Garden`, 3994,3,4104), camera Custom and behind the player (look dot 0.83, 12.6 st). The cut is not restarted (state Started, not Seen). After the sneak is Seen the respawn lands on FenceLand; a bus death mid-cut (10 s) and under the hold (33 s) both respawn at the Stand mark (resumecheck, 5 rows) |
+| Rejoin | PASS (bridge Enter) | Stop and Play again: Origin.Checkpoint persisted; the bridge's TutorialEnter put the player on the checkpoint's mark. The production caller of Tutorial.Enter is deferred (not wired in slice 1), so the real rejoin path is not exercised |
+| Reduce Motion on | PASS | reducecheck OK: In/Out are 0.2 s dips (0 visible camera changes, veil peak 1.00). Measured with NHReducedMotion on (camcheck motion row, sneak): horizon roll 0.00 to 0.00 deg in every phase, and the Fence shot is 100 % still (no handheld: every frame under 0.003 st and 0.03 deg) |
 | Phone | PARTIAL: OWNER | The device emulator is not driven by this harness. Static facts: CineUI.textSize floors subtitle text at 20 px; the skip button is 190 x 64 px at the bottom right with a 48 px seal |
 
 Manual two-player steps (owner): Test > Clients and Servers > Local Server, 2 players, both Play, both reach the tutorial (TutorialEnter).
@@ -53,19 +53,45 @@ Watch: (a) each client sees only its own character, Biscuit and bus (the other p
 
 ## Step 3: house style (no video)
 
-`video_capture` failed with NoSpaceOnDevice (drive C: has 1.3 GB free), so there is no mp4 and no motion_audit.py run. Substitute: numbers from
-the engine camera sampled every frame (camcheck's new `motion` row; "still" = under 0.003 st and 0.03 deg per frame):
+`video_capture` fails with NoSpaceOnDevice (drive C: has 1.3 GB free), so there is no mp4 and no motion_audit.py run. The screen_capture
+fallback was tried: it renders one still from a camera position and look point you give it (HUD included); it cannot capture the running
+cut or a frame sequence of it, so it gives framing stills only (the Fence key-0 framing was captured: gate centred, far side in view,
+level). Substitute: the engine camera sampled every frame (camcheck's `motion` rows: same-phase frame pairs only, so phase boundaries
+never count; "still" = under 0.003 st and 0.03 deg a frame).
 
-| Cut | Cut frames | Still fraction | Longest still run | Horizon roll |
-|---|---|---|---|---|
-| `__SeamlessTest` | 1013 / 16.9 s | 66.8 % | 3.37 s | -1.40 to 0.00 deg |
-| `TutorialBus` (to the hold) | 1808 / 30.2 s | 74.4 % | 9.60 s | -1.40 to 0.93 deg |
-| `TutorialSneak` (sneak path) | 753 / 12.8 s | 49.5 % | 6.16 s | -1.83 to 0.00 deg |
+Findings and fixes (fix round 1):
+- Roll: the sneak's one-way roll (-1.83 deg, -3.1 in the glide in) came from the quaternion slerp between two LEVEL cameras that differ in yaw
+  and pitch (CFrame:Lerp in Seam.Blend and the glide's rotation slerp tilt the horizon in between). Seam.Rot now slerps the look on its great
+  circle and eases the ends' own rolls; Seam.Blend and GlideTrack use it. A second source, on the framed shots of the bus and the test cut
+  (-1.4 to -1.6 deg): the screen-placement yaw in Cine.framedCFrame turns about the camera's local up. Levelled there too (Cine.framedCFrame
+  is the shared toolkit: every framed shot in the game now has a level horizon).
+- Locked camera: the Fence shot is now a moving hold (a 1.7-stud push with a drifting aim, keys, level).
+- The bus's held title freeze-frame is deliberate and exempt.
 
-Against skill section 3: action beats want still under 10 %, roll 0 on ground beats, holds as moving holds. All three are above it, and the sneak (a
-ground beat) rolls up to 1.8 deg. These are not directly comparable to motion_audit's pixel-level still fraction (handheld noise sits under the
-threshold at 15 fps frames), but they flag fixed shots (bus arrival, Fence) holding a locked camera for 6-9 s. Re-run with real clips:
+| Cut | Before | After |
+|---|---|---|
+| `__SeamlessTest` | still 66.8 %, longest 3.37 s, roll -1.40 to 0.00 | still 65.5 %, longest 3.31 s (the walk beat), roll -0.01 to 0.01 |
+| `TutorialBus` (to the hold) | still 74.4 %, longest 9.60 s, roll -1.40 to 0.93 | still 74.3 %, longest 9.58 s, roll 0.00 (the freeze-frame hold is exempt; the shots on the parked bus are the rest, see Open rows) |
+| `TutorialSneak` sneak path | still 49.5 %, longest 6.16 s, roll -1.83 to 0.00 | still 14.2 %, longest 0.87 s, roll 0.00; Fence shot (phase Cut) 27.5 % still, longest 0.83 s |
+| `TutorialSneak` fail path | not measured | still 40.0 %, longest 6.19 s (the 7.2 s Hide beat holds still while Biscuit stares), roll -0.05 to 0.01 |
+
+Real clips are still needed for motion_audit's pixel-level numbers:
 `python ~/.claude/skills/r6-animation-cinematics/scripts/motion_audit.py <clip.mp4> OUT --strip <t0> <t1> 30` around the glide in, the doors and the fence.
+
+## Fix round 1 (review CHANGES REQUIRED)
+
+- I1 Dip token: Veil records `VeilTarget`; the dip forces black at its midpoint only if the latest claim still wants black, and lifts unless a
+  newer black claim is pending (`VeilGen == Mine or VeilTarget == 0`). Reduce Motion's delayed `Veil(0, 0.1)` in the beat entry is guarded with
+  `Cut.Live`. dipcheck gained two cases (a 0.25 dip inside a 0.3 dip at d = 0.01; a `Veil(0, 0.1)` inside a dip): RED on the 4f4645e code
+  (both ended black), GREEN now (7 rows).
+- I2 Tutorial.Resume: each cut declares `Resume = { Marks = segment -> mark, End = mark }` in Config.Cine (TutorialSneak: Start, Garden, Hide ->
+  Start, Fence -> FenceZone, End FenceLand; TutorialBus: Start, Main -> Stand, End Stand). A Seen cut resumes at End; an unmapped segment or a
+  missing mark warns and leaves the player where the game put them. checks/resumecheck.py: 5 rows pass.
+- Motion: see Step 3. CineSeamTest gained a level-horizon row.
+- Minors: M1 and M2 in the matrix; M3 in Step 3; M4 the motion row counts same-phase pairs only.
+- Regressions after the last install (fresh Play): CineSeamTest, CineRigsTest, camcheck seamless/bus/sneak/fail, bodycheck, skipcheck,
+  reducecheck, beatcheck, hometowncheck, replayrefused, holdcheck timeout and leave, buscheck, dipcheck, sneakcheck x4 and a skip at 5.5 s: all pass.
+  Run dipcheck last in a session: it builds a second NHCineUI gui in the client VM that confuses the veil-reading checks.
 
 ## Open rows
 
@@ -74,6 +100,6 @@ threshold at 15 fps frames), but they flag fixed shots (bus arrival, Fence) hold
 - OWNER: phone-size row in the device emulator (subtitles >= 20 px, the skip a large target).
 - OWNER: the fence vault: the top-of-climb pose after the dip, FenceLand, APPROACH_YAW, DIP_AT.
 - OWNER: bus boarding with the known door clipping (21-stud bus accepted); the door and driver camera marks.
-- OWNER: Fence and Garden camera marks (first guesses); the stillness numbers above.
+- OWNER: Fence and Garden camera marks (first guesses), the new Fence push-in, the bus's static shots (the 9.6 s run includes the deliberate held title), and the 6 s still in the Hide beat (fail path).
 - OWNER: record both cuts and run motion_audit (needs disk space on C:).
 - Sign-off: pending.

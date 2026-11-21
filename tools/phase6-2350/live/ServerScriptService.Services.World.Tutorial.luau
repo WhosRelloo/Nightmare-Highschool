@@ -32,20 +32,30 @@ function Shared.CheckpointOf(Player: Player): string?
 	return P and P.Origin and P.Origin.Checkpoint or nil
 end
 
--- (task 12) resume: a player who enters Wickfield or respawns in it with a checkpoint ("<Cut>:<Segment>") is put on that segment's
--- mark in the cut's set (a mark named like the segment, else <Segment>Zone, else Start), 3 studs up like Cine's own placements.
--- Returns the mark's name when it placed the player. The two-line version the plan sketched, plus the segment-to-mark lookup.
+-- (task 12, fix round 1) resume: a player who enters Wickfield or respawns in it with a checkpoint ("<Cut>:<Segment>") is put on a mark
+-- of the cut's set, 3 studs up like Cine's own placements. The cut declares the map (Config.Cine Cuts[Id].Resume = { Marks = segment ->
+-- mark, End = mark }): a Seen (finished) cut resumes at End (the sneak's FenceLand, the bus's Stand), never at a mid-cut mark that
+-- strands the player behind what they already did; otherwise Marks[Segment]. An unmapped segment or a missing mark warns and
+-- leaves the player where the game put them. Returns the mark's name when it placed the player.
 function Shared.Resume(Player: Player): string?
 	local Cp = Shared.CheckpointOf(Player)
-	local CutId, Segment
-	if Cp then CutId, Segment = Cp:match(`^([%w_]+):([%w_]+)$`) end
+	if not Cp then return nil end
+	local CutId, Segment = Cp:match(`^([%w_]+):([%w_]+)$`)
 	local Cut = CutId and Config.Cuts[CutId]
+	local Map = Cut and Cut.Resume
+	if not (Cut and Map) then warn(`[Tutorial] resume: checkpoint {Cp} names a cut with no Resume map`) return nil end
+	local Done = false
+	pcall(function() Done = require(script.Parent.Cine).Seen(Player, CutId) == true end)
+	local Name = if Done then Map.End else Map.Marks[Segment]
 	local Sets = workspace:FindFirstChild(`NHCineSets`)
-	local Set = Cut and Cut.Set and Sets and Sets:FindFirstChild(Cut.Set)
-	if not (Set and Segment) then return nil end
-	local Mark = Set:FindFirstChild(Segment) or Set:FindFirstChild(Segment .. `Zone`) or Set:FindFirstChild(`Start`)
+	local Set = Cut.Set and Sets and Sets:FindFirstChild(Cut.Set)
+	local Mark = Set and Name and Set:FindFirstChild(Name)
+	if not (Mark and Mark:IsA(`BasePart`)) then
+		warn(`[Tutorial] resume: checkpoint {Cp} (seen {tostring(Done)}) maps to mark {tostring(Name)}, not found in set {tostring(Cut.Set)}`)
+		return nil
+	end
 	local Char = Player.Character
-	if not (Mark and Mark:IsA(`BasePart`) and Char and Char:FindFirstChild(`HumanoidRootPart`)) then return nil end
+	if not (Char and Char:FindFirstChild(`HumanoidRootPart`)) then return nil end
 	Char:PivotTo(Mark.CFrame * CFrame.new(0, 3, 0))
 	return Mark.Name
 end

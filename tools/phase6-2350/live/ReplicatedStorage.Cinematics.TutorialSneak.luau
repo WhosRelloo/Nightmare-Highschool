@@ -205,7 +205,13 @@ function Def.Build(Ctx)
 			-- (the director carries a beat's grade and bloom into the shots, not a DOF). The shot is the square-up, the chain
 			-- (about 5.5 s) and the re-seat, plus a beat (fix round 1, M4)
 			{ name = `Over the fence`; dur = FENCE_DUR; subject = Ctx.Mark(`FenceZone`); noise = `tense`; dof = false;
-			  camera = { cframe = CFrame.lookAt(Ctx.CF(`FenceZone`):PointToWorldSpace(Vector3.new(5.5, 2.6, 6.0)), Ctx.CF(`FenceZone`):PointToWorldSpace(Vector3.new(0, 2.4, -2.4))); lens = 36 } };
+			  -- (task 12 fix round 1, motion ruling) a moving hold, not a locked camera: a slow push in (about 1.7 studs over the shot) with
+			  -- the aim drifting a little toward where you land; level horizon (keys carry no roll). Fixed in the world, so the chain's
+			  -- re-seat still can't move it
+			  camera = { lens = 36; ease = `inout`; path = `linear`; keys = {
+				{ t = 0; pos = Ctx.CF(`FenceZone`):PointToWorldSpace(Vector3.new(5.5, 2.6, 6.0)); look = Ctx.CF(`FenceZone`):PointToWorldSpace(Vector3.new(0, 2.4, -2.4)) };
+				{ t = FENCE_DUR; pos = Ctx.CF(`FenceZone`):PointToWorldSpace(Vector3.new(4.5, 2.5, 4.7)); look = Ctx.CF(`FenceZone`):PointToWorldSpace(Vector3.new(-0.2, 2.4, -3.0)) };
+			  } } };
 		}; events = { { t = 0; call = function()
 			if not Actor then return end
 			local Char = Player.Character

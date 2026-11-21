@@ -1006,7 +1006,7 @@ function Local.PlayBeat(Cut, Name: string, Seg, Node)
 		task.wait(0.1)
 		UI().Veil(1, 0)
 		if not Cut.Live or Cut.Seg ~= Name then return end
-		task.delay(0.05, function() UI().Veil(0, 0.1) end)
+		task.delay(0.05, function() if Cut.Live then UI().Veil(0, 0.1) end end) -- (task 12 fix round 1) not after the cut ended: a late lift un-blacks whoever owns the veil now
 		Entry.Len = 1e-3 -- the rig (and the grade) go in at black
 	end
 	local Out = {}
@@ -1109,7 +1109,7 @@ function Local.GlideTrack(Cut, T: number)
 	end
 	-- the rotation is an eased slerp from the live camera's to shot 1's live first frame (the keys' look points swing
 	-- the view unevenly on a big turn, when they pass close to the camera); the position keeps the keys' curved path
-	Cam.CFrame = CFrame.new(C.Position + Follow * (1 - W) + (Live.Position - G.To.Position) * W) * FromRot:Lerp(Live.Rotation, W)
+	Cam.CFrame = CFrame.new(C.Position + Follow * (1 - W) + (Live.Position - G.To.Position) * W) * Seam.Rot(FromRot, Live.Rotation, W) -- (task 12 fix round 1) level-horizon slerp
 	Cam.FieldOfView = math.clamp(Cam.FieldOfView + FovFrom * (1 - W) + ((LiveFov :: number) - G.ToFov) * W, 1, 120)
 end
 

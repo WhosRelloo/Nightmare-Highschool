@@ -269,6 +269,9 @@ local function framedCFrame(s, p, aspect, letterbox, avoid, excludes)
 	local ax = math.atan((sx - 0.5) * 2 * th)
 	local ay = math.atan((0.5 - syFull) * 2 * tv)
 	local cf = base * CFrame.Angles(0, ax, 0) * CFrame.Angles(-ay, 0, 0)
+	-- (task 12 fix round 1) the yaw above turns about the camera's LOCAL up, which on a camera looking down at its subject tilts the
+	-- horizon (measured up to -1.6 deg of roll on framed shots): put the horizon back level, same look, before any authored roll
+	if math.abs(cf.LookVector.Y) < 0.999 then cf = CFrame.lookAt(cf.Position, cf.Position + cf.LookVector) end
 	if p.roll and p.roll ~= 0 then cf = cf * CFrame.Angles(0, 0, math.rad(p.roll)) end
 	return cf, fov
 end

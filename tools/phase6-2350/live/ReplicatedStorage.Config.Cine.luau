@@ -35,8 +35,13 @@ return {
 		-- (task 11 fix round 1, ruling I4) Replay = false for the two tutorial walk-and-talk cuts until seamless replay staging is
 		-- designed (T12/T13): a journal replay outside Wickfield has no cast and no player-private set, and a beat's suspended timeout
 		-- never ends it. Their first viewing is unchanged (a first viewing is the only way to play them)
-		TutorialBus = { Name = `The Bus`; Length = 34; Set = `BusStop`; Seamless = true; Replay = false };
-		TutorialSneak = { Name = `Sneaking Out`; Length = 90; Set = `Garden`; Seamless = true; Replay = false };
+		-- (task 12 fix round 1, ruling I2) Resume: where Tutorial.Resume puts a player who enters or respawns in Wickfield with a checkpoint
+		-- "<Cut>:<Segment>": Marks maps each segment the cut reports to a mark of its Set; End is the mark a Seen/finished cut resumes at.
+		-- No name guessing: an unmapped segment (or a missing mark) warns and leaves the player where the game put them.
+		TutorialBus = { Name = `The Bus`; Length = 34; Set = `BusStop`; Seamless = true; Replay = false;
+			Resume = { Marks = { Start = `Stand`; Main = `Stand` }; End = `Stand` } };
+		TutorialSneak = { Name = `Sneaking Out`; Length = 90; Set = `Garden`; Seamless = true; Replay = false;
+			Resume = { Marks = { Start = `Start`; Garden = `Start`; Hide = `Start`; Fence = `FenceZone` }; End = `FenceLand` } };
 	};
 	-- (2.35.0) per-scene grades for seamless cuts, eased over 1 s (spec §4.1)
 	Looks = {
