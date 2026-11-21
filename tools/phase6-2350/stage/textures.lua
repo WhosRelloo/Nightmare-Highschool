@@ -12,8 +12,8 @@ local ATLAS = {
 	WFPicketGate = set(84222340516192, 98064335371557, 120543061893612, 126247700072127),
 	WFBiscuit = set(112546262860861, 136186793277403, 111360307162850, 91765761922029),
 	WFWickHouse = set(78429174177737, 116158405674482, 86100793161793, 120446577334327),
-	WFKennel = nil, -- MISSING: WFKennel_{color,normal,metal,rough}.png not uploaded
-	WFPicketFence = nil, -- MISSING: WFPicketFence_* not uploaded
+	WFKennel = set(82707989702453, 135687643487219, 117170230930850, 117358596024459),
+	WFPicketFence = set(128495500741626, 121191286456473, 135904678807860, 128667251269387),
 }
 local CANVAS_SETS = {
 	BusBlind = set(112756168878675, 110905673173953, 113104884743415, 131482475033372),
@@ -21,7 +21,10 @@ local CANVAS_SETS = {
 	BusPlate = set(81201460479671, 127109260492071, 133933169566034, 117393760068008),
 	BusSign = set(91938222268972, 93154342156751, 119492087272701, 115690778262859),
 	ShelterBand = set(94161896505343, 85816461846991, 74791049067750, 122872534510742),
-	Timetable = nil, PosterBand = nil, ThePlan = nil, Biscuit = nil, -- MISSING: WF_<Name>_canvas* not uploaded
+	PosterBand = set(73093154751740, 79632058701398, 117419975024305, 104271770143494),
+	ThePlan = set(102309737570223, 123906876914059, 74424215072451, 104132500629485),
+	Biscuit = set(121465001224548), -- the kennel sign has a colour map only
+	Timetable = nil, -- MISSING: WF_Timetable_canvas* not uploaded
 }
 local CANVAS = {
 	WFBlackBus_Blind = "BusBlind", WFBlackBus_SideL = "BusSide", WFBlackBus_SideR = "BusSide",
@@ -32,15 +35,20 @@ local CANVAS = {
 }
 local TILES = { Siding = "WF_ClapCream", Roof = "WF_Shingle", Brick = "WF_Brick", Walk = "WF_Sidewalk",
 	Asphalt = "WF_Road", Floor = "WF_FloorOak", Paper = "WF_Wallpaper" }
-local TILE_SETS = {} -- MISSING: none of the WF_ tile sets are uploaded yet
+local TILE_SETS = {
+	WF_ClapCream = set(123304236805154, 85996737149979, 138775822833363, 132726121032361),
+	WF_Brick = set(117145373109688, 109095381636468, 135123052756281, 131789682702424),
+	-- MISSING: WF_Shingle_* (the house and kennel roofs) not uploaded
+}
 
 local out, missing = {}, {}
 local function dress(part, s)
 	local sa = part:FindFirstChildOfClass("SurfaceAppearance") or Instance.new("SurfaceAppearance")
-	sa.ColorMap = "rbxassetid://" .. s.Color
-	sa.NormalMap = "rbxassetid://" .. s.Normal
-	sa.MetalnessMap = "rbxassetid://" .. s.Metal
-	sa.RoughnessMap = "rbxassetid://" .. s.Rough
+	local function id(n) return if n then "rbxassetid://" .. n else "" end
+	sa.ColorMap = id(s.Color)
+	sa.NormalMap = id(s.Normal)
+	sa.MetalnessMap = id(s.Metal)
+	sa.RoughnessMap = id(s.Rough)
 	sa.Parent = part
 end
 local counts = {}
