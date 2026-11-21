@@ -33,5 +33,5 @@ return {
 	BiscuitSigh = `rbxassetid://131075439249040`;
 	GateOpen = `rbxassetid://127810787589543`;
 	GateSwingShut = `rbxassetid://100841390179835`;
-	WickHouseSashOpen = ``; -- the rigid house (stage/rigid_rig.py): Studio preview until the owner publishes ServerStorage.NHPublish.WickHouse
+	WickHouseSashOpen = `rbxassetid://73964857478179`; -- the rigid house (stage/rigid_rig.py), group upload
 }
