@@ -32,6 +32,12 @@ local function look()
 		contrast = CC and CC.Contrast or 0; saturation = CC and CC.Saturation or 0; brightness = CC and CC.Brightness or 0;
 		tint = (1 - T.R) + (1 - T.G) + (1 - T.B); bloom = B and B.Enabled and B.Intensity or 0;
 		dof = D and D.Enabled and D.FarIntensity or 0; exposure = Lighting.ExposureCompensation;
+		day = (function()
+			-- (task 8 fix round 2) the day/night grade (Controllers.World.DayCycle) must run on through a seamless cut
+			local G = Lighting:FindFirstChild("NHDayGrade")
+			if not G then return { on = false; c = 0; s = 0; b = 0; t = Color3.new(1, 1, 1) } end
+			return { on = G.Enabled; c = G.Contrast; s = G.Saturation; b = G.Brightness; t = G.TintColor }
+		end)();
 	}
 end
 RunService:BindToRenderStep(Name, Enum.RenderPriority.Last.Value, function()
@@ -181,6 +187,24 @@ do
 	local Ok = #Bad == 0
 	Pass = Pass and Ok
 	table.insert(Report, string.format("look: worst step / allowed: %s %s", #Shown > 0 and table.concat(Shown, ", ") or "(no grade)", Ok and "ok" or ("POP " .. table.concat(Bad, ","))))
+end
+-- (task 8 fix round 2) the day/night grade: never toggled, and no frame-to-frame step bigger than its own drift
+-- (DayCycle eases with the hour: far under 0.005 a frame); the night look is contrast 0.1, saturation -0.15, a violet tint
+do
+	local Worst, Toggles = 0, 0
+	for i = 2, #Rows do
+		local A, B = Rows[i - 1].look.day, Rows[i].look.day
+		if A.on ~= B.on then Toggles += 1 end
+		local Step = math.max(math.abs(A.c - B.c), math.abs(A.s - B.s), math.abs(A.b - B.b),
+			math.abs(A.t.R - B.t.R), math.abs(A.t.G - B.t.G), math.abs(A.t.B - B.t.B))
+		Worst = math.max(Worst, Step)
+	end
+	local D = Rows[1] and Rows[1].look.day
+	local Ok = Toggles == 0 and Worst <= 0.005 and D ~= nil and D.on
+	Pass = Pass and Ok
+	table.insert(Report, string.format("day grade: on %s (contrast %.2f, saturation %.2f, tint %.2f/%.2f/%.2f), toggles %d, worst step %.4f %s",
+		tostring(D and D.on), D and D.c or 0, D and D.s or 0, D and D.t.R or 0, D and D.t.G or 0, D and D.t.B or 0, Toggles, Worst,
+		Ok and "ok" or "POP"))
 end
 local Dts = {}
 for i = 2, #Rows do table.insert(Dts, Rows[i].t - Rows[i - 1].t) end

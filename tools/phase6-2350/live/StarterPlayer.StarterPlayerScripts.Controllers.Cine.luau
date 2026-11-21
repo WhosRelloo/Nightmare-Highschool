@@ -765,11 +765,12 @@ function Local.Play(Message)
 	-- (task 8 fix round 1) the gameplay FOV as the cut starts: every segment's shot player restores to it (a segment that
 	-- starts after a beat would otherwise "restore" to the beat rig's lens when the cut ends)
 	Cut.GameFov = Local.SettingsFov()
-	-- (task 8 fix round 1) a seamless cut with a graded exposure holds the day cycle (it rewrites ExposureCompensation
-	-- every 0.2 s, which snapped the grade back mid-cut); per-session name, so a superseded cut can't free the new one's
+	-- (task 8 fix rounds 1-2) a seamless cut with a graded exposure holds ONLY the day cycle's exposure write (it rewrites
+	-- ExposureCompensation every 0.2 s, which snapped the grade back mid-cut); its grade, ambient, atmosphere and sky keep
+	-- running, so nothing pops. A per-session name, so a superseded cut can't free the new one's hold
 	if Cut.Seamless and typeof(Built.grade) == `table` and Built.grade.exposure ~= nil then
 		Cut.DayHold = `Cine:{tostring(Cut.Session)}`
-		pcall(function() require(script.Parent:WaitForChild(`World`):WaitForChild(`DayCycle`)).Suspend(Cut.DayHold) end)
+		pcall(function() require(script.Parent:WaitForChild(`World`):WaitForChild(`DayCycle`)).HoldExposure(Cut.DayHold, true) end)
 	end
 	local OpensOnBeat = StartSeg ~= nil and StartSeg.beat ~= nil
 	Cut.Solo = not Cut.Group
@@ -1309,7 +1310,7 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 	if Cut.DayHold then
 		local Hold = Cut.DayHold
 		Cut.DayHold = nil
-		pcall(function() require(script.Parent:WaitForChild(`World`):WaitForChild(`DayCycle`)).Resume(Hold) end)
+		pcall(function() require(script.Parent:WaitForChild(`World`):WaitForChild(`DayCycle`)).HoldExposure(Hold, false) end)
 	end
 	if Seamless and (Blended or Dipped) then
 		if Dipped then Gui.FadeHud(false, 0.4) end
