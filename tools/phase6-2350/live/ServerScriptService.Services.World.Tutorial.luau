@@ -49,6 +49,8 @@ function Shared.Leave(Player: Player)
 	Player:SetAttribute(`NHTutorial`, nil)
 	-- (task 8 fix round 1) a walk-and-talk beat's crouch doesn't outlive Wickfield
 	pcall(function() require(script.Parent.Cine).EndBeatCrouch(Player) end)
+	-- (task 9, spec §4.3) leaving Wickfield is the safety net for an open-ended beat: end any running cine session
+	pcall(function() require(script.Parent.Cine).EndFor(Player, `Skipped`) end)
 	setGroup(Player.Character, `Default`)
 end
 

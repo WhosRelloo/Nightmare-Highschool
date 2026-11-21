@@ -466,6 +466,14 @@ function Shared.EndBeatCrouch(Player: Player)
 	if H then pcall(require(ServerScriptService.Services.Player.Crouch).Stand, H) end
 end
 
+-- (task 9) ends the player's running session (Tutorial.Leave: the safety net for an open-ended beat). The client sees
+-- the normal non-blended end for How ("Skipped" is the skip-style dip).
+function Shared.EndFor(Player: Player, How: string?)
+	local Id = ByPlayer[Player]
+	local S = Id and Sessions[Id]
+	if S then Local.End(S, Player, How or `Skipped`) end
+end
+
 function Shared.IsWatching(Player: Player, CutId: string?): boolean
 	local Id = ByPlayer[Player]
 	local S = Id and Sessions[Id]
