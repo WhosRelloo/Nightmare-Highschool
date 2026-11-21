@@ -30,6 +30,7 @@ local Player = Players.LocalPlayer
 local C = Theme.Colors
 
 local Local = {}
+Local.DesktopY = 200 -- the card's desktop Y; Local.Follow updates it, PhonePlace restores from it
 local Shared = {}
 
 local Ui = nil
@@ -188,7 +189,7 @@ function Local.Build()
 			Card.Position = UDim2.new(0, 24, 0, 120)
 		else
 			Card.AnchorPoint = Vector2.new(1, 0)
-			Card.Position = UDim2.new(1, -24, 0, Card.Position.Y.Offset)
+			Card.Position = UDim2.new(1, -24, 0, Local.DesktopY)
 		end
 	end
 	PhonePlace()
@@ -414,6 +415,7 @@ function Local.Follow()
 	local U = Ui.Gui:FindFirstChild(`NHAutoScale`)
 	local Scale = if U and U:IsA(`UIScale`) and U.Scale > 0 then U.Scale else 1
 	local Want = math.floor((Panel.AbsolutePosition.Y + Panel.AbsoluteSize.Y) / Scale + 12)
+	Local.DesktopY = Want
 	if math.abs(Ui.Card.Position.Y.Offset - Want) > 1 then Ui.Card.Position = UDim2.new(1, -24, 0, Want) end
 end
 
