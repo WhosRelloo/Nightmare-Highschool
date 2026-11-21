@@ -655,8 +655,25 @@ def back_out(t, s=1.4):
     return 1 + t * t * ((s + 1) * t + s)
 
 
+def _apply_transforms(objs):
+    """Bake every mesh's object transform into its vertices, so each skinned piece exports with an identity node.
+    Roblox's skinned-mesh import mishandles a mesh node that isn't identity (a joined piece keeps its first part's
+    location; wheels and wipers are rotated): the piece lands displaced at rest and every clip picks up the bind
+    offset as a constant bone translation (found on the 2.35.0 black bus)."""
+    from mathutils import Matrix
+    for ob in objs:
+        if ob.type != "MESH":
+            continue
+        if ob.data.users > 1:
+            ob.data = ob.data.copy()
+        ob.data.transform(ob.matrix_basis)
+        ob.matrix_basis = Matrix.Identity(4)
+        ob.data.update()
+
+
 def rig_pieces(prop, objs):
     spec = RIG[prop]
+    _apply_transforms(objs)
     bones = {"Root": ((0, 0, 0), (0, 0, 1), None)}
     bones.update(spec["bones"])
     arm_data = bpy.data.armatures.new(f"{prop}Rig")
