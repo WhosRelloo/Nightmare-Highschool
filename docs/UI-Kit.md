@@ -266,9 +266,11 @@ The in-play HUD:
 ### The Bell Tower cluster (2.36)
 R1 of the Bell Tower rebuilt the top-right clock panel (`ClockHud`) and the quest card (`QuestTracker`) with new art. Both were rebuilt in place, not replaced by a new controller, because Timetable, Moments, TouchControls, SchoolFx and GamepadControls depend on their instance names. No rules changed: it reads the same attributes and remotes. The spec is `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-design.md`, the plan `docs/superpowers/plans/2026-11-20-belltower-r1-cluster.md`.
 
-**Status: the art ids are not filled yet.** Every id in `ReplicatedStorage.Config.BellTowerArt` is 0, so R1 currently runs on the kit fallbacks (below). The Dial, wax Seal, parchment Lead Card and fang pips appear once the nine ids are pasted in. Nothing here claims the art is live.
+**Status (2.36.0): the art is live.** All nine ids in `ReplicatedStorage.Config.BellTowerArt` are filled (group 15981569). If an id is ever set back to 0, that piece falls back to the kit look (below).
 
-![The cluster on the kit fallbacks](img/belltower-r1-fallback.jpg)
+![The cluster with the art](img/belltower-r1-owed.jpg)
+
+![The kit fallbacks (all ids 0)](img/belltower-r1-fallback.jpg)
 - **Art** (`art/ui/hud/make_belltower.py`, staged in `art/group-upload-belltower/`, group 15981569). Ids live in `Config.BellTowerArt`, and `Functions.BellTower.Image(Art, Key)` returns `rbxassetid://<id>`, or nil for 0:
 
   | Key | File | Size | Used for |
@@ -314,12 +316,12 @@ R1 of the Bell Tower rebuilt the top-right clock panel (`ClockHud`) and the ques
 
   | Missing | Drawn instead |
   |---|---|
-  | `TowerPlate` | the kit's ornate chip (`Components.Panel`), 440 wide |
+  | `TowerPlate` | the kit's ornate chip (a Frame with `Kit.Decorate`), 440 wide |
   | `Dial`, `DialHand` | no dial; the moon (30 px) sits beside the time |
   | `Seal` | no seal image is drawn; the level text alone carries the level, tinted by level (`ClockHud` `Local.Img` returns nil for an id of 0) |
   | `SealBroken` | while its id is 0 but `Seal`'s isn't, a suspension shows the plain `Seal`, tinted, not a broken one |
   | `Slip` | a thin frame |
-  | `LeadCard` | the kit's ornate panel, a fixed 420 x 176 (a three-line objective plus a timer can overflow it until the art is in) |
+  | `LeadCard` | the kit's ornate panel, a fixed 420 x 176 (a three-line objective plus a timer can overflow it) |
   | `PipEmpty`, `PipFang` | the count as text |
 
 - **Contracts to keep** (other scripts read these):
@@ -334,9 +336,9 @@ R1 of the Bell Tower rebuilt the top-right clock panel (`ClockHud`) and the ques
 
 - **Checked in Studio** (slot 2, restored after every run):
   - `bt_pure`: PASS in the Edit VM.
-  - `bt_hud`: PASS for the five states (owed, warning, clear, active, suspended), on the fallbacks.
-  - Contracts in Play (`bt_contracts`): the Timetable hook and a real click on the plate, the Moments panel, the ShowClock hide, the "In class" line at 09:10, and a PA line typing above the time. Screenshots: [the Timetable under the cluster](img/belltower-r1-timetable.jpg), [the PA line](img/belltower-r1-pa.jpg).
-- **Not checked:** the art path (the ids are pending), the phone layout (no emulator run), two players, and whether the PA line wraps fully after it finishes typing (to be re-checked once the art is in).
+  - `bt_hud`: PASS for the five states, on the fallbacks and with the art (`active` passed on a re-run; the card follows the cluster on a 0.25 s poll).
+  - Contracts in Play (`bt_contracts`): the Timetable hook and a real click on the plate (fallbacks) and the dial (art), the Moments panel, the "In class" line, and the PA line typing above the time and wrapping in full at 20 px. Screenshots with the art: [calm](img/belltower-r1-calm.jpg), [detention owed](img/belltower-r1-owed.jpg), [detention under way](img/belltower-r1-active.jpg), [suspended](img/belltower-r1-suspended.jpg), [the Timetable under the cluster](img/belltower-r1-timetable-art.jpg), [the PA line](img/belltower-r1-pa-art.jpg). On the fallbacks: [the Timetable](img/belltower-r1-timetable.jpg), [the PA line](img/belltower-r1-pa.jpg).
+- **Not checked:** the phone layout (no emulator run), two players, filled fang pips and the Warning seal tint, the longest quest title on the card, and the BellRim flash around the new cluster.
 - **Backup:** the pre-R1 scripts are in `ServerStorage.NH_Backup.BellTower_pre_20261120` (Studio) and `tools/belltower-r1/pre/`. The live mirror is `tools/belltower-r1/live/`.
 
 ### Health bar: Thornrose

@@ -1,12 +1,15 @@
 # The Bell Tower: notoriety, timetable, discipline and quest HUD (design)
 
 **Status:** design approved in chat on 2026-11-20 (direction A, Sections 1 and 2). This written spec is waiting for the owner's
-review. No game code has been written.
-**R1 status:** R1 built in 2.36.0 (plan `docs/superpowers/plans/2026-11-20-belltower-r1-cluster.md`). The art ids in
-`Config.BellTowerArt` are not filled yet, so R1 runs on the kit fallbacks until the owner's 9 ids are pasted in.
+review. R1's code is built (below).
+**R1 status:** R1 built in 2.36.0 (plan `docs/superpowers/plans/2026-11-20-belltower-r1-cluster.md`). The 9 art ids are in
+`Config.BellTowerArt`, so R1 runs on the new art (kit fallbacks remain for any id set to 0). Not yet seen: the phone layout from §7's R1 acceptance.
 **Spec delta:** ClockHud and QuestTracker were rebuilt in place instead of getting a new `Controllers.Gui.BellTower`,
 because Timetable, Moments, TouchControls, SchoolFx and GamepadControls depend on their instance names (see the plan's
-Architecture).
+Architecture). R1 also differs from §4 and §6 in five places: the cluster `Panel` is 500 wide (only the Lead Card is 470);
+the dial stays 176 px on phones (no 140 px size yet); the "Now" line keeps the old class-line colours (green, red, blue,
+orange) rather than gold-normal / amber-warning; the J key is a hand-built key-cap, not a kit component; and the Seal has
+no image fallback while its id is 0 (only the tinted level text), where §6 said "today's kit panel draws instead".
 **Mockups:** <https://claude.ai/artifact/NiejF4HWaeEze5GzdBNsbF> (source:
 `docs/superpowers/mockups/2026-11-20-belltower/index.html`).
 **Concept art:** `art/ui/hud/make_belltower.py` writes the set to `art/ui/hud/out/belltower/`. It's baked with the Thornrose

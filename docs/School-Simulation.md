@@ -59,7 +59,7 @@ A 40-minute class is about 3 minutes 20 seconds of real time, and a passing peri
   - the current period and when it ends
   - a "School hours: 1.2x EXP" badge during school hours
 
-  See [UI Kit](UI-Kit.md#the-bell-tower-cluster-236). The dial art is pending, so it draws without the dial for now.
+  See [UI Kit](UI-Kit.md#the-bell-tower-cluster-236). The dial is Bell Tower art (`Config.BellTowerArt`); with its id at 0 the moon sits beside the time instead.
 
 ## Verified (Studio playtest)
 

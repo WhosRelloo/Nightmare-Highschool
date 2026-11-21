@@ -206,7 +206,7 @@ Verified with real presses:
 - E next to trash picked it up (1/5) and equip stayed false.
 - E away from any prompt toggled equip from false to true.
 
-**HUD (2.36):** the conduct row under the clock: a wax seal tinted by level with "Warning · 3 pts", and a detention slip ("Detention owed · Room 106, outside class", or "Trash 2/5" during a session). The Room 106 marker still shows outside class time. Until the art ids are filled the row uses kit fallbacks (see [UI Kit](UI-Kit.md#the-bell-tower-cluster-236)).
+**HUD (2.36):** the conduct row under the clock: a wax seal tinted by level with "Warning · 3 pts", and a detention slip ("Detention owed · Room 106, outside class", or "Trash 2/5" during a session). The Room 106 marker still shows outside class time. The seal and slip are Bell Tower art (`Config.BellTowerArt`), with kit fallbacks; see [UI Kit](UI-Kit.md#the-bell-tower-cluster-236).
 
 ## Verified (Studio, single player)
 

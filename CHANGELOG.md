@@ -8,8 +8,13 @@ R1 of `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-desig
 `docs/superpowers/plans/2026-11-20-belltower-r1-cluster.md`. This is 2.36.0 because `main` is at 2.34.0 and the phase 6 branch already uses 2.35.x.
 - **Mirror:** `tools/belltower-r1/` (`live/` is the built scripts, `pre/` the scripts before R1).
 - **The Map place:** untouched.
-- **Art status:** the nine art ids in `ReplicatedStorage.Config.BellTowerArt` are still 0, so this release runs on the
-  kit fallbacks. The Dial, wax Seal, parchment Lead Card and fang pips appear once the owner's 9 ids are pasted in.
+- **Art status:** the nine art ids are in `ReplicatedStorage.Config.BellTowerArt` (group 15981569), so the Dial, TowerPlate, wax Seal, Slip, parchment Lead Card and fang pips are live. Any piece whose id is set back to 0 falls back to the kit look.
+- **Deviations from the spec (§4, §6):**
+  - the cluster `Panel` is 500 wide (only the Lead Card is 470)
+  - the dial stays 176 px on phones (no 140 px phone size yet)
+  - the "Now" line keeps the old class-line colours (green in class, red NOT IN CLASS, blue next, orange suspended) rather than gold-normal / amber-warning
+  - the `J` key is a hand-built key-cap, not a kit component
+  - the Seal has no image fallback while its id is 0 (only the tinted level text), where spec §6 said "today's kit panel draws instead"
 
 ### Changed
 - **`Gui.ClockHud`** (rebuilt in place, same `ClockHud` ScreenGui and `Panel`):
@@ -20,7 +25,7 @@ R1 of `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-desig
   - Clicking the plate or dial still opens the Timetable. The PA line still types above the time.
 - **`Gui.QuestTracker`** (rebuilt in place, same `QuestTracker` and `Tracker`): a 470 px parchment Lead Card that sits 12 px
   under the clock, fang pips for a counted objective of 2 to 6 (otherwise the count as text), and a `J` Journal key.
-- **Text floor:** game text in both is at least 20 design px (`BellTower.MIN_TEXT`).
+- **Text floor:** game text in the cluster and on the Lead Card is at least 20 design px (`BellTower.MIN_TEXT`).
 - **No rules changed.** It reads the same Discipline, Detention and quest attributes and remotes.
 
 ### Added
@@ -33,15 +38,16 @@ R1 of `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-desig
 ### Checked
 - **Self-test:** `bt_pure` passes in the Edit VM.
 - **Live (slot 2, restored after every run):**
-  - `bt_hud`: the five states (owed, warning, clear, active, suspended) pass on the fallbacks.
-  - The contracts in Play: the Timetable hook and a real click, the Moments panel, the ShowClock hide, the "In class"
-    line at 09:10, and the PA line typing above the time.
-  - Screenshots: [fallbacks](docs/img/belltower-r1-fallback.jpg), [Timetable](docs/img/belltower-r1-timetable.jpg), [PA line](docs/img/belltower-r1-pa.jpg).
+  - `bt_hud`: the five states (owed, warning, clear, active, suspended) pass on the kit fallbacks and again with the art. `active` failed once ("tracker overlaps the clock cluster") right after a clear to active switch and passed on re-run, because the card follows the cluster on a 0.25 s poll.
+  - The contracts in Play: the Timetable hook and a real click (on the plate with the fallbacks, on the dial with the art), the Moments panel, the "In class" line, and the PA line: it types in full above the time and wraps to two lines at 20 px (TextFits true).
+  - Screenshots: [calm](docs/img/belltower-r1-calm.jpg), [detention owed](docs/img/belltower-r1-owed.jpg), [detention under way](docs/img/belltower-r1-active.jpg), [suspended](docs/img/belltower-r1-suspended.jpg), [Timetable](docs/img/belltower-r1-timetable-art.jpg), [PA line](docs/img/belltower-r1-pa-art.jpg); on the fallbacks: [cluster](docs/img/belltower-r1-fallback.jpg), [Timetable](docs/img/belltower-r1-timetable.jpg), [PA line](docs/img/belltower-r1-pa.jpg).
 - **Not checked:**
-  - the art path (the ids are pending)
-  - the phone layout (no emulator run)
+  - the phone layout (no emulator run; spec §7 lists it in R1's acceptance)
   - a two-player run
-  - whether the PA line wraps fully after it finishes typing (to be re-checked with the art)
+  - filled fang pips and the Warning seal tint (not captured)
+  - the longest quest title ("Showdown: Captain Rhys Thorne") on the card
+  - Moments' BellRim flash around the new cluster (no period change seen)
+  - note: in the suspended screenshot SchoolFx's existing "SUSPENSION" stamp crosses the plate for a moment (pre-existing level-climb VFX, not R1)
 - **Backup:** `ServerStorage.NH_Backup.BellTower_pre_20261120` holds the pre-R1 ClockHud and QuestTracker.
 
 ## [2.34.0] - 2026-11-18: Path wardrobe & the Today card (Progression & Identity 4 of 4)
