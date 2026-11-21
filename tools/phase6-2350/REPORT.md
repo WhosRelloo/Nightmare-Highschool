@@ -89,6 +89,8 @@ Real clips are still needed for motion_audit's pixel-level numbers:
   missing mark warns and leaves the player where the game put them. checks/resumecheck.py: 5 rows pass.
 - Motion: see Step 3. CineSeamTest gained a level-horizon row.
 - Minors: M1 and M2 in the matrix; M3 in Step 3; M4 the motion row counts same-phase pairs only.
+- Published player clips: all 66 are in Config.CineClips and verified in Play (checks/tutorialclips.lua: every id loads with Length > 0; Length and Looped match the KeyframeSequence and the chain step). TheBus1_WaitBored plays from rbxassetid://74294967099318, FenceOver2 from rbxassetid://137091473855957; bodycheck and sneakcheck resolve through Config.CineClips.
+- Older cuts after the framing change: Strikethrough both paths (S and D; the authored -8 deg keyed roll is intact), Collected and RollCall pass. The NPC talk cinematic has no check: unchecked.
 - Regressions after the last install (fresh Play): CineSeamTest, CineRigsTest, camcheck seamless/bus/sneak/fail, bodycheck, skipcheck,
   reducecheck, beatcheck, hometowncheck, replayrefused, holdcheck timeout and leave, buscheck, dipcheck, sneakcheck x4 and a skip at 5.5 s: all pass.
   Run dipcheck last in a session: it builds a second NHCineUI gui in the client VM that confuses the veil-reading checks.

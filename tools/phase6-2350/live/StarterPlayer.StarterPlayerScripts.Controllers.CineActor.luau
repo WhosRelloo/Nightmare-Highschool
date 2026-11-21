@@ -13,6 +13,7 @@
 local Players = game:GetService(`Players`)
 local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
 local RunService = game:GetService(`RunService`)
+local ContentProvider = game:GetService(`ContentProvider`)
 
 local Player = Players.LocalPlayer
 local Shared = {}
@@ -96,6 +97,21 @@ function Shared.Chain(Chain: string, Resolve: (string) -> string?, Cues: any?, O
 	local _, _, _, Animator = parts()
 	assert(Animator, `no Animator`)
 	local TA = require(ReplicatedStorage.Config.TutorialAnim)
+	-- (final fix round) the published clips are fetched over the network, not registered locally like the Studio previews: warm the
+	-- chain's _End poses while it plays, so the re-seat at its end finds them loaded (a cold first run had Length 0 there)
+	task.spawn(function()
+		local List = {}
+		for _, P in TA.Chains[Chain] or {} do
+			local Id = Resolve(P.Piece .. `_End`)
+			if Id and Id ~= `` then
+				local A = Instance.new(`Animation`)
+				A.AnimationId = Id
+				table.insert(List, A)
+			end
+		end
+		pcall(function() ContentProvider:PreloadAsync(List) end)
+		for _, A in List do A:Destroy() end
+	end)
 	-- the first piece eases in over 0.4 s (smootherstep weight 0 -> 1, written each frame) so the arms don't snap from the
 	-- game's idle to the chain's pose; this is a blend. Later switches are identical frames and stay instant.
 	local First = true
@@ -122,6 +138,12 @@ function Shared.Chain(Chain: string, Resolve: (string) -> string?, Cues: any?, O
 	local My = ChainGen
 	local Tracks = TA.Play(Animator, Chain, Resolve, Cues, switched, function() return ChainGen ~= My end)
 	if ChainGen ~= My then return Tracks end                -- released while it ran: Play stopped its tracks (Stop(0))
+	-- (final fix round) a second Chain must not leave the first one's held tracks playing, unreachable, once their table is overwritten
+	local Fresh = {}
+	for _, T in Tracks do Fresh[T] = true end
+	for _, Old in ChainTracks or {} do
+		if not Fresh[Old] and Old.IsPlaying then Old:Stop(0) end
+	end
 	ChainTracks = Tracks
 	return Tracks
 end
@@ -157,6 +179,9 @@ function Shared.Reseat(Piece: string, Offset: { X: number, Z: number, Yaw: numbe
 	T.Priority = Enum.AnimationPriority.Action4
 	T.Looped = true                                         -- belt and braces: two identical keyframes, speed 0
 	Pending, PendingAnim = T, A
+	-- (final fix round) a clip still loading has Length 0: give it up to 3 s (the re-seat holds the chain's last pose meanwhile)
+	local Wait0 = os.clock()
+	while T.Length == 0 and Gen == My and os.clock() - Wait0 < 3 do task.wait() end
 	local Thread = coroutine.running()
 	local Moved = false
 	local function cancel()
@@ -170,6 +195,13 @@ function Shared.Reseat(Piece: string, Offset: { X: number, Z: number, Yaw: numbe
 		T:Play(0, 1, 0)
 		RunService.PreSimulation:Once(function()
 			if Gen ~= My or not T.IsPlaying or not Root.Parent then cancel() return end
+			-- (final fix round) a track that never loaded (an unpublished clip: PreviewId resolves only in Studio) has Length 0 and draws no
+			-- pose: moving the root by EndOffset would pop the character with nothing to hide it, so the re-seat doesn't happen
+			if T.Length == 0 then
+				warn(`[CineActor] Reseat {Piece}: its _End track has Length 0 (clip not loaded or not published): root left where it is`)
+				cancel()
+				return
+			end
 			-- EndOffset is in the clip's units; the Animator scales a Pose's translation by the character's scale (Model:ScaleTo,
 			-- e.g. 1.0296 for this avatar), so the ground offset is scaled the same way (unscaled it left a 0.03 x 1.4 = 4 cm step)
 			local S = (Char :: Model):GetScale()

@@ -86,6 +86,11 @@ what the build changed). The plan is `docs/superpowers/plans/2026-11-20-tutorial
   - **Playtests:** solo, death mid-beat, rejoin (driven through the bridge's `Tutorial.Enter`) and Reduce Motion (0.2 s dips,
     no handheld, roll 0) pass.
   - **Motion, from camera samples:** the sneak is 14 % still (longest still run 0.9 s). The Fence shot is now a moving hold.
+- **Older cuts (after the shared framing change):** `Strikethrough` on both paths (all right: grade S, all missed: grade D), `Collected`
+  and `RollCall` pass. The authored -8 deg tilt in `Strikethrough` is intact. The NPC talk cinematic has no check and is unchecked.
+- **Published player clips:** all 66 tutorial player clips are published and verified in Play: every id in `Config.CineClips` loads
+  (Length > 0), and its Length and Looped match its KeyframeSequence and the chain step's loop flag. The chains now play from the
+  published ids (`TheBus1_WaitBored` is `rbxassetid://74294967099318`, `FenceOver2` is `rbxassetid://137091473855957`).
 - **Mirror:** all 21 scripts in `tools/phase6-2350/live/` match Studio.
 - **Details:** `tools/phase6-2350/REPORT.md`.
 

@@ -135,13 +135,17 @@ function Def.Build(Ctx)
 	-- (fix round 2) a Skip or a timeout before the dip would leave you on the house side of a fence you can't cross (and a resumed
 	-- run, after a rejoin, can skip): the end state is the far side. Placed at full black inside the skip's own dip, and only if
 	-- no newer cut has started (the director checks). A Leave (Aborted) doesn't move you: Hometown's cleanup owns that
-	Ctx.OnBlack(function(How: string)
+	Ctx.OnBlack(function(How: string, Black: boolean?)
 		if How ~= `Skipped` and How ~= `Timeout` then return end
 		local Land = Ctx.Mark(`FenceLand`)
 		local Root = Player.Character and Player.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?
 		if not (Land and Root) then return end
-		Root.CFrame = CFrame.new(Land.Position.X, Root.Position.Y, Land.Position.Z) * (Land.CFrame - Land.Position)
-		Root.AssemblyLinearVelocity = Vector3.zero
+		local function place()
+			Root.CFrame = CFrame.new(Land.Position.X, Root.Position.Y, Land.Position.Z) * (Land.CFrame - Land.Position)
+			Root.AssemblyLinearVelocity = Vector3.zero
+		end
+		-- (final fix round) the screen isn't black (a newer lift won): never a visible jump, hide it under a short dip of its own
+		if Black == false then pcall(require(Player.PlayerScripts.Controllers.Gui.CineUI).Dip, 0.3, place) else place() end
 	end)
 
 	local function lamp(On: boolean)
@@ -246,11 +250,16 @@ function Def.Build(Ctx)
 				if LandMark then
 					task.delay(DIP_AT, function()
 						if not Ctx.Alive() then return end
-						pcall(require(Player.PlayerScripts.Controllers.Gui.CineUI).Dip, 0.3, function()
+						local CineUI = require(Player.PlayerScripts.Controllers.Gui.CineUI)
+						local function place()
 							if not Ctx.Alive() or not Root.Parent then return end
 							local Land = LandMark.CFrame
 							Root.CFrame = CFrame.new(Land.X, Root.Position.Y, Land.Z) * (Land - Land.Position) * Seat:Inverse()
 							Root.AssemblyLinearVelocity = Vector3.zero
+						end
+						-- (final fix round) only at real black; if a newer lift won, the move waits for a fresh short dip of its own
+						pcall(CineUI.Dip, 0.3, function(Black: boolean?)
+							if Black == false then pcall(CineUI.Dip, 0.2, place) else place() end
 						end)
 					end)
 				end

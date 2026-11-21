@@ -29,9 +29,9 @@ return {
 		-- (2.25.0) a test cut for the interactive director (TestBridge / harness only; never in a quest)
 		__QteTest = { Name = `QTE test`; Length = 30; Set = `Hall`; Replay = true; Interactive = true; Hidden = true };
 		-- (2.35.0) seamless (spec 2026-11-20): the real character acts, the camera glides in and out, nothing anchors
-		__SeamlessTest = { Name = `Seamless test`; Length = 18; Set = `BusStop`; Seamless = true; Replay = true; Hidden = true };
+		__SeamlessTest = { Name = `Seamless test`; Length = 18; Set = `BusStop`; Seamless = true; Replay = true; Hidden = true; Beats = { Walk = true } };
 		-- (task 8 fix round 1) beatcheck: Length 6 is shorter than the cut on purpose (a beat holds the timeout)
-		__BeatHoldTest = { Name = `Beat hold test`; Length = 6; Set = `BusStop`; Seamless = true; Replay = true; Hidden = true };
+		__BeatHoldTest = { Name = `Beat hold test`; Length = 6; Set = `BusStop`; Seamless = true; Replay = true; Hidden = true; Beats = { Hold = true } };
 		-- (task 11 fix round 1, ruling I4) Replay = false for the two tutorial walk-and-talk cuts until seamless replay staging is
 		-- designed (T12/T13): a journal replay outside Wickfield has no cast and no player-private set, and a beat's suspended timeout
 		-- never ends it. Their first viewing is unchanged (a first viewing is the only way to play them)
@@ -40,7 +40,7 @@ return {
 		-- No name guessing: an unmapped segment (or a missing mark) warns and leaves the player where the game put them.
 		TutorialBus = { Name = `The Bus`; Length = 34; Set = `BusStop`; Seamless = true; Replay = false;
 			Resume = { Marks = { Start = `Stand`; Main = `Stand` }; End = `Stand` } };
-		TutorialSneak = { Name = `Sneaking Out`; Length = 90; Set = `Garden`; Seamless = true; Replay = false;
+		TutorialSneak = { Name = `Sneaking Out`; Length = 90; Set = `Garden`; Seamless = true; Replay = false; Beats = { Garden = true; Hide = true };
 			Resume = { Marks = { Start = `Start`; Garden = `Start`; Hide = `Start`; Fence = `FenceZone` }; End = `FenceLand` } };
 	};
 	-- (2.35.0) per-scene grades for seamless cuts, eased over 1 s (spec §4.1)

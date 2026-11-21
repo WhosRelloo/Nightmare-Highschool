@@ -263,7 +263,14 @@ function Local.RestoreOthers(Fade: number?)
 				end
 			end)
 		else
-			for _, CG in Groups do if CanvasWas[CG] then CG.GroupTransparency = CanvasWas[CG] end end
+			-- (final fix round) a Hide fade still running on these groups would keep tweening to invisible over the values set here
+			-- (a seamless cut ending within 0.4 s of its start): a zero-length tween of the same property replaces it
+			for _, CG in Groups do
+				if CanvasWas[CG] then
+					tween(CG, 0, { GroupTransparency = CanvasWas[CG] })
+					CG.GroupTransparency = CanvasWas[CG]
+				end
+			end
 			pcall(function() (G :: any).Enabled = Was end)
 		end
 	end
@@ -632,7 +639,7 @@ end
 
 -- (2.35.0) the one black in a seamless cut: skip's jump to the end state (spec §2.3). AtBlack (optional) runs while the
 -- screen is fully black (the actor placed, the camera handed back), then the veil lifts.
-function Shared.Dip(Seconds: number, AtBlack: (() -> ())?)
+function Shared.Dip(Seconds: number, AtBlack: ((Black: boolean) -> ())?)
 	if not Ui then Local.Build() end
 	Ui.Gui.Enabled = true
 	Local.Dips = (Local.Dips or 0) + 1 -- (a counter: two dips at once must not clear each other's wait)
@@ -641,18 +648,21 @@ function Shared.Dip(Seconds: number, AtBlack: (() -> ())?)
 	task.wait(Seconds / 2)
 	-- (task 12 fix round 1) force black only if the latest claim on the veil still wants black: a newer lift (a shorter dip that
 	-- already finished, a Veil(0, t)) must not be undone, or nobody lifts it again
-	if Local.VeilGen == Mine or Local.VeilTarget == 1 then
+	-- (final fix round) Black tells AtBlack whether the screen really is black now: false when a newer lift (or a partial veil) won, so
+	-- the callback can hide what it does under a fresh dip of its own instead of showing it
+	local Black = Local.VeilGen == Mine or Local.VeilTarget == 1
+	if Black then
 		Ui.Veil.BackgroundTransparency = 0
 		if Local.VeilGen ~= Mine then tween(Ui.Veil, 0.01, { BackgroundTransparency = 0 }) end -- a newer veil's tween would drag this black back up: replace it
 	end
 	if AtBlack then
-		local Ok, Err = pcall(AtBlack)
+		local Ok, Err = pcall(AtBlack, Black)
 		if not Ok then warn(`[CineUI] Dip: {Err}`) end
 	end
 	Local.Dips = math.max(0, (Local.Dips or 1) - 1) -- (task 10) black reached and its work done: what waited for black (Hometown's cast) may go
 	-- lift unless a newer BLACK claim is still pending (a Skip inside the fence dip or the hold's timeout dip, a Prologue Play
 	-- inside the timeout dip): that owner decides when the screen clears. A newer lift claim means the screen is ours to clear.
-	if Local.VeilGen == Mine or Local.VeilTarget == 0 then Shared.Veil(0, Seconds / 2) end
+	if Local.VeilGen == Mine or (Local.VeilTarget or 0) < 1 then Shared.Veil(0, Seconds / 2) end -- (final fix round) a partial newer veil is lifted too
 end
 
 -- true from a dip's start until it is at full black (and its AtBlack has run)

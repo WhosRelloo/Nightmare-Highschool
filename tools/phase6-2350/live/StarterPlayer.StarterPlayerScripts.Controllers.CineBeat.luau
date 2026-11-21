@@ -306,7 +306,10 @@ function Shared.Run(Cut, SegName: string, Spec, Ctx, Entry: any?, Out: any?, Loo
 	end
 
 	local function say(L)
-		local Text = if typeof(L.text) == `function` then L.text(Ctx) else tostring(L.text)
+		-- (final fix round) a line's text function that errors must not take the frame (and the beat) with it
+		local Got, Value = pcall(function() return if typeof(L.text) == `function` then L.text(Ctx) else tostring(L.text) end)
+		if not Got then warn(`[CineBeat] {Cut.Id}.{SegName}: a line's text errored: {Value}`) return end
+		local Text = tostring(Value)
 		pcall(UI.Subtitle, L.who or ``, Text, L.secs or math.clamp(#Text / 14 + 0.8, 1.4, 5))
 		-- the talking face (FaceTalk visemes) on whoever speaks: "You" is your own character
 		pcall(function()
@@ -422,7 +425,13 @@ function Shared.Run(Cut, SegName: string, Spec, Ctx, Entry: any?, Out: any?, Loo
 		local Ok, Err = pcall(frame)
 		if not Ok then
 			warn(`[CineBeat] {Cut.Id}.{SegName}: {Err}`)
-			finish(Ends[1] and Ends[1].next or `__end`) -- the beat's own cleanup; the cut carries on (or ends) from here
+			-- (final fix round) an error is not the cut's soft failure: carry on along the first end that isn't a `fail` one
+			local Carry
+			for _, E in Ends do
+				if parse(E.on) ~= `fail` then Carry = E break end
+			end
+			Carry = Carry or Ends[1]
+			finish(Carry and Carry.next or `__end`) -- the beat's own cleanup; the cut carries on (or ends) from here
 		end
 	end
 

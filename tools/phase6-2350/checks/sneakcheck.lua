@@ -24,6 +24,7 @@ local Player = Players.LocalPlayer
 local Char = Player.Character
 local Hum = Char:FindFirstChildOfClass("Humanoid")
 local Root = Char.HumanoidRootPart
+local BaseWalk = Hum.WalkSpeed -- (final fix round) before anything touches it
 local StartPos = Vector3.new(3994, 3, 4104)
 Root.CFrame = CFrame.lookAt(StartPos, Vector3.new(4012, 3, 4081))
 Root.AssemblyLinearVelocity = Vector3.zero
@@ -188,7 +189,8 @@ if MODE == "skipfence" or MODE == "timeout" then
 	for _, R in Rows do if R.path and R.path:match("Fence$") and R.seam and R.crouch then Crouched = true break end end
 	check((MODE == "timeout" or SkipAt ~= nil) and Crouched, "the skip was sent (or the timeout came) while you were still crouched in the Fence segment")
 	check(not Last.crouch, string.format("after the skip: crouch %s (want false)", tostring(Last.crouch)))
-	check(Last.seam == nil and Last.ws > 12, string.format("after the skip: seam %s, walk speed %.1f (want nil, > 12)", tostring(Last.seam), Last.ws))
+	-- (final fix round) the player's own walk speed before the cut, not a fixed 12: the game's hunger bands change it (Starving is 12.0)
+	check(Last.seam == nil and Last.ws >= BaseWalk - 0.01, string.format("after the skip: seam %s, walk speed %.1f (want nil, back to the %.1f it was before the cut)", tostring(Last.seam), Last.ws, BaseWalk))
 	-- (fix round 2) the skip puts you on the far side: at least 1 stud past the fence's far face, standing, facing away from the house
 	check(Last.pos.Z <= FarFace - 1, string.format("after the skip: root z %.2f, the fence's far face z %.2f (%.2f studs clear, want >= 1)", Last.pos.Z, FarFace, FarFace - Last.pos.Z))
 	check(Last.rl.Z < -0.8, string.format("after the skip: faces away from the house, look z %.2f", Last.rl.Z))

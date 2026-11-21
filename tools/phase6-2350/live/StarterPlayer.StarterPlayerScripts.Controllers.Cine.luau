@@ -708,7 +708,7 @@ function Local.Context(Cut, Message)
 	function Ctx.Alive(): boolean return Cut.Live == true end
 	-- (task 11 fix round 2) runs at FULL BLACK when the cut ends any way but Done (Skipped / Timeout / Aborted ...), with How, and
 	-- only if no newer cut has started: the place to put the player where the cut's end state is (the skip's own dip hides it)
-	function Ctx.OnBlack(Fn: (string) -> ())
+	function Ctx.OnBlack(Fn: (string, boolean) -> ())
 		Cut.AtBlack = Cut.AtBlack or {}
 		table.insert(Cut.AtBlack, Fn)
 	end
@@ -1303,7 +1303,7 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 			Gui.Veil(1, 0) -- fully black before anything changes (a slow frame can leave the tween short)
 			Local.DropLook(Look, true)
 			if Current == nil then CameraLease.Release(LEASE) end
-			Gui.Veil(0, 0.1)
+			if Current == nil then Gui.Veil(0, 0.1) end -- (final fix round) a newer cut owns the veil now: don't lift it
 			task.wait(0.1)
 		else
 			CameraLease.Release(LEASE)
@@ -1330,26 +1330,31 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 		Player:SetAttribute(`NHCineSeam`, nil)
 		pcall(function() actor().Release() end)
 	end
-	local function atBlack()
+	-- (final fix round) Black: whether the screen really is black now (a Dip says so; false when a newer lift won). The callbacks that
+	-- move the player must hide it under a dip of their own when it is false
+	local function atBlack(IsBlack: boolean?)
 		if Current ~= nil then return end -- a newer cut owns the player now
-		for _, Fn in Cut.AtBlack or {} do pcall(Fn, How) end
+		for _, Fn in Cut.AtBlack or {} do pcall(Fn, How, IsBlack ~= false) end
 		Cut.AtBlack = nil
 	end
 	local Dipped = false
 	if Black and Seamless and (How == `Skipped` or How == `Aborted`) then
 		-- the jump to the end state happens at full black: the cut stops, the camera goes back to the gameplay camera
 		Dipped = true
-		Gui.Dip(0.25, function()
-			atBlack()
+		Gui.Dip(0.25, function(IsBlack: boolean)
+			atBlack(IsBlack)
 			if Cut.Handle then pcall(function() Cut.Handle:stop() end) end
 			if Cut.BeatLook then Local.DropLook(Cut.BeatLook, true) Cut.BeatLook = nil end
-			CameraLease.Release(LEASE)
-			if not CameraLease.Held() and workspace.CurrentCamera.CameraType ~= Enum.CameraType.Custom then CameraLease.Restore() end
+			-- (final fix round) the lease is keyed by the constant name "Cine": a newer cut that already took it must keep it
+			if Current == nil then
+				CameraLease.Release(LEASE)
+				if not CameraLease.Held() and workspace.CurrentCamera.CameraType ~= Enum.CameraType.Custom then CameraLease.Restore() end
+			end
 		end)
 	elseif Black then
 		Gui.Veil(1, 0.25) task.wait(0.25)
 		Gui.Veil(1, 0)
-		atBlack()
+		atBlack(true)
 	end
 	if not Hold then
 		if Cut.Handle then pcall(function() Cut.Handle:stop() end) end
@@ -1388,7 +1393,7 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 	if Hold then
 		-- nothing else changes: the HUD stays away, the camera and the card stay (ReleaseHold puts everything back)
 	elseif Seamless and (Blended or Dipped) then
-		if Dipped then Gui.FadeHud(false, 0.4) end
+		if Dipped and Current == nil then Gui.FadeHud(false, 0.4) end -- (final fix round) not under a newer cut's HUD
 	else
 		Gui.Hide(0.45)
 		Gui.Veil(0, 0.6)

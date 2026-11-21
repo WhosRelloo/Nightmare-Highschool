@@ -25,6 +25,9 @@ local Marks = workspace.NHCineSets.BusStop
 local Align = nil -- measured once, while the bus is parked on its mark
 local SourceStart = Source:GetPivot().Position
 local function previewId(N)
+	-- (final fix round) the cut resolves a clip through Config.CineClips first (the published id), the Studio preview only as a fallback
+	local Pub = Clips[N]
+	if typeof(Pub) == "string" and Pub ~= "" then return (Pub:gsub("rbxassetid://", "")) end
 	local S = Tutorial and Tutorial:FindFirstChild(N)
 	return S and tostring(S:GetAttribute("PreviewId")) or nil
 end

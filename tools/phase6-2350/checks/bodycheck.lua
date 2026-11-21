@@ -7,9 +7,19 @@ local RunService = game:GetService("RunService")
 local Actor = require(Players.LocalPlayer.PlayerScripts.Controllers.CineActor)
 local TA = require(game.ReplicatedStorage.Config.TutorialAnim)
 local Folder = game.ReplicatedStorage.NHCineClips.Tutorial
+local Clips = require(game.ReplicatedStorage.Config.CineClips)
+local Used = { published = 0, preview = 0, ids = {} }
+-- (final fix round) as Controllers.Cine's Ctx.Clip: the published id in Config.CineClips first, the Studio preview only as a fallback
 local function resolve(Name)
+	local Pub = Clips[Name]
+	if typeof(Pub) == "string" and Pub ~= "" then
+		Used.published += 1
+		Used.ids[Name] = Pub
+		return Pub
+	end
 	local Seq = Folder:FindFirstChild(Name)
 	if not Seq then return nil end
+	Used.preview += 1
 	return Seq:GetAttribute("PreviewId") or tostring(game:GetService("AnimationClipProvider"):RegisterAnimationClip(Seq))
 end
 local C = Players.LocalPlayer.Character
@@ -67,6 +77,7 @@ table.sort(Inside)
 local P99 = Inside[math.max(1, math.floor(#Inside * 0.99))] or 1
 local Lines, Pass = {}, Reseated == true
 table.insert(Lines, "Reseat returned " .. tostring(Reseated))
+table.insert(Lines, string.format("clips resolved: %d published ids, %d previews; TheBus1_WaitBored -> %s; TheBus2 -> %s", Used.published, Used.preview, tostring(Used.ids.TheBus1_WaitBored), tostring(Used.ids.TheBus2)))
 for _, Mk in Marks do
 	local Peak = 0
 	for i = Mk.at - 4, Mk.at + 4 do if Acc[i] and Acc[i] > Peak then Peak = Acc[i] end end

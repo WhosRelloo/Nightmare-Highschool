@@ -12,6 +12,7 @@ local ServerScriptService = game:GetService(`ServerScriptService`)
 local GROUP = `TutorialPlayers`
 local Shared = {}
 local Inside: { [Player]: RBXScriptConnection } = {}
+local Late: { [Player]: RBXScriptConnection } = {} -- (final fix round) parts added to the character after Enter (tools, accessories)
 
 local Config = require(game:GetService(`ReplicatedStorage`).Config.Cine)
 local function progression() return require(ServerScriptService.Services.Player.Progression) end
@@ -21,6 +22,16 @@ local function setGroup(Character: Model?, Group: string)
 	for _, D in Character:GetDescendants() do
 		if D:IsA(`BasePart`) then D.CollisionGroup = Group end
 	end
+end
+
+-- (final fix round) a part that joins the character later (a Tool's handle, an accessory) is put in the tutorial group too; dropped on
+-- Leave and whenever the character changes
+local function watchLate(Player: Player, Character: Model?)
+	if Late[Player] then Late[Player]:Disconnect() Late[Player] = nil end
+	if not Character then return end
+	Late[Player] = Character.DescendantAdded:Connect(function(D)
+		if D:IsA(`BasePart`) then D.CollisionGroup = GROUP end
+	end)
 end
 
 function Shared.Checkpoint(Player: Player, CutId: string, Segment: string)
@@ -64,10 +75,12 @@ function Shared.Enter(Player: Player): boolean
 	if Inside[Player] then return true end
 	Player:SetAttribute(`NHTutorial`, true)
 	setGroup(Player.Character, GROUP)
+	watchLate(Player, Player.Character)
 	Shared.Resume(Player)
 	Inside[Player] = Player.CharacterAdded:Connect(function(C)
 		C:WaitForChild(`HumanoidRootPart`, 5)
 		setGroup(C, GROUP)
+		watchLate(Player, C)
 		Shared.Resume(Player)
 	end)
 	return true
@@ -79,6 +92,7 @@ function Shared.Leave(Player: Player, Why: string?)
 	local Cn = Inside[Player]
 	if Cn then Cn:Disconnect() end
 	Inside[Player] = nil
+	watchLate(Player, nil)
 	-- (task 9, spec §4.3) leaving Wickfield is the safety net for an open-ended beat: end any running cine session first,
 	-- while the player is still marked as in Wickfield
 	pcall(function() require(script.Parent.Cine).EndFor(Player, if Why == `Left` then `Left` else `Aborted`) end)
@@ -90,7 +104,9 @@ end
 
 function Shared.OnStart()
 	pcall(function() PhysicsService:RegisterCollisionGroup(GROUP) end)
-	PhysicsService:CollisionGroupSetCollidable(GROUP, GROUP, false)
+	-- (final fix round) a failure here must not stop the service's own start: players would then not even get the PlayerRemoving hook
+	local Ok, Err = pcall(function() PhysicsService:CollisionGroupSetCollidable(GROUP, GROUP, false) end)
+	if not Ok then warn(`[Tutorial] collision group: {Err}`) end
 	Players.PlayerRemoving:Connect(function(P) Shared.Leave(P, `Left`) end)
 end
 
