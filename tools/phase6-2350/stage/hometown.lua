@@ -109,8 +109,11 @@ end
 -- FenceZone: where you stop at the gate to climb (z 82: the gate's collision face is at z 80.3 and your root needs about 1 stud
 -- more, so a mark nearer than that can't be walked to)
 -- LightWindow: the bedroom window (the house's BedSash, 3994.3 / 7.1 / 4113.2 in the world), a hair in front of it
+-- FenceLand (task 11 fix round 1, ruling C1): where you end the climb, on the far side of the fence plane (the fence's far face is at
+-- z 79.65, the gate's 79.72): 2.1 studs past it, facing away from the house (-Z). FenceOver2's own root motion is 1.56 studs sideways
+-- and 0.43 forward, so the cut moves your root here under a short dip at the top of the climb
 set("Garden", {
 	Start = CFrame.new(-6, 0, 104), Biscuit = CFrame.new(14, 0, 93), FenceZone = CFrame.new(12, 0, 82),
-	LightWindow = CFrame.new(-5.66, 7.11, 113.0), Hide = CFrame.new(4, 0, 92),
+	LightWindow = CFrame.new(-5.66, 7.11, 113.0), Hide = CFrame.new(4, 0, 92), FenceLand = CFrame.new(12, 0, 77.5),
 })
 return table.concat(Report, "\n")

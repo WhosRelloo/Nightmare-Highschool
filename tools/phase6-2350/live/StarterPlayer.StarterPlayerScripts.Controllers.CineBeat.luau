@@ -33,6 +33,7 @@ local BIND = `NHBeat`
 local HALFLIFE = 0.18
 local WALK = 12              -- the walk speed Sprint's Release writes (ActionManager.Movement.Sprint)
 local SPRINTING = 20         -- at or above this WalkSpeed you're sprinting (sprint writes 25 / 40.5)
+local CROUCH = 7             -- Services.Player.Crouch's CROUCH_SPEED: the speed the game's own crouch holds
 local STICK_RATE = 480       -- right stick at full tilt: 480 "pixels" a second = 120 degrees a second of nudge
 local DEADZONE = 0.15
 local STANDING = 0.8        -- seconds standing before a held crouch is asserted again
@@ -79,11 +80,11 @@ Shared.EndsOf = endsOf
 local function trigger(On: string?, Ctx, Clock: number, Root: BasePart, Idle: number, Results, Cut): boolean
 	local Kind, A, B = parse(On)
 	if Kind == `start` then return Clock >= 0 end
-	-- (task 11) `fail`: the cut's Built.Fail was set (a cue's soft failure); it is cleared when it fires
+	-- (task 11) `fail`: the cut's Built.Fail was set (a cue's soft failure). Only the ends loop clears it, when an end on it
+	-- fires (fix round 1, M6: a line or cue asking about `fail` must not eat it)
 	if Kind == `fail` then
 		local Built = Cut and Cut.Built
-		if Built and Built.Fail == true then Built.Fail = nil return true end
-		return false
+		return Built ~= nil and Built.Fail == true
 	end
 	if Kind == `t` then return Clock >= (tonumber(A) or math.huge) end
 	if Kind == `idle` then return Idle >= (tonumber(A) or math.huge) end
@@ -226,6 +227,8 @@ function Shared.Run(Cut, SegName: string, Spec, Ctx, Entry: any?, Out: any?, Loo
 		if not Unbound then Unbound = true pcall(function() RunService:UnbindFromRenderStep(BIND) end) end
 		if SpeedConn then SpeedConn:Disconnect() SpeedConn = nil end
 		-- only our own speed goes back (the server, a stun or crouch may have written theirs since)
+		-- (fix round 1, I1) SpeedBase is the speed the beat found for the state it hands on (crouch speed for a crouching player,
+		-- so a keepCrouch end leaves the crouch speed, never the standing one)
 		if Applied and Hum.Parent and math.abs(Hum.WalkSpeed - Applied) < 1e-3 then Hum.WalkSpeed = SpeedBase end
 		Applied = nil
 		if NoSprint then Player:SetAttribute(`NHBeatNoSprint`, nil) NoSprint = false end
@@ -245,6 +248,10 @@ function Shared.Run(Cut, SegName: string, Spec, Ctx, Entry: any?, Out: any?, Loo
 		-- from the walk base: a beat that starts mid-sprint scales the walk (Sprint's Release writes it), not the sprint
 		local Base = Hum.WalkSpeed
 		if Move.sprint == false and (Hum:GetAttribute(`Sprint`) or Base >= SPRINTING) then Base = WALK end
+		-- (fix round 1, I1) a crouched player, or a beat that crouches, scales the crouch speed: the standing speed the previous
+		-- beat handed back (or the sprint's) must never be what a crouching beat multiplies, and the server's own crouch write
+		-- (7) doesn't replicate again when the player is already crouched
+		if Hum:GetAttribute(`Crouch`) == true or Move.crouch then Base = CROUCH end
 		SpeedBase = Base
 		Applied = Base * Move.speed
 		Hum.WalkSpeed = Applied :: number
@@ -288,6 +295,7 @@ function Shared.Run(Cut, SegName: string, Spec, Ctx, Entry: any?, Out: any?, Loo
 	local Next: string? = nil
 	local GradeDone = false
 	local SawCrouch, StandSince = false, nil :: number?
+	local Said = false                -- "Stay low." shows once per stand-up
 
 	local function finish(To: string?, KeepCrouch: boolean?)
 		if Finished then return end
@@ -384,6 +392,7 @@ function Shared.Run(Cut, SegName: string, Spec, Ctx, Entry: any?, Out: any?, Loo
 		for _, E in Ends do
 			if not Finished and trigger(E.on, Ctx, Clock, Root, Rig.Idle, Results, Cut) then
 				-- the camera was written this frame; the continuation (next segment, or the blend out) starts in this frame
+				if parse(E.on) == `fail` and Cut.Built then Cut.Built.Fail = nil end
 				finish(E.next or `__end`, E.keepCrouch == true)
 			end
 		end
@@ -394,13 +403,14 @@ function Shared.Run(Cut, SegName: string, Spec, Ctx, Entry: any?, Out: any?, Loo
 		-- cues judge a stand-up first: standing near a sleeping dog is a soft fail, not something to undo), crouch again and say so
 		if Crouched then
 			if Hum:GetAttribute(`Crouch`) == true then
-				SawCrouch, StandSince = true, nil
+				SawCrouch, StandSince, Said = true, nil, false
 			elseif SawCrouch then
 				StandSince = StandSince or Clock
 				if Clock - StandSince >= STANDING then
-					SawCrouch, StandSince = false, nil
+					-- (fix round 1, M5) asked again every STANDING seconds until it lands (the server refuses while you're busy)
+					StandSince = Clock
 					Remote:FireServer({ Kind = `BeatCrouch`; On = true })
-					pcall(UI.Subtitle, ``, `Stay low.`, 1.2)
+					if not Said then Said = true pcall(UI.Subtitle, ``, `Stay low.`, 1.2) end
 				end
 			end
 		end

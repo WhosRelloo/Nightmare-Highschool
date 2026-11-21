@@ -1,5 +1,6 @@
 -- holdcheck (2.35.0, task 10 fix round 1): when TutorialBus's held title holds, and when it lets go. Client VM, ONE call.
 -- MODE (sed 's/^local MODE = .*/local MODE = "leave"/'):
+-- (task 11 fix round 1) TutorialBus has Replay = false now: the "replay" mode below is refused by the server (see replayrefused.lua); use "timeout"
 --   "replay":  NOT in the tutorial (bridge TutorialLeave first), the script fires a journal Replay (mark TutorialBus Seen first).
 --              The cut must blend out (phase Out seen), never hold (NHCineHold never true), leave the shared bus untouched
 --              (same pivot, same Animator count, no playing track, no cast folder) and the character visible.

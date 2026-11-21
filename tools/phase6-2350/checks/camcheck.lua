@@ -57,8 +57,10 @@ RunService:BindToRenderStep(Name, Enum.RenderPriority.Last.Value, function()
 	table.insert(Rows, { cf = Cam.CFrame; fov = Cam.FieldOfView; phase = Player:GetAttribute("NHCineSeam") or "Play"; t = os.clock(); look = look() })
 end)
 -- GARDEN (task 11): TutorialSneak. "sneak" crouch-walks Start -> FenceZone; "fail" walks at Biscuit, stands up within 7 studs (a
--- BeatCrouch Off), waits out Hide and goes on to the fence. Variant (TRIGGER replay; mark the cut Seen first):
---   sed 's/^local ID = "__SeamlessTest"/local ID = "TutorialSneak"/; s/^local GARDEN = nil/local GARDEN = "sneak"/' camcheck.lua
+-- BeatCrouch Off), waits out Hide and goes on to the fence. TutorialSneak has Replay = false (task 11 fix round 1), so it is a first
+-- viewing: TRIGGER "wait", TutorialEnter first, and ~6 s after this starts bridge.py PlayCut $P '"TutorialSneak"' false (clear the
+-- mark after: bridge.py CineMark $P '"TutorialSneak"' nil). Variant (sneak has no BeatIn; "fail" adds it):
+--   sed 's/^local ID = "__SeamlessTest"/local ID = "TutorialSneak"/; s/^local GARDEN = nil/local GARDEN = "sneak"/; s/^local TRIGGER = .*/local TRIGGER = "wait"/; s/^local PHASES = .*/local PHASES = { "In", "BeatOut", "Out" }/' camcheck.lua
 local GARDEN = nil
 if GARDEN then
 	local Char = Player.Character

@@ -6,10 +6,18 @@
 	chain, then control comes straight back on the far side. Set Garden (tools/phase6-2350/stage/hometown.lua).
 
 	Biscuit is the player's own copy (Controllers.Hometown.Cast; Wickfield is private), and the rig only lays out right while
-	a clip plays, so a BASE LOOP is always playing on him: BiscuitSleep from the moment the copy exists (Build, before the
-	first frame), with Wuff / WakeStare / Sigh played over it (Action priority). A clip that ends fades out to the sleep
+	a clip plays, so a BASE LOOP is always playing on him: BiscuitSleep from the moment the copy exists (Hometown casts him
+	and starts the loop as soon as NHTutorial is set, long before this cut; Build only starts it if it isn't already
+	playing), with Wuff / WakeStare / Sigh played over it (Action priority). A clip that ends fades out to the sleep
 	loop; WakeStare is held on its last frame until the Sigh. Every track the cut loads is stopped and destroyed when the cut
-	ends (Ctx.OnEnd), except the sleep loop itself, which keeps him laid out for as long as he's in the garden. Outside Wickfield (Cast nil: a lint run, a replay from the journal) nothing of the shared WFBiscuit is touched.
+	ends (Ctx.OnEnd), except the sleep loop itself, which keeps him laid out for as long as he's in the garden. Outside Wickfield (Cast nil: a lint run) nothing of the shared WFBiscuit is touched.
+
+	The fence (ruling C1): FenceOver2 is a vault whose own root motion is 1.56 studs sideways (-X of the root) and 0.43
+	forward, ending turned 100 degrees (measured in Play against the clip's data: the EndOffset is not a mis-measure, the clip is
+	simply a vault in place). So the cut squares you up to FenceZone (position AND heading: turned 40 degrees left of the fence
+	so the clip's first frame, which faces 40 degrees right of its root, faces the fence), and at the top of the climb, under a
+	short dip, moves your root to the far-side mark FenceLand (less the clip's own EndOffset, so the re-seat at the end of the clip
+	lands exactly on it, facing away from the house).
 
 	The crouch is the game's own (CineBeat: move.crouch -> BeatCrouch). Beat to beat and beat to fence it is handed on
 	(ends.keepCrouch), so the player isn't stood up and crouched again between them; the FenceOver chain starts on the
@@ -21,6 +29,11 @@ local RunService = game:GetService(`RunService`)
 local TweenService = game:GetService(`TweenService`)
 local Config = require(ReplicatedStorage.Config.Cine)
 local Def = { Set = `Garden`; Seamless = true }
+-- (fix round 1, C1) FenceOver2's first frame faces 40 degrees to the right of its root (measured in Play: torso heading -40 as the
+-- piece starts), so the root squares up turned 40 degrees left of the fence's heading and the body faces the fence
+local APPROACH_YAW = 40
+local FENCE_DUR = 6.1        -- the square-up, the chain and the re-seat end 5.47 s in (measured, checks/sneakcheck.lua timeline), plus a beat; was 7.0 with 1.5 s dead
+local DIP_AT = 0.75          -- seconds into FenceOver2: the dip reaches black at its top (about 0.9 s)
 
 function Def.Build(Ctx)
 	local Player = Players.LocalPlayer
@@ -109,6 +122,9 @@ function Def.Build(Ctx)
 		end
 	end
 	Ctx.OnEnd(function()
+		-- (fix round 1, I2) the crouch the Garden beat handed on to the Fence cut ends with the cut, however it ends (a skip, the
+		-- timeout, a leave) before FenceOver2 stands it; the server ignores this if nothing is crouched by a beat
+		if Remote then Remote:FireServer({ Kind = `BeatCrouch`; On = false }) end
 		for _, T in Tracks do pcall(function() T:Stop(0) T:Destroy() end) end
 		for _, A in Anims do pcall(function() A:Destroy() end) end
 		table.clear(Tracks)
@@ -171,33 +187,57 @@ function Def.Build(Ctx)
 			ends = { on = `t:7.2`; next = `Garden`; keepCrouch = true };
 		} };
 		Fence = { shots = {
-			-- a fixed camera on the fence (the chain's re-seat moves your root 1.5 studs and turns it 100 degrees in one frame, so a
-			-- shot framed on you would jump with it): three-quarter from behind on the right, looking at where you climb. No depth of field: the Garden beat has none, so
-			-- one that switches on with these shots would pop (the director carries a beat's grade and bloom into the shots, not a DOF)
-			{ name = `Over the fence`; dur = 7.0; subject = Ctx.Mark(`FenceZone`); noise = `tense`; dof = false;
-			  camera = { cframe = CFrame.lookAt(Ctx.CF(`FenceZone`):PointToWorldSpace(Vector3.new(4.5, 2.4, 5.5)), Ctx.CF(`FenceZone`):PointToWorldSpace(Vector3.new(0, 2.3, -0.8))); lens = 30 } };
+			-- a fixed camera on the fence (the chain's re-seat moves your root and turns it in one frame, so a shot framed on you
+			-- would jump with it): three-quarter from behind on the right, looking at the fence, wide enough to take the far side
+			-- (where you land). No depth of field: the Garden beat has none, so one that switches on with these shots would pop
+			-- (the director carries a beat's grade and bloom into the shots, not a DOF). The shot is the square-up, the chain
+			-- (about 5.5 s) and the re-seat, plus a beat (fix round 1, M4)
+			{ name = `Over the fence`; dur = FENCE_DUR; subject = Ctx.Mark(`FenceZone`); noise = `tense`; dof = false;
+			  camera = { cframe = CFrame.lookAt(Ctx.CF(`FenceZone`):PointToWorldSpace(Vector3.new(5.5, 2.6, 6.0)), Ctx.CF(`FenceZone`):PointToWorldSpace(Vector3.new(0, 2.4, -2.4))); lens = 36 } };
 		}; events = { { t = 0; call = function()
 			if not Actor then return end
-			-- square up to the fence over 0.35 s (you're already in the zone: CineActor.WalkTo would wait out its 3 s for a
-			-- point the Humanoid's MoveTo stops about a stud short of)
-			local Root = Player.Character and Player.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?
-			if Root then
-				local Mark = Ctx.CF(`FenceZone`)
-				local From, To = Root.CFrame, CFrame.new(Root.Position) * (Mark - Mark.Position)
-				local T0 = os.clock()
-				while Ctx.Alive() and os.clock() - T0 < 0.35 do
-					local A = (os.clock() - T0) / 0.35
-					Root.CFrame = From:Lerp(To, A * A * (3 - 2 * A))
-					RunService.Heartbeat:Wait()
-				end
-				if Ctx.Alive() then Root.CFrame = To end
+			local Char = Player.Character
+			local Root = Char and Char:FindFirstChild(`HumanoidRootPart`) :: BasePart?
+			if not (Char and Root) then return end
+			-- square up to the fence over 0.35 s: position AND heading (you're already in the zone, up to 2 studs off it; CineActor
+			-- WalkTo would wait out its 3 s for a point the Humanoid's MoveTo stops about a stud short of)
+			local Zone = Ctx.CF(`FenceZone`)
+			local From = Root.CFrame
+			local To = CFrame.new(Zone.X, From.Y, Zone.Z) * (Zone - Zone.Position) * CFrame.Angles(0, math.rad(APPROACH_YAW), 0)
+			local T0 = os.clock()
+			while Ctx.Alive() and os.clock() - T0 < 0.35 do
+				local A = (os.clock() - T0) / 0.35
+				Root.CFrame = From:Lerp(To, A * A * (3 - 2 * A))
+				RunService.Heartbeat:Wait()
 			end
+			if not Ctx.Alive() then return end
+			Root.CFrame = To
+			Root.AssemblyLinearVelocity = Vector3.zero
 			local TA = require(ReplicatedStorage.Config.TutorialAnim)
+			local Offset = TA.Chains.FenceOver[2].EndOffset
+			-- the re-seat's own root move (CineActor.Reseat writes this); the far side is placed so it lands on FenceLand
+			local S = Char:GetScale()
+			local Seat = CFrame.new(Offset.X * S, 0, Offset.Z * S) * CFrame.Angles(0, math.rad(Offset.Yaw), 0)
+			local LandMark = Ctx.Mark(`FenceLand`)
+			if not LandMark then warn(`[Cine] TutorialSneak: no FenceLand mark in the Garden set: the climb lands where the clip's own motion does`) end
 			Actor.Chain(`FenceOver`, Ctx.Clip, nil, function(Piece: string)
+				if Piece ~= `FenceOver2` then return end
 				-- the climb starts: the game's crouch ends under the chain's own pose
-				if Piece == `FenceOver2` and Remote then Remote:FireServer({ Kind = `BeatCrouch`; On = false }) end
+				if Remote then Remote:FireServer({ Kind = `BeatCrouch`; On = false }) end
+				-- and at the top of it (about 0.9 s in) the root moves to the far side under a 0.3 s dip to black
+				if LandMark then
+					task.delay(DIP_AT, function()
+						if not Ctx.Alive() then return end
+						pcall(require(Player.PlayerScripts.Controllers.Gui.CineUI).Dip, 0.3, function()
+							if not Ctx.Alive() or not Root.Parent then return end
+							local Land = LandMark.CFrame
+							Root.CFrame = CFrame.new(Land.X, Root.Position.Y, Land.Z) * (Land - Land.Position) * Seat:Inverse()
+							Root.AssemblyLinearVelocity = Vector3.zero
+						end)
+					end)
+				end
 			end)
-			if Ctx.Alive() then Actor.Reseat(`FenceOver2`, TA.Chains.FenceOver[2].EndOffset, Ctx.Clip) end
+			if Ctx.Alive() then Actor.Reseat(`FenceOver2`, Offset, Ctx.Clip) end
 		end } } };
 	}
 	return Built

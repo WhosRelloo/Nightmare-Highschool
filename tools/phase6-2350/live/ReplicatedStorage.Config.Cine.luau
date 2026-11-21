@@ -32,8 +32,11 @@ return {
 		__SeamlessTest = { Name = `Seamless test`; Length = 18; Set = `BusStop`; Seamless = true; Replay = true; Hidden = true };
 		-- (task 8 fix round 1) beatcheck: Length 6 is shorter than the cut on purpose (a beat holds the timeout)
 		__BeatHoldTest = { Name = `Beat hold test`; Length = 6; Set = `BusStop`; Seamless = true; Replay = true; Hidden = true };
-		TutorialBus = { Name = `The Bus`; Length = 34; Set = `BusStop`; Seamless = true; Replay = true };
-		TutorialSneak = { Name = `Sneaking Out`; Length = 90; Set = `Garden`; Seamless = true; Replay = true };
+		-- (task 11 fix round 1, ruling I4) Replay = false for the two tutorial walk-and-talk cuts until seamless replay staging is
+		-- designed (T12/T13): a journal replay outside Wickfield has no cast and no player-private set, and a beat's suspended timeout
+		-- never ends it. Their first viewing is unchanged (a first viewing is the only way to play them)
+		TutorialBus = { Name = `The Bus`; Length = 34; Set = `BusStop`; Seamless = true; Replay = false };
+		TutorialSneak = { Name = `Sneaking Out`; Length = 90; Set = `Garden`; Seamless = true; Replay = false };
 	};
 	-- (2.35.0) per-scene grades for seamless cuts, eased over 1 s (spec §4.1)
 	Looks = {

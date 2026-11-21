@@ -139,7 +139,54 @@ function Shared.Cast(Name: string): Model?
 	return M
 end
 
+-- (task 11 fix round 1, I3) Biscuit is cast, and his sleep loop started, as soon as NHTutorial is set: the garden cut (TutorialSneak)
+-- reuses this copy. Before this the copy came with the cut's Build, so the shared WFBiscuit (hidden by the cast) was what
+-- anyone saw first, in its bare rig pose. The rig only lays out right while a clip plays, so the loop is always on him. The
+-- copy and its Animator die together when NHTutorial clears (the cast folder is destroyed at black). Streaming: the models are
+-- Persistent, but this waits for the source to arrive rather than assuming it is there.
+function Shared.StartBiscuit(): AnimationTrack?
+	local Own = Shared.Cast(`WFBiscuit`)
+	if not Own then return nil end
+	local Animator = Own:FindFirstChildWhichIsA(`Animator`, true)
+	if not Animator then
+		local Controller = Own:FindFirstChildWhichIsA(`AnimationController`, true)
+		if not Controller then return nil end
+		local Made = Instance.new(`Animator`)
+		Made.Parent = Controller
+		Animator = Made
+	end
+	local Ok, Clips = pcall(function() return require(game:GetService(`ReplicatedStorage`).Config.CineClips) end)
+	local Id = Ok and (Clips :: any).BiscuitSleep
+	if typeof(Id) ~= `string` or Id == `` then return nil end
+	for _, T in (Animator :: Animator):GetPlayingAnimationTracks() do
+		if T.Animation and T.Animation.AnimationId == Id then return T end
+	end
+	local A = Instance.new(`Animation`)
+	A.AnimationId = Id
+	local T = (Animator :: Animator):LoadAnimation(A)
+	T.Priority = Enum.AnimationPriority.Movement
+	T.Looped = true
+	T:Play(0)
+	return T
+end
+
+local function castBiscuitSoon()
+	task.spawn(function()
+		local T0 = os.clock()
+		while Player:GetAttribute(`NHTutorial`) == true and os.clock() - T0 < 20 do
+			local H = workspace:FindFirstChild(`Hometown`)
+			if H and H:FindFirstChild(`WFBiscuit`, true) then
+				local Ok, Err = pcall(Shared.StartBiscuit)
+				if not Ok then warn(`[Hometown] Biscuit: {Err}`) end
+				return
+			end
+			task.wait(0.25)
+		end
+	end)
+end
+
 function Shared.OnStart()
+	if Player:GetAttribute(`NHTutorial`) == true then castBiscuitSoon() end
 	table.insert(Conns, RunService.Heartbeat:Connect(function()
 		if Player:GetAttribute(`NHTutorial`) ~= true then return end
 		for _, Other in Players:GetPlayers() do
@@ -154,7 +201,7 @@ function Shared.OnStart()
 		end
 	end))
 	table.insert(Conns, Player:GetAttributeChangedSignal(`NHTutorial`):Connect(function()
-		if Player:GetAttribute(`NHTutorial`) == true then return end
+		if Player:GetAttribute(`NHTutorial`) == true then castBiscuitSoon() return end
 		for _, Other in Players:GetPlayers() do
 			if Other.Character and Other.Character:GetAttribute(`NHHiddenLocal`) then
 				Other.Character:SetAttribute(`NHHiddenLocal`, false)

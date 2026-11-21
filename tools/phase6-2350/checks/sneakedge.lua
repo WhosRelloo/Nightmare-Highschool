@@ -1,6 +1,8 @@
 -- sneakedge (task 11): the held crouch. Part 1 (this call): TutorialSneak running, you stand up FAR from Biscuit (a BeatCrouch Off at
 -- the start of the Garden beat): the crouch must come back by itself within ~2 s and "Stay low." must show once. The cut is left
 -- running: the caller then runs bridge.py TutorialLeave and sneakafter.lua (the crouch goes, the cut and Biscuit's extra tracks are gone).
+-- (fix round 1) TutorialSneak is a first viewing now (Replay = false): TutorialEnter first, start this script in the background, then ~4 s
+-- later bridge.py PlayCut $P '"TutorialSneak"' false (and clear the mark afterwards: bridge.py CineMark $P '"TutorialSneak"' nil).
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Player = Players.LocalPlayer
@@ -13,9 +15,8 @@ Root.AssemblyLinearVelocity = Vector3.zero
 Player:SetAttribute("NHCinePath", nil)
 workspace:WaitForChild("Hometown"):WaitForChild("Garden"):WaitForChild("WFBiscuit")
 task.wait(1.5)
-Remote:FireServer({ Kind = "Replay"; Id = "TutorialSneak" })
 local T0 = os.clock()
-repeat task.wait(0.1) until Player:GetAttribute("NHCineSeam") == "Beat" or os.clock() - T0 > 15
+repeat task.wait(0.1) until Player:GetAttribute("NHCineSeam") == "Beat" or os.clock() - T0 > 40
 task.wait(2.0) -- the beat's crouch has landed
 local Before = Hum:GetAttribute("Crouch") == true
 local Said, DownAt, BackAt, WasDown = false, nil, nil, false

@@ -20,6 +20,19 @@ local function fake(Attr) return { GetAttribute = function(_, K) if K == "NHTuto
 Player:SetAttribute("NHTutorial", nil)
 check("1a not in tutorial: others not hidden", H.Hidden(fake(true)) == false)
 Player:SetAttribute("NHTutorial", true)
+-- (task 11 fix round 1, I3) setting NHTutorial casts Biscuit and starts his sleep loop at once (this copy and the game's own): wait for it,
+-- check it, and count the watchers it left (the hidden source) as the baseline for the counts below
+local Bis0 = os.clock()
+repeat task.wait(0.1) until workspace:FindFirstChild("NHHometownCast") and workspace.NHHometownCast:FindFirstChild("WFBiscuit") or os.clock() - Bis0 > 5
+task.wait(0.5)
+do
+	local B = workspace:FindFirstChild("NHHometownCast") and workspace.NHHometownCast:FindFirstChild("WFBiscuit")
+	local A = B and B:FindFirstChildWhichIsA("Animator", true)
+	local Playing = 0
+	if A then for _, T in A:GetPlayingAnimationTracks() do Playing += 1 end end
+	check("1e NHTutorial set: Biscuit cast with a clip playing on him", B ~= nil and Playing >= 1, Playing)
+end
+local Base = H.WatchedForTests()
 check("1b both in tutorial: hidden", H.Hidden(fake(true)) == true)
 check("1c other not in tutorial: not hidden", H.Hidden(fake(nil)) == false)
 check("1d self: not hidden", H.Hidden(Player) == false)
@@ -40,7 +53,7 @@ check("2d billboard off, original kept", Bb.Enabled == false and Bb:GetAttribute
 check("2e name display none", Hum.DisplayDistanceType == Enum.HumanoidDisplayDistanceType.None)
 H.HideCharacter(D, true) -- hiding twice must not clobber the saved volume
 check("2f hide twice keeps original", near(Snd:GetAttribute("NHVol"), 0.7))
-check("2f2 one watcher while hidden", H.WatchedForTests() == 1)
+check("2f2 one watcher while hidden", H.WatchedForTests() == Base + 1)
 -- (fix round 1, I2) things that arrive after the hide are hidden too
 local Acc = Instance.new("Accessory"); local Handle = Instance.new("Part"); Handle.Name = "Handle"; Handle.Parent = Acc
 local Late = Instance.new("Sound"); Late.Volume = 0.5; Late.Parent = Handle
@@ -58,13 +71,13 @@ H.HideCharacter(D, false)
 check("2g restored", Part.LocalTransparencyModifier == 0 and Decal.LocalTransparencyModifier == 0 and near(Snd.Volume, 0.7) and Snd:GetAttribute("NHVol") == nil
 	and Bb.Enabled == false and Bb:GetAttribute("NHEn") == nil and Hum.DisplayDistanceType == Enum.HumanoidDisplayDistanceType.Subject)
 check("2g2 late things restored", Handle.LocalTransparencyModifier == 0 and near(Late.Volume, 0.5) and near(Sound2.Volume, 0.3))
-check("2g3 watcher gone after restore", H.WatchedForTests() == 0)
+check("2g3 watcher gone after restore", H.WatchedForTests() == Base)
 -- a hidden model that is destroyed drops its watcher
 H.HideCharacter(D, true)
-check("2l watcher while hidden again", H.WatchedForTests() == 1)
+check("2l watcher while hidden again", H.WatchedForTests() == Base + 1)
 D:Destroy()
 task.wait(0.1)
-check("2m watcher gone when the model is destroyed", H.WatchedForTests() == 0)
+check("2m watcher gone when the model is destroyed", H.WatchedForTests() == Base)
 D = Instance.new("Model") -- (the dummy is gone; the lines below only need something to destroy)
 D:Destroy()
 
