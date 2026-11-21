@@ -5,7 +5,9 @@
 local Def = { Set = `BusStop`; Seamless = true }
 function Def.Build(Ctx)
 	local Me = Ctx.Self
-	return { grade = nil; shots = {
+	-- (fix round 1) a grade, so camcheck sees it ease in over the glide and out over the blend
+	return { grade = { contrast = 0.15; saturation = -0.3; brightness = -0.03; tint = { 0.92, 0.95, 1 }; bloom = { intensity = 0.6 };
+		exposure = -0.25 }; shots = {
 		{ name = `Over shoulder`; dur = 3; subject = Me; noise = `calm`; dof = true;
 		  camera = { frame = { size = `MS`; yaw = 160; pitch = 6; lens = 35 }; to = { size = `MCU` }; ease = `inout` } };
 		{ name = `Side`; dur = 3; subject = Me; noise = `tense`; dof = true;

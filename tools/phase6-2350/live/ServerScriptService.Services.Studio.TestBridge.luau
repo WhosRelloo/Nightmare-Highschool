@@ -1021,6 +1021,16 @@ function Commands.CineMark(PlayerName: string, CutId: string, Value: string?)
 	return true
 end
 
+-- (2.35.0, task 7) the CineActor Begin/Release race: a seamless cut ended (Skipped) 0.1 s after it starts, so the
+-- client's Release lands inside Begin's 0.3 s ease-out (checks/racecheck.lua watches the client side)
+function Commands.CineRaceTest(PlayerName: string)
+	local Player = Players:FindFirstChild(PlayerName)
+	local Id = CineService().Play({ Player }, `__SeamlessTest`, { Skippable = true })
+	task.wait(0.1)
+	CineService().EndForTests(Player)
+	return Id ~= nil
+end
+
 ---| (2.25.0) interactive cuts: the judge and the graph |---
 
 -- (2.35.0) CineSeam: the glide's length, keys and lint

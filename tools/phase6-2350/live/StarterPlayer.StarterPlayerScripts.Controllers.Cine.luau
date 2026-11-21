@@ -700,7 +700,10 @@ function Local.Play(Message)
 	Cut.Seamless = Message.Seamless == true
 	-- black first: the menu's "The bell is ringing..." hands straight over to the cut
 	local Gui = UI()
-	if not Cut.Seamless then Gui.Veil(1, 0) end
+	if not Cut.Seamless then
+		Gui.Veil(1, 0)
+		Player:SetAttribute(`NHCineSeam`, nil) -- (an earlier seamless cut's blend may have been cut short by this one)
+	end
 	if not Local.Ready(Config.StartGrace - 2) or Current ~= Cut then
 		if Current == Cut then Local.Finish(Cut, `NotReady`) end
 		return
@@ -711,6 +714,11 @@ function Local.Play(Message)
 	local Ctx = Local.Context(Cut, Message)
 	for _, Spec in Def.Actors or {} do
 		if Cut.Seamless and Spec.From == `Self` then continue end -- your real character acts (Controllers.CineActor)
+		if Cut.Seamless then
+			-- a clone would pop in and out in plain view (no veil): the per-player cast is Hometown's (task 9)
+			warn(`[Cine] {Message.Id}: seamless cuts ignore Def.Actors ({Spec.Name})`)
+			continue
+		end
 		local Ok, A = pcall(Local.MakeActor, Cut, Spec)
 		if Ok and A then Cut.Actors[Spec.Name] = A elseif not Ok then warn(`[Cine] actor {Spec.Name}: {A}`) end
 	end
@@ -722,7 +730,9 @@ function Local.Play(Message)
 	end
 	-- Def.Clock: the time of day the cut is set at (the roll call is morning, COLLECTED is midnight), on this screen
 	-- only; it's held every frame (the school clock may write Lighting) and put back when the cut ends
-	if typeof(Def.Clock) == `number` then
+	if typeof(Def.Clock) == `number` and Cut.Seamless then
+		warn(`[Cine] {Message.Id}: seamless cuts ignore Def.Clock (the hour would snap in view)`)
+	elseif typeof(Def.Clock) == `number` then
 		Cut.ClockWas = game:GetService(`Lighting`).ClockTime
 		Local.HoldHour(Def.Clock) -- the whole day/night look (Controllers.World.DayCycle), not just the sun
 	end
@@ -783,10 +793,22 @@ function Local.PlaySegment(Cut, Name: string, Start: number?)
 	-- by the glide's length
 	local Shots = Local.Strip(Cut, Seg.shots)
 	local Shift = 0
+	local LookIn = nil
+	local Dissolve = false
 	if Cut.Seamless and not Cut.Glided and Name == Cut.Graph.start then
 		Cut.Glided = true
-		Shots = Local.GlideIn(Cut, Shots)
-		Shift = Cut.GlideLen or 0
+		if Cut.Ctx.Reduced then
+			-- Reduce Motion (spec §2.1): no camera move at all; a 0.2 s fade through black, the cut's camera put in at black
+			Dissolve = true
+			UI().Veil(1, 0.1)
+			task.wait(0.1)
+			UI().Veil(1, 0) -- fully black before the cut's camera goes in
+			if not Cut.Live or Cut.Seg ~= Name then return end
+		else
+			Shots = Local.GlideIn(Cut, Shots)
+			Shift = Cut.GlideLen or 0
+			LookIn = Shift
+		end
 	end
 	Cut.Events = {}
 	for _, E in Seg.events or {} do
@@ -803,11 +825,13 @@ function Local.PlaySegment(Cut, Name: string, Start: number?)
 	local Def = Cut.Def
 	local Lib = CineLib()
 	local Last = os.clock()
+	Cut.LastShot = Shots[#Shots] -- the blend out keeps this shot's camera moving (BlendOut's From end)
 	-- a seamless cut has no bars, so its shots are framed for the full screen (and the glide aims at that framing)
 	Cut.Handle = Lib.play({ name = `{Cut.Id}.{Name}`; letterbox = if Cut.Seamless then nil else LETTERBOX; grade = Cut.Built.grade; shots = Shots }, {
-		start = Start; overlay = false; autoStop = false;
+		start = Start; overlay = false; autoStop = false; lookIn = LookIn;
 		onFrame = function(H)
 			if not Cut.Live or Cut.Seg ~= Name then return end
+			if Shift > 0 and Cut.Glide and H.time < Shift then Local.GlideTrack(Cut, H.time) end
 			local Now = os.clock()
 			local Dt = math.min(Now - Last, 0.1) * Cut.Scale
 			Last = Now
@@ -826,6 +850,10 @@ function Local.PlaySegment(Cut, Name: string, Start: number?)
 		onDone = function() if Cut.Live and Cut.Seg == Name then Local.SegmentDone(Cut, Name) end end;
 	})
 	Cut.Handle._restoreCameraType = nil
+	if Dissolve then
+		UI().Veil(0, 0.1)
+		task.delay(0.1, function() if Cut.Live then Player:SetAttribute(`NHCineSeam`, `Cut`) end end)
+	end
 	if Cut.Interactive then send({ Kind = `Seg`; Session = Cut.Session; Name = Name; At = workspace:GetServerTimeNow() - Start }) end
 end
 
@@ -843,21 +871,97 @@ function Local.GlideIn(Cut, Shots)
 	local Glide = { name = `GlideIn`; dur = Len; dof = Shots[1].dof; subject = Shots[1].subject;
 		camera = { keys = Seam.Keys(FromCF, FromFov, ToCF, ToFov, Len); ease = `inout` } }
 	Cut.GlideLen = Len
+	-- the keys end on shot 1's first frame as it is NOW; GlideTrack moves that endpoint with the live one every frame
+	local Root = Player.Character and Player.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?
+	Cut.Glide = { Probe = { letterbox = nil; shots = { Shots[1] } };
+		To = CFrame.lookAt(ToCF.Position, ToCF.Position + ToCF.LookVector * 10); ToFov = ToFov; Len = Len; FromRot = FromCF.Rotation;
+		Root = Root; RootFrom = Root and Root.Position }
 	task.delay(Len, function() if Cut.Live then Player:SetAttribute(`NHCineSeam`, `Cut`) end end)
-	local Out = { Glide }
-	for _, S in Shots do table.insert(Out, S) end
+	-- shot 1's handheld noise ramps in over 0.3 s, so the glide doesn't land on a non-zero noise sample
+	local First = table.clone(Shots[1])
+	First.noiseIn = 0.3
+	local Out = { Glide, First }
+	for I = 2, #Shots do table.insert(Out, Shots[I]) end
 	return Out
+end
+
+-- (fix round 1) the glide's target tracks shot 1's live first frame (its subject may still be moving: a player who was
+-- walking when the cut fired): after the shot player writes the keyed glide, the difference between the live and the
+-- frozen target is added in, weighted by the glide's ease, so the last glide frame IS shot 1's first frame. The start
+-- end moves too: the player's displacement since the glide began, weighted by (1 - ease), so a glide that starts on a
+-- walking player leaves with the live camera's own velocity instead of stopping dead (the Custom camera follows the root)
+function Local.GlideTrack(Cut, T: number)
+	local G = Cut.Glide
+	local Seam = require(ReplicatedStorage.Functions.CineSeam)
+	local Ok, Live, LiveFov = pcall(CineLib().cameraAt, G.Probe, 0)
+	if not Ok or typeof(Live) ~= `CFrame` then return end
+	local W = Seam.Ease(T / G.Len)
+	local Cam = workspace.CurrentCamera
+	local C = Cam.CFrame
+	local Follow = if G.Root and G.Root.Parent and G.RootFrom then G.Root.Position - G.RootFrom else Vector3.zero
+	-- the rotation is an eased slerp from the live camera's to shot 1's live first frame (the keys' look points swing
+	-- the view unevenly on a big turn, when they pass close to the camera); the position keeps the keys' curved path
+	Cam.CFrame = CFrame.new(C.Position + Follow * (1 - W) + (Live.Position - G.To.Position) * W) * G.FromRot:Lerp(Live.Rotation, W)
+	Cam.FieldOfView = math.clamp(Cam.FieldOfView + ((LiveFov :: number) - G.ToFov) * W, 1, 120)
+end
+
+-- Look (from Handle:detachLook): the grade, bloom and DOF ease to neutral and the exposure back over the blend
+function Local.EaseLook(Look, E: number)
+	if not Look then return end
+	Look.Start = Look.Start or {}
+	for _, Fx in Look.effects do
+		local S = Look.Start[Fx]
+		if not S then
+			S = {}
+			for _, K in { `Contrast`, `Saturation`, `Brightness`, `TintColor`, `Intensity`, `FarIntensity`, `NearIntensity` } do
+				local Ok, V = pcall(function() return (Fx :: any)[K] end)
+				if Ok then S[K] = V end
+			end
+			Look.Start[Fx] = S
+		end
+		for K, V in S do
+			pcall(function()
+				if typeof(V) == `Color3` then (Fx :: any)[K] = V:Lerp(Color3.new(1, 1, 1), E) else (Fx :: any)[K] = V * (1 - E) end
+			end)
+		end
+	end
+	if Look.restoreExposure then
+		game:GetService(`Lighting`).ExposureCompensation = Look.exposure + (Look.restoreExposure - Look.exposure) * E
+	end
+end
+
+function Local.DropLook(Look, Restore: boolean)
+	if not Look then return end
+	for _, Fx in Look.effects do pcall(function() Fx:Destroy() end) end
+	if Restore and Look.restoreExposure then game:GetService(`Lighting`).ExposureCompensation = Look.restoreExposure end
 end
 
 -- (2.35.0) the glide out onto the live Custom camera (spec delta 3): the camera module reads Camera.CFrame back every
 -- frame, so before it runs we put back its own last CFrame; after it runs we save that and write the blend. The
 -- endpoint is whatever the Custom camera renders: the release can't jump. Someone else taking the camera mid-blend
 -- (a new lease) ends it at once.
-function Local.BlendOut(Cut, FromCF: CFrame, FromFov: number, Seconds: number)
+-- Returns true if the blend was cut short by another lease (a new cut took the camera).
+-- Track (optional): the cut's last shot; the From end keeps moving as that shot's camera would (a shot tracking a walking
+-- player), so the blend leaves with the cut camera's own velocity instead of freezing it
+function Local.BlendOut(Cut, FromCF: CFrame, FromFov: number, Seconds: number, Look: any?, GameFov: number?, Track: any?): boolean
 	local Seam = require(ReplicatedStorage.Functions.CineSeam)
 	local Cam = workspace.CurrentCamera
+	local Lib = CineLib()
+	local L0: CFrame?, L0Fov: number? = nil, nil
+	if Track then
+		local Ok, A, B = pcall(Lib.cameraAt, Track.Probe, Track.T)
+		if Ok and typeof(A) == `CFrame` then L0, L0Fov = A, B end
+	end
+	local function from(): (CFrame, number)
+		if not L0 then return FromCF, FromFov end
+		local Ok, L, LFov = pcall(Lib.cameraAt, Track.Probe, Track.T)
+		if not Ok or typeof(L) ~= `CFrame` then return FromCF, FromFov end
+		local Turn = L.Rotation * (L0 :: CFrame).Rotation:Inverse()
+		return CFrame.new(FromCF.Position + (L.Position - (L0 :: CFrame).Position)) * Turn * FromCF.Rotation,
+			FromFov + ((LFov :: number) - (L0Fov :: number))
+	end
 	local Own: CFrame? = nil
-	local OwnFov: number? = nil
+	local OwnFov: number? = GameFov
 	local T0 = os.clock()
 	local Pre, Post = `NHCineBlendPre`, `NHCineBlendPost`
 	local Stolen = false
@@ -870,13 +974,18 @@ function Local.BlendOut(Cut, FromCF: CFrame, FromFov: number, Seconds: number)
 		if Stolen or CameraLease.Held() then Stolen = true return end
 		Own, OwnFov = Cam.CFrame, Cam.FieldOfView
 		local E = Seam.Ease((os.clock() - T0) / Seconds)
-		Cam.CFrame = Seam.Blend(FromCF, Own :: CFrame, E)
-		Cam.FieldOfView = FromFov + ((OwnFov :: number) - FromFov) * E
+		local FromNow, FromNowFov = from()
+		Cam.CFrame = Seam.Blend(FromNow, Own :: CFrame, E)
+		Cam.FieldOfView = FromNowFov + ((OwnFov :: number) - FromNowFov) * E
+		Local.EaseLook(Look, E)
 	end)
 	while os.clock() - T0 < Seconds and not Stolen do RunService.RenderStepped:Wait() end
 	RunService:UnbindFromRenderStep(Post)
 	RunService.RenderStepped:Wait()                          -- one frame where Pre still restores the module's own CFrame
 	RunService:UnbindFromRenderStep(Pre)
+	-- stolen: the new cut captured the exposure as it was, so it is left alone (only the old effects go)
+	Local.DropLook(Look, not Stolen)
+	return Stolen
 end
 
 function Local.SegmentDone(Cut, Name: string)
@@ -952,17 +1061,46 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 	local Seamless = Cut.Seamless == true
 	local Blended = Seamless and How == `Done`
 	local function actor() return require(script.Parent:WaitForChild(`CineActor`)) end
+	local Superseded = false
 	if Blended then
 		-- (2.35.0) out without black (spec §2.2): control comes back as the glide onto the Custom camera starts
 		local Cam = workspace.CurrentCamera
 		local FromCF, FromFov = Cam.CFrame, Cam.FieldOfView
-		if Cut.Handle then pcall(function() Cut.Handle:stop() end) end
+		local Look = nil
+		if Cut.Handle then
+			pcall(function() Look = Cut.Handle:detachLook() end) -- the look eases out over the blend, not popped by stop()
+			pcall(function() Cut.Handle:stop() end)
+		end
 		Player:SetAttribute(`NHCineSeam`, `Out`)
 		pcall(function() actor().Release() end)
-		CameraLease.Release(LEASE)
-		Local.BlendOut(Cut, FromCF, FromFov, if Cut.Ctx and Cut.Ctx.Reduced then 0.2 else 0.8)
-		Player:SetAttribute(`NHCineSeam`, nil)
-		Gui.FadeHud(false, 0.4)
+		local Stolen = false
+		if Cut.Ctx and Cut.Ctx.Reduced then
+			-- Reduce Motion: a 0.2 s fade through black, the gameplay camera put back at black; no camera move (stop()
+			-- wrote the gameplay FOV: the cut's last frame stays up until the screen is black; the lease is still ours)
+			Cam.CFrame, Cam.FieldOfView = FromCF, FromFov
+			Gui.Veil(1, 0.1)
+			task.wait(0.1)
+			Gui.Veil(1, 0) -- fully black before anything changes (a slow frame can leave the tween short)
+			Local.DropLook(Look, true)
+			if Current == nil then CameraLease.Release(LEASE) end
+			Gui.Veil(0, 0.1)
+			task.wait(0.1)
+		else
+			CameraLease.Release(LEASE)
+			-- stop() and the lease's Restore write the gameplay FOV, and this can run inside the shot player's own render
+			-- step (its onDone), before the blend's binds first run: put the cut's last frame back for this frame, and
+			-- hand the blend the gameplay FOV as the camera module's own (the module never writes FOV itself)
+			local GameFov = Cam.FieldOfView
+			Cam.CFrame, Cam.FieldOfView = FromCF, FromFov
+			local Track = if Cut.LastShot then { Probe = { letterbox = nil; shots = { Cut.LastShot } }; T = Cut.LastShot.dur or 0 } else nil
+			Stolen = Local.BlendOut(Cut, FromCF, FromFov, 0.8, Look, GameFov, Track)
+		end
+		-- (fix round 1) a cut that started during the blend owns the attribute, the HUD and the "Cine" lease now
+		Superseded = Current ~= nil or Stolen
+		if not Superseded then
+			Player:SetAttribute(`NHCineSeam`, nil)
+			Gui.FadeHud(false, 0.4)
+		end
 	end
 	-- out through black, never a pop back to the gameplay camera (doc 04 §4); a seamless skip dips (spec §2.3)
 	local Black = How ~= `Done` and How ~= `NotReady`
@@ -992,11 +1130,13 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 	end
 	if Cut.Folder then Cut.Folder:Destroy() end
 	Local.ShowLive(Cut)
-	pcall(function() UI().ClearSubtitle() end)
 	Cut.EndingAt = nil
-	CameraLease.Release(LEASE)
-	-- belt and braces: nobody else holds the camera, so it must be the normal one now
-	if not CameraLease.Held() and workspace.CurrentCamera.CameraType ~= Enum.CameraType.Custom then CameraLease.Restore() end
+	if not Superseded then
+		pcall(function() UI().ClearSubtitle() end)
+		CameraLease.Release(LEASE)
+		-- belt and braces: nobody else holds the camera, so it must be the normal one now
+		if not CameraLease.Held() and workspace.CurrentCamera.CameraType ~= Enum.CameraType.Custom then CameraLease.Restore() end
+	end
 	if Seamless and (Blended or Dipped) then
 		if Dipped then Gui.FadeHud(false, 0.4) end
 	else

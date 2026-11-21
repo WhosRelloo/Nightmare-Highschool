@@ -34,11 +34,14 @@ function Seam.Keys(FromCF: CFrame, FromFov: number, ToCF: CFrame, ToFov: number,
 	local Side = FromCF.RightVector * (if FromCF.LookVector:Cross(ToCF.LookVector).Y > 0 then -1 else 1)
 	local Bend = math.clamp(Span * 0.18, 0.4, 2.5)
 	local MidPos = Mid + Side * Bend + Vector3.new(0, Bend * 0.35, 0)
+	-- the shot player interpolates FOV linearly in log focal length between keys, so the middle key sits at the geometric
+	-- mean focal length (tan(fov/2) is inverse to it): both halves then share one slope and the FOV has no kink mid-glide
+	local MidFov = math.deg(2 * math.atan(math.sqrt(math.tan(math.rad(FromFov) / 2) * math.tan(math.rad(ToFov) / 2))))
 	local LookA = A + FromCF.LookVector * 10
 	local LookB = B + ToCF.LookVector * 10
 	return {
 		{ t = 0; pos = A; look = LookA; fov = FromFov },
-		{ t = Length / 2; pos = MidPos; look = LookA:Lerp(LookB, 0.5); fov = (FromFov + ToFov) / 2 },
+		{ t = Length / 2; pos = MidPos; look = LookA:Lerp(LookB, 0.5); fov = MidFov },
 		{ t = Length; pos = B; look = LookB; fov = ToFov },
 	}
 end

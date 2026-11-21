@@ -424,9 +424,13 @@ local function evalCamera(c, sh, tau, aspect, cacheBySubject, useNoise)
 		if np then
 			local seed = sh.index
 			local ct = c._clockForNoise or tau
-			local x = noiseChannel(np.p.x or {}, ct, seed, np.gain)
-			local y = noiseChannel(np.p.y or {}, ct, seed + 101, np.gain)
-			local z = noiseChannel(np.p.z or {}, ct, seed + 202, np.gain)
+			-- (2.35.0) noiseIn (seconds): the gain ramps in from zero (smootherstep) at the shot's start, so a shot that
+			-- follows a seamless glide doesn't step onto a non-zero noise sample
+			local gain = np.gain
+			if type(d.noiseIn) == "number" and d.noiseIn > 0 then gain *= ease("smooth", tau / d.noiseIn) end
+			local x = noiseChannel(np.p.x or {}, ct, seed, gain)
+			local y = noiseChannel(np.p.y or {}, ct, seed + 101, gain)
+			local z = noiseChannel(np.p.z or {}, ct, seed + 202, gain)
 			cf = cf * CFrame.Angles(math.rad(x), math.rad(y), math.rad(z))
 		end
 	end
@@ -508,20 +512,26 @@ local function ensureEffect(className, name)
 	return e
 end
 
-local function applyGrade(g)
+-- (2.35.0) w (0..1, default 1): the grade's weight from neutral (a seamless cut eases its look in over the glide);
+-- exposure goes from baseExposure (the scene's own) toward the grade's
+local function applyGrade(g, w, baseExposure)
 	if not g then return end
+	w = w or 1
 	local cc = ensureEffect("ColorCorrectionEffect", "CineGrade")
-	cc.Contrast = g.contrast or 0
-	cc.Saturation = g.saturation or 0
-	cc.Brightness = g.brightness or 0
-	cc.TintColor = C3(g.tint)
+	cc.Contrast = (g.contrast or 0) * w
+	cc.Saturation = (g.saturation or 0) * w
+	cc.Brightness = (g.brightness or 0) * w
+	cc.TintColor = Color3.new(1, 1, 1):Lerp(C3(g.tint) or Color3.new(1, 1, 1), w)
 	if g.bloom then
 		local b = ensureEffect("BloomEffect", "CineBloom")
-		b.Intensity = g.bloom.intensity or 0.4
+		b.Intensity = (g.bloom.intensity or 0.4) * w
 		b.Size = g.bloom.size or 24
 		b.Threshold = g.bloom.threshold or 0.95
 	end
-	if g.exposure then Lighting.ExposureCompensation = g.exposure end
+	if g.exposure then
+		local base = baseExposure or g.exposure
+		Lighting.ExposureCompensation = base + (g.exposure - base) * w
+	end
 end
 
 -- ---------------------------------------------------------------- play
@@ -702,10 +712,16 @@ function Handle:_step(dt)
 	end
 	local sh = shotAt(c, self.time)
 	local tau = self.time - sh.start
+	-- (2.35.0) options.lookIn: grade and DOF ease in from neutral over the first lookIn seconds (the seamless glide)
+	local lookW = 1
+	if self._lookIn and self._lookIn > 0 and self.time < self._lookIn + 0.5 then
+		lookW = ease("smooth", self.time / self._lookIn)
+		applyGrade(sh.def.grade or self._baseGrade, lookW, self._restoreExposure)
+	end
 	if sh.index ~= self._shot then
 		self._shot = sh.index
 		local d = sh.def
-		applyGrade(d.grade or self._baseGrade)
+		applyGrade(d.grade or self._baseGrade, lookW, self._restoreExposure)
 		if self._overlay then
 			local card = d.card
 			self._overlay.card.Text = card and card.text or ""
@@ -750,8 +766,8 @@ function Handle:_step(dt)
 		end
 		dof.FocusDistance = (cf.Position - focusPoint).Magnitude
 		dof.InFocusRadius = spec.radius or preset[1]
-		dof.FarIntensity = spec.far or preset[2]
-		dof.NearIntensity = spec.near or 0
+		dof.FarIntensity = (spec.far or preset[2]) * lookW
+		dof.NearIntensity = (spec.near or 0) * lookW
 		dof.Enabled = true
 	else
 		local dof = Lighting:FindFirstChild("CineDOF")
@@ -835,6 +851,19 @@ function Handle:stop()
 	return "stopped"
 end
 
+-- (2.35.0) hands the look (grade, bloom, DOF and the exposure) over to the caller before stop(), so a seamless cut can
+-- ease it out over its blend instead of popping. Returns { effects = { instance }, exposure = now, restoreExposure };
+-- the effects are renamed (stop() no longer finds them) and the caller destroys them.
+function Handle:detachLook()
+	local out = { effects = {}, exposure = Lighting.ExposureCompensation, restoreExposure = self._restoreExposure }
+	for _, n in { "CineGrade", "CineBloom", "CineDOF" } do
+		local e = Lighting:FindFirstChild(n)
+		if e then e.Name = n .. "Out" table.insert(out.effects, e) end
+	end
+	self._restoreExposure = nil
+	return out
+end
+
 -- Jump to cinematic time t (re-fires the events that should be running at t).
 function Handle:seek(t)
 	for _, tr in self._tracks do pcall(function() tr.track:Stop(0) end) end
@@ -870,7 +899,8 @@ function Cine.play(cut, options)
 	for _, ev in c.def.events or {} do table.insert(self._events, { at = ev.t or 0, def = ev }) end
 	table.sort(self._events, function(a, b) return a.at < b.at end)
 	if options.overlay ~= false then self._overlay = makeOverlay() end
-	applyGrade(c.def.grade)
+	self._lookIn = options.lookIn
+	applyGrade(c.def.grade, if options.lookIn and options.lookIn > 0 then 0 else 1, self._restoreExposure)
 	if c.def.music and c.def.music.id then
 		local m = Instance.new("Sound")
 		m.SoundId = c.def.music.id
