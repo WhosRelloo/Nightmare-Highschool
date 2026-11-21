@@ -2,15 +2,15 @@
 	An id of 0 means "not uploaded yet". The HUD then draws that piece's kit fallback (Functions.BellTower.Image).
 	Slices: 9-slice centres in source pixels and the SliceScale that draws them at the HUD's design size. ]]
 local Art = {
-	Dial = 0;
-	DialHand = 0;
-	TowerPlate = 0;
-	Seal = 0;
-	SealBroken = 0;
-	Slip = 0;
-	LeadCard = 0;
-	PipEmpty = 0;
-	PipFang = 0;
+	Dial = 93892744369524;
+	DialHand = 78039527171573;
+	TowerPlate = 129283325483369;
+	Seal = 133512351138579;
+	SealBroken = 132264578552566;
+	Slip = 118395926975311;
+	LeadCard = 78392319140082;
+	PipEmpty = 79927335523001;
+	PipFang = 116823141480891;
 }
 Art.Slices = {
 	TowerPlate = { Center = Rect.new(60, 60, 540, 140); Scale = 0.5 };
