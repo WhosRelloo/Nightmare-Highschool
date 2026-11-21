@@ -1,5 +1,6 @@
 # Tutorial seamless cinematics: design
 
+**Status:** slice 1 shipped in 2.35.0 (plan: docs/superpowers/plans/2026-11-20-tutorial-seamless-cinematics-slice1.md).
 **Date:** 2026-11-20
 **Place:** NH Combat Test (98950102230473), `Workspace.Hometown` (Wickfield). The Map place is not touched.
 **Builds on:**
@@ -217,3 +218,113 @@ The rest of the run follows, beat by beat, in doc 15's order.
 - Converting the existing story cuts (Prologue, COLLECTED, the Strikethrough) to the seamless path. They can opt in
   later with `seamless = true`.
 - The Map place.
+
+## Spec deltas
+
+These are the choices the build made while implementing slice 1 (2.35.0).
+Where one differs from the text above, the delta wins.
+Each ends with its reason.
+
+1. **The clips' folder.**
+   - Tutorial pieces live in `ReplicatedStorage.NHCineClips.Tutorial`, not `ServerStorage.NHTutorialAnims`.
+   - The client resolves clips with the director's `Ctx.Clip`: a published id in `Config.CineClips`, else a preview id
+     registered from the KeyframeSequence.
+   - Reason: `ServerStorage` isn't visible to the client.
+2. **The re-seat (amended: the settle is in the last piece).**
+   - The last one-shot piece of every chain ends at rest.
+     `build.py` appends 10 frames of its own motion dying out (0.82 per frame), then a 2-frame hold.
+   - Each piece also gets a `<Piece>_End` clip: its final settled pose, with the torso's ground offset and heading
+     taken out. It carries two identical keyframes, because one keyframe gives a track no length.
+   - `Play` plays the last piece to its end and holds it.
+   - The re-seat moves the root by `EndOffset` and switches to `_End` in the same engine step.
+   - `EndOffset` is scaled by the character's scale. The first build forgot this and stepped 0.04 stud at a scale of 1.03.
+   - `_End` then fades out over 0.25 s into the game's idle or walk.
+   - Chains that end on a loop don't re-seat. They hand back through `Release`, because the game's own crouch is the
+     same pose.
+   - Reason: switching one still pose to an identical still pose has no velocity to step, so frame-level timing
+     slack can't show.
+     An `_End` that only froze the last frame stopped moving limbs dead, which showed as a 3 cm arm step.
+3. **The glide out.**
+   - It's a blend layer on the live Custom camera, not a scripted path to a computed target. Two RenderStep binds:
+     - before the camera module, the layer puts back the Custom camera's own last CFrame, so the module never reads
+       the blend;
+     - after it, the layer saves that CFrame and writes the blend.
+   - Reason: the endpoint is whatever the Custom camera renders, so the release can't jump.
+4. **Glide-in tracking, and Reduce Motion.**
+   - The glide in re-evaluates shot 1's first frame every frame, so a walking player doesn't jump at the end of the glide.
+   - Grade and DOF scale with the glide's ease on entry and ease back over the blend-out. Handheld noise ramps in over
+     shot 1's first 0.3 s.
+   - Under Reduce Motion, both glides become a 0.2 s fade through black: the camera cuts while the screen is black.
+   - Reason: Roblox can't cross-dissolve two cameras, and the first build popped the grade, DOF and handheld.
+5. **Movement on Lead and Side rigs.**
+   - The beat swaps the PlayerModule ControlModule's `moveFunction`, so the stick is read against the beat's travel
+     direction.
+   - Travel is the authored `frame.travel` mark, else the heading to the `ends` enter-zone mark, else the player's facing.
+   - Reason: controls must never invert when the camera runs alongside or ahead.
+6. **The crouch is the game's own** (owner, 2026-11-20).
+   - Playable sneaking uses `Assets.Animations.Default.Movement.Crouch` and `CrouchWalk`, which the
+     AnimationController plays while `Services.Player.Crouch` holds crouch.
+     A beat holds it through the server (the `BeatCrouch` message).
+   - The chains are built from 30 fps samples of those clips (`tools/tutorial-anim/game/`), so a cinematic piece
+     starts and ends on the game's exact crouch pose. That replaces the Mixamo `SneakLoop`.
+   - `Tutorial.Leave` stands the player if a beat left them crouched.
+   - Reason: a second crouch look would pop at every handoff.
+7. **The bus and the Wick house are rigid rigs.**
+   - They're plain meshes joined by Motor6Ds, built in Studio by `tools/phase6-2350/stage/bus_rig.py` (with
+     `bus_rig.lua`) and `stage/rigid_rig.py` (with `rigid_rig_WickHouse.lua`) from `art/props/anim/WFBlackBus_rigid.json`
+     and `WickHouse_rigid.json`. The clips are KeyframeSequences generated from the same JSON.
+   - Biscuit and the garden gate stay skinned.
+   - Reason: Studio's skinned import laid the bus and the house out wrong (wheels, hood and windows displaced). The cause
+     of the bad bone rests was never found. Biscuit's import is fine.
+8. **Rigs keep a base loop on whenever they're visible.**
+   - The bus plays `EngineIdle` from the moment its cast copy exists. Biscuit plays `Sleep`; `Hometown` casts him as
+     soon as `NHTutorial` is set.
+   - Other clips play over the base loop.
+   - Reason: a rig is never drawn bare, and the scene is never dead (an idling engine, a sleeping dog).
+9. **Seamless cuts reject `Def.Actors` and `Def.Clock`.**
+   - The director warns and ignores them.
+   - Reason: the per-player cast belongs to `Hometown`, and a clock restored after the blend pops in view.
+10. **A held title is tutorial-only.**
+    - `Def.EndHold` (the bus's freeze on the title card) applies only while the player has `NHTutorial`, and never on a
+      replay.
+    - A safety release dips and ends the cut if no next `Play` arrives within 10 s.
+    - Outside Wickfield the cut doesn't move or animate the shared bus.
+    - Reason: otherwise a replay, or a run with no Prologue behind it, would strand on the held frame.
+11. **`Replay = false` for `TutorialSneak` and `TutorialBus`.**
+    - Reason: a journal replay outside Wickfield would walk the real character on Wickfield-framed shots, and a beat
+      suspends the server timeout, so it would never end.
+      Seamless replay staging still needs a design.
+12. **The fence vault lands on `FenceLand`.**
+    - The vault is an in-place clip (1.66 studs, mostly sideways). The root is moved to the `FenceLand` mark, 2.15
+      studs past the far face, under a 0.3 s dip at the top of the climb.
+    - A Skip or a Timeout before that point uses `Ctx.OnBlack` to place the player on `FenceLand` under the skip's own dip.
+    - Reason: the clip's travel can't clear the fence. A skip must not strand the player on the house side.
+13. **`CineUI`'s `Dip` and `Veil` use a generation token.**
+    - Every `Veil` bumps a counter. A dip lifts its veil only if no newer veil or dip claimed the screen, and a claimed
+      dip holds black.
+    - Reason: overlapping dips (a skip inside the fence dip) lifted each other's black early.
+14. **Replays write no checkpoints.**
+    - `Cine.Play` and `OnSeg` skip the write when the run is a replay.
+    - Reason: a replay would overwrite the tutorial's real resume point.
+15. **`Tutorial.Resume` resumes at the checkpoint's mark.**
+    - It runs on `Tutorial.Enter` and on every respawn in Wickfield. It puts the player on a mark of the cut's set, 3
+      studs up.
+    - Each cut declares its own map in `Config.Cine`: `Resume = { Marks = { <segment> = <mark> }, End = <mark> }`.
+      `TutorialSneak` maps Fence to `FenceZone` and ends at `FenceLand`. `TutorialBus` maps to and ends at `Stand`.
+    - A cut that is finished (Seen) resumes at its `End` mark.
+    - An unmapped segment or a missing mark warns and leaves the player where the game put them.
+    - Reason: guessing marks by name stranded a player behind what they had already done.
+    - TODO(controller): Task 12's fix round may still change this. Check it against the final commit.
+16. **Leaving Wickfield ends any cine session.**
+    - `Tutorial.Leave` ends a running cut with `How = "Aborted"`. A disconnect ends it with `How = "Left"`.
+    - Neither marks the cut Seen, so a returning player sees it again.
+    - `OnFinish` still fires; handlers must treat `Left` and `Aborted` as not completed.
+    - Reason: a cut must not outlive Wickfield, and a leaver shouldn't lose a scene they never watched.
+17. **A graded cut holds only the exposure.**
+    - `DayCycle.HoldExposure(name, on)` pauses the exposure write. The rest of the day grade runs on.
+    - Reason: holding the whole cycle snapped the night grade off as a glide began.
+18. **Wickfield's staging tools** are in `tools/phase6-2350/stage/`:
+    - `hometown.lua`: fits and places the imported models, and writes the marks and sets;
+    - `textures.lua`: applies the SurfaceAppearances;
+    - `bus_rig.py` and `rigid_rig.py`: build the rigid rigs and their clips (delta 7).
+    - Re-run them after any re-import. `hometown.lua` skips a rigid rig so it isn't re-fitted.

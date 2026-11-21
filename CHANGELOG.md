@@ -2,6 +2,95 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.35.0] - 2026-11-21: Seamless cinematics, slice 1 (Tutorial)
+
+The spec is `docs/superpowers/specs/2026-11-20-tutorial-seamless-cinematics-design.md` (its "Spec deltas" section lists
+what the build changed). The plan is `docs/superpowers/plans/2026-11-20-tutorial-seamless-cinematics-slice1.md`.
+- **Mirror:** `tools/phase6-2350/` (the live scripts, the stage scripts, the checks and `REPORT.md`).
+- **The Map place:** untouched.
+- **Slice 1 is two cuts:** the sneak out past Biscuit (doc 15 beat 2) and the bus (beat 10). The cold open is unchanged.
+
+### Added
+- **A seamless path in the Cine director** (`Cine.luau`, `Controllers.Cine`), next to the clone path. A cut opts in with
+  `Seamless = true` in `Config.Cine`.
+  - **In:** the camera glides from the live view into shot 1 (0.6-1.0 s, curved, eased) and tracks shot 1 while you move.
+  - **Out:** the last shot blends onto the live Custom camera, so the release can't jump. Control returns when the glide
+    out starts.
+  - **Screen:** the HUD fades through `CineUI.FadeHud`. There are no letterbox bars.
+  - **Skip:** a 0.25 s dip to black.
+  - **Reduce Motion:** the glides become a 0.2 s fade through black.
+  - `CineSeam` (`Functions.CineSeam`) holds the glide maths and the shot-1 lint (more than 90° of turn or 12 studs of
+    travel is a `[fix]`).
+- **Your own character is the actor** (`Controllers.CineActor`): it walks onto marks, plays the `TutorialAnim` chains at
+  Action priority, re-seats the root on the chain's last frame, and hands control back mid-stride.
+- **Walk-and-talk beats** (`Controllers.CineBeat`, `Functions.CineRigs`):
+  - **Rigs:** `Follow`, `Lead`, `Side` and `Frame` (spring-damped), with a mouse or right-stick nudge of about 25° that
+    springs back over 0.6 s.
+  - **Movement:** `move.speed`, `sprint = false` and `crouch = true` (the game's own crouch, held through the server).
+  - **Lines and cues:** triggers `start`, `t:`, `enter:`, `near:`, `idle:` and `prompt:`.
+  - **Timeouts:** a beat has no server timeout; leaving Wickfield ends it.
+- **The film look:** handheld noise by `feel` (`calm`, `tense`, `chase`), and per-scene grades in `Config.Cine.Looks` (`Night`, `Morning`, `BusStop`).
+- **A private Wickfield** (`Controllers.Hometown`):
+  - Other tutorial players are hidden on your client: parts, decals, name tags and sounds.
+  - Tutorial characters sit in a `TutorialPlayers` collision group that doesn't collide with itself.
+  - Biscuit and the bus are cast per player.
+- **The Tutorial service** (`Services.World.Tutorial`): `Enter`, `Leave`, `Checkpoint`, `CheckpointOf` and `Resume`.
+  - Every beat and cut start writes `Progress.Origin.Checkpoint`, and `Progression.Sanitize` keeps it.
+  - Death, respawn or a rejoin puts you on the checkpoint's mark. Each cut declares its own `Resume` map in `Config.Cine`.
+  - Leaving Wickfield ends any running cut without marking it Seen.
+- **`TutorialSneak`** (Garden, Hide, Fence): you crouch past Biscuit, who wakes, stares, sighs and goes back to sleep.
+  Stand up near him and he gives one bored "wuff" and the bedroom light flicks on (the soft fail: crouch and wait). The fence
+  vault lands on `FenceLand` under a short dip.
+- **`TutorialBus`:** the free-roam at the stop, the glide into the arrival (BrakeStop, DoorsOpen, DriverTurn), boarding, and
+  the held title card (the held title applies only in the tutorial, with a 10 s safety release).
+- **Wickfield art and staging** (`tools/phase6-2350/stage/`):
+  - **The rigs:** the black bus and the Wick house as rigid Motor6D rigs, built by `bus_rig.py` and `rigid_rig.py` from
+    `art/props/anim/WFBlackBus_rigid.json` and `WickHouse_rigid.json`. Biscuit and the garden gate stay skinned.
+  - **Models and marks:** `hometown.lua` fits and places the imported models and writes the marks.
+  - **Textures:** `textures.lua` applies the SurfaceAppearances.
+  - **Base loops:** the bus plays `EngineIdle` and Biscuit plays `Sleep` whenever they're visible.
+  - **Clips:** the bus, Biscuit, the gate and the house sash are published and listed in `Config.CineClips`.
+- **The tutorial animation chains** (`tools/tutorial-anim/`):
+  - The chains are built from the game's own `Crouch` and `CrouchWalk` (sampled into `game/`), replacing the Mixamo `SneakLoop`.
+  - Each chain's last one-shot ends at rest, and each piece has a `<Piece>_End` pose for the re-seat.
+  - The clips are in `ReplicatedStorage.NHCineClips.Tutorial`.
+- **TestBridge:** `CineSeamTest`, `CineRigsTest` and `SeamlessHoldTest`.
+- **Checks** (`tools/phase6-2350/checks/`): `camcheck`, `bodycheck`, `sneakcheck`, `beatcheck`, `buscheck`, `holdcheck`,
+  `hometowncheck`, `skipcheck`, `reducecheck`, `dipcheck`, `replayrefused` and others. The harness (`harness/`) installs,
+  restores and drives them.
+
+### Changed
+- **`TutorialAnim.Play`** takes an `isCancelled` check, holds the chain's last piece, and returns its tracks.
+  `TutorialAnim.Ids` is gone: published ids live in `Config.CineClips`.
+- **`Config.CineClips`** gains the bus, Biscuit, gate and house clips.
+- **`DayCycle`** gains `HoldExposure`: a graded cut holds only the exposure, not the whole day grade.
+- **`CineUI`'s `Dip` and `Veil`** use a generation token, so overlapping dips don't lift each other's black.
+- **Replays write no checkpoints.** `TutorialSneak` and `TutorialBus` have `Replay = false` until seamless replay staging is
+  designed.
+- **`tools/tutorial-anim/PUBLISH.md`** describes the real folder, the game's crouch and `Config.CineClips`.
+
+### Checked
+- **Self-tests:** `CineSeamTest`, `CineRigsTest` and `SeamlessHoldTest` all pass.
+- **Live (slot 2, restored after):**
+  - **Camera seam check:** passes on `TutorialSneak`, `TutorialBus` and a graded test cut. The release frame matches the
+    last frame under it to 0.0007 stud, and the walking-glide ratio stays under the bound.
+  - **Body seam check:** the bus chain's switches and the re-seat are at or under the chain's own p99, with no duplicated
+    frames. The 21 runtime switches in `chaincheck` are all ok.
+  - **The sneak:** four runs (sneak, soft fail, skip at the fence, timeout) pass. Skips from 5.0 to 5.9 s land on `FenceLand` every time.
+  - **The bus:** the doorway sits within 0.05 stud of `Stand`, and the held title releases on a timeout and on leave.
+  - **Playtests:** solo, death mid-beat, rejoin and Reduce Motion pass.
+- **Details:** `tools/phase6-2350/REPORT.md`.
+
+### Not checked
+- **Owner:** sign-off after watching both cuts at full speed.
+- **Two players** in a Local Server (the harness drives one client); the manual steps are in `REPORT.md`.
+- **Phone size** in the device emulator.
+- **The fence vault** by eye (the top-of-climb pose after the dip, `FenceLand`, the approach yaw), and the Fence and Garden
+  camera marks (first guesses).
+- **Bus boarding** by eye (the door clips the player a little; the 21-stud bus is accepted).
+- **`motion_audit.py`:** the capture failed for lack of disk space. The camera-sampled numbers are in `REPORT.md`.
+- **`TutorialAnim.Ids`** still exists in the Studio copy of `Config.TutorialAnim` until the next sync (dead, harmless).
+
 ## [2.34.0] - 2026-11-18: Path wardrobe & the Today card (Progression & Identity 4 of 4)
 
 The spec is `docs/expansion/14-Progression-and-Identity.md` §6. This release completes Phase 3.

@@ -231,7 +231,7 @@ Bell item, a line from the hall monitor.
    mascot head, the Ashby House.
 6. **The creatures:** Biscuit and the goose, sculpted, rigged and animated (in the same quality bar as the Anatomy
    specimens).
-7. **The bus stop and the black bus.**
+7. **The bus stop and the black bus.** Built in 2.35.0 (slice 1): the stop, the bus as a rigid rig, its seven clips.
 8. **The props:** the envelope, the brochure, the evidence items, the night-clothes shirt, Dad's glasses and the
    cereal set.
 
@@ -243,6 +243,33 @@ Bell item, a line from the hall monitor.
 - Key hints, a hold-to-skip, and Replay from Options.
 - New animations: on the non-bending R6 rig, in the house style, reusing existing clips where they fit (owner's
   rule).
+
+**Seamless cinematics, slice 1: built in 2.35.0** (spec: `docs/superpowers/specs/2026-11-20-tutorial-seamless-cinematics-design.md`).
+
+Built:
+- **Beat 1, the cold open:** unchanged. It still plays as the old cut.
+- **Beat 2, the sneak out:** new. `TutorialSneak` runs Garden, Hide and Fence as seamless beats and shots on your own character.
+  - The camera glides in from gameplay and lands back behind your shoulder.
+  - You sneak with the game's own crouch. Biscuit wakes, stares, sighs and sleeps again.
+  - The soft fail is in: stand up near him and the bedroom light flicks on.
+  - The fence vault lands you on `FenceLand` under a short dip.
+- **Beat 10, the bus:** new. `TutorialBus` runs the stop, the arrival, boarding and the held title card.
+- **Wickfield is private:** other tutorial players are hidden, and Biscuit and the bus are cast per player.
+- **Safety:** each beat writes a checkpoint, and death, respawn or a rejoin resumes at it.
+
+Not in slice 1:
+- beats 3 to 9, which the later slices cover (the getaway's hedge dive needs server-judged prompts inside a beat first);
+- replay of these two cuts (`Replay = false` until replay staging is designed);
+- one texture: the bus stop's timetable canvas (`WF_Timetable_canvas`) is not uploaded yet.
+
+Owner checks still open (full list in `tools/phase6-2350/REPORT.md`):
+- sign-off after watching both cuts at full speed;
+- a two-player run in a Local Server;
+- the phone-size row in the device emulator;
+- the fence vault: the top-of-climb pose after the dip, `FenceLand`, the approach yaw and the dip time;
+- bus boarding (the door clips the player a little; the 21-stud bus is accepted) and the door and driver camera marks;
+- the Fence and Garden camera marks, which were first guesses;
+- recording both cuts and running `motion_audit.py` (the capture failed for lack of disk space).
 
 **Releases (each playable and tested before the next):**
 

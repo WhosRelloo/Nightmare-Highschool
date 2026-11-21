@@ -723,11 +723,8 @@ def main():
            "-- A chain is a list of PIECES. A one-shot piece is several clips already blended into one; a Loop piece holds",
            "-- until its cue. Every switch between pieces lands on an identical frame (switch instantly, no fade): a loop is entered at Entry and left at",
            "-- Exit (seconds into the loop), so the blends are all baked and nothing pops. Hold: freeze on the last frame.",
-           "-- The KeyframeSequences (and <Piece>_End poses) are in ReplicatedStorage.NHCineClips.Tutorial.",
-           "", "local TutorialAnim = {}", "", "TutorialAnim.Ids = {"]
-    for c, _ in built:
-        mod.append(f'\t["{c.name}"] = "",')
-    mod += ["}", "", "TutorialAnim.Chains = {"]
+           "-- The KeyframeSequences (and <Piece>_End poses) are in ReplicatedStorage.NHCineClips.Tutorial; published ids live in Config.CineClips.",
+           "", "local TutorialAnim = {}", "", "TutorialAnim.Chains = {"]
     for chain, out in plan.items():
         mod.append(f"\t{chain} = {{")
         for e in out:

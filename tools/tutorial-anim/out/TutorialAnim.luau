@@ -3,45 +3,9 @@
 -- A chain is a list of PIECES. A one-shot piece is several clips already blended into one; a Loop piece holds
 -- until its cue. Every switch between pieces lands on an identical frame (switch instantly, no fade): a loop is entered at Entry and left at
 -- Exit (seconds into the loop), so the blends are all baked and nothing pops. Hold: freeze on the last frame.
--- The KeyframeSequences (and <Piece>_End poses) are in ReplicatedStorage.NHCineClips.Tutorial.
+-- The KeyframeSequences (and <Piece>_End poses) are in ReplicatedStorage.NHCineClips.Tutorial; published ids live in Config.CineClips.
 
 local TutorialAnim = {}
-
-TutorialAnim.Ids = {
-	["ColdOpen1"] = "",
-	["Drainpipe1"] = "",
-	["Drainpipe2_GameCrouch"] = "",
-	["BiscuitStirs1_GameCrouchWalk"] = "",
-	["BiscuitStirs2"] = "",
-	["BiscuitStirs3_GameCrouchWalk"] = "",
-	["FenceOver1_GameCrouchWalk"] = "",
-	["FenceOver2"] = "",
-	["ThePlan1"] = "",
-	["Getaway1_RunLookBack"] = "",
-	["Getaway2"] = "",
-	["Getaway3_LookAroundNervous"] = "",
-	["HomeAgain1"] = "",
-	["HomeAgain2_GameCrouchWalk"] = "",
-	["HomeAgain3"] = "",
-	["HomeAgain4_SleepLoop"] = "",
-	["HomeAgain5"] = "",
-	["HomeAgain6_LieLookAround"] = "",
-	["Excuses1_LieLookAround"] = "",
-	["Excuses2"] = "",
-	["ParentsWaiting1_ParentSit"] = "",
-	["ParentsWaiting2"] = "",
-	["ParentsWaiting3_ParentSit"] = "",
-	["ParentsWaiting4"] = "",
-	["ParentsWaiting5_ParentSit"] = "",
-	["Breakfast1_TableIdle"] = "",
-	["Breakfast2"] = "",
-	["Breakfast3_TableIdle"] = "",
-	["MomSlidesEnvelope1_ParentSit"] = "",
-	["MomSlidesEnvelope2"] = "",
-	["MomSlidesEnvelope3_ParentSit"] = "",
-	["TheBus1_WaitBored"] = "",
-	["TheBus2"] = "",
-}
 
 TutorialAnim.Chains = {
 	ColdOpen = {
