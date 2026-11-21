@@ -98,7 +98,9 @@ local CHANNELS = {
 	{ "ang", function(r) return r.cf.LookVector end, 0.05 },  -- rad/s^2 (look vector)
 	{ "fov", function(r) return r.fov end, 0.5 },             -- deg/s^2
 }
-local FACTOR = 3.5 -- an eased glide's peak acceleration over its median, all channels: measured up to 3.44 (fix round 1, task-7 report)
+-- an eased glide's peak acceleration over its median. Final runs (fix round 2, 9 runs at 15 fps): In pos 1.29-2.22,
+-- ang 1.22-1.61, fov 1.63-1.82; Out pos/fov 1.34-1.76. 2.5 x 1.5 headroom = a 3.75 x median bound.
+local FACTOR = 2.5
 local Report, Pass = {}, true
 local Ratios = {}
 for _, Phase in { "In", "Out" } do

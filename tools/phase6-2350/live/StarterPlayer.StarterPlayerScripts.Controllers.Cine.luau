@@ -873,9 +873,14 @@ function Local.GlideIn(Cut, Shots)
 	Cut.GlideLen = Len
 	-- the keys end on shot 1's first frame as it is NOW; GlideTrack moves that endpoint with the live one every frame
 	local Root = Player.Character and Player.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?
+	-- (fix round 2) FromCF is the LAST render's camera (a Play lands at network receive, before this frame's render), so
+	-- the follow is measured from the root as it was at that render, not now (one physics step on): from "now", the
+	-- first glide frame re-showed the previous frame's camera (a one-frame hold on a walking player, then a catch-up)
+	local RootFrom = Root and Root.Position
+	if Root and Local.RootAtRender and (Local.RootAtRender - Root.Position).Magnitude < 4 then RootFrom = Local.RootAtRender end
 	Cut.Glide = { Probe = { letterbox = nil; shots = { Shots[1] } };
 		To = CFrame.lookAt(ToCF.Position, ToCF.Position + ToCF.LookVector * 10); ToFov = ToFov; Len = Len; FromRot = FromCF.Rotation;
-		Root = Root; RootFrom = Root and Root.Position }
+		Root = Root; RootFrom = RootFrom }
 	task.delay(Len, function() if Cut.Live then Player:SetAttribute(`NHCineSeam`, `Cut`) end end)
 	-- shot 1's handheld noise ramps in over 0.3 s, so the glide doesn't land on a non-zero noise sample
 	local First = table.clone(Shots[1])
@@ -1186,6 +1191,12 @@ function Shared.FlattenForTests(Built, Graph, Path: { string })
 end
 
 function Shared.OnStart()
+	-- (fix round 2) where the root was when the camera module last framed it (GlideIn's follow starts from there)
+	RunService:BindToRenderStep(`NHCineRootMark`, Enum.RenderPriority.Camera.Value - 2, function()
+		local C = Player.Character
+		local R = C and C:FindFirstChild(`HumanoidRootPart`) :: BasePart?
+		Local.RootAtRender = R and R.Position
+	end)
 	Remote = ReplicatedStorage:WaitForChild(`NHCine`, 60) :: RemoteEvent?
 	if not Remote then warn(`[Cine] no NHCine remote`) return end
 	UI().OnSkip(function()
