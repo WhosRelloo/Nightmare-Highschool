@@ -12,8 +12,12 @@ local RunService = game:GetService(`RunService`)
 local Player = Players.LocalPlayer
 local Shared = {}
 local Held = false
-local EndTrack: AnimationTrack? = nil
-local HoldConn: RBXScriptConnection? = nil
+local EndTrack: AnimationTrack? = nil                       -- the held _End pose (after a re-seat), until Release
+local EndAnim: Animation? = nil
+local Pending: AnimationTrack? = nil                        -- a Reseat's _End track before its step lands
+local PendingAnim: Animation? = nil
+local ChainTracks: { [string]: AnimationTrack }? = nil      -- the last Chain's tracks (its last piece held at its end)
+local Gen = 0                                               -- cancellation token: Release and every Reseat bump it
 local SpeedWas: number? = nil
 
 local function controls()
@@ -70,7 +74,9 @@ function Shared.WalkTo(Mark: CFrame, MaxStuds: number?): boolean
 	return true
 end
 
-function Shared.Chain(Chain: string, Resolve: (string) -> string?, Cues: any?, OnSwitch: ((string) -> ())?)
+-- Plays the chain and yields until it ends: its last piece is then held on its final (settled) frame until Reseat or
+-- Release. Returns the tracks.
+function Shared.Chain(Chain: string, Resolve: (string) -> string?, Cues: any?, OnSwitch: ((string) -> ())?): { [string]: AnimationTrack }
 	local _, _, _, Animator = parts()
 	assert(Animator, `no Animator`)
 	local TA = require(ReplicatedStorage.Config.TutorialAnim)
@@ -97,54 +103,84 @@ function Shared.Chain(Chain: string, Resolve: (string) -> string?, Cues: any?, O
 		end
 		if OnSwitch then OnSwitch(Piece) end
 	end
-	return TA.Play(Animator, Chain, Resolve, Cues, switched)
+	local Tracks = TA.Play(Animator, Chain, Resolve, Cues, switched)
+	ChainTracks = Tracks
+	return Tracks
 end
 
-function Shared.Reseat(Piece: string, Offset: { X: number, Z: number, Yaw: number }, Resolve: (string) -> string?, Clock: (() -> number)?, Length: number?)
-	local _, _, Root, Animator = parts()
-	if not (Root and Animator) then return end
+-- the _End track (and its Animation) held after a re-seat, or still waiting for its step; and the last chain's tracks
+local function drop(Track: AnimationTrack?, Anim: Animation?, Fade: number)
+	if Track then
+		Track:Stop(Fade)
+		task.delay(Fade + 0.1, function() Track:Destroy() end)
+	end
+	if Anim then task.delay(Fade + 0.1, function() Anim:Destroy() end) end
+end
+
+-- The re-seat. The chain's last piece has played to its end and is held still (build.py settles it; TutorialAnim.Play
+-- freezes it); its _End clip is that same final pose with the ground offset and heading taken out, as two identical
+-- keyframes. So this switches a still pose to an identical still pose: the _End track is played (Action4, speed 0, so it
+-- can't advance and fall to idle even through a frame hitch) on a Heartbeat; a played track's pose is first drawn by the
+-- NEXT step's animation, and that step's PreSimulation (after the animation, before render) writes the root, so the pose
+-- and the root change in one engine step. The chain's tracks (outranked by Action4) are stopped after it.
+-- Returns true once the root has moved. Returns false, and changes nothing, if `<Piece>_End` doesn't resolve or the
+-- character is missing; false too if a Release (or another Reseat) cancelled it before it landed.
+function Shared.Reseat(Piece: string, Offset: { X: number, Z: number, Yaw: number }, Resolve: (string) -> string?): boolean
+	local Char, _, Root, Animator = parts()
+	if not (Char and Root and Animator) then return false end
+	local Id = Resolve(Piece .. `_End`)
+	if not Id or Id == `` then return false end
+	Gen += 1
+	local My = Gen
+	if Pending then drop(Pending, PendingAnim, 0) Pending, PendingAnim = nil, nil end -- an earlier Reseat still in flight
 	local A = Instance.new(`Animation`)
-	A.AnimationId = Resolve(Piece .. `_End`) or ``
+	A.AnimationId = Id
 	local T = Animator:LoadAnimation(A)
 	T.Priority = Enum.AnimationPriority.Action4
-	-- A track's first evaluation after :Play() is at time 0, and a TimePosition write is only drawn one step later. So the
-	-- _End clip is played at near-zero weight under the chain's last track (which Play hands over 0.1 s before its end, so
-	-- it is still drawing), seeked on the next step to where the chain's clock will be on the step after (the clip leads with
-	-- 3 of the piece's own frames, so it lands where the piece was), and on that step given full weight with the root write
-	-- (after the evaluation, before render).
-	T:Play(0, 0.001)
-	local Waiting = coroutine.running()
-	RunService.PreAnimation:Once(function(Dt: number)
-		if Clock and Length then T.TimePosition = math.max(0, 3 / 30 + (Clock() - Length)) end
-		RunService.PreAnimation:Once(function()
-			T:AdjustWeight(1, 0)
-			RunService.PreSimulation:Once(function()
-				Root.CFrame = Root.CFrame * CFrame.new(Offset.X, 0, Offset.Z) * CFrame.Angles(0, math.rad(Offset.Yaw), 0)
-				task.spawn(Waiting)
-			end)
+	T.Looped = true                                         -- belt and braces: two identical keyframes, speed 0
+	Pending, PendingAnim = T, A
+	local Thread = coroutine.running()
+	local Moved = false
+	local function cancel()
+		if Pending == T then Pending, PendingAnim = nil, nil end
+		drop(T, A, 0)
+		task.spawn(Thread)
+	end
+	RunService.Heartbeat:Once(function()
+		if Gen ~= My then cancel() return end
+		if EndTrack then drop(EndTrack, EndAnim, 0) EndTrack, EndAnim = nil, nil end -- a second Reseat replaces the first's hold (same priority: never two at once)
+		T:Play(0, 1, 0)
+		RunService.PreSimulation:Once(function()
+			if Gen ~= My or not T.IsPlaying or not Root.Parent then cancel() return end
+			-- EndOffset is in the clip's units; the Animator scales a Pose's translation by the character's scale (Model:ScaleTo,
+			-- e.g. 1.0296 for this avatar), so the ground offset is scaled the same way (unscaled it left a 0.03 x 1.4 = 4 cm step)
+			local S = (Char :: Model):GetScale()
+			Root.CFrame = Root.CFrame * CFrame.new(Offset.X * S, 0, Offset.Z * S) * CFrame.Angles(0, math.rad(Offset.Yaw), 0)
+			Moved = true
+			Pending, PendingAnim = nil, nil
+			EndTrack, EndAnim = T, A
+			for _, Other in ChainTracks or {} do
+				if Other.IsPlaying then Other:Stop(0) end
+			end
+			ChainTracks = nil
+			task.spawn(Thread)
 		end)
 	end)
 	coroutine.yield()
-	for _, Other in Animator:GetPlayingAnimationTracks() do
-		if Other ~= T and Other.Priority == Enum.AnimationPriority.Action then Other:Stop(0) end
-	end
-	-- the _End clip is a short settle (the piece's last motion dying out, then two identical frames): hold the final pose
-	-- from one frame before its end until Release, so the body neither falls to idle nor freezes mid-motion
-	local Hold: RBXScriptConnection
-	Hold = RunService.PreAnimation:Connect(function()
-		if T.TimePosition >= T.Length - 1 / 30 or not T.IsPlaying then
-			Hold:Disconnect()
-			T.TimePosition = math.max(T.TimePosition, T.Length - 1 / 30)
-			T:AdjustSpeed(0)
-		end
-	end)
-	HoldConn = Hold
-	EndTrack = T
+	return Moved
 end
 
+-- Release wins over a Reseat in flight (the Skip path): it bumps the token, so the pending Reseat's next step stops and
+-- destroys its _End track without moving the root; nothing is left held. The held _End (or, without a re-seat, the
+-- chain's held last piece) fades out over 0.25 s and the game's idle/walk blends back in (spec §2.2).
 function Shared.Release()
-	if HoldConn then HoldConn:Disconnect() HoldConn = nil end
-	if EndTrack then EndTrack:Stop(0.25) EndTrack = nil end -- the game's idle/walk blends back in (spec §2.2)
+	Gen += 1
+	if Pending then drop(Pending, PendingAnim, 0) Pending, PendingAnim = nil, nil end
+	if EndTrack then drop(EndTrack, EndAnim, 0.25) EndTrack, EndAnim = nil, nil end
+	for _, Other in ChainTracks or {} do
+		if Other.IsPlaying then Other:Stop(0.25) end
+	end
+	ChainTracks = nil
 	local Ctl = controls()
 	if Ctl then Ctl:Enable() end
 	Held = false
