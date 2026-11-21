@@ -353,7 +353,7 @@ function Local.OnSeg(S, Player: Player, V, M)
 	if S.Graph == nil then
 		-- (2.35.0) a seamless cut without a prompt graph (shots only, or shots and beats): nothing to judge, but every
 		-- segment the client reaches is a resume checkpoint (the server can't build the cut, so the name is only bounded)
-		if Seamless and not S.Group and #M.Name <= 40 and M.Name:match(`^[%w_]+$`) then
+		if Seamless and not S.Replay and not S.Group and #M.Name <= 40 and M.Name:match(`^[%w_]+$`) then
 			pcall(function() require(script.Parent.Tutorial).Checkpoint(Player, S.CutId, M.Name) end)
 		end
 		return
@@ -376,7 +376,7 @@ function Local.OnSeg(S, Player: Player, V, M)
 	if not Ok then return end
 	S.Seg = M.Name
 	S.SegStartAt = tonumber(M.At) or workspace:GetServerTimeNow()
-	if Seamless then
+	if Seamless and not S.Replay then -- (task 12) a replay is not progress: it never writes a resume checkpoint
 		pcall(function() require(script.Parent.Tutorial).Checkpoint(Player, S.CutId, M.Name) end)
 	end
 end
@@ -428,7 +428,7 @@ function Shared.Play(List: { Player }, CutId: string, Opts: any?): string?
 		local Release = if Cut.Seamless then Local.HoldSeamless(Player) else Local.Hold(Player)
 		if not Release then continue end
 		Local.Mark(Player, CutId, `Started`) -- saved before it plays: a disconnect mid-cut replays on rejoin
-		if Cut.Seamless then pcall(function() require(script.Parent.Tutorial).Checkpoint(Player, CutId, `Start`) end) end
+		if Cut.Seamless and Opts.Replay ~= true then pcall(function() require(script.Parent.Tutorial).Checkpoint(Player, CutId, `Start`) end) end
 		S.Viewers[Player] = { SeenBefore = SeenBefore; StartedBefore = StartedBefore; Release = Release;
 			Points = 0; Max = 0; Perfects = 0; Judged = {} }
 		ByPlayer[Player] = S.Id

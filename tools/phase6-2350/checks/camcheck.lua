@@ -198,7 +198,7 @@ if HOLD then
 	local Drift, Ang = 0, 0
 	for _, R in Tail do
 		Drift = math.max(Drift, (R.cf.Position - Tail[1].cf.Position).Magnitude)
-		Ang = math.max(Ang, math.deg(math.acos(math.clamp(R.cf.LookVector:Dot(Tail[1].cf.LookVector), -1, 1))))
+		Ang = math.max(Ang, math.deg(2 * math.asin(math.clamp((R.cf.LookVector - Tail[1].cf.LookVector).Magnitude / 2, 0, 1)))) -- chord form: acos(dot) reads 0.02 deg for two identical float32 vectors
 	end
 	local Held = Player:GetAttribute("NHCineHold") == true
 	local Ok = #Tail >= 10 and Drift <= 0.001 and Ang <= 0.01 and Held and Cam.CameraType == Enum.CameraType.Scriptable
@@ -282,5 +282,28 @@ table.insert(Report, string.format("%s%d frames, median dt %.1f ms; max/median, 
 	#Rows, (Dts[math.floor(#Dts / 2) + 1] or 0) * 1000, table.concat(Ratios, ", ")))
 local Beat = 0
 for _, R in Rows do if R.phase == "Beat" then Beat += 1 end end
+-- (task 12) house-style numbers from the engine's own camera (no video capture on this machine): the stand-in for motion_audit's
+-- camera still fraction, horizon roll and moving holds (skill 3: alive camera, still < 10 % on action beats, roll 0 on ground beats)
+do
+	local N, Still, Run, LongRun, RunT0, Dur, StillDur = 0, 0, 0, 0, nil, 0, 0
+	local RollMin, RollMax = 1e9, -1e9
+	for i = 2, #Rows do
+		local A, B = Rows[i - 1], Rows[i]
+		if B.phase ~= "Play" or A.phase ~= "Play" then
+			local Dt = math.max(B.t - A.t, 1e-4)
+			local Dp = (B.cf.Position - A.cf.Position).Magnitude
+			local Da = math.deg(2 * math.asin(math.clamp((B.cf.LookVector - A.cf.LookVector).Magnitude / 2, 0, 1)))
+			N += 1 Dur += Dt
+			local Roll = math.deg(math.asin(math.clamp(B.cf.RightVector.Y, -1, 1)))
+			RollMin, RollMax = math.min(RollMin, Roll), math.max(RollMax, Roll)
+			if Dp < 0.003 and Da < 0.03 then
+				Still += 1 StillDur += Dt Run += Dt
+				LongRun = math.max(LongRun, Run)
+			else Run = 0 end
+		end
+	end
+	table.insert(Report, string.format("motion (engine camera, cut frames only): %d frames over %.1f s, still %.1f %% of the time (a hold with pos < 0.003 st and < 0.03 deg a frame), longest still run %.2f s, horizon roll %.2f to %.2f deg",
+		N, Dur, 100 * StillDur / math.max(Dur, 1e-4), LongRun, RollMin, RollMax))
+end
 table.insert(Report, string.format("path %s; Beat frames %d", tostring(LastPath), Beat))
 return (Pass and "CAM OK\n" or "CAM JERK\n") .. table.concat(Report, "\n")

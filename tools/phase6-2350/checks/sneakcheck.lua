@@ -17,6 +17,7 @@
 --     side of the fence plane, at least 1 stud clear of it, facing away from the house, standing
 --   * the end: NHCineSeam back to nil, controls handed back; the timeline and the Fence segment's own length (for FENCE_DUR)
 local MODE = "sneak"
+local SKIP_DELAY = 0.6 -- skipfence: seconds into the Fence segment the Skip is sent (task 12: 5.2-5.8 spans the re-seat at ~5.5 s; the root must still land on FenceLand)
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Player = Players.LocalPlayer
@@ -71,7 +72,7 @@ RunService:BindToRenderStep(Name .. "Walk", Enum.RenderPriority.Input.Value + 1,
 	local Path = Player:GetAttribute("NHCinePath") or ""
 	if MODE == "skipfence" and Path:match("Fence$") and Ph ~= nil and not SkipAt then
 		SkipAt = os.clock()
-		task.delay(0.6, function() Remote:FireServer({ Kind = "Skip"; Session = Session }) end)
+		task.delay(SKIP_DELAY, function() Remote:FireServer({ Kind = "Skip"; Session = Session }) end)
 	end
 	if not Began or not (Ph == "In" or Ph == "Beat" or Ph == "BeatIn") then return end
 	local Goal = Fence
@@ -139,7 +140,7 @@ for I, R in Rows do
 	end
 	if R.seam == "Beat" and R.path == "Garden" and (not FailAt or R.t < FailAt) and R.t > (FirstSeam or 0) + 1.5 then
 		CrouchBeat += 1 if R.crouch then CrouchHeld += 1 end
-		if R.vel > 1 and R.t > (FirstSeam or 0) + 1.3 then table.insert(Ws1, R.ws) end
+		if R.vel > 1 then table.insert(Ws1, R.ws) end -- (task 12) same window as the crouch rows: first pass, 1.5 s after the beat began (the old extra 1.3 s test sat inside it and did nothing)
 	end
 	if R.seam == "Beat" and R.path == "Garden>Hide>Garden" and R.vel > 1 then table.insert(Ws2, R.ws) end
 	if R.lamp then

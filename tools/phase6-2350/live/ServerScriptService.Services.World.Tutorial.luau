@@ -13,6 +13,7 @@ local GROUP = `TutorialPlayers`
 local Shared = {}
 local Inside: { [Player]: RBXScriptConnection } = {}
 
+local Config = require(game:GetService(`ReplicatedStorage`).Config.Cine)
 local function progression() return require(ServerScriptService.Services.Player.Progression) end
 
 local function setGroup(Character: Model?, Group: string)
@@ -31,13 +32,33 @@ function Shared.CheckpointOf(Player: Player): string?
 	return P and P.Origin and P.Origin.Checkpoint or nil
 end
 
+-- (task 12) resume: a player who enters Wickfield or respawns in it with a checkpoint ("<Cut>:<Segment>") is put on that segment's
+-- mark in the cut's set (a mark named like the segment, else <Segment>Zone, else Start), 3 studs up like Cine's own placements.
+-- Returns the mark's name when it placed the player. The two-line version the plan sketched, plus the segment-to-mark lookup.
+function Shared.Resume(Player: Player): string?
+	local Cp = Shared.CheckpointOf(Player)
+	local CutId, Segment
+	if Cp then CutId, Segment = Cp:match(`^([%w_]+):([%w_]+)$`) end
+	local Cut = CutId and Config.Cuts[CutId]
+	local Sets = workspace:FindFirstChild(`NHCineSets`)
+	local Set = Cut and Cut.Set and Sets and Sets:FindFirstChild(Cut.Set)
+	if not (Set and Segment) then return nil end
+	local Mark = Set:FindFirstChild(Segment) or Set:FindFirstChild(Segment .. `Zone`) or Set:FindFirstChild(`Start`)
+	local Char = Player.Character
+	if not (Mark and Mark:IsA(`BasePart`) and Char and Char:FindFirstChild(`HumanoidRootPart`)) then return nil end
+	Char:PivotTo(Mark.CFrame * CFrame.new(0, 3, 0))
+	return Mark.Name
+end
+
 function Shared.Enter(Player: Player): boolean
 	if Inside[Player] then return true end
 	Player:SetAttribute(`NHTutorial`, true)
 	setGroup(Player.Character, GROUP)
+	Shared.Resume(Player)
 	Inside[Player] = Player.CharacterAdded:Connect(function(C)
 		C:WaitForChild(`HumanoidRootPart`, 5)
 		setGroup(C, GROUP)
+		Shared.Resume(Player)
 	end)
 	return true
 end
