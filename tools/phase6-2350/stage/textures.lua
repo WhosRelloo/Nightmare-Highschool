@@ -38,7 +38,7 @@ local TILES = { Siding = "WF_ClapCream", Roof = "WF_Shingle", Brick = "WF_Brick"
 local TILE_SETS = {
 	WF_ClapCream = set(123304236805154, 85996737149979, 138775822833363, 132726121032361),
 	WF_Brick = set(117145373109688, 109095381636468, 135123052756281, 131789682702424),
-	-- MISSING: WF_Shingle_* (the house and kennel roofs) not uploaded
+	WF_Shingle = set(133994678414940, 139001006865550, nil, 107762671353016), -- no metalness map uploaded (it's all 0)
 }
 
 local out, missing = {}, {}
