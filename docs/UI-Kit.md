@@ -309,13 +309,15 @@ R1 of the Bell Tower rebuilt the top-right clock panel (`ClockHud`) and the ques
   | `Tints` | the seal tint per level: Warning, Detention, Probation, Suspension |
   | `MIN_TEXT` | 20 |
 
-- **The 20 px floor:** game text in the cluster and on the card is at least `BellTower.MIN_TEXT` (20) design px. The Period, Class, Badge and Record lines, the Objective, Timer, `J` key, Journal label and the class marker were raised to it.
+- **The 20 px floor:** game text in the cluster and on the card is at least `BellTower.MIN_TEXT` (20) design px. The Period, Class and Badge lines, the conduct row's level text and slip lines, the Objective, Timer, `J` key, Journal label and the class marker were raised to it.
 - **Fallbacks** (while an id is 0):
 
   | Missing | Drawn instead |
   |---|---|
   | `TowerPlate` | the kit's ornate chip (`Components.Panel`), 440 wide |
   | `Dial`, `DialHand` | no dial; the moon (30 px) sits beside the time |
+  | `Seal` | no seal image is drawn; the level text alone carries the level, tinted by level (`ClockHud` `Local.Img` returns nil for an id of 0) |
+  | `SealBroken` | while its id is 0 but `Seal`'s isn't, a suspension shows the plain `Seal`, tinted, not a broken one |
   | `Slip` | a thin frame |
   | `LeadCard` | the kit's ornate panel, a fixed 420 x 176 (a three-line objective plus a timer can overflow it until the art is in) |
   | `PipEmpty`, `PipFang` | the count as text |
