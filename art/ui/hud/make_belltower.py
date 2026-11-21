@@ -163,10 +163,25 @@ def dial():
         ticks.append([(c + ux * m0, c + uy * m0), (c + ux * mid + px * 7, c + uy * mid + py * 7),
                       (c + ux * m1, c + uy * m1), (c + ux * mid - px * 7, c + uy * mid - py * 7)])
     tick = P.polymask((S, S), ticks)
+    # a raised sun at noon (top) and a crescent at midnight (bottom) on the face
+    sx, sy = c, c - 160
+    rays = []
+    for k in range(12):
+        a = k * math.pi / 6
+        ux, uy = math.cos(a), math.sin(a)
+        px, py = -uy, ux
+        rays.append([(sx + ux * 17 + px * 3, sy + uy * 17 + py * 3), (sx + ux * 26, sy + uy * 26),
+                     (sx + ux * 17 - px * 3, sy + uy * 17 - py * 3)])
+    sun = np.clip(P.polymask((S, S), rays, [(sx - 13, sy - 13, sx + 13, sy + 13)]), 0, 1)
+    mx, my = c, c + 160
+    cres = np.clip(P.polymask((S, S), [], [(mx - 16, my - 16, mx + 16, my + 16)])
+                   - P.polymask((S, S), [], [(mx - 9, my - 20, mx + 19, my + 10)]), 0, 1)
+    emblem = np.clip(sun + cres, 0, 1) * (R < 236)
     # face: blued iron with an engraved star chart
     face = soft((R < 236).astype(np.float32))
     Hf = np.maximum(Hf, face * 0.25)
     Hf = np.maximum(Hf, tick * (0.5 + 0.15 * P.dome(dist(tick), 3)))
+    Hf = np.maximum(Hf, emblem * (0.42 + 0.15 * P.dome(dist(emblem), 4)))
     eng = np.zeros((S, S), np.float32)
     for rr in (128, 170):
         eng = np.maximum(eng, np.exp(-((R - rr) / 0.9) ** 2))
@@ -190,7 +205,7 @@ def dial():
     dents = ndimage.gaussian_filter(rng.standard_normal((S, S)), 2.5)
     Hf -= np.clip(dents, 0, None) * 0.03 * face
     # materials
-    is_brass = np.clip(bezel + brs + ring + tick + bead + riv + dots * face, 0, 1)
+    is_brass = np.clip(bezel + brs + ring + tick + bead + riv + dots * face + emblem, 0, 1)
     enamel = cls
     albedo = mix(iron[0] * 0.75, brass[0], is_brass)
     albedo = mix(albedo, np.array([0.30, 0.012, 0.025]), enamel)            # crimson enamel
@@ -671,6 +686,17 @@ def preview():
     sheet.save(OUT / "_sheet.png")
 
 
+R1_PIECES = ["Dial", "DialHand", "TowerPlate", "Seal", "SealBroken", "Slip", "LeadCard", "PipEmpty", "PipFang"]
+
+
+def export_r1():
+    dest = HERE.parents[1] / "group-upload-belltower"
+    dest.mkdir(parents=True, exist_ok=True)
+    for n in R1_PIECES:
+        Image.open(OUT / f"{n}.png").save(dest / f"Bt{n}.png", optimize=True)
+    print("exported", len(R1_PIECES), "to", dest)
+
+
 if __name__ == "__main__":
     dial()
     for k in ("Hollow", "Tarnished", "Lit"):
@@ -688,4 +714,5 @@ if __name__ == "__main__":
     tower_plate()
     candle()
     preview()
+    export_r1()
     print("ok", OUT)
