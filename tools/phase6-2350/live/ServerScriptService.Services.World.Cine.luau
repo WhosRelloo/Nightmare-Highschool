@@ -5,7 +5,8 @@
 	Cine.Play(Players, CutId, Opts?) -> session id?
 		Plays a cut (Config.Cine.Cuts) for one player (a personal cut) or a party (a group cut). Opts:
 		  Skippable = true      everyone may skip at once (a replay from the journal)
-		  OnFinish(Player, How) called once per viewer: How = "Done" | "Skipped" | "Timeout" | "Left" | "Died"
+		  OnFinish(Player, How) called once per viewer: How = "Done" | "Skipped" | "Timeout" | "Left" | "Died" | "Aborted"
+		    ("Aborted": the player was taken out of the cut by the game, Tutorial.Leave; not marked Seen)
 		Before it plays, each viewer's cut is saved as "Started" (Quests block: Cine[Id]), so a disconnect mid-cut
 		is replayed once on rejoin with Skip offered (Quests' Cinematic objective does that). When it ends it's saved
 		as "Seen". The beat's progress never depends on the cut finishing: the timeout (Length + 5 s from the moment
@@ -178,7 +179,7 @@ function Local.End(S, Player: Player, How: string)
 		-- (doc 04 §4) control comes back with a short grace after the camera has landed
 		task.delay(if How == `Left` then 0 else Config.SkipGrace, function() pcall(Release) end)
 	end
-	if How ~= `Left` and How ~= `Died` then Local.Mark(Player, S.CutId, `Seen`) end
+	if How ~= `Left` and How ~= `Died` and How ~= `Aborted` then Local.Mark(Player, S.CutId, `Seen`) end
 	if How ~= `Done` and How ~= `Left` then Local.Send(Player, { Kind = `End`; Session = S.Id; How = How }) end
 	if S.OnFinish then task.spawn(S.OnFinish, Player, How) end
 	Shared.Finished:Fire(Player, S.CutId, How)
@@ -466,12 +467,14 @@ function Shared.EndBeatCrouch(Player: Player)
 	if H then pcall(require(ServerScriptService.Services.Player.Crouch).Stand, H) end
 end
 
--- (task 9) ends the player's running session (Tutorial.Leave: the safety net for an open-ended beat). The client sees
--- the normal non-blended end for How ("Skipped" is the skip-style dip).
+-- (task 9) ends the player's running session (Tutorial.Leave: the safety net for an open-ended beat). How defaults to
+-- "Aborted": the client dips and hands everything back like a skip, and the cut is NOT marked Seen (the player didn't
+-- watch it). A disconnect passes "Left": no Seen mark and no message, exactly like this module's own PlayerRemoving.
+-- A player with no session is a no-op, so it doesn't matter which PlayerRemoving handler runs first.
 function Shared.EndFor(Player: Player, How: string?)
 	local Id = ByPlayer[Player]
 	local S = Id and Sessions[Id]
-	if S then Local.End(S, Player, How or `Skipped`) end
+	if S then Local.End(S, Player, How or `Aborted`) end
 end
 
 function Shared.IsWatching(Player: Player, CutId: string?): boolean

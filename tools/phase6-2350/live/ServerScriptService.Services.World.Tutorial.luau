@@ -42,22 +42,25 @@ function Shared.Enter(Player: Player): boolean
 	return true
 end
 
-function Shared.Leave(Player: Player)
+-- Why: nil for a deliberate leave (a running cut ends "Aborted"), "Left" when the player is disconnecting (the cut ends
+-- "Left": not marked Seen, nothing sent to a client that is gone)
+function Shared.Leave(Player: Player, Why: string?)
 	local Cn = Inside[Player]
 	if Cn then Cn:Disconnect() end
 	Inside[Player] = nil
+	-- (task 9, spec §4.3) leaving Wickfield is the safety net for an open-ended beat: end any running cine session first,
+	-- while the player is still marked as in Wickfield
+	pcall(function() require(script.Parent.Cine).EndFor(Player, if Why == `Left` then `Left` else `Aborted`) end)
 	Player:SetAttribute(`NHTutorial`, nil)
 	-- (task 8 fix round 1) a walk-and-talk beat's crouch doesn't outlive Wickfield
 	pcall(function() require(script.Parent.Cine).EndBeatCrouch(Player) end)
-	-- (task 9, spec §4.3) leaving Wickfield is the safety net for an open-ended beat: end any running cine session
-	pcall(function() require(script.Parent.Cine).EndFor(Player, `Skipped`) end)
 	setGroup(Player.Character, `Default`)
 end
 
 function Shared.OnStart()
 	pcall(function() PhysicsService:RegisterCollisionGroup(GROUP) end)
 	PhysicsService:CollisionGroupSetCollidable(GROUP, GROUP, false)
-	Players.PlayerRemoving:Connect(function(P) Shared.Leave(P) end)
+	Players.PlayerRemoving:Connect(function(P) Shared.Leave(P, `Left`) end)
 end
 
 return Shared

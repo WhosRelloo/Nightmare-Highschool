@@ -3,8 +3,8 @@
 --   bridge.py TutorialEnter $P ; bridge.py CineMark $P '"<CUT>"' '"Seen"'
 --   (start this client script in the background), wait ~6 s, then bridge.py TutorialLeave $P
 -- CUT is __BeatHoldTest (a 14 s crouching Hold beat) by default; replace the CUT line for __SeamlessTest (4 s Walk beat: leave at ~10 s).
--- Confirms: NHTutorial set before and cleared after; the leave hit mid-beat; the client got { Kind = "End", How = "Skipped" }
--- (the skip-style dip, not a hang); the cut's seam state clears; the game's controls come back; the crouch is released.
+-- Confirms: NHTutorial set before and cleared after; the leave hit mid-beat; the client got { Kind = "End", How = "Aborted" }
+-- (Aborted: the skip-style dip, not a hang); the cut's seam state clears; the game's controls come back; the crouch is released.
 -- NEVER require game modules from here (execute_luau's own VM builds rogue copies).
 local CUT = "__BeatHoldTest"
 local Players = game:GetService("Players")
@@ -55,7 +55,7 @@ check(SeamAtLeave == "Beat" or SeamAtLeave == "BeatIn", "3 the leave landed mid-
 check(CUT ~= "__BeatHoldTest" or CrouchSeen, "3b the beat had crouched the player before the leave (for __BeatHoldTest)")
 local T1 = os.clock()
 repeat task.wait(0.05) until (EndHow ~= nil and Player:GetAttribute("NHCineSeam") == nil) or os.clock() - T1 > 6
-check(EndHow == "Skipped", "4 client got End How=" .. tostring(EndHow) .. " (want Skipped)")
+check(EndHow == "Aborted", "4 client got End How=" .. tostring(EndHow) .. " (want Aborted: dips like a skip)")
 check(Player:GetAttribute("NHCineSeam") == nil, "5 seam state cleared (" .. tostring(Player:GetAttribute("NHCineSeam")) .. ")")
 task.wait(1.5)
 check(gameControlsOn(), "6 game controls back")

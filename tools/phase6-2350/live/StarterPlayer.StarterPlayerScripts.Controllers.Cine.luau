@@ -105,6 +105,19 @@ end
 
 ---| the world behind the cut: everyone else is hidden on this screen while it plays |---
 
+-- (task 9 fix round 1, I3) Controllers.Hometown hides other tutorial players' characters (NHHiddenLocal = true) and
+-- restores them itself when it lets go. The cut records the UNHIDDEN value of anything Hometown already holds, and ShowLive
+-- leaves a thing Hometown still holds alone, so a cut ending never re-hides someone Hometown has released nor un-hides
+-- someone it still hides.
+local function hometownHolds(D: Instance): boolean
+	local A = D.Parent
+	while A and A ~= workspace do
+		if A:GetAttribute(`NHHiddenLocal`) == true then return true end
+		A = A.Parent
+	end
+	return false
+end
+
 function Local.HideLive(Cut)
 	Cut.HiddenParts = {}
 	Cut.HiddenGuis = {}
@@ -112,10 +125,12 @@ function Local.HideLive(Cut)
 		-- a deferred hide that lands after the cut ended (ShowLive cleared the tables) does nothing
 		if not (Cut.Live and Cut.HiddenParts and Cut.HiddenGuis) then return end
 		if D:IsA(`BasePart`) or D:IsA(`Decal`) then
-			if Cut.HiddenParts[D] == nil then Cut.HiddenParts[D] = (D :: any).LocalTransparencyModifier end
+			if Cut.HiddenParts[D] == nil then Cut.HiddenParts[D] = if hometownHolds(D) then 0 else (D :: any).LocalTransparencyModifier end
 			;(D :: any).LocalTransparencyModifier = 1
 		elseif D:IsA(`BillboardGui`) or D:IsA(`SurfaceGui`) then
-			if Cut.HiddenGuis[D] == nil then Cut.HiddenGuis[D] = (D :: any).Enabled end
+			if Cut.HiddenGuis[D] == nil then
+				Cut.HiddenGuis[D] = if hometownHolds(D) then (D:GetAttribute(`NHEn`) ~= false) else (D :: any).Enabled
+			end
 			;(D :: any).Enabled = false
 		end
 	end
@@ -153,8 +168,12 @@ function Local.HideLive(Cut)
 end
 
 function Local.ShowLive(Cut)
-	for D, V in Cut.HiddenParts or {} do if D.Parent then pcall(function() (D :: any).LocalTransparencyModifier = V end) end end
-	for D, V in Cut.HiddenGuis or {} do if D.Parent then pcall(function() (D :: any).Enabled = V end) end end
+	for D, V in Cut.HiddenParts or {} do
+		if D.Parent and not hometownHolds(D) then pcall(function() (D :: any).LocalTransparencyModifier = V end) end
+	end
+	for D, V in Cut.HiddenGuis or {} do
+		if D.Parent and not hometownHolds(D) then pcall(function() (D :: any).Enabled = V end) end
+	end
 	Cut.HiddenParts, Cut.HiddenGuis = nil, nil
 end
 
@@ -1206,7 +1225,7 @@ function Local.EndGraph(Cut)
 	if Cut.Live then Local.Finish(Cut, `Done`) end
 end
 
--- How: Done (played out), Skipped / Timeout / Died (the server ended it), Replaced, NotReady, NoCamera, Error
+-- How: Done (played out), Skipped / Aborted / Timeout / Died (the server ended it; Aborted = Tutorial.Leave), Replaced, NotReady, NoCamera, Error
 function Local.Finish(Cut, How: string, Quiet: boolean?)
 	if not Cut.Live then return end
 	Cut.Live = false
@@ -1276,7 +1295,7 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 		pcall(function() actor().Release() end)
 	end
 	local Dipped = false
-	if Black and Seamless and How == `Skipped` then
+	if Black and Seamless and (How == `Skipped` or How == `Aborted`) then
 		-- the jump to the end state happens at full black: the cut stops, the camera goes back to the gameplay camera
 		Dipped = true
 		Gui.Dip(0.25, function()
