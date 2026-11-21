@@ -53,10 +53,13 @@ A 40-minute class is about 3 minutes 20 seconds of real time, and a passing peri
     - `SetTime("HH:MM", Day?)`
     - signals: `PeriodChanged(State, OldSegment)`, `SchoolHoursChanged(bool)`
 - **`ReplicatedStorage.Functions.SchoolTime`** holds the pure time math that server and client share: parse and format times, find the current segment, and build the state.
-- **`StarterPlayerScripts.Controllers.Gui.ClockHud`** is a top-right panel showing:
+- **`StarterPlayerScripts.Controllers.Gui.ClockHud`** is a top-right cluster (2.36):
+  - the timetable dial (the hand at now, the moon in its window)
   - the day and time
   - the current period and when it ends
   - a "School hours: 1.2x EXP" badge during school hours
+
+  See [UI Kit](UI-Kit.md#the-bell-tower-cluster-236). The dial is Bell Tower art (`Config.BellTowerArt`); with its id at 0 the moon sits beside the time instead.
 
 ## Verified (Studio playtest)
 

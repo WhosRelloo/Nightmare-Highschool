@@ -249,7 +249,7 @@ Every reskin swaps visuals only. Packets, attributes, instance names and public 
 | `Dialogue` | A compact ornate box, low on screen, tinted in the speaker's faction colour, with `ChoiceRow` replies and an AutoScale floor of 0.8 |
 | `Notifications` | `Toast` rows that fade with `FadeOut` |
 | `Chat` (2.1.0, new) | The NH chat window in place of Roblox's: a thin-frame `Panel`, the "HALLWAY" header, an inked log and a quill bar; see [Chat](Chat.md) |
-| `ClockHud` | An ornate auto-height chip, plus an engraved class-waypoint plate |
+| `ClockHud` | The Bell Tower cluster (2.36): the timetable Dial with the moon and hand, the time lines on an iron TowerPlate, and the conduct row (wax seal, level, detention slip). Kit fallbacks while an art id is 0. See [The Bell Tower cluster](#the-bell-tower-cluster-236). |
 | `DownedHud` | An engraved prompt plate above the health bar. It turns red when you're downed or gripped. |
 | `FactionsPanel` | An ornate panel with a plaque, bracket-cornered cards, `Bar`s and kit buttons |
 | `Activities` | The lesson chalkboard framed in iron ornament over slate-green. The renderers are untouched. Leaving a lesson keeps the core backpack off while KitHud is active. |
@@ -262,6 +262,89 @@ The in-play HUD:
 - **Hotbar** from your Backpack tools. Click, tap or press 1-9 to equip. Tools can set `Rarity` and `Count` attributes.
 - **Yen** from the profile.
 - **Posture rail** (1.74.0, "Twin Rail"), reading a `Posture` attribute on the character or Humanoid, out of `Config.Combat.PostureMax`. It replaced the vertical posture meter that stood left of the bar. It only draws posture: nothing in it writes the value. See [Posture rail](#posture-rail) below.
+
+### The Bell Tower cluster (2.36)
+R1 of the Bell Tower rebuilt the top-right clock panel (`ClockHud`) and the quest card (`QuestTracker`) with new art. Both were rebuilt in place, not replaced by a new controller, because Timetable, Moments, TouchControls, SchoolFx and GamepadControls depend on their instance names. No rules changed: it reads the same attributes and remotes. The spec is `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-design.md`, the plan `docs/superpowers/plans/2026-11-20-belltower-r1-cluster.md`.
+
+**Status (2.36.0): the art is live.** All nine ids in `ReplicatedStorage.Config.BellTowerArt` are filled (group 15981569). If an id is ever set back to 0, that piece falls back to the kit look (below).
+
+![The cluster with the art](img/belltower-r1-owed.jpg)
+
+![The kit fallbacks (all ids 0)](img/belltower-r1-fallback.jpg)
+- **Art** (`art/ui/hud/make_belltower.py`, staged in `art/group-upload-belltower/`, group 15981569). Ids live in `Config.BellTowerArt`, and `Functions.BellTower.Image(Art, Key)` returns `rbxassetid://<id>`, or nil for 0:
+
+  | Key | File | Size | Used for |
+  |---|---|---|---|
+  | `Dial` | `BtDial.png` | 640 x 640 | the timetable dial face, drawn at 176 px |
+  | `DialHand` | `BtDialHand.png` | 640 x 640 | the hand, rotated by `HandAngle` |
+  | `TowerPlate` | `BtTowerPlate.png` | 600 x 200 | the iron plate behind the time lines (9-slice) |
+  | `Seal` | `BtSeal.png` | 256 x 256 | the conduct wax seal, greyscale, tinted per level |
+  | `SealBroken` | `BtSealBroken.png` | 256 x 256 | the seal while suspended |
+  | `Slip` | `BtSlip.png` | 420 x 150 | the detention slip (9-slice) |
+  | `LeadCard` | `BtLeadCard.png` | 1000 x 300 | the quest card's parchment (9-slice) |
+  | `PipEmpty` | `BtPipEmpty.png` | 96 x 96 | an unfilled objective pip |
+  | `PipFang` | `BtPipFang.png` | 96 x 96 | a filled objective pip |
+
+- **9-slice data** (`Art.Slices`: the centre in source pixels, and the `Scale` that draws it at design size):
+
+  | Piece | `Center` | `Scale` |
+  |---|---|---|
+  | `TowerPlate` | `Rect(60, 60, 540, 140)` | 0.5 |
+  | `LeadCard` | `Rect(140, 130, 880, 250)` | 0.47 |
+  | `Slip` | `Rect(90, 40, 380, 110)` | 0.68 |
+
+- **Layout** (design px, before the AutoScale):
+  - `Panel`: 500 wide, auto height, anchored top-right at (-24, 12), with an 8 px gap between its rows. It spans the whole cluster, including the conduct row.
+  - `Dial`: 176 x 176 at the right end of `Head`. The moon sits in its window (35% of the dial) and the hand turns on top.
+  - `Plate`: 340 wide, right-anchored, 22 px down, overlapping the dial by 30. Padding is 14 top and bottom, 22 left, 40 right. It grows for the PA line.
+  - `Conduct` row: the 66 px `Seal`, the level text at 22 px ("Warning · 3 pts"), and a 300 x 100 `Slip` ("Detention owed" over "Room 106, outside class", or "Trash 2/5" in a session). It is hidden when there's nothing to show.
+  - Lead Card (`QuestTracker`): 470 wide, auto height, padding 70 left (clear of the brass clip), 56 right (clear of the ribbon), 16 top and 20 bottom. It follows the clock: `Local.Follow` puts its Y at the bottom of the clock `Panel` plus 12 on desktop. (2.36.1) It moves as soon as the `Panel`'s AbsoluteSize or AbsolutePosition changes (the signals are connected once, found lazily) and when ClockHud is enabled or disabled; with ShowClock off it goes back to Y 200. Phones keep their left-column spot (24, 120).
+  - Pips: the foot row shows fang pips for a counted objective of 2 to 6, otherwise the count as text. The `J` key cap and "Journal" sit at the right. (2.36.1) The `Pips` frame is `UDim2.new(1, -130, 1, 0)` (it stops 4 px before the key), and pips are 34 px for a need of up to 4, 26 px for 5 or 6, so six pips plus the count fit.
+- **`Functions.BellTower`** (pure: no services, no instances; tested by `tools/belltower-r1/checks/bt_pure.lua`):
+
+  | Member | Returns |
+  |---|---|
+  | `Image(Art, Key)` | the `rbxassetid://` string, or nil when the id is 0 |
+  | `HandAngle(Hour)` | `((Hour / 24) * 360 + 180) % 360`: midnight at the bottom, noon at the top |
+  | `Conduct(Attributes, IsClass)` | `{ Visible, Seal, Broken, Text, Slips, Waypoint }`, from `DisciplineLevel`, `DisciplinePoints`, `DetentionsOwed`, `DetentionActive`, `DetentionCollected`, `DetentionTotal` and `Suspended` |
+  | `Pips(Have, Need)` | a list of booleans for a need of 2 to 6, else nil |
+  | `Tints` | the seal tint per level: Warning, Detention, Probation, Suspension (typed `{ [string]: Color3 }`) |
+  | `MIN_TEXT` | 20 |
+
+- **The 20 px floor:** game text in the cluster and on the card is at least `BellTower.MIN_TEXT` (20) design px. The Period, Class and Badge lines, the conduct row's level text and slip lines, the Objective, Timer, `J` key, Journal label and the class marker were raised to it, and (2.36.1) the Detection meter's label.
+- **Fallbacks** (while an id is 0):
+
+  | Missing | Drawn instead |
+  |---|---|
+  | `TowerPlate` | the kit's ornate chip (a Frame with `Kit.Decorate`), 440 wide |
+  | `Dial`, `DialHand` | no dial; the moon (30 px) sits beside the time |
+  | `Seal` | no seal image is drawn; the level text alone carries the level, tinted by level (`ClockHud` `Local.Img` returns nil for an id of 0) |
+  | `SealBroken` | while its id is 0 but `Seal`'s isn't, a suspension shows the plain `Seal`, tinted, not a broken one |
+  | `Slip` | a thin frame |
+  | `LeadCard` | the kit's ornate panel, a fixed 420 x 176 (a three-line objective plus a timer can overflow it) |
+  | `PipEmpty`, `PipFang` | the count as text |
+
+- **Contracts to keep** (other scripts read these):
+
+  | Contract | Read by |
+  |---|---|
+  | ScreenGui `ClockHud`, whose only direct Frame child is `Panel` | Timetable (`FindFirstChildWhichIsA("Frame")`, click hook, placement), Moments (`BellRim` overlay), TouchControls (Top) |
+  | A visible TextLabel whose text contains `In class` | SchoolFx |
+  | `ClockHud.Shared.ShowPA(Text, Chime?)` | the `NHBroadcast` hook inside ClockHud |
+  | ScreenGui `QuestTracker` with a GuiObject `Tracker`, AnchorPoint.X above 0.5 on desktop | TouchControls |
+  | ScreenGui names in hide lists | GamepadControls, TouchControls, `UI.Settings` (ShowClock) |
+
+- **Checked in Studio** (slot 2, restored after every run):
+  - `bt_pure`: PASS in the Edit VM.
+  - `bt_hud`: PASS for the five states, on the fallbacks and with the art (`active` passed on a re-run; the card follows the cluster on a 0.25 s poll).
+  - Contracts in Play (`bt_contracts`): the Timetable hook and a real click on the plate (fallbacks) and the dial (art), the Moments panel, the "In class" line, and the PA line typing above the time and wrapping in full at 20 px. Screenshots with the art: [calm](img/belltower-r1-calm.jpg), [detention owed](img/belltower-r1-owed.jpg), [detention under way](img/belltower-r1-active.jpg), [suspended](img/belltower-r1-suspended.jpg), [the Timetable under the cluster](img/belltower-r1-timetable-art.jpg), [the PA line](img/belltower-r1-pa-art.jpg). On the fallbacks: [the Timetable](img/belltower-r1-timetable.jpg), [the PA line](img/belltower-r1-pa.jpg).
+- **Checked in 2.36.1** (Play starts at 12:30, after school, so a run books no Absent):
+  - `bt_pure` PASS in the Edit VM. All five `bt_hud` states PASS with the new art-path checks: Plate and Tracker are ImageLabels, and the Seal uses `Seal` (or `SealBroken` when suspended), tinted `Tints[level]`.
+  - `bt_contracts` runs the real `UI.Settings` ShowClock handler (`Settings.Apply`, not saved): the cluster hides, the card goes back to Y 200, then follows the cluster again.
+  - `bt_pips` PASS: needs 3 to 6 stop before the `J` key. It measures a copy of the live Pips row, because the check runner gets its own module copies and can't drive the live tracker.
+  - Phone, in the kit's Studio preview only (`NHTouchTest` and `NHPhonePreview` 844 x 390): the card goes to the left column under the compass, clear of the chat bar and the Factions/Journal buttons ([screenshot](img/belltower-r1-phone-preview.jpg)).
+- **Not checked:** a real phone viewport in Studio's device emulator, so the touch buttons (TouchControls isn't built in the preview) and true phone scale aren't checked; two players; filled fang pips on screen; the longest quest title on the card; and the BellRim flash around the new cluster.
+- **Backup:** the pre-R1 scripts are in `ServerStorage.NH_Backup.BellTower_pre_20261120` (Studio) and `tools/belltower-r1/pre/`. The live mirror is `tools/belltower-r1/live/`.
 
 ### Health bar: Thornrose
 The owner asked for "a completely new and cooler and on theme design". Three all-new concepts were mocked up (Vigil, Reliquary, Thornrose: [options](img/health-thornrose-options.jpg)), and the owner picked **Thornrose**: a briar of black iron (`KitHud` `Local.SkinThorn`, over the kit's `HealthBar`).
