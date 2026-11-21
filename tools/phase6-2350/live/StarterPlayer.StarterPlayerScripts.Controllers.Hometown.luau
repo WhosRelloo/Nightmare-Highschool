@@ -161,7 +161,11 @@ function Shared.OnStart()
 				hideCharacter(Other.Character, false)
 			end
 		end
-		for C in table.clone(Watching) do hideCharacter(C, false) end -- anything still watched (a character that left the list)
+		-- anything still watched (a character that left the list), except what is released later at black: the cast sources (the
+		-- deferred block below) and this player's own character (a cut hid it; its release restores it)
+		for C in table.clone(Watching) do
+			if not HiddenSources[C] and C ~= Player.Character then hideCharacter(C, false) end
+		end
 		-- (task 10) the cast goes at full black: Tutorial.Leave ends the cine session (a dip to black) just before it clears
 		-- NHTutorial, and a cast folder destroyed at once popped the bus out in view. Wait out a seamless blend-out
 		-- (NHCineSeam) and a dip's way to black, then put the sources back and destroy the cast together (no double model)

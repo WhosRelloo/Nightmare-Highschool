@@ -633,7 +633,7 @@ end
 function Shared.Dip(Seconds: number, AtBlack: (() -> ())?)
 	if not Ui then Local.Build() end
 	Ui.Gui.Enabled = true
-	Local.Dipping = true
+	Local.Dips = (Local.Dips or 0) + 1 -- (a counter: two dips at once must not clear each other's wait)
 	Shared.Veil(1, Seconds / 2)
 	task.wait(Seconds / 2)
 	Ui.Veil.BackgroundTransparency = 0
@@ -641,12 +641,12 @@ function Shared.Dip(Seconds: number, AtBlack: (() -> ())?)
 		local Ok, Err = pcall(AtBlack)
 		if not Ok then warn(`[CineUI] Dip: {Err}`) end
 	end
-	Local.Dipping = false -- (task 10) black reached and its work done: what waited for black (Hometown's cast) may go
+	Local.Dips = math.max(0, (Local.Dips or 1) - 1) -- (task 10) black reached and its work done: what waited for black (Hometown's cast) may go
 	Shared.Veil(0, Seconds / 2)
 end
 
 -- true from a dip's start until it is at full black (and its AtBlack has run)
-function Shared.Dipping(): boolean return Local.Dipping == true end
+function Shared.Dipping(): boolean return (Local.Dips or 0) > 0 end
 
 function Shared.IsOn(): boolean return On end
 

@@ -16,10 +16,14 @@ local WALK = false
 -- ID: the cut to watch. PHASES: the seamless phases that cut has (a cut with Def.EndHold, like TutorialBus, has "In" only: it never
 -- blends out). HOLD: the cut ends held (Def.EndHold): instead of the release check, the camera must stay frozen on the held
 -- frame and NHCineHold must be set. TutorialBus variant:
---   sed 's/^local ID = "__SeamlessTest"/local ID = "TutorialBus"/; s/^local PHASES = .*/local PHASES = { "In" }/; s/^local HOLD = false/local HOLD = true/'
+--   sed 's/^local ID = "__SeamlessTest"/local ID = "TutorialBus"/; s/^local PHASES = .*/local PHASES = { "In" }/; s/^local HOLD = false/local HOLD = true/; s/^local TRIGGER = .*/local TRIGGER = "wait"/'
 local ID = "__SeamlessTest"
 local PHASES = { "In", "BeatIn", "BeatOut", "Out" }
 local HOLD = false
+-- TRIGGER: "replay" fires a journal Replay from here (mark the cut Seen first); "wait" waits for the caller to start it the way the
+-- tutorial does (bridge.py PlayCut $P '"TutorialBus"' false, ~3 s after this starts, with TutorialEnter done): a held cut (HOLD) is
+-- never held on a replay (task 10 fix round 1), so the TutorialBus variant uses "wait".
+local TRIGGER = "replay"
 -- TURN (degrees): before the cut, the gameplay camera is swung this far round the player (the Custom camera keeps it),
 -- so the glide has a big turn to make. Variant: sed 's/^local TURN = 0/local TURN = 120/'
 local TURN = 0
@@ -87,13 +91,13 @@ if TURN ~= 0 then
 	task.wait(0.6)
 end
 local SpeedAtFire = Player.Character.HumanoidRootPart.AssemblyLinearVelocity.Magnitude
-game.ReplicatedStorage:WaitForChild("NHCine"):FireServer({ Kind = "Replay"; Id = ID })
+if TRIGGER == "replay" then game.ReplicatedStorage:WaitForChild("NHCine"):FireServer({ Kind = "Replay"; Id = ID }) end
 local T0 = os.clock()
 local Started = false
 repeat
 	task.wait(0.1)
 	if Player:GetAttribute("NHCineSeam") ~= nil then Started = true end
-until (Started and Player:GetAttribute("NHCineSeam") == nil and os.clock() - T0 > 3) or os.clock() - T0 > 35
+until (Started and Player:GetAttribute("NHCineSeam") == nil and os.clock() - T0 > 3) or os.clock() - T0 > 50
 task.wait(1.2)
 RunService:UnbindFromRenderStep(Name)
 if WALK then pcall(function() RunService:UnbindFromRenderStep(Name .. "Walk") end) end

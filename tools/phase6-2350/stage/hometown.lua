@@ -21,10 +21,21 @@ local function take(name, into, cf, longest)
 	-- bus 60 studs away, the dog), so Wickfield's models are Persistent (sent whole to every client)
 	if M:IsA("Model") then M.ModelStreamingMode = Enum.ModelStreamingMode.Persistent end
 	local Root = M:FindFirstChild("RootPart")
-	for _, D in M:GetDescendants() do
-		if D:IsA("BasePart") then D.Anchored = (Root == nil) or D == Root end
+	-- a rig part with no joint path to the root would fall in Play: those are anchored too, and named in the report
+	local Joined = {}
+	if Root then
+		Root.Anchored = false
+		for _, P in Root:GetConnectedParts(true) do Joined[P] = true end
+		Joined[Root] = true
 	end
-	return name .. " ok"
+	local Loose = {}
+	for _, D in M:GetDescendants() do
+		if D:IsA("BasePart") then
+			D.Anchored = (Root == nil) or D == Root or not Joined[D]
+			if Root and D ~= Root and not Joined[D] then table.insert(Loose, D.Name) end
+		end
+	end
+	return name .. " ok" .. (#Loose > 0 and (" (anchored, no joint to the root: " .. table.concat(Loose, ", ") .. ")") or "")
 end
 local Report = {
 	-- the stop faces -Y in Blender = -Z in Roblox; the road runs along X in front of it

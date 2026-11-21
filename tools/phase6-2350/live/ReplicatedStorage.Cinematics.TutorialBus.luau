@@ -21,6 +21,12 @@ local RunService = game:GetService(`RunService`)
 local Config = require(ReplicatedStorage.Config.Cine)
 local Def = { Set = `BusStop`; Seamless = true; EndHold = true }
 
+-- TODO(bus re-export): the bus's clips carry the rig's bind offsets as constant pose translations on every bone but Root and
+-- Body (wheels 3.3 studs down, doors 1.7 down), so, unmodified, the wheels sink through the road. The bus is being re-exported
+-- with its mesh transforms applied; when it is re-imported and its clips republished, delete this flag and the strip below.
+-- Authored bus clips translate only Body (and Body is not stripped), so the strip loses no authored motion.
+local STRIP_BIND_TRANSLATION = true
+
 local function controllers()
 	local Player = Players.LocalPlayer
 	return if Player then Player.PlayerScripts:FindFirstChild(`Controllers`) else nil
@@ -31,7 +37,9 @@ function Def.Build(Ctx)
 	local Ctl = controllers()
 	local Actor = Ctl and require(Ctl.CineActor) or nil
 	local Hometown = Ctl and require(Ctl.Hometown) or nil
-	-- the player's own copy of the bus (a Studio lint, outside the tutorial, borrows the shared one and leaves it where it is)
+	-- The player's own copy of the bus (Hometown.Cast; Wickfield is private). Outside the tutorial Cast returns nil: the
+	-- shared WFBlackBus is then only a subject to frame (a lint, a replay from the journal) and is never moved, animated,
+	-- given an Animator or touched in any way.
 	local Own = Hometown and Hometown.Cast(`WFBlackBus`) or nil
 	local Bus: Model = Own or workspace.Hometown.BlackBus:FindFirstChild(`WFBlackBus`)
 	if Own then
@@ -40,27 +48,30 @@ function Def.Build(Ctx)
 		end
 		Own:PivotTo(Ctx.CF(`BusStart`)) -- out in the fog before the first frame (the copy starts where the source stands)
 	end
-	local Controller = Bus:FindFirstChildWhichIsA(`AnimationController`, true)
-	local BusAnimator: Animator? = Bus:FindFirstChildWhichIsA(`Animator`, true)
-	if not BusAnimator and Controller then
+	local Controller = Own and Own:FindFirstChildWhichIsA(`AnimationController`, true)
+	local BusAnimator: Animator? = Own and Own:FindFirstChildWhichIsA(`Animator`, true) or nil
+	if Own and not BusAnimator and Controller then
 		BusAnimator = Instance.new(`Animator`)
 		BusAnimator.Parent = Controller
 	end
 
-	-- The bus clips' pose translations are not animation: every bone but Root and Body carries a constant offset (DoorA
-	-- (-1.69, -1.70, 0.44) in all of them, the wheels 3.3 studs down), the rig's bind offset written into the pose, so
-	-- unmodified the wheels sink through the road and the doors drop. Their rotations are the animation (doors 88 deg, the
-	-- head 33 deg). So after the Animator's step, each frame, those bones keep their rotation and lose the translation.
-	local Bones: { Bone } = {}
-	for _, B in Bus:GetDescendants() do
-		if B:IsA(`Bone`) and B.Name ~= `Root` and B.Name ~= `Body` then table.insert(Bones, B) end
-	end
-	local Strip = RunService.PreRender:Connect(function()
-		for _, B in Bones do
-			local X = B.Transform
-			if X.Position.Magnitude > 1e-4 then B.Transform = X - X.Position end
+	-- The clips' bind offsets (see STRIP_BIND_TRANSLATION): every bone but Root and Body keeps its rotation and loses the
+	-- translation after the Animator's step, each frame. Started by the cut's first event (not at Build), so a Build that
+	-- never plays (BuildForTests) leaves nothing connected.
+	local Strip: RBXScriptConnection? = nil
+	local function stripOn()
+		if not (STRIP_BIND_TRANSLATION and Own) or Strip then return end
+		local Bones: { Bone } = {}
+		for _, B in Own:GetDescendants() do
+			if B:IsA(`Bone`) and B.Name ~= `Root` and B.Name ~= `Body` then table.insert(Bones, B) end
 		end
-	end)
+		Strip = RunService.PreRender:Connect(function()
+			for _, B in Bones do
+				local X = B.Transform
+				if X.Position.Magnitude > 1e-4 then B.Transform = X - X.Position end
+			end
+		end)
+	end
 
 	-- the bus clips: one at a time, the last frame held until the next starts; all stopped at the cut's end
 	local Tracks: { AnimationTrack } = {}
@@ -68,7 +79,7 @@ function Def.Build(Ctx)
 	local Current: AnimationTrack? = nil
 	local function play(Clip: string, Loop: boolean?)
 		local Id = Ctx.Clip(Clip)
-		if not (BusAnimator and Id and Ctx.Alive()) then return end
+		if not (Own and BusAnimator and Id and Ctx.Alive()) then return end
 		local A = Instance.new(`Animation`)
 		A.AnimationId = Id
 		local T = BusAnimator:LoadAnimation(A)
@@ -94,7 +105,7 @@ function Def.Build(Ctx)
 		end
 	end
 	Ctx.OnEnd(function()
-		Strip:Disconnect()
+		if Strip then Strip:Disconnect() Strip = nil end
 		for _, T in Tracks do pcall(function() T:Stop(0) T:Destroy() end) end
 		for _, A in Anims do pcall(function() A:Destroy() end) end
 		table.clear(Tracks)
@@ -104,6 +115,7 @@ function Def.Build(Ctx)
 
 	-- a slide along a line, ending on its own or when the cut does
 	local function slide(From: CFrame, To: CFrame, Seconds: number, Curve: (number) -> number)
+		if not Own then return end
 		local T0 = os.clock()
 		while Ctx.Alive() and os.clock() - T0 < Seconds do
 			Bus:PivotTo(From:Lerp(To, Curve((os.clock() - T0) / Seconds)))
@@ -121,6 +133,7 @@ function Def.Build(Ctx)
 		cues = {};
 		events = {
 			{ t = 0; call = function()
+				stripOn()
 				play(`BusEngineIdle`, true)
 				if not Actor then return end
 				Actor.WalkTo(Ctx.CF(`Stand`), 4)
@@ -138,7 +151,7 @@ function Def.Build(Ctx)
 			-- you're on: the doors close behind you, your own copy of you is out of sight for the rest of the cut
 			{ t = 19.6; call = function() play(`BusDoorsClose`) end };
 			{ t = 19.75; call = function()
-				if Hometown and Me and not Taken then
+				if Own and Hometown and Me and not Taken then
 					Taken = true
 					Hometown.HideCharacter(Me, true)
 					Ctx.OnRelease(function() Hometown.HideCharacter(Me, false) end)

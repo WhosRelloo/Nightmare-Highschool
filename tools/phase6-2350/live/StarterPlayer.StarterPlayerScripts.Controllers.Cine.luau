@@ -737,6 +737,7 @@ function Local.Play(Message)
 	Current = Cut
 	-- (2.35.0) a seamless cut (spec §2) starts from the live view: no black, no clones of you, no hidden world
 	Cut.Seamless = Message.Seamless == true
+	Cut.Replay = Message.Replay == true -- (task 10) a journal replay: never a held ending
 	-- black first: the menu's "The bell is ringing..." hands straight over to the cut
 	local Gui = UI()
 	if not Cut.Seamless then
@@ -1250,7 +1251,10 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 	local Seamless = Cut.Seamless == true
 	-- (task 10) Def.EndHold: the tutorial's last cut ends on its title; there is no glide out. The frame freezes where it is, the
 	-- title card stays, the player stays held, until ReleaseHold (the next cut, leaving Wickfield, a respawn)
-	local Hold = Seamless and How == `Done` and Cut.Def.EndHold == true
+	-- Only the real thing holds: in Wickfield (NHTutorial) and not a replay. Anything else blends out as usual, so a replay
+	-- from the journal can never strand the player under a frozen title.
+	local Hold = Seamless and How == `Done` and Cut.Def.EndHold == true and Cut.Replay ~= true
+		and Player:GetAttribute(`NHTutorial`) == true
 	local Blended = Seamless and How == `Done` and not Hold
 	local function actor() return require(script.Parent:WaitForChild(`CineActor`)) end
 	local Superseded = false
@@ -1259,6 +1263,10 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 		Player:SetAttribute(`NHCineSeam`, nil)
 		Player:SetAttribute(`NHCineHold`, true)
 		pcall(function() Gui.SetSkippable(false) end) -- nothing left to skip
+		-- safety net: no next cut (the Prologue) within 10 s -> dip to black and let go; a hold is never forever
+		task.delay(10, function()
+			if HeldCut == Cut then pcall(function() UI().Dip(0.3, function() Local.ReleaseHold() end) end) end
+		end)
 	end
 	if Blended then
 		-- (2.35.0) out without black (spec §2.2): control comes back as the glide onto the Custom camera starts
@@ -1335,9 +1343,11 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 	end
 	Cut.BeatRig = nil
 	for _, Cn in Cut.Conns do Cn:Disconnect() end
-	for _, Fn in Cut.Cleanups or {} do pcall(Fn) end
-	Cut.Cleanups = nil
+	-- (task 10 fix round 1) a held cut keeps its tracks and loops' cleanups until the hold is released: stopped now, the
+	-- bus would fall to its rest pose under the frozen title
 	if not Hold then
+		for _, Fn in Cut.Cleanups or {} do pcall(Fn) end
+		Cut.Cleanups = nil
 		for _, Fn in Cut.AfterHold or {} do pcall(Fn) end
 		Cut.AfterHold = nil
 	end
@@ -1381,6 +1391,8 @@ function Local.ReleaseHold()
 	if not Cut then return end
 	HeldCut = nil
 	Player:SetAttribute(`NHCineHold`, nil)
+	for _, Fn in Cut.Cleanups or {} do pcall(Fn) end
+	Cut.Cleanups = nil
 	for _, Fn in Cut.AfterHold or {} do pcall(Fn) end
 	Cut.AfterHold = nil
 	pcall(function() UI().ClearCard(0.2) end)

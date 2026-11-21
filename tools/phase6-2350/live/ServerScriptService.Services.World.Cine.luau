@@ -414,7 +414,7 @@ function Shared.Play(List: { Player }, CutId: string, Opts: any?): string?
 	if not Cut then warn(`[Cine] unknown cut {CutId}`) return nil end
 	Opts = Opts or {}
 	local S = { Id = HttpService:GenerateGUID(false); CutId = CutId; Viewers = {}; OnFinish = Opts.OnFinish;
-		Group = #List > 1; Skippable = Opts.Skippable == true }
+		Group = #List > 1; Skippable = Opts.Skippable == true; Replay = Opts.Replay == true }
 	local Ids = {}
 	for _, Player in List do
 		if not Player.Parent or ByPlayer[Player] or Player:GetAttribute(`InMainMenu`) == true then continue end
@@ -447,7 +447,7 @@ function Shared.Play(List: { Player }, CutId: string, Opts: any?): string?
 		local Skippable = S.Skippable or (not S.Group and (V.SeenBefore or V.StartedBefore))
 		Local.Send(Player, { Kind = `Play`; Session = S.Id; Id = CutId; StartAt = StartAt; Skippable = Skippable;
 			Group = S.Group; Viewers = Ids; Need = Local.Need(S); Votes = Local.Votes(S); Name = Local.NameOf(Player);
-			Seamless = Cut.Seamless == true; Interactive = S.Graph ~= nil; Solo = not S.Group; Flags = Local.FlagsFor(Player, Cut) })
+			Replay = S.Replay == true; Seamless = Cut.Seamless == true; Interactive = S.Graph ~= nil; Solo = not S.Group; Flags = Local.FlagsFor(Player, Cut) })
 		-- the client may take a moment to get ready (the menu finishing); the real timer starts when it says Began
 		Local.ArmTimeout(S, Player, Config.StartGrace + Cut.Length + Config.TimeoutPad)
 		Shared.Began:Fire(Player, CutId)
@@ -497,7 +497,7 @@ function Local.OnMessage(Player: Player, Message)
 		local Id = Message.Id
 		local Cut = typeof(Id) == `string` and Config.Cuts[Id]
 		if Cut and Cut.Replay and Shared.Seen(Player, Id) and not ByPlayer[Player] then
-			Shared.Play({ Player }, Id, { Skippable = true })
+			Shared.Play({ Player }, Id, { Skippable = true; Replay = true }) -- (task 10) Replay: a journal replay, never a held ending
 		end
 		return
 	end

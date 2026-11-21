@@ -1,5 +1,6 @@
 -- buscheck (2.35.0, task 10): the Bus cut end to end, from the client VM, ONE call (the cut is started and watched inside it).
--- Mark it Seen first (bridge.py CineMark $P '"TutorialBus"' '"Seen"'), TutorialEnter, and stand the player on Stand.
+-- TutorialEnter, stand the player on Stand, run this in the background, and 3 s later start the cut as the tutorial does
+-- (bridge.py PlayCut $P '"TutorialBus"' false: not a replay, so the cut ends held). It waits up to 40 s for the cut.
 -- Samples every frame and checks:
 --   * the cast: the bus is the player's own copy (NHHometownCast), the shared source never moves, the copy comes in from
 --     BusStart, stops on BusStop and leaves to BusAway; the copy has exactly one Animator;
@@ -7,6 +8,9 @@
 --     out and the new one); none is left playing when the cut ends;
 --   * the player's chain: TheBus1_WaitBored loops, TheBus2 starts near 16.15 s (the step on's shot at 15.8 s), and the
 --     character is out of sight (LocalTransparencyModifier) from ~19.75 s until the hold is released;
+--   * the alignment, MEASURED while the bus is parked (bones and marks, not the mesh): the DoorA/DoorB bone midpoint against
+--     Stand (X) and the Stand..Board span (Z), and the lowest wheel point against the road (a raycast under each wheel);
+--   * the hold (fix round 1): the bus tracks still playing on every held frame (the frozen title frame keeps its pose);
 --   * the end: NHCineHold set, the title card up (text, rendered text height >= 20 px), the camera frozen;
 --   * the release: TutorialLeave (done by the caller after this returns) must put everything back.
 local Players = game:GetService("Players")
@@ -17,6 +21,8 @@ local Tutorial = game.ReplicatedStorage.NHCineClips:FindFirstChild("Tutorial")
 local Rows = {}
 local Name = "BusCheck_" .. math.random(1e6)
 local Source = workspace.Hometown.BlackBus:FindFirstChild("WFBlackBus")
+local Marks = workspace.NHCineSets.BusStop
+local Align = nil -- measured once, while the bus is parked on its mark
 local SourceStart = Source:GetPivot().Position
 local function previewId(N)
 	local S = Tutorial and Tutorial:FindFirstChild(N)
@@ -62,6 +68,36 @@ RunService:BindToRenderStep(Name, Enum.RenderPriority.Last.Value, function()
 		cam = workspace.CurrentCamera.CFrame; src = Source:GetPivot().Position;
 	})
 end)
+-- the alignment sample runs deferred from PreRender: the frame's Animator step has run and so has the cut's translation strip
+-- (also PreRender), so the bones read here are the ones that are drawn (at Heartbeat they would still be unstripped)
+local AlignConn = RunService.PreRender:Connect(function() task.defer(function()
+	local Cast = workspace:FindFirstChild("NHHometownCast")
+	local Bus = Cast and Cast:FindFirstChild("WFBlackBus")
+	if Bus and not Align and math.abs(Bus:GetPivot().Position.X - Marks.BusStop.Position.X) < 0.05 then
+		local function bone(N) return Bus:FindFirstChild(N, true) end
+		local A, B = bone("DoorA"), bone("DoorB")
+		if A and B then
+			local Mid = (A.TransformedWorldCFrame.Position + B.TransformedWorldCFrame.Position) / 2
+			local RP = RaycastParams.new()
+			RP.FilterType = Enum.RaycastFilterType.Exclude
+			RP.FilterDescendantsInstances = { Bus, Source, Cast, Player.Character }
+			local Worst, Lowest, RoadAt = 0, math.huge, 0
+			for _, W in { "WheelFL", "WheelFR", "WheelRL", "WheelRR" } do
+				local Bn, Part = bone(W), Bus:FindFirstChild("WFBlackBus_" .. W)
+				if Bn and Part then
+					local P = Bn.TransformedWorldCFrame.Position
+					local Low = P.Y - Part.Size.Y / 2
+					local Hit = workspace:Raycast(P + Vector3.new(0, 6, 0), Vector3.new(0, -30, 0), RP)
+					if Hit then
+						Worst = math.max(Worst, math.abs(Low - Hit.Position.Y))
+						if Low < Lowest then Lowest, RoadAt = Low, Hit.Position.Y end
+					end
+				end
+			end
+			Align = { mid = Mid; wheelWorst = Worst; lowest = Lowest; road = RoadAt }
+		end
+	end
+end) end)
 -- the clips load in Play: LoadAnimation on a throwaway copy of the rig
 local Loads = {}
 do
@@ -85,15 +121,15 @@ do
 	M:Destroy()
 end
 task.wait(0.5)
-game.ReplicatedStorage:WaitForChild("NHCine"):FireServer({ Kind = "Replay"; Id = "TutorialBus" })
 local W0 = os.clock()
 local Started = false
 repeat
 	task.wait(0.1)
 	if Player:GetAttribute("NHCineSeam") ~= nil then Started = true end
-until (Started and Player:GetAttribute("NHCineSeam") == nil and os.clock() - W0 > 3) or os.clock() - W0 > 45
+until (Started and Player:GetAttribute("NHCineSeam") == nil and os.clock() - W0 > 3) or os.clock() - W0 > 70
 task.wait(1.0)
 RunService:UnbindFromRenderStep(Name)
+AlignConn:Disconnect()
 local Report, Pass = { "clips in Play: " .. table.concat(Loads, ", ") }, true
 for _, L in Loads do if L:find("FAILED") then Pass = false end end
 local Start = nil
@@ -143,10 +179,24 @@ chk("one Animator", MaxAnimators == 1, "animators on the copy " .. MaxAnimators)
 chk("bus arrives and stops", Stopped ~= nil and Stopped > 4 and Stopped < 9, "settled on BusStop's X at " .. f(Stopped) .. " s")
 chk("bus leaves", EndBus ~= nil and EndBus.X < Stop.X - 80, string.format("final X %.1f (stop %.1f, away %.1f)", EndBus and EndBus.X or 0, Stop.X, Away.X))
 chk("tracks (at most 2 at a time)", MaxTracks <= 2 and MaxTracks >= 1, "max playing bus tracks " .. MaxTracks)
-chk("bus tracks gone at the end", EndRow.playing == 0, "playing at the end " .. EndRow.playing)
 chk("chain", Walk ~= nil and Two ~= nil and Two > 14.5 and Two < 18, string.format("TheBus1 loop from %s s, TheBus2 from %s s", f(Walk), f(Two)))
 chk("you are out of sight after the doors close", Hid ~= nil and Hid > 19 and Hid < 21, "character hidden from " .. f(Hid) .. " s")
 chk("hold", Hold ~= nil and EndRow.hold and #Tail >= 10 and Drift < 0.001, string.format("NHCineHold from %s s, %d held frames, camera drift %.5f", f(Hold), #Tail, Drift))
+do
+	local Stand, Board = Marks.Stand.Position, Marks.Board.Position
+	local M = Align and Align.mid
+	local DX = M and (M.X - Stand.X) or math.huge
+	local Within = M and M.Z <= Stand.Z + 0.3 and M.Z >= Board.Z - 0.3
+	chk("doorway (bones vs marks)", M ~= nil and math.abs(DX) <= 0.5 and Within == true,
+		M and string.format("DoorA/DoorB midpoint (%.2f, %.2f, %.2f): dX to Stand %.2f, Z %.2f between Stand %.2f and Board %.2f", M.X, M.Y, M.Z, DX, M.Z, Stand.Z, Board.Z) or "no sample")
+	chk("wheels on the road", Align ~= nil and Align.wheelWorst <= 0.25,
+		Align and string.format("lowest wheel point %.2f, road %.2f, worst wheel to road %.2f studs", Align.lowest, Align.road, Align.wheelWorst) or "no sample")
+end
+local HeldPlaying, HeldRows = math.huge, 0
+for _, R in Rows do
+	if R.hold then HeldRows += 1 HeldPlaying = math.min(HeldPlaying, R.playing) end
+end
+chk("bus tracks stay up through the hold", HeldRows >= 10 and HeldPlaying >= 1, string.format("%d held frames, fewest playing bus tracks %s", HeldRows, tostring(HeldPlaying)))
 chk("title", TitleRow ~= nil and TitleRow.cardText == "NIGHTMARE HIGHSCHOOL" and TitleRow.cardSize >= 20, string.format("card '%s' size %s", TitleRow and TitleRow.cardText or "none", TitleRow and tostring(TitleRow.cardSize) or "?"))
 chk("still out of sight at the end (the caller releases)", EndRow.ltm >= 0.99, "LocalTransparencyModifier " .. EndRow.ltm)
 return (Pass and "BUS OK\n" or "BUS FAIL\n") .. table.concat(Report, "\n")
