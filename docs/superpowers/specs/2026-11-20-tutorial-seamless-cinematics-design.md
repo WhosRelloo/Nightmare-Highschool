@@ -310,11 +310,13 @@ Each ends with its reason.
     - It runs on `Tutorial.Enter` and on every respawn in Wickfield. It puts the player on a mark of the cut's set, 3
       studs up.
     - Each cut declares its own map in `Config.Cine`: `Resume = { Marks = { <segment> = <mark> }, End = <mark> }`.
-      `TutorialSneak` maps Fence to `FenceZone` and ends at `FenceLand`. `TutorialBus` maps to and ends at `Stand`.
-    - A cut that is finished (Seen) resumes at its `End` mark.
-    - An unmapped segment or a missing mark warns and leaves the player where the game put them.
+      - `TutorialSneak`: Start, Garden and Hide map to `Start`; Fence maps to `FenceZone`; `End` is `FenceLand`.
+      - `TutorialBus`: Start and Main map to `Stand`; `End` is `Stand`.
+    - A cut that is finished (Seen) resumes at its `End` mark, never at a mid-cut mark.
+    - A checkpoint whose cut has no map, an unmapped segment or a missing mark warns and leaves the player where the game
+      put them.
+    - Slice 1 has no production caller of `Tutorial.Enter` yet. The TestBridge drives it.
     - Reason: guessing marks by name stranded a player behind what they had already done.
-    - TODO(controller): Task 12's fix round may still change this. Check it against the final commit.
 16. **Leaving Wickfield ends any cine session.**
     - `Tutorial.Leave` ends a running cut with `How = "Aborted"`. A disconnect ends it with `How = "Left"`.
     - Neither marks the cut Seen, so a returning player sees it again.
@@ -328,3 +330,18 @@ Each ends with its reason.
     - `textures.lua`: applies the SurfaceAppearances;
     - `bus_rig.py` and `rigid_rig.py`: build the rigid rigs and their clips (delta 7).
     - Re-run them after any re-import. `hometown.lua` skips a rigid rig so it isn't re-fitted.
+19. **The Dip token tracks what the screen wants.**
+    - `CineUI.Veil` records `VeilTarget` as well as bumping its generation.
+    - A dip forces black at its midpoint only if the latest claim still wants black.
+      It lifts unless a newer black claim is pending (`VeilGen == Mine or VeilTarget == 0`).
+    - Reduce Motion's delayed `Veil(0, 0.1)` in the beat entry is guarded with `Cut.Live`.
+    - Reason: the first token (delta 13) could leave the screen black for good when the newer claim was a lift or a
+      shorter dip that had already lifted.
+20. **Framed shots have a level horizon.**
+    - `Seam.Rot` slerps the look on its great circle and eases the ends' own rolls. `Seam.Blend` and the glide use it.
+    - `Cine.framedCFrame` turns the screen-placement yaw about world up, so the horizon stays level before any authored roll.
+    - An authored `roll` (a Dutch angle) is kept.
+    - `Cine.framedCFrame` is the shared toolkit, so every framed shot in the game now has a level horizon.
+      The Strikethrough, Collected and RollCall cuts were re-checked.
+    - Reason: the slerp between two level cameras tilted the horizon in between (up to -1.8 deg), and the old placement
+      yaw tilted framed shots (up to -1.6 deg). House style wants roll 0 on ground beats.

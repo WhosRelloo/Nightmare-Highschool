@@ -70,26 +70,36 @@ what the build changed). The plan is `docs/superpowers/plans/2026-11-20-tutorial
 - **`tools/tutorial-anim/PUBLISH.md`** describes the real folder, the game's crouch and `Config.CineClips`.
 
 ### Checked
-- **Self-tests:** `CineSeamTest`, `CineRigsTest` and `SeamlessHoldTest` all pass.
+- **Self-tests:** `CineSeamTest` (now with a level-horizon row), `CineRigsTest` and `SeamlessHoldTest` all pass.
 - **Live (slot 2, restored after):**
-  - **Camera seam check:** passes on `TutorialSneak`, `TutorialBus` and a graded test cut. The release frame matches the
-    last frame under it to 0.0007 stud, and the walking-glide ratio stays under the bound.
+  - **Camera seam check:** passes on `TutorialSneak` (and five soft-fail runs), `TutorialBus` and a graded test cut. The release
+    frame matches the last frame under it to 0.0007 stud, and the walking-glide ratio stays under the bound.
+  - **Level horizon:** roll is 0.00 on all three cuts. It was up to -1.8 deg before the fix.
   - **Body seam check:** the bus chain's switches and the re-seat are at or under the chain's own p99, with no duplicated
     frames. The 21 runtime switches in `chaincheck` are all ok.
   - **The sneak:** four runs (sneak, soft fail, skip at the fence, timeout) pass. Skips from 5.0 to 5.9 s land on `FenceLand` every time.
   - **The bus:** the doorway sits within 0.05 stud of `Stand`, and the held title releases on a timeout and on leave.
-  - **Playtests:** solo, death mid-beat, rejoin and Reduce Motion pass.
+  - **Dip token:** `dipcheck` has 7 rows. The two new cases (a dip inside a dip, a `Veil(0, 0.1)` inside a dip) failed on the
+    earlier code and pass now.
+  - **Resume:** `resumecheck` has 5 rows. After the sneak is Seen, a respawn lands on `FenceLand`. A bus death mid-cut and
+    under the hold both respawn at `Stand`.
+  - **Playtests:** solo, death mid-beat, rejoin (driven through the bridge's `Tutorial.Enter`) and Reduce Motion (0.2 s dips,
+    no handheld, roll 0) pass.
+  - **Motion, from camera samples:** the sneak is 14 % still (longest still run 0.9 s). The Fence shot is now a moving hold.
+- **Mirror:** all 21 scripts in `tools/phase6-2350/live/` match Studio.
 - **Details:** `tools/phase6-2350/REPORT.md`.
 
 ### Not checked
 - **Owner:** sign-off after watching both cuts at full speed.
 - **Two players** in a Local Server (the harness drives one client); the manual steps are in `REPORT.md`.
 - **Phone size** in the device emulator.
+- **A real rejoin:** `Tutorial.Enter` has no production caller yet, so only the bridge path ran.
 - **The fence vault** by eye (the top-of-climb pose after the dip, `FenceLand`, the approach yaw), and the Fence and Garden
-  camera marks (first guesses).
-- **Bus boarding** by eye (the door clips the player a little; the 21-stud bus is accepted).
-- **`motion_audit.py`:** the capture failed for lack of disk space. The camera-sampled numbers are in `REPORT.md`.
-- **`TutorialAnim.Ids`** still exists in the Studio copy of `Config.TutorialAnim` until the next sync (dead, harmless).
+  camera marks (first guesses; the Fence shot has a new push-in).
+- **Bus boarding** by eye (the door clips the player a little; the 21-stud bus is accepted), and the bus's static shots
+  (the 9.6 s run includes the deliberate held title).
+- **The Hide beat's 6 s still** on the soft-fail path.
+- **`motion_audit.py`:** the capture failed for lack of disk space, so only camera-sampled numbers exist.
 
 ## [2.34.0] - 2026-11-18: Path wardrobe & the Today card (Progression & Identity 4 of 4)
 
