@@ -656,10 +656,10 @@ def back_out(t, s=1.4):
 
 
 def _apply_transforms(objs):
-    """Bake every mesh's object transform into its vertices, so each skinned piece exports with an identity node.
-    Roblox's skinned-mesh import mishandles a mesh node that isn't identity (a joined piece keeps its first part's
-    location; wheels and wipers are rotated): the piece lands displaced at rest and every clip picks up the bind
-    offset as a constant bone translation (found on the 2.35.0 black bus)."""
+    """Bake every mesh's object transform into its vertices, so each skinned piece exports with an identity node
+    (hygiene: one bind space for every piece). Note (2.35.0): this did NOT change how Roblox imports the rigs. The
+    importer still gives each Bone a wrong rest CFrame, and every clip carries a constant translation that cancels it,
+    so a rig is laid out right only while a clip plays. Game code keeps a base loop playing on every rig."""
     from mathutils import Matrix
     for ob in objs:
         if ob.type != "MESH":
