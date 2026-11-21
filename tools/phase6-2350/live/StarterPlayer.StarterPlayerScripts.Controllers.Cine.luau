@@ -706,6 +706,12 @@ function Local.Context(Cut, Message)
 	end
 	-- (task 10) a cut's own loops (a bus driving in) stop when it ends; its cleanups (tracks it loaded) run at Finish
 	function Ctx.Alive(): boolean return Cut.Live == true end
+	-- (task 11 fix round 2) runs at FULL BLACK when the cut ends any way but Done (Skipped / Timeout / Aborted ...), with How, and
+	-- only if no newer cut has started: the place to put the player where the cut's end state is (the skip's own dip hides it)
+	function Ctx.OnBlack(Fn: (string) -> ())
+		Cut.AtBlack = Cut.AtBlack or {}
+		table.insert(Cut.AtBlack, Fn)
+	end
 	function Ctx.OnEnd(Fn: () -> ())
 		Cut.Cleanups = Cut.Cleanups or {}
 		table.insert(Cut.Cleanups, Fn)
@@ -1324,11 +1330,17 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 		Player:SetAttribute(`NHCineSeam`, nil)
 		pcall(function() actor().Release() end)
 	end
+	local function atBlack()
+		if Current ~= nil then return end -- a newer cut owns the player now
+		for _, Fn in Cut.AtBlack or {} do pcall(Fn, How) end
+		Cut.AtBlack = nil
+	end
 	local Dipped = false
 	if Black and Seamless and (How == `Skipped` or How == `Aborted`) then
 		-- the jump to the end state happens at full black: the cut stops, the camera goes back to the gameplay camera
 		Dipped = true
 		Gui.Dip(0.25, function()
+			atBlack()
 			if Cut.Handle then pcall(function() Cut.Handle:stop() end) end
 			if Cut.BeatLook then Local.DropLook(Cut.BeatLook, true) Cut.BeatLook = nil end
 			CameraLease.Release(LEASE)
@@ -1336,6 +1348,8 @@ function Local.Finish(Cut, How: string, Quiet: boolean?)
 		end)
 	elseif Black then
 		Gui.Veil(1, 0.25) task.wait(0.25)
+		Gui.Veil(1, 0)
+		atBlack()
 	end
 	if not Hold then
 		if Cut.Handle then pcall(function() Cut.Handle:stop() end) end

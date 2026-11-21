@@ -132,6 +132,18 @@ function Def.Build(Ctx)
 		Over = nil
 	end)
 
+	-- (fix round 2) a Skip or a timeout before the dip would leave you on the house side of a fence you can't cross (and a resumed
+	-- run, after a rejoin, can skip): the end state is the far side. Placed at full black inside the skip's own dip, and only if
+	-- no newer cut has started (the director checks). A Leave (Aborted) doesn't move you: Hometown's cleanup owns that
+	Ctx.OnBlack(function(How: string)
+		if How ~= `Skipped` and How ~= `Timeout` then return end
+		local Land = Ctx.Mark(`FenceLand`)
+		local Root = Player.Character and Player.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?
+		if not (Land and Root) then return end
+		Root.CFrame = CFrame.new(Land.Position.X, Root.Position.Y, Land.Position.Z) * (Land.CFrame - Land.Position)
+		Root.AssemblyLinearVelocity = Vector3.zero
+	end)
+
 	local function lamp(On: boolean)
 		TweenService:Create(Light, TweenInfo.new(if On then 0.25 else 0.6), { Transparency = if On then 0 else 1 }):Play()
 	end
@@ -162,7 +174,7 @@ function Def.Build(Ctx)
 	Built.segments = {
 		Garden = { beat = {
 			rig = `Follow`; frame = { also = `Biscuit`; lens = 35; low = true };
-			move = { speed = 0.7; sprint = false; crouch = true };
+			move = { speed = 1; sprint = false; crouch = true }; -- (fix round 2) the game's own crouch speed (7): a scale under it makes CrouchWalk foot-slide
 			lines = { { on = `start`; who = `You`; text = function()
 				return if Built.Fails > 0 then `Still asleep. Probably.` else `Okay. Quiet. Very quiet.`
 			end } };

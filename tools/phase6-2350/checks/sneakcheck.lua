@@ -9,7 +9,7 @@
 --   * path (Garden>Fence, or Garden>Hide>Garden>Fence)
 --   * Biscuit (ruling I3): the player's cast copy exists BEFORE the cut, and has a clip playing on every frame before the cut, during it,
 --     in its Out phase and after it (0 frames of N with none, per bucket)
---   * the crouch: held through the Garden beat; the walk speed on the Garden beat (4.9 = 0.7 x the crouch speed 7), the same on the
+--   * the crouch: held through the Garden beat; the walk speed on the Garden beat (7, the game's crouch speed), the same on the
 --     second Garden pass after a soft fail (I1)
 --   * the lamp: on at the wuff and back to 1 (off) after the sigh (M1)
 --   * the fence (C1): the torso faces the fence as FenceOver2 starts; the dip's root jump happens under a black veil; you end on the far
@@ -138,7 +138,7 @@ for I, R in Rows do
 	end
 	if R.seam == "Beat" and R.path == "Garden" and (not FailAt or R.t < FailAt) and R.t > (FirstSeam or 0) + 1.5 then
 		CrouchBeat += 1 if R.crouch then CrouchHeld += 1 end
-		if R.vel > 1 and R.t > (FirstSeam or 0) + 2.5 then table.insert(Ws1, R.ws) end
+		if R.vel > 1 and R.t > (FirstSeam or 0) + 1.3 then table.insert(Ws1, R.ws) end
 	end
 	if R.seam == "Beat" and R.path == "Garden>Hide>Garden" and R.vel > 1 then table.insert(Ws2, R.ws) end
 	if R.lamp then
@@ -165,7 +165,7 @@ add("clips seen during the cut: " .. table.concat(L, ", "))
 if MODE ~= "skipfence" then
 	check((MODE == "fail" and CrouchBeat == 0) or (CrouchBeat > 0 and CrouchHeld >= CrouchBeat * 0.95), string.format("crouch held %d of %d Garden-beat frames (before any stand-up)", CrouchHeld, CrouchBeat))
 	local W1 = median(Ws1)
-	check(W1 ~= nil and math.abs(W1 - 4.9) < 0.4, string.format("walk speed on the Garden beat %s (want 4.9 = 0.7 x crouch speed 7), %d moving frames", tostring(W1), #Ws1))
+	check(W1 ~= nil and math.abs(W1 - 7) < 0.4, string.format("walk speed on the Garden beat %s (want the game's crouch speed 7), %d moving frames", tostring(W1), #Ws1))
 	if MODE == "fail" then
 		local W2 = median(Ws2)
 		check(W2 ~= nil and W1 ~= nil and math.abs(W2 - W1) < 0.4, string.format("walk speed on the second Garden pass %s (want the first pass's %s), %d moving frames", tostring(W2), tostring(W1), #Ws2))
@@ -187,6 +187,9 @@ if MODE == "skipfence" then
 	check(SkipAt ~= nil and Crouched, "the skip was sent while you were still crouched in the Fence segment")
 	check(not Last.crouch, string.format("after the skip: crouch %s (want false)", tostring(Last.crouch)))
 	check(Last.seam == nil and Last.ws > 12, string.format("after the skip: seam %s, walk speed %.1f (want nil, > 12)", tostring(Last.seam), Last.ws))
+	-- (fix round 2) the skip puts you on the far side: at least 1 stud past the fence's far face, standing, facing away from the house
+	check(Last.pos.Z <= FarFace - 1, string.format("after the skip: root z %.2f, the fence's far face z %.2f (%.2f studs clear, want >= 1)", Last.pos.Z, FarFace, FarFace - Last.pos.Z))
+	check(Last.rl.Z < -0.8, string.format("after the skip: faces away from the house, look z %.2f", Last.rl.Z))
 	add(string.format("cut lived %.1f s, %d frames", (LastSeam or 0) - (FirstSeam or 0), #Rows))
 	return (Pass and "SNEAK OK\n" or "SNEAK FAIL\n") .. table.concat(Rep, "\n")
 end
@@ -215,10 +218,10 @@ do
 	local Jumps = {}
 	for I = 2, #Rows do
 		local D = (Rows[I].pos - Rows[I - 1].pos) * Vector3.new(1, 0, 1)
-		if Rows[I].path and Rows[I].path:match("Fence$") and D.Magnitude > 2 then table.insert(Jumps, { I = I, D = D.Magnitude, veil = math.min(Rows[I].veil, Rows[I - 1].veil) }) end
+		if Rows[I].path and Rows[I].path:match("Fence$") and D.Magnitude > 2 then table.insert(Jumps, { I = I, D = D.Magnitude, veil = math.max(Rows[I].veil, Rows[I - 1].veil) }) end
 	end
 	local Dip = Jumps[1]
-	check(Dip ~= nil and Dip.veil <= 0.05, string.format("the dip's root jump (%s studs) happens under a black veil (veil transparency %s)", Dip and string.format("%.2f", Dip.D) or "none", Dip and string.format("%.2f", Dip.veil) or "-"))
+	check(Dip ~= nil and Dip.veil <= 0.05, string.format("the dip's root jump (%s studs) happens under a black veil on BOTH frames around it (worst veil transparency %s)", Dip and string.format("%.2f", Dip.D) or "none", Dip and string.format("%.2f", Dip.veil) or "-"))
 	-- the end: the far side of the fence plane, at least 1 stud clear, facing away from the house, standing
 	local End = Last.pos
 	check(End.Z <= FarFace - 1, string.format("ends on the far side: root z %.2f, the fence's far face z %.2f (%.2f studs clear, want >= 1)", End.Z, FarFace, FarFace - End.Z))

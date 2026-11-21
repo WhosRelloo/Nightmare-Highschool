@@ -12,9 +12,9 @@ local function take(name, into, cf, longest)
 	Folder.Name = into
 	Folder.Parent = H
 	M.Parent = Folder
-	-- (task 10 fix round 2) a model rigged by stage/bus_rig.lua (its PrimaryPart carries NHBusRig) is already fitted, joined and
+	-- (task 10 fix round 2) a model rigged by stage/bus_rig.lua or stage/rigid_rig.py (its PrimaryPart carries NHBusRig, or NHRigid for the generic rig) is already fitted, joined and
 	-- anchored by it (only its RootPart): it is placed and made Persistent, never rescaled or re-anchored
-	local Rigid = M:IsA("Model") and M.PrimaryPart ~= nil and M.PrimaryPart:GetAttribute("NHBusRig") == true
+	local Rigid = M:IsA("Model") and M.PrimaryPart ~= nil and (M.PrimaryPart:GetAttribute("NHBusRig") == true or M.PrimaryPart:GetAttribute("NHRigid") == true)
 	if not Rigid then
 		local _, Size = M:GetBoundingBox()
 		M:ScaleTo(M:GetScale() * longest / math.max(Size.X, Size.Y, Size.Z))
