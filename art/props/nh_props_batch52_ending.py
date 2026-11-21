@@ -728,7 +728,23 @@ P.CANVAS.update({"WFBusStop_Timetable": "WF_Timetable", "WFBusStop_Band": "WF_Sh
                  "WFBlackBus_Blind": "WF_BusBlind", "WFBlackBus_SideL": "WF_BusSide", "WFBlackBus_SideR": "WF_BusSide",
                  "WFBlackBus_Plate": "WF_BusPlate", "WFBlackBus_PlateRear": "WF_BusPlate"})
 B49.CLIPS["WFBlackBus"] = BUS_CLIPS
-P.RIGS["WFBlackBus"] = lambda objs: B49.rig_pieces("WFBlackBus", objs)
+# (2.35.0) The bus is a RIGID rig: Studio's skinned import laid its pieces out wrong at rest (cause never found), and
+# every piece belongs to exactly one bone anyway. The FBX exports the pieces as plain meshes; Studio joins them with
+# Motor6Ds at the bone heads (art/props/anim/WFBlackBus_rigid.json), and the clips are built from
+# art/props/anim/WFBlackBus.json (written by the last skinned build; the clip curves are unchanged).
+RIGID = {"WFBlackBus"}
+
+
+def write_rigid(name):
+    import json
+    spec = B49.RIG[name]
+    bones = {"Root": ((0, 0, 0), (0, 0, 1), None)}
+    bones.update(spec["bones"])
+    out = {"prop": name, "axes": "Blender (x right, y back-to-front is -y = the bus's front, z up), units = Blender m",
+           "bones": {bn: {"head": list(h), "parent": p or ("Root" if bn != "Root" else None)} for bn, (h, t, p) in bones.items()},
+           "pieces": {f"{name}_{g}": bn for g, bn in spec["own"].items()}}
+    with open(os.path.join(B49.ANIM_DIR, f"{name}_rigid.json"), "w", encoding="utf-8") as fh:
+        json.dump(out, fh, indent=1)
 B49.CLIP_CAM["WFBlackBus"] = {
     "BrakeStop": ((24.0, -6.0, 5.0), (0, 0, 4.0)), "EngineIdle": ((18.0, -22.0, 7.0), (0, -6.0, 5.0)),
     "DoorsOpen": ((14.0, -16.0, 6.0), (4.2, -8.4, 5.0)), "DoorsClose": ((14.0, -16.0, 6.0), (4.2, -8.4, 5.0)),
@@ -742,5 +758,7 @@ if __name__ == "__main__":
     names = list(BUILDERS) if (not argv or argv[0] == "all") else [argv[0]]
     for n in names:
         P.run(n)
-        if n in B49.CLIPS:
+        if n in RIGID:
+            write_rigid(n)
+        elif n in B49.CLIPS:
             B49.clip_strips(n)
