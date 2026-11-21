@@ -12,14 +12,20 @@ local function take(name, into, cf, longest)
 	Folder.Name = into
 	Folder.Parent = H
 	M.Parent = Folder
-	local _, Size = M:GetBoundingBox()
-	M:ScaleTo(M:GetScale() * longest / math.max(Size.X, Size.Y, Size.Z))
+	-- (task 10 fix round 2) a model rigged by stage/bus_rig.lua (its PrimaryPart carries NHBusRig) is already fitted, joined and
+	-- anchored by it (only its RootPart): it is placed and made Persistent, never rescaled or re-anchored
+	local Rigid = M:IsA("Model") and M.PrimaryPart ~= nil and M.PrimaryPart:GetAttribute("NHBusRig") == true
+	if not Rigid then
+		local _, Size = M:GetBoundingBox()
+		M:ScaleTo(M:GetScale() * longest / math.max(Size.X, Size.Y, Size.Z))
+	end
 	M:PivotTo(ORIGIN * cf)
 	-- (task 10) nothing may fall in Play: a rigged model (a RootPart, its mesh parts on Motor6Ds) is held by its root alone (its
 	-- joints still animate); a plain model has every part anchored
 	-- (task 10) StreamingEnabled: a model is only complete on a client near it, and Hometown.Cast clones the whole thing (the
 	-- bus 60 studs away, the dog), so Wickfield's models are Persistent (sent whole to every client)
 	if M:IsA("Model") then M.ModelStreamingMode = Enum.ModelStreamingMode.Persistent end
+	if Rigid then return name .. " ok (rigid rig kept)" end
 	local Root = M:FindFirstChild("RootPart")
 	-- a rig part with no joint path to the root would fall in Play: those are anchored too, and named in the report
 	local Joined = {}

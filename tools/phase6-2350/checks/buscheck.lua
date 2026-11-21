@@ -68,36 +68,71 @@ RunService:BindToRenderStep(Name, Enum.RenderPriority.Last.Value, function()
 		cam = workspace.CurrentCamera.CFrame; src = Source:GetPivot().Position;
 	})
 end)
--- the alignment sample runs deferred from PreRender: the frame's Animator step has run and so has the cut's translation strip
--- (also PreRender), so the bones read here are the ones that are drawn (at Heartbeat they would still be unstripped)
-local AlignConn = RunService.PreRender:Connect(function() task.defer(function()
+-- the alignment samples run on Heartbeat (the Animator's Motor6D poses are applied by then); the bus is a rigid Motor6D rig, so
+-- the joint parts (DoorA, DoorB, Wheel*) and the mesh pieces are read straight from their world positions, with EngineIdle (the
+-- base loop) and the cut's clips playing:
+--   Align: once, while the bus is parked on its mark (doors still shut): the DoorA/DoorB joint midpoint, the lowest wheel point
+--   Leaves: once the DoorsOpen swing is complete (the DoorA joint turned > 80 deg): the world AABB of both door leaves and
+--           their glass against the boarding line, a corridor 1.6 studs wide from Stand to Board
+local function aabb(Part)
+	local C, S = Part.CFrame, Part.Size
+	local Lo, Hi = Vector3.one * math.huge, Vector3.one * -math.huge
+	for _, X in { -1, 1 } do for _, Y in { -1, 1 } do for _, Z in { -1, 1 } do
+		local P = (C * CFrame.new(X * S.X / 2, Y * S.Y / 2, Z * S.Z / 2)).Position
+		Lo, Hi = Lo:Min(P), Hi:Max(P)
+	end end end
+	return Lo, Hi
+end
+local Leaves = nil
+local AlignConn = RunService.Heartbeat:Connect(function()
 	local Cast = workspace:FindFirstChild("NHHometownCast")
 	local Bus = Cast and Cast:FindFirstChild("WFBlackBus")
-	if Bus and not Align and math.abs(Bus:GetPivot().Position.X - Marks.BusStop.Position.X) < 0.05 then
-		local function bone(N) return Bus:FindFirstChild(N, true) end
-		local A, B = bone("DoorA"), bone("DoorB")
+	if not Bus then return end
+	local function joint(N) local P = Bus:FindFirstChild(N) return P and P:IsA("BasePart") and P or nil end
+	if not Align and math.abs(Bus:GetPivot().Position.X - Marks.BusStop.Position.X) < 0.05 then
+		local A, B = joint("DoorA"), joint("DoorB")
 		if A and B then
-			local Mid = (A.TransformedWorldCFrame.Position + B.TransformedWorldCFrame.Position) / 2
 			local RP = RaycastParams.new()
 			RP.FilterType = Enum.RaycastFilterType.Exclude
 			RP.FilterDescendantsInstances = { Bus, Source, Cast, Player.Character }
 			local Worst, Lowest, RoadAt = 0, math.huge, 0
 			for _, W in { "WheelFL", "WheelFR", "WheelRL", "WheelRR" } do
-				local Bn, Part = bone(W), Bus:FindFirstChild("WFBlackBus_" .. W)
-				if Bn and Part then
-					local P = Bn.TransformedWorldCFrame.Position
-					local Low = P.Y - Part.Size.Y / 2
-					local Hit = workspace:Raycast(P + Vector3.new(0, 6, 0), Vector3.new(0, -30, 0), RP)
+				local Piece = Bus:FindFirstChild("WFBlackBus_" .. W)
+				if Piece then
+					local Low = Piece.Position.Y - Piece.Size.Y / 2
+					local Hit = workspace:Raycast(Piece.Position + Vector3.new(0, 6, 0), Vector3.new(0, -30, 0), RP)
 					if Hit then
 						Worst = math.max(Worst, math.abs(Low - Hit.Position.Y))
 						if Low < Lowest then Lowest, RoadAt = Low, Hit.Position.Y end
 					end
 				end
 			end
-			Align = { mid = Mid; wheelWorst = Worst; lowest = Lowest; road = RoadAt }
+			Align = { mid = (A.Position + B.Position) / 2; wheelWorst = Worst; lowest = Lowest; road = RoadAt }
 		end
 	end
-end) end)
+	local Motor = nil
+	for _, D in Bus:GetDescendants() do if D:IsA("Motor6D") and D.Name == "DoorA" then Motor = D end end
+	if Align and Motor and math.abs(Bus:GetPivot().Position.X - Marks.BusStop.Position.X) < 0.05 then
+		local _, Rad = Motor.Transform:ToAxisAngle()
+		if math.deg(math.abs(Rad)) > 80 then
+			local Stand, Board = Marks.Stand.Position, Marks.Board.Position
+			local CLo = Vector3.new(Stand.X - 0.8, Stand.Y, Board.Z)
+			local CHi = Vector3.new(Stand.X + 0.8, Stand.Y + 5.5, Stand.Z)
+			local Sep, Who = math.huge, ""
+			for _, N in { "WFBlackBus_DoorA", "WFBlackBus_DoorA_Glass", "WFBlackBus_DoorB", "WFBlackBus_DoorB_Glass" } do
+				local P = Bus:FindFirstChild(N)
+				if P then
+					local Lo, Hi = aabb(P)
+					-- separating gap from the corridor box (positive = clear, <= 0 = the leaf is in the way)
+					local Gap = math.max(Lo.X - CHi.X, CLo.X - Hi.X, Lo.Y - CHi.Y, CLo.Y - Hi.Y, Lo.Z - CHi.Z, CLo.Z - Hi.Z)
+					if Gap < Sep then Sep, Who = Gap, N end
+				end
+			end
+			-- the worst (smallest) gap over every frame the leaves are open past 80 deg, bus parked
+			if not Leaves or Sep < Leaves.clear then Leaves = { clear = Sep; who = Who; angle = math.max(Leaves and Leaves.angle or 0, math.deg(math.abs(Rad))) } end
+		end
+	end
+end)
 -- the clips load in Play: LoadAnimation on a throwaway copy of the rig
 local Loads = {}
 do
@@ -114,7 +149,29 @@ do
 			task.wait(0.1)
 			Len = Ok and T.Length or 0
 		end
-		table.insert(Loads, string.format("%s %s", N, Len > 0 and string.format("%.3fs", Len) or "FAILED"))
+		-- the asset's own loop flag (read before anything sets it), and that it DRIVES the Motor6D rig: some joint's Transform
+		-- leaves identity while it plays
+		local Flag = Ok and T.Looped
+		local Moved = 0
+		if Ok and Len > 0 then
+			T.Priority = Enum.AnimationPriority.Action
+			T:Play(0)
+			local T1 = os.clock()
+			while os.clock() - T1 < math.min(Len, 1.6) do
+				for _, D in M:GetDescendants() do
+					if D:IsA("Motor6D") then
+						local X = D.Transform
+						local _, Rad = X:ToAxisAngle()
+						Moved = math.max(Moved, X.Position.Magnitude, math.abs(Rad))
+					end
+				end
+				RunService.Heartbeat:Wait()
+			end
+			T:Stop(0)
+		end
+		local Want = (N == "BusEngineIdle" or N == "BusWipersSweep")
+		table.insert(Loads, string.format("%s %s loop %s%s drives rig %s", N, Len > 0 and string.format("%.3fs", Len) or "FAILED", tostring(Flag), Flag == Want and "" or " WRONG", Moved > 1e-3 and "yes" or "NO"))
+		if Flag ~= Want or Moved <= 1e-3 then table.insert(Loads, "FAILED " .. N .. " (loop flag or no motion)") end
 		if Ok then T:Destroy() end
 		A:Destroy()
 	end
@@ -178,7 +235,7 @@ chk("own copy", Frames > 100 and SourceMoved < 0.01, string.format("copy sampled
 chk("one Animator", MaxAnimators == 1, "animators on the copy " .. MaxAnimators)
 chk("bus arrives and stops", Stopped ~= nil and Stopped > 4 and Stopped < 9, "settled on BusStop's X at " .. f(Stopped) .. " s")
 chk("bus leaves", EndBus ~= nil and EndBus.X < Stop.X - 80, string.format("final X %.1f (stop %.1f, away %.1f)", EndBus and EndBus.X or 0, Stop.X, Away.X))
-chk("tracks (at most 2 at a time)", MaxTracks <= 2 and MaxTracks >= 1, "max playing bus tracks " .. MaxTracks)
+chk("tracks (at most 3 at a time)", MaxTracks <= 3 and MaxTracks >= 1, "max playing bus tracks (base loop + current + the one fading out) " .. MaxTracks)
 chk("chain", Walk ~= nil and Two ~= nil and Two > 14.5 and Two < 18, string.format("TheBus1 loop from %s s, TheBus2 from %s s", f(Walk), f(Two)))
 chk("you are out of sight after the doors close", Hid ~= nil and Hid > 19 and Hid < 21, "character hidden from " .. f(Hid) .. " s")
 chk("hold", Hold ~= nil and EndRow.hold and #Tail >= 10 and Drift < 0.001, string.format("NHCineHold from %s s, %d held frames, camera drift %.5f", f(Hold), #Tail, Drift))
@@ -189,6 +246,8 @@ do
 	local Within = M and M.Z <= Stand.Z + 0.3 and M.Z >= Board.Z - 0.3
 	chk("doorway (bones vs marks)", M ~= nil and math.abs(DX) <= 0.5 and Within == true,
 		M and string.format("DoorA/DoorB midpoint (%.2f, %.2f, %.2f): dX to Stand %.2f, Z %.2f between Stand %.2f and Board %.2f", M.X, M.Y, M.Z, DX, M.Z, Stand.Z, Board.Z) or "no sample")
+	chk("door leaves clear the boarding line (DoorsOpen done)", Leaves ~= nil and Leaves.clear >= 0,
+		Leaves and string.format("door joint turned %.0f deg; nearest leaf piece %s is %.2f studs from the 1.6-wide Stand-Board corridor (worst frame)", Leaves.angle, Leaves.who, Leaves.clear) or "DoorsOpen never completed")
 	chk("wheels on the road", Align ~= nil and Align.wheelWorst <= 0.25,
 		Align and string.format("lowest wheel point %.2f, road %.2f, worst wheel to road %.2f studs", Align.lowest, Align.road, Align.wheelWorst) or "no sample")
 end
@@ -196,6 +255,9 @@ local HeldPlaying, HeldRows = math.huge, 0
 for _, R in Rows do
 	if R.hold then HeldRows += 1 HeldPlaying = math.min(HeldPlaying, R.playing) end
 end
+local NoClip = 0
+for _, R in Rows do if R.bus and R.playing == 0 then NoClip += 1 end end
+chk("a clip plays on every frame the copy exists (the base loop)", NoClip <= 1, NoClip .. " frames with the copy and no playing track")
 chk("bus tracks stay up through the hold", HeldRows >= 10 and HeldPlaying >= 1, string.format("%d held frames, fewest playing bus tracks %s", HeldRows, tostring(HeldPlaying)))
 chk("title", TitleRow ~= nil and TitleRow.cardText == "NIGHTMARE HIGHSCHOOL" and TitleRow.cardSize >= 20, string.format("card '%s' size %s", TitleRow and TitleRow.cardText or "none", TitleRow and tostring(TitleRow.cardSize) or "?"))
 chk("still out of sight at the end (the caller releases)", EndRow.ltm >= 0.99, "LocalTransparencyModifier " .. EndRow.ltm)

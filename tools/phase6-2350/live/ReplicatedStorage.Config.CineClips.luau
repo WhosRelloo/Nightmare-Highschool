@@ -15,14 +15,16 @@ return {
 	StrikeShatter = `rbxassetid://104606462612953`; -- group upload
 	YouTugPull = `rbxassetid://116365221175140`; -- group upload (loop)
 	YouFinisher = `Assets:Weapons.Fist.M2`; -- the charged heavy
-	-- (2.35.0) the black bus (WFBlackBus, an AnimationController rig), group uploads; EngineIdle and WipersSweep loop
-	BusBrakeStop = `rbxassetid://99530299303466`;
-	BusDoorsOpen = `rbxassetid://81342810671111`;
-	BusDoorsClose = `rbxassetid://136198219537290`;
-	BusDriverTurn = `rbxassetid://79027613977041`;
-	BusEngineIdle = `rbxassetid://92379746659066`; -- loop
-	BusPullAway = `rbxassetid://113739044717474`;
-	BusWipersSweep = `rbxassetid://121682498815960`; -- loop
+	-- (2.35.0) the black bus (WFBlackBus: a rigid rig, plain meshes on Motor6Ds built by stage/bus_rig.lua), group uploads of
+	-- ServerStorage.NHPublish.WFBlackBus (an empty string would play the Studio preview NHCineClips.Bus<Clip>). EngineIdle is the
+	-- base loop; EngineIdle and WipersSweep loop. (The earlier ids target the deleted skinned bone rig: dead.)
+	BusBrakeStop = `rbxassetid://86119358976248`;
+	BusDoorsOpen = `rbxassetid://104054269135104`;
+	BusDoorsClose = `rbxassetid://123569026172264`;
+	BusDriverTurn = `rbxassetid://83327824886537`;
+	BusEngineIdle = `rbxassetid://128354189531944`; -- loop (the base loop)
+	BusPullAway = `rbxassetid://104172158912194`;
+	BusWipersSweep = `rbxassetid://121067625954733`; -- loop
 	-- (2.35.0) Biscuit (WFBiscuit, an AnimationController rig) and the garden gate, group uploads; BiscuitSleep and BiscuitTrot loop
 	BiscuitSleep = `rbxassetid://95274201499517`; -- loop (the base loop)
 	BiscuitTrot = `rbxassetid://101982272082907`; -- loop

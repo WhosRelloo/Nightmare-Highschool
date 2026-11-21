@@ -6,10 +6,11 @@
 	(tools/phase6-2350/stage/hometown.lua).
 
 	The bus is the player's own copy (Controllers.Hometown.Cast): Wickfield is private, so each player moves their own bus
-	and the shared model never moves. Its AnimationController gets an Animator if it has none. Every bus clip authors the
-	whole rig (all bones), so they play one after another, each held on its last frame until the next one starts (a clip
-	that ends falls back to the rest pose, which is not an assembled bus); every track loaded is stopped and destroyed when
-	the cut ends (Ctx.OnEnd).
+	and the shared model never moves. The bus is a rigid rig (stage/bus_rig.lua: plain meshes on Motor6Ds, an Animator on its
+	AnimationController; Cast clones all of it). EngineIdle is its base loop (Idle priority), playing from the moment the
+	copy exists; the other clips play over it (Action), one after another, each held on its last frame until the next one
+	starts (a clip that ends would let go of its joints). Every track loaded is stopped and destroyed when the cut ends, or,
+	for a held ending, when the hold is released (Ctx.OnEnd).
 
 	Timing: the TheBus chain's loop leaves on its exit phase (5.133 s into a 10.667 s loop, so 16.15 s after the cut's
 	first frame with the 0.35 s turn onto the mark); the cue below holds the loop until 15.0 so TheBus2 (the step on) starts at
@@ -20,12 +21,6 @@ local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
 local RunService = game:GetService(`RunService`)
 local Config = require(ReplicatedStorage.Config.Cine)
 local Def = { Set = `BusStop`; Seamless = true; EndHold = true }
-
--- TODO(bus re-export): the bus's clips carry the rig's bind offsets as constant pose translations on every bone but Root and
--- Body (wheels 3.3 studs down, doors 1.7 down), so, unmodified, the wheels sink through the road. The bus is being re-exported
--- with its mesh transforms applied; when it is re-imported and its clips republished, delete this flag and the strip below.
--- Authored bus clips translate only Body (and Body is not stripped), so the strip loses no authored motion.
-local STRIP_BIND_TRANSLATION = true
 
 local function controllers()
 	local Player = Players.LocalPlayer
@@ -53,24 +48,6 @@ function Def.Build(Ctx)
 	if Own and not BusAnimator and Controller then
 		BusAnimator = Instance.new(`Animator`)
 		BusAnimator.Parent = Controller
-	end
-
-	-- The clips' bind offsets (see STRIP_BIND_TRANSLATION): every bone but Root and Body keeps its rotation and loses the
-	-- translation after the Animator's step, each frame. Started by the cut's first event (not at Build), so a Build that
-	-- never plays (BuildForTests) leaves nothing connected.
-	local Strip: RBXScriptConnection? = nil
-	local function stripOn()
-		if not (STRIP_BIND_TRANSLATION and Own) or Strip then return end
-		local Bones: { Bone } = {}
-		for _, B in Own:GetDescendants() do
-			if B:IsA(`Bone`) and B.Name ~= `Root` and B.Name ~= `Body` then table.insert(Bones, B) end
-		end
-		Strip = RunService.PreRender:Connect(function()
-			for _, B in Bones do
-				local X = B.Transform
-				if X.Position.Magnitude > 1e-4 then B.Transform = X - X.Position end
-			end
-		end)
 	end
 
 	-- the bus clips: one at a time, the last frame held until the next starts; all stopped at the cut's end
@@ -104,8 +81,21 @@ function Def.Build(Ctx)
 			end)
 		end
 	end
+	-- the base loop, from the moment the copy exists (before any other clip; Build runs before the first frame)
+	do
+		local Id = Ctx.Clip(`BusEngineIdle`)
+		if Own and BusAnimator and Id and Ctx.Alive() then
+			local A = Instance.new(`Animation`)
+			A.AnimationId = Id
+			local T = BusAnimator:LoadAnimation(A)
+			table.insert(Anims, A)
+			table.insert(Tracks, T)
+			T.Priority = Enum.AnimationPriority.Idle
+			T.Looped = true
+			T:Play(0)
+		end
+	end
 	Ctx.OnEnd(function()
-		if Strip then Strip:Disconnect() Strip = nil end
 		for _, T in Tracks do pcall(function() T:Stop(0) T:Destroy() end) end
 		for _, A in Anims do pcall(function() A:Destroy() end) end
 		table.clear(Tracks)
@@ -133,8 +123,6 @@ function Def.Build(Ctx)
 		cues = {};
 		events = {
 			{ t = 0; call = function()
-				stripOn()
-				play(`BusEngineIdle`, true)
 				if not Actor then return end
 				Actor.WalkTo(Ctx.CF(`Stand`), 4)
 				Actor.Chain(`TheBus`, Ctx.Clip, { [1] = function() while not Go and Ctx.Alive() do task.wait() end end })
