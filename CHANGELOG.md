@@ -2,6 +2,48 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.36.0] - 2026-11-21: The Bell Tower, R1: the clock, conduct and quest cluster
+
+R1 of `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-design.md`. The plan is
+`docs/superpowers/plans/2026-11-20-belltower-r1-cluster.md`. This is 2.36.0 because `main` is at 2.34.0 and the phase 6 branch already uses 2.35.x.
+- **Mirror:** `tools/belltower-r1/` (`live/` is the built scripts, `pre/` the scripts before R1).
+- **The Map place:** untouched.
+- **Art status:** the nine art ids in `ReplicatedStorage.Config.BellTowerArt` are still 0, so this release runs on the
+  kit fallbacks. The Dial, wax Seal, parchment Lead Card and fang pips appear once the owner's 9 ids are pasted in.
+
+### Changed
+- **`Gui.ClockHud`** (rebuilt in place, same `ClockHud` ScreenGui and `Panel`):
+  - A 500 px wide cluster in the top right: a 176 px timetable Dial (the hand at the time, the moon in its window) and
+    the day, time, period and school-hours lines on an iron `TowerPlate` (340 wide, overlapping the dial by 30).
+  - A conduct row under it: a wax seal tinted by level with "Warning · 3 pts", and a detention slip ("Detention owed",
+    "Room 106, outside class", or "Trash 2/5" in a session). It replaces the old fifth "Record" line.
+  - Clicking the plate or dial still opens the Timetable. The PA line still types above the time.
+- **`Gui.QuestTracker`** (rebuilt in place, same `QuestTracker` and `Tracker`): a 470 px parchment Lead Card that sits 12 px
+  under the clock, fang pips for a counted objective of 2 to 6 (otherwise the count as text), and a `J` Journal key.
+- **Text floor:** game text in both is at least 20 design px (`BellTower.MIN_TEXT`).
+- **No rules changed.** It reads the same Discipline, Detention and quest attributes and remotes.
+
+### Added
+- **The art** (`art/ui/hud/make_belltower.py`, staged in `art/group-upload-belltower/`): `BtDial`, `BtDialHand` (640 x 640),
+  `BtTowerPlate` (600 x 200), `BtSeal`, `BtSealBroken` (256 x 256), `BtSlip` (420 x 150), `BtLeadCard` (1000 x 300),
+  `BtPipEmpty` and `BtPipFang` (96 x 96). The ids and the 9-slice data live in `Config.BellTowerArt`.
+- **`Functions.BellTower`:** the pure view logic (`Image`, `HandAngle`, `Conduct`, `Pips`, `Tints`, `MIN_TEXT`).
+- **Docs:** [UI Kit](docs/UI-Kit.md#the-bell-tower-cluster-236) (art table, layout, API, fallbacks, contracts), Attendance and Discipline, School Simulation.
+
+### Checked
+- **Self-test:** `bt_pure` passes in the Edit VM.
+- **Live (slot 2, restored after every run):**
+  - `bt_hud`: the five states (owed, warning, clear, active, suspended) pass on the fallbacks.
+  - The contracts in Play: the Timetable hook and a real click, the Moments panel, the ShowClock hide, the "In class"
+    line at 09:10, and the PA line typing above the time.
+  - Screenshots: [fallbacks](docs/img/belltower-r1-fallback.jpg), [Timetable](docs/img/belltower-r1-timetable.jpg), [PA line](docs/img/belltower-r1-pa.jpg).
+- **Not checked:**
+  - the art path (the ids are pending)
+  - the phone layout (no emulator run)
+  - a two-player run
+  - whether the PA line wraps fully after it finishes typing (to be re-checked with the art)
+- **Backup:** `ServerStorage.NH_Backup.BellTower_pre_20261120` holds the pre-R1 ClockHud and QuestTracker.
+
 ## [2.34.0] - 2026-11-18: Path wardrobe & the Today card (Progression & Identity 4 of 4)
 
 The spec is `docs/expansion/14-Progression-and-Identity.md` §6. This release completes Phase 3.
