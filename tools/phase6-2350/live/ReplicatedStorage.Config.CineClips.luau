@@ -16,11 +16,11 @@ return {
 	YouTugPull = `rbxassetid://116365221175140`; -- group upload (loop)
 	YouFinisher = `Assets:Weapons.Fist.M2`; -- the charged heavy
 	-- (2.35.0) the black bus (WFBlackBus, an AnimationController rig), group uploads; EngineIdle and WipersSweep loop
-	BusBrakeStop = `rbxassetid://85285887380650`;
-	BusDoorsOpen = `rbxassetid://107869936112254`;
-	BusDoorsClose = `rbxassetid://71775239074817`;
-	BusDriverTurn = `rbxassetid://128487838188107`;
-	BusEngineIdle = `rbxassetid://134074375837233`; -- loop
-	BusPullAway = `rbxassetid://76472696334011`;
-	BusWipersSweep = `rbxassetid://109946694239383`; -- loop
+	BusBrakeStop = `rbxassetid://99530299303466`;
+	BusDoorsOpen = `rbxassetid://81342810671111`;
+	BusDoorsClose = `rbxassetid://136198219537290`;
+	BusDriverTurn = `rbxassetid://79027613977041`;
+	BusEngineIdle = `rbxassetid://92379746659066`; -- loop
+	BusPullAway = `rbxassetid://113739044717474`;
+	BusWipersSweep = `rbxassetid://121682498815960`; -- loop
 }
