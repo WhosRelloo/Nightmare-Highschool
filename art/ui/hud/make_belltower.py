@@ -697,6 +697,17 @@ def export_r1():
     print("exported", len(R1_PIECES), "to", dest)
 
 
+R2_PIECES = ["BellHollow", "BellTarnished", "BellLit", "BellGlow", "BellRail"]
+
+
+def export_r2():
+    dest = HERE.parents[1] / "group-upload-belltower"
+    dest.mkdir(parents=True, exist_ok=True)
+    for n in R2_PIECES:
+        Image.open(OUT / f"{n}.png").save(dest / f"Bt{n}.png", optimize=True)
+    print("exported", len(R2_PIECES), "to", dest)
+
+
 if __name__ == "__main__":
     dial()
     for k in ("Hollow", "Tarnished", "Lit"):
@@ -715,4 +726,5 @@ if __name__ == "__main__":
     candle()
     preview()
     export_r1()
+    export_r2()
     print("ok", OUT)
