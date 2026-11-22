@@ -149,7 +149,7 @@ Results on the final build:
 - skipcheck: ok.
 - camcheck: `__SeamlessTest`, TutorialSneak and TutorialBus ×3 all OK.
 - approachcheck: fence OK, bus short OK, bus side (-4, 0, 2) OK.
-  - Walk on the spot 0; seam 81-84 %; settle 7-14.5 deg with residual 0; on-screen jumps 0; lead 0.17-0.22 s.
+  - Walk on the spot 0; seam 81-84 %; settle turn 4.8-17 deg over every fix round 1 run (7-14.5 on these final runs), residual 0; on-screen jumps 0; lead 0.17-0.22 s.
   - Fence clearance: 0.47-0.55 walking up, 0.05-0.06 at the climb.
 - sneakcheck: sneak, fail, skipfence and timeout all OK. The dip-under-black rows now pass at real-time frames.
 - buscheck: BUS OK (TheBus2 at 17.00 s).
@@ -169,6 +169,62 @@ Slot 2 was restored from each round's fresh snapshot:
 - The checkpoint was cleared (Origin `{}`).
 - The only difference from the snapshot is Discipline.LastDecayDay (an in-game day passed).
 
+### Fix round 2 (2026-11-22, re-review ADDRESSED WITH FOLLOW-UPS; fresh Play rounds on slot 2, frames at 16.6-17 ms)
+
+- **I-1, fixed.** The NearSkip branch zeroes the move before it returns. A walk handed on through the ease wait or Begin's re-issue
+  now stops there.
+- **I-2, fixed.**
+  - FenceOver1's Pace now comes from root speed: flat velocity / 7, clamped to [0, 1.2].
+  - New approachcheck row CADENCE: a walk cycle's speed against v / stride, within 25 %, while v > 0.5.
+  - It was not RED on the old code for the fence (2 of 288 frames out): the live CrouchWalk already followed the root there.
+  - It did catch the game's own Walk on the bus walk at up to 143 % off. The AnimationController only resets that speed on
+    Humanoid.Running events, which lag a pace that changes every frame.
+  - Fixes:
+    - During an approach, CineActor drives the live Core locomotion track's speed from the root's flat speed every PreAnimation.
+    - The turn slow-down (TurnPace) is eased (at most 3 a second). It used to snap a walk from 11 to under 5 studs/s in two frames.
+    - TurnPace is floored at 75 % on the way to the lead-in corner.
+  - A rate limit on the whole pace was tried and dropped: it broke OnNear's timing (bus side LEAD went to 0.90 s).
+  - Ruling taken for the row:
+    - HARD for the chain's own walk cycle on every frame, and for the game's locomotion on steady frames (acceleration
+      ≤ 15 studs/s²).
+    - INFO for the game's own Walk on the start/stop transients (a standing start, the last stud). Those are the same start and
+      stop blends the AnimationController shows in normal play, and this slice must use the game's own locomotion.
+  - Final: fence 0 of 245-247 frames out, worst 7-15 %; bus short 0 of 4; bus side 0 of 11-12.
+  - Transients (info): 1 of 45-46 frames out on the fence; 3 of 13-46 on the bus (worst 35-70 %).
+- **I-3, done.** A probe TutorialSneak forced the exit-phase branch. The probe opens the cue at 0.8 studs instead of 0.5 and shifts
+  FenceOver1's entry so the exit comes at 0.35 studs left.
+  - On the final CineActor, FenceOver2 started WHILE WALKING in 2 of 2 runs (Left 0.40 and 0.43), and the root stopped on that frame.
+  - Clearance in FenceOver2's first 0.5 s: 0.20 (0.10-0.12 on the earlier build).
+  - Settle -14.2 / -13.9 deg, residual 0; on-screen jumps 0; CADENCE 0 out.
+  - With the production values (cue at 0.5, exit aimed at 0.40 studs left), the branch was missed 2 of 2 times. The exit came a frame
+    or two after the cue opened, so the cover hand-off ran instead.
+  - So in production the branch is rare by design: the window is about 0.5 down to 0.25 studs.
+  - The real TutorialSneak was reinstalled after the probe.
+- **m-1, fixed.** groundBelow uses RespectCanCollide and casts from 2 studs up. A hit above the point is refused (a mark part may sit
+  1 stud into the floor). LastRise is clamped to [1, 6].
+- **m-2, fixed.** Approaching / NHApproach is a depth count.
+- **m-3, fixed.** On the wrapper's error path the cadence hook is disconnected and the move, WalkSpeed and AutoRotate are put back.
+- **m-4, fixed.** NearSkip only applies within TurnMax (20 deg), and its settle is capped at TurnMax.
+  - New run "bus on the mark": placed on Stand, turned 10 deg. OK: 0 walking frames; settle -10.0 deg, residual 0; lead 0.
+- **m-5:** left as is, by ruling.
+
+Results on the final build:
+- skipcheck: ok.
+- approachcheck: fence OK ×2 (seam 83 / 91 %, settle -16.4 / -15.7 deg, clearance 0.60-0.61 walking up and 0.12-0.13 at the climb);
+  bus short OK (settle 2.2 deg); bus side OK (settle -19.2 deg); bus on the mark OK.
+- sneakcheck: sneak OK ×2 and skipfence OK.
+- camcheck bus: OK (In edges 16 against a median of 25).
+
+Over all fix round 2 runs on this build the settle turn is 2.2-19.2 deg, residual 0.
+
+Not re-run (no change to their code paths): camcheck seamless/sneak, sneakcheck fail/timeout, buscheck, beatcheck, holdcheck,
+resumecheck, hometowncheck, replayrefused, bodycheck, dipcheck.
+
+Slot 2 was restored from each round's fresh snapshot:
+- CineState was {Collected=Seen} before and after.
+- Origin `{}` before and after.
+- The final snapshot comparison shows no differences.
+
 ## Open rows
 
 - OWNER: sign-off. Watch both cuts at full speed and record your words here.
@@ -187,4 +243,15 @@ Slot 2 was restored from each round's fresh snapshot:
   - the bus walk starting 0.25 s after the glide.
 - DEFERRED (review ruling): M3, M6, M7, M9, M10.
 - Done in fix round 1 (Studio at full rate): the sneakcheck sneak and fail dip rows, bodycheck, dipcheck.
+- OWNER: Task 14 fix round 2, the exit-phase branch.
+  - FenceOver2 started while still walking and the root stopped on it; this only ran when forced by a probe (2 of 2).
+  - Clearance 0.20, settle about 14 deg, no jumps.
+  - In production it fires only when the walk's exit phase lands 0.5-0.25 studs from the stop. Every other time it's the 0.3 s cover
+    blend from the planted stop.
+  - Watch either one at full speed.
+- WATCH (fix round 2):
+  - sneakcheck's "torso faces the fence as FenceOver2 starts" reads 14.2-14.4 deg against its 15 limit (it was 7.6-11.1).
+    The eased corner turn leaves a slightly larger heading at the stop, which the 0.45 s settle is still turning out.
+  - approachcheck's fence SEAM SPEED row is borderline. It passed 3 of 4 fence runs on the final CineActor and failed 1 (67 %,
+    exactly at the 0.2 s window edge, where the eased corner slow-down begins).
 - Sign-off: pending.

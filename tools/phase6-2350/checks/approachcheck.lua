@@ -15,6 +15,9 @@
 --   * (fix round 1) WALK ON THE SPOT: frames where a walk-cycle track (the game's Walk / Sprint / CrouchWalk, or a chain piece made of
 --     one: *Walk*) is ADVANCING at a SEEN weight over 0.5 (its weight less what higher-priority tracks cover), while the root's flat
 --     speed is under 0.5 studs/s, outside black. A run of up to 2 frames is a blend; anything beyond is a FAIL.
+--   * (fix round 2) CADENCE: the seen walk cycle's playback speed against root speed / its stride speed (CrouchWalk 7, Walk 10, Sprint 24),
+--     within 25 % while the root moves (> 0.5 studs/s): a leg cycle out of step with the ground is a skate. <= 2 frames out. Hard for the
+--     chain's own walk cycle and for the game's locomotion on steady frames; the game's start/stop transients are listed as info.
 --   * (fix round 1) SEAM SPEED (sneak): the root's speed (3-frame average) in the first 0.2 s after the beat -> approach seam must not
 --     drop under 70 % of its speed just before it.
 --   * (fix round 1) SETTLE: the heading left 0.6 s after the stop against the mark's heading (residual, <= 15 degrees) and the size of
@@ -22,6 +25,7 @@
 --   * the mark: distance and heading error where the approach stopped; the fence's CLEARANCE: the smallest gap in Z between any body
 --     part of the character and the gate/fence's near face from the start of the approach to FenceOver2's first frame.
 local MODE = "sneak"
+local BUS_YAW = 10 -- (fix round 2) bus mode with BUS_OFFSET zero: on the mark, turned this many degrees off its heading
 local BUS_OFFSET = Vector3.new(0, 0, 4) -- bus mode: where the player is put, relative to the Stand mark (x along the kerb, z behind it): 4 = a short walk, (6, 0, 8) = a long one from the side
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -66,7 +70,12 @@ else
 	Goal = Marks:WaitForChild("Stand", 30).Position
 	MarkYaw = yawOfCF(Marks.Stand.CFrame)
 	-- off the mark: BUS_START studs back and to the side (behind the kerb, facing the stop)
-	Root.CFrame = CFrame.lookAt(Goal + BUS_OFFSET + Vector3.new(0, 3, 0), Goal + Vector3.new(0, 3, 0))
+	if BUS_OFFSET.Magnitude < 0.01 then
+		-- (fix round 2) ON the mark, turned BUS_YAW off its heading: no walk at all (NearSkip), the heading turns in the blend
+		Root.CFrame = CFrame.new(Goal + Vector3.new(0, 3, 0)) * Marks.Stand.CFrame.Rotation * CFrame.Angles(0, math.rad(BUS_YAW), 0)
+	else
+		Root.CFrame = CFrame.lookAt(Goal + BUS_OFFSET + Vector3.new(0, 3, 0), Goal + Vector3.new(0, 3, 0))
+	end
 end
 Root.AssemblyLinearVelocity = Vector3.zero
 Player:SetAttribute("NHCinePath", nil)
@@ -100,6 +109,7 @@ local function sample()
 	local Tracks = {}
 	local Walk, ChainOn, ChainW = false, {}, {}
 	local Cyc, CycWho, EndOn = 0, nil, false
+	local CadW, CadWho, CadSpeed = 0, nil, 0
 	-- (fix round 1) a track is only SEEN if no higher-priority track at full weight covers it (Core is the lowest priority)
 	local function rank(T) return if T.Priority == Enum.AnimationPriority.Core then -1 else T.Priority.Value end
 	local Playing = Animator and Animator:GetPlayingAnimationTracks() or {}
@@ -123,13 +133,18 @@ local function sample()
 			if ((L and WALKING[L]) or (N and N:match("Walk"))) and Was and math.abs(Tp - Was) > 1e-3 and seen(T) > Cyc then
 				Cyc, CycWho = seen(T), L or N
 			end
+			-- (fix round 2) cadence: the most-seen walk-cycle track (advancing or not) and its playback speed
+			if ((L and WALKING[L]) or (N and N:match("Walk"))) and seen(T) > CadW then
+				CadW, CadWho, CadSpeed = seen(T), L or N, T.Speed
+			end
 			table.insert(Tracks, L or N or Id)
 		end
 	end
 	local Look = Root.CFrame.LookVector
 	local Row = { t = Now; dt = Last and (Now - Last.t) or 0; pos = Root.Position; yaw = math.deg(math.atan2(-Look.X, -Look.Z));
 		seam = Player:GetAttribute("NHCineSeam"); path = Player:GetAttribute("NHCinePath"); veil = Veil and Veil.BackgroundTransparency or 1;
-		walk = Walk; chain = ChainOn; cw = ChainW; cyc = Cyc; cycWho = CycWho; endOn = EndOn; ws = Hum.WalkSpeed; crouch = Hum:GetAttribute("Crouch") == true; tracks = Tracks;
+		walk = Walk; chain = ChainOn; cw = ChainW; cyc = Cyc; cycWho = CycWho; endOn = EndOn; cadW = CadW; cadWho = CadWho; cadSpeed = CadSpeed; appr = Player:GetAttribute("NHApproach") == true;
+		vel = Vector3.new(Root.AssemblyLinearVelocity.X, 0, Root.AssemblyLinearVelocity.Z).Magnitude; ws = Hum.WalkSpeed; crouch = Hum:GetAttribute("Crouch") == true; tracks = Tracks;
 		clear = if MODE == "sneak" then (clearance()) else nil; clearWho = if MODE == "sneak" then select(2, clearance()) else nil }
 	Last = Row
 	table.insert(Rows, Row)
@@ -267,6 +282,42 @@ do -- (fix round 1) walk on the spot: an advancing walk cycle at weight > 0.5 wi
 	check(Excess == 0, string.format("WALK ON THE SPOT (an advancing walk cycle at weight > 0.5, root under 0.5 studs/s, beyond 2 blend frames): %d frames, %.2f s%s",
 		Excess, Secs, #Runs > 0 and (" -> " .. table.concat(Runs, "; ")) or ""))
 end
+do -- (fix round 2) CADENCE: the seen walk cycle's playback speed against the root's speed over the clip's own stride speed (CrouchWalk
+	-- and the *GameCrouchWalk pieces 7 studs/s at speed 1, Walk 10, Sprint 24: the game's own scales), within 25 %, while the root moves
+	-- over 0.5 studs/s, outside black. A leg cycle out of step with the ground is a skate.
+	-- HARD (<= 2 frames out): a chain piece's walk cycle (ours: FenceOver1) on every frame, and the game's own locomotion on STEADY frames
+	-- (root acceleration <= 15 studs/s^2). INFO: the game's own Walk/CrouchWalk on the start/stop transients (the ramp from a standing start,
+	-- the last stud's ease-out), where the game's own AnimationController blends a start or a stop exactly as it does in normal play.
+	local STRIDE = { CrouchWalk = 7, Walk = 10, Sprint = 24, FastSprint = 30 }
+	local Bad, N, Worst, WorstAt, WorstWho = 0, 0, 0, 0, nil
+	local TBad, TN, TWorst = 0, 0, 0
+	local OutL = {}
+	for I = math.max(S0, 2), #Rows do
+		local R = Rows[I]
+		if R.cadWho and R.cadW > 0.5 and R.vel > 0.5 and not black(R) and R.seam ~= nil then
+			local Per = STRIDE[R.cadWho] or (tostring(R.cadWho):match("CrouchWalk") and 7) or 10
+			local Want = R.vel / Per
+			local Err = math.abs(R.cadSpeed - Want) / math.max(Want, 1e-3)
+			local Acc = math.abs(R.vel - Rows[I - 1].vel) / math.max(R.t - Rows[I - 1].t, 1e-3)
+			local Ours = STRIDE[R.cadWho] == nil
+			if Ours or Acc <= 15 then
+				N += 1
+				if Err > 0.25 then
+					Bad += 1
+					if #OutL < 8 then table.insert(OutL, string.format("%.2f s %s %.2f vs %.2f%s", R.t - Rows[S0].t, tostring(R.cadWho), R.cadSpeed, Want, R.appr and " (approach)" or "")) end
+				end
+				if Err > Worst then Worst, WorstAt, WorstWho = Err, R.t - Rows[S0].t, string.format("%s speed %.2f vs %.2f", tostring(R.cadWho), R.cadSpeed, Want) end
+			else
+				TN += 1
+				if Err > 0.25 then TBad += 1 end
+				TWorst = math.max(TWorst, Err)
+			end
+		end
+	end
+	check(Bad <= 2, string.format("CADENCE (walk-cycle speed vs root speed / stride, within 25 %%: the chain's walk cycle always, the game's own on steady frames): %d of %d frames out (<= 2); worst %.0f %% at %.2f s (%s)",
+		Bad, N, Worst * 100, WorstAt, tostring(WorstWho)) .. (#OutL > 0 and (" -> " .. table.concat(OutL, "; ")) or ""))
+	add(string.format("cadence on the start/stop transients (info: the game's own locomotion, accel > 15 studs/s^2): %d of %d frames out of 25 %%, worst %.0f %%", TBad, TN, TWorst * 100))
+end
 -- the approach: first moving frame in the cut, the stop (the last frame of the approach's walk), the first chain piece
 local Move0, Stop0, P1, P2
 for I = A0, #Rows do
@@ -275,7 +326,15 @@ for I = A0, #Rows do
 	if not P1 and R.chain[CHAIN[1]] then P1 = I end
 	if not P2 and R.chain[CHAIN[2]] then P2 = I end
 end
-if P1 then
+local OnMark = MODE == "bus" and BUS_OFFSET.Magnitude < 0.01
+if OnMark and P1 then
+	-- (fix round 2) on the mark there's no walk: the "stop" is where the first piece starts; any frame that moves is reported below
+	Move0 = Move0 or P1
+	local Moved = 0
+	for I = S0, #Rows do if Rows[I].v > 0.5 and not IsJump[I] and not black(Rows[I]) and Rows[I].walk then Moved += 1 end end
+	check(Moved <= 2, string.format("ON THE MARK: %d walking frames (want none: NearSkip, no walk)", Moved))
+end
+if P1 and not OnMark then
 	-- the stop: the first frame after the walk started where the root is still (under 0.5 studs/s for 2 frames) at or after the piece began, minus nothing
 	for I = math.max(2, Move0 or A0), #Rows - 1 do
 		if Rows[I].v < 0.5 and Rows[I + 1].v < 0.5 and Rows[I - 1].v >= 0.5 then Stop0 = I break end

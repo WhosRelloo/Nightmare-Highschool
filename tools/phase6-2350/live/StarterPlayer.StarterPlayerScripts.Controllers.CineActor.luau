@@ -29,6 +29,8 @@ local SpeedWas: number? = nil
 local EaseOver = false                                      -- an Approach asks Begin to end its ease at once (the walk carries on, it doesn't stop and start)
 local Easing = false                                        -- Begin's 0.3 s input ease is running (Approach waits it out)
 local Approaching = false                                   -- an Approach is driving the character (fix round 1)
+local ApproachDepth = 0                                     -- (fix round 2) how many are running (Approaching = depth > 0)
+local STRIDE = { Walk = 10, CrouchWalk = 7, Sprint = 24, FastSprint = 30 } -- (fix round 2) studs/s at speed 1: AnimationController's own scales
 local WALK, RUN, CROUCH = 12, 25, 7                         -- the game's own speeds: Sprint's Release, Sprint's Activate, Services.Player.Crouch
 
 local function controls()
@@ -95,21 +97,26 @@ local function wrap(Deg: number): number return (Deg + 540) % 360 - 180 end
 -- caller can start the next piece's fade-in), Timeout (seconds; default from the distance),
 -- (fix round 1) EaseOut (true: the pace eases down over the last stud), StopWhen() (asked every frame on the last leg: true = stop here,
 -- the caller's next piece has taken over), OnLeft(studs) (every frame on the last leg: the distance left), TurnMax (20 degrees),
--- NearSkip (0.5 studs) and NearTurn (45 degrees): already this close to the mark and this nearly facing it, there is no walk at all and the
+-- NearSkip (0.5 studs) and NearTurn (TurnMax; fix round 2): already this close to the mark and this nearly facing it, there is no walk at all and the
 -- heading turns in the blend.
 -- Returns true on arrival. Otherwise false and a reason: "blocked" (no progress for 3 s), "timeout", "fell" (dropped 8 studs), "died"
 -- (Health 0 or the character gone), "released" (Release ran) or "nochar". On blocked / timeout / fell the caller dips to black and places
 -- the character (Shared.Fallback); on died / released / nochar it does neither (nothing to place, and no chain on a dead character).
 local LastRise: number? = nil                                -- the root's height over the ground at the last Approach's start (Fallback places at it)
-local function groundBelow(At: Vector3, Char: Model?): number?
+-- (fix round 2, m-1) the floor under a point: solid parts only (RespectCanCollide), cast from just above it (2 studs, so a roof or a
+-- branch overhead isn't taken for the floor), and a hit above the point itself is refused (Above: a mark part sitting on the floor may
+-- have its centre a little under the floor's top)
+local function groundBelow(At: Vector3, Char: Model?, Above: number?): number?
 	local Params = RaycastParams.new()
 	Params.FilterType = Enum.RaycastFilterType.Exclude
 	Params.FilterDescendantsInstances = if Char then { Char } else {}
-	local Hit = workspace:Raycast(At + Vector3.new(0, 6, 0), Vector3.new(0, -40, 0), Params)
-	return Hit and Hit.Position.Y or nil
+	Params.RespectCanCollide = true
+	local Hit = workspace:Raycast(At + Vector3.new(0, 2, 0), Vector3.new(0, -40, 0), Params)
+	if not Hit or Hit.Position.Y > At.Y + (Above or 0.05) then return nil end
+	return Hit.Position.Y
 end
 local function approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, Arrive: number?, BlendLead: number?, OnNear: ((number) -> ())?, Timeout: number?,
-	EaseOut: boolean?, StopWhen: (() -> boolean)?, OnLeft: ((number) -> ())?, TurnMax: number?, NearSkip: number?, NearTurn: number? }?): (boolean, string?)
+	EaseOut: boolean?, StopWhen: (() -> boolean)?, OnLeft: ((number) -> ())?, TurnMax: number?, NearSkip: number?, NearTurn: number? }?, State: { Restore: (() -> ())? }?): (boolean, string?)
 	local Opt = Opts or {}
 	local Char, Hum, Root = parts()
 	if not (Char and Hum and Root) then return false, `nochar` end
@@ -139,13 +146,30 @@ local function approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, Ar
 	end
 	local Was = Hum.WalkSpeed
 	local RotWas = Hum.AutoRotate
+	-- (fix round 2) the legs keep step with the ground: Controllers.Character.AnimationController sets the live Walk / CrouchWalk /
+	-- Sprint speed only on Humanoid.Running events, which lag a pace that changes every frame (the ramp, the turn slow-down, the ease-out:
+	-- measured Walk at 0.95 against 0.39 wanted). While the approach drives you, the live locomotion track's speed is the root's flat
+	-- speed over that clip's own stride (the game's scales: Walk 10, CrouchWalk 7, Sprint 24, FastSprint 30), written before each
+	-- animation step
+	local Animator = Hum:FindFirstChildOfClass(`Animator`)
+	local CadConn = Animator and RunService.PreAnimation:Connect(function()
+		if not Root.Parent then return end
+		local Flat = flat(Root.AssemblyLinearVelocity).Magnitude
+		for _, T in (Animator :: Animator):GetPlayingAnimationTracks() do
+			local Per = T.Animation and STRIDE[T.Animation.Name]
+			if Per and T.Priority == Enum.AnimationPriority.Core then T:AdjustSpeed(math.clamp(Flat / Per, 0.05, 2.5)) end
+		end
+	end) or nil
+	local function cadOff() if CadConn then CadConn:Disconnect() CadConn = nil end end
+	-- (fix round 2, m-3) what the wrapper puts back if this errors part way
+	if State then State.Restore = function() cadOff() Hum:Move(Vector3.zero) Hum.WalkSpeed = Was Hum.AutoRotate = RotWas end end
 	Hum.AutoRotate = true                                        -- (fix round 1, M4) the body turns with the walk, whatever the cut had set
 	local Speed = if Gait == `Run` then RUN elseif Crouching then CROUCH
 		else (if Was > 4 and Was < 20 then Was else WALK)           -- the walk speed the player has (hunger bands change it), the game's 12 otherwise
 	local Face = flat(Mark.LookVector)
 	Face = if Face.Magnitude > 1e-3 then Face.Unit else Vector3.new(0, 0, -1)
 	local Goal = Vector3.new(Mark.Position.X, Root.Position.Y, Mark.Position.Z)
-	do local G = groundBelow(Root.Position, Char) LastRise = if G then Root.Position.Y - G else nil end
+	do local G = groundBelow(Root.Position, Char) LastRise = if G then math.clamp(Root.Position.Y - G, 1, 6) else nil end
 	local function headErr(): number return wrap(math.deg(yawOf(Face) - yawOf(Root.CFrame.LookVector))) end
 	-- the settle: the heading left at the stop turns over the blend window, inside the next piece's fade-in, about where the root is now
 	local function settle(Cap: number)
@@ -165,12 +189,15 @@ local function approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, Ar
 		end)
 	end
 	-- (fix round 1, I4) already on the mark and nearly facing it: no walk (a lead-in from here is an out-and-back); the heading turns in the blend
-	if (flat(Root.Position) - flat(Goal)).Magnitude <= (Opt.NearSkip or 0.5) and math.abs(headErr()) <= (Opt.NearTurn or 45) then
+	-- (fix round 2, m-4) only within TurnMax of its heading, and the turn is capped there like every other settle
+	if (flat(Root.Position) - flat(Goal)).Magnitude <= (Opt.NearSkip or 0.5) and math.abs(headErr()) <= (Opt.NearTurn or TurnMax) then
+		cadOff()
+		Hum:Move(Vector3.zero)                                  -- (fix round 2, I-1) a walk handed on (the ease wait, Begin's re-issue) stops here
 		Hum.AutoRotate = RotWas
 		Hum.WalkSpeed = Was
 		local Fn = Opt.OnNear
 		if Fn then task.spawn(Fn, 0) end
-		settle(Opt.NearTurn or 45)
+		settle(math.min(Opt.NearTurn or TurnMax, TurnMax))
 		return true, nil
 	end
 	local Lead = Goal - Face * LeadIn
@@ -234,8 +261,13 @@ local function approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, Ar
 		local Err = wrap(Want - Yaw)
 		local Rate = math.clamp(Err * 8, -360, 360)
 		local Step = 1800 * Dt
-		TurnPace = math.clamp(1.15 - math.abs(Err) / 90, 0.2, 1)
-		if Move.Magnitude > 3 * Speed / math.rad(360) then TurnPace = math.max(TurnPace, 0.9) end
+		local TurnWant = math.clamp(1.15 - math.abs(Err) / 90, 0.2, 1)
+		if Move.Magnitude > 3 * Speed / math.rad(360) then TurnWant = math.max(TurnWant, 0.9) end
+		-- (fix round 2) on the way to the lead-in the corner is rounded by pursuit (CORNER), not stopped at: no need to brake below 75 % there
+		if Leg < #Legs then TurnWant = math.max(TurnWant, 0.75) end
+		-- (fix round 2) eased, at most 3 a second: a slow-down that snapped took the walk from 11 to under 5 studs/s in two frames, which no
+		-- body does and which the leg cycle couldn't keep step with
+		TurnPace += math.clamp(TurnWant - TurnPace, -3 * Dt, 3 * Dt)
 		Spin += math.clamp(Rate - Spin, -Step, Step)
 		Yaw = wrap(Yaw + Spin * Dt)
 		local Dir = Vector3.new(-math.sin(math.rad(Yaw)), 0, -math.cos(math.rad(Yaw)))
@@ -304,6 +336,7 @@ local function approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, Ar
 		if os.clock() - Moved0 > 3 then Reason = `blocked` break end
 		if os.clock() - T0 > Budget then Reason = `timeout` break end
 	end
+	cadOff()
 	Hum:Move(Vector3.zero)                                      -- the Humanoid stops
 	Hum.WalkSpeed = Was                                         -- (nothing else owns the speed during an approach)
 	Hum.AutoRotate = RotWas
@@ -318,13 +351,21 @@ end
 
 -- the player attribute NHApproach is true while an approach drives the character (a player's held input keeps walking up to it: the
 -- checks' scripted walker hands over on it the same way)
+-- (fix round 2, m-2) a depth count: an approach that starts while another is still unwinding doesn't have its flag cleared under it
 function Shared.Approach(Mark: CFrame, Opts: any?): (boolean, string?)
-	Player:SetAttribute(`NHApproach`, true)
+	ApproachDepth += 1
 	Approaching = true
-	local Ok, Res, Why = pcall(approach, Mark, Opts)
-	Approaching = false
-	Player:SetAttribute(`NHApproach`, nil)
-	if not Ok then warn(`[CineActor] Approach errored: {Res}`) return false, `error` end
+	Player:SetAttribute(`NHApproach`, true)
+	local State = {}
+	local Ok, Res, Why = pcall(approach, Mark, Opts, State)
+	ApproachDepth -= 1
+	Approaching = ApproachDepth > 0
+	if not Approaching then Player:SetAttribute(`NHApproach`, nil) end
+	if not Ok then
+		warn(`[CineActor] Approach errored: {Res}`)
+		if State.Restore then pcall(State.Restore) end           -- (fix round 2, m-3) speed, AutoRotate and the move put back
+		return false, `error`
+	end
 	return Res, Why
 end
 
@@ -344,7 +385,7 @@ function Shared.Fallback(Mark: CFrame, Why: string?, Alive: (() -> boolean)?): b
 	end
 	local function place()
 		if not live() then return end
-		local G = groundBelow(Mark.Position, Char)
+		local G = groundBelow(Mark.Position, Char, 1)
 		local Y = if G then G + (LastRise or (Root.Size.Y / 2 + (if Hum.RigType == Enum.HumanoidRigType.R6 then 2 else Hum.HipHeight))) else Mark.Position.Y
 		if not G and Why ~= `fell` then Y = Root.Position.Y end           -- no ground found under the mark: a walk that was blocked keeps its height
 		Root.CFrame = CFrame.new(Mark.X, Y, Mark.Z) * (Mark - Mark.Position)

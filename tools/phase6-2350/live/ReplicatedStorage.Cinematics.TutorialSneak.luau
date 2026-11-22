@@ -246,7 +246,7 @@ function Def.Build(Ctx)
 			if not LandMark then warn(`[Cine] TutorialSneak: no FenceLand mark in the Garden set: the climb lands where the clip's own motion does`) end
 			local Started = false
 			-- (fix round 1, I1) FenceOver1 is the game's crouch walk baked into the chain. It enters at the LIVE crouch walk's own phase (so its
-			-- fade-in is in step) and plays at the live walk's own speed (CineActor.Chain Pace): its legs go exactly as far as the root does
+			-- fade-in is in step) and plays at the root's speed over the clip's stride (CineActor.Chain Pace, fix round 2): its legs go exactly as far as the root does
 			-- and stop when the root stops. Its loop is cued on the walk: if its exit phase comes round in the last SYNC_SHORT studs, FenceOver2
 			-- starts right there and the approach stops on it (StopWhen). Otherwise, once stopped, the stopped pose is held on a cover track
 			-- (the same clip, Action2) while FenceOver1 is put on its exit (FenceOver2 takes over at once, underneath), and the cover fades out
@@ -327,10 +327,12 @@ function Def.Build(Ctx)
 							local L = liveWalk()
 							return if L and L.IsPlaying then L.TimePosition else nil
 						end;
+						-- (fix round 2, I-2) from the root's own speed: the clip's stride is 7 studs/s at speed 1 (the game's crouch speed), so
+						-- speed = flat velocity / 7 keeps the legs on the ground through the ease-out whatever the live track was set to
 						Pace = function(): number
-							if Stopped then return 0 end
-							local L = liveWalk()
-							return if L and L.IsPlaying then L.Speed else 0
+							if Stopped or not Root.Parent then return 0 end
+							local V = Root.AssemblyLinearVelocity
+							return math.clamp(Vector3.new(V.X, 0, V.Z).Magnitude / 7, 0, 1.2)
 						end })
 					if Ctx.Alive() then Actor.Reseat(`FenceOver2`, Offset, Ctx.Clip) end
 					Climbing = false
