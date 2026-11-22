@@ -842,15 +842,16 @@ def evidence_answer(solved=False):
 
 
 # ---------------------------------------------------------------- dialogue
-def dialogue():
-    scr = Screen(bg("lounge-corner.jpg", "night", dark=0.8), name="dialogue")
+def dialogue(crest="Ink", speaker="ODETTE MARSH", sub="The Ink Club · second year",
+             line="You came back. Nobody comes back after their first night in Room 106.", replies=None,
+             out="10-dialogue.jpg", name="dialogue"):
+    scr = Screen(bg("lounge-corner.jpg", "night", dark=0.8), name=name)
     vignette(scr, 0.5)
     scr.rect(0, 0, 1920, 36, fill=(0, 0, 0, 255))          # the talk cinematic's thin bars (NHTalkBars)
     scr.rect(0, 1044, 1920, 1080, fill=(0, 0, 0, 255))
     rx, ry, rw, rh = 110, 830, 1100, 150
     scr.put(DL / "Ribbon.png", rx, ry, rw, rh, label="Ribbon")
     rb = (rx + 0.1 * rw, ry + 0.2 * rh, rx + 0.9 * rw, ry + 0.8 * rh)
-    line = "You came back. Nobody comes back after their first night in Room 106."
     width = 0.74 * rw
     lines = scr.wrap(line, 24, width)
     y0 = ry + rh / 2 - (len(lines) - 1) * 17
@@ -860,12 +861,12 @@ def dialogue():
     cx, cy, cw, ch = 120, 708, 520, 120
     scr.put(DL / "CallingCardHuman.png", cx, cy, cw, ch, label="CallingCard")
     sx, sy, sr = cx + 60, cy + 60, 47
-    scr.put(DL / "CrestInk.png", sx - sr, sy - sr, 2 * sr, 2 * sr, label="clique crest")   # the Ink Club
+    scr.put(DL / f"Crest{crest}.png", sx - sr, sy - sr, 2 * sr, 2 * sr, label="clique crest")
     fb = (cx + 235 * cw / 1040, cy + 34 * ch / 240, cx + 988 * cw / 1040, cy + 206 * ch / 240)
-    scr.text(fb[0] + 8, cy + 44, "ODETTE MARSH", 24, BONE, "b", "lm", box=fb)
-    scr.text(fb[0] + 8, cy + 89, "The Ink Club · second year", 20, DIM, "r", "lm", box=fb)
-    replies = [("What happened in Room 106?", "Ask"), ("Maybe you could show me around?", "Kind"),
-               ("Pay her ¥10 to keep quiet", "Sly"), ("Stay out of my way.", "Threat")]
+    scr.text(fb[0] + 8, cy + 44, speaker, 24, BONE, "b", "lm", box=fb)
+    scr.text(fb[0] + 8, cy + 89, sub, 20, DIM, "r", "lm", box=fb)
+    replies = replies or [("What happened in Room 106?", "Ask"), ("Maybe you could show me around?", "Kind"),
+                          ("Pay her ¥10 to keep quiet", "Sly"), ("Stay out of my way.", "Threat")]
     tx, tw, th = 1330, 540, 69
     for i, (t, tone) in enumerate(replies):
         ty = 690 + i * 78
@@ -877,7 +878,16 @@ def dialogue():
         scr.text(ib[0] + 10, ty + th / 2, t, 22, BONE if on else DIM, "b" if on else "r", "lm", box=ib)
         scr.put(DL / f"Tone{tone}.png", ib[2] - 40, ty + th / 2 - 16, 32, 32, label=f"tone {tone}")
     scr.text(1870, 1018, "1-4 reply · click the line to skip · walk away to leave", 20, DIM, "r", "rm")
-    return scr.save("10-dialogue.jpg")
+    return scr.save(out)
+
+
+def dialogue_unaffiliated():
+    """A speaker with no clique (staff, townsfolk, a new student): the Unaffiliated crest, never the school Seal."""
+    return dialogue("Unaffiliated", "WENDELL PRICE", "Custodian · staff",
+                    "Mind the wet floor. And don't go past the boiler room after the last bell, whatever you hear.",
+                    [("What's past the boiler room?", "Ask"), ("Need a hand with that mop?", "Kind"),
+                     ("Lend me your master key.", "Sly"), ("Mind your own business.", "Threat")],
+                    "10b-dialogue-unaffiliated.jpg", "dialogue-unaffiliated")
 
 
 def overview(paths):
@@ -901,7 +911,8 @@ if __name__ == "__main__":
     only = sys.argv[1:]
     fns = {"zones": zones, "zones_phone": zones_phone, "ghost": lambda: explore("ghost"), "vanish": lambda: explore("vanish"),
            "combat": combat, "cut": cut, "menu": menu, "phone": phone, "races": races, "wall": evidence_wall,
-           "answer": lambda: evidence_answer(False), "solved": lambda: evidence_answer(True), "dialogue": dialogue}
+           "answer": lambda: evidence_answer(False), "solved": lambda: evidence_answer(True), "dialogue": dialogue,
+           "dialogue_none": dialogue_unaffiliated}
     ps, failed = [], []
     for key, fn in fns.items():
         if only and key not in only:

@@ -281,7 +281,7 @@ The talk-cinematic camera, its thin bars and its blur (1.35.1) stay. The on-scre
 | Piece | Size | What |
 |---|---|---|
 | `CallingCard<Race>` | 1040 x 240 | the speaker's card, lower-left: blackened iron, trim bead, a crimson rule, a socket for the crest |
-| `Crest<Clique>` | 512 | the speaker's clique crest, **replacing the wax seal**: a cameo with a beaded metal rim, a guilloche-engraved enamel dome in the clique's colour, and a raised emblem, all fully baked (not tinted). Ink Club: a nib and an ink drop on indigo. Vigil: a lantern, silver on midnight. Crimson Court: a chalice with a blood drop on oxblood. Athletes: a laurel and star, copper on green. Delinquents: a broken padlock, steel on rust. Pack: a paw, bone on black. Ordinary: a key, pewter on slate. Chapel Choir: a haloed cross, gold on ivory. Staff and NPCs without a clique: **open** (a ninth crest in the same cameo style, still to be drawn; never `Theme.Images.Seal`, which the owner has retired from new UI). |
+| `Crest<Clique>` | 512 | the speaker's clique crest, **replacing the wax seal**: a cameo with a beaded metal rim, a guilloche-engraved enamel dome in the clique's colour, and a raised emblem, all fully baked (not tinted). Ink Club: a nib and an ink drop on indigo. Vigil: a lantern, silver on midnight. Crimson Court: a chalice with a blood drop on oxblood. Athletes: a laurel and star, copper on green. Delinquents: a broken padlock, steel on rust. Pack: a paw, bone on black. Ordinary: a key, pewter on slate. Chapel Choir: a haloed cross, gold on ivory. **Unaffiliated** (`CrestUnaffiliated`, owner decision 2026-11-22): the one crest with no enamel. Its engine-turned field is left bare and oxidised (no colour was ever poured), and the emblem is a blank, unmarked heater shield in polished iron-pewter with a raised border: "no arms". It is the only all-metal crest, so it can't be mistaken for a clique. **Rule:** any NPC or staff member without a clique (teachers, the custodian, townsfolk, a new student who hasn't joined one) shows `CrestUnaffiliated`; it is never `Theme.Images.Seal`, which the owner has retired from new UI, and never left empty. All 9 crests animate (below). |
 | `Ribbon` | 2048 x 280 | a torn, burnt-edged parchment ribbon across the lower third (a 9-slice in game); the line is inked on it |
 | `ReplyTab<Race>` / `ReplyTabOn<Race>` | 1000 x 128 | the replies, stacked bottom-right: an iron tab with a key-cap socket; the selected one has crimson velvet |
 | `ToneKind` / `ToneSly` / `ToneThreat` / `ToneAsk` | 96 | tone marks in relief: candle, mask, dagger, quill |
@@ -302,6 +302,92 @@ The talk-cinematic camera, its thin bars and its blur (1.35.1) stay. The on-scre
   | Keyboard | 1-4 | walk away |
   | Gamepad | D-pad, then A | B |
   | Touch | tap a tab | - |
+
+**Crest animation** (owner requirement 2026-11-22; all 9 crests). The crest is the one moving thing on the card, and
+it moves the way metal does: it catches the light, then rests. Nothing spins, bounces or loops constantly.
+
+- **Art:** `CrestFlip<Clique>.png`, 1024 x 1024, a 4 x 4 flipbook of 256 px frames (row by row). Frame 0 is the crest
+  at rest (the same art as `Crest<Clique>.png`); frames 1-15 are one light-catch that fades in from frame 0 and back
+  out to it, so the loop never pops (checked: the frame 15 to frame 0 step is as small as the frame 0 to 1 step).
+  Played by stepping `ImageRectOffset` (`ImageRectSize` 256 x 256). No `AnimatedImage` or UI particles (both beta).
+- **The light-catch, per crest** (one second at 15 fps):
+
+  | Crest | What catches the light |
+  |---|---|
+  | Ink Club | a glint runs down the nib to its tip, then the ink drop glimmers wet |
+  | Vigil | the lantern flame gutters up and settles; its warm glow fills the window, and a soft sheen crosses the lantern |
+  | Crimson Court | the blood drop flashes, then the light pours down the chalice |
+  | Athletes | the laurel lights leaf by leaf, bottom to top, then the star |
+  | Delinquents | a hard glint slides along the crack and over the shackle |
+  | Pack | moonlight crosses the four toes one by one, then settles on the pad |
+  | Ordinary | the light runs the key from bow to teeth |
+  | Chapel Choir | a light travels once round the halo, then down the cross |
+  | Unaffiliated | one slow, wide sheen crosses the blank shield like a mirror, and the rim with it |
+
+- **Idle timing:** after the entrance, hold frame 0 for a random 5-8 s, play frames 1-15 at 15 fps, return to frame
+  0, repeat. An idle catch never plays while a line is typing; it waits for the typing to finish, so it never
+  competes with the text (the entrance's one catch is the only exception).
+- **Entrance** (when the card appears): the card fades in over 0.18 s with a 12 px slide from the left. At 0.12 s the
+  crest drops into the socket: from 118 % size and fully transparent to 100 % and opaque in 0.2 s (Cubic Out), then
+  presses to 96 % and back in 0.12 s (Sine InOut), as if seated, then plays one light-catch straight away. The name
+  and clique fade in from 0.2 s.
+- **Reduce Motion** (`NHReducedMotion`): frame 0 only. The crest appears with the card in a single 0.2 s fade; no
+  press, no light-catch, no idle loop.
+- **Preview:** `11-crests-idle.mp4` / `.gif` (all 9 idling, staggered) and `12-dialogue-crest-entrance.mp4` / `.gif`
+  (a no-clique custodian's card arriving), in this mockup folder. `10b-dialogue-unaffiliated.jpg` is the full screen.
+- **Client playback** (sketch for the dialogue card controller; not installed):
+
+  ```lua
+  local TweenService = game:GetService("TweenService")
+  local Players = game:GetService("Players")
+  local FRAME, COLS, FRAMES, FPS = 256, 4, 16, 15
+
+  local function setFrame(img: ImageLabel, i: number)
+      img.ImageRectSize = Vector2.new(FRAME, FRAME)
+      img.ImageRectOffset = Vector2.new((i % COLS) * FRAME, (i // COLS) * FRAME)
+  end
+
+  -- crest: ImageLabel in the card socket, Image = Config.DialogueArt.CrestFlip[clique or "Unaffiliated"]
+  -- isTyping: () -> boolean, from the typewriter
+  local function playCrest(crest: ImageLabel, isTyping: () -> boolean): () -> ()
+      local alive = true
+      setFrame(crest, 0)
+      if Players.LocalPlayer:GetAttribute("NHReducedMotion") == true then
+          crest.ImageTransparency = 1
+          TweenService:Create(crest, TweenInfo.new(0.2), { ImageTransparency = 0 }):Play()
+          return function() alive = false end
+      end
+      local function catch()
+          for i = 1, FRAMES - 1 do
+              if not alive then return end
+              setFrame(crest, i)
+              task.wait(1 / FPS)
+          end
+          setFrame(crest, 0)
+      end
+      task.spawn(function()
+          local size = crest.Size
+          crest.Size = UDim2.new(size.X.Scale * 1.18, size.X.Offset * 1.18, size.Y.Scale * 1.18, size.Y.Offset * 1.18)
+          crest.ImageTransparency = 1
+          task.wait(0.12)
+          local drop = TweenService:Create(crest, TweenInfo.new(0.2, Enum.EasingStyle.Cubic, Enum.EasingDirection.Out),
+              { Size = size, ImageTransparency = 0 })
+          drop:Play(); drop.Completed:Wait()
+          local press = TweenService:Create(crest, TweenInfo.new(0.06, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut,
+              0, true), { Size = UDim2.new(size.X.Scale * 0.96, size.X.Offset * 0.96, size.Y.Scale * 0.96, size.Y.Offset * 0.96) })
+          press:Play(); press.Completed:Wait()
+          catch()
+          while alive do
+              task.wait(5 + math.random() * 3)
+              while alive and isTyping() do task.wait(0.25) end
+              if alive then catch() end
+          end
+      end)
+      return function() alive = false end   -- call when the card closes
+  end
+  ```
+
+  The crest's `AnchorPoint` is 0.5, 0.5 so the drop and press scale about the socket's centre.
 
 **Layout rules:**
 - The ribbon's text box is set by its torn edges, and the card overlaps only the ribbon's top margin. Both are fit
@@ -371,7 +457,8 @@ The talk-cinematic camera, its thin bars and its blur (1.35.1) stay. The on-scre
 | | `Lens<Race>` | 640 | no |
 | | `StampInk` | 640 x 240 | yes (crimson) |
 | Dialogue | `CallingCard<Race>` | 1040 x 240 | no |
-| | `Crest<Clique>` (8) | 512 | no |
+| | `Crest<Clique>` (9: the 8 cliques and `CrestUnaffiliated`) | 512 | no |
+| | `CrestFlip<Clique>` (9 flipbooks, 4 x 4 frames of 256) | 1024 | no |
 | | `Ribbon` (9-slice, centre 240..1808) | 2048 x 280 | no |
 | | `ReplyTab<Race>`, `ReplyTabOn<Race>` | 1000 x 128 | no |
 | | `Tone*`, `Nib` | 96 | no |
@@ -381,7 +468,7 @@ The talk-cinematic camera, its thin bars and its blur (1.35.1) stay. The on-scre
   pattern of `Config.BellTowerArt`).
 - **If an id is missing,** the Human trim draws instead, and if that's missing too, today's kit art draws. Nothing
   breaks before upload.
-- **Count:** 6 races x 13 per-race pieces (78 images), plus about 25 shared.
+- **Count:** 6 races x 13 per-race pieces (78 images), plus about 43 shared (including the 9 crests and 9 crest flipbooks).
 
 ## 13. Releases (each one playable and tested before the next)
 
