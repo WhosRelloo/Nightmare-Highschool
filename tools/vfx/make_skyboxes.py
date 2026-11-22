@@ -2,6 +2,10 @@
 
 usage: python tools/vfx/make_skyboxes.py [outdir=art/group-upload-skies] [size=1024] [only=Day,Dusk,...] [preview=art/skies-preview]
 
+2.36 (sky-2360): 19 sets. Day and Dusk below, plus the 17 sets painted in tools/vfx/skies2360.py: Dawn; Night, NightNew,
+NightCrimson, NightBlue; Storm; WinterDay/Dusk/Night, SpringDay/Dusk/Night, SummerDay/Dusk/Night; NightmareDusk/Night.
+The 2.16 descriptions below still describe Day and Dusk; see skies2360.py for the rest.
+
   NHSkyDay        a muted, cool gothic day: blue-grey zenith, bone haze on the horizon, big painted clouds lit from the
                   sun's side of the sky (-Z), the far hills and the town lost in the haze
   NHSkyDusk       the dusk / dawn sky: a candle-gold glow where the sun sets (-X, a little -Z), crimson-mauve above it,
@@ -493,6 +497,16 @@ def sky_storm(D):
 
 
 SKIES = {"Day": sky_day, "Dusk": sky_dusk, "Night": sky_night, "NightBlue": sky_night_blue, "Storm": sky_storm}
+
+# The 2.36 sets (sky-2360): tools/vfx/skies2360.py paints Dawn, the B-style nights (Night, NightNew, NightCrimson,
+# NightBlue), the restyled Storm and the Winter/Spring/Summer/Nightmare event skies. Day and Dusk stay as painted above
+# (their 2026-11-13 uploads stay live); the 2.16 Night/NightBlue/Storm painters above are kept only as the Storm base.
+sys.modules.setdefault("make_skyboxes", sys.modules[__name__])  # so skies2360's `import make_skyboxes` gets this module
+sys.path.insert(0, HERE)
+import skies2360  # noqa: E402
+
+SKIES_216 = dict(SKIES)
+SKIES = {"Day": sky_day, "Dusk": sky_dusk, **skies2360.SETS}
 
 
 # ---------------------------------------------------------------- preview: re-project the written faces
