@@ -1,0 +1,9 @@
+- [Imported assets: find ids yourself](imported-assets-means-find-ids.md) — "imported" = uploaded to group 15981569; look up ids in the group creations
+- [DevForum: read via browser JSON](devforum-read-via-browser.md) — web-fetch gets empty 202; use /t/<id>.json in the built-in browser
+- [Rigid rigs for multi-piece props](rigid-rigs-for-multipiece-props.md) — skinned FBX import breaks multi-piece props; use RIGID + rigid_rig.py
+- [Roblox import quirks](roblox-import-quirks.md) — 100x scale, textures.lua rules, group assets can't be archived, Blender paths, low C: space
+- [Studio sharing and slot 2](studio-sharing-and-slot2.md) — one Studio driver at a time, release protocol, fresh slot-2 snapshots
+- [Owner priorities](owner-priorities.md) — tutorial first ASAP; bus stays 21 studs; remember everything project-wide
+- [Roblox platform changes 2026 Q4](roblox-platform-changes-2026q4.md) — live/beta DevForum features and bug risks, as of 2026-11-21
+- [Night: dark but readable](night-dark-but-readable.md) — owner: nights dark but not too dark; current night is too dark
+- [Sky/lighting decisions](sky-lighting-decisions.md) — approved A days + B nights, autumn + 4 event seasons, full sky motion, worktree sky-2360
