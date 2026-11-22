@@ -326,6 +326,15 @@ def bell_glow():
     YY, XX = np.mgrid[0:S, 0:S].astype(np.float32)
     g = np.exp(-(((XX - 128) / 86) ** 2 + ((YY - 150) / 98) ** 2))
     g = g ** 1.6
+    # (R2 fix) feather to 0 at the image edges, so a tint never shows the square's border
+    # (the gaussian alone left alpha 6-7 mid-side and 40 along the bottom)
+    # an elliptical window that reaches 0 exactly at each edge (the centre sits 105 px above the bottom)
+    ry = np.where(YY > 150, S - 1 - 150, 150)
+    r = np.hypot((XX - 128) / 127, (YY - 150) / ry)
+    w = np.clip((1 - r) / 0.45, 0, 1)
+    g = g * w * w * (3 - 2 * w)
+    floor = 8 / 255
+    g = np.clip((g - floor) / (1 - floor), 0, 1)
     save(np.ones((S, S, 3)), g, "BellGlow.png")
 
 
