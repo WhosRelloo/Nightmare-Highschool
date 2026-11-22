@@ -9,8 +9,10 @@
 - **Cadence:** every player gait plays at a stride-matched cadence, and CineActor uses the same rule.
 - **NPC gestures:** NPCs use the FIER ANIMATIONS clips where they fit, through a new `StudentBrain.Gestures` service
   and `Config.Gestures`.
-- **New places:** the get-up reaction, an infirmary with a Nurse and patients, and bleacher seats with an Athletes
-  "watch the match" job.
+- **New places:** the get-up reaction, an infirmary with Nurse Agatha Thorne and patients, and bleacher seats (players
+  can sit too) with an Athletes "watch the match" job.
+- **Treat:** the Nurse treats players through a minimal, pluggable `Infirmary.Treat(Player)` with a `Care` interface.
+  A separate injury-system design will replace `Care`. **No injury states, visuals or models in this plan.**
 
 **Architecture:**
 - **Pure maths:** `Functions.Locomotion` and `Functions.Gestures` (VM-tested), with tunables in `Config.Locomotion`
@@ -92,6 +94,7 @@
 | Scale buckets | 0.8, 0.9, 1.0 (task S2 may drop 0.8) |
 | Infirmary spot | centre (214, 6, 24), 26 × 24, opposite R106 |
 | Get-up idle | 5-8 s, Dizzy 60 % / InjuredHurt 40 % |
+| Treat (owner defaults, tunable) | free; 3 s; full heal; refused while tagged, downed or carried; 180 s cooldown per player; prompt range 8 |
 | Infirmary visit | 60-120 s, within an in-game hour of the get-up |
 
 ## Task order
@@ -101,7 +104,7 @@
 - **R2:** `Config.Locomotion` and `Functions.Locomotion`, plus `lc_pure.lua`.
 - **R3:** the baker transforms (pytest).
 - **R4:** `Config.Gestures` and `Functions.Gestures`, plus `gs_pure.lua`.
-- **R5:** `StudentBrain.Space` and `StudentBrain.Gestures` (new modules).
+- **R5:** `StudentBrain.Space` and `StudentBrain.Gestures` (new modules), plus `Features.Infirmary` and `Infirmary.Care`.
 - **R6:** the builder Luau for the infirmary and the bleachers (written, not run).
 - **R7:** the check scripts.
 
@@ -145,6 +148,8 @@
 | `…/live/ReplicatedStorage.Functions.Gestures.luau` | Pick, Bucket | new |
 | `…/live/ServerScriptService.Services.AI.StudentBrain.Space.luau` | the clear and room checks shared by Nudges and Gestures | new |
 | `…/live/ServerScriptService.Services.AI.StudentBrain.Gestures.luau` | the service, Carry, GetUp and the probe | new |
+| `…/live/ServerScriptService.Services.Features.Infirmary.luau`, `…/live/ServerScriptService.Services.Features.Infirmary.Care.luau` | `Treat` (the interaction) and `Care` (the pluggable rules) | new |
+| `…/live/ServerScriptService.Services.Features.PlayerSeats.luau` | `KINDS.BleacherSeat` | changed |
 | `…/live/StarterPlayer.StarterPlayerScripts.Controllers.Character.AnimationController.luau` | the directional blend and stride-matched rates | changed |
 | `…/live/StarterPlayer.StarterPlayerScripts.Controllers.CineActor.luau` | `STRIDE` comes from `Config.Locomotion` | changed |
 | `…/live/ServerScriptService.Services.Features.CombatSpeed.luau` | the `NHStrafe` remote and the cap | changed |
@@ -159,7 +164,7 @@
 | `…/live/ReplicatedStorage.Config.Regions.luau` | `Infirmary` | changed |
 | `…/live/ServerScriptService.Services.Features.AmbientNpcs.luau` | the infirmary patient | changed |
 | `tools/phase6-strafes/dialogue/Nurse.luau` | the builder for `ServerStorage.Dialogue.Nurse` | new |
-| `tools/phase6-strafes/checks/*.lua` | lc_pure, gs_pure, clipcheck, infirmarycheck, scaleprobe, strafecheck, footcheck, cinegate, gesturecheck, getupcheck, nursecheck, watchcheck | new |
+| `tools/phase6-strafes/checks/*.lua` | lc_pure, gs_pure, clipcheck, infirmarycheck, scaleprobe, strafecheck, footcheck, cinegate, gesturecheck, getupcheck, nursecheck, watchcheck, healcheck, playerseatcheck | new |
 | `CHANGELOG.md`, `docs/Gameplay-and-NPC-Concepts.md` (gestures), a new `docs/Movement.md` and `docs/Infirmary.md`, the spec | docs | changed or new |
 
 (`…` = `tools/phase6-strafes`.)
@@ -589,7 +594,26 @@ def test_emit_lua_round_trip_fields():
   - Each new file must `loadstring` in a VM: write `checks/parse.lua`, which loads every file under `live/` over the
     HTTP bridge with `loadstring` (not run). It's re-run at every install.
   - Expected: `PASS parse <n>`.
-- [ ] **Step 4: Commit:** "phase6-strafes: StudentBrain.Space and StudentBrain.Gestures".
+- [ ] **Step 4: Write `Features.Infirmary` and its child `Care`** (spec §6.4).
+  - **`Infirmary.Treat(P)`** runs these steps:
+    1. checks the Nurse model (`workspace.Live` or the Npcs folder, with `NpcId = "Nurse"`) is within 8 studs;
+    2. `Care.CanTreat(P)` returns ok or a reason; on a reason, Notify the player and return false;
+    3. `Busy[P]`;
+    4. faces both;
+    5. sets `NHKitSlow = 0.01` and plays the Kit `FirstAid` clip (the id from `Config.Kit.Anims.FirstAid`);
+    6. plays the Nurse's `Inspect` (1.5 s), then `ReachDown` (1.5 s), through `Gestures.Play` with `Force`;
+    7. a 0.1 s watch loop cancels on a health drop, `DownedUntil`, `CombatTagUntil` rising, or a distance over 6;
+    8. on success, `Care.Apply(P)`;
+    9. clears `NHKitSlow` and `Busy`.
+  - **`Infirmary.SetCare(Module)`** lets the future injury system swap the rules.
+  - **`Care`:** `CanTreat`, `Apply` and `Cost`, exactly as spec §6.4, reading `Config.Gestures.Treat` (`Seconds = 3;
+    Heal = "Full"; Cooldown = 180; Price = 0; Range = 8; CancelRange = 6`). It holds session cooldowns in a table.
+  - **The Nurse's prompt:** a `ProximityPrompt` ("Get patched up", hold 0.5 s, `MaxActivationDistance` 8) is attached
+    when the Nurse spawns. It's an `OnNpcSpawned` hook in `Social.Npcs` (R10), so it's re-attached on every respawn,
+    and `Triggered` calls `Treat`.
+  - **The probe:** `NHGestureProbe` gets `Treat(PlayerName)`, `ResetCooldown(PlayerName)` and `SetHealth(PlayerName,
+    n)`, Studio only.
+- [ ] **Step 5: Commit:** "phase6-strafes: StudentBrain.Space, StudentBrain.Gestures, Features.Infirmary (Treat + pluggable Care)".
 
 ---
 
@@ -619,12 +643,12 @@ def test_emit_lua_round_trip_fields():
   - **Idempotent:** it returns `exists` if `School.Infirmary` is already there.
 - [ ] **Step 3: `bleachers.luau`** (spec §7.1).
   - **Guard:** the place id.
-  - From the S1 survey numbers (rows, heights, venue), create `NHBleacherSeat` parts under
-    `workspace.Sports.<Venue>.NHBleacherSeats`:
-    - Anchored, CanCollide off, CanQuery off, Transparency 1;
-    - `SeatHeight` and `Venue` attributes;
-    - tagged `NHBleacherSeat`;
-    - facing the court.
+  - From the S1 survey numbers (rows, heights, venue), create one Model `BleacherSeat_<n>` per sitting place under
+    `workspace.Sports.<Venue>.NHBleacherSeats`.
+    - Each holds a `Base` part: Anchored; CanCollide, CanQuery and CanTouch off; Transparency 1.
+    - The pivot sits on the step, facing the court.
+    - Attributes: `SeatHeight` and `Venue`. Tagged `NHBleacherSeat`.
+  - Places are 2.2 studs apart along each step.
   - **Idempotent.**
 - [ ] **Step 4: `dialogue/Nurse.luau`.**
   - It builds `ServerStorage.Dialogue.Nurse` in the same shape as an existing tree. Read `ServerStorage.Dialogue.Hale`
@@ -712,7 +736,25 @@ def test_emit_lua_round_trip_fields():
   - Within 30 s, at least one Athlete not playing is seated on an `NHBleacherSeat` (`S.Seated`). `Sitting` is playing
     and `CheerSeated_Upper` is playing at Action2.
   - End the match: they unseat within 5 s.
-- [ ] **Step 11: Commit:** "phase6-strafes: check scripts".
+- [ ] **Step 11: `healcheck.lua` (Server, Play, through `NHGestureProbe`).**
+  - **Setup:** move the player next to the Nurse (by root CFrame) and set Health to 40.
+  - **Treat:**
+    - it returns true;
+    - the player's `FirstAid` track and the Nurse's `Inspect` track are playing;
+    - after 3.3 s, Health equals MaxHealth, `NHWounded` is nil, and `NHBandagedUntil` is in the future.
+  - **A second Treat at once:** refused with the cooldown reason.
+  - **`ResetCooldown`, Health 40, `CombatTagUntil` = now + 10:** refused with the fight reason.
+  - **Downed:** refused.
+  - **Interrupt:** Treat, then a Health drop at 1 s; it's cancelled and Health stays below Max.
+  - **`SetCare` swap:** a stub `Care` whose `Apply` sets Health to 77, then Treat, leaves Health at 77. That proves
+    the interface is pluggable.
+- [ ] **Step 12: `playerseatcheck.lua` (Server, Play).**
+  - The first `BleacherSeat_*` has an `NHPlayerSeat` Seat and a Sit prompt.
+  - Fire the prompt's handler (the PlayerSeats Studio path, or `Seat:Sit(Hum)`): the player's `Humanoid.SeatPart` is
+    that seat.
+  - Through the Watch job, a student picks another seat.
+  - Jumping stands the player up.
+- [ ] **Step 13: Commit:** "phase6-strafes: check scripts".
 
 ---
 
@@ -875,10 +917,15 @@ python -X utf8 -I tools/phase6-strafes/harness/dump.py StarterPlayer.StarterPlay
   - **`Social.Npcs`:** a Post loop per spawned NPC. Every 12-25 s, with a player within 60, play
     `Gestures.PickFor({ Model, Hum, Root, Tracks }, "Post", { Npc = Id })` for 4-9 s.
   - **`Config.Npcs`:** add the Nurse (spec §6.3).
+  - **`Social.Npcs`:** an `OnNpcSpawned(Id, Model)` callback list; Infirmary registers the Nurse's prompt there.
   - **`HallMonitor`:** on entering Confront, `Point` once.
   - **`CliqueFights`:** the scuffle loser gets `Shove_InPlace` or `ShoveSpin_InPlace` with `Carry`.
 - [ ] **Step 6: The infirmary support.**
-  - **`Seats`:** `Kind` returns `"Bleacher"` for `NHBleacherSeat`-tagged parts; `Height` already reads `SeatHeight`.
+  - **`Seats`:** `Kind` already returns `BleacherSeat` from the name; `Height` already reads `SeatHeight`. No change,
+    unless the S1 read shows otherwise.
+  - **`PlayerSeats`:** `KINDS.BleacherSeat = true`. It sets up seats for the tagged `NHBleacherSeat` models, as it
+    does for chairs.
+  - **`Schedules.ChairTaken`:** covers bleacher seats; Watch skips `PlayerSeats.IsOccupied`.
   - **`Config.Regions`:** add `Infirmary = { Title = "The Infirmary"; Priority = <R106's> }`.
   - **`AmbientNpcs`:** one infirmary patient on `NHInfirmaryBed1` with `LayingIdle` during school hours. It's played
     through Gestures' `idOf`, so Studio and live behave the same.
@@ -938,7 +985,9 @@ Every round follows the Global Constraints run order.
   1. `server.py checks/gesturecheck.lua`;
   2. `getupcheck.lua`;
   3. `nursecheck.lua`;
-  4. `watchcheck.lua`.
+  4. `watchcheck.lua`;
+  5. `healcheck.lua`;
+  6. `playerseatcheck.lua`.
 
   All must `PASS`.
 - [ ] **Round D, the tutorial regressions** (from `tools/phase6-2350/checks/`, run with that harness's runners), in
@@ -987,8 +1036,8 @@ Every round follows the Global Constraints run order.
 
 - [ ] **Step 1: `docs/Movement.md`** (new): the strafe modes, the blend, the speed rule, the cadence rule and the
   numbers, the cine gating, and `NHStrafeTest` (Studio).
-- [ ] **Step 2: `docs/Infirmary.md`** (new): the room, the Nurse, patients, get-up routing, the dialogue, and the
-  owner's open questions (name, healing).
+- [ ] **Step 2: `docs/Infirmary.md`** (new): the room, Nurse Agatha Thorne, patients, get-up routing, the dialogue,
+  `Infirmary.Treat` and the `Care` interface (the injury system replaces it), and the owner-default Treat tunables.
 - [ ] **Step 3: `docs/Gameplay-and-NPC-Concepts.md`:** add a "Gestures (phase6)" section with the casting table,
   hooks, caps, the publish status, and the bleachers and Watch.
 - [ ] **Step 4: `CHANGELOG.md`:** an entry with the version decided at merge.
@@ -1001,3 +1050,9 @@ Every round follows the Global Constraints run order.
 - [ ] **Step 6: The graph.** Run `python -m graphify update .`, but don't commit `graphify-out/` unless it's tracked
   on this branch.
 - [ ] **Step 7: Commit:** "phase6-strafes: docs and changelog".
+
+---
+
+## Owner-visual rows (to report after T6)
+V1 square-chest strafes · V2 the cadence slide at the 2.4x cap · V3 the Praying kneel-in (provisional) · V4 the
+infirmary greybox · V5 the Treat gestures · V6 bleachers with Athletes and a player. Spec §12 describes each one.

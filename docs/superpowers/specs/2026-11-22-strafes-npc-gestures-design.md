@@ -18,6 +18,17 @@
    - **a new Nurse NPC with an infirmary spot**. Neither place has an infirmary, so one is added (§6).
 4. **Seated cheering:** add bleacher seats, and give the Athletes a "watch the match" scheduled job.
 
+Second round of rulings (2026-11-22, later):
+5. **The stride fix applies to walk, sprint AND crouch**, capped at 2.4x playback (`CadenceMax`).
+6. **The Nurse treats players.** It's gameplay, but kept **minimal and pluggable** (§6.4): an `Infirmary.Treat(Player)`
+   entry point, the bandage interaction and its gestures, with the heal amount and rules behind a tiny interface.
+   - **An in-depth injury system** (custom injury models per body type) is coming as its own design and plan, and will
+     replace that interface.
+   - **This build makes no injury states, injury visuals or injury models.**
+7. **Players can sit on the bleachers too** (§7.1).
+8. **The Nurse is "Nurse Agatha Thorne".**
+9. **The Praying kneel-in** (the stand-up reversed, slower) is accepted provisionally, as an owner-visual row (§12).
+
 The coordinator's defaults:
 - A reversed Walk is the backward walk for now.
 - Touch and gamepad strafe whenever the same modes are active.
@@ -73,7 +84,8 @@ House style, for every clip:
 - **Risk: a fast cadence.** A 14.4 studs/s "walk" on 1.6-stud legs is really a jog. At a full stride match it plays
   about 3x, which reads as speed-walking.
   - The cap `CadenceMax = 2.4` leaves about 20 % slide at 14.4, against about 50 % today.
-  - The value is a single config number, and the owner judges it in the footcheck screenshots (§10 Q1).
+  - **Owner ruling: ship the stride fix for Walk, Sprint and Crouch (and FastSprint, which uses the same rule), capped
+    at 2.4x.** The footcheck numbers and screenshots go in the report as an owner-visual row (§12).
 - **CineActor stays in step.**
   - `Controllers.CineActor`'s `STRIDE` table (Walk 10, CrouchWalk 7, Sprint 24, FastSprint 30) copies today's
     divisors.
@@ -165,7 +177,7 @@ Only the legs and the chest animation change.
 | `square_chest(KeepYaw = 0)` | Per frame: decompose the Torso pose's rotation about the RootJoint-space Z axis (the world vertical, by R6 RootJoint `C0`); remove the yaw (down to `KeepYaw`). **Legs:** recompute each Hip pose so the leg's world rotation is unchanged (`Pose' = rot((Torso' C0hip)^-1 Torso C0hip Pose)`), keeping the hip pivot (no leg translation is added, so no gap at the socket). **Head:** drop the head's counter-yaw too, so the head faces forward. Arms stay in torso space. | Torso yaw ≤ 1° on every frame; each leg's world rotation within 0.5° of the source; stance-foot velocity within 5 % of the source; the lowest foot Y within 0.05 of the source; seam 0 |
 | `foot_lock` | After `square_chest`: the existing `tools/phase3-2260/anim/footlock.luau` method, ported as a Python pass. While a foot is the lowest and below contact height, hold its horizontal velocity at the stance value, so the feet are truly planted | Stance-foot jitter under 0.05 studs per frame |
 | `loop_cut(Window, Blend)` | Find the frames a and b inside `Window` (for Praying: the kneeling part, torso drop under -0.8) with the smallest weighted pose distance and b - a at least 3 s. Cut [a, b] and bake a `Blend` (0.3 s) cross-blend of b toward a into its tail, so the loop is seamless | Seam ≤ 1°; no frame outside the window's drop band |
-| `split(At)` | Praying → `PrayLoop` (the cut), `PrayStandUp` (b to the end, a one-shot) and `PrayKneelIn`: the time-reversed stand-up, retimed 1.15x slower with an ease-in on the first 0.2 s. It's flagged for the owner's eye, because a reversed rise can read weightless (§10 Q3). The ends match the loop's frames exactly, so the switches are frame-identical, as in the tutorial chains | The pose distance at each switch is 0 |
+| `split(At)` | Praying → `PrayLoop` (the cut), `PrayStandUp` (b to the end, a one-shot) and `PrayKneelIn`: the time-reversed stand-up, retimed 1.15x slower with an ease-in on the first 0.2 s. Accepted provisionally by the owner; it stays an owner-visual row (§12). The ends match the loop's frames exactly, so the switches are frame-identical, as in the tutorial chains | The pose distance at each switch is 0 |
 | `upper_body` | Keep only Head, Left Arm and Right Arm. Set the `HumanoidRootPart` and `Torso` Pose `Weight = 0` (they stay as parents), and drop both legs. The walk, idle or sitting underneath keeps the torso and legs | No leg poses; Torso and root weight 0 |
 | `scale(k)` | Multiply every pose translation by `k` (the leg length / 2). Buckets: **k = 0.8, 0.9, 1.0**. Applied only to clips whose root drop is under -0.6 (Kneeling Inspecting, Gathering Objects, the Pray parts, Injured Hurting Idle) | The deepest knee or shin point on the matching rig sits within 0.05 of the floor |
 | `strip_root(Yaw = true)` | Move the Torso pose's horizontal translation (RootJoint-space X and Y) and, with `Yaw`, its vertical-axis rotation into a **carry curve** `{ t, dx, dz, dyaw }` in root space at 10 Hz. Leave the vertical translation and the tilt. The runtime moves the root along the curve (§3.4) | Residual horizontal torso travel under 0.05 studs; the integrated carry equals the source travel (7.24 for Shove Reaction, 5.56 plus 159° for the spin version) |
@@ -377,7 +389,7 @@ Later (v2, not in this plan):
 
 ### 6.3 The Nurse NPC and the patients
 - **`Config.Npcs.Nurse`:**
-  - Name **"Matron Ivy Pell"**, an owner-renamable placeholder.
+  - Name **"Nurse Agatha Thorne"** (owner).
   - `Role = "School Nurse"`, `Dialogue = "Nurse"`.
   - `Posts = { Homeroom = "Nurse", Class = "Nurse", Other = "Nurse" }`, so she's in during the school day and off
     campus otherwise.
@@ -386,7 +398,7 @@ Later (v2, not in this plan):
   - a greeting by time of day;
   - "You don't look good." when the player is Wounded (`NHWounded`) or under 50 % health;
   - a rumour line (from `Social.Rumours`, as other talkables do).
-  - **No healing service in v1** (§10 Q5).
+  - **A "Get patched up" choice** in her dialogue (and her `ProximityPrompt`) calls `Infirmary.Treat(Player)` (§6.4).
 - **Her idle:** a `Post` loop alternating `Inspect` at the cabinet, `KneelInspect_*` beside an occupied bed,
   `ReachDown`, and `Talk` when a player is within 8 studs.
 - **Patients:**
@@ -399,17 +411,66 @@ Later (v2, not in this plan):
 
 ---
 
+### 6.4 Treating players (minimal and pluggable)
+**Scope:** an entry point, the interaction and its gestures. The rules sit behind a small interface (`Care`) that the
+coming injury system replaces. **Nothing here adds injury states, visuals or models.**
+
+How health works today (read 2026-11-22), which this fits in with:
+- **Out-of-combat regen:** `Player.Progression` regenerates 2 % of MaxHealth a second once `CombatTagUntil` has
+  passed. It doesn't run while downed (`DownedUntil`), in the main menu, or while `NHChilled`.
+- **Low-health regen:** a race or bloodline effect (`LowHealthRegen`) below 30 %.
+- **Max health:** `MaxHealth` is 100 plus the Effects bonus.
+- **The Kit bandage:** `Features.Kit` `Local.Bandage` channels `Kit.Aid.Channel` seconds at `Kit.Aid.ChannelSpeed`
+  (it sets `NHKitSlow`), cancels on a hit or a down, and heals `Kit.Aid.Heal` over `Kit.Aid.Duration`.
+  - It sets `NHBandagedUntil = now + Kit.Aid.Clears` and clears `NHWounded`.
+  - `NHWounded` is Kit's own flag: under the `Kit.Wounded.Threshold` of health, and not bandaged. It slows walking
+    10 % through CombatSpeed.
+
+**New: `ServerScriptService.Services.Features.Infirmary`:**
+- **`Infirmary.Treat(P) -> (ok, reason?)`** is the only entry point. The Nurse's `ProximityPrompt` and her dialogue
+  choice call it, and so will the injury system later.
+- **It asks `Infirmary.Care.CanTreat(P)`, then runs the interaction:**
+  - Face each other.
+  - The player is planted (`NHKitSlow = 0.01`) and plays the Kit's existing `FirstAid` clip (93493041203096). That's
+    reuse, not a new clip.
+  - The Nurse plays `Inspect`, then `ReachDown`, through Gestures, with `Force`.
+  - It lasts `Config.Gestures.Treat.Seconds` (3 s).
+- **It cancels** on damage (health drops), on being downed, on walking more than 6 studs away, or on a combat tag
+  starting. The message is "Hold still."
+- **On completion,** `Care.Apply(P)` runs.
+- **The interface, `Infirmary.Care`:** a child ModuleScript, the default that the injury system swaps out.
+
+| Member | Default rule (tunables in `Config.Gestures.Treat`, every one flagged "owner default") |
+|---|---|
+| `CanTreat(P) -> (bool, string?)` | refused if combat-tagged ("Not while you're fighting."), downed or carried ("Lie still, help is coming."), on cooldown (`Cooldown` 180 s per player: "Come back in a few minutes."), or at full health and not `NHWounded` ("You're fine. Off you go.") |
+| `Apply(P)` | `Health = MaxHealth` (`Heal = "Full"`); `NHBandagedUntil = now + Kit.Aid.Clears`; `NHWounded = nil`; start the cooldown |
+| `Cost(P) -> number` | 0 (`Price = 0`, free) |
+
+- **Server-authoritative.** It's reached only through the Nurse's `ProximityPrompt` (`MaxActivationDistance` 8) and
+  the dialogue choice, the same proximity and dialogue pattern as the other talkables (`Social.Npcs` and
+  `Social.Dialogue`).
+- **Cooldowns** are kept per player for the session; they're not saved.
+- **A Studio-only seam** is added to `NHGestureProbe`: `Treat(PlayerName)` and `ResetCooldown(PlayerName)`.
+
 ## 7. The bleachers and the "watch the match" job
 
 ### 7.1 Seats
 - **Survey first (S1, read-only):** the bleacher geometry under `workspace.Sports.Gymnasium.Stands.Bleacher*` and
   `School.Quests.Ring.Bleachers`: the rows, the seat-top heights, and whether they take queries.
-- **Bleacher seats join the `Features.Seats` vocabulary as markers, not props.**
-  - One `NHBleacherSeat` part per sitting place (Anchored, CanCollide off, Transparency 1, the `SeatHeight`
-    attribute, LookVector facing the court), tagged `NHBleacherSeat`.
-  - They're placed by `tools/phase6-strafes/build/bleachers.luau` in Edit.
-  - `Seats.Height` already honours `SeatHeight`. `Seats.Kind` gets `Bleacher` for these parts.
-  - Players can still use them through `Features.PlayerSeats` only if the owner wants that (§10 Q6); v1 is NPCs only.
+- **Bleacher seats are small seat "props":** one Model `BleacherSeat_<n>` per sitting place, so both the NPC and
+  the player seat code treat them like chairs.
+  - Each holds an invisible anchored `Base` part (CanCollide, CanQuery and CanTouch off; Transparency 1), with its
+    pivot on the step and facing the court.
+  - Attributes: `SeatHeight` (the step's top above the pivot) and `Venue`. Tagged `NHBleacherSeat`.
+  - They're placed by `tools/phase6-strafes/build/bleachers.luau` in Edit, under `workspace.Sports.<Venue>.NHBleacherSeats`.
+  - `Seats.Kind` already returns `BleacherSeat` from the name prefix, and `Seats.Height` already honours
+    `SeatHeight`.
+- **Players (owner):** `Features.PlayerSeats` `KINDS` gains `BleacherSeat = true`.
+  - Every bleacher seat gets the same invisible Seat and "Sit" prompt as the classroom chairs.
+  - The client's `Controllers.World.PlayerSeat` plays the students' Sitting pose and settles the hips (unchanged).
+  - A seat a student is on or heading for refuses (`Schedules.ChairTaken` covers bleacher seats too), and students
+    skip a seat a player sits in (`PlayerSeats.IsOccupied`).
+  - **Players don't get the cheer** in v1; it's for NPCs only.
 
 ### 7.2 The job
 - **`Schedules.Local.Watch(S, Job)`:**
@@ -456,15 +517,10 @@ Later (v2, not in this plan):
 ---
 
 ## 10. Open questions for the owner
-1. **Q1, walk cadence:** with the stride match, Walk at 14.4 studs/s plays at the `CadenceMax` cap of 2.4x, which
-   leaves about 20 % slide. The full match is about 3x and looks like speed-walking. Is 2.4 OK? Would you rather
-   bring the walk band down, or supply a jog clip for 12-14.4?
-2. **Q2, sprint and crouch:** the same stride match applies (Sprint 2.3x, crouch 2.4x). OK to ship together?
-3. **Q3, the Praying kneel-in:** FIER has no kneel-down, so it's the stand-up played in reverse, slower. Is it OK
-   after you see it, or would you prefer a clip?
-4. **Q4, the Nurse's name:** "Matron Ivy Pell" is a placeholder.
-5. **Q5, healing:** should the Nurse heal or bandage players (a prompt that costs time), or be ambience only for now?
-6. **Q6, bleachers for players:** should the bleachers be sittable by players too?
+All of the first round's questions are answered (§0, rulings 5-9).
+1. **Treat defaults** (§6.4): free, 3 s, a full heal, refused in a fight or while downed, a 3-minute cooldown. These
+   are the owner's defaults as set by the coordinator, all tunable in `Config.Gestures.Treat`. Confirm them after
+   playing.
 
 ## 11. Verification (summary; the plan has the steps)
 - **Pure checks in a VM:**
@@ -479,8 +535,20 @@ Later (v2, not in this plan):
     is about 8.5; the stance-foot slip is under 0.6 studs/s.
   - `footcheck.lua`: Walk, Sprint and Crouch slip before and after.
   - `cinegate.lua`: with `NHApproach`, `NHCineSeam` or `NHInCine` set, the strafe weight stays 0.
-  - `gesturecheck.lua`, `getupcheck.lua`, `nursecheck.lua`, `watchcheck.lua`.
+  - `gesturecheck.lua`, `getupcheck.lua`, `nursecheck.lua`, `watchcheck.lua`;
+  - `healcheck.lua`: Treat's refusals and the full heal;
+  - `playerseatcheck.lua`: a player sits on a bleacher seat, and a student skips it.
 - **The tutorial regressions,** in the owner's order: `phase6-2350` `skipcheck` first, then `approachcheck` (after
   the `STRIDE` change), with `bodycheck` and `dipcheck` last.
 - **Screenshots** for the owner: the strafe in lock-on (square chest), the walk cadence before and after, Praying,
   the infirmary, the bleachers.
+
+## 12. Owner-visual rows (to judge in the T6 screenshots)
+| Row | What to look at |
+|---|---|
+| V1 | The square-chest strafes in lock-on: the chest faces the target, the feet stay planted |
+| V2 | Walk, Sprint and Crouch cadence at the 2.4x cap: how much slide is left |
+| V3 | The Praying kneel-in (the stand-up reversed, slower): accepted provisionally |
+| V4 | The infirmary greybox and its props |
+| V5 | Treat: the bandage gestures on both sides |
+| V6 | Athletes cheering on the bleachers; a player seated beside them |
