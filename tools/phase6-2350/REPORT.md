@@ -204,7 +204,7 @@ Slot 2 was restored from each round's fresh snapshot:
   1 stud into the floor). LastRise is clamped to [1, 6].
 - **m-2, fixed.** Approaching / NHApproach is a depth count.
 - **m-3, fixed.** On the wrapper's error path the cadence hook is disconnected and the move, WalkSpeed and AutoRotate are put back.
-- **m-4, fixed.** NearSkip only applies within TurnMax (20 deg), and its settle is capped at TurnMax.
+- **m-4, fixed (superseded in fix round 3: NearSkip gates at 45 deg again).** NearSkip only applied within TurnMax (20 deg), and its settle was capped at TurnMax.
   - New run "bus on the mark": placed on Stand, turned 10 deg. OK: 0 walking frames; settle -10.0 deg, residual 0; lead 0.
 - **m-5:** left as is, by ruling.
 
@@ -224,6 +224,47 @@ Slot 2 was restored from each round's fresh snapshot:
 - CineState was {Collected=Seen} before and after.
 - Origin `{}` before and after.
 - The final snapshot comparison shows no differences.
+
+### Fix round 3 (2026-11-22, review CHANGES REQUIRED, one Important item; one fresh Play round on slot 2)
+
+- **Important, fixed.** The fence SEAM SPEED row was flaky.
+  - A walk handed on (Up0 > 0.5) now keeps the turn slow-down at 90 % or more for its first 0.3 s (the hand-on grace).
+  - LEAD_IN is 3.5 (was 3.0).
+  - The seam speed is now a 5-frame average (was 3). The one failing run kept a steady WalkSpeed of 6.3 (90 %), while per-frame
+    displacement alternated 3.1 / 9.4 / 3.6 / 10.7. That is render frames with and without a physics step, so the 3-frame average still
+    caught the beat.
+  - The row also prints the WalkSpeed asked for. Across 6 runs it never dropped below 6.30 (89-92 %).
+  - Results:
+    - approachcheck fence 6 of 6 OK with the 5-frame row. Seam 79-91 %; settle -9.6 to -14.7 deg, residual 0.
+    - Clearance after the LEAD_IN change: 0.59-0.70 walking up, 0.15-0.23 in FenceOver2's first 0.5 s (was 0.05-0.13).
+    - On the 3-frame row before the change: 3 of 4 (one at 68 % at 0.08 s, the jitter above).
+    - sneakcheck: the torso faces the fence at 7.5-9.2 deg as FenceOver2 starts (was 14.2-14.4).
+- **Minor 1, fixed.** NearSkip gates at 45 deg again, and this one settle may turn up to 45 deg (at most 45 deg/s on average). The only
+  other way round is the out-and-back I4 removed. approachcheck allows 45 on the mark.
+  - Bus on the mark at 10 deg: OK, turn -10.0.
+  - Bus on the mark at 35 deg: OK, turn -30.5 by the 0.6 s sample, residual 4.5, 0 walking frames.
+- **Minor 2, fixed.** WalkSpeed and AutoRotate are captured when the depth goes from 0 to 1, and only the outermost approach puts them back.
+- **Minor 3, fixed.** The fallback raycast excludes every player's character.
+- **Minor 4, fixed.** The near-skip text is current again (45 deg). The CADENCE comment says that on the game's locomotion it proves the
+  cadence hook ran, not that the stride constants match each clip.
+- **Optional, taken.** The bus Approach has LeadIn = 4 (ARRIVE 0.15 unchanged).
+  - The doorway is unaffected: the lead-in sits behind Stand, on the side the short walk starts from.
+  - Bus side settle -12.6 deg (was -19.2); bus short 7.5; arrival 0.12 / 0.22 studs.
+
+Results:
+- skipcheck: ok.
+- approachcheck: fence 6 of 6 OK; bus short OK; bus side OK; bus on the mark OK at 10 deg and at 35 deg.
+- sneakcheck:
+  - skipfence OK.
+  - sneak OK once at real-time frames (17 ms).
+  - Two later sneak runs came after Studio fell back to 67 ms frames (unfocused). They passed every row except "the dip's root jump
+    happens under black on both frames" (veil 0.32 / 0.36), the known frame-rate artifact. This round didn't touch the dip; it
+    passed at 17 ms in rounds 1-2 and in this round's first run.
+- camcheck: TutorialSneak OK and TutorialBus OK, both at 67 ms frames.
+- buscheck: BUS OK (TheBus2 at 17.08 s).
+
+Slot 2: restored from this round's fresh snapshot. CineState {Collected=Seen} before and after, Origin `{}` before and after; the final
+snapshot comparison shows no differences.
 
 ## Open rows
 
@@ -249,9 +290,7 @@ Slot 2 was restored from each round's fresh snapshot:
   - In production it fires only when the walk's exit phase lands 0.5-0.25 studs from the stop. Every other time it's the 0.3 s cover
     blend from the planted stop.
   - Watch either one at full speed.
-- WATCH (fix round 2):
-  - sneakcheck's "torso faces the fence as FenceOver2 starts" reads 14.2-14.4 deg against its 15 limit (it was 7.6-11.1).
-    The eased corner turn leaves a slightly larger heading at the stop, which the 0.45 s settle is still turning out.
-  - approachcheck's fence SEAM SPEED row is borderline. It passed 3 of 4 fence runs on the final CineActor and failed 1 (67 %,
-    exactly at the 0.2 s window edge, where the eased corner slow-down begins).
+- Resolved in fix round 3: the torso-faces-fence margin (now 7.5-9.2 deg against 15) and the flaky fence SEAM SPEED row (6 of 6).
+- TODO (focused Studio): one more sneakcheck sneak at real-time frames, for the dip-under-black row on the fix round 3 build (passed
+  once at 17 ms; the two runs at 67 ms are the known artifact).
 - Sign-off: pending.

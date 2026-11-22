@@ -30,6 +30,7 @@ local EaseOver = false                                      -- an Approach asks 
 local Easing = false                                        -- Begin's 0.3 s input ease is running (Approach waits it out)
 local Approaching = false                                   -- an Approach is driving the character (fix round 1)
 local ApproachDepth = 0                                     -- (fix round 2) how many are running (Approaching = depth > 0)
+local OuterWas: number?, OuterRot: boolean? = nil, nil      -- (fix round 3) WalkSpeed / AutoRotate from before the outermost approach
 local STRIDE = { Walk = 10, CrouchWalk = 7, Sprint = 24, FastSprint = 30 } -- (fix round 2) studs/s at speed 1: AnimationController's own scales
 local WALK, RUN, CROUCH = 12, 25, 7                         -- the game's own speeds: Sprint's Release, Sprint's Activate, Services.Player.Crouch
 
@@ -97,7 +98,7 @@ local function wrap(Deg: number): number return (Deg + 540) % 360 - 180 end
 -- caller can start the next piece's fade-in), Timeout (seconds; default from the distance),
 -- (fix round 1) EaseOut (true: the pace eases down over the last stud), StopWhen() (asked every frame on the last leg: true = stop here,
 -- the caller's next piece has taken over), OnLeft(studs) (every frame on the last leg: the distance left), TurnMax (20 degrees),
--- NearSkip (0.5 studs) and NearTurn (TurnMax; fix round 2): already this close to the mark and this nearly facing it, there is no walk at all and the
+-- NearSkip (0.5 studs) and NearTurn (45 degrees; fix round 3): already this close to the mark and this nearly facing it, there is no walk at all and the
 -- heading turns in the blend.
 -- Returns true on arrival. Otherwise false and a reason: "blocked" (no progress for 3 s), "timeout", "fell" (dropped 8 studs), "died"
 -- (Health 0 or the character gone), "released" (Release ran) or "nochar". On blocked / timeout / fell the caller dips to black and places
@@ -109,7 +110,10 @@ local LastRise: number? = nil                                -- the root's heigh
 local function groundBelow(At: Vector3, Char: Model?, Above: number?): number?
 	local Params = RaycastParams.new()
 	Params.FilterType = Enum.RaycastFilterType.Exclude
-	Params.FilterDescendantsInstances = if Char then { Char } else {}
+	-- (fix round 3) every player's character, not just yours: another player standing on the mark is not the floor
+	local Skip: { Instance } = if Char then { Char } else {}
+	for _, P in Players:GetPlayers() do if P.Character and P.Character ~= Char then table.insert(Skip, P.Character) end end
+	Params.FilterDescendantsInstances = Skip
 	Params.RespectCanCollide = true
 	local Hit = workspace:Raycast(At + Vector3.new(0, 2, 0), Vector3.new(0, -40, 0), Params)
 	if not Hit or Hit.Position.Y > At.Y + (Above or 0.05) then return nil end
@@ -144,8 +148,12 @@ local function approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, Ar
 		local T0 = os.clock()
 		while Hum:GetAttribute(`Crouch`) ~= true and os.clock() - T0 < 1 do RunService.Heartbeat:Wait() end
 	end
-	local Was = Hum.WalkSpeed
-	local RotWas = Hum.AutoRotate
+	-- (fix round 3) the speed and AutoRotate handed back are the ones from before the OUTERMOST approach: a nested one (depth > 1)
+	-- would otherwise capture the outer one's pace and put that back
+	if ApproachDepth <= 1 then OuterWas, OuterRot = Hum.WalkSpeed, Hum.AutoRotate end
+	local Was = OuterWas or Hum.WalkSpeed
+	local RotWas = if OuterRot == nil then Hum.AutoRotate else OuterRot
+	local Outer = ApproachDepth <= 1
 	-- (fix round 2) the legs keep step with the ground: Controllers.Character.AnimationController sets the live Walk / CrouchWalk /
 	-- Sprint speed only on Humanoid.Running events, which lag a pace that changes every frame (the ramp, the turn slow-down, the ease-out:
 	-- measured Walk at 0.95 against 0.39 wanted). While the approach drives you, the live locomotion track's speed is the root's flat
@@ -162,7 +170,7 @@ local function approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, Ar
 	end) or nil
 	local function cadOff() if CadConn then CadConn:Disconnect() CadConn = nil end end
 	-- (fix round 2, m-3) what the wrapper puts back if this errors part way
-	if State then State.Restore = function() cadOff() Hum:Move(Vector3.zero) Hum.WalkSpeed = Was Hum.AutoRotate = RotWas end end
+	if State then State.Restore = function() cadOff() Hum:Move(Vector3.zero) if Outer then Hum.WalkSpeed = Was Hum.AutoRotate = RotWas end end end
 	Hum.AutoRotate = true                                        -- (fix round 1, M4) the body turns with the walk, whatever the cut had set
 	local Speed = if Gait == `Run` then RUN elseif Crouching then CROUCH
 		else (if Was > 4 and Was < 20 then Was else WALK)           -- the walk speed the player has (hunger bands change it), the game's 12 otherwise
@@ -189,15 +197,15 @@ local function approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, Ar
 		end)
 	end
 	-- (fix round 1, I4) already on the mark and nearly facing it: no walk (a lead-in from here is an out-and-back); the heading turns in the blend
-	-- (fix round 2, m-4) only within TurnMax of its heading, and the turn is capped there like every other settle
-	if (flat(Root.Position) - flat(Goal)).Magnitude <= (Opt.NearSkip or 0.5) and math.abs(headErr()) <= (Opt.NearTurn or TurnMax) then
+	-- (fix round 3) within NearTurn (45 degrees) of its heading; this is the one settle allowed past TurnMax (a turn in the blend, at most
+	-- 45 degrees a second on average), because the only other way round is the out-and-back I4 removed
+	if (flat(Root.Position) - flat(Goal)).Magnitude <= (Opt.NearSkip or 0.5) and math.abs(headErr()) <= (Opt.NearTurn or 45) then
 		cadOff()
 		Hum:Move(Vector3.zero)                                  -- (fix round 2, I-1) a walk handed on (the ease wait, Begin's re-issue) stops here
-		Hum.AutoRotate = RotWas
-		Hum.WalkSpeed = Was
+		if Outer then Hum.AutoRotate = RotWas Hum.WalkSpeed = Was end
 		local Fn = Opt.OnNear
 		if Fn then task.spawn(Fn, 0) end
-		settle(math.min(Opt.NearTurn or TurnMax, TurnMax))
+		settle(Opt.NearTurn or 45)                              -- (fix round 3) on the mark the turn may be up to 45 (still <= 45 deg/s on average): the alternative is a 3-stud out-and-back
 		return true, nil
 	end
 	local Lead = Goal - Face * LeadIn
@@ -224,6 +232,7 @@ local function approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, Ar
 	local Arrived = false
 	-- (fix round 1, I2) the pace ramps up from the speed you already have (a walk that is handed on carries on; only a standing start eases in)
 	local Up0 = math.clamp(math.max(V0.Magnitude, flat(Root.AssemblyLinearVelocity).Magnitude) / Speed, 0, 1)
+	local Inherit, GRACE = Up0 > 0.5, 0.3
 	-- steering: the Humanoid is moved straight at the leg's point every frame (Hum:Move, world space). MoveTo was tried first and stops
 	-- about a stud short of its point (it counts as arrived there) and gives up after 8 s, which left the walk stalled short of a
 	-- lead-in; Move toward the point is exact, and AutoRotate turns the body along it
@@ -265,6 +274,9 @@ local function approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, Ar
 		if Move.Magnitude > 3 * Speed / math.rad(360) then TurnWant = math.max(TurnWant, 0.9) end
 		-- (fix round 2) on the way to the lead-in the corner is rounded by pursuit (CORNER), not stopped at: no need to brake below 75 % there
 		if Leg < #Legs then TurnWant = math.max(TurnWant, 0.75) end
+		-- (fix round 3) a walk handed on (Up0 > 0.5) keeps 90 % for its first GRACE seconds: the beat hands over within 3 turning radii of
+		-- the lead-in, and the corner slow-down would otherwise start right at the seam
+		if Inherit and Now - T0 < GRACE then TurnWant = math.max(TurnWant, 0.9) end
 		-- (fix round 2) eased, at most 3 a second: a slow-down that snapped took the walk from 11 to under 5 studs/s in two frames, which no
 		-- body does and which the leg cycle couldn't keep step with
 		TurnPace += math.clamp(TurnWant - TurnPace, -3 * Dt, 3 * Dt)
@@ -338,8 +350,10 @@ local function approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, Ar
 	end
 	cadOff()
 	Hum:Move(Vector3.zero)                                      -- the Humanoid stops
-	Hum.WalkSpeed = Was                                         -- (nothing else owns the speed during an approach)
-	Hum.AutoRotate = RotWas
+	if Outer then                                               -- (nothing else owns the speed during an approach; only the outermost hands it back)
+		Hum.WalkSpeed = Was
+		Hum.AutoRotate = RotWas
+	end
 	if not Arrived then return false, Reason end
 	-- whatever is left (AutoRotate got it within a few degrees) turns in the blend; never more than TurnMax on the spot
 	if math.abs(headErr()) > TurnMax then
@@ -360,6 +374,7 @@ function Shared.Approach(Mark: CFrame, Opts: any?): (boolean, string?)
 	local Ok, Res, Why = pcall(approach, Mark, Opts, State)
 	ApproachDepth -= 1
 	Approaching = ApproachDepth > 0
+	if not Approaching then OuterWas, OuterRot = nil, nil end
 	if not Approaching then Player:SetAttribute(`NHApproach`, nil) end
 	if not Ok then
 		warn(`[CineActor] Approach errored: {Res}`)

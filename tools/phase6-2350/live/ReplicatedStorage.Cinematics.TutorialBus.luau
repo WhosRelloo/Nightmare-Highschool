@@ -22,6 +22,7 @@ local RunService = game:GetService(`RunService`)
 local Config = require(ReplicatedStorage.Config.Cine)
 local Def = { Set = `BusStop`; Seamless = true; EndHold = true }
 local ARRIVE = 0.15      -- (task 14) the Walk approach's stop radius: the doorway is tight (Stand is measured against it), so tighter than the default
+local LEAD_IN = 4.0     -- (fix round 3) the bus walk's lead-in behind Stand (the default is 3): a longer straight last stretch, so less is left to turn at the stop
 local WALK_AT = 0.25     -- (fix round 1, I4) the walk to Stand starts this long after the glide (shot 1 has settled)
 local STEP_AT = 16.15     -- the cut's clock (after the glide) when TheBus2 starts: the "You step on" shot begins at 15.8
 local FADE_IN = 0.3      -- the waiting loop fades in from the live walk over this long
@@ -157,7 +158,7 @@ function Def.Build(Ctx)
 						if Ctx.Alive() then Actor.Reseat(`TheBus2`, TA.Chains.TheBus[2].EndOffset, Ctx.Clip) end
 					end)
 				end
-				local Ok, Why = Actor.Approach(Stand, { Gait = `Walk`; Arrive = ARRIVE; OnNear = wait })
+				local Ok, Why = Actor.Approach(Stand, { Gait = `Walk`; Arrive = ARRIVE; LeadIn = LEAD_IN; OnNear = wait })
 				if not Ctx.Alive() then return end
 				-- a dip and a placement, with a warning (blocked, timed out, fell); a death or a release starts nothing (fix round 1, I3)
 				if not Ok and not Actor.Fallback(Stand, Why, Ctx.Alive) then return end

@@ -18,7 +18,7 @@
 --   * (fix round 2) CADENCE: the seen walk cycle's playback speed against root speed / its stride speed (CrouchWalk 7, Walk 10, Sprint 24),
 --     within 25 % while the root moves (> 0.5 studs/s): a leg cycle out of step with the ground is a skate. <= 2 frames out. Hard for the
 --     chain's own walk cycle and for the game's locomotion on steady frames; the game's start/stop transients are listed as info.
---   * (fix round 1) SEAM SPEED (sneak): the root's speed (3-frame average) in the first 0.2 s after the beat -> approach seam must not
+--   * (fix round 1) SEAM SPEED (sneak): the root's speed (5-frame average, fix round 3) in the first 0.2 s after the beat -> approach seam must not
 --     drop under 70 % of its speed just before it.
 --   * (fix round 1) SETTLE: the heading left 0.6 s after the stop against the mark's heading (residual, <= 15 degrees) and the size of
 --     the settle turn from the stop to then (<= 20 degrees; a bigger error keeps steering instead of turning on the spot).
@@ -286,7 +286,8 @@ do -- (fix round 2) CADENCE: the seen walk cycle's playback speed against the ro
 	-- and the *GameCrouchWalk pieces 7 studs/s at speed 1, Walk 10, Sprint 24: the game's own scales), within 25 %, while the root moves
 	-- over 0.5 studs/s, outside black. A leg cycle out of step with the ground is a skate.
 	-- HARD (<= 2 frames out): a chain piece's walk cycle (ours: FenceOver1) on every frame, and the game's own locomotion on STEADY frames
-	-- (root acceleration <= 15 studs/s^2). INFO: the game's own Walk/CrouchWalk on the start/stop transients (the ramp from a standing start,
+	-- (root acceleration <= 15 studs/s^2). On the game's locomotion this proves CineActor's cadence hook ran (it writes speed = root speed /
+	-- these same stride constants); it does NOT prove the constants match each clip's real stride (that needs a foot-contact measure). INFO: the game's own Walk/CrouchWalk on the start/stop transients (the ramp from a standing start,
 	-- the last stud's ease-out), where the game's own AnimationController blends a start or a stop exactly as it does in normal play.
 	local STRIDE = { CrouchWalk = 7, Walk = 10, Sprint = 24, FastSprint = 30 }
 	local Bad, N, Worst, WorstAt, WorstWho = 0, 0, 0, 0, nil
@@ -371,11 +372,17 @@ if Move0 and P1 then
 	for I = StopI + 1, SettledI do if IsJump[I] then break end SetI = I end
 	local Resid = (Rows[SetI].yaw - MarkYaw + 540) % 360 - 180
 	local Turn = (Rows[SetI].yaw - Rows[StopI].yaw + 540) % 360 - 180
-	check(math.abs(Resid) <= 15 and math.abs(Turn) <= 20, string.format("SETTLE: residual heading %.1f deg against the mark (<= 15), settle turn %.1f deg after the stop (<= 20)", Resid, Turn))
+	-- (fix round 3) on the mark (NearSkip) the turn may be up to 45: the one settle allowed past TurnMax, instead of an out-and-back
+	local TurnCap = if OnMark then 45 else 20
+	check(math.abs(Resid) <= 15 and math.abs(Turn) <= TurnCap, string.format("SETTLE: residual heading %.1f deg against the mark (<= 15), settle turn %.1f deg after the stop (<= %d)", Resid, Turn, TurnCap))
 	-- (fix round 1) the beat -> approach seam (sneak): no drop under 70 % of the speed just before it
 	if MODE == "sneak" and A0 > S0 + 5 then
-		-- speed over 3 frames (a render frame with no physics step reads near 0 and the next one double: sampling, not motion)
-		local function v3(I) return (flat(Rows[I + 1].pos) - flat(Rows[I - 1].pos)).Magnitude / math.max(Rows[I + 1].t - Rows[I - 1].t, 1e-3) end
+		-- speed over 5 frames (fix round 3; it was 3): a render frame with no physics step reads near 0 and the next one double, and that
+		-- beat runs 2 frames long (measured 3.1 / 9.4 / 3.6 / 10.7 studs/s with WalkSpeed a steady 6.3): sampling, not motion
+		local function v3(I)
+			local A, B = math.max(1, I - 2), math.min(#Rows, I + 2)
+			return (flat(Rows[B].pos) - flat(Rows[A].pos)).Magnitude / math.max(Rows[B].t - Rows[A].t, 1e-3)
+		end
 		local Pre = {}
 		for I = A0 - 4, A0 - 2 do table.insert(Pre, v3(I)) end
 		table.sort(Pre)
@@ -398,7 +405,10 @@ if Move0 and P1 then
 		local L = {}
 		for I = A0 - 3, math.min(#Rows, A0 + 14) do table.insert(L, string.format("%.1f/%.1f", Rows[I].v, Rows[I].ws)) end
 		add("seam frames (speed/WalkSpeed, from 3 before the seam): " .. table.concat(L, " "))
-		check(PreV < 1 or MinV >= 0.7 * PreV, string.format("SEAM SPEED (3-frame average): %.2f studs/s before the beat -> approach seam, lowest %.2f (%.0f %%) in its first 0.2 s, at %.2f s (>= 70 %%)",
+		local MinWs = math.huge
+		for I = A0, #Rows do if Rows[I].t - Rows[A0].t > 0.2 then break end MinWs = math.min(MinWs, Rows[I].ws) end
+		add(string.format("seam: the WalkSpeed asked for in the first 0.2 s, lowest %.2f (%.0f %% of the speed before the seam)", MinWs, PreV > 0 and 100 * MinWs / PreV or 0))
+		check(PreV < 1 or MinV >= 0.7 * PreV, string.format("SEAM SPEED (5-frame average): %.2f studs/s before the beat -> approach seam, lowest %.2f (%.0f %%) in its first 0.2 s, at %.2f s (>= 70 %%)",
 			PreV, MinV, PreV > 0 and 100 * MinV / PreV or 0, Rows[MinAt].t - Rows[A0].t))
 	elseif MODE == "sneak" then
 		add("SEAM SPEED: not measured (the seam came too soon after the cut began)")
