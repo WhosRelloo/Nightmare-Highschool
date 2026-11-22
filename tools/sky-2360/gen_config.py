@@ -7,6 +7,7 @@ Controllers.World.DayCycle reads (Keys, Looks with the 2.16 field names, Skies.S
 in before the controller is updated still works (the new fields are just ignored). The new controller reads the rest:
 see docs/Sky-and-Lighting.md, "Wiring plan".
 """
+import json
 import os
 import sys
 
@@ -27,6 +28,15 @@ OLD_IDS = {
     "Storm": dict(Bk=140004647918133, Dn=75870366649344, Ft=138974617955349, Lf=81795809687373, Rt=128479768841317, Up=127658888445040),
 }
 FACES = ["Bk", "Dn", "Ft", "Lf", "Rt", "Up"]
+# 2026-11-22: the owner's uploads to group 15981569 (art/group-upload-skies/ids.json, read from the group's creations).
+# Day and Dusk were re-uploaded too, byte-identical to 2026-11-13, so KEEP_IDS stays in use for them.
+_IDS_PATH = os.path.join(HERE, "..", "..", "art", "group-upload-skies", "ids.json")
+UPLOADED = json.load(open(_IDS_PATH, encoding="utf-8")) if os.path.exists(_IDS_PATH) else {}
+
+
+def uploaded(s):
+    d = {f: UPLOADED.get(f"NHSky{s}_{f}", 0) for f in FACES}
+    return d if all(d.values()) else None
 ORDER = ["Ambient", "OutdoorAmbient", "Brightness", "ColorShiftTop", "ColorShiftBottom", "EnvDiffuse", "EnvSpecular",
          "ExposureCompensation", "Density", "Offset", "Haze", "Glare", "AtmosphereColor", "Decay",
          "CloudCover", "CloudDensity", "CloudColor", "GradeBrightness", "Contrast", "Saturation", "Tint",
@@ -179,8 +189,13 @@ local rgb = Color3.fromRGB
         if s in KEEP_IDS:
             L.append(f"\t\t\t{s} = {ids(KEEP_IDS[s])};  -- 2026-11-13 upload, unchanged")
         else:
-            note = "  -- repainted for 2.36: upload the new faces (2.16 ids in Sets216)" if s in OLD_IDS else ""
-            L.append(f"\t\t\t{s} = {empty()};{note}")
+            up = uploaded(s)
+            if up:
+                note = "  -- 2.36 painting, uploaded 2026-11-22 (2.16 ids in Sets216)" if s in OLD_IDS else "  -- uploaded 2026-11-22"
+                L.append(f"\t\t\t{s} = {ids(up)};{note}")
+            else:
+                note = "  -- repainted for 2.36: upload the new faces (2.16 ids in Sets216)" if s in OLD_IDS else ""
+                L.append(f"\t\t\t{s} = {empty()};{note}")
     L.append("\t\t};")
     L.append("\t\t-- the 2.16 paintings, live until the 2.36 faces are uploaded (copy back into Sets to roll back)")
     L.append("\t\tSets216 = {")
@@ -197,7 +212,7 @@ local rgb = Color3.fromRGB
 		Clouds = { WindStuds = Vector3.new(6, 0, 3); StormMultiplier = 3; LowMultiplier = 0.5 };   -- workspace.GlobalWind
 		Wisps = {
 			-- NHWisp_A / NHWisp_B (1024 x 256, tiling in U, white with alpha; Beam.Color tints them by the key's CloudColor)
-			Textures = { A = 0; B = 0 };
+			Textures = { A = """ + str(UPLOADED.get("NHWisp_A", 0)) + """; B = """ + str(UPLOADED.get("NHWisp_B", 0)) + """ };
 			Beams = { High = 3; Medium = 1; Low = 0 };
 			TextureSpeed = { 0.01, 0.03 };
 			Radius = 1500;   -- studs from the camera anchor; their band crosses the moon's path

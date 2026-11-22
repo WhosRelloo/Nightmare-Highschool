@@ -206,23 +206,23 @@ return {
 		Sets = {
 			Day = { Bk = 103651333736497; Dn = 77333463665975; Ft = 119988626923704; Lf = 82325193338630; Rt = 98736878816049; Up = 96123202776655 };  -- 2026-11-13 upload, unchanged
 			Dusk = { Bk = 130059050523371; Dn = 109620867877755; Ft = 134244672227710; Lf = 92637844935076; Rt = 123188875952160; Up = 104447967963998 };  -- 2026-11-13 upload, unchanged
-			Dawn = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };
-			Night = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };  -- repainted for 2.36: upload the new faces (2.16 ids in Sets216)
-			NightNew = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };
-			NightCrimson = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };
-			NightBlue = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };  -- repainted for 2.36: upload the new faces (2.16 ids in Sets216)
-			Storm = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };  -- repainted for 2.36: upload the new faces (2.16 ids in Sets216)
-			WinterDay = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };
-			WinterDusk = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };
-			WinterNight = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };
-			SpringDay = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };
-			SpringDusk = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };
-			SpringNight = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };
-			SummerDay = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };
-			SummerDusk = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };
-			SummerNight = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };
-			NightmareDusk = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };
-			NightmareNight = { Bk = 0; Dn = 0; Ft = 0; Lf = 0; Rt = 0; Up = 0 };
+			Dawn = { Bk = 125667965766377; Dn = 136927526454592; Ft = 139360760275881; Lf = 74243397234322; Rt = 103400090916312; Up = 137465057332488 };  -- uploaded 2026-11-22
+			Night = { Bk = 78547941738148; Dn = 78903362399894; Ft = 113189433059277; Lf = 107044656522835; Rt = 75178959517061; Up = 137223863841397 };  -- 2.36 painting, uploaded 2026-11-22 (2.16 ids in Sets216)
+			NightNew = { Bk = 122743320462272; Dn = 81324800432802; Ft = 75862468531476; Lf = 93354658281544; Rt = 120232318883197; Up = 73026139974308 };  -- uploaded 2026-11-22
+			NightCrimson = { Bk = 132329117211679; Dn = 93768577775689; Ft = 95026826593012; Lf = 125597150937889; Rt = 102566650917477; Up = 105401813141063 };  -- uploaded 2026-11-22
+			NightBlue = { Bk = 118975260615401; Dn = 87909077761405; Ft = 72362382637792; Lf = 72458780667009; Rt = 74642019990641; Up = 117940034115185 };  -- 2.36 painting, uploaded 2026-11-22 (2.16 ids in Sets216)
+			Storm = { Bk = 107648213775138; Dn = 84692537589883; Ft = 133783865534048; Lf = 87011073402955; Rt = 118756941934652; Up = 138689451767999 };  -- 2.36 painting, uploaded 2026-11-22 (2.16 ids in Sets216)
+			WinterDay = { Bk = 130338085258734; Dn = 121525938021158; Ft = 124336234145945; Lf = 92217774881130; Rt = 99542695966612; Up = 117197868010363 };  -- uploaded 2026-11-22
+			WinterDusk = { Bk = 94141805445790; Dn = 88269985875963; Ft = 107625990846557; Lf = 86006697141077; Rt = 104562572117038; Up = 89261629906934 };  -- uploaded 2026-11-22
+			WinterNight = { Bk = 106231003116796; Dn = 126646587286145; Ft = 102564780898870; Lf = 103160310233517; Rt = 124983402534439; Up = 139292096736483 };  -- uploaded 2026-11-22
+			SpringDay = { Bk = 76036106707555; Dn = 128243256605457; Ft = 108888098664878; Lf = 83504177778400; Rt = 75475868719671; Up = 72431443834010 };  -- uploaded 2026-11-22
+			SpringDusk = { Bk = 129767308232127; Dn = 86769819407593; Ft = 130483751711425; Lf = 133034583275493; Rt = 118990271769267; Up = 75407778564862 };  -- uploaded 2026-11-22
+			SpringNight = { Bk = 74946412474398; Dn = 130560382847615; Ft = 117390376862173; Lf = 134044607806597; Rt = 75748478609674; Up = 78364679651383 };  -- uploaded 2026-11-22
+			SummerDay = { Bk = 74691215879965; Dn = 127638589764383; Ft = 70849969595039; Lf = 139823354539670; Rt = 92143359134979; Up = 88398380570631 };  -- uploaded 2026-11-22
+			SummerDusk = { Bk = 112416003455163; Dn = 138933398869052; Ft = 109567662296234; Lf = 131083252106625; Rt = 102724506847080; Up = 126812103358595 };  -- uploaded 2026-11-22
+			SummerNight = { Bk = 74394649611583; Dn = 83884562180317; Ft = 132345564869762; Lf = 133748085484266; Rt = 92602082122851; Up = 105470376249703 };  -- uploaded 2026-11-22
+			NightmareDusk = { Bk = 115499184365920; Dn = 117873758768028; Ft = 122741943471985; Lf = 121878839822380; Rt = 87702811374896; Up = 123233272331215 };  -- uploaded 2026-11-22
+			NightmareNight = { Bk = 89570072612161; Dn = 88281984942439; Ft = 74541160031886; Lf = 131921214893082; Rt = 107970526141371; Up = 88675603067487 };  -- uploaded 2026-11-22
 		};
 		-- the 2.16 paintings, live until the 2.36 faces are uploaded (copy back into Sets to roll back)
 		Sets216 = {
@@ -240,7 +240,7 @@ return {
 		Clouds = { WindStuds = Vector3.new(6, 0, 3); StormMultiplier = 3; LowMultiplier = 0.5 };   -- workspace.GlobalWind
 		Wisps = {
 			-- NHWisp_A / NHWisp_B (1024 x 256, tiling in U, white with alpha; Beam.Color tints them by the key's CloudColor)
-			Textures = { A = 0; B = 0 };
+			Textures = { A = 138327450591461; B = 126409446670111 };
 			Beams = { High = 3; Medium = 1; Low = 0 };
 			TextureSpeed = { 0.01, 0.03 };
 			Radius = 1500;   -- studs from the camera anchor; their band crosses the moon's path
