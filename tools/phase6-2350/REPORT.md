@@ -96,6 +96,28 @@ Real clips are still needed for motion_audit's pixel-level numbers:
   reducecheck, beatcheck, hometowncheck, replayrefused, holdcheck timeout and leave, buscheck, dipcheck, sneakcheck x4 and a skip at 5.5 s: all pass.
   Run dipcheck last in a session: it builds a second NHCineUI gui in the client VM that confuses the veil-reading checks.
 
+## Task 14: walking into placed animations (2026-11-22, fresh Play, slot 2)
+
+Studio was unfocused for the whole round: frames ran at 67 ms to 200 ms. Rows that need real-time frames are marked.
+- skipcheck: ok (first, as required).
+- camcheck: `__SeamlessTest` OK; TutorialSneak OK (BeatOut ok); TutorialBus OK in 2 of 3 runs. The failing run had an In-phase
+  edge JERK (pos edge/median 9.7) at 67 ms frames. It did not repeat (the next runs read 1.69 and 0.84). Judged a
+  frame artifact, as in the earlier bus runs; an owner watch row is below.
+- approachcheck: fence OK (0 slides, 0 spins, idle gap 0, the piece started 0.27 s before the stop, heading 41 deg,
+  clearance 0.54 walking up, 0.51 in FenceOver1, 0.15 in FenceOver2's first 0.5 s); bus short OK twice (arrival
+  0.03-0.06 studs); bus from the side (-4, 0, 2) OK (arrival 0.17 studs, heading 0.0 after the settle). The check's
+  suggested long offset (6, 0, 8) puts the player over the void at this stage (no ground under it), so that variant isn't valid here.
+- sneakcheck: skipfence OK; timeout OK (Length 1 and TimeoutPad 2.5 set on the server; the cut ended at 7.9 s on
+  FenceLand); sneak and fail pass every row except two that need real-time frames: "dip root jump under black on both
+  frames" (at 200 ms frames the 0.3 s dip falls between samples) and the fail path's "walk speed on the second Garden
+  pass" (0 moving frames sampled). NOT VERIFIED at real-time frames.
+- buscheck BUS OK (TheBus2 at 17.15 s, hidden from 20.75 s, hold from 30.38 s); beatcheck BEAT OK; holdcheck timeout
+  OK (10.17 s) and leave OK; resumecheck 5/5; hometowncheck PASS; replayrefused OK.
+- bodycheck and dipcheck: NOT RUN this round (they need real-time frames). Both passed after the final fix round,
+  and Task 14 changed neither CineUI.Dip nor the re-seat.
+- Slot 2 restored from this round's snapshot; CineState {Collected=Seen} before and after, Origin unchanged. Only
+  Discipline.LastDecayDay moved, because an in-game day passed.
+
 ## Open rows
 
 - OWNER: sign-off. Watch both cuts at full speed and record your words here.
@@ -105,4 +127,7 @@ Real clips are still needed for motion_audit's pixel-level numbers:
 - OWNER: bus boarding with the known door clipping (21-stud bus accepted); the door and driver camera marks.
 - OWNER: Fence and Garden camera marks (first guesses), the new Fence push-in, the bus's static shots (the 9.6 s run includes the deliberate held title), and the 6 s still in the Hide beat (fail path).
 - OWNER: record both cuts and run motion_audit (needs disk space on C:).
+- OWNER: Task 14: the fence approach (crouch-walk up, the square-up turn, FenceOver1 fading in), the bus walk to Stand,
+  the 40-degree vault heading, VAULT_BACK 0.6; watch the bus glide-in for a hitch.
+- TODO (focused Studio): sneakcheck sneak and fail dip rows, bodycheck, dipcheck last.
 - Sign-off: pending.

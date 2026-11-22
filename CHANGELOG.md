@@ -23,6 +23,10 @@ what the build changed). The plan is `docs/superpowers/plans/2026-11-20-tutorial
     travel is a `[fix]`).
 - **Your own character is the actor** (`Controllers.CineActor`): it walks onto marks, plays the `TutorialAnim` chains at
   Action priority, re-seats the root on the chain's last frame, and hands control back mid-stride.
+- **The character walks into every placed animation** (`CineActor.Approach`, task 14): before the fence vault and the bus
+  boarding, your character walks, runs or crouch-walks to the mark with the game's own locomotion. A lead-in waypoint
+  makes the last steps face the mark, and the first chain piece fades in just before the stop, so nothing slides or
+  turns on the spot. If the path is blocked, it falls back to a dip to black and a placement. No new animations.
 - **Walk-and-talk beats** (`Controllers.CineBeat`, `Functions.CineRigs`):
   - **Rigs:** `Follow`, `Lead`, `Side` and `Frame` (spring-damped), with a mouse or right-stick nudge of about 25° that
     springs back over 0.6 s.
