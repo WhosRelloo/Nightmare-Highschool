@@ -712,6 +712,16 @@ function Local.Context(Cut, Message)
 		Cut.AtBlack = Cut.AtBlack or {}
 		table.insert(Cut.AtBlack, Fn)
 	end
+	-- (task 14) a segment whose shots run out while Fn() still returns true waits (3 s at most) before it ends or blends out: a re-seat
+	-- still loading its _End clip must land under the held shot, never under the blend out (a slow client would slide under it)
+	function Ctx.HoldEnd(Fn: () -> boolean)
+		Cut.EndHolds = Cut.EndHolds or {}
+		table.insert(Cut.EndHolds, Fn)
+	end
+	-- (task 14) where the segment's clock is: Clock() is the shot player's time (it includes the glide in), Glide() the glide's length (the
+	-- shifted events start that late). An unshifted event can time what follows against the shifted ones with these
+	function Ctx.Clock(): number return Cut.Clock or 0 end
+	function Ctx.Glide(): number return Cut.GlideLen or 0 end
 	function Ctx.OnEnd(Fn: () -> ())
 		Cut.Cleanups = Cut.Cleanups or {}
 		table.insert(Cut.Cleanups, Fn)
@@ -898,7 +908,8 @@ function Local.PlaySegment(Cut, Name: string, Start: number?)
 	end
 	Cut.Events = {}
 	for _, E in Seg.events or {} do
-		if Shift > 0 then E = table.clone(E) E.t = (E.t or 0) + Shift end
+		-- (task 14) E.noShift: an event on the segment's own clock, not the glide's (an approach on foot that starts as the beat ends)
+		if Shift > 0 and not E.noShift then E = table.clone(E) E.t = (E.t or 0) + Shift end
 		table.insert(Cut.Events, E)
 	end
 	table.sort(Cut.Events, function(A, B) return (A.t or 0) < (B.t or 0) end)
@@ -1191,8 +1202,26 @@ function Local.SegmentDone(Cut, Name: string)
 		if not Cut.Solo then send({ Kind = `Where`; Session = Cut.Session }) end
 		return
 	end
-	if Node.next then Local.PlaySegment(Cut, Node.next) return end
-	task.spawn(Local.EndGraph, Cut)
+	local function proceed()
+		if Node.next then Local.PlaySegment(Cut, Node.next) return end
+		task.spawn(Local.EndGraph, Cut)
+	end
+	local function holding(): boolean
+		for _, Fn in Cut.EndHolds or {} do
+			local Ok, Busy = pcall(Fn)
+			if Ok and Busy then return true end
+		end
+		return false
+	end
+	if holding() then
+		task.spawn(function()
+			local T0 = os.clock()
+			while Cut.Live and Cut.Seg == Name and os.clock() - T0 < 3 and holding() do task.wait() end
+			if Cut.Live and Cut.Seg == Name then proceed() end
+		end)
+		return
+	end
+	proceed()
 end
 
 function Local.OpenPrompt(Cut, SegName: string, P)

@@ -21,6 +21,9 @@ local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
 local RunService = game:GetService(`RunService`)
 local Config = require(ReplicatedStorage.Config.Cine)
 local Def = { Set = `BusStop`; Seamless = true; EndHold = true }
+local ARRIVE = 0.15      -- (task 14) the Walk approach's stop radius: the doorway is tight (Stand is measured against it), so tighter than the default
+local STEP_AT = 16.15     -- the cut's clock (after the glide) when TheBus2 starts: the "You step on" shot begins at 15.8
+local FADE_IN = 0.3      -- the waiting loop fades in from the live walk over this long
 
 local function controllers()
 	local Player = Players.LocalPlayer
@@ -122,11 +125,39 @@ function Def.Build(Ctx)
 		grade = Config.Looks.BusStop;
 		cues = {};
 		events = {
+			-- (task 14) not noShift: the glide in frames you (the shot is framed on your heading), so a walk during it swung the camera (camcheck In
+			-- 4.6-6x the bound); you stand through the glide, as you already were, and walk to the mark as the shot settles
 			{ t = 0; call = function()
 				if not Actor then return end
-				Actor.WalkTo(Ctx.CF(`Stand`), 4)
-				Actor.Chain(`TheBus`, Ctx.Clip, { [1] = function() while not Go and Ctx.Alive() do task.wait() end end })
-				if Ctx.Alive() then Actor.Reseat(`TheBus2`, TA.Chains.TheBus[2].EndOffset, Ctx.Clip) end
+				-- (task 14) from wherever you stand at the stop you WALK to the Stand mark (CineActor.Approach, the game's own Walk: the
+				-- last steps run straight along the mark's heading, no turn on the spot, no distance limit), and the waiting loop fades in
+				-- from the live walk just before you stop. Nothing is lerped or placed on screen
+				local Stand = Ctx.CF(`Stand`)
+				task.spawn(Actor.Preload, `TheBus`, Ctx.Clip)
+				local Started = false
+				-- the waiting loop starts the moment you stop, however long the walk took, and has to leave on its exit phase so TheBus2 starts at
+				-- STEP_AT on the cut's clock (the "You step on" shot): the loop enters at the phase that puts its exit there (kept at its own
+				-- authored entry when a natural exit already lands within 0.3 s of it)
+				local function entry(): number
+					local Loop = TA.Chains.TheBus[1]
+					local D = math.max(0.5, Ctx.Glide() + STEP_AT - Ctx.Clock())
+					local Nat = (Loop.Exit - Loop.Entry) % Loop.Length
+					local R = (D - Nat) % Loop.Length
+					if D > Nat - 0.3 and (R < 0.3 or Loop.Length - R < 0.3) then return Loop.Entry end
+					return (Loop.Exit - D) % Loop.Length
+				end
+				local function wait()
+					if Started or not Ctx.Alive() then return end
+					Started = true
+					task.spawn(function()
+						Actor.Chain(`TheBus`, Ctx.Clip, { [1] = function() while not Go and Ctx.Alive() do task.wait() end end }, nil, { FadeIn = FADE_IN; Entry = entry })
+						if Ctx.Alive() then Actor.Reseat(`TheBus2`, TA.Chains.TheBus[2].EndOffset, Ctx.Clip) end
+					end)
+				end
+				local Ok, Why = Actor.Approach(Stand, { Gait = `Walk`; Arrive = ARRIVE; OnNear = wait })
+				if not Ctx.Alive() then return end
+				if not Ok then Actor.Fallback(Stand, Why) end -- a dip and a placement, with a warning (blocked, timed out, fell)
+				wait()
 			end };
 			-- the last 58 studs to the stop over 5.5 s, decelerating; BrakeStop plays through its arrival
 			{ t = 1.0; call = function()

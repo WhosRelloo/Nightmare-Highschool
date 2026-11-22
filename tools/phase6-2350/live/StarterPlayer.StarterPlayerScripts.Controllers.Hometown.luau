@@ -170,7 +170,28 @@ function Shared.StartBiscuit(): AnimationTrack?
 	return T
 end
 
+-- (task 14) the tutorial's two walk-up chains are fetched as soon as NHTutorial is set (their published clips load over the network),
+-- so the first piece is in the moment an on-foot approach ends and never shows a dead idle first
+local function warmChains()
+	task.spawn(function()
+		local Ok, Clips = pcall(function() return require(game:GetService(`ReplicatedStorage`).Config.CineClips) end)
+		if not Ok then return end
+		local function resolve(Name: string): string?
+			local Id = (Clips :: any)[Name]
+			return if typeof(Id) == `string` and Id ~= `` then Id else nil
+		end
+		local T0 = os.clock()
+		while Player:GetAttribute(`NHTutorial`) == true and not (Player.Character and Player.Character:FindFirstChildWhichIsA(`Animator`, true)) and os.clock() - T0 < 20 do task.wait(0.25) end
+		local Actor = require(script.Parent.CineActor)
+		for _, Chain in { `FenceOver`, `TheBus` } do
+			if Player:GetAttribute(`NHTutorial`) ~= true then return end
+			pcall(Actor.Preload, Chain, resolve)
+		end
+	end)
+end
+
 local function castBiscuitSoon()
+	warmChains()
 	task.spawn(function()
 		local T0 = os.clock()
 		while Player:GetAttribute(`NHTutorial`) == true and os.clock() - T0 < 20 do

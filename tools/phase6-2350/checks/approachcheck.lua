@@ -1,0 +1,279 @@
+-- approachcheck (2.35.0, task 14): every placed animation starts with an on-foot approach. Client VM, ONE call; the cut is started from
+-- outside as the tutorial does (first viewing, not a replay):
+--   MODE "sneak": start this in the background, then ~3 s later   bridge.py PlayCut $P '"TutorialSneak"' false
+--   MODE "bus":   TutorialEnter, start this in the background, then ~3 s later   bridge.py PlayCut $P '"TutorialBus"' false
+--                 (BUS_OFFSET puts the player that far off the Stand mark first: a short walk, a long one from the side)
+-- It samples the root EVERY frame (real per-sample frame times: Studio throttles when it isn't focused) and reports:
+--   * SLIDES: the root moving more than 0.5 studs/s for 3+ frames (and 0.15 s) with NO walk / run / crouch-walk track playing, outside a
+--     dip (black veil). Zero required. (A single isolated frame jump is not a slide: it is a placement, listed under JUMPS)
+--   * SPINS: yaw rate above 90 degrees/s for 3+ frames while the root speed is near 0 (under 0.5 studs/s), outside a dip. Zero required.
+--   * IDLE GAPS: from the stop to the first chain piece's track, in frames (negative = the piece started that many frames BEFORE the
+--     stop, the intended blend lead); and the frames stopped with NO chain piece playing (a dead idle). Zero dead-idle frames wanted.
+--   * JUMPS: isolated one-frame root moves over 0.8 studs, each with the veil state (the fence dip is under black; the re-seat is a
+--     pose-to-identical-pose switch and listed as such).
+--   * the mark: distance and heading error where the approach stopped; the fence's CLEARANCE: the smallest gap in Z between any body
+--     part of the character and the gate/fence's near face from the start of the approach to FenceOver2's first frame.
+local MODE = "sneak"
+local BUS_OFFSET = Vector3.new(0, 0, 4) -- bus mode: where the player is put, relative to the Stand mark (x along the kerb, z behind it): 4 = a short walk, (6, 0, 8) = a long one from the side
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Player = Players.LocalPlayer
+local Char = Player.Character
+local Hum = Char:FindFirstChildOfClass("Humanoid")
+local Root = Char.HumanoidRootPart
+local Remote = game.ReplicatedStorage:WaitForChild("NHCine")
+local Animator = Hum:FindFirstChildOfClass("Animator")
+local Names = {}
+local Clips = require(game.ReplicatedStorage.Config.CineClips)
+for K, V in Clips do if typeof(V) == "string" and V ~= "" then Names[(V:gsub("rbxassetid://", ""))] = K end end
+local Tut = game.ReplicatedStorage.NHCineClips:FindFirstChild("Tutorial")
+if Tut then for _, S in Tut:GetChildren() do local P = S:GetAttribute("PreviewId") if P then Names[tostring(P)] = Names[tostring(P)] or S.Name end end end
+local Loco = {}
+for _, A in game.ReplicatedStorage.Assets.Animations.Default.Movement:GetChildren() do
+	if A:IsA("Animation") then Loco[(A.AnimationId:gsub("rbxassetid://", ""))] = A.Name end
+end
+local WALKING = { Walk = true, Sprint = true, FastSprint = true, CrouchWalk = true }
+local CHAIN = MODE == "sneak" and { "FenceOver1_GameCrouchWalk", "FenceOver2" } or { "TheBus1_WaitBored", "TheBus2" }
+local CHAINSET = {}
+for _, N in CHAIN do CHAINSET[N] = true end
+local Fence = {}
+local Marks, Goal
+if MODE == "sneak" then
+	Marks = workspace:WaitForChild("NHCineSets"):WaitForChild("Garden")
+	Goal = Marks.FenceZone.Position
+	for _, N in { "WFPicketFence", "WFPicketGate" } do
+		for _, D in workspace.Hometown.Garden:WaitForChild(N):GetDescendants() do
+			if D:IsA("BasePart") and D.CanCollide and D.Size.Y > 0.5 then table.insert(Fence, D) end
+		end
+	end
+	Root.CFrame = CFrame.lookAt(Marks.Start.Position + Vector3.new(0, 3, 0), Goal + Vector3.new(0, 3, 0))
+else
+	Marks = workspace:WaitForChild("NHCineSets"):WaitForChild("BusStop")
+	Goal = Marks.Stand.Position
+	-- off the mark: BUS_START studs back and to the side (behind the kerb, facing the stop)
+	Root.CFrame = CFrame.lookAt(Goal + BUS_OFFSET + Vector3.new(0, 3, 0), Goal + Vector3.new(0, 3, 0))
+end
+Root.AssemblyLinearVelocity = Vector3.zero
+Player:SetAttribute("NHCinePath", nil)
+task.wait(1.5)
+
+local Rows, Name = {}, "ApproachCheck_" .. math.random(1e6)
+local Last
+local function clearance()
+	local Best, Who = math.huge, nil
+	for _, P in Char:GetChildren() do
+		if P:IsA("BasePart") and P.Name ~= "HumanoidRootPart" then
+			local R, H = P.CFrame, P.Size / 2
+			local function ext(I) return math.abs(R:VectorToWorldSpace(Vector3.xAxis)[I]) * H.X + math.abs(R:VectorToWorldSpace(Vector3.yAxis)[I]) * H.Y + math.abs(R:VectorToWorldSpace(Vector3.zAxis)[I]) * H.Z end
+			local MinZ, X0, X1, Y0, Y1 = P.Position.Z - ext("Z"), P.Position.X - ext("X"), P.Position.X + ext("X"), P.Position.Y - ext("Y"), P.Position.Y + ext("Y")
+			for _, F in Fence do
+				local Fx, Fy, Fz = F.Size.X / 2, F.Size.Y / 2, F.Size.Z / 2
+				if X1 > F.Position.X - Fx and X0 < F.Position.X + Fx and Y1 > F.Position.Y - Fy and Y0 < F.Position.Y + Fy then
+					local G = MinZ - (F.Position.Z + Fz)
+					if G < Best then Best, Who = G, P.Name end
+				end
+			end
+		end
+	end
+	return Best, Who
+end
+local function sample()
+	local Now = os.clock()
+	local Ui = Player.PlayerGui:FindFirstChild("NHCineUI")
+	local Veil = Ui and Ui:FindFirstChild("Veil", true)
+	local Tracks = {}
+	local Walk, ChainOn, ChainW = false, {}, {}
+	if Animator then
+		for _, T in Animator:GetPlayingAnimationTracks() do
+			local Id = T.Animation and (T.Animation.AnimationId:gsub("rbxassetid://", "")) or ""
+			local L = Loco[Id]
+			if L and WALKING[L] and T.WeightCurrent > 0.05 then Walk = true end
+			local N = Names[Id]
+			if N and CHAINSET[N] then ChainOn[N] = true ChainW[N] = T.WeightCurrent end
+			table.insert(Tracks, L or N or Id)
+		end
+	end
+	local Look = Root.CFrame.LookVector
+	local Row = { t = Now; dt = Last and (Now - Last.t) or 0; pos = Root.Position; yaw = math.deg(math.atan2(-Look.X, -Look.Z));
+		seam = Player:GetAttribute("NHCineSeam"); path = Player:GetAttribute("NHCinePath"); veil = Veil and Veil.BackgroundTransparency or 1;
+		walk = Walk; chain = ChainOn; cw = ChainW; ws = Hum.WalkSpeed; crouch = Hum:GetAttribute("Crouch") == true; tracks = Tracks;
+		clear = if MODE == "sneak" then (clearance()) else nil; clearWho = if MODE == "sneak" then select(2, clearance()) else nil }
+	Last = Row
+	table.insert(Rows, Row)
+end
+RunService:BindToRenderStep(Name, Enum.RenderPriority.Last.Value, sample)
+-- sneak: walk (crouched) to the fence until the Fence segment takes over, as sneakcheck does
+local Began = false
+RunService:BindToRenderStep(Name .. "Walk", Enum.RenderPriority.Input.Value + 1, function()
+	local Ph = Player:GetAttribute("NHCineSeam")
+	if Ph ~= nil then Began = true end
+	local Path = Player:GetAttribute("NHCinePath") or ""
+	if MODE ~= "sneak" or not Began or not (Ph == "In" or Ph == "Beat" or Ph == "BeatIn") or Path:match("Fence$") then return end
+	local D = (Goal - Root.Position) * Vector3.new(1, 0, 1)
+	if D.Magnitude > 0.5 then Hum:Move(D.Unit, false) end
+end)
+local T0, Started = os.clock(), false
+local FirstSeam
+repeat
+	task.wait(0.1)
+	if Player:GetAttribute("NHCineSeam") ~= nil then Started = true FirstSeam = FirstSeam or os.clock() end
+until (Started and MODE == "sneak" and Player:GetAttribute("NHCineSeam") == nil and os.clock() - T0 > 6)
+	or (Started and MODE == "bus" and os.clock() - FirstSeam > 24) or os.clock() - T0 > 90
+task.wait(0.5)
+RunService:UnbindFromRenderStep(Name)
+RunService:UnbindFromRenderStep(Name .. "Walk")
+Hum:Move(Vector3.zero)
+
+local Rep, Pass = {}, true
+local function add(S) table.insert(Rep, S) end
+local function check(Ok, S) Pass = Pass and Ok add(S .. (Ok and " ok" or " FAIL")) end
+local function black(R) return R.veil < 0.5 end
+local function flat(V) return Vector3.new(V.X, 0, V.Z) end
+-- per-frame speed, yaw rate
+for I = 2, #Rows do
+	local A, B = Rows[I - 1], Rows[I]
+	local Dt = math.max(B.t - A.t, 1e-3)
+	B.d = (flat(B.pos) - flat(A.pos)).Magnitude
+	B.v = B.d / Dt
+	local Dy = (B.yaw - A.yaw + 540) % 360 - 180
+	B.w = math.abs(Dy) / Dt
+	B.dy = Dy
+end
+Rows[1].d, Rows[1].v, Rows[1].w, Rows[1].dy = 0, 0, 0, 0
+-- only the cut's own frames (after the first seam phase)
+local S0
+for I, R in Rows do if R.seam ~= nil then S0 = I break end end
+S0 = S0 or 1
+-- the approach is judged from the segment that makes it: the Fence segment (sneak), the whole cut (bus)
+local A0 = S0
+if MODE == "sneak" then
+	for I, R in Rows do if R.path and R.path:match("Fence$") and R.seam ~= nil then A0 = I break end end
+end
+-- jumps: an isolated frame over 0.8 studs with calm frames either side
+local Jumps, IsJump = {}, {}
+for I = S0 + 1, #Rows - 1 do
+	local R = Rows[I]
+	if R.d > 0.8 and Rows[I - 1].v < R.v * 0.5 and Rows[I + 1].v < R.v * 0.5 then
+		IsJump[I] = true
+		table.insert(Jumps, string.format("%.2f studs at %.2f s (veil transparency %.2f, walk track %s)", R.d, R.t - Rows[S0].t, math.max(R.veil, Rows[I - 1].veil), tostring(R.walk)))
+	end
+end
+-- slides: runs of frames with v > 0.5, no walking track, not black, not a jump, lasting 3+ frames and 0.15 s
+local Slides, Run = {}, {}
+local function flush()
+	if #Run >= 3 and Rows[Run[#Run]].t - Rows[Run[1]].t >= 0.15 then
+		local Peak = 0
+		for _, I in Run do Peak = math.max(Peak, Rows[I].v) end
+		table.insert(Slides, string.format("%d frames from %.2f s, peak %.2f studs/s", #Run, Rows[Run[1]].t - Rows[S0].t, Peak))
+	end
+	Run = {}
+end
+for I = S0, #Rows do
+	local R = Rows[I]
+	if R.v > 0.5 and not R.walk and not IsJump[I] and not black(R) and R.seam ~= nil then table.insert(Run, I) else flush() end
+end
+flush()
+-- spins: yaw rate over 90 deg/s, root speed under 0.5, 3+ frames, not black, not a jump
+local Spins, RunS = {}, {}
+local function flushS()
+	if #RunS >= 3 then
+		local Peak = 0
+		for _, I in RunS do Peak = math.max(Peak, Rows[I].w) end
+		table.insert(Spins, string.format("%d frames from %.2f s, peak %.0f deg/s", #RunS, Rows[RunS[1]].t - Rows[S0].t, Peak))
+	end
+	RunS = {}
+end
+for I = S0, #Rows do
+	local R = Rows[I]
+	if R.w > 90 and R.v < 0.5 and not IsJump[I] and not black(R) and R.seam ~= nil then table.insert(RunS, I) else flushS() end
+end
+flushS()
+local PeakW, PeakWAt = 0, 0
+for I = S0, #Rows do if Rows[I].v < 0.5 and not IsJump[I] and not black(Rows[I]) and Rows[I].w > PeakW then PeakW = Rows[I].w PeakWAt = Rows[I].t - Rows[S0].t end end
+do -- every stopped frame turning faster than 90 deg/s, even a single one (a spin needs 3 in a row; these are listed so a one-frame twitch is seen)
+	local L = {}
+	for I = S0, #Rows do
+		local R = Rows[I]
+		if R.w > 90 and R.v < 0.5 and not IsJump[I] and not black(R) and R.seam ~= nil and #L < 8 then
+			table.insert(L, string.format("%.2f s: %.1f deg in %.0f ms (%.0f deg/s)", R.t - Rows[S0].t, R.dy, (R.t - Rows[I - 1].t) * 1000, R.w))
+		end
+	end
+	add("stopped frames over 90 deg/s: " .. (#L > 0 and table.concat(L, "; ") or "none"))
+end
+check(#Slides == 0, string.format("SLIDES (moving over 0.5 studs/s with no walk/run/crouch-walk track, outside a dip): %d%s", #Slides, #Slides > 0 and (" -> " .. table.concat(Slides, "; ")) or ""))
+check(#Spins == 0, string.format("SPINS (over 90 deg/s while stopped, 3+ frames, outside a dip): %d%s; peak stopped yaw rate %.0f deg/s at %.2f s", #Spins, #Spins > 0 and (" -> " .. table.concat(Spins, "; ")) or "", PeakW, PeakWAt))
+add("JUMPS: " .. (#Jumps > 0 and table.concat(Jumps, " | ") or "none"))
+-- the approach: first moving frame in the cut, the stop (the last frame of the approach's walk), the first chain piece
+local Move0, Stop0, P1, P2
+for I = A0, #Rows do
+	local R = Rows[I]
+	if not Move0 and R.v > 1 and R.walk then Move0 = I end
+	if not P1 and R.chain[CHAIN[1]] then P1 = I end
+	if not P2 and R.chain[CHAIN[2]] then P2 = I end
+end
+if P1 then
+	-- the stop: the first frame after the walk started where the root is still (under 0.5 studs/s for 2 frames) at or after the piece began, minus nothing
+	for I = math.max(2, Move0 or A0), #Rows - 1 do
+		if Rows[I].v < 0.5 and Rows[I + 1].v < 0.5 and Rows[I - 1].v >= 0.5 then Stop0 = I break end
+	end
+end
+if Move0 and P1 then
+	local StopI = Stop0 or P1
+	local Lead = StopI - P1 -- frames the piece began BEFORE the stop
+	local Dead = 0
+	for I = StopI, P1 - 1 do if Rows[I] and not (next(Rows[I].chain)) then Dead += 1 end end
+	-- frames between the stop and the piece with the root still and no chain piece (a dead idle): none when the piece began before it
+	local Dt = (Rows[StopI].t - Rows[P1].t)
+	add(string.format("approach: walking from %.2f s (frame %d), stop at frame %d (%.2f s), first chain piece at frame %d (%.2f s): the piece began %d frames (%.2f s) BEFORE the stop", Rows[Move0].t - Rows[S0].t, Move0, StopI, Rows[StopI].t - Rows[S0].t, P1, Rows[P1].t - Rows[S0].t, Lead, Dt))
+	check(Dead == 0, string.format("IDLE GAP: %d frames stopped with no chain piece playing (want 0); the piece started %d frames before the stop", Dead, Lead))
+	local Wmax = 0
+	for I = P1, math.min(#Rows, P1 + 90) do Wmax = math.max(Wmax, Rows[I].cw[CHAIN[1]] or 0) end
+	-- the arrival: where the root stopped against the mark, and the body's heading
+	local SettledI = StopI
+	for I = StopI, #Rows do SettledI = I if Rows[I].t - Rows[StopI].t >= 0.6 then break end end
+	local Settled = Rows[SettledI]
+	local Err = (flat(Settled.pos) - flat(Goal)).Magnitude
+	add(string.format("start (%.2f, %.2f) stop (%.2f, %.2f) mark (%.2f, %.2f)", Rows[Move0].pos.X, Rows[Move0].pos.Z, Rows[StopI].pos.X, Rows[StopI].pos.Z, Goal.X, Goal.Z))
+	add(string.format("arrival: %.2f studs from the mark 0.6 s after the stop; first piece weight reached %.2f", Err, Wmax))
+	add(string.format("heading at the stop %.1f, 0.6 s on %.1f (the mark's heading + %s)", Rows[StopI].yaw, Settled.yaw, MODE == "sneak" and "40 degrees left of the fence" or "facing the road"))
+	if MODE == "sneak" then
+		-- three windows: while walking up (to the stop), the FenceOver1 crouch walk (stop to FenceOver2's first frame), and the climb's first 0.5 s
+		local function window(From, To)
+			local Min, At, Who = math.huge, nil, nil
+			for I = From, To do if Rows[I].clear and Rows[I].clear < Min then Min, At, Who = Rows[I].clear, I, Rows[I].clearWho end end
+			return Min, At, Who
+		end
+		local StopI = Stop0 or P1
+		local M1, A1, W1 = window(Move0, StopI)
+		local M2, A2, W2 = window(StopI, (P2 or #Rows) - 1)
+		local P3 = P2 or #Rows
+		local E3 = P3
+		while E3 < #Rows and Rows[E3 + 1].t - Rows[P3].t < 0.5 and not IsJump[E3 + 1] do E3 += 1 end
+		local M3, A3, W3 = window(P3, E3)
+		add(string.format("fence clearance (gap in Z between a body part and the fence's near face; negative = inside it): walking up %.2f (%s), FenceOver1 until the climb %.2f (%s), first 0.5 s of FenceOver2 %.2f (%s)", M1, tostring(W1), M2, tostring(W2), M3, tostring(W3)))
+		add(string.format("root z at the stop %.2f (the fence's near face z %.2f)", Rows[StopI].pos.Z, (function() local Z = -math.huge for _, F in Fence do Z = math.max(Z, F.Position.Z + F.Size.Z / 2) end return Z end)()))
+		local Min = math.min(M1, M2)
+		check(Min > 0.1, "the body clears the gate and pickets until the climb begins (walking up and FenceOver1)")
+	end
+else
+	check(false, string.format("approach: no walking frame (%s) or no first chain piece (%s) found", tostring(Move0), tostring(P1)))
+end
+if P2 then add(string.format("second chain piece at %.2f s from the cut's first phase", Rows[P2].t - Rows[S0].t)) end
+local Tl = {}
+local Prev
+for I = S0, #Rows do
+	local R = Rows[I]
+	local Key = (R.walk and "walk" or "-") .. "/" .. (next(R.chain) and (next(R.chain)) or "-")
+	if Key ~= Prev then table.insert(Tl, string.format("%s@%.2f", Key, R.t - Rows[S0].t)) Prev = Key end
+end
+add("timeline: " .. table.concat(Tl, " "))
+do
+	local Seen = {}
+	for I = S0, #Rows do for _, N in Rows[I].tracks do Seen[N] = (Seen[N] or 0) + 1 end end
+	local L = {}
+	for N, C in Seen do table.insert(L, N .. " " .. C) end
+	table.sort(L)
+	add("tracks seen during the cut: " .. table.concat(L, ", "))
+end
+add(string.format("%d frames, median frame %.0f ms", #Rows, (function() local L = {} for I = 2, #Rows do table.insert(L, Rows[I].dt * 1000) end table.sort(L) return L[math.ceil(#L / 2)] or 0 end)()))
+return (Pass and "APPROACH OK\n" or "APPROACH FAIL\n") .. table.concat(Rep, "\n")
