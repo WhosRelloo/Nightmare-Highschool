@@ -28,6 +28,7 @@ local ChainGen = 0                                          -- a running Chain's
 local SpeedWas: number? = nil
 local EaseOver = false                                      -- an Approach asks Begin to end its ease at once (the walk carries on, it doesn't stop and start)
 local Easing = false                                        -- Begin's 0.3 s input ease is running (Approach waits it out)
+local Approaching = false                                   -- an Approach is driving the character (fix round 1)
 local WALK, RUN, CROUCH = 12, 25, 7                         -- the game's own speeds: Sprint's Release, Sprint's Activate, Services.Player.Crouch
 
 local function controls()
@@ -69,7 +70,11 @@ function Shared.Begin()
 	end
 	if ChainGen ~= My then return end
 	local Ctl = controls()
+	-- (fix round 1, I2) disabling the controls writes a zero move: with an Approach already walking you, that was a one-step stop at the
+	-- beat -> approach seam. The walk's move is put straight back (the Approach steers it again on its next frame)
+	local Mv = Hum and Hum.MoveDirection
 	if Ctl then Ctl:Disable() end
+	if Approaching and Hum and Mv and Mv.Magnitude > 0.1 then Hum:Move(Mv, false) end
 end
 
 local function flat(V: Vector3): Vector3 return Vector3.new(V.X, 0, V.Z) end
@@ -81,25 +86,51 @@ local function wrap(Deg: number): number return (Deg + 540) % 360 - 180 end
 -- CrouchWalk from its speed, so nothing here animates and nothing is placed. It arrives already facing the mark: a lead-in
 -- waypoint LeadIn studs behind the mark along its facing is walked to first (skipped if the character is already within ~30 degrees
 -- of the mark's facing and in line with it), then the last steps run straight at the mark and AutoRotate has the body facing along
--- them. The few degrees left at the stop turn over 0.45 s or more (45 degrees a second at most on average) while the next piece fades in (a turn inside the blend, never a spin).
+-- them. The few degrees left at the stop (TurnMax at most) turn over 0.45 s or more (45 degrees a second at most on average) while the next piece
+-- fades in: a turn inside the blend, never a spin. (fix round 1) The turn is about where the root IS (it never pins it to the arrival
+-- point), and a Reseat or a Release cancels it. A heading more than TurnMax off as the stop nears is not turned on the spot: the walk keeps
+-- steering (once round the lead-in again) instead.
 -- Opts: Gait "Walk" | "Run" | "Crouch" | "Sneak" (Crouch and Sneak are the game's crouch: speed 7; the crouch is asked of the server if
 -- it isn't up), LeadIn (3.0), Arrive (0.35 studs), BlendLead (0.2 s), OnNear(secondsLeft) (fires once, BlendLead before arrival, so the
--- caller can start the next piece's fade-in), Timeout (seconds; default from the distance).
--- Returns true on arrival. Otherwise false and a reason: "blocked" (no progress for 3 s), "timeout", "fell", "released" (Release ran) or
--- "nochar". The caller then dips to black and places the character (Shared.Fallback).
-function Shared.Approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, Arrive: number?, BlendLead: number?, OnNear: ((number) -> ())?, Timeout: number? }?): (boolean, string?)
+-- caller can start the next piece's fade-in), Timeout (seconds; default from the distance),
+-- (fix round 1) EaseOut (true: the pace eases down over the last stud), StopWhen() (asked every frame on the last leg: true = stop here,
+-- the caller's next piece has taken over), OnLeft(studs) (every frame on the last leg: the distance left), TurnMax (20 degrees),
+-- NearSkip (0.5 studs) and NearTurn (45 degrees): already this close to the mark and this nearly facing it, there is no walk at all and the
+-- heading turns in the blend.
+-- Returns true on arrival. Otherwise false and a reason: "blocked" (no progress for 3 s), "timeout", "fell" (dropped 8 studs), "died"
+-- (Health 0 or the character gone), "released" (Release ran) or "nochar". On blocked / timeout / fell the caller dips to black and places
+-- the character (Shared.Fallback); on died / released / nochar it does neither (nothing to place, and no chain on a dead character).
+local LastRise: number? = nil                                -- the root's height over the ground at the last Approach's start (Fallback places at it)
+local function groundBelow(At: Vector3, Char: Model?): number?
+	local Params = RaycastParams.new()
+	Params.FilterType = Enum.RaycastFilterType.Exclude
+	Params.FilterDescendantsInstances = if Char then { Char } else {}
+	local Hit = workspace:Raycast(At + Vector3.new(0, 6, 0), Vector3.new(0, -40, 0), Params)
+	return Hit and Hit.Position.Y or nil
+end
+local function approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, Arrive: number?, BlendLead: number?, OnNear: ((number) -> ())?, Timeout: number?,
+	EaseOut: boolean?, StopWhen: (() -> boolean)?, OnLeft: ((number) -> ())?, TurnMax: number?, NearSkip: number?, NearTurn: number? }?): (boolean, string?)
 	local Opt = Opts or {}
 	local Char, Hum, Root = parts()
 	if not (Char and Hum and Root) then return false, `nochar` end
+	if Hum.Health <= 0 then return false, `died` end
 	local My = ChainGen
+	-- (fix round 1, I2) the walk you have as the approach takes over: it carries on through the frame Begin's ease takes to end (nothing
+	-- else moves you then: the controls are going off) and the pace ramps up from it
+	local V0 = flat(Root.AssemblyLinearVelocity)
 	if Easing then EaseOver = true end                          -- Begin's ease would slow a walking player to a stop first: end it now
-	while Easing and ChainGen == My do RunService.Heartbeat:Wait() end -- (it writes the speed each frame)
+	while Easing and ChainGen == My do                          -- (it writes the speed each frame)
+		if V0.Magnitude > 0.5 then Hum:Move(V0.Unit, false) end
+		RunService.Heartbeat:Wait()
+	end
 	if ChainGen ~= My then return false, `released` end
 	local Gait = Opt.Gait or `Walk`
 	local Crouching = Gait == `Crouch` or Gait == `Sneak`
 	local LeadIn = Opt.LeadIn or 3.0
 	local Arrive = Opt.Arrive or 0.35
 	local BlendLead = Opt.BlendLead or 0.2
+	local EaseOut = Opt.EaseOut ~= false
+	local TurnMax = Opt.TurnMax or 20
 	local Remote = ReplicatedStorage:FindFirstChild(`NHCine`)
 	if Crouching and Hum:GetAttribute(`Crouch`) ~= true and Remote then
 		Remote:FireServer({ Kind = `BeatCrouch`; On = true })
@@ -107,12 +138,41 @@ function Shared.Approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, A
 		while Hum:GetAttribute(`Crouch`) ~= true and os.clock() - T0 < 1 do RunService.Heartbeat:Wait() end
 	end
 	local Was = Hum.WalkSpeed
+	local RotWas = Hum.AutoRotate
+	Hum.AutoRotate = true                                        -- (fix round 1, M4) the body turns with the walk, whatever the cut had set
 	local Speed = if Gait == `Run` then RUN elseif Crouching then CROUCH
 		else (if Was > 4 and Was < 20 then Was else WALK)           -- the walk speed the player has (hunger bands change it), the game's 12 otherwise
-	Hum.WalkSpeed = Speed
 	local Face = flat(Mark.LookVector)
 	Face = if Face.Magnitude > 1e-3 then Face.Unit else Vector3.new(0, 0, -1)
 	local Goal = Vector3.new(Mark.Position.X, Root.Position.Y, Mark.Position.Z)
+	do local G = groundBelow(Root.Position, Char) LastRise = if G then Root.Position.Y - G else nil end
+	local function headErr(): number return wrap(math.deg(yawOf(Face) - yawOf(Root.CFrame.LookVector))) end
+	-- the settle: the heading left at the stop turns over the blend window, inside the next piece's fade-in, about where the root is now
+	local function settle(Cap: number)
+		local Turn = math.clamp(headErr(), -Cap, Cap)
+		if math.abs(Turn) <= 1.5 then return end
+		local MyGen, MyChain = Gen, ChainGen
+		task.spawn(function()
+			local Rot0 = Root.CFrame.Rotation
+			local T1 = os.clock()
+			local Dur = math.max(0.45, math.abs(Turn) / 45)                 -- never faster than about 45 degrees a second on average (peak 1.5x): a turn, not a spin
+			while ChainGen == MyChain and Gen == MyGen and Root.Parent and Hum.Health > 0 do
+				local A = math.min(1, (os.clock() - T1) / Dur)
+				Root.CFrame = CFrame.new(Root.Position) * Rot0 * CFrame.Angles(0, math.rad(Turn) * A * A * (3 - 2 * A), 0)
+				if A >= 1 then break end
+				RunService.Heartbeat:Wait()
+			end
+		end)
+	end
+	-- (fix round 1, I4) already on the mark and nearly facing it: no walk (a lead-in from here is an out-and-back); the heading turns in the blend
+	if (flat(Root.Position) - flat(Goal)).Magnitude <= (Opt.NearSkip or 0.5) and math.abs(headErr()) <= (Opt.NearTurn or 45) then
+		Hum.AutoRotate = RotWas
+		Hum.WalkSpeed = Was
+		local Fn = Opt.OnNear
+		if Fn then task.spawn(Fn, 0) end
+		settle(Opt.NearTurn or 45)
+		return true, nil
+	end
 	local Lead = Goal - Face * LeadIn
 	-- in line: facing within 30 degrees of the mark's heading and on the line running back from it (within 0.6 studs of it, behind the mark)
 	local Off = flat(Root.Position - Goal)
@@ -132,8 +192,11 @@ function Shared.Approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, A
 	local Best = Total
 	local Y0 = Root.Position.Y
 	local Near = false
+	local Replanned = false
 	local Reason: string? = nil
 	local Arrived = false
+	-- (fix round 1, I2) the pace ramps up from the speed you already have (a walk that is handed on carries on; only a standing start eases in)
+	local Up0 = math.clamp(math.max(V0.Magnitude, flat(Root.AssemblyLinearVelocity).Magnitude) / Speed, 0, 1)
 	-- steering: the Humanoid is moved straight at the leg's point every frame (Hum:Move, world space). MoveTo was tried first and stops
 	-- about a stud short of its point (it counts as arrived there) and gives up after 8 s, which left the walk stalled short of a
 	-- lead-in; Move toward the point is exact, and AutoRotate turns the body along it
@@ -142,6 +205,7 @@ function Shared.Approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, A
 	-- on: the camera framing you swings with your heading, so a sharp turn there swung it). The aim is always ahead of the root along the
 	-- line, so it can't settle short of the mark
 	local CORNER, LOOK = 1.5, 1.2
+	local REPLAN = 45
 	local Yaw, Spin, TurnAt, TurnPace = math.deg(yawOf(Root.CFrame.LookVector)), 0, os.clock(), 1
 	local function steer()
 		local P = flat(Root.Position)
@@ -160,7 +224,9 @@ function Shared.Approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, A
 		if Move.Magnitude < 1e-3 then Hum:Move(Vector3.zero, false) return end
 		-- the heading you walk is turned toward the aim with a limited rate (360 degrees a second) that builds up (1800 degrees a second
 		-- squared): the camera framing you is relative to your heading, and a heading that snaps swings it. The body follows the move direction.
-		-- A big turn slows the pace (TurnPace) so the turning circle stays small: at full pace a limited turn would orbit a mark close by
+		-- A big turn slows the pace (TurnPace) so the turning circle stays small: at full pace a limited turn would orbit a mark close by.
+		-- (fix round 1) only when the aim is that close: with room to turn (over 3 turning radii away) the pace keeps at least 90 %, so a walk
+		-- handed on from a beat doesn't brake at the seam
 		local Now = os.clock()
 		local Dt = math.min(Now - TurnAt, 0.1)
 		TurnAt = Now
@@ -169,6 +235,7 @@ function Shared.Approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, A
 		local Rate = math.clamp(Err * 8, -360, 360)
 		local Step = 1800 * Dt
 		TurnPace = math.clamp(1.15 - math.abs(Err) / 90, 0.2, 1)
+		if Move.Magnitude > 3 * Speed / math.rad(360) then TurnPace = math.max(TurnPace, 0.9) end
 		Spin += math.clamp(Rate - Spin, -Step, Step)
 		Yaw = wrap(Yaw + Spin * Dt)
 		local Dir = Vector3.new(-math.sin(math.rad(Yaw)), 0, -math.cos(math.rad(Yaw)))
@@ -178,26 +245,59 @@ function Shared.Approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, A
 	while true do
 		RunService.Heartbeat:Wait()
 		if ChainGen ~= My then Reason = `released` break end
-		if not (Hum.Parent and Root.Parent) or Hum.Health <= 0 then Reason = `fell` break end
+		if not (Hum.Parent and Root.Parent) or Hum.Health <= 0 then Reason = `died` break end
 		if Root.Position.Y < Y0 - 8 then Reason = `fell` break end
 		local Left = remaining()
-		-- the pace: the gait's speed, eased up over 0.25 s from the start and down over the last stud to 35 % of it, so the camera that is
-		-- framing you (the glide in tracks the root) never sees the root start or stop in one frame. Someone else writing the speed (the
-		-- server's crouch, a sprint) is put back: this is the pace of the walk
+		-- the pace: the gait's speed, eased up over 0.25 s from the speed you had (I2) and (EaseOut) down over the last stud to 35 % of it, so
+		-- the camera that is framing you (the glide in tracks the root) never sees the root start or stop in one frame. Someone else writing the
+		-- speed (the server's crouch, a sprint) is put back: this is the pace of the walk
 		local Up = math.clamp((os.clock() - T0) / 0.25, 0, 1)
-		local Pace = Speed * math.max(0.15, Up * Up * (3 - 2 * Up)) * (if Leg == #Legs then math.clamp(Left / 1.0, 0.35, 1) else 1) * TurnPace
+		local Ramp = Up0 + (1 - Up0) * Up * Up * (3 - 2 * Up)
+		local Pace = Speed * math.max(0.15, Ramp) * (if Leg == #Legs and EaseOut then math.clamp(Left / 1.0, 0.35, 1) else 1) * TurnPace
 		if math.abs(Hum.WalkSpeed - Pace) > 1e-3 then Hum.WalkSpeed = Pace end
 		if Leg < #Legs then
 			if (flat(Legs[Leg]) - flat(Root.Position)).Magnitude < CORNER then Leg += 1 Left = remaining() end
 		else
+			local Fn = Opt.OnLeft
+			if Fn then Fn(Left) end
+			local Stop = Opt.StopWhen
+			if Stop and Stop() then Arrived = true break end
 			-- arrived: within the stop radius, or the mark passed (a hitching frame stepped over it)
 			local Rel = flat(Root.Position) - flat(Goal)
 			if Left <= Arrive or (Rel:Dot(Face) > 0 and Left < 1.2) then Arrived = true break end
 		end
-		if not Near and Leg == #Legs and (Left - Arrive) / (Pace * 1.0) <= BlendLead then
-			Near = true
-			local Fn = Opt.OnNear
-			if Fn then task.spawn(Fn, math.max(0, (Left - Arrive) / Pace)) end
+		-- the time left at the pace profile still to come (fix round 1: the EaseOut slow-down over the last stud is counted, so OnNear's piece
+		-- starts BlendLead before the stop, not up to 0.7 s before it with the legs still walking under a still pose)
+		local function secondsLeft(): number
+			local K = math.max(Pace, 0.05) / (if Leg == #Legs and EaseOut then math.clamp(Left / 1.0, 0.35, 1) else 1) -- the pace before the slow-down
+			if not EaseOut then return math.max(0, Left - Arrive) / K end
+			local T = math.max(0, Left - math.max(1, Arrive)) / K                 -- the stretch before the last stud
+			local A, B = Arrive, math.min(Left, 1)
+			if B > A then
+				local C = math.max(A, 0.35)
+				if C > A then T += (math.min(B, 0.35) - A) / (0.35 * K) end    -- under 0.35 studs: at 35 %
+				if B > C then T += math.log(B / C) / K end                        -- from 0.35 to 1 stud: pace in proportion to the distance
+			end
+			return T
+		end
+		if not Near and Leg == #Legs and secondsLeft() <= BlendLead then
+			-- (fix round 1, M1) a walk still heading far off the mark's heading as the stop nears (over REPLAN degrees: the body, turning
+			-- with it, can't get within TurnMax by the stop) would end in a turn on the spot: keep steering instead, once more round the
+			-- lead-in (the next piece hasn't started). The walk's own direction is judged, not the body's (the body lags it while it turns)
+			local MoveErr = wrap(math.deg(yawOf(Face)) - Yaw)
+			if math.abs(MoveErr) > REPLAN and not Replanned then
+				Replanned = true
+				warn(`[CineActor] Approach: walking {math.floor(math.abs(MoveErr))} degrees off the mark's heading as the stop nears: round the lead-in again`)
+				Legs = { Goal - Face * LeadIn, Goal }
+				Leg = 1
+				Best = remaining()
+				Moved0 = os.clock()
+				Budget += 3 + 2 * Best / Speed
+			else
+				Near = true
+				local Fn = Opt.OnNear
+				if Fn then task.spawn(Fn, secondsLeft()) end
+			end
 		end
 		steer()
 		if Left < Best - 0.25 then Best = Left Moved0 = os.clock() end
@@ -206,41 +306,57 @@ function Shared.Approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, A
 	end
 	Hum:Move(Vector3.zero)                                      -- the Humanoid stops
 	Hum.WalkSpeed = Was                                         -- (nothing else owns the speed during an approach)
+	Hum.AutoRotate = RotWas
 	if not Arrived then return false, Reason end
-	-- the heading left at the stop (AutoRotate got it within a few degrees) turns over the blend window, inside the next piece's fade-in
-	local Err = wrap(math.deg(yawOf(Face) - yawOf(Root.CFrame.LookVector)))
-	if math.abs(Err) > 1.5 then
-		task.spawn(function()
-			local From = Root.CFrame
-			local T1 = os.clock()
-			local Dur = math.max(0.45, math.abs(Err) / 45)                 -- never faster than about 45 degrees a second on average (peak 1.5x): a turn, not a spin
-			while os.clock() - T1 < Dur and ChainGen == My and Root.Parent do
-				local A = (os.clock() - T1) / Dur
-				Root.CFrame = From * CFrame.Angles(0, math.rad(Err) * A * A * (3 - 2 * A), 0)
-				RunService.Heartbeat:Wait()
-			end
-		end)
+	-- whatever is left (AutoRotate got it within a few degrees) turns in the blend; never more than TurnMax on the spot
+	if math.abs(headErr()) > TurnMax then
+		warn(`[CineActor] Approach: arrived {math.floor(math.abs(headErr()))} degrees off the mark's heading: turning {TurnMax} in the blend, the rest stays`)
 	end
+	settle(TurnMax)
 	return true, nil
 end
 
+-- the player attribute NHApproach is true while an approach drives the character (a player's held input keeps walking up to it: the
+-- checks' scripted walker hands over on it the same way)
+function Shared.Approach(Mark: CFrame, Opts: any?): (boolean, string?)
+	Player:SetAttribute(`NHApproach`, true)
+	Approaching = true
+	local Ok, Res, Why = pcall(approach, Mark, Opts)
+	Approaching = false
+	Player:SetAttribute(`NHApproach`, nil)
+	if not Ok then warn(`[CineActor] Approach errored: {Res}`) return false, `error` end
+	return Res, Why
+end
+
 -- The fallback when Approach can't arrive (blocked, timed out, fell): a short dip to black and the character is placed on the mark
--- (position and heading, root height kept), with a warning. Black first, then the move, so nothing is seen to jump. The token rules
--- are CineUI.Dip's own (a newer veil claim wins; if black isn't reached, a second short dip of its own hides the move).
-function Shared.Fallback(Mark: CFrame, Why: string?)
+-- (position and heading), with a warning. Black first, then the move, so nothing is seen to jump. The token rules are CineUI.Dip's
+-- own (a newer veil claim wins; if black isn't reached, a second short dip of its own hides the move).
+-- (fix round 1, I3) nothing is placed for "died", "released" or "nochar" (returns false: the caller doesn't start its chain either). The
+-- height is the ground under the mark plus the root's height over the ground when the walk began (a fall kept the fallen height).
+-- (M2) Alive (optional, the cut's Ctx.Alive) is asked again inside the dip, the nested one too: a cut that ended meanwhile places nothing.
+function Shared.Fallback(Mark: CFrame, Why: string?, Alive: (() -> boolean)?): boolean
+	if Why == `died` or Why == `released` or Why == `nochar` then return false end
 	warn(`[CineActor] Approach fell back to a dip and a placement ({Why or `unknown`})`)
-	local _, _, Root = parts()
-	if not Root then return end
+	local Char, Hum, Root = parts()
+	if not (Char and Hum and Root) or Hum.Health <= 0 then return false end
+	local function live(): boolean
+		return Root.Parent ~= nil and Hum.Health > 0 and (Alive == nil or Alive())
+	end
 	local function place()
-		if not Root.Parent then return end
-		Root.CFrame = CFrame.new(Mark.X, Root.Position.Y, Mark.Z) * (Mark - Mark.Position)
+		if not live() then return end
+		local G = groundBelow(Mark.Position, Char)
+		local Y = if G then G + (LastRise or (Root.Size.Y / 2 + (if Hum.RigType == Enum.HumanoidRigType.R6 then 2 else Hum.HipHeight))) else Mark.Position.Y
+		if not G and Why ~= `fell` then Y = Root.Position.Y end           -- no ground found under the mark: a walk that was blocked keeps its height
+		Root.CFrame = CFrame.new(Mark.X, Y, Mark.Z) * (Mark - Mark.Position)
 		Root.AssemblyLinearVelocity = Vector3.zero
 	end
 	local Ok, CineUI = pcall(function() return require(Player.PlayerScripts.Controllers.Gui.CineUI) end)
-	if not Ok then place() return end
+	if not Ok then place() return live() end
 	pcall(CineUI.Dip, 0.3, function(Black: boolean?)
+		if not live() then return end
 		if Black == false then pcall(CineUI.Dip, 0.2, place) else place() end
 	end)
+	return live()
 end
 
 -- the old name: a walk to a mark on foot, with no distance limit and no turn on the spot
@@ -298,7 +414,10 @@ end
 -- Release. Returns the tracks. Opts.FadeIn (seconds, default 0.4) is the FIRST piece's fade-in from whatever is showing (the live
 -- locomotion pose after an Approach: 0.2 to 0.3 s); the later pieces switch instantly, exactly as before. Opts.Entry (a number, or a function
 -- asked right before the first piece plays) is the phase a first LOOP piece enters at, so a cut can land the loop's exit on a beat.
-function Shared.Chain(Chain: string, Resolve: (string) -> string?, Cues: any?, OnSwitch: ((string) -> ())?, Opts: { FadeIn: number?, Entry: (number | () -> number)? }?): { [string]: AnimationTrack }
+-- (fix round 1, I1) Opts.Pace (a function) is the first piece's playback speed, asked every frame until the second piece starts: a first
+-- piece that is a walk cycle (FenceOver1_GameCrouchWalk) is driven at the live walk's own speed, so its legs move exactly as far as the
+-- root does and stop when it stops (a walk cycle played at speed 1 after the root stopped was a walk on the spot).
+function Shared.Chain(Chain: string, Resolve: (string) -> string?, Cues: any?, OnSwitch: ((string) -> ())?, Opts: { FadeIn: number?, Entry: (number | () -> number?)?, Pace: (() -> number)? }?): { [string]: AnimationTrack }
 	local _, _, _, Animator = parts()
 	assert(Animator, `no Animator`)
 	local TA = require(ReplicatedStorage.Config.TutorialAnim)
@@ -307,12 +426,24 @@ function Shared.Chain(Chain: string, Resolve: (string) -> string?, Cues: any?, O
 	-- the first piece eases in over FadeIn (smootherstep weight 0 -> 1, written each frame) so the arms don't snap from the
 	-- game's idle to the chain's pose; this is a blend. Later switches are identical frames and stay instant.
 	local First = true
+	local Second = false
+	local Pace = Opts and Opts.Pace
 	local function switched(Piece: string)
+		if not First then Second = true end
 		if First then
 			First = false
 			local Id = Resolve(Piece)
 			for _, T in Animator:GetPlayingAnimationTracks() do
 				if T.Animation and T.Animation.AnimationId == Id then
+					if Pace then
+						local PaceFn = Pace
+						T:AdjustSpeed(PaceFn())
+						local PConn: RBXScriptConnection
+						PConn = RunService.PreAnimation:Connect(function()
+							if Second or not T.IsPlaying then PConn:Disconnect() return end
+							T:AdjustSpeed(PaceFn())
+						end)
+					end
 					T:AdjustWeight(0.001, 0)
 					local T0 = os.clock()
 					local Conn: RBXScriptConnection

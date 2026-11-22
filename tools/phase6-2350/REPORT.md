@@ -118,6 +118,57 @@ Studio was unfocused for the whole round: frames ran at 67 ms to 200 ms. Rows th
 - Slot 2 restored from this round's snapshot; CineState {Collected=Seen} before and after, Origin unchanged. Only
   Discipline.LastDecayDay moved, because an in-game day passed.
 
+### Fix round 1 (2026-11-22, review CHANGES REQUIRED; five fresh Play rounds on slot 2, frames at 16.6-17 ms)
+
+Studio ran at full rate this round, so the real-time rows were judged too. RED was shown on the old code first for the new
+approachcheck rows.
+- **I1, fixed.** FenceOver1 walked on the spot after the stop. Approachcheck WALK ON THE SPOT read 1.47 s on the old code (RED). Now:
+  - FenceOver1 enters at the live CrouchWalk's phase and plays at its live Speed (`Chain` Opts `Pace`).
+  - Its loop is cued on the arrival.
+  - At the stop, a cover track holds the planted pose while FenceOver2 takes over underneath, and the cover fades out over 0.3 s.
+  - Walk on the spot is now 0 frames in 4 runs.
+- **I2, fixed.** The pace ramps from the walk you have. Two seam stalls were fixed as well: the Begin-ease wait, and `Ctl:Disable()`'s zero move.
+  - Seam speed was 10-12 % on the old code (RED); it is now 72-84 %.
+- **I3, fixed.** Approach returns "died".
+  - `Fallback(Mark, Why, Alive)` places nothing on died/released/nochar, and the callers skip the chain.
+  - The fall height comes from a raycast under the mark.
+  - Probe (kill as the approach starts): no fallback, no dip, no chain.
+- **I4, fixed by timing.** The bus walk starts 0.25 s after the glide, with NearSkip (within 0.5 studs and 45 deg: no walk).
+  - Bus camcheck: OK 3 of 3.
+- **M1, fixed.** The settle turn runs about the current position. Reseat and Release cancel it. It is capped at 20 deg; a walk more than 45 deg off goes round the lead-in again.
+  - Settle measured 4.8-17 deg, residual 0.
+- **M2, M4, M5, fixed.**
+  - M2: Fallback's place checks liveness, including in the nested dip.
+  - M4: AutoRotate is forced on during the walk.
+  - M5: an on-screen jump that isn't the re-seat now FAILs.
+- **New, found and fixed.** OnNear ignored the ease-out, so the bus's waiting loop began 0.68 s before the stop, over walking legs.
+  - New row LEAD (≤ 0.45 s): RED 0.68 s on the old code, now 0.17-0.22 s.
+- **Deferred by ruling:** M3, M6, M7, M9, M10.
+
+Results on the final build:
+- skipcheck: ok.
+- camcheck: `__SeamlessTest`, TutorialSneak and TutorialBus ×3 all OK.
+- approachcheck: fence OK, bus short OK, bus side (-4, 0, 2) OK.
+  - Walk on the spot 0; seam 81-84 %; settle 7-14.5 deg with residual 0; on-screen jumps 0; lead 0.17-0.22 s.
+  - Fence clearance: 0.47-0.55 walking up, 0.05-0.06 at the climb.
+- sneakcheck: sneak, fail, skipfence and timeout all OK. The dip-under-black rows now pass at real-time frames.
+- buscheck: BUS OK (TheBus2 at 17.00 s).
+  - One run failed the base-loop row on 177 frames, all before the cut. That was the previous run's leftover cast (NHTutorial still set). After a TutorialLeave it reads 0 frames.
+- beatcheck OK; holdcheck timeout OK (10.20 s) and leave OK; resumecheck 5/5; hometowncheck PASS; replayrefused OK.
+- bodycheck BODY OK at 60 fps (it covers the TheBus chain only).
+- dipcheck DIP OK (run last).
+
+On-screen root placements were audited; the list is in `task-14-report.md`. On screen there are only:
+- the capped settle turn;
+- the re-seats (pose to identical pose).
+
+Every other move happens at full black.
+
+Slot 2 was restored from each round's fresh snapshot:
+- CineState was {Collected=Seen} before and after every round.
+- The checkpoint was cleared (Origin `{}`).
+- The only difference from the snapshot is Discipline.LastDecayDay (an in-game day passed).
+
 ## Open rows
 
 - OWNER: sign-off. Watch both cuts at full speed and record your words here.
@@ -129,5 +180,11 @@ Studio was unfocused for the whole round: frames ran at 67 ms to 200 ms. Rows th
 - OWNER: record both cuts and run motion_audit (needs disk space on C:).
 - OWNER: Task 14: the fence approach (crouch-walk up, the square-up turn, FenceOver1 fading in), the bus walk to Stand,
   the 40-degree vault heading, VAULT_BACK 0.6; watch the bus glide-in for a hitch.
-- TODO (focused Studio): sneakcheck sneak and fail dip rows, bodycheck, dipcheck last.
+- OWNER: Task 14 fix round 1, watch at full speed:
+  - the fence stop and the 0.3 s blend from the planted stop pose into FenceOver2. FenceOver2's own first frames are baked
+    crouch-walk frames in place;
+  - the corner turn on the way to the vault, which slows to about 66 % (TurnPace);
+  - the bus walk starting 0.25 s after the glide.
+- DEFERRED (review ruling): M3, M6, M7, M9, M10.
+- Done in fix round 1 (Studio at full rate): the sneakcheck sneak and fail dip rows, bodycheck, dipcheck.
 - Sign-off: pending.

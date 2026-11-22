@@ -22,6 +22,7 @@ local RunService = game:GetService(`RunService`)
 local Config = require(ReplicatedStorage.Config.Cine)
 local Def = { Set = `BusStop`; Seamless = true; EndHold = true }
 local ARRIVE = 0.15      -- (task 14) the Walk approach's stop radius: the doorway is tight (Stand is measured against it), so tighter than the default
+local WALK_AT = 0.25     -- (fix round 1, I4) the walk to Stand starts this long after the glide (shot 1 has settled)
 local STEP_AT = 16.15     -- the cut's clock (after the glide) when TheBus2 starts: the "You step on" shot begins at 15.8
 local FADE_IN = 0.3      -- the waiting loop fades in from the live walk over this long
 
@@ -126,8 +127,10 @@ function Def.Build(Ctx)
 		cues = {};
 		events = {
 			-- (task 14) not noShift: the glide in frames you (the shot is framed on your heading), so a walk during it swung the camera (camcheck In
-			-- 4.6-6x the bound); you stand through the glide, as you already were, and walk to the mark as the shot settles
-			{ t = 0; call = function()
+			-- 4.6-6x the bound); you stand through the glide, as you already were, and walk to the mark as the shot settles.
+			-- (fix round 1, I4) WALK_AT after the glide, not on its last frame: the walk's first steps (and a lead-in turn) started on the very frame
+			-- the camera handed over and read as an In-edge jerk; already on the mark and nearly facing it there's no walk at all (Approach NearSkip)
+			{ t = WALK_AT; call = function()
 				if not Actor then return end
 				-- (task 14) from wherever you stand at the stop you WALK to the Stand mark (CineActor.Approach, the game's own Walk: the
 				-- last steps run straight along the mark's heading, no turn on the spot, no distance limit), and the waiting loop fades in
@@ -156,7 +159,8 @@ function Def.Build(Ctx)
 				end
 				local Ok, Why = Actor.Approach(Stand, { Gait = `Walk`; Arrive = ARRIVE; OnNear = wait })
 				if not Ctx.Alive() then return end
-				if not Ok then Actor.Fallback(Stand, Why) end -- a dip and a placement, with a warning (blocked, timed out, fell)
+				-- a dip and a placement, with a warning (blocked, timed out, fell); a death or a release starts nothing (fix round 1, I3)
+				if not Ok and not Actor.Fallback(Stand, Why, Ctx.Alive) then return end
 				wait()
 			end };
 			-- the last 58 studs to the stop over 5.5 s, decelerating; BrakeStop plays through its arrival
