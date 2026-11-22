@@ -212,8 +212,9 @@ with no installs.
 
 - [ ] **Step 1: Write the failing test** `checks/lc_pure.lua`.
   - Run it in a VM with no game access: any Edit VM, with **no instance writes**.
-  - It reads the two sources from the repo through the local HTTP bridge (`python -m http.server 8833 --bind
-    127.0.0.1` in `tools/phase6-strafes/live`) and `loadstring`s them.
+  - **(Delta, R2 build)** The Studio Assistant's HTTP allowlist refuses 127.0.0.1, so there's no HTTP bridge.
+    `harness/pure.py` inlines every `live/*.luau` named in the check's `load("…")` calls as `__SRC`, then runs the
+    check through rbxc. Usage: `python -X utf8 -I harness/pure.py checks/lc_pure.lua`.
 
 ```lua
 local H = game:GetService("HttpService")

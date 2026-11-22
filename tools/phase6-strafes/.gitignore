@@ -1,0 +1,4 @@
+harness/_*
+!build/_backup.lua
+anim/__pycache__/
+anim/.pytest_cache/
