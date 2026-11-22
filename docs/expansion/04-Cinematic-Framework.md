@@ -42,6 +42,7 @@
 - **In:** ease the gameplay camera into shot 1 over 0.4-0.8 s, matching the FOV. Never a pop.
 - **Out:** the last shot lands behind the player's shoulder, then the lease is released and control returns with a 0.3 s input grace.
 - **Mid-gameplay beats:** short "beats" (under 4 s, no letterbox) for quest moments, such as the camera glancing at a changed photograph. They don't lock movement for more than the beat.
+- **Seamless cuts (2.35.0):** a cut with `Seamless = true` in `Config.Cine` glides in from the live camera, uses the real character, fades the HUD and blends out onto the Custom camera; see `docs/superpowers/specs/2026-11-20-tutorial-seamless-cinematics-design.md`.
 
 ## 5. Multiplayer behaviour
 - **Personal cuts** (story beats for one student) play only for that player. Others nearby see nothing, and the player's real character stays in place, protected from damage for the cut (`Protected` state, as in duels).

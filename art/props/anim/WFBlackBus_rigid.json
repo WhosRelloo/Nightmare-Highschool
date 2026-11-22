@@ -1,0 +1,119 @@
+{
+ "prop": "WFBlackBus",
+ "axes": "Blender (x right, y back-to-front is -y = the bus's front, z up), units = Blender m",
+ "bones": {
+  "Root": {
+   "head": [
+    0,
+    0,
+    0
+   ],
+   "parent": null
+  },
+  "Body": {
+   "head": [
+    0,
+    0,
+    1.55
+   ],
+   "parent": "Root"
+  },
+  "DoorA": {
+   "head": [
+    4.22,
+    -9.88,
+    1.7
+   ],
+   "parent": "Body"
+  },
+  "DoorB": {
+   "head": [
+    4.22,
+    -6.92,
+    1.7
+   ],
+   "parent": "Body"
+  },
+  "WiperL": {
+   "head": [
+    -3.3,
+    -10.25,
+    6.6
+   ],
+   "parent": "Body"
+  },
+  "WiperR": {
+   "head": [
+    0.6,
+    -10.25,
+    6.6
+   ],
+   "parent": "Body"
+  },
+  "DriverHead": {
+   "head": [
+    -2.4,
+    -7.88,
+    7.8
+   ],
+   "parent": "Body"
+  },
+  "WheelFL": {
+   "head": [
+    -3.5,
+    -12.4,
+    1.55
+   ],
+   "parent": "Root"
+  },
+  "WheelFR": {
+   "head": [
+    3.5,
+    -12.4,
+    1.55
+   ],
+   "parent": "Root"
+  },
+  "WheelRL": {
+   "head": [
+    -3.6,
+    10.6,
+    1.55
+   ],
+   "parent": "Root"
+  },
+  "WheelRR": {
+   "head": [
+    3.6,
+    10.6,
+    1.55
+   ],
+   "parent": "Root"
+  }
+ },
+ "pieces": {
+  "WFBlackBus_Main": "Body",
+  "WFBlackBus_Nose": "Body",
+  "WFBlackBus_Driver": "Body",
+  "WFBlackBus_Glass": "Body",
+  "WFBlackBus_Glow": "Body",
+  "WFBlackBus_Blind": "Body",
+  "WFBlackBus_SideL": "Body",
+  "WFBlackBus_SideR": "Body",
+  "WFBlackBus_Plate": "Body",
+  "WFBlackBus_PlateRear": "Body",
+  "WFBlackBus_Interior": "Body",
+  "WFBlackBus_DoorA": "DoorA",
+  "WFBlackBus_DoorA_Glass": "DoorA",
+  "WFBlackBus_DoorB": "DoorB",
+  "WFBlackBus_DoorB_Glass": "DoorB",
+  "WFBlackBus_WiperL": "WiperL",
+  "WFBlackBus_WiperR": "WiperR",
+  "WFBlackBus_DriverHead": "DriverHead",
+  "WFBlackBus_DriverEyes_Glow": "DriverHead",
+  "WFBlackBus_WheelFL": "WheelFL",
+  "WFBlackBus_WheelFR": "WheelFR",
+  "WFBlackBus_WheelRL": "WheelRL",
+  "WFBlackBus_WheelRR": "WheelRR"
+ }
+}

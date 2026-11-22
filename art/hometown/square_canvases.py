@@ -1,0 +1,210 @@
+"""Wickfield Square canvases (PBR, via posters_hq.save): the church clock's dial.
+
+  WF_ClockDial   cream enamel, a gilt chapter ring, black Roman numerals, minute ticks, "WICKFIELD · 1851"
+  python art/hometown/square_canvases.py
+"""
+import math
+import os
+import sys
+
+import numpy as np
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE)
+import posters_hq as Q  # noqa: E402
+H = Q.H
+Q.PBR["WF_ClockDial"] = dict(rough=0.25, ink_rough=0.35, ink_lift=0.25, strength=3.0, gilt=True)
+
+
+def dial():
+    L = H.Logo("WF_ClockDial", 1024, 1024)
+    c = 512
+    L.paint(L.rrect(0, 0, 1024, 1024, 0), "#2a2622")                    # the stone behind (cropped by the round mesh)
+    L.paint(L.ellipse(c, c, 505), L.vgrad("#f4d892", "#9a7432", 0, 1024))
+    L.shade(np.clip(L.ellipse(c, c, 505) - L.ellipse(c, c, 470), 0, 1), strength=0.5, blur=4)
+    face = L.ellipse(c, c, 470)
+    L.paint(face, L.rgrad("#fbf5e6", "#e8dcc0", c - 80, c - 80, 520))
+    L.col *= (1 + 0.03 * Q.noise(L, 30, 300)[..., None] * face[..., None])
+    for r_, w_ in ((430, 3), (380, 3)):                                  # the chapter ring
+        L.paint(np.clip(L.ellipse(c, c, r_ + w_) - L.ellipse(c, c, r_ - w_), 0, 1), "#1a1612")
+    for k in range(60):
+        a = 2 * math.pi * k / 60
+        r0, r1 = (382, 428) if k % 5 == 0 else (400, 428)
+        L.paint(L.stroke_round([(c + r0 * math.sin(a), c - r0 * math.cos(a)), (c + r1 * math.sin(a), c - r1 * math.cos(a))], 7 if k % 5 == 0 else 3), "#1a1612")
+    numerals = ["XII", "I", "II", "III", "IIII", "V", "VI", "VII", "VIII", "IX", "X", "XI"]
+    for k, n in enumerate(numerals):
+        a = 2 * math.pi * k / 12
+        x, y = c + 320 * math.sin(a), c - 320 * math.cos(a)
+        g = L.text(n, "georgiab", 64, 0, 0)
+        # draw each numeral upright at its place (simple: text centred at the point)
+        L.paint(L.text(n, "georgiab", 60, x, y), "#1a1612")
+    L.paint(L.text("WICKFIELD", "georgiab", 34, c, c - 150, spacing=8), "#1a1612")
+    L.paint(L.text("1851", "georgiab", 30, c, c + 150, spacing=8), "#1a1612")
+    L.paint(L.ellipse(c, c, 30), L.vgrad("#f4d892", "#9a7432", c - 30, c + 30))
+    Q.save(L, "WF_ClockDial")
+
+
+Q.PBR["WF_ThePlan"] = dict(rough=0.85, ink_rough=0.6, ink_lift=0.35, strength=3.0)
+
+
+def the_plan():
+    """THE PLAN: lined notebook paper torn from a spiral pad, marker doodles of the five pranks, numbered, a big title,
+    'tonight. 12:00. DON'T get caught.' Taped to a lamp post in the square"""
+    L = H.Logo("WF_ThePlan", 1024, 1408)
+    W, Hh = 1024, 1408
+    pg = L.rrect(0, 0, W, Hh, 0)
+    L.paint(pg, "#f6f2e6")
+    Q.fibres(L, 400, 0.04)
+    for y in range(160, Hh - 20, 44):                                   # the blue rules and the red margin
+        L.paint(L.rrect(0, y, W, y + 2, 0), "#9cb8d8", alpha=0.7)
+    L.paint(L.rrect(110, 0, 113, Hh, 0), "#e07a7a", alpha=0.8)
+    for k in range(14):                                                  # the torn spiral edge
+        L.paint(L.ellipse(40 + k * 72, 18, 12, 10), "#d8d2c0")
+    INK = "#1a1a24"
+
+    def marker(pts, w=7, col=INK, seed=0):
+        m = L.stroke_round(pts, w)
+        L.paint(m * (Q.noise(L, 0.5, seed) > -0.5), col, alpha=0.95)
+    L.paint(L.text("THE PLAN", "lucky", 120, W / 2 + 40, 95, spacing=6), INK)
+    marker([(300, 150), (840, 150)], 8, "#c8201a", 401)
+    cells = [(310, 330), (720, 330), (310, 720), (720, 720), (515, 1000)]
+    labels = ["HALL OF FAME", "THE STATUE", "CHET'S TRUCK", "THE PUMA", "ASHBY HOUSE"]
+    for i, ((cx, cy), lab) in enumerate(zip(cells, labels)):
+        L.paint(L.text(str(i + 1), "lucky", 54, cx - 160, cy - 140), "#c8201a")
+        L.paint(L.text(lab, "chela", 36, cx + 10, cy + 150), INK)
+        if i == 0:     # the hall-of-fame board with a name crossed out and "ME" written over it
+            marker([(cx - 120, cy - 90), (cx + 120, cy - 90), (cx + 120, cy + 80), (cx - 120, cy + 80), (cx - 120, cy - 90)], 6, INK, 410)
+            for k in range(4):
+                marker([(cx - 90, cy - 50 + k * 34), (cx + 60, cy - 50 + k * 34)], 4, INK, 411 + k)
+            marker([(cx - 95, cy - 50), (cx + 70, cy - 30)], 6, "#c8201a", 415)
+            L.paint(L.text("ME!!", "chela", 40, cx + 80, cy - 60), "#c8201a")
+        if i == 1:     # a stick-figure horse and rider with a cone on his head
+            marker([(cx - 90, cy + 70), (cx - 70, cy), (cx + 60, cy), (cx + 80, cy + 70)], 6, INK, 420)
+            marker([(cx + 60, cy), (cx + 100, cy - 50), (cx + 125, cy - 40)], 6, INK, 421)
+            marker([(cx, cy), (cx, cy - 80)], 6, INK, 422)
+            L.paint(L.ellipse(cx, cy - 100, 20), INK)
+            L.paint(L.poly([(cx - 22, cy - 115), (cx + 22, cy - 115), (cx, cy - 175)]), "#f07a1a")
+            marker([(cx - 40, cy - 60), (cx - 80, cy - 130)], 5, INK, 423)
+            for k in range(3):
+                marker([(cx - 80 + k * 40, cy - 130), (cx - 60 + k * 30, cy + 40)], 3, "#9a9a9a", 424 + k)
+        if i == 2:     # a pickup truck, flat tyres, a goose looking furious
+            marker([(cx - 130, cy + 30), (cx - 130, cy - 20), (cx - 40, cy - 20), (cx - 20, cy - 70), (cx + 40, cy - 70), (cx + 60, cy - 20),
+                    (cx + 130, cy - 20), (cx + 130, cy + 30), (cx - 130, cy + 30)], 6, INK, 430)
+            for x in (cx - 80, cx + 80):
+                L.paint(L.ellipse(x, cy + 45, 28, 16), INK)
+            marker([(cx + 150, cy + 60), (cx + 150, cy - 10), (cx + 175, cy - 40)], 6, INK, 431)
+            L.paint(L.ellipse(cx + 150, cy + 70, 30, 20), INK)
+            marker([(cx + 170, cy - 45), (cx + 200, cy - 48)], 5, "#f07a1a", 432)
+            L.paint(L.text("!!", "lucky", 40, cx + 200, cy - 90), "#c8201a")
+        if i == 3:     # the puma mascot head, with a big arrow "GRAB"
+            L.paint(np.clip(L.ellipse(cx, cy, 80) - L.ellipse(cx, cy, 72), 0, 1), INK)
+            for sx in (-1, 1):
+                marker([(cx + sx * 50, cy - 60), (cx + sx * 70, cy - 110), (cx + sx * 20, cy - 75)], 6, INK, 440 + sx)
+                L.paint(L.ellipse(cx + sx * 28, cy - 15, 9), INK)
+            marker([(cx - 30, cy + 35), (cx, cy + 50), (cx + 30, cy + 35)], 5, INK, 443)
+            marker([(cx - 180, cy + 110), (cx - 90, cy + 60)], 6, "#c8201a", 444)
+            L.paint(L.text("GRAB", "chela", 32, cx - 170, cy + 140), "#c8201a")
+        if i == 4:     # a crooked house with a spooky face in the window and a ghost doodle
+            marker([(cx - 110, cy + 80), (cx - 110, cy - 30), (cx - 10, cy - 120), (cx + 100, cy - 25), (cx + 110, cy + 80), (cx - 110, cy + 80)], 6, INK, 450)
+            L.paint(L.rrect(cx - 30, cy - 10, cx + 30, cy + 50, 4), INK)
+            for sx in (-1, 1):
+                L.paint(L.ellipse(cx + sx * 12, cy + 10, 5), "#f6f2e6")
+            marker([(cx + 150, cy - 60), (cx + 140, cy - 120), (cx + 180, cy - 140), (cx + 210, cy - 100), (cx + 200, cy - 50), (cx + 185, cy - 65), (cx + 170, cy - 48), (cx + 150, cy - 60)], 5, INK, 451)
+            L.paint(L.text("??", "lucky", 40, cx + 250, cy - 110), INK)
+    L.paint(L.text("tonight.  12:00.", "chela", 54, W / 2 + 40, Hh - 150), INK)
+    L.paint(L.text("DON'T get caught.", "chela", 54, W / 2 + 40, Hh - 85), "#c8201a")
+    marker([(390, Hh - 60), (660, Hh - 56)], 5, "#c8201a", 460)
+    Q.age_paper(L, 470, folds=((0.5, "h"), (0.5, "v")), tape=True)
+    Q.save(L, "WF_ThePlan")
+
+
+Q.PBR["WF_HallFameRow"] = dict(rough=0.4, ink_rough=0.35, ink_lift=0.3, strength=3.0, gilt=True)
+Q.PBR["WF_HallFameTitle"] = dict(rough=0.4, ink_rough=0.3, ink_lift=0.4, strength=3.5, gilt=True)
+Q.PBR["WF_SchoolName"] = dict(rough=0.45, ink_rough=0.3, ink_lift=0.45, strength=4.0, gilt=True)
+
+HONOUREES = [("1962", "Margaret Holloway", "Spelling Bee, 41 years unbeaten"), ("1971", "Dennis Okafor", "Most Library Books Returned On Time"),
+             ("1978", "Patricia Wren", "Perfect Attendance, K through 8"), ("1984", "Gordon Feldt", "Regional Science Fair: The Potato Battery"),
+             ("1991", "Lucy Abernathy", "Student Council, Six Terms"), ("1997", "Thomas Kade", "Never Once Ran In The Halls"),
+             ("2006", "Priya Sandoval", "State Mathletes, First Place"), ("2015", "Samuel Wick IV", "Most Polite, Founder's Award")]
+
+
+def hall_rows():
+    """eight brass name plates on walnut, one canvas per row (each row is a flip panel on the board): the year, the name,
+    the achievement; plus the blank brass plate the rows flip round to (the game writes your name on it)"""
+    for i, (yr, nm, what) in enumerate(HONOUREES + [("", "", "")]):
+        L = H.Logo(f"WF_HallFameRow{i}" if yr else "WF_HallFameBlank", 1536, 192)
+        wood = L.rrect(0, 0, 1536, 192, 0)
+        L.paint(wood, L.vgrad("#4a2c18", "#2e1a0e", 0, 192))
+        L.grain(wood, 0.12, 4, seed=500 + i)
+        plate = L.rrect(24, 22, 1512, 170, 10)
+        L.paint(L.grow(plate, 4), "#1c120a")
+        L.paint(plate, L.vgrad("#f2d58c", "#a8782e", 22, 170))
+        L.shade(plate, light=(-1, -1), strength=0.35, blur=4)
+        for x in (52, 1484):
+            L.paint(L.ellipse(x, 96, 10), "#6a4a1e")
+            L.paint(L.ellipse(x - 2, 94, 5), "#f8e4a8")
+        if yr:
+            L.paint(L.text(yr, "georgiab", 70, 170, 96, spacing=4), "#2a1c0c")
+            L.paint(L.text(nm, "georgiab", 60, 700, 78), "#2a1c0c")
+            L.paint(L.text(what, "georgiai", 36, 700, 134), "#3a2812")
+            L.paint(L.rrect(290, 40, 293, 152, 0), "#6a4a1e")
+        Q.save(L, L.name)
+
+
+def hall_title():
+    L = H.Logo("WF_HallFameTitle", 1536, 384)
+    wood = L.rrect(0, 0, 1536, 384, 0)
+    L.paint(wood, L.vgrad("#4a2c18", "#2e1a0e", 0, 384))
+    L.grain(wood, 0.12, 4, seed=520)
+    t = L.text("HALL OF FAME", "georgiab", 128, 768, 175, spacing=14)
+    L.paint(L.grow(t, 5), "#1c120a")
+    L.paint(t, L.vgrad("#fbe6a8", "#b8893a", 100, 250))
+    L.shade(t, strength=0.4, blur=2)
+    L.paint(L.text("WICKFIELD JUNIOR HIGH  ·  EXCELLENCE SINCE 1924", "georgia", 34, 768, 300, spacing=6), "#e8cf8c")
+    for sx in (-1, 1):
+        L.paint(H.star(L, 768 + sx * 690, 175, 34), L.vgrad("#fbe6a8", "#b8893a", 135, 215))
+    Q.save(L, "WF_HallFameTitle")
+
+
+def school_name():
+    """the cast-stone panel over the school's entrance: WICKFIELD JUNIOR HIGH SCHOOL in raised gilt capitals"""
+    L = H.Logo("WF_SchoolName", 2048, 320)
+    stone = L.rrect(0, 0, 2048, 320, 0)
+    L.paint(stone, L.vgrad("#d8d0bc", "#b8ae98", 0, 320))
+    L.col *= (1 + 0.08 * Q.noise(L, 3, 530)[..., None])
+    L.paint(np.clip(L.rrect(20, 20, 2028, 300, 6) - L.rrect(30, 30, 2018, 290, 6), 0, 1), "#9a907a")
+    t = L.text("WICKFIELD JUNIOR HIGH SCHOOL", "georgiab", 84, 1024, 150, spacing=8)
+    L.paint(np.roll(np.roll(t, 4 * H.SS, 0), 3 * H.SS, 1), "#6a604c")
+    L.paint(t, L.vgrad("#fbe6a8", "#b8893a", 90, 210))
+    L.paint(L.text("MDCCCCXXIV", "georgia", 36, 1024, 260, spacing=10), "#6a604c")
+    Q.save(L, "WF_SchoolName")
+
+
+Q.PBR["WF_ScoreLabels"] = dict(rough=0.7, ink_rough=0.6, ink_lift=0.2, strength=2.0)
+
+
+def score_labels():
+    """the scoreboard's painted face: WICKFIELD WICKS banner, HOME and GUESTS over the two bulb grids (left empty, dark),
+    QUARTER and DOWN in the middle"""
+    L = H.Logo("WF_ScoreLabels", 2048, 976)
+    pg = L.rrect(0, 0, 2048, 976, 0)
+    L.paint(pg, L.vgrad("#1f4a32", "#123020", 0, 976))
+    L.grain(pg, 0.06, 2, seed=540)
+    L.paint(L.rrect(0, 0, 2048, 150, 0), "#e3b23c")
+    L.paint(L.text("WICKFIELD WICKS", "lucky", 110, 1024, 80, spacing=16), "#1f4a32")
+    for cx, t in ((480, "HOME"), (1568, "GUESTS")):
+        L.paint(L.text(t, "lucky", 90, cx, 230, spacing=10), "#f4ead2")
+        L.paint(L.rrect(cx - 330, 300, cx + 330, 900, 18), "#0a140e")
+    L.paint(L.text("QTR", "lucky", 60, 1024, 380, spacing=6), "#f4ead2")
+    L.paint(L.rrect(964, 420, 1084, 560, 10), "#0a140e")
+    L.paint(L.text("DOWN", "lucky", 60, 1024, 660, spacing=6), "#f4ead2")
+    L.paint(L.rrect(964, 700, 1084, 840, 10), "#0a140e")
+    Q.save(L, "WF_ScoreLabels")
+
+
+if __name__ == "__main__":
+    import sys as _s
+    want = _s.argv[1:]
+    for fn in (dial, the_plan, hall_rows, hall_title, school_name, score_labels):
+        if not want or fn.__name__ in want:
+            fn()

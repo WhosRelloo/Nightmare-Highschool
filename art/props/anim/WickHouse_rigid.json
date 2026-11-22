@@ -1,0 +1,80 @@
+{
+ "prop": "WickHouse",
+ "axes": "Blender (x, y, z up), units = Blender m",
+ "bones": {
+  "Root": {
+   "head": [
+    0,
+    0,
+    0
+   ],
+   "parent": null
+  },
+  "Sash": {
+   "head": [
+    11.75,
+    -14.12,
+    13.4
+   ],
+   "parent": "Root"
+  }
+ },
+ "pieces": {
+  "WickHouse_BedSash": "Sash",
+  "WickHouse_Brick": "Root",
+  "WickHouse_Glass": "Root",
+  "WickHouse_Glow": "Root",
+  "WickHouse_Main": "Root",
+  "WickHouse_Porch": "Root",
+  "WickHouse_Roof": "Root",
+  "WickHouse_Siding": "Root",
+  "WickHouse_Win": "Root"
+ },
+ "centres": {
+  "WickHouse_BedSash": [
+   11.75,
+   -14.119999885559082,
+   14.760000228881836
+  ],
+  "WickHouse_Brick": [
+   1.0749988555908203,
+   4.76837158203125e-07,
+   17.768999099731445
+  ],
+  "WickHouse_Glass": [
+   9.5367431640625e-07,
+   -0.5625004768371582,
+   11.80000114440918
+  ],
+  "WickHouse_Glow": [
+   -2.799999952316284,
+   -14.949999809265137,
+   8.050000190734863
+  ],
+  "WickHouse_Main": [
+   0.5999984741210938,
+   -2.625001907348633,
+   18.409584045410156
+  ],
+  "WickHouse_Porch": [
+   3.500000476837158,
+   -19.149999618530273,
+   5.403560161590576
+  ],
+  "WickHouse_Roof": [
+   0.0,
+   -3.299999713897705,
+   21.71607780456543
+  ],
+  "WickHouse_Siding": [
+   0.0,
+   -4.76837158203125e-07,
+   17.068998336791992
+  ],
+  "WickHouse_Win": [
+   9.5367431640625e-07,
+   4.76837158203125e-07,
+   12.0024995803833
+  ]
+ }
+}
