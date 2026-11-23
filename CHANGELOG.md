@@ -39,7 +39,7 @@ The owner: the tracked-quest card's text "looks weird" and should be "better, on
 (fresh `pre/` dump; `live/`, also copied to `tools/belltower-r2/live/`). [Before and after](docs/img/questcard-before-after.jpg).
 
 ### Changed
-- **Type** (`Gui.QuestTracker`): the title is GrenzeGotisch SemiBold at 34 px (was Fantasy 24); the objective is Merriweather at 20 px
+- **Type** (`Gui.QuestTracker`): the title is GrenzeGotisch SemiBold at 34 px (was Fantasy 24) in blood red (140, 22, 32: 6.5:1 on the paper; the owner asked for something more readable than black) for every quest ([shot](docs/img/questcard-red-title.jpg)); the objective is Merriweather at 20 px
   (was Guru/Garamond, which is condensed and hard to read on the card); the count reads "0 of 3" in Merriweather Bold; the hint and the
   "Journal" label are Fondamento at 23 px in a dimmer ink (92, 66, 46: 6.4:1 on the card paper). The timer is Merriweather Bold.
 - **Objective and hint:** the trailing "( ... )" of an objective's text (or a new optional `Hint` field) moves to its own line under the

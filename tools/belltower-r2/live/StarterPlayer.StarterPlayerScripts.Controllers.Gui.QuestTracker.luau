@@ -25,6 +25,7 @@ local BellTower = require(ReplicatedStorage:WaitForChild(`Functions`):WaitForChi
 local Art = require(ReplicatedStorage.Config:WaitForChild(`BellTowerArt`)) -- (2.36)
 local PAPER_INK = Color3.fromRGB(43, 29, 18)
 local PAPER_CRIMSON = Color3.fromRGB(110, 14, 24)
+local PAPER_TITLE = Color3.fromRGB(140, 22, 32) -- (2.37.1) the owner: the title in something more readable than black (6.5:1 on the paper)
 local PAPER_HINT = Color3.fromRGB(92, 66, 46) -- (2.37.1) the hint line: dimmer than the ink, still >= 4.5:1 on the card paper
 -- (2.37.1) the card's type, picked with the owner's "readable and on theme": a blackletter title, a book serif for the
 -- objective (Guru, the house body face, is condensed and hard to read at 20 px on the card), a quill hand for the hint
@@ -490,7 +491,7 @@ function Local.UpdateTracker()
 	Ui.Objective.Visible = not Folded
 	Ui.Pips.Visible = not Folded
 	Ui.Name.Text = Def.Name
-	Ui.Name.TextColor3 = if Ui.OnPaper then (if Def.Category == `Main` then PAPER_CRIMSON else PAPER_INK)
+	Ui.Name.TextColor3 = if Ui.OnPaper then PAPER_TITLE
 		else (if Def.Category == `Main` then C.Gold else C.Text)
 	local Need = Obj.Count or 1
 	local Have = (State.Counts or {})[Obj.Id] or 0
