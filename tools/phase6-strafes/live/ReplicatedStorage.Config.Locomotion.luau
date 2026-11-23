@@ -6,7 +6,7 @@ return {
 	Ids = {
 		-- the square-chest bakes (ServerStorage.NHPublish.Gestures.NHG_StrafeLeft_Square / Right) once published;
 		-- 0 = Studio plays the local KeyframeSequence, live servers the originals below
-		StrafeLeftSquare = 0; StrafeRightSquare = 0;
+		StrafeLeftSquare = 71722624627092; StrafeRightSquare = 96856365545562;
 		StrafeLeft = 126969213208550; StrafeRight = 84541589738848;
 	};
 	Studio = { StrafeLeftSquare = "NHG_StrafeLeft_Square"; StrafeRightSquare = "NHG_StrafeRight_Square" }; -- ServerStorage.NHGestures
