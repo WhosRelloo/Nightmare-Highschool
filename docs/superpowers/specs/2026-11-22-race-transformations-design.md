@@ -1,6 +1,6 @@
 # Race transformations: design
 
-- **Status:** concepts for the owner's pick. Nothing is built in the game yet.
+- **Status:** approved by the owner on 2026-11-23 ("They all look good. Continue them"); §8 resolved below. Building per `../plans/2026-11-22-race-transformations.md`.
 - **Survey:** [`../research/2026-11-22-transformation-survey.md`](../research/2026-11-22-transformation-survey.md).
 - **Concepts:** [`../mockups/2026-11-22-transformations/`](../mockups/2026-11-22-transformations/):
   - `races/`: per race, a lineup plus front and back of each direction;
@@ -112,3 +112,9 @@ Each slot is one Look option. Options unlock by tier, as the race Looks do now: 
 2. **Which wing and horn styles each race may use:** the table in §6 is a proposal.
 3. **Priests and Humans:** should a Priest get a "Sanctified" form (Fallen wings in Dove, the Sovereign halo), and should Humans stay untransformed?
 4. **Unlocks:** are all styles earned by tier, or are some sold in the Spin Shop?
+
+**Resolved (2026-11-23, from the owner's approval of every concept):**
+1. Both directions ship for every race; the player picks with a new Look slot `FormDirection` (`1` / `2`), Tier I.
+2. The §6 table is the allowed list per race.
+3. Not in scope: Humans and Priests stay untransformed (no Sanctified form was drawn).
+4. Unlocks are by tier only (Tier I defaults, Tier II two more, Tier III the rest); nothing in the Spin Shop.
