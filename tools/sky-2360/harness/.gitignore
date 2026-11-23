@@ -1,0 +1,4 @@
+_*.lua
+!_backup.lua
+_slot2.json
+_snap_raw.txt

@@ -6,21 +6,63 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 Work on branches that aren't merged into `main` yet. Nothing here is in NH Combat Test unless it says so.
 
-### `sky-2360`: painted skies and lighting, 2.36 pass (art and a proposed config, not wired)
-- **What it is:** the owner-approved sky and lighting pass (`docs/superpowers/specs/2026-11-21-sky-2360-design.md`):
-  Candlelit Gothic days and Moonlit Storybook nights, with Winter, Spring, Summer and Nightmare Nights as event seasons.
-- **Done:** 19 painted sky sets (17 new painters in `tools/vfx/skies2360.py`, next to the unchanged 2.16 Day and Dusk)
-  and the `NHWisp_A`/`NHWisp_B` wisps. The owner uploaded the 116 faces and 2 wisps, and their ids are in the proposed
-  `tools/sky-2360/proposed/ReplicatedStorage.Config.DayCycle.luau` (from `presets.py` and `gen_config.py`). Preview
-  renders are in `docs/img/sky-2360/`, and `docs/Sky-and-Lighting.md` holds the preset table, the upload list, the
-  wiring plan and the tests.
-- **Left:** the Studio wiring and its checks. The live skies are still 2.16's.
-
 ### `phase6-strafes`: strafe walks, NPC gestures, the Infirmary (merged into `main` 2026-11-23, version at release)
 - Square-chest strafes at about 8.5 studs/s, the stride-matched cadence (capped 2.4x), 42 NPC gesture clips (published,
   ids in `Config.Gestures`), Nurse Agatha Thorne's minimal `Infirmary.Treat`, bleacher seats and the Athletes' watch job.
   Checks and open rows: `tools/phase6-strafes/REPORT.md` (owner eye: the strafe look in motion, the pray kneel, the
   treatment gestures, the bleachers; the Infirmary room is still bare).
+
+## [2.39.0] - 2026-11-23: Skies and lighting (sky-2360), wired
+
+The owner-approved sky and lighting pass (`docs/superpowers/specs/2026-11-21-sky-2360-design.md`), now live in NH Combat Test.
+Reference: `docs/Sky-and-Lighting.md`. Mirror: `tools/sky-2360/` (`pre/` fresh dump, `live/` installed, `checks/sky_live.lua`).
+Screenshots: `docs/img/sky-2360/studio/` ([sheet](docs/img/sky-2360/studio/sheet.jpg)). Backup: `ServerStorage.NH_Backup.Sky2360_pre_20261123`.
+
+### Added
+- **19 painted sky sets** (116 faces, uploaded by the owner) in `Config.DayCycle.Skies.Sets`; Dawn is its own painting; Night,
+  NightBlue and Storm are repainted (the 2.16 ids stay in `Skies.Sets216` for a rollback).
+- **Seven time-of-day keys** (Dawn, Morning, Day, Golden, Dusk, Night, Witching) with ColorShift, environment light, clouds,
+  bloom size and threshold, and sun rays. Nights are dark but readable: ambient and exposure up, contrast down from 2.16.
+- **Moon modifiers** (`Config.DayCycle.Moon`, scaled by `NightWeight`): Full, New (`NightNew` sky), Crimson (`NightCrimson`),
+  Blue (`NightBlue`).
+- **Event seasons** (workspace `NHSeason` = Winter | Spring | Summer | Nightmare; nil = Autumn): their own skies and partial key
+  overrides; Summer's evening runs an hour later; Nightmare Nights bring the crimson moon every night with `NightmareNight`.
+- **`Controllers.World.SkyMotion`** (new): cloud drift through `workspace.GlobalWind` (3x in a storm, half on Low), the night
+  wisp ring (3 beams High, 1 Medium, none Low), storm flashes on its own `NHStormFlash` grade (never white; one soft pulse with
+  Reduce Flashing). The tier follows the Effects Quality setting and drops a step after 5 s over 22 ms a frame. The sky turn
+  stays off until the seam check.
+
+### Changed
+- **`Controllers.World.DayCycle`** writes the new fields (ColorShift_Top/Bottom, EnvironmentDiffuse/SpecularScale, Terrain.Clouds,
+  Bloom Size/Threshold, SunRays; Clouds and SunRays are made if missing), merges the season over each key, applies the moon
+  modifier, maps the schedule through the season and the moon, and preloads only the shown set and the next one (2.16 preloaded
+  every set). New: `Season()`, `Moon()`, `NightWeight(h)`, `Active()`, `Preloaded()`. Studio previews: `NHSeasonPreview`,
+  `NHMoonPhasePreview`, `NHSkyPreview`.
+- **One grade:** `World.FullMoon` no longer writes `NHMoonGrade`, and `World.MoonPhases` no longer writes `NHNewMoonGrade` or
+  `NHMoonEventGrade`; their numbers live in `Config.DayCycle.Moon`. They keep the moon size, the moon textures, the stars and the
+  banners. The Werewolf/Vampire-only stronger full-moon grade is gone with it.
+- **`Config.Cine` Looks.Night:** contrast 0.1 to 0.04, to match the brighter night.
+
+### Rulings
+- The moon is picked as: the event moon (`NHMoonEventTonight`), then the season's moon, then the phase (`NHMoonPhase`). The doc's
+  order put the phase before the season's moon, which would have kept Nightmare Nights from ever turning crimson.
+- A season that paints its own night for its own moon keeps its sky (`NightmareNight` over `NightCrimson`); an event moon on top
+  of a season still brings its own sky (a blue moon in Nightmare Nights shows `NightBlue`).
+- The wisps glow (LightEmission 1, Brightness 2.5, peak 70 % opaque, texture every 0.4 R): the uploaded wisp textures are mostly
+  clear (mean alpha 6 and 16 of 255), and unlit they vanished against the night sky in Studio.
+
+### Checked (NH Combat Test, slot 2, restored every round)
+- `sky_live` PASS: full x1.25 and new x0.4 brightness, every moon's and season's sky, Summer's late dusk, Nightmare's sky beating
+  the crimson one, the storm override, `NightWeight`, the live Lighting/Clouds/SunRays values, no old moon grades, the faces on
+  the Sky, and only Day and Dusk preloaded at noon.
+- Screenshots at 06:00, 12:00, 18:30, 23:00 (full, new, crimson, blue), Winter noon, Nightmare Nights 23:00 and the storm.
+- Storm flashes: `NHStormFlash` peaked at 0.12 brightness.
+- Wisps at High: 3 beams at full night weight; faint streaks in the sky ([shot](docs/img/sky-2360/studio/2300-wisps-high.jpg)).
+- **Not checked:** the Performance Simulator at Q1/Q4/Q10/Q21, a phone RAM tier, a console profile; 02:00 on every moon; Spring and
+  Summer on screen; the Wickfield hometown; client memory with the events off; the sky-turn seam check (so `SkyTurn` stays off);
+  Night Sight against the brighter base; a real night with `NHMoonEventTonight` set by the server.
+- **For the owner's eye:** the crimson-moon and Nightmare nights wash the scene red, so the crimson uniform blends in; the wisps
+  are very subtle; the storm darkens only the sky (the ground keeps the hour's light).
 
 ## [2.38.0] - 2026-11-23: Quiet Corners (QC1–QC5): the HUD states, slips, prompts, compass, dialogue, the Evidence Wall and the book
 

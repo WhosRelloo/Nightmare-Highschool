@@ -2,8 +2,8 @@
 
 The approved design is `docs/superpowers/specs/2026-11-21-sky-2360-design.md` (owner approval, 2026-11-21). This doc is
 the working reference: the preset table, the moon and event modifiers, the sky-motion tiers, what to upload, how to wire
-it, and how to test it. **Nothing here is in NH Combat Test yet.** The art is ready to upload, and the Studio wiring
-waits until the place is free.
+it, and how to test it. **Live in NH Combat Test from 2.39.0 (2026-11-23)**; the Studio results are in the last section and
+the CHANGELOG.
 
 ## Owner rules
 - **Nights are dark but readable.** Compared with 2.16, the blue ambient and the exposure go up and the contrast goes
@@ -177,6 +177,17 @@ config as `Skies.Sets216`, so a rollback is a copy-paste.
    - Check the school and the Wickfield hometown (4000, 0, 4000).
    - The sky-turn seam check at QL21 and QL1 before `Motion.SkyTurn.Enabled` goes on.
    - Watch client memory with every event off: only two sky sets should be resident.
+
+## Studio results (2026-11-23)
+- Installed: `Config.DayCycle` (the proposed config, ids filled), `World.DayCycle`, `World.FullMoon`, `World.MoonPhases`,
+  `Config.Cine`, and the new `World.SkyMotion`. Mirror `tools/sky-2360/live/`; backup `ServerStorage.NH_Backup.Sky2360_pre_20261123`.
+- `tools/sky-2360/checks/sky_live.lua` (Play, Client VM): PASS. `tools/sky-2360/harness/shot.sh <hour> [Attr=value]` holds the
+  look at an hour with the preview attributes, for screenshots. Screenshots: `docs/img/sky-2360/studio/`.
+- Moon order as built: the event moon, then the season's moon, then the phase (so Nightmare Nights is crimson every night).
+- The wisps glow (LightEmission 1, Brightness 2.5): the textures are mostly clear and vanished unlit.
+- Studio test: `NHSkyTierPreview` forces SkyMotion's tier (Studio's frame times drop it to Low).
+- Still to test: the Performance Simulator tiers, a phone RAM tier, a console profile, 02:00 on every moon, Spring and Summer,
+  Wickfield, client memory, the sky-turn seam check (SkyTurn stays off), and Night Sight against the brighter night.
 
 ## Files
 | Path | What |
