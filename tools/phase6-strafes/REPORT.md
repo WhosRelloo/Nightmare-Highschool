@@ -19,7 +19,7 @@ Commits 5297baa..73fa065 on phase6-strafes. Installed in NH Combat Test (Edit); 
 - watch the match: an Athlete sits on the bleachers, cheers at a score, nobody left seated after the end. Players can sit.
 - Fixes during Play: get-up walk starts after the idle; idle starts 0.35 s after recovery; probe positions; Studio debug attributes removed.
 
-## Round D: tutorial regressions (NOT cleared)
+## Round D: tutorial regressions (CLEARED 2026-11-23, see tools/phase6-2350/REPORT.md on main)
 - skipcheck FAILS ("controls still on mid-cut", "HUD still on"), and fails the same way with AnimationController + CineActor swapped back to pre-change copies. Cause under investigation.
 - approachcheck did not run (the fence set never streamed in). checks/approachcheck_loco.lua expects the new cadence rule.
 
@@ -33,3 +33,19 @@ Commits 5297baa..73fa065 on phase6-strafes. Installed in NH Combat Test (Edit); 
 4. Not built: the ambient patient on bed 1; the phone prop while walking.
 5. The Infirmary spot not checked against the Map (Map closed). NH lot empty: x 199-225, z 13.5-39.5.
 6. The 42 publishes, then the ids.
+
+## 2026-11-23: published ids, idcheck, screenshots
+- The owner published all 42 clips. Ids filled from the group (a184a91): 22 Id, 6 bucketed Ids (x3), the two square strafes.
+  Installed Config.Gestures + Config.Locomotion in NH Combat Test.
+- checks/idcheck.lua (Play, client): IDCHECK OK, 42 ids load (Length > 0), each within 0.05 s of the baked Len, Loop matches.
+- Round D: the skipcheck "failure" was the harness (an unmarked __SeamlessTest replay); the whole tutorial suite passes on this
+  build, and the cadence change is folded into approachcheck / TutorialSneak on main (da0bb56).
+- Screenshots: docs/img/strafes-infirmary-room.jpg (3 beds; the room is bare: plain walls, no other furniture, no ceiling at this
+  angle; the Nurse was off post at night), docs/img/strafes-square-strafe-pose.jpg (StrafeLeftSquare frozen at 30 %: chest square,
+  legs crossing). The pray kneel shot was blocked by a crowded chapel: owner eye.
+- Slot 2: fresh snapshot, restored; Play stopped; nothing saved.
+
+## Open rows (updated)
+1. Owner eye: the strafe look in motion, the pray kneel-in, the treatment gestures, the bleachers.
+2. The Infirmary room is bare (furniture, cabinets, curtains, a ceiling) and the bed seat height (2.1) is still a guess.
+3. Not built: the ambient patient on bed 1; the phone prop while walking.
