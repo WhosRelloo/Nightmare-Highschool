@@ -1561,6 +1561,43 @@ lined up so we can move them and size them however we want." That's concepts 1, 
   API (the note on concept 3).
 - **The Map:** it has the boxes and the new places, but not these scripts, so nothing reads the boxes there yet.
 
+## [2.16.0] - 2026-11-13: Painted skies, one per time of day (art ready, waiting on uploads)
+
+Owner: "make new painted skies" (concept 58 in `docs/Environment-Ambience-Concepts.md`).
+- **Studio backup:** `ServerStorage.NH_Backup.Skies_pre_20261113` (`Config.DayCycle` and `Controllers.World.DayCycle`).
+
+### Added
+- **Four painted gothic skies and a blue-moon night.** They're original and use the house palette, with no blood or
+  gore. Each is six 1024 Sky faces in `art/group-upload-skies/` (30 PNGs) for the owner to upload to group 15981569.
+  - **The skies:** Day, Dusk/Dawn, Night (with a faint distant town silhouette on the horizon), and Storm.
+  - **The blue-moon variant:** NightBlue, the Night with a faint aurora-like band.
+  - **Not painted:** the moon and the stars. Roblox's Sky draws them, so the upper sky stays clean where the moon
+    travels.
+- **The generator:** `tools/vfx/make_skyboxes.py` (numpy + PIL).
+  - **How it paints:** every pixel is painted from its 3D direction, using 3D noise and a horizon strip that wraps all
+    the way round, so the faces meet with no seams.
+  - **How it checks:** it re-projects the written PNGs into `art/skies-preview/NHSkies_Preview.png` (panoramas, the
+    cube corners and the zenith) and measures every face edge in `art/skies-preview/seams.txt`.
+- **The sky swap in `Controllers.World.DayCycle`**, set in `Config.DayCycle.Skies`.
+  - **Schedule:** Night until 05:42, then dawn (the Dusk faces turned −133° with `SkyboxOrientation` so the glow sits
+    at sunrise), Day from 07:00, Dusk from 17:36 and Night from 19:36.
+  - **Hiding the swap:** two Sky layers can't blend. Each swap happens while the dusk or dawn haze is already up,
+    under an extra 3 s swell of Atmosphere haze (+1.2 at the peak), and the faces change at the peak.
+  - **Blue moon:** NightBlue replaces Night when `workspace.NHMoonEventTonight` is "Blue".
+  - **Overrides:** `workspace` attribute `NHSky = "Storm"` (or any set's name) overrides the schedule, for a future
+    weather system or an admin. The LocalPlayer attribute `NHSkyPreview` does the same on one client, for testing.
+  - **What it writes:** only the six Skybox faces and `SkyboxOrientation`. It never writes the moon texture,
+    `MoonAngularSize` or `StarCount`, which `World.FullMoon` and `World.MoonPhases` own.
+  - **Loading:** the faces are preloaded when the game starts.
+
+### Notes
+- **Ids in:** the owner uploaded all 30 faces to group 15981569. All five sets are complete in
+  `Config.DayCycle.Skies.Sets`, and each was checked rendering in Studio. The table is in
+  `art/group-upload-skies/README.md`.
+- **Face orientation:** measured in Studio with labelled test faces. Roblox shows `SkyboxLf` on +X and `SkyboxRt` on
+  −X. The script's header has the full mapping.
+- **Map:** not touched. It needs the same port once the ids exist.
+
 ## [2.15.0] - 2026-11-13: Fights in the world: crowds, study-group tag assists, beast stagger, and enemy NPCs on fists
 
 Owner: "For section E, leave out map gaps and the sparring room for now. Continue." That's concepts 19, 21 and 22 in
