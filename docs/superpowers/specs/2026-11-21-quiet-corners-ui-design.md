@@ -1,6 +1,6 @@
 # Quiet Corners: the whole-screen UI, the Evidence Wall and dialogue (design)
 
-**Status:** concept. The owner chose the direction in chat on 2026-11-21 (the choices are listed below). This written
+**Status:** QC1–QC5 built lean in 2.38.0 (plan `docs/superpowers/plans/2026-11-22-quiet-corners-ui.md`); the Bell Tower trims and fold wait for the hook, now that R2 is merged. Originally: concept. The owner chose the direction in chat on 2026-11-21 (the choices are listed below). This written
 spec is waiting for the owner's review. No game code has been written, and Studio wasn't touched.
 **Mockups:** `docs/superpowers/mockups/2026-11-21-quietcorners/` (`overview.jpg` holds every state). They're made by
 `art/ui/hud/make_quietcorners_mockups.py`, which also runs the text fit check (§9).

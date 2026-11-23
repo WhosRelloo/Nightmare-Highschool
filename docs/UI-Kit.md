@@ -447,6 +447,34 @@ Draws every ProximityPrompt in the NH style:
 
 Left as they are: the `FlashUI`, `RedScreen` and `Vingette` screen effects.
 
+### Quiet Corners (2.38)
+The whole-screen pass (plan `docs/superpowers/plans/2026-11-22-quiet-corners-ui.md`, report `tools/quietcorners/REPORT.md`).
+
+| Part | Controller | Decision as built |
+|---|---|---|
+| Vitals and hotbar | `KitHud` | kept; adopted as the `Vitals` cluster; a 4 px crimson health line in Vanish; DOWNED outside the fade |
+| Compass | `Compass` | restyled in place (`CompassStrip/Lubber<Race>`, `CompassTicks`), letters 24/20 px, readout 20 px |
+| Toasts → slips | `Notifications` | replaced: `Slip<Race>` top-left, max 3 (2 on phones), queued with an "N waiting" stub, clickable |
+| Prompts | `PromptUi` | restyled: `PromptCap<Race>` with the hold fill and `PromptTag<Race>` on the nearest; `PromptPip<Race>` on the others |
+| Journal | `QuestJournal` | the open book (4 quadrants); tabs Journal, Evidence, Record, Settings |
+| Case Files → Evidence Wall | `EvidenceWall` | added; the Evidence tab opens the wall |
+| Dialogue | `Dialogue` | replaced: `CallingCard<Race>`, animated `Crest<Clique>`, `Ribbon`, `ReplyTab(On)<Race>`, `Tone*`, `Nib` |
+| Top bar | `TopBar` | kept; adopted as the `TopLeft` cluster |
+| Bell Tower | `ClockHud`, `QuestTracker` | not touched yet; the hook reads `NHHudState` |
+| Skip button | `CineUI` | `SkipRing<Race>` |
+
+- **`HudState`:** the states Calm, Active, Combat, Dialogue, Menu and Cut, published as the `NHHudState` attribute. `HudMode` (Settings:
+  Always, Ghost, Vanish) sets how far idle clusters fade. `Adopt(Gui, Cluster, Names?, Edge, Height)` wraps a cluster's pieces in a
+  `QcFade` CanvasGroup pinned to its edge. `Wake(Cluster?)`, `Poke(Kind)`. Studio probe: `PlayerGui.NHQuietProbe`, re-made after each respawn.
+- **Fallbacks:** every piece draws a kit fallback when its id is 0 or fails, so a missing upload never breaks a controller.
+- **Art configs:** `Config.QuietCornersArt`, `Config.DialogueArt`, `Config.EvidenceArt`. Uploads are at most 1024 px; the book and the wall
+  are 4 quadrants each. Text boxes come from each config's `Boxes`, measured on the art; text colours are checked for contrast against the
+  measured `QcBg` (4.5:1 under 23 px).
+- **Phone:** controllers ask `Components.Viewport()`, so the Studio preview (`NHPhonePreview`) counts.
+- **Contracts that still hold:** `Packets.Notify` (an open table), `KeepDefaultStyle` and `Reject` on prompts, the Compass API,
+  `QuestJournal.Toggle/SelectTab`, the talk cinematic and its keys.
+- **Not checked:** a real phone (the owner's end-of-phases mobile session), two players, the Bell Tower hook, photo clues.
+
 ### Settings (menu: M)
 - `ReplicatedStorage.UI.Settings` holds the schema, defaults and ranges, server saving (`StartServer`, run by `ServerScriptService.NHSettings`), and client applying.
 - Client API: `Load()`, `Get(key)`, `Set(key, value)`, `SetKey(action, keyName) -> ok, message`, `Reset()`, and `Changed` (a BindableEvent).

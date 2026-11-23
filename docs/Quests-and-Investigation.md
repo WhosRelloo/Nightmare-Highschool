@@ -44,7 +44,13 @@ The journal and tracker use the new Nightmare Highschool UI kit (`ReplicatedStor
 - **Quest objects:** prompts (E) only appear for things you currently need, with a soft gold outline. There are no invisible interaction points.
 - **Journal (J, or the Journal button for touch):**
   - **Quests tab:** active quests with every objective (✓ done, ◆ current, ○ later), Track, and Abandon (side quests only), plus failed and completed quests and the chapter ending text.
-  - **Case Files tab:** your clues with where you found them. Tap two clues and press **Connect**. Below that are your insights and the deduction question.
+  - **Evidence tab (2.38):** opens the **Evidence Wall** (`Gui.EvidenceWall`, full screen). The case plate asks the deduction question. Your clues
+    are cards by kind (Note, Object, Record); missing ones show as chalk outlines. Each public question (`Config.Cases[..].Questions`) has two
+    slots: pick up a card and pin it into a slot (mouse: click, right click to inspect; controller: A to pick up and pin, X to inspect, B to close; touch: tap, then tap the slot).
+    When both slots are full the client sends `QuestAction { Action = "Link", Case, A, B, Question }`. `Investigation.Link` checks only that
+    question's link, so the right pair under the wrong question is a miss. Missing twice on a question shows its hint. Once every non-bonus
+    question is answered, "Your answer" shows the deduction options; the server's `Needs` still decides. On phones the clues sit in a scrolling
+    tray at the bottom, under the questions.
 - **Stealth:**
   - Inside a watched zone, an eye meter shows the zone name and "unseen", "SOMEONE SEES YOU" or "HIDDEN".
   - The meter fills while the watcher can see you: within range, inside a 100–110° view cone, and with clear line of sight. Running fills it 1.7× faster; standing still fills it at 0.6×.
