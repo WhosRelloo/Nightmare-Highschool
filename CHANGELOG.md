@@ -2,6 +2,54 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [Unreleased]
+
+Work on branches that aren't merged into `main` yet. Nothing here is in NH Combat Test unless it says so.
+
+### `belltower-r2`: the Bell Tower, R2: the Bells (planned 2.37.0)
+- **What it is:** Notoriety. Misdeeds that staff witness build Heat (0-100), Heat rings up to five Bells (Murmur, Noticed,
+  Named, Hunted, The Tolling), and the HUD gets a Bell Rail under the clock. Spec §3, §4 item 2 and §7 R2 of
+  `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-design.md`; the plan is
+  `docs/superpowers/plans/2026-11-21-belltower-r2-bells.md`.
+- **Done (repo only):** the bell art (`BtBellHollow`, `BtBellTarnished`, `BtBellLit`, `BtBellGlow`, `BtBellRail`),
+  uploaded to group 15981569 with its ids recorded (`BtBellGlow` re-baked with feathered edges and re-uploaded);
+  `Config.Notoriety` and `Functions.Notoriety` (pure, with the `nt_pure` check); the `Services.School.Notoriety`
+  service; the harness and `probe.py`; and a draft 2.37.0 changelog entry and docs.
+- **Left:** HallMonitor joining in, the Bell Rail on the HUD and the Lead Card fold, the art ids and screenshots, and the
+  Studio install with every check run. Nothing is installed in Studio yet.
+
+### `sky-2360`: painted skies and lighting, 2.36 pass (art and a proposed config, not wired)
+- **What it is:** the owner-approved sky and lighting pass (`docs/superpowers/specs/2026-11-21-sky-2360-design.md`):
+  Candlelit Gothic days and Moonlit Storybook nights, with Winter, Spring, Summer and Nightmare Nights as event seasons.
+- **Done:** 19 painted sky sets (17 new painters in `tools/vfx/skies2360.py`, next to the unchanged 2.16 Day and Dusk)
+  and the `NHWisp_A`/`NHWisp_B` wisps. The owner uploaded the 116 faces and 2 wisps, and their ids are in the proposed
+  `tools/sky-2360/proposed/ReplicatedStorage.Config.DayCycle.luau` (from `presets.py` and `gen_config.py`). Preview
+  renders are in `docs/img/sky-2360/`, and `docs/Sky-and-Lighting.md` holds the preset table, the upload list, the
+  wiring plan and the tests.
+- **Left:** the Studio wiring and its checks. The live skies are still 2.16's.
+
+### `ui-quietcorners`: Quiet Corners, the whole-screen UI (design and art, not built)
+- **What it is:** a new HUD direction (`docs/superpowers/specs/2026-11-21-quiet-corners-ui-design.md`): the corners
+  stay where players know them and the centre stays clear, with a `HudMode` setting (Always, Ghost, Vanish), paper-slip
+  notifications, the open-book menus, prompts on the object, race accents on blackened iron, the Evidence Wall for
+  investigations, and new dialogue art with a clique crest in place of the wax seal.
+- **Done:** the spec (waiting on the owner's review), the PBR art generators (`make_quietcorners.py`,
+  `make_evidence_wall.py`, `make_dialogue_ui.py`), fit-checked mockups in
+  `docs/superpowers/mockups/2026-11-21-quietcorners/`, the Unaffiliated crest and animated crests, and the group ids
+  for the 9 crests and 9 crest flipbooks (owner uploaded 2026-11-22).
+- **Left:** everything in game. No game code is written and Studio wasn't touched.
+
+### `phase6-strafes`: strafe walks and NPC gestures (in progress, not pushed)
+- **What it is:** phase 6 Studio queue item 2, cut from the tutorial branch
+  (`docs/superpowers/specs/2026-11-22-strafes-npc-gestures-design.md`, the plan
+  `docs/superpowers/plans/2026-11-22-strafes-npc-gestures.md` and the survey in `docs/superpowers/research/`).
+  Counter-rotated strafe clips at about 8.5 studs/s, a stride fix for walk, sprint and crouch, injured and dizzy idles,
+  Nurse Agatha Thorne with a minimal `Infirmary.Treat` entry point, and bleacher seats with an Athletes "watch the
+  match" job.
+- **Done:** the survey, the spec and plan (with the owner's two rounds of rulings), the harness and
+  `Config.Locomotion` / `Functions.Locomotion` (pure, `lc_pure` passes).
+- **Version:** decided at merge, probably 2.38.0.
+
 ## [2.36.1] - 2026-11-21: The Bell Tower, R1 follow-ups
 
 The small items the final R1 review deferred. Mirror: `tools/belltower-r1/`. The Map place: untouched.
