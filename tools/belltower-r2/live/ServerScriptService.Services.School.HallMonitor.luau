@@ -48,6 +48,12 @@ local LastFightReport = {} :: { [Player]: number }
 local Local = {}
 local Shared = {}
 
+-- (2.37) Notoriety (Services.School.Notoriety), required lazily (it calls back into this module)
+function Local.Notoriety(): any?
+	local Ok, M = pcall(function() return require(ServerScriptService.Services.School.Notoriety) end)
+	return if Ok then M else nil
+end
+
 Shared.Escaped = SignalPlus() -- (Player, Reason)
 Shared.Caught = SignalPlus()  -- (Player, Reason, Excused)
 -- Optional: function(Player, Reason) -> (punish: boolean, line: string?). Set by Factions (Vigil Pass).
@@ -302,10 +308,17 @@ function Local.StartChase(M, Player: Player, Reason: string)
 	M.Model:SetAttribute(`MonitorChaseAt`, os.clock()) -- (kit 1.79) the pass works only in the first seconds
 	M.Model:SetAttribute(`MonitorReason`, Reason) -- (inventory audit 1.90) the hall pass only covers Truancy
 	Fx.Fire(Player, `Spotted`, { Monitor = M.Model; Reason = Reason })
+	-- (2.37) the chase is a witnessed misdeed (a "Wanted" chase is the hunt itself, not a new one)
+	if Reason ~= `Wanted` then
+		local No = Local.Notoriety()
+		local Root = Player.Character and Player.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?
+		if No and No.Witnessed then pcall(No.Witnessed, Player, Reason, if Root then Root.Position else nil, `Hall Monitor`) end
+	end
 	Local.Say(M, if Reason == `Fighting` then `Hey! Stop right there!`
 		elseif Reason == `Vandalism` then `Hey! Put that paint down!`
 		elseif Reason == `Trespassing` then `You're suspended! Off school grounds!`
 		elseif Reason == `Curfew` then `Curfew! Back to the dorms, now.` -- (2.30)
+		elseif Reason == `Wanted` then `There you are! Don't move!` -- (2.37)
 		else `You! Why aren't you in class?`)
 end
 
@@ -334,21 +347,30 @@ function Local.Catch(M, Player: Player, State)
 			elseif Reason == `Vandalism` then `Painting on the walls? You're done.`
 			elseif Reason == `Trespassing` then `Suspended means off campus. This goes on your record.`
 			elseif Reason == `Curfew` then `Out after curfew. This goes on your record.` -- (2.30)
+			elseif Reason == `Wanted` then `Got you. This goes on your record.` -- (2.37)
 			else `Get to class! This is going on your record.`)
-		Discipline.ReportIncident({
-			Type = if Reason == `Curfew` then `Trespassing` else Reason; -- (2.30) curfew is trespassing on the record
-			Suspect = Player;
-			Witness = `Hall Monitor`;
-			Position = M.Root.Position;
-			Recognized = true;
-		})
+		local Type = if Reason == `Curfew` then `Trespassing` else Reason -- (2.30) curfew is trespassing on the record
+		if Reason == `Wanted` then -- (2.37) the hunt books what started it
+			local No = Local.Notoriety()
+			Type = if No and No.BookType then No.BookType(Player) else nil
+		end
+		if Type then
+			Discipline.ReportIncident({
+				Type = Type;
+				Suspect = Player;
+				Witness = `Hall Monitor`;
+				Position = M.Root.Position;
+				Recognized = true;
+				Caught = true; -- (2.37) Notoriety adds the tier bonus and clears the heat
+			})
+		end
 		-- (2.30) caught after curfew: pockets turned out, the contraband kept (as the fight path does)
 		if Reason == `Curfew` then
 			local Took = false
 			pcall(function() Took = require(ServerScriptService.Services.Features.Armory).Confiscate(Player, `BrassKnuckles`) end)
 			if Took then
 				task.delay(1.6, function() Local.Say(M, `And I'll take those knuckles.`) end)
-				Discipline.ReportIncident({ Type = `Contraband`; Suspect = Player; Witness = `Hall Monitor`; Position = M.Root.Position; Recognized = true })
+				Discipline.ReportIncident({ Type = `Contraband`; Suspect = Player; Witness = `Hall Monitor`; Position = M.Root.Position; Recognized = true; Caught = true })
 			end
 		end
 	else
@@ -463,13 +485,15 @@ function Local.UpdateMonitor(M, State)
 			or (M.Root.Position - M.ChaseOrigin).Magnitude > Settings.MaxChaseDistance
 
 		if Escaped then
-			Discipline.ReportIncident({
-				Type = if M.Reason == `Curfew` then `Trespassing` else M.Reason; -- (2.30)
-				Suspect = Player;
-				Witness = `Hall Monitor`;
-				Position = Root.Position;
-				Recognized = false; -- got away: can't be pinned on them later
-			})
+			if M.Reason ~= `Wanted` then -- (2.37) a Wanted escape isn't a new report (the hunt already knows)
+				Discipline.ReportIncident({
+					Type = if M.Reason == `Curfew` then `Trespassing` else M.Reason; -- (2.30)
+					Suspect = Player;
+					Witness = `Hall Monitor`;
+					Position = Root.Position;
+					Recognized = false; -- got away: can't be pinned on them later
+				})
+			end
 			Notifications.Notify(Player, { Title = `You slipped away from the hall monitor`; Kind = `Info`; Duration = 4 })
 			Fx.Fire(Player, `SpottedEnd`, { Monitor = M.Model; Result = `Escaped` })
 			Local.Say(M, `...Where did they go?`)
@@ -499,6 +523,23 @@ function Local.UpdateMonitor(M, State)
 		end
 	end
 
+	-- (2.37) Bell 3 and up: any monitor on duty chases a hunted student on sight, in any segment
+	if Settings.DutyKinds[State.Segment.Kind] then
+		local No = Local.Notoriety()
+		if No and No.IsHunted then
+			local Best, BestDistance = nil, math.huge
+			for _, Player in Players:GetPlayers() do
+				if not Player.Character or not No.IsHunted(Player) then continue end
+				local Visible, Distance = Local.CanSee(M, Player.Character, true)
+				if Visible and Distance < BestDistance then Best, BestDistance = Player, Distance end
+			end
+			if Best then
+				Local.StartChase(M, Best, `Wanted`)
+				return
+			end
+		end
+	end
+
 	if #Route == 0 then return end
 	M.Index = M.Index or 1
 	local Waypoint = Route[M.Index]
@@ -522,6 +563,15 @@ function Local.OnDamage(Target: Model, Damage: number, Attacker: Model?)
 	if not Attacker then return end
 	local Player = Players:GetPlayerFromCharacter(Attacker)
 	if not Player then return end
+	-- (2.37) a hit on a monitor itself: hitting staff (Notoriety heat 45, booked as Fighting)
+	for _, M in Monitors do
+		if M.Model == Target then
+			local No = Local.Notoriety()
+			local R = Attacker:FindFirstChild(`HumanoidRootPart`) :: BasePart?
+			if No and No.Witnessed then pcall(No.Witnessed, Player, `AssaultStaff`, if R then R.Position else nil, `Hall Monitor`) end
+			break
+		end
+	end
 
 	local Now = os.clock()
 	if LastFightReport[Player] and Now - LastFightReport[Player] < Config.Witness.FightCooldown then return end
@@ -703,6 +753,49 @@ function Shared.Respond(Position: Vector3, OnArrive: (() -> ())?): boolean
 	Local.SetState(Best, `Respond`)
 	Local.Say(Best, `What's going on over there?`)
 	return true
+end
+
+-- (2.37) for Notoriety: is any on-duty monitor seeing this student right now? Returns (seen, nearest distance)
+function Shared.SeenBy(Player: Player): (boolean, number)
+	local Character = Player.Character
+	if not Character then return false, math.huge end
+	local State = SchoolClock.GetState()
+	if not (State and State.Segment and Settings.DutyKinds[State.Segment.Kind]) then return false, math.huge end
+	local Seen, Nearest = false, math.huge
+	for _, M in Monitors do
+		if not Local.IsActive(M) then continue end
+		local Chasing = M.State == `Chase` and M.Target == Player and os.clock() - (M.LastSeen or 0) < 0.5
+		local Visible, Distance = Local.CanSee(M, Character, true)
+		if Chasing or Visible then
+			Seen = true
+			Nearest = math.min(Nearest, Distance)
+		end
+	end
+	return Seen, Nearest
+end
+
+-- (2.37) for Notoriety: inside the school (Local.OnCampus)
+function Shared.OnCampus(Player: Player): boolean
+	return Local.OnCampus(Player)
+end
+
+-- (2.37) Bell 4: every patrolling monitor on duty within 400 studs heads for the spot. Returns how many went.
+function Shared.Converge(Position: Vector3): number
+	local State = SchoolClock.GetState()
+	if not (State and State.Segment and Settings.DutyKinds[State.Segment.Kind]) then return 0 end
+	local Count = 0
+	for _, M in Monitors do
+		if Local.IsActive(M) and M.State == `Patrol` and (M.Root.Position - Position).Magnitude <= 400 then
+			M.RespondAt = Position
+			M.RespondDone = nil
+			M.RespondUntil = os.clock() + 30
+			M.Humanoid.WalkSpeed = Settings.ChaseSpeed
+			Local.SetState(M, `Respond`)
+			Local.Say(M, `All hands! Over there!`)
+			Count += 1
+		end
+	end
+	return Count
 end
 
 function Shared.GetMonitors(): { any }
