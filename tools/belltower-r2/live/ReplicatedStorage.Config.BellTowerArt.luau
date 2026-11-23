@@ -11,6 +11,11 @@ local Art = {
 	LeadCard = 78392319140082;
 	PipEmpty = 79927335523001;
 	PipFang = 116823141480891;
+	BellHollow = 73177035232417;    -- (2.37) R2
+	BellTarnished = 132965538168678;
+	BellLit = 82432772953626;
+	BellGlow = 96913118397929;      -- greyscale halo, tinted Gold (the feathered re-upload)
+	BellRail = 126038840460786;
 }
 Art.Slices = {
 	TowerPlate = { Center = Rect.new(60, 60, 540, 140); Scale = 0.5 };

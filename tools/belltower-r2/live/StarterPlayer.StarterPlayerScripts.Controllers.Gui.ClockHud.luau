@@ -108,6 +108,51 @@ function Local.CreateGui()
 	Head.AutomaticSize = Enum.AutomaticSize.Y
 	Head.Parent = Panel
 
+	-- (2.37) the Bell Rail (Notoriety R2): shown while NHBells > 0, between the plate and the conduct row
+	local BellsRow = Instance.new(`Frame`)
+	BellsRow.Name = `Bells`
+	BellsRow.LayoutOrder = 2
+	BellsRow.BackgroundTransparency = 1
+	BellsRow.Size = UDim2.new(1, 0, 0, 126)
+	BellsRow.Visible = false
+	BellsRow.Parent = Panel
+	Local.Img(`BellRail`, { Name = `Rail`; AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, 6, 0, 0); Size = UDim2.fromOffset(450, 71); ZIndex = 2; Parent = BellsRow })
+	local BellImgs = {}
+	for I = 1, 5 do
+		-- bell I hangs from rail hook 5 - I (hooks at x 150 + k * 240 of the 1400 px rail, which is 450 wide at the right edge)
+		local HookX = 6 - 450 + (150 + (5 - I) * 240) * 450 / 1400
+		local B = Instance.new(`ImageLabel`)
+		B.Name = `Bell{I}`
+		B.BackgroundTransparency = 1
+		B.AnchorPoint = Vector2.new(0.5, 0)
+		B.Position = UDim2.new(1, HookX, 0, 20)
+		B.Size = UDim2.fromOffset(62, 62)
+		B.ZIndex = 3
+		B.Visible = false
+		B.Parent = BellsRow
+		local Glow = Local.Img(`BellGlow`, { Name = `Glow`; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.6);
+			Size = UDim2.fromScale(1.9, 1.9); ImageColor3 = KitTheme.Colors.Gold; ImageTransparency = 0.35; ZIndex = 2; Visible = false; Parent = B })
+		BellImgs[I] = { Img = B; Glow = Glow }
+	end
+	local Status = Instance.new(`TextLabel`)
+	Status.Name = `Status`
+	Status.BackgroundTransparency = 1
+	Status.AnchorPoint = Vector2.new(1, 0)
+	Status.Position = UDim2.new(1, 0, 0, 94)
+	Status.Size = UDim2.new(1, 0, 0, 28)
+	Status.Font = KitTheme.Fonts.Body
+	Status.TextSize = BellTower.MIN_TEXT
+	Status.TextColor3 = KitTheme.Colors.Text
+	Status.TextXAlignment = Enum.TextXAlignment.Right
+	Status.RichText = true
+	Status.Text = ``
+	Status.ZIndex = 3
+	Status.Parent = BellsRow
+	local SS = Instance.new(`UIStroke`)
+	SS.Thickness = 1.2
+	SS.Transparency = 0.25
+	SS.Parent = Status
+
 	local HasDial = BellTower.Image(Art, `Dial`) ~= nil and BellTower.Image(Art, `DialHand`) ~= nil
 	-- the plate: TowerPlate 9-slice, or the kit's ornate chip while the art isn't uploaded
 	local Plate: GuiObject = Local.Img(`TowerPlate`, { Name = `Plate` }) or Instance.new(`Frame`)
@@ -188,7 +233,7 @@ function Local.CreateGui()
 	-- the conduct row: a detention slip, the wax seal, the level (replaces the orange record line)
 	local Conduct = Instance.new(`Frame`)
 	Conduct.Name = `Conduct`
-	Conduct.LayoutOrder = 2
+	Conduct.LayoutOrder = 3 -- (2.37) the Bell Rail sits at 2
 	Conduct.BackgroundTransparency = 1
 	Conduct.Size = UDim2.new(1, 0, 0, 0)
 	Conduct.AutomaticSize = Enum.AutomaticSize.Y
@@ -249,6 +294,7 @@ function Local.CreateGui()
 	LS.Parent = Level
 	Labels.Conduct = { Row = Conduct; Slip = Slip; SlipTitle = SlipTitle; SlipLine = SlipLine; Seal = Seal; Level = Level }
 
+	Labels.Bells = { Row = BellsRow; Bells = BellImgs; Status = Status; Last = 0; Tweens = {} } -- (2.37)
 	Gui.Parent = Player:WaitForChild(`PlayerGui`)
 	return Labels
 end
@@ -259,6 +305,7 @@ function Local.UpdateConduct(Labels, IsClass: boolean): boolean
 		DisciplineLevel = Player:GetAttribute(`DisciplineLevel`);
 		DisciplinePoints = Player:GetAttribute(`DisciplinePoints`);
 		DetentionsOwed = Player:GetAttribute(`DetentionsOwed`);
+		NHSummons = Player:GetAttribute(`NHSummons`); -- (2.37)
 		DetentionActive = Player:GetAttribute(`DetentionActive`);
 		DetentionCollected = Player:GetAttribute(`DetentionCollected`);
 		DetentionTotal = Player:GetAttribute(`DetentionTotal`);
@@ -283,6 +330,63 @@ function Local.UpdateConduct(Labels, IsClass: boolean): boolean
 		end
 	end
 	return C.Waypoint
+end
+
+-- (2.37) one toll when a bell is added (the brass hand bell, lower for each tier); a small kick unless Reduce Motion
+function Local.Toll(B: ImageLabel, Count: number)
+	pcall(function()
+		local S = Instance.new(`Sound`)
+		S.SoundId = `rbxassetid://9113584435`
+		S.Volume = 0.35
+		S.PlaybackSpeed = 1 - 0.08 * Count
+		S.Parent = game:GetService(`SoundService`)
+		S:Play()
+		game:GetService(`Debris`):AddItem(S, 3)
+	end)
+	if Player:GetAttribute(`NHReducedMotion`) == true then return end
+	B.Rotation = 7
+	game:GetService(`TweenService`):Create(B, TweenInfo.new(0.6, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), { Rotation = 0 }):Play()
+end
+
+-- (2.37) the rail swings (Search) or stands still
+function Local.Swing(U, On: boolean)
+	On = On and Player:GetAttribute(`NHReducedMotion`) ~= true
+	if On == (U.Swinging == true) then return end
+	U.Swinging = On
+	for _, T in U.Tweens do T:Cancel() end
+	table.clear(U.Tweens)
+	for I, E in U.Bells do
+		E.Img.Rotation = 0
+		if On then
+			E.Img.Rotation = -9
+			local T = game:GetService(`TweenService`):Create(E.Img, TweenInfo.new(0.6, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut, -1, true, (I - 1) * 0.12), { Rotation = 9 })
+			T:Play()
+			table.insert(U.Tweens, T)
+		end
+	end
+end
+
+function Local.UpdateBells(Labels)
+	local U = Labels.Bells
+	local V = BellTower.BellStatus(Player:GetAttribute(`NHBells`), Player:GetAttribute(`NHBellState`), Player:GetAttribute(`NHSearchWhere`))
+	U.Row.Visible = V.Visible
+	if not V.Visible then
+		U.Last = 0
+		Local.Swing(U, false)
+		return
+	end
+	local Img = BellTower.Image(Art, V.ArtKey)
+	for I, E in U.Bells do
+		E.Img.Visible = I <= V.Count
+		E.Img.Image = Img or KitTheme.Images.Bell
+		E.Img.ImageColor3 = if Img then Color3.new(1, 1, 1) else V.Tint
+		E.Img.ImageTransparency = if V.Dim then 0.35 else 0
+		if E.Glow then E.Glow.Visible = V.Glow end
+	end
+	U.Status.Text = V.Line
+	if V.Count > U.Last and V.Count >= 1 then Local.Toll(U.Bells[V.Count].Img, V.Count) end
+	U.Last = V.Count
+	Local.Swing(U, V.Swing)
 end
 
 -- The class happening now, or the next one later today.
@@ -457,6 +561,7 @@ function Shared.OnStart()
 
 				-- (2.36) Discipline: the conduct row (seal, level, slip) replaces the orange record line
 				local DetentionWaypoint = Local.UpdateConduct(Labels, State.Segment.Kind == `Class`)
+				Local.UpdateBells(Labels) -- (2.37)
 
 				if ShowWaypoint and Info then
 					Local.UpdateWaypoint(Info.Class.Room, `{Info.Class.Subject} · {RoomName}`)

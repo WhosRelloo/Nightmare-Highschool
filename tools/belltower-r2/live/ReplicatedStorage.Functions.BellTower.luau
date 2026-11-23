@@ -41,6 +41,10 @@ function BellTower.Conduct(A: { [string]: any }, IsClass: boolean)
 		local Done = tonumber(A.DetentionCollected) or 0
 		local Total = tonumber(A.DetentionTotal) or 0
 		table.insert(Out.Slips, { Title = "Detention", Line = if Done >= Total then "Use the bin to finish" else `Trash {Done}/{Total}` })
+	elseif (tonumber(A.NHSummons) or 0) > 0 then -- (2.37) Notoriety: report to Room 106
+		local S = math.floor(tonumber(A.NHSummons) or 0)
+		table.insert(Out.Slips, { Title = if S > 1 then `Summons ×{S}` else "Summons", Line = "Room 106, outside class" })
+		Out.Waypoint = not IsClass
 	elseif Owed > 0 then
 		table.insert(Out.Slips, { Title = if Owed > 1 then `Detention owed ×{Owed}` else "Detention owed", Line = "Room 106, outside class" })
 		Out.Waypoint = not IsClass
@@ -57,6 +61,34 @@ function BellTower.Pips(Have: number, Need: number): { boolean }?
 	local P = {}
 	for I = 1, N do P[I] = I <= H end
 	return P
+end
+
+-- (2.37) the Bell Rail (R2): tier names, fallback tints, and what the rail shows
+BellTower.TierNames = { "Murmur", "Noticed", "Named", "Hunted", "The Tolling" }
+BellTower.BellTint = {
+	Hollow = Color3.fromRGB(70, 64, 74);
+	Tarnished = Color3.fromRGB(110, 150, 128);
+	Lit = Color3.fromRGB(235, 205, 120);
+	Search = Color3.fromRGB(235, 205, 120);
+}
+
+function BellTower.BellStatus(Bells: any, State: any, Where: any)
+	local N = math.clamp(math.floor(tonumber(Bells) or 0), 0, 5)
+	local S = if State == "Lit" or State == "Search" or State == "Tarnished" or State == "Hollow" then State else "Hollow"
+	local Out = { Visible = N > 0; Count = N; State = S; ArtKey = "BellHollow"; Tint = BellTower.BellTint[S];
+		Glow = false; Dim = false; Swing = false; Line = "" }
+	if N == 0 then return Out end
+	Out.ArtKey = if S == "Lit" or S == "Search" then "BellLit" elseif S == "Tarnished" then "BellTarnished" else "BellHollow"
+	Out.Glow = S == "Lit"
+	Out.Dim = S == "Search"
+	Out.Swing = S == "Search"
+	local Place = if typeof(Where) == "string" and Where ~= "" then Where else "nearby"
+	local Detail = if S == "Lit" then "they can see you"
+		elseif S == "Search" then "searching · " .. Place
+		elseif S == "Tarnished" then "they know who you are"
+		else "something was seen"
+	Out.Line = '<font color="#C8283C">' .. BellTower.TierNames[N] .. '</font> · ' .. Detail
+	return Out
 end
 
 return BellTower

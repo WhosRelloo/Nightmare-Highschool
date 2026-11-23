@@ -446,6 +446,10 @@ function Local.UpdateTracker()
 	end
 
 	Ui.Card.Visible = true
+	-- (2.37) while the Bells are up, the card folds to its title and the J key
+	local Folded = (Player:GetAttribute(`NHBells`) or 0) > 0
+	Ui.Objective.Visible = not Folded
+	Ui.Pips.Visible = not Folded
 	Ui.Name.Text = Def.Name
 	Ui.Name.TextColor3 = if Ui.OnPaper then (if Def.Category == `Main` then PAPER_CRIMSON else PAPER_INK)
 		else (if Def.Category == `Main` then C.Gold else C.Text)
@@ -462,7 +466,7 @@ function Local.UpdateTracker()
 	else
 		Ui.Timer.Text = ``
 	end
-	Ui.Timer.Visible = Ui.Timer.Text ~= ``
+	Ui.Timer.Visible = Ui.Timer.Text ~= `` and not Folded -- (2.37)
 
 	local Target, Override = Local.Target(Q, Id, State, Obj)
 	local Root = Player.Character and Player.Character:FindFirstChild(`HumanoidRootPart`) :: BasePart?
