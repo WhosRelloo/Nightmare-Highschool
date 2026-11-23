@@ -25,6 +25,16 @@ local BellTower = require(ReplicatedStorage:WaitForChild(`Functions`):WaitForChi
 local Art = require(ReplicatedStorage.Config:WaitForChild(`BellTowerArt`)) -- (2.36)
 local PAPER_INK = Color3.fromRGB(43, 29, 18)
 local PAPER_CRIMSON = Color3.fromRGB(110, 14, 24)
+local PAPER_HINT = Color3.fromRGB(92, 66, 46) -- (2.37.1) the hint line: dimmer than the ink, still >= 4.5:1 on the card paper
+-- (2.37.1) the card's type, picked with the owner's "readable and on theme": a blackletter title, a book serif for the
+-- objective (Guru, the house body face, is condensed and hard to read at 20 px on the card), a quill hand for the hint
+local function Face(Family: string, Weight: Enum.FontWeight?): Font
+	return Font.new(`rbxasset://fonts/families/{Family}.json`, Weight or Enum.FontWeight.Regular)
+end
+local FACE_TITLE = Face(`GrenzeGotisch`, Enum.FontWeight.SemiBold)
+local FACE_BODY = Face(`Merriweather`)
+local FACE_BOLD = Face(`Merriweather`, Enum.FontWeight.Bold)
+local FACE_HAND = Face(`Fondamento`)
 
 local Player = Players.LocalPlayer
 local C = Theme.Colors
@@ -197,10 +207,11 @@ function Local.Build()
 	if workspace.CurrentCamera then workspace.CurrentCamera:GetPropertyChangedSignal(`ViewportSize`):Connect(PhonePlace) end
 	local Ink = if OnPaper then PAPER_INK else C.Text
 	local Name = Components.Text({
-		Name = `QuestName`; Text = ``; Font = Theme.Fonts.Title; TextSize = 24;
+		Name = `QuestName`; Text = ``; Font = Theme.Fonts.Title; TextSize = 34;
 		TextColor3 = C.Gold; TextXAlignment = Enum.TextXAlignment.Left; LayoutOrder = 1;
-		Size = UDim2.new(1, 0, 0, 30); Parent = Content;
+		Size = UDim2.new(1, 0, 0, 38); TextTruncate = Enum.TextTruncate.AtEnd; Parent = Content;
 	})
+	Name.FontFace = FACE_TITLE -- (2.37.1)
 	if not OnPaper then Components.Emboss(Name, Color3.fromRGB(150, 118, 70), 1.4) end
 	local Objective = Components.Text({
 		Name = `Objective`; Text = ``; Font = Theme.Fonts.Body; TextSize = BellTower.MIN_TEXT;
@@ -208,15 +219,26 @@ function Local.Build()
 		TextYAlignment = Enum.TextYAlignment.Top; RichText = true; LayoutOrder = 2;
 		Size = UDim2.new(1, 0, 0, 0); AutomaticSize = Enum.AutomaticSize.Y; Parent = Content;
 	})
+	Objective.FontFace = FACE_BODY -- (2.37.1)
+	Objective.LineHeight = 1.05
+	-- (2.37.1) the how-to under the objective (Obj.Hint, or the objective's trailing "( ... )"), small and italic
+	local Hint = Components.Text({
+		Name = `Hint`; Text = ``; Font = Theme.Fonts.Body; TextSize = 23; -- Fondamento is small for its size
+		TextColor3 = if OnPaper then PAPER_HINT else C.TextDim; TextWrapped = true; TextXAlignment = Enum.TextXAlignment.Left;
+		TextYAlignment = Enum.TextYAlignment.Top; LayoutOrder = 3; Visible = false;
+		Size = UDim2.new(1, 0, 0, 0); AutomaticSize = Enum.AutomaticSize.Y; Parent = Content;
+	})
+	Hint.FontFace = FACE_HAND
 	local Timer = Components.Text({
 		Name = `Timer`; Text = ``; Font = Theme.Fonts.BodyBold; TextSize = BellTower.MIN_TEXT;
 		TextColor3 = if OnPaper then PAPER_CRIMSON else C.Danger; TextXAlignment = Enum.TextXAlignment.Left;
-		LayoutOrder = 3; Visible = false; Size = UDim2.new(1, 0, 0, 24); Parent = Content;
+		LayoutOrder = 4; Visible = false; Size = UDim2.new(1, 0, 0, 24); Parent = Content;
 	})
+	Timer.FontFace = FACE_BOLD -- (2.37.1)
 	-- the foot: fang pips on the left, the J Journal key on the right
 	local Foot = Instance.new(`Frame`)
 	Foot.Name = `Foot`
-	Foot.LayoutOrder = 4
+	Foot.LayoutOrder = 5
 	Foot.BackgroundTransparency = 1
 	Foot.Size = UDim2.new(1, 0, 0, 36)
 	Foot.Parent = Content
@@ -253,10 +275,11 @@ function Local.Build()
 	KeyStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 	KeyStroke.Parent = Key
 	local Footer = Components.Text({
-		Name = `Footer`; Text = `Journal`; Font = Theme.Fonts.Body; TextSize = BellTower.MIN_TEXT;
-		TextColor3 = if OnPaper then PAPER_INK else C.TextDim; TextXAlignment = Enum.TextXAlignment.Right;
+		Name = `Footer`; Text = `Journal`; Font = Theme.Fonts.Body; TextSize = 23;
+		TextColor3 = if OnPaper then PAPER_HINT else C.TextDim; TextXAlignment = Enum.TextXAlignment.Right;
 		AnchorPoint = Vector2.new(1, 0.5); Position = UDim2.new(1, 0, 0.5, 0); Size = UDim2.fromOffset(90, 26); Parent = Foot;
 	})
+	Footer.FontFace = FACE_HAND -- (2.37.1)
 
 	-- Detection meter (top centre, only inside stealth zones)
 	local Eye, EyeApi = Components.Panel({
@@ -310,7 +333,7 @@ function Local.Build()
 	Components.Slice(`FrameThin`, C.Gold:Lerp(C.Iron, 0.5), { SliceScale = 0.35, Parent = MarkerLabel })
 
 	return {
-		Gui = Gui; Card = Card; Name = Name; Objective = Objective; Timer = Timer; Footer = Footer;
+		Gui = Gui; Card = Card; Name = Name; Objective = Objective; Hint = Hint; Timer = Timer; Footer = Footer;
 		Pips = Pips; PipKey = ``; OnPaper = OnPaper; HasPips = BellTower.Image(Art, `PipFang`) ~= nil and BellTower.Image(Art, `PipEmpty`) ~= nil;
 		Eye = Eye; EyeLabel = EyeLabel; Fill = Fill; Marker = Marker; MarkerLabel = MarkerLabel;
 	}
@@ -364,10 +387,25 @@ function Local.Target(Q, Id: string, State, Obj): (BasePart?, string?)
 	return Best, nil
 end
 
+-- (2.37.1) an objective's line and its how-to: Obj.Hint, or the trailing "( ... )" of Obj.Text, as its own sentence
+function Shared.SplitHint(Obj): (string, string?)
+	local Text = Obj.Text or ``
+	local Hint = if typeof(Obj.Hint) == `string` and Obj.Hint ~= `` then Obj.Hint else nil
+	if not Hint then
+		local Main, Tail = string.match(Text, `^(.-)%s*%(([^()]+)%)%s*$`)
+		if Main and Main ~= `` then Text, Hint = Main, Tail end
+	end
+	if Hint then
+		Hint = string.upper(string.sub(Hint, 1, 1)) .. string.sub(Hint, 2)
+		if not string.match(Hint, `[%.!?]$`) then Hint ..= `.` end
+	end
+	return Text, Hint
+end
+
 function Local.ObjectiveLine(Q, Id: string, State, Obj, WithCount: boolean): string
 	local Need = Obj.Count or 1
 	local Have = (State.Counts or {})[Obj.Id] or 0
-	local Text = Obj.Text
+	local Text = (Shared.SplitHint(Obj))
 	if WithCount and Need > 1 then Text ..= `  ({Have}/{Need})` end
 	if Obj.Item and State.Items and State.Items[Obj.Item] == `Dropped` then
 		local Item = QuestConfig.Items[Obj.Item]
@@ -402,9 +440,10 @@ function Local.SetPips(List: { boolean }?, Have: number, Need: number)
 	Count.AutomaticSize = Enum.AutomaticSize.X
 	Count.Size = UDim2.fromOffset(0, 30)
 	Count.Font = Theme.Fonts.Body
+	Count.FontFace = FACE_BOLD -- (2.37.1)
 	Count.TextSize = BellTower.MIN_TEXT
 	Count.TextColor3 = if Ui.OnPaper then PAPER_INK else C.Text
-	Count.Text = `  {Have}/{Need}`
+	Count.Text = `  {Have} of {Need}`
 	Count.Parent = Ui.Pips
 end
 
@@ -457,6 +496,9 @@ function Local.UpdateTracker()
 	local Have = (State.Counts or {})[Obj.Id] or 0
 	local PipList = if Ui.HasPips then BellTower.Pips(Have, Need) else nil
 	Ui.Objective.Text = Local.ObjectiveLine(Q, Id, State, Obj, PipList == nil)
+	local _, HintText = Shared.SplitHint(Obj) -- (2.37.1)
+	Ui.Hint.Text = HintText or ``
+	Ui.Hint.Visible = HintText ~= nil and not Folded and not string.find(Ui.Objective.Text, `dropped the`, 1, true)
 	Local.SetPips(PipList, Have, Need)
 	Local.Follow()
 
