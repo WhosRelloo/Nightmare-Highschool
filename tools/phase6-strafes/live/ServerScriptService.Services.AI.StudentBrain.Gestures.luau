@@ -237,12 +237,15 @@ function Gestures.GetUp(Model: Model): string?
 	local Seconds = Lo + roll() * (Hi - Lo)
 	if S.Agent then pcall(function() S.Agent:Stop() end) end
 	S.Reacting = true
+	task.wait(0.35) -- Downed.Recover stops the downed tracks as it stands them up: start after it
 	local T = Gestures.Play(S, Name, { Force = true; Seconds = Seconds })
-	task.delay(Seconds, function() if S.Model == Model then S.Reacting = false end end)
-	if Model:GetAttribute(`NHScheduled`) then
-		S.SickUntil = os.clock() + Config.Infirmary.VisitAfter
-		S.Replan = true
-	end
+	if Model:GetAttribute(`NHScheduled`) then S.SickUntil = os.clock() + Config.Infirmary.VisitAfter end
+	task.delay(Seconds, function()
+		if S.Model ~= Model then return end
+		S.Reacting = false
+		-- only now: a replan walks them off (Schedules' WalkTo ends every gesture), to the infirmary first
+		if Model:GetAttribute(`NHScheduled`) then S.Replan = true end
+	end)
 	return if T then Gestures.Name(S, Name) else nil
 end
 
@@ -289,7 +292,7 @@ local function probe()
 					local An = S.Hum:FindFirstChildOfClass(`Animator`)
 					for _, T in (An and An:GetPlayingAnimationTracks() or {}) do table.insert(Tracks, { Id = T.Animation and T.Animation.AnimationId; W = T.WeightCurrent; P = T.Priority.Name; Speed = T.Speed }) end
 				end
-				return { Gesture = S and S.Gesture; Reacting = S and S.Reacting; Sick = S and S.SickUntil ~= nil; Seated = S and S.Seated ~= nil; Model = S and S.Model and S.Model:GetFullName(); Pos = S and S.Root and S.Root.Position; Tracks = Tracks }
+				return { Gesture = S and S.Gesture; Reacting = S and S.Reacting; Sick = S and S.SickUntil ~= nil; Seated = S and S.Seated ~= nil; Model = S and S.Model and S.Model:GetFullName(); Pos = S and S.Root and { S.Root.Position.X, S.Root.Position.Y, S.Root.Position.Z }; Moving = S and S.Agent and S.Agent.Moving; Tracks = Tracks }
 			elseif Cmd == `Active` then
 				return { Active = ActiveCount }
 			elseif Cmd == `GetUp` then
@@ -298,7 +301,7 @@ local function probe()
 			elseif Cmd == `Students` then
 				local L = {}
 				for I, S in (Host and Host.Students and Host.Students() or {}) do
-					table.insert(L, { I = I; Clique = S.Clique; Alive = S.Model ~= nil and S.Model.Parent ~= nil; Pos = S.Root and S.Root.Position })
+					table.insert(L, { I = I; Clique = S.Clique; Alive = S.Model ~= nil and S.Model.Parent ~= nil; Pos = S.Root and { S.Root.Position.X, S.Root.Position.Y, S.Root.Position.Z } })
 				end
 				return L
 			elseif Cmd == `Id` then

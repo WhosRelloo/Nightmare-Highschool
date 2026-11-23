@@ -466,6 +466,7 @@ end
 -- Config.Locomotion.StrafeSpeed while it runs (NHStrafe -> Features.CombatSpeed). Off during cuts and approaches.
 
 local Directional = { Left = nil :: AnimationTrack?, Right = nil :: AnimationTrack? }
+local Studio = RunService:IsStudio()
 local StrafeOn, Since, Sent = false, 0, nil :: boolean?
 local Remote: RemoteEvent? = nil
 

@@ -4,7 +4,7 @@ if not B then return "FAIL no NHGestureProbe" end
 local Fails, Notes = {}, {}
 local L = B:Invoke("Students")
 local I
-for _, S in L do if S.Alive then I = S.I break end end
+for _, S in L do if S.Alive and not B:Invoke("State", S.I).Seated then I = S.I break end end
 if not I then return "FAIL no student with a body" end
 B:Invoke("Near", I, 8)
 local R = B:Invoke("DownRecover", I)
