@@ -36,7 +36,7 @@
 - **Owner rules:**
   - cool, high quality, on theme, no gore;
   - animated and customizable;
-  - **still look like students**: face and uniform readable; no werewolf muzzle; no fur on the head; Wraith heads clear; no Wraith lower-body shroud; no claws on werewolves or Wraiths;
+  - **still look like students**: face and uniform readable; no werewolf muzzle; no fur on the head; Wraith heads clear; no Wraith lower-body shroud; no claws on any race;
   - sculpted geometry only.
 - **Art:**
   - PaintRigV3 opened read-only;

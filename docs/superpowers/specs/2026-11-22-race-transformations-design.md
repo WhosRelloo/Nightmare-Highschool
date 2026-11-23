@@ -17,19 +17,19 @@
   - the face and the uniform stay readable;
   - **no werewolf muzzle and no fur on the head** (the ears stay);
   - **no Wraith lower-body shroud** (the legs and uniform show), and **Wraith heads kept clear** (no hood, no crown);
-  - **no claws on werewolves or Wraiths**.
+  - **no claws on any race**.
 - **Sculpted geometry only**, built on PaintRigV3 proportions.
 
 ## 2. The forms
 
 | Race | Direction | Silhouette | Parts |
 |---|---|---|---|
-| Vampire | **V1 Nocturne** | wings folded close like a cloak, long swept ears | Nocturne wings (bat, 4 digits, veined membrane, healed notch); ears; slim black claws |
+| Vampire | **V1 Nocturne** | wings folded close like a cloak, long swept ears | Nocturne wings (bat, 4 digits, veined membrane, healed notch); ears |
 | Vampire | **V2 Night Sovereign** | wings spread, horns swept back, a spined back | Wyrm wings (3 long digits, leading-edge spikes); Demon horns (ridged, twisted, Bloodstone tips); obsidian spines |
 | Werewolf | **W1 Moonbound** | a fur mantle over the shoulders, fur cuffs, a bushy tail | layered fur locks on the shoulders, forearms and shins; wolf ears; tail. **No claws, no muzzle, no head fur.** |
 | Werewolf | **W2 Feral Lord** | a heavier charcoal mantle down the arms and back | fur down the arms and back; glowing moon-mark crescents on the chest; tail. Same rules. |
-| Ghoul | **G1 Ossuary** | a bone king: antlers, bone wings, ribs grown over the chest | Ossuary wings (bones with grave-cloth tatters); Wendigo antlers; rib plates, sternum, vertebral ridge, arm spurs, jaw guard, bone claws |
-| Ghoul | **G2 Gravecloth** | wound in grave linen, moss on the shoulders | linen wraps on the arms and chest, hanging tatters, grave-moss, iron coffin nails (in the cloth), the Thorn crown |
+| Ghoul | **G1 Ossuary** | a bone king: antlers, bone wings, ribs grown over the chest | Ossuary wings (bones with grave-cloth tatters); Wendigo antlers; rib plates, sternum, vertebral ridge, arm spurs, jaw guard |
+| Ghoul | **G2 Gravecloth** | wound in grave linen, moss on the shoulders | linen wraps on the arms and chest, hanging tatters, grave-moss, iron coffin nails (in the cloth), the Thorn crown. No claws. |
 | Wraith | **R1 Hollow Shroud** | a lit face, a tattered spectral capelet, veil wings | capelet open at the front; Wraithveil wings (a rippling mist membrane, trailing wisps). **Head clear, no claws; legs and uniform show.** |
 | Wraith | **R2 Frost Revenant** | ice spikes at the shoulders, spectral chains, rime wings | shoulder spikes; a chain loop and a hanging chain; rime-crusted shins; Rime wings. **Head clear, no ice claws.** |
 

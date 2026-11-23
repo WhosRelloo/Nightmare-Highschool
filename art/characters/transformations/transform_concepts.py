@@ -281,7 +281,7 @@ def build(tag, race, direction, body, gender, skin_key):
         for sx in (-1, 1):
             add(leaf(f"{tag}Ear{sx}", hc + Vector((0.58 * sx, -0.02, 0.05)), Vector((0.75 * sx, -0.35, 0.6)), Vector((0, 0.3, 1)),
                      Vector((0, 1, 0)), 0.62 if direction == 1 else 0.5, 0.2, 0.05, nhfig.SKIN[skin_key], tip_curl=0.04), "Head")
-            add(claws(f"{tag}Claw{sx}", 1.5 * sx, Vector((0, 1, 0)), F["claw"], length=0.36, r0=0.035), "RArm" if sx > 0 else "LArm")
+            pass  # (owner 2026-11-23: no claws on any race)
         root_l, root_r = Vector((-0.45, -0.52, 3.75)), Vector((0.45, -0.52, 3.75))
         if direction == 1:
             # Nocturne: wings folded like a cloak, a high membrane collar behind the head
@@ -341,7 +341,7 @@ def build(tag, race, direction, body, gender, skin_key):
                     z = 3.55 - k * 0.3
                     pts = [project(bv["Torso"], Vector((sx * (0.08 + 0.85 * t), 1, z - 0.18 * t * t)), Vector((0, -1, 0)), 0.035) for t in [i / 8 for i in range(9)]]
                     add(taper(f"{tag}Rib{sx}_{k}", pts, 0.055, 0.03, F["ivory"]), "Torso")
-                add(claws(f"{tag}BClaw{sx}", 1.5 * sx, Vector((0, 1, 0)), F["boneclaw"], length=0.4, r0=0.05, n=3), "RArm" if sx > 0 else "LArm")
+                pass  # (owner 2026-11-23: no claws on any race)
             add(hq_wings(tag, "ossuary", "Wine", "Ivory", 1.0), "Torso")
             add(hq_horns(tag, "wendigo", "Bone", "Bone"), "Head")
             st = [project(bv["Torso"], Vector((0, 1, 3.85 - 0.12 * i)), Vector((0, -1, 0)), 0.05) for i in range(10)]
@@ -374,7 +374,7 @@ def build(tag, race, direction, body, gender, skin_key):
                         verts += [fray(q - sd * w, 0.01), fray(q + sd * w, 0.01)]
                     faces = [(i * 2, i * 2 + 2, i * 2 + 3, i * 2 + 1) for i in range(5)]
                     add(add_mods(mesh_obj(f"{tag}Tatter{sx}_{k}", verts, faces, F["linen"]), thick=0.01), key)
-                add(claws(f"{tag}BClaw{sx}", 1.5 * sx, Vector((0, 1, 0)), F["boneclaw"], length=0.3, r0=0.045, n=4), key)
+                pass  # (owner 2026-11-23: no claws on any race)
             add(gauze_wrap(f"{tag}Chest", bv["Torso"], (0, 0), 2.6, 3.75, 2.2, 0.38, off=0.03, layer=0.01, mat=F["linen"], phase=1.0), "Torso")
             add(hq_horns(tag, "thorn", "Obsidian", "Obsidian"), "Head")
             add(fur_region(f"{tag}Moss", bv["Torso"], Vector((0, 0, 3.95)), Vector((1.0, 0.55, 0.06)), 120, 0.09, 0.035, [F["moss"]],
