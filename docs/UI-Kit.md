@@ -346,6 +346,41 @@ R1 of the Bell Tower rebuilt the top-right clock panel (`ClockHud`) and the ques
 - **Not checked:** a real phone viewport in Studio's device emulator, so the touch buttons (TouchControls isn't built in the preview) and true phone scale aren't checked; two players; filled fang pips on screen; the longest quest title on the card; and the BellRim flash around the new cluster.
 - **Backup:** the pre-R1 scripts are in `ServerStorage.NH_Backup.BellTower_pre_20261120` (Studio) and `tools/belltower-r1/pre/`. The live mirror is `tools/belltower-r1/live/`.
 
+### The Bell Rail (2.37)
+R2 of the Bell Tower adds the **Bell Rail** to the cluster: a forged rail under the clock plate with up to five bells, and a status line under them. It shows while the server's Notoriety service gives you Bells (see [Attendance and Discipline](Attendance-and-Discipline.md#notoriety-the-bells-237)). The plan is `docs/superpowers/plans/2026-11-21-belltower-r2-bells.md`.
+
+
+- **Art** (`art/ui/hud/make_belltower.py` `export_r2()`, staged in `art/group-upload-belltower/`, uploaded to group 15981569, ids in `art/group-upload-belltower/ids-r2.json` and `Config.BellTowerArt`):
+
+  | Key | File | Size | Id | Used for |
+  |---|---|---|---|---|
+  | `BellHollow` | `BtBellHollow.png` | 256 x 256 | 73177035232417 | the bells while Hollow (blackened iron) |
+  | `BellTarnished` | `BtBellTarnished.png` | 256 x 256 | 132965538168678 | the bells while Tarnished (verdigris brass) |
+  | `BellLit` | `BtBellLit.png` | 256 x 256 | 82432772953626 | the bells while Lit or in Search (hot brass) |
+  | `BellGlow` | `BtBellGlow.png` | 256 x 256 | 96913118397929 | a greyscale halo behind each bell while Lit, tinted Gold. (2.37) Re-baked to reach alpha 0 at every edge and re-uploaded (the old id 122809646117990 is unused) |
+  | `BellRail` | `BtBellRail.png` | 1400 x 220 | 126038840460786 | the rail with five hooks |
+
+- **Fallback** (an id of 0): each bell draws the kit's `Theme.Images.Bell`, tinted per state by `BellTower.BellTint` (Hollow grey-violet, Tarnished verdigris, Lit and Search gold). The rail and glow are left out.
+- **Layout** (design px, inside the cluster `Panel`):
+  - `Panel.Bells`: a Frame 126 tall at `LayoutOrder 2`, between `Head` (1) and the `Conduct` row, which moves to 3. It is hidden at Bell 0, so R1's layout is unchanged then.
+  - `Rail`: 450 x 71, right-anchored at x +6.
+  - `Bell1`…`Bell5`: 62 x 62, hung 20 px down. Bell I hangs from rail hook 5 − I (hooks at x 150 + k × 240 of the 1400 px rail), so the first bell is on the right.
+  - Each bell's `Glow` is 1.9 times its size at 0.35 transparency, centred a little low.
+  - `Status`: a right-aligned rich-text line at y 94, 28 tall, 20 px (`BellTower.MIN_TEXT`) with a 1.2 stroke.
+- **`BellTower.BellStatus(Bells, State, Where)`** (pure; tested by `tools/belltower-r2/checks/bt_pure_r2.lua`) returns `{ Visible, Count, State, ArtKey, Tint, Glow, Dim, Swing, Line }`:
+  - `Count` is clamped to 0-5, and an unknown state reads as Hollow.
+  - `ArtKey`: `BellLit` for Lit and Search, `BellTarnished`, else `BellHollow`. `Glow` is on only while Lit; `Dim` (0.35 transparency) and `Swing` only in Search.
+  - `Line` is the tier name in crimson `#C8283C`, then "they can see you" (Lit), "searching · {Where or nearby}" (Search), "they know who you are" (Tarnished) or "something was seen" (Hollow).
+  - Also `BellTower.TierNames` and `BellTower.BellTint`.
+- **Motion:**
+  - **Toll:** when a bell is added, the brass hand bell (`rbxassetid://9113584435`) plays at volume 0.35, a little lower for each tier, and the new bell kicks 7° and springs back.
+  - **Swing:** in Search the bells swing ±9° on a 0.6 s sine, each 0.12 s behind the last.
+  - With `NHReducedMotion` there's no kick and no swing; the sound and the words still change.
+- **The conduct row** shows a **Summons** slip ("Summons" or "Summons ×N", "Room 106, outside class") after a detention in progress and before an owed detention, from `NHSummons`. It sets the Room 106 waypoint outside class.
+- **The Lead Card folds** while `NHBells` is above 0: the Objective, Pips and Timer hide, leaving the title and the `J` key. The card still follows the taller cluster (2.36.1's signals).
+- **Contracts:** all of R1's still hold. `Panel` stays ClockHud's only direct Frame child, the "In class" line and `ShowPA` are unchanged, and `QuestTracker.Tracker` keeps AnchorPoint.X above 0.5 on desktop. `tools/belltower-r2/checks/bt_bells.lua` checks the first, plus the 20 px floor, the rail under the plate and the fold.
+- **Checked (2026-11-23):** `bt_pure_r2` and R1's `bt_pure` PASS (Edit VM); `bt_bells` and R1's five `bt_hud*` PASS, `bt_contracts` as expected outside class (Play). Screenshots: [Named, Lit](img/belltower-r2-named-lit.jpg), [The Tolling, Tarnished](img/belltower-r2-tolling-tarnished.jpg).
+
 ### Health bar: Thornrose
 The owner asked for "a completely new and cooler and on theme design". Three all-new concepts were mocked up (Vigil, Reliquary, Thornrose: [options](img/health-thornrose-options.jpg)), and the owner picked **Thornrose**: a briar of black iron (`KitHud` `Local.SkinThorn`, over the kit's `HealthBar`).
 

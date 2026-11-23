@@ -6,18 +6,6 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 Work on branches that aren't merged into `main` yet. Nothing here is in NH Combat Test unless it says so.
 
-### `belltower-r2`: the Bell Tower, R2: the Bells (planned 2.37.0)
-- **What it is:** Notoriety. Misdeeds that staff witness build Heat (0-100), Heat rings up to five Bells (Murmur, Noticed,
-  Named, Hunted, The Tolling), and the HUD gets a Bell Rail under the clock. Spec §3, §4 item 2 and §7 R2 of
-  `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-design.md`; the plan is
-  `docs/superpowers/plans/2026-11-21-belltower-r2-bells.md`.
-- **Done (repo only):** the bell art (`BtBellHollow`, `BtBellTarnished`, `BtBellLit`, `BtBellGlow`, `BtBellRail`),
-  uploaded to group 15981569 with its ids recorded (`BtBellGlow` re-baked with feathered edges and re-uploaded);
-  `Config.Notoriety` and `Functions.Notoriety` (pure, with the `nt_pure` check); the `Services.School.Notoriety`
-  service; the harness and `probe.py`; and a draft 2.37.0 changelog entry and docs.
-- **Left:** HallMonitor joining in, the Bell Rail on the HUD and the Lead Card fold, the art ids and screenshots, and the
-  Studio install with every check run. Nothing is installed in Studio yet.
-
 ### `sky-2360`: painted skies and lighting, 2.36 pass (art and a proposed config, not wired)
 - **What it is:** the owner-approved sky and lighting pass (`docs/superpowers/specs/2026-11-21-sky-2360-design.md`):
   Candlelit Gothic days and Moonlit Storybook nights, with Winter, Spring, Summer and Nightmare Nights as event seasons.
@@ -39,16 +27,73 @@ Work on branches that aren't merged into `main` yet. Nothing here is in NH Comba
   for the 9 crests and 9 crest flipbooks (owner uploaded 2026-11-22).
 - **Left:** everything in game. No game code is written and Studio wasn't touched.
 
-### `phase6-strafes`: strafe walks and NPC gestures (in progress, not pushed)
-- **What it is:** phase 6 Studio queue item 2, cut from the tutorial branch
-  (`docs/superpowers/specs/2026-11-22-strafes-npc-gestures-design.md`, the plan
-  `docs/superpowers/plans/2026-11-22-strafes-npc-gestures.md` and the survey in `docs/superpowers/research/`).
-  Counter-rotated strafe clips at about 8.5 studs/s, a stride fix for walk, sprint and crouch, injured and dizzy idles,
-  Nurse Agatha Thorne with a minimal `Infirmary.Treat` entry point, and bleacher seats with an Athletes "watch the
-  match" job.
-- **Done:** the survey, the spec and plan (with the owner's two rounds of rulings), the harness and
-  `Config.Locomotion` / `Functions.Locomotion` (pure, `lc_pure` passes).
-- **Version:** decided at merge, probably 2.38.0.
+### `phase6-strafes`: strafe walks, NPC gestures, the Infirmary (merged into `main` 2026-11-23, version at release)
+- Square-chest strafes at about 8.5 studs/s, the stride-matched cadence (capped 2.4x), 42 NPC gesture clips (published,
+  ids in `Config.Gestures`), Nurse Agatha Thorne's minimal `Infirmary.Treat`, bleacher seats and the Athletes' watch job.
+  Checks and open rows: `tools/phase6-strafes/REPORT.md` (owner eye: the strafe look in motion, the pray kneel, the
+  treatment gestures, the bleachers; the Infirmary room is still bare).
+
+## [2.37.0] - 2026-11-23: The Bell Tower, R2: the Bells
+
+
+R2 of `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-design.md` (§3, §4 item 2, §7 R2). The plan is `docs/superpowers/plans/2026-11-21-belltower-r2-bells.md`.
+- **Mirror:** `tools/belltower-r2/` (`live/` is the built scripts, `pre/` the scripts before R2).
+- **The Map place:** untouched.
+- **Art status:** the five bell pieces are uploaded to group 15981569, and their ids are in `Config.BellTowerArt`. Confirmed in Play. `BtBellGlow` was re-uploaded after the edge fix: id 96913118397929 (the old 122809646117990 is unused).
+
+### Added
+- **Notoriety** (`ServerScriptService.Services.School.Notoriety`): misdeeds that staff witness build Heat (0-100), and Heat rings up to five Bells: Murmur 10+, Noticed 25+, Named 45+, Hunted 70+, The Tolling 90+.
+  - **States:** Lit (a monitor sees you), Search (lost under 30 s ago), Tarnished (they know your face), Hollow (they don't).
+  - **Heat:** Truancy 12, Trespassing and Curfew 20, Vandalism 15, Fighting 25, Contraband 10, Exposure 30, hitting staff 45. ×1.5 at night, ×1.25 on Probation or Suspension.
+  - **Cooling:** none while Lit; 1.5/s in Search, then 3/s. ×2 in a locker, the Dorms or off campus; ×3 with an alibi (your class room in class, or serving detention).
+  - **Escalation:** at Bell 3 a monitor responds; at Bell 4 every monitor converges and the PA calls a disturbance; Bell 5 is an emergency PA.
+  - **Caught:** the violation plus a tier bonus (Bell 3 +1, Bell 4 +2, Bell 5 +3).
+  - **Escaped but identified:** a **summons**, served in Room 106 outside class, without the bonus. At most 3, and one ignored for a day books Skipped Detention (+4).
+  - Pure maths in `ReplicatedStorage.Functions.Notoriety`, every number in `ReplicatedStorage.Config.Notoriety`.
+  - The client reads only `NHBells`, `NHBellState`, `NHSearchWhere` and `NHSummons`.
+- **`Exposure` violation** (3 points, "Seen transformed by staff").
+- **Save data:** `Discipline.Summons` and `Discipline.FaceKnownUntilDay` (old saves get them through Reconcile).
+- **The Bell Rail** on the HUD: a forged rail under the clock plate with up to five bells (Hollow, Tarnished and Lit art; a gold glow while Lit; dimmed and swinging in Search), and a status line at 20 px ("Named · searching · The Library"). Each new bell tolls. Reduce Motion stops the swing and the kick.
+- **The art:** `BtBellHollow`, `BtBellTarnished`, `BtBellLit`, `BtBellGlow` (256 x 256) and `BtBellRail` (1400 x 220).
+- **Test seam:** `ServerStorage.NHNotorietyProbe` (Studio only) and `tools/belltower-r2/harness/probe.py`.
+
+### Changed
+- **`Discipline.AddViolation`** takes `{ Bonus }` and adds it, with "· +N for running" on the toast. **`Discipline.ReportIncident`** tells Notoriety about every report (`OnReport`), and a caught report carries the bonus back.
+- **`HallMonitor`:**
+  - a chase it starts, and a hit on a monitor, feed Notoriety
+  - its catches report `Caught = true`
+  - on duty, monitors chase a hunted student (Bell 3+) on sight with the new **Wanted** reason ("There you are! Don't move!"); a Wanted catch books what started the hunt, and a Wanted escape files no new report
+  - new `SeenBy`, `OnCampus` and `Converge`
+- **The conduct row** shows a Summons slip, with the Room 106 waypoint outside class.
+- **The Lead Card** folds to its title and `J` key while you have Bells.
+- **`BtBellGlow`** was re-baked so its alpha reaches 0 at every edge (it was 6-7 on the sides and 40 along the bottom, which could show a faint square when tinted).
+
+### Rulings and spec deltas
+- Live sight comes from the hall monitors only; every staff report adds Heat through `ReportIncident`. Student witnesses and snitches are R3.
+- Only the face is tracked (25 studs, 2 s Lit, or a recognised report; it lasts to the end of the next in-game day). Hollow means not identified and Tarnished means identified, until R3's notes.
+- The summons is served in Room 106 (there's no Headmaster's office in NH Combat Test yet), and it's issued when the search ends, not at the next period change.
+- `Exposure` is new; hitting staff books `Fighting`.
+- Watched wings and the map layer are R4, and the notes row is R3. `SearchRadius` (30-120 studs) is built and tested; in R2 monitors go to the last-seen point.
+- The Tolling is an emergency PA plus every monitor converging. The Headmaster has no body. Bell 4's PA uses the normal once-per-segment limit.
+- `Contraband` Heat 10 is not in spec §3.2.
+- The probation multiplier also applies on Suspension.
+- Bells 1 and 2 draw no staff response yet. Bell 5 cools like the others, and has no campus-wide search.
+- Quests call `HallMonitor.CheckWitness` with their objective's `Witness` value. A reason with no Heat row adds no Heat, but it becomes the misdeed a later Wanted catch books. Not checked in Studio (no quest with a `Witness` objective was run).
+
+### Checked
+- `nt_pure` (Edit VM): PASS.
+- `nt_server` (Play): PASS. Observation: `8 RespondOk=false monitors=1` (the one monitor on duty was not in range to respond at Bell 3).
+- `nt_monitor` (Play): PASS (responding 1).
+- `bt_pure_r2` and R1's `bt_pure` (Edit VM): PASS.
+- `bt_bells` and R1's five `bt_hud*` (owed, active, clear, suspended, warning) (Play): PASS. `bt_contracts`: as expected outside a class period.
+- The live hunt was not driven (the character was not walked to a monitor).
+- Screenshots: [Named, Lit](docs/img/belltower-r2-named-lit.jpg) and [The Tolling, Tarnished](docs/img/belltower-r2-tolling-tarnished.jpg). The search, hunted and summons states were checked by `bt_bells` but not photographed.
+- **Not checked:**
+  - two players
+  - students as witnesses (R3)
+  - the phone layout
+  - the Headmaster's office (there isn't one)
+- **Backup:** `ServerStorage.NH_Backup.BellTower_R2_pre_20261121` holds the scripts before R2.
 
 ## [2.36.1] - 2026-11-21: The Bell Tower, R1 follow-ups
 
