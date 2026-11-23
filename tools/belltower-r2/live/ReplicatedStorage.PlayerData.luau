@@ -146,6 +146,8 @@ local DEFAULT_PLAYER_DATA: PlayerData = {
 		SuspendedUntilDay = -1;
 		LastDecayDay = -1;
 		Recent = {};
+		Summons = {};               -- (2.37) Notoriety: { { Type, Day, Witness } }, at most 3
+		FaceKnownUntilDay = -1;     -- (2.37) Notoriety: staff know your face until this in-game day
 	};
 
 	Settings = {};

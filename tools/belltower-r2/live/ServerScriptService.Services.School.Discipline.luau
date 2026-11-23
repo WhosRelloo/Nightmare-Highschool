@@ -17,6 +17,7 @@
 		Discipline.Reduce(Player, Amount, Reason)
 		Discipline.ServeDetention(Player)
 		Discipline.ReportIncident({ Type, Suspect: Player, Witness, Position?, Recognized }) -> punished?
+		(2.37) Notoriety hears every report (OnReport); a caught report carries the Bonus
 		Discipline.GetData(Player), Discipline.IsSuspended(Player)
 		Signals: ViolationAdded(Player, Record), LevelChanged(Player, New, Old), DetentionServed(Player)
 ]]
@@ -165,21 +166,24 @@ function Shared.AddViolation(Player: Player, Type: string, Details: any?): any?
 	local Rule = Config.Violations[Type]
 	local Discipline = Shared.GetData(Player)
 	if not Rule or not Discipline then return nil end
+	local Bonus = math.max(0, math.floor(tonumber(Details and Details.Bonus) or 0)) -- (2.37) Notoriety: caught while hunted
+	local Points = Rule.Points + Bonus
 
 	local State = SchoolClock.GetState()
 	local Record = {
 		Type = Type;
 		Text = Rule.Text;
-		Points = Rule.Points;
+		Points = Points;
+		Bonus = if Bonus > 0 then Bonus else nil;
 		Day = State.Day;
 		Time = State.ClockText;
 		Witness = Details and Details.Witness or nil;
 	}
 
-	Discipline.Points += Rule.Points
+	Discipline.Points += Points
 	-- (2.7.3) kept aside while suspended: the suspension's end resets points to PointsAfterSuspension, then adds these
 	if Discipline.SuspendedUntilDay >= 0 and State.Day < Discipline.SuspendedUntilDay then
-		Discipline.HeldPoints = (Discipline.HeldPoints or 0) + Rule.Points
+		Discipline.HeldPoints = (Discipline.HeldPoints or 0) + Points
 	end
 	table.insert(Discipline.Recent, 1, Record)
 	while #Discipline.Recent > Config.RecentLimit do
@@ -188,7 +192,7 @@ function Shared.AddViolation(Player: Player, Type: string, Details: any?): any?
 
 	Notifications.Notify(Player, {
 		Title = `Violation: {Rule.Text}`;
-		Text = `+{Rule.Points} discipline points ({Discipline.Points} total)`;
+		Text = `+{Points} discipline points ({Discipline.Points} total)` .. (if Bonus > 0 then ` · +{Bonus} for running` else ``);
 		Kind = `Warning`;
 		Duration = 5;
 	})
@@ -228,6 +232,12 @@ function Shared.ServeDetention(Player: Player)
 	return true
 end
 
+-- (2.37) Notoriety (Services.School.Notoriety) hears every report; required lazily (it requires this module)
+function Local.Notoriety(): any?
+	local Ok, M = pcall(function() return require(ServerScriptService.Services.School.Notoriety) end)
+	return if Ok then M else nil
+end
+
 -- Witness framework entry point. Returns true if the suspect was punished.
 function Shared.ReportIncident(Incident): boolean
 	local State = SchoolClock.GetState()
@@ -237,9 +247,16 @@ function Shared.ReportIncident(Incident): boolean
 	table.insert(Incidents, 1, Incident)
 	while #Incidents > MAX_INCIDENTS do table.remove(Incidents) end
 
+	local Bonus = 0
+	local N = Local.Notoriety()
+	if N and N.OnReport then
+		local Ok, B = pcall(N.OnReport, Incident)
+		if Ok and type(B) == `number` then Bonus = B end
+	end
+
 	local Suspect = Incident.Suspect
 	if Incident.Recognized and typeof(Suspect) == `Instance` and Suspect:IsA(`Player`) then
-		Shared.AddViolation(Suspect, Incident.Type, { Witness = Incident.Witness })
+		Shared.AddViolation(Suspect, Incident.Type, { Witness = Incident.Witness; Bonus = Bonus })
 		return true
 	end
 	return false

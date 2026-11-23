@@ -26,6 +26,7 @@ return {
 		SkippedDetention = { Points = 4; Text = `Walked out of detention` };
 		Vandalism        = { Points = 3; Text = `Caught painting on school walls` };
 		Trespassing      = { Points = 3; Text = `Caught in a restricted area` };
+		Exposure         = { Points = 3; Text = `Seen transformed by staff` }; -- (2.37) Notoriety
 	};
 
 	Recovery = {
