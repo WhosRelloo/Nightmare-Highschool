@@ -268,7 +268,7 @@ snapshot comparison shows no differences.
 
 ## Open rows
 
-- OWNER: sign-off. Watch both cuts at full speed and record your words here.
+- Done: owner sign-off (2026-11-23, after the recorded clips): "Sign off".
 - OWNER: two players (steps above).
 - OWNER: phone-size row in the device emulator (subtitles >= 20 px, the skip a large target).
 - OWNER: the fence vault: the top-of-climb pose after the dip, FenceLand, APPROACH_YAW, DIP_AT.
@@ -293,7 +293,7 @@ snapshot comparison shows no differences.
 - Resolved in fix round 3: the torso-faces-fence margin (now 7.5-9.2 deg against 15) and the flaky fence SEAM SPEED row (6 of 6).
 - Done 2026-11-23: sneakcheck sneak at real-time frames (881 frames in 11.2 s) on the main build: SNEAK OK, the dip root jump (6.78 studs)
   under a black veil on both frames (worst transparency 0.01).
-- Sign-off: pending.
+- Sign-off: given by the owner on 2026-11-23 ("Sign off"), after watching the TutorialSneak and TutorialBus recordings.
 
 ## Regression after the strafes install (2026-11-23, NH Combat Test, slot 2)
 

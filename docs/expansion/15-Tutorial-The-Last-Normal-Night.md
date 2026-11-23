@@ -263,7 +263,6 @@ Not in slice 1:
 - one texture: the bus stop's timetable canvas (`WF_Timetable_canvas`) is not uploaded yet.
 
 Owner checks still open (full list in `tools/phase6-2350/REPORT.md`):
-- sign-off after watching both cuts at full speed;
 - a two-player run in a Local Server;
 - the phone-size row in the device emulator;
 - the fence vault: the top-of-climb pose after the dip, `FenceLand`, the approach yaw and the dip time;
