@@ -274,7 +274,7 @@ snapshot comparison shows no differences.
 - OWNER: the fence vault: the top-of-climb pose after the dip, FenceLand, APPROACH_YAW, DIP_AT.
 - OWNER: bus boarding with the known door clipping (21-stud bus accepted); the door and driver camera marks.
 - OWNER: Fence and Garden camera marks (first guesses), the new Fence push-in, the bus's static shots (the 9.6 s run includes the deliberate held title), and the 6 s still in the Hide beat (fail path).
-- OWNER: record both cuts and run motion_audit (needs disk space on C:).
+- Done 2026-11-23: both cuts recorded and motion_audit run (see "Recordings" below).
 - OWNER: Task 14: the fence approach (crouch-walk up, the square-up turn, FenceOver1 fading in), the bus walk to Stand,
   the 40-degree vault heading, VAULT_BACK 0.6; watch the bus glide-in for a hitch.
 - OWNER: Task 14 fix round 1, watch at full speed:
@@ -291,8 +291,8 @@ snapshot comparison shows no differences.
     blend from the planted stop.
   - Watch either one at full speed.
 - Resolved in fix round 3: the torso-faces-fence margin (now 7.5-9.2 deg against 15) and the flaky fence SEAM SPEED row (6 of 6).
-- TODO (focused Studio): one more sneakcheck sneak at real-time frames, for the dip-under-black row on the fix round 3 build (passed
-  once at 17 ms; the two runs at 67 ms are the known artifact).
+- Done 2026-11-23: sneakcheck sneak at real-time frames (881 frames in 11.2 s) on the main build: SNEAK OK, the dip root jump (6.78 studs)
+  under a black veil on both frames (worst transparency 0.01).
 - Sign-off: pending.
 
 ## Regression after the strafes install (2026-11-23, NH Combat Test, slot 2)
@@ -323,3 +323,23 @@ Results on the strafes build (round 1 at 50-67 ms frames, unfocused; round 2 at 
 | dipcheck (last) | DIP OK |
 
 Slot 2: fresh snapshot each round (yen 97), restored after each; marks cleared; TutorialLeave; Play stopped; nothing saved.
+
+## Recordings and motion_audit (2026-11-23, main build, fresh Play, slot 2)
+
+Clips (not committed, 17 MB each): `E:/NH-Work/tutorial-clips/TutorialSneak.mp4`, `TutorialBus.mp4` (arrival, to 14.6 s into the cut: the
+capture stops at 30 s) and `TutorialBus_part2.mp4` (from about 13 s into the cut: boarding, pull-away, the held title). Audits in `audit_*` next to them.
+Checks run during the recordings: sneakcheck SNEAK OK (every row); buscheck BUS OK twice (settled at 6.80 s, TheBus2 at 16.86 s, hidden
+from 20.53 s, hold at 30.17 s with 0 drift, doorway dX 0.06, wheels 0.06 studs off the road).
+
+| Cut (window) | moving | still stretches over 1 s | dup frames in motion | notes |
+|---|---|---|---|---|
+| `TutorialSneak` (11.4 s) | 56 % | one 3.1 s, from about 7.2 s into the cut (the landing on FenceLand into the fade out) | 14 % | pan p90 533 px/s and zoom p90 140 %/s at the glide in and the vault |
+| `TutorialBus` 0-14.6 s | 26 % | 1.0 s, 2.3 s and 3.8 s on the parked bus (arrival, the wait) | 5 % | the arrival settles at 6.8 s |
+| `TutorialBus` 13-33 s | 16 % | 2.0 s at the doors, then 13.1 s: the bus pulling away in the dark plus the deliberate held title | 5 % | the pull-away is lights receding in near-black, so it reads as still |
+
+Findings for the owner's watch:
+- slot 2's character wears a large red magic-circle back accessory. In the over-the-shoulder shots (the Garden walk, the boarding) it
+  covers part of the frame. The cuts don't hide back accessories.
+- The bus scene is very dark from the boarding onward; the pull-away reads as two receding lights.
+- The 3.1 s still at the end of the vault: the engine camera has a slow drift there (camcheck), but at pixel level it reads as a hold.
+
