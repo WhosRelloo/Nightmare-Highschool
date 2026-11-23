@@ -1,0 +1,27 @@
+{
+ "group": 15981569,
+ "found": "2026-11-23, itemconfiguration get-assets (newest first), one of each name",
+ "ids": {
+  "NHForm_Membrane_color": 135205925838029,
+  "NHForm_Membrane_normal": 131588905823219,
+  "NHForm_Membrane_rough": 98075805815547,
+  "NHForm_Feather_color": 77686053566433,
+  "NHForm_Feather_normal": 84059578753499,
+  "NHForm_Feather_rough": 129806633381577,
+  "NHForm_Cloth_color": 138112712699916,
+  "NHForm_Cloth_normal": 70844911033119,
+  "NHForm_Cloth_rough": 77793688753953,
+  "NHForm_Mist_color": 106250679469907,
+  "NHForm_Mist_normal": 129771447645641,
+  "NHForm_Mist_rough": 90005488644542,
+  "NHForm_Ice_color": 99796689341880,
+  "NHForm_Ice_normal": 104415262518492,
+  "NHForm_Ice_rough": 84690912729597,
+  "NHForm_Bone_color": 124233546569226,
+  "NHForm_Bone_normal": 94823965627909,
+  "NHForm_Bone_rough": 103382690601514,
+  "NHForm_Horn_color": 130451982169321,
+  "NHForm_Horn_normal": 83784713526082,
+  "NHForm_Horn_rough": 131027277593486
+ }
+}

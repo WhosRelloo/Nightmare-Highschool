@@ -5,6 +5,8 @@
 ]]
 local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
 local RunService = game:GetService(`RunService`)
+local Players = game:GetService(`Players`)
+local preview -- (defined below Shared.Busy)
 local Lineage = require(ReplicatedStorage:WaitForChild(`Lineage`))
 local Kit = require(ReplicatedStorage:WaitForChild(`UI`):WaitForChild(`Components`))
 local Progression = require(ReplicatedStorage:WaitForChild(`Config`):WaitForChild(`Progression`))
@@ -27,6 +29,87 @@ local function entry(subId)
 end
 
 function Shared.Busy(): boolean return SpinBusy end
+
+-- (forms, 2026-11-23) colour slots show as swatches; the preview shows you in your race's form with the chosen Looks
+local FormCfg = require(ReplicatedStorage:WaitForChild(`Config`):WaitForChild(`Forms`))
+local SWATCH = { WingPalette = FormCfg.Palettes; WingFinish = FormCfg.Finishes; HornFinish = FormCfg.Finishes; HornTip = FormCfg.Finishes }
+local PREVIEW_SPIN = math.rad(20) -- per second (still under Reduce Motion)
+
+local function formParts()
+	local Ok, M = pcall(function()
+		return require(script.Parent.Parent:WaitForChild(`Character`, 2):WaitForChild(`FormParts`, 2))
+	end)
+	return Ok and M or nil
+end
+
+local function reduceMotion(): boolean
+	local Ok, S = pcall(function() return require(ReplicatedStorage.UI.Settings) end)
+	return Ok and S and S.Get and S.Get(`ReduceMotion`) == true
+end
+
+function preview(Ctx, L, Worn)
+	if not FormCfg.Races[L.Race] then return end
+	local FP = formParts()
+	local Char = Players.LocalPlayer.Character
+	local Torso = Char and Char:FindFirstChild(`Torso`)
+	if not (FP and FP.Preview and Torso and Char:FindFirstChild(`HumanoidRootPart`)) then return end
+	local Row = Ctx.Row(330)
+	local VF = Instance.new(`ViewportFrame`)
+	VF.Size = UDim2.fromScale(1, 1)
+	VF.BackgroundColor3 = Color3.fromRGB(14, 12, 16)
+	VF.BackgroundTransparency = 0.2
+	VF.Ambient = Color3.fromRGB(140, 136, 150)
+	VF.LightColor = Color3.fromRGB(255, 238, 220)
+	VF.LightDirection = Vector3.new(-0.6, -1, -0.8)
+	VF.Parent = Row
+	local Cr = Instance.new(`UICorner`); Cr.CornerRadius = UDim.new(0, 8); Cr.Parent = VF
+	local World = Instance.new(`WorldModel`)
+	World.Parent = VF
+	local Was = Char.Archivable
+	Char.Archivable = true
+	local Ok, M = pcall(function() return Char:Clone() end)
+	Char.Archivable = Was
+	if not Ok or not M then VF:Destroy() return end
+	for _, D in M:GetDescendants() do
+		if D.Parent and (D:IsA(`LuaSourceContainer`) or D:IsA(`Sound`) or D:IsA(`ParticleEmitter`) or D:IsA(`BillboardGui`)
+			or D:IsA(`ForceField`) or D.Name == `NHFormParts`) then
+			D:Destroy()
+		elseif D:IsA(`BasePart`) then
+			D.Anchored = true
+		end
+	end
+	local Hum = M:FindFirstChildOfClass(`Humanoid`)
+	if Hum then
+		Hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+		Hum.HealthDisplayType = Enum.HumanoidHealthDisplayType.AlwaysOff
+	end
+	M:PivotTo(CFrame.new())
+	M.Parent = World
+	local Looks = {}
+	for Slot, O in Worn do
+		if type(O) == `table` and O.Id then Looks[Slot] = O.Id end
+	end
+	FP.Preview(M, L.Race, Looks, Worn.Fur and Worn.Fur.Color)
+	local S = Torso.Size.Y / 2
+	local Cam = Instance.new(`Camera`)
+	Cam.FieldOfView = 38
+	Cam.Parent = VF
+	VF.CurrentCamera = Cam
+	local Angle = math.rad(150) -- three-quarters from behind: the wings first
+	local function place()
+		local Eye = Vector3.new(math.sin(Angle) * 16 * S, 1.6 * S, -math.cos(Angle) * 16 * S)
+		Cam.CFrame = CFrame.lookAt(Eye, Vector3.new(0, 0.9 * S, 0))
+	end
+	place()
+	local Conn
+	Conn = RunService.RenderStepped:Connect(function(Dt)
+		if not VF.Parent then Conn:Disconnect() return end
+		if reduceMotion() then return end
+		Angle += PREVIEW_SPIN * Dt
+		place()
+	end)
+	Ctx.Note(`Your form, with the Looks below. Transform (T) to wear it.`)
+end
 
 -- choose a race look (the server checks race and tier)
 function Shared.SetLook(Ctx, Slot: string, Id: string)
@@ -156,10 +239,11 @@ function Shared.Build(Ctx)
 	if Slots then
 		Ctx.Section(`Looks`)
 		local Worn = Lineage.ResolveLooks(L)
+		preview(Ctx, L, Worn)
 		for _, Slot in Slots do
 			local Opts = Lineage.Looks[L.Race][Slot]
 			Ctx.Note(`<b>{Lineage.SlotNames[Slot] or Slot}</b>`, C.Text)
-			local Swatch = Slot == `Fur`
+			local Swatch = Slot == `Fur` or SWATCH[Slot] ~= nil
 			local PerRow = if Swatch then 6 else 2
 			local Rows = math.ceil(#Opts / PerRow)
 			local Row = Ctx.Row(Rows * (if Swatch then 54 else 50))
@@ -172,12 +256,19 @@ function Shared.Build(Ctx)
 				local Locked = O.Tier > (L.Tier or 1)
 				local On = Worn[Slot] and Worn[Slot].Id == O.Id
 				if Swatch then
+					local Col = O.Color or (SWATCH[Slot] and SWATCH[Slot][O.Id] and SWATCH[Slot][O.Id].Color)
 					local B = Instance.new(`TextButton`)
-					B.Name = O.Id; B.LayoutOrder = I; B.Text = ``; B.AutoButtonColor = true
-					B.BackgroundColor3 = O.Color; B.BorderSizePixel = 0; B.Parent = Row
+					B.Name = O.Id; B.LayoutOrder = I; B.AutoButtonColor = not Locked
+					B.Text = if O.Id == `Auto` then `Auto` elseif Locked then ROMAN[O.Tier] or `` else ``
+					B.Font = Enum.Font.GothamBold; B.TextSize = 13; B.TextColor3 = C.Text; B.TextStrokeTransparency = 0.4
+					B.BackgroundColor3 = Col or C.IronDim; B.BackgroundTransparency = if Locked then 0.55 else 0
+					B.BorderSizePixel = 0; B.Parent = Row
 					local Cr = Instance.new(`UICorner`); Cr.CornerRadius = UDim.new(0, 6); Cr.Parent = B
 					local St = Instance.new(`UIStroke`); St.Thickness = if On then 3 else 1; St.Color = if On then C.Gold else C.IronDim; St.Parent = B
-					B.Activated:Connect(function() Shared.SetLook(Ctx, Slot, O.Id) end)
+					B.Activated:Connect(function()
+						if Locked then Ctx.Status(`Unlocks at Tier {ROMAN[O.Tier]}`, C.TextDim) return end
+						Shared.SetLook(Ctx, Slot, O.Id)
+					end)
 				else
 					local Label = if Locked then `{O.Name}  ·  Tier {ROMAN[O.Tier]}` else O.Name
 					local Root = Kit.Button({ text = (if On then `◆  ` else ``) .. Label; style = if On then `gold` else `default`; textSize = 19;

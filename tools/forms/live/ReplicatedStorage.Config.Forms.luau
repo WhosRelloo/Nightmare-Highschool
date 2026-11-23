@@ -8,8 +8,9 @@
 	no fur on the head, no Wraith lower-body cover, Wraith heads clear; no claws and no wing hooks on any race;
 	sculpted geometry only. Humans and Priests have no form.
 
-	Races[race].Directions[i]: Id ("1"/"2", the FormDirection Look), Name, Parts (region pieces welded to the body,
-	12 fitted body variants each), Wings / Horns (the direction's defaults, or nil).
+	Races[race].Directions[i]: Id ("1"/"2", the FormDirection Look), Name, Parts (its body pieces, welded to the R6
+	parts, one fitted variant per body type: Assets.Forms.Bodies.<body>.<race letter><Id><Part>, e.g. W1Mantle; head
+	pieces in Assets.Forms.NHFormHead), Wings / Horns (the direction's defaults, or nil).
 	A race's WingStyles / HornStyles are what the Looks may pick; a direction's own style is Tier I, two more Tier II,
 	the rest Tier III (Lineage builds the options from this table).
 ]]
@@ -70,7 +71,7 @@ Forms.HornDefaults = { Finish = "Obsidian"; Tip = "Gilded" }
 Forms.Races = {
 	Vampire = {
 		Directions = {
-			{ Id = "1"; Name = "Nocturne"; Parts = { "Ears" };
+			{ Id = "1"; Name = "Nocturne"; Parts = {}; -- its long swept ears are the Vampire Ears Look
 				Wings = { Style = "Nocturne"; Palette = "Wine"; Finish = "Obsidian" } };
 			{ Id = "2"; Name = "Night Sovereign"; Parts = { "Spines" };
 				Wings = { Style = "Wyrm"; Palette = "Wine"; Finish = "Bloodstone" };
@@ -82,16 +83,16 @@ Forms.Races = {
 	Werewolf = {
 		-- fur locks on the shoulders, forearms and shins (no head fur, no muzzle); the tail and ears are the race Looks
 		Directions = {
-			{ Id = "1"; Name = "Moonbound"; Parts = { "Mantle", "Cuffs", "Shins" }; Mantle = "Shoulders" };
-			{ Id = "2"; Name = "Feral Lord"; Parts = { "Mantle", "Arms", "Back", "MoonMarks" }; Mantle = "Full" };
+			{ Id = "1"; Name = "Moonbound"; Parts = { "Mantle", "CuffL", "CuffR", "ShinL", "ShinR" }; Mantle = "Shoulders" };
+			{ Id = "2"; Name = "Feral Lord"; Parts = { "Mantle", "Back", "ArmL", "ArmR", "Moon" }; Mantle = "Full" };
 		};
 	};
 	Ghoul = {
 		Directions = {
-			{ Id = "1"; Name = "Ossuary"; Parts = { "Ribs", "Spine", "ArmSpurs", "JawGuard" };
+			{ Id = "1"; Name = "Ossuary"; Parts = { "Ribs", "Spine", "SpurL", "SpurR", "Jaw" };
 				Wings = { Style = "Ossuary"; Palette = "Wine"; Finish = "Bone" };
 				Horns = { Style = "Wendigo"; Finish = "Bone"; Tip = "Ivory" } };
-			{ Id = "2"; Name = "Gravecloth"; Parts = { "ArmWraps", "ChestWraps", "Tatters", "Moss", "Nails" };
+			{ Id = "2"; Name = "Gravecloth"; Parts = { "WrapL", "WrapR", "Chest", "Moss", "Nails" };
 				Horns = { Style = "Thorn"; Finish = "Obsidian"; Tip = "Bone" } };
 		};
 		WingStyles = { "Ossuary" };
@@ -102,7 +103,7 @@ Forms.Races = {
 		Directions = {
 			{ Id = "1"; Name = "Hollow Shroud"; Parts = { "Capelet" };
 				Wings = { Style = "Wraithveil"; Palette = "Midnight"; Finish = "Ivory" } };
-			{ Id = "2"; Name = "Frost Revenant"; Parts = { "ShoulderSpikes", "Chains", "RimeShins" };
+			{ Id = "2"; Name = "Frost Revenant"; Parts = { "SpikeL", "SpikeR", "Chains", "Hang", "RimeL", "RimeR" };
 				Wings = { Style = "Rime"; Palette = "Midnight"; Finish = "Ivory" } };
 		};
 		WingStyles = { "Wraithveil", "Rime", "Tattered" };

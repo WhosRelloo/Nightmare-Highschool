@@ -84,29 +84,31 @@
 - [ ] `form_models.py`:
   - the wing per style as a skinned mesh, with Bones `Hum`, `Fore`, `D1a`/`D1b` to `D4a`/`D4b` (no thumb), and weights from the skeleton;
   - the horns per style;
-  - fur, bone and wrap regions per body (12), raycast-fitted as in the concepts.
+  - [x] fur, bone and wrap regions per body (12), raycast-fitted as in the concepts (`form_bodies.py`, 2026-11-23).
 - [ ] PBR bakes: palette and finish sets as SurfaceAppearance textures (1024² membrane and feathers, 512² bones and horns).
 - [ ] `forms_fit` (Python): no vertex inside a body, everything centred, tri budgets met (spec §7). A check sheet per body.
 - [ ] Commit the scripts, the fit JSON and the sheets. The FBX go to `E:/NH-Work/forms`.
 
 ### Task 3: The wing clips
 
-- [ ] `form_clips.py` writes KeyframeSequences for the wing rig:
+- [x] (changed 2026-11-23) No KeyframeSequences: `Functions.FormWings` runs the concepts' skeleton and sets the bones'
+  `Transform` each frame, so nothing to publish and states blend in parameter space. Same four motions:
   - Idle (a breathe, 3 s loop);
   - Flap (1.33 s loop, the digits trailing);
-  - Fold (0.4 s);
+  - Fold (0.4 s, on landing);
   - Flare (0.6 s, on transform).
-- [ ] The owner publishes them to the group. I find the ids myself.
+- [x] Checked in Edit (bones within 0.03 degrees of the skeleton) and in Play (see `docs/Forms-Import.md`, Wing motion).
 
 ### Task 4: The client and the server
 
 - [ ] `FormLooks`: resolves Looks into `NHFormLook` on join, on a Look change and on transform.
 - [ ] `FormParts`:
   - weld, scale and skin;
-  - play the clips: Idle while standing, Flap while sprinting or airborne, Fold on landing;
-  - Reduce Motion holds the idle;
-  - hide hats and fold capes while transformed.
-- [ ] The Bloodline Looks section: the new slots and a viewport preview of the student wearing them.
+  - [x] play the clips: Idle while standing, Flap while sprinting or airborne, Fold on landing;
+  - [x] Reduce Motion holds the idle;
+  - [x] hide hats and fold capes while transformed (the cape is hidden while the form is worn);
+  - [x] body pieces per body type from `Assets.Forms.Bodies.<body>`.
+- [x] The Bloodline Looks section: the new slots (already in Lineage), colour swatches and a turning viewport preview of the student wearing them (2026-11-23).
 - [ ] Commit.
 
 ## Part 2: Studio tasks

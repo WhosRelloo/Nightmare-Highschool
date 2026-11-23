@@ -1,6 +1,7 @@
 
 # render scratch / caches
 art/vfx/evolve/sprites/_frames/
+docs/superpowers/mockups/2026-11-22-transformations/anim/anim_*/
 __pycache__/
 
 # owner's raw hair exports and the rigged FBX built from them (large, re-creatable)
