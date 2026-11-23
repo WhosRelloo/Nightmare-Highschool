@@ -35,6 +35,19 @@ local function playAndSession(): string?
 	return Session
 end
 
+-- (2026-11-22) precondition: the replay below is refused unless __SeamlessTest is marked Seen, and then no cut plays at all: every row
+-- would read "controls on mid-cut" / "HUD still on" for a cut that never started. Say so instead (harness/round_start.sh marks it)
+do
+	local Probe = playAndSession()
+	if not Probe then
+		return "SKIPCHECK FAIL (precondition): the __SeamlessTest replay was refused, no cut played. Mark it first: python -X utf8 -I bridge.py CineMark $P '\"__SeamlessTest\"' '\"Seen\"' (harness/round_start.sh does it)"
+	end
+	Remote:FireServer({ Kind = "Skip"; Session = Probe })
+	local T0 = os.clock()
+	repeat task.wait(0.05) until Player:GetAttribute("NHCineSeam") == nil or os.clock() - T0 > 3
+	task.wait(1.5)
+end
+
 -- (1) the game's controls: a seamless cut takes them, a skip gives them back. (The Begin/Release race itself:
 -- racecheck.lua + race_server.lua, which can end a cut inside Begin's 0.3 s ease; a client round trip can't.)
 do

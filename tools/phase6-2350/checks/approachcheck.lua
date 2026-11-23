@@ -54,7 +54,9 @@ local MarkYaw, VaultPos -- (fix round 1) the approach mark's heading (settle row
 local function yawOfCF(C) local L = C.LookVector return math.deg(math.atan2(-L.X, -L.Z)) end
 if MODE == "sneak" then
 	Marks = workspace:WaitForChild("NHCineSets"):WaitForChild("Garden")
-	Goal = Marks:WaitForChild("FenceZone", 30).Position
+	local FZ = Marks:WaitForChild("FenceZone", 15)
+	if not FZ then return "APPROACH FAIL\nprecondition: the Garden set isn't streamed to this client (the player is far from Wickfield). Run harness/stream_set.lua with SET = \"Garden\" first (harness/run_cut.sh does it)" end
+	Goal = FZ.Position
 	-- TutorialSneak's Vault: FenceZone + VAULT_BACK (0.6) along its +Z, turned APPROACH_YAW (40) left
 	local Zone = Marks.FenceZone.CFrame
 	VaultPos = Zone.Position + Zone.Rotation:VectorToWorldSpace(Vector3.new(0, 0, 0.6))
@@ -67,7 +69,9 @@ if MODE == "sneak" then
 	Root.CFrame = CFrame.lookAt(Marks.Start.Position + Vector3.new(0, 3, 0), Goal + Vector3.new(0, 3, 0))
 else
 	Marks = workspace:WaitForChild("NHCineSets"):WaitForChild("BusStop")
-	Goal = Marks:WaitForChild("Stand", 30).Position
+	local ST = Marks:WaitForChild("Stand", 15)
+	if not ST then return "APPROACH FAIL\nprecondition: the BusStop set isn't streamed to this client. Run harness/stream_set.lua with SET = \"BusStop\" first (harness/run_cut.sh does it)" end
+	Goal = ST.Position
 	MarkYaw = yawOfCF(Marks.Stand.CFrame)
 	-- off the mark: BUS_START studs back and to the side (behind the kerb, facing the stop)
 	if BUS_OFFSET.Magnitude < 0.01 then
@@ -290,14 +294,27 @@ do -- (fix round 2) CADENCE: the seen walk cycle's playback speed against the ro
 	-- these same stride constants); it does NOT prove the constants match each clip's real stride (that needs a foot-contact measure). INFO: the game's own Walk/CrouchWalk on the start/stop transients (the ramp from a standing start,
 	-- the last stud's ease-out), where the game's own AnimationController blends a start or a stop exactly as it does in normal play.
 	local STRIDE = { CrouchWalk = 7, Walk = 10, Sprint = 24, FastSprint = 30 }
+	-- (2026-11-22, the strafes build) when Config.Locomotion exists the game's walk cycles follow its stride-matched rule
+	-- (Functions.Locomotion.Rate: ground speed / (Stride * leg / 2), clamped to [CadenceMin, CadenceMax]). The chain's *GameCrouchWalk
+	-- pieces are the same CrouchWalk clip baked in, so they follow the CrouchWalk rule too (one clip, one cadence)
+	local LocoCfg = game.ReplicatedStorage:FindFirstChild("Config") and game.ReplicatedStorage.Config:FindFirstChild("Locomotion")
+	LocoCfg = LocoCfg and require(LocoCfg) or nil -- pure config: a VM copy is fine
+	local LegLen = Char:FindFirstChild("Left Leg") and Char["Left Leg"].Size.Y or 2
+	local function want(Name: string, V: number): number
+		local Key = if STRIDE[Name] then Name elseif Name:match("CrouchWalk") then "CrouchWalk" else "Walk"
+		if LocoCfg and LocoCfg.Stride and LocoCfg.Stride[Key] then
+			return math.clamp(V / (LocoCfg.Stride[Key] * math.max(LegLen, 0.1) / 2), LocoCfg.CadenceMin, LocoCfg.CadenceMax)
+		end
+		return V / STRIDE[Key]
+	end
+	add("cadence rule: " .. (LocoCfg and string.format("Config.Locomotion stride-matched (CrouchWalk %.1f, Walk %.1f per 2-stud leg; leg %.2f)", LocoCfg.Stride.CrouchWalk, LocoCfg.Stride.Walk, LegLen) or "the game's old scales (CrouchWalk 7, Walk 10)"))
 	local Bad, N, Worst, WorstAt, WorstWho = 0, 0, 0, 0, nil
 	local TBad, TN, TWorst = 0, 0, 0
 	local OutL = {}
 	for I = math.max(S0, 2), #Rows do
 		local R = Rows[I]
 		if R.cadWho and R.cadW > 0.5 and R.vel > 0.5 and not black(R) and R.seam ~= nil then
-			local Per = STRIDE[R.cadWho] or (tostring(R.cadWho):match("CrouchWalk") and 7) or 10
-			local Want = R.vel / Per
+			local Want = want(tostring(R.cadWho), R.vel)
 			local Err = math.abs(R.cadSpeed - Want) / math.max(Want, 1e-3)
 			local Acc = math.abs(R.vel - Rows[I - 1].vel) / math.max(R.t - Rows[I - 1].t, 1e-3)
 			local Ours = STRIDE[R.cadWho] == nil

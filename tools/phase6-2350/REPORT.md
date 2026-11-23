@@ -294,3 +294,32 @@ snapshot comparison shows no differences.
 - TODO (focused Studio): one more sneakcheck sneak at real-time frames, for the dip-under-black row on the fix round 3 build (passed
   once at 17 ms; the two runs at 67 ms are the known artifact).
 - Sign-off: pending.
+
+## Regression after the strafes install (2026-11-23, NH Combat Test, slot 2)
+
+The strafes build (phase6-strafes 73fa065) was installed when skipcheck reported "controls still on mid-cut" / "HUD still on".
+
+- **Root cause: harness, not game code.** skipcheck replays `__SeamlessTest`; the server refuses a replay of an unseen cut, so no
+  cut played and every row read the idle state. The strafes session started its round without marking `__SeamlessTest` Seen.
+  Reproduced: unmarked fails, marked passes. skipcheck now refuses with a precondition message instead of reporting false fails, and
+  `harness/round_start.sh` marks it.
+- **approachcheck "couldn't run"**: the Wickfield sets stream in only near them. `harness/stream_set.lua` (run by `harness/run_cut.sh`
+  with SET=Garden|BusStop) puts the player on the set's start mark first, and approachcheck says so when a set is missing.
+- **Cadence:** the strafes build gives the game's walk cycles a stride-matched rate (Config.Locomotion / Functions.Locomotion.Rate).
+  approachcheck's CADENCE row follows that rule when Config.Locomotion exists. TutorialSneak's FenceOver1 `Pace` (the CrouchWalk clip
+  baked into the chain) uses the same rule, so one clip has one cadence. Before (old Pace, /7): fence CADENCE 2 of 268 out, worst 60 %.
+  After: 0 of 261 and 0 of 265, worst 12 %.
+
+Results on the strafes build (round 1 at 50-67 ms frames, unfocused; round 2 at 17 ms):
+| Check | Result |
+|---|---|
+| skipcheck (marked) | ok (same rows as round 3) |
+| camcheck `__SeamlessTest` / TutorialSneak / TutorialBus | CAM OK, all three |
+| approachcheck bus | APPROACH OK (cadence 0 of 5 out; lead 0.27 s) |
+| approachcheck fence, new Pace (x2, 17 ms) | APPROACH OK: seam speed 86 % / 90 %, settle -10.4 / -10.1 deg, clearance 0.18 / 0.19 |
+| sneakcheck | SNEAK OK at 17 ms. At 50 ms frames the dip-veil row failed (worst 0.36 / 0.40): a frame landing in the fade, as in round 3 |
+| buscheck | BUS OK at 17 ms. At 67 ms the base-loop row failed (240 / 48 frames), as in the earlier unfocused rounds |
+| bodycheck | BODY OK |
+| dipcheck (last) | DIP OK |
+
+Slot 2: fresh snapshot each round (yen 97), restored after each; marks cleared; TutorialLeave; Play stopped; nothing saved.

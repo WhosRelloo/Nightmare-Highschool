@@ -252,6 +252,11 @@ function Def.Build(Ctx)
 			-- (the same clip, Action2) while FenceOver1 is put on its exit (FenceOver2 takes over at once, underneath), and the cover fades out
 			-- over HANDOFF: the planted stop pose blends into the climb. No walking on the spot either way
 			local Animator = (Char:FindFirstChildOfClass(`Humanoid`) :: Humanoid):FindFirstChildOfClass(`Animator`)
+			-- the game's cadence rule, if this build has one (Config.Locomotion / Functions.Locomotion: phase6-strafes)
+			local LocoCfgM = ReplicatedStorage.Config:FindFirstChild(`Locomotion`)
+			local LocoFnM = ReplicatedStorage:FindFirstChild(`Functions`) and ReplicatedStorage.Functions:FindFirstChild(`Locomotion`)
+			local LocoCfg = if LocoCfgM and LocoCfgM:IsA(`ModuleScript`) then require(LocoCfgM) :: any else nil
+			local LocoFn = if LocoFnM and LocoFnM:IsA(`ModuleScript`) then require(LocoFnM) :: any else nil
 			local Exit = TA.Chains.FenceOver[1].Exit
 			local Over2, Stopped, LeftNow = false, false, math.huge
 			local Cover: AnimationTrack? = nil
@@ -327,12 +332,20 @@ function Def.Build(Ctx)
 							local L = liveWalk()
 							return if L and L.IsPlaying then L.TimePosition else nil
 						end;
-						-- (fix round 2, I-2) from the root's own speed: the clip's stride is 7 studs/s at speed 1 (the game's crouch speed), so
-						-- speed = flat velocity / 7 keeps the legs on the ground through the ease-out whatever the live track was set to
+						-- (fix round 2, I-2) from the root's own speed. FenceOver1 is the game's CrouchWalk clip baked into the chain, so it plays at
+						-- whatever cadence the game's CrouchWalk does: where Config.Locomotion exists (the strafes build: the owner's stride fix) its
+						-- stride-matched rule (Functions.Locomotion.Rate, Stride.CrouchWalk over the leg length, clamped), else the old scale (7
+						-- studs/s at speed 1). One clip, one cadence: the fade-in from the live crouch walk stays in step and the feet don't skate
 						Pace = function(): number
 							if Stopped or not Root.Parent then return 0 end
 							local V = Root.AssemblyLinearVelocity
-							return math.clamp(Vector3.new(V.X, 0, V.Z).Magnitude / 7, 0, 1.2)
+							local Flat = Vector3.new(V.X, 0, V.Z).Magnitude
+							if Flat < 0.05 then return 0 end
+							if LocoCfg and LocoFn then
+								local Leg = Char:FindFirstChild(`Left Leg`)
+								return LocoFn.Rate(Flat, LocoCfg.Stride.CrouchWalk, if Leg and Leg:IsA(`BasePart`) then Leg.Size.Y else 2, LocoCfg)
+							end
+							return math.clamp(Flat / 7, 0, 1.2)
 						end })
 					if Ctx.Alive() then Actor.Reseat(`FenceOver2`, Offset, Ctx.Clip) end
 					Climbing = false
