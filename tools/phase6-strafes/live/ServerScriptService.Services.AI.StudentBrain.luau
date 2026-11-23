@@ -61,6 +61,10 @@ local React = {}
 -- (someone walking straight at them) or "Space" (someone standing on top of them). Rec is the Senses record of
 -- the player (Rec.Player, Rec.Root, Rec.Pos, Rec.Speed, Rec.Dist).
 local NudgeMod = require(script:WaitForChild(`Nudges`))
+-- (phase6-strafes) the FIER gestures (idle variety, chats, arguments, phones, reactions, the get-up)
+local Gestures = require(script:WaitForChild(`Gestures`))
+local Space = require(script:WaitForChild(`Space`))
+local GestureCfg = require(ReplicatedStorage.Config.Gestures)
 Brain.OnBump = NudgeMod.Handle :: ((any, any, string) -> boolean)? -- (1.86.3) the nudges
 
 ---| helpers |---
@@ -373,6 +377,11 @@ function React.Danger(S, Snap)
 	if not (Moment and Who and sayMatrix(S, Moment, Who, nil, 8, nil)) then say(S, Pool, 8) end
 	S.Shaken = true
 	lookAt(S, T.Pos + Vector3.new(0, 2, 0), 2)
+	-- (phase6-strafes) a monster or a transformed player: cower first (Duck), then back away
+	if T.Kind == `Monster` and not S.Seated then
+		local D = Gestures.Play(S, Gestures.PickFor(S, `Danger`), { Force = true })
+		if D then task.wait(math.min(1.2, D.Length > 0 and D.Length or 1.2)) Gestures.Stop(S, 0.2) end
+	end
 	local To = awayFrom(S, T.Pos)
 	if To then
 		S.Agent:GoTo(To, { Speed = 13 + S.Bravery * 2; Arrive = 2.5 })
@@ -466,7 +475,8 @@ function React.Gawk(S, Snap)
 			S.Agent:Stop()
 		end
 		S.Agent:Face(R.Center)
-		if Started and math.random() < 0.35 then holdPhone(S) end
+		if Started and math.random() < 0.35 then holdPhone(S)
+		elseif Started and not S.CrowdPhone then Gestures.Play(S, Gestures.PickFor(S, `Gawk`), { Force = true; Seconds = 4 }) end -- (phase6-strafes)
 	end
 	lookAt(S, R.Center + Vector3.new(0, 2, 0), 1.2)
 	if Started then -- just started watching
@@ -670,6 +680,10 @@ local function chat(A, B)
 	if not Lines2 then return end
 	A.Chatting, B.Chatting = true, true
 	A.Partner, B.Partner = B, A
+	-- (phase6-strafes) rival cliques argue (the paired Argue_A / Argue_B take); everyone else talks with their hands
+	local DefA = A.Clique and CliqueConfig.Defs[A.Clique]
+	local Arguing = DefA ~= nil and B.Clique ~= nil and DefA.Rival == B.Clique and not (A.Seated or B.Seated)
+	if Arguing and Gestures.Play(A, `Argue_A`, { Force = true }) then Gestures.Play(B, `Argue_B`, { Force = true }) end
 	if not A.Seated and A.Agent and B.Root then A.Agent:Face(B.Root.Position) end
 	if not B.Seated and B.Agent and A.Root then B.Agent:Face(A.Root.Position) end
 	for _, L in Lines2 do
@@ -680,12 +694,17 @@ local function chat(A, B)
 		if Brain.Urgent(A) or Brain.Urgent(B) or A.Reacting or B.Reacting then break end
 		if (A.Agent and A.Agent.Moving) or (B.Agent and B.Agent.Moving) then break end
 		sayText(Speaker, Text or L)
+		if not Arguing then -- (phase6-strafes) the speaker gestures, the listener settles into an idle
+			Gestures.Play(Speaker, Gestures.PickFor(Speaker, `ChatSpeaker`), { Force = true })
+			Gestures.Play(Listener, Gestures.PickFor(Listener, `ChatListener`), { Force = true })
+		end
 		lookAt(Listener, Speaker.Root.Position + Vector3.new(0, 1.5, 0), 3)
 		lookAt(Speaker, Listener.Root.Position + Vector3.new(0, 1.5, 0), 3)
 		task.wait(math.clamp(1.6 + #(Text or L) * 0.055, 2.2, 4.6))
 	end
 	A.Chatting, B.Chatting = false, false
 	A.Partner, B.Partner = nil, nil
+	Gestures.Stop(A, 0.4) Gestures.Stop(B, 0.4) -- (phase6-strafes)
 end
 
 ---| fidgets |---
@@ -754,7 +773,10 @@ local function fidgetPhone(S, Valid)
 	if not (T and J and S.Hum) then if T then T:Destroy() end return end
 	T.Parent = S.Model
 	pcall(function() S.Hum:EquipTool(T) end)
-	J.C0 = (J:GetAttribute(`NHBaseC0`) or J.C0) * PHONE_POSE
+	-- (phase6-strafes) a phone-call gesture (pacing where the floor is clear); the old shoulder pose only without one
+	local Space4 = if Space.Pace(S, GestureCfg.PaceClear.Wide) then `Wide` elseif Space.Pace(S, GestureCfg.PaceClear.Pace) then `Pace` else nil
+	local Call = not S.Seated and Gestures.Play(S, Gestures.PickFor(S, `Phone`, { Space = Space4 }))
+	if not Call then J.C0 = (J:GetAttribute(`NHBaseC0`) or J.C0) * PHONE_POSE end
 	if math.random() < 0.45 then say(S, Lines.Phone, 8) end
 	local Until = os.clock() + math.random(40, 90) / 10
 	while os.clock() < Until and not busyNow(S) and T.Parent and Valid() do
@@ -764,6 +786,7 @@ local function fidgetPhone(S, Valid)
 	end
 	if T.Parent then T:Destroy() end
 	if J.Parent then J.C0 = J:GetAttribute(`NHBaseC0`) or J.C0 end
+	if Call then Gestures.Stop(S, 0.4) end
 end
 
 local function fidget(S, Valid)
@@ -777,6 +800,8 @@ local function fidget(S, Valid)
 			{ `LookUp`, 0.14 };
 			{ `LookBehind`, if C.Night then 0.3 else 0.12 };
 			{ `Shift`, if S.Leaning then 0 else 0.25 };
+			-- (phase6-strafes) a clique's idle gesture (Config.Gestures Cast, Fidget rules)
+			{ `Gesture`, (function() local R = require(ReplicatedStorage.Functions.Gestures).Rule(GestureCfg.Cast, `Fidget`, { Clique = S.Clique }) return R and R.Weight or 0 end)() };
 		}
 	local Total = 0
 	for _, P in Pool do Total += P[2] end
@@ -784,7 +809,9 @@ local function fidget(S, Valid)
 	local Kind = Pool[#Pool][1]
 	for _, P in Pool do R -= P[2] if R <= 0 then Kind = P[1] break end end
 	step(S, `fidget: {Kind}`)
-	if Kind == `Phone` then
+	if Kind == `Gesture` then
+		Gestures.Play(S, Gestures.PickFor(S, `Fidget`), { Seconds = math.random(40, 90) / 10 })
+	elseif Kind == `Phone` then
 		fidgetPhone(S, Valid)
 	elseif Kind == `Stretch` then
 		S.Model:SetAttribute(`NHFidget`, `Stretch`)
@@ -1122,6 +1149,7 @@ end
 
 function Brain.Init(H)
 	Host = H
+	Gestures.Init(H) -- (phase6-strafes)
 	if Started then return end
 	Started = true
 	Nav.Init()

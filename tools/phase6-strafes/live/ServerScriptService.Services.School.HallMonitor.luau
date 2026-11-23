@@ -360,6 +360,12 @@ function Local.Catch(M, Player: Player, State)
 	M.Target = nil
 	M.ConfrontUntil = os.clock() + 2
 	Local.SetState(M, `Confront`)
+	-- (phase6-strafes) the monitor points the student out (a FIER gesture)
+	pcall(function()
+		local G = require(game:GetService(`ServerScriptService`).Services.AI.StudentBrain.Gestures)
+		local R = G.Record(M.Model)
+		G.Play(R, G.PickFor(R, `Confront`) or `Point`, { Force = true; Seconds = 2 })
+	end)
 end
 
 function Local.UpdateMonitor(M, State)

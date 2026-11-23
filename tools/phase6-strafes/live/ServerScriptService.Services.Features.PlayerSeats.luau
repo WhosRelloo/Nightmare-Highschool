@@ -20,7 +20,7 @@ local ServerScriptService = game:GetService(`ServerScriptService`)
 local Shared = {}
 local Local = {}
 
-local KINDS = { StudentChair = true }
+local KINDS = { StudentChair = true; BleacherSeat = true } -- (phase6-strafes) players sit on the bleachers too (owner)
 -- (audit) can't sit while busy: the Npcs / Hangouts BUSY list, plus Carrying
 local BUSY = { `Downed`, `Carried`, `Carrying`, `Gripped`, `Gripping`, `InActivity`, `Stun`, `ParryStun`, `Paralyzed` }
 local StateManager = require(ReplicatedStorage.Packages.Bind.StateManager)
@@ -136,6 +136,12 @@ function Shared.OnStart()
 		end
 		Props.ChildAdded:Connect(function(P)
 			if P:IsA(`Model`) and KINDS[P.Name] then task.defer(function() pcall(Local.Setup, P) end) end
+		end)
+		-- (phase6-strafes) the bleacher seats (tagged models, workspace.Sports.<Venue>.NHBleacherSeats)
+		local CS = game:GetService(`CollectionService`)
+		for _, P in CS:GetTagged(`NHBleacherSeat`) do if P:IsA(`Model`) then pcall(Local.Setup, P) end end
+		CS:GetInstanceAddedSignal(`NHBleacherSeat`):Connect(function(P)
+			if P:IsA(`Model`) then task.defer(function() pcall(Local.Setup, P) end) end
 		end)
 	end)
 end

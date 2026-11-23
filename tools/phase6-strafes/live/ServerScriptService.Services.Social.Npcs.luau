@@ -258,6 +258,11 @@ function Local.Spawn(NpcId: string)
 
 	local N = { Id = NpcId; Key = Local.KeyNow(NpcId); Model = Model; Humanoid = Humanoid; Root = Root; Post = Post; Prompt = Prompt } -- (2.28) Key
 	Active[NpcId] = N
+	-- (phase6-strafes) the Nurse's "Get patched up" prompt (Features.Infirmary), and the staff's idle gestures at a post
+	if NpcId == `Nurse` then
+		pcall(function() require(ServerScriptService.Services.Features.Infirmary).AttachPrompt(Model) end)
+	end
+	task.spawn(Local.PostGestures, N)
 
 	Humanoid:GetAttributeChangedSignal(`Downed`):Connect(function()
 		Prompt.Enabled = not Humanoid:GetAttribute(`Downed`)
@@ -276,6 +281,20 @@ function Local.Spawn(NpcId: string)
 			Local.Spawn(NpcId)
 		end)
 	end)
+end
+
+-- (phase6-strafes) every 12-25 s, with a player near, a staff NPC at their post plays one of their gestures
+function Local.PostGestures(N)
+	local G = require(ServerScriptService.Services.AI.StudentBrain.Gestures)
+	local R = G.Record(N.Model)
+	while Active[N.Id] == N and N.Model.Parent do
+		task.wait(math.random(120, 250) / 10)
+		if Active[N.Id] ~= N or not N.Model.Parent then break end
+		local Home = (N.Root.Position - N.Post.Position) * Vector3.new(1, 0, 1)
+		if N.Humanoid.Health > 0 and not N.Humanoid:GetAttribute(`Downed`) and Home.Magnitude < 3 and not G.Busy(R) then
+			G.Play(R, G.PickFor(R, `Post`, { Npc = N.Id }), { Seconds = math.random(40, 90) / 10 })
+		end
+	end
 end
 
 -- Walk back to the post when moved (pushed, carried and dropped, recovered from downed).

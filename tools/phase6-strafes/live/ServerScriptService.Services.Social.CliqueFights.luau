@@ -485,7 +485,24 @@ function Local.EndScuffle(Ev, Why: string, Winner: string?)
 			end
 		end
 	end
-	task.delay(if Why == `Monitor` then 0.4 else 1.5, function()
+	-- (phase6-strafes) the losing side still on its feet takes a parting shove (a FIER reaction with its root carry)
+	local Hold = 0
+	if Winner then
+		pcall(function()
+			local G = require(ServerScriptService.Services.AI.StudentBrain.Gestures)
+			for Id, List in Ev.Sides do
+				if Id ~= Winner then
+					for _, Ch in List do
+						if Ch.Parent and not Local.Out(Ch) then
+							local R = G.Record(Ch)
+							if G.Play(R, G.PickFor(R, `ScuffleLoser`), { Force = true; Carry = true }) then Hold = 2.6 end
+						end
+					end
+				end
+			end
+		end)
+	end
+	task.delay(math.max(Hold, if Why == `Monitor` then 0.4 else 1.5), function()
 		for _, List in Ev.Sides do for _, Ch in List do if Ch.Parent then Local.Leave(Ch) end end end
 	end)
 end

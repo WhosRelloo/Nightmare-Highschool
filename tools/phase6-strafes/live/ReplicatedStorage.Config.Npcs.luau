@@ -44,6 +44,10 @@ return {
 		Posts = { Class = `Pryce`; Other = `Pryce@Staff` } };
 	Whitlock = { Name = `Dr. Whitlock`; Role = `History, Room 105`; Color = Color3.fromRGB(120, 100, 80); Dialogue = `Whitlock`;
 		Posts = { Class = `Whitlock`; Other = `Whitlock@Staff` } };
+	-- (phase6-strafes) the school nurse: the Infirmary (south of the hallway extension, opposite R106) during the school
+	-- day; she treats players (Features.Infirmary.Treat, minimal: the coming injury system replaces its rules)
+	Nurse = { Name = `Nurse Agatha Thorne`; Role = `School Nurse`; Color = Color3.fromRGB(110, 160, 150); Dialogue = `Nurse`;
+		Posts = { Homeroom = `Nurse`; Class = `Nurse`; Other = `Nurse` } };
 	Ashgrave = { Name = `Headmaster Ashgrave`; Role = `Headmaster`; Color = Color3.fromRGB(60, 50, 70); Dialogue = `Ashgrave`;
 		Posts = { Homeroom = `Ashgrave`; Class = `Ashgrave` } }; -- office hours by the Records Office door, class time only
 }

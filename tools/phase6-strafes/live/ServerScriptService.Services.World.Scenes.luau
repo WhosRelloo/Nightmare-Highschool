@@ -157,6 +157,13 @@ function Shared.Run(Id: string, Pos: Vector3?): (boolean, string?)
 			elseif Op == `fx` then
 				local S = Cast[St[2]]
 				if S and S.Model then S.Model:SetAttribute(`NHMood`, `Startled`) end
+			elseif Op == `anim` then -- (phase6-strafes) { "anim", castIdx, gesture, seconds? }: a FIER gesture (with its root carry)
+				local S = Cast[St[2]]
+				if S then
+					pcall(function()
+						require(ServerScriptService.Services.AI.StudentBrain.Gestures).Play(S, St[3], { Force = true; Seconds = St[4]; Carry = true })
+					end)
+				end
 			elseif Op == `prompt` then
 				Pressed = Local.Prompt(Cast[St[2]], SpotPart, St[3], St[4])
 			end

@@ -30,6 +30,9 @@ local Classes = require(ReplicatedStorage.Config.Classes)
 local BenchTaken
 local Seats = require(ServerScriptService.Services.Features.Seats) -- where hips go on the school's seat props
 local Brain = require(ServerScriptService.Services.AI.StudentBrain) -- (1.86.2) walking, senses, reactions, voices
+-- (phase6-strafes) the FIER gestures (hangouts, lockers, phones), the infirmary visit and the watch-the-match job
+local Gestures = require(ServerScriptService.Services.AI.StudentBrain.Gestures)
+local GestureCfg = require(ReplicatedStorage.Config.Gestures)
 local CliqueConfig = require(ReplicatedStorage.Config.Cliques) -- each student's clique (1.20)
 local NpcBuilds = require(ReplicatedStorage.Config.NpcBuilds) -- (2.3.0) height, body, personality, posture, pace
 local Roster = require(ServerScriptService.Services.Social.Roster) -- (2.27) who they are; (2.28) their timetable
@@ -381,7 +384,10 @@ function Local.WalkTo(S, Job, Goal: Vector3): boolean
 	Local.Unseat(S)
 	Local.Pose(S, nil)
 	S.Leaning = false
+	-- (phase6-strafes) between classes some walk with a phone call (upper body over the walk)
+	local Call = Plan.Kind == `Passing` and (S.Root.Position - Goal).Magnitude > 12 and Gestures.Play(S, Gestures.PickFor(S, `PhoneWalk`))
 	local Ok = Brain.GoTo(S, Goal, function() return S.Job == Job and not Paused and S.Model ~= nil end)
+	if Call then Gestures.Stop(S, 0.4) end
 	return Ok and S.Job == Job and S.Root ~= nil and (S.Root.Position - Goal).Magnitude < 8
 end
 
@@ -488,6 +494,15 @@ function Local.Mingle(S, Job)
 		else
 			-- (1.86.2, owner 1.78.6) lean only with a real wall behind them (a few steps to one is fine)
 			local Valid = function() return S.Job == Job and not Paused end
+			local Locker = Local.NearLocker(S)
+			if Locker and math.random() < 0.5 then
+				-- (phase6-strafes) rummage in a hallway locker
+				Local.Face(S, Locker.Position)
+				if Gestures.Play(S, Gestures.PickFor(S, `Locker`) or `Rummage`, { Seconds = math.random(40, 100) / 10 }) then
+					S.Model:SetAttribute(`NHActivity`, `At a locker`)
+					task.wait(4)
+				end
+			end
 			if math.random() < 0.4 then Brain.LeanOnWall(S, true, Valid) end
 			Brain.Idle(S, math.random(60, 160) / 10, Valid)
 			Local.Pose(S, nil)
@@ -643,10 +658,36 @@ end
 -- (1.27, Cliques Phase 2) while hanging out: watch a scuffle nearby (workspace NHScuffleAt, Social.CliqueFights), and
 -- turn to face a student your clique respects or hates (their CliqueTier_<Id> attribute, Social.Cliques)
 local LINGER_FACE = { Respected = true; Hostile = true }
+-- (phase6-strafes) a clique's hangout gesture once in a while (the Choir prays: kneel, the loop, stand up)
+function Local.HangoutGesture(S, Job)
+	if S.Leaning or S.Seated or math.random() > 0.35 then return end
+	local Name = Gestures.PickFor(S, `Hangout`)
+	if not Name then return end
+	local Valid = function() return S.Job == Job and not Paused and S.Model ~= nil end
+	if Name == `PrayLoop` then
+		local In = Gestures.Play(S, `PrayKneelIn`)
+		if not In then return end
+		task.wait(GestureCfg.Clips.PrayKneelIn.Len - 0.05)
+		if not Valid() then Gestures.Stop(S) return end
+		Gestures.Play(S, `PrayLoop`, { Force = true; Fade = 0 })
+		local Until = os.clock() + math.random(80, 200) / 10
+		while os.clock() < Until and Valid() and not S.Reacting do task.wait(0.25) end
+		if Valid() then
+			Gestures.Play(S, `PrayStandUp`, { Force = true; Fade = 0 })
+			task.wait(GestureCfg.Clips.PrayStandUp.Len)
+		end
+		Gestures.Stop(S, 0.2)
+	else
+		Gestures.Play(S, Name, { Seconds = math.random(50, 120) / 10 })
+	end
+end
+
 function Local.Linger(S, Job, Seconds: number)
 	local Until = os.clock() + Seconds
 	local Range = (CliqueConfig.Fights and CliqueConfig.Fights.FacingRange) or 10
+	local Gestured = false
 	while os.clock() < Until and S.Job == Job and not Paused do
+		if not Gestured and os.clock() > Until - Seconds + 3 then Gestured = true pcall(Local.HangoutGesture, S, Job) end
 		Brain.Idle(S, 1, function() return S.Job == Job and not Paused end) -- (1.86.2) fidgets, chats, mutters
 		local R = S.Root
 		if not R then return end
@@ -676,6 +717,148 @@ function Local.Club(S, Job)
 	end
 end
 
+---| (phase6-strafes) lockers, the infirmary visit, watching a match |---
+
+function Local.NearLocker(S): BasePart?
+	local HP = workspace.School:FindFirstChild(`Quests`) and workspace.School.Quests:FindFirstChild(`HallwayProps`)
+	if not (HP and S.Root) then return nil end
+	for _, L in HP:GetChildren() do
+		local P = if L:IsA(`BasePart`) then L elseif L:IsA(`Model`) then L.PrimaryPart or L:FindFirstChildWhichIsA(`BasePart`) else nil
+		if P and L.Name:find(`Locker`) and (P.Position - S.Root.Position).Magnitude < 6 then return P end
+	end
+	return nil
+end
+
+local InfirmaryTaken = {} :: { [Instance]: any }
+function Local.InfirmaryPlace(S): (Instance?, string?)
+	local Room = workspace.School:FindFirstChild(`Infirmary`)
+	if not Room then return nil, nil end
+	local Props = Room:FindFirstChild(`Props`)
+	for _, N in { `DormBed_Infirmary1`, `DormBed_Infirmary2` } do
+		local B = Props and Props:FindFirstChild(N)
+		local Who = B and InfirmaryTaken[B]
+		if B and not (Who and Who.Model) then return B, `Bed` end
+	end
+	for _, N in { `NHInfirmarySpot1`, `NHInfirmarySpot2` } do
+		local P = Room:FindFirstChild(N)
+		local Who = P and InfirmaryTaken[P]
+		if P and not (Who and Who.Model) then return P, `Stand` end
+	end
+	return nil, nil
+end
+
+function Local.Infirmary(S, Job, Prev)
+	local Room = workspace.School:FindFirstChild(`Infirmary`)
+	local Zone = Room and Room:FindFirstChild(`Zone`)
+	if not (Zone and Local.Arrive(S, Job, Zone.Position)) then S.SickUntil = nil return end
+	local Place, Kind = Local.InfirmaryPlace(S)
+	if Place then
+		InfirmaryTaken[Place] = S
+		S.Model:SetAttribute(`NHActivity`, `At the infirmary`)
+		local At = if Place:IsA(`Model`) then (Place:GetPivot() * CFrame.new(2.6, 0, 0)).Position else (Place :: BasePart).Position
+		if Local.WalkTo(S, Job, Local.Floor(At) or At) and S.Job == Job then
+			local Stay = GestureCfg.Infirmary.Stay
+			local Until = os.clock() + math.random(Stay[1], Stay[2])
+			if Kind == `Bed` then
+				Local.Sit(S, Place :: Model, 0, `Sitting`) -- on the edge of the bed (the Nurse treats players; students rest)
+			else
+				Local.Face(S, Zone.Position)
+				Gestures.Play(S, Gestures.PickFor(S, `Patient`, { Spot = `Stand` }), { Force = true })
+			end
+			while os.clock() < Until and S.Job == Job and not Paused do task.wait(0.5) end
+			Gestures.Stop(S, 0.4)
+			if S.Job == Job then Local.Unseat(S) end
+		end
+		if InfirmaryTaken[Place] == S then InfirmaryTaken[Place] = nil end
+	end
+	S.SickUntil = nil
+	if S.Job == Job and Prev then Local.Assign(S, Prev.Fn, table.unpack(Prev.Args, 1, Prev.Args.n)) end
+end
+
+-- a live match at a venue (Services.Sports.Matches), or nil
+function Local.LiveMatch(): any?
+	local Ok, All = pcall(function() return require(ServerScriptService.Services.Sports.Matches).All() end)
+	if not Ok or not All then return nil end
+	for _, M in All do
+		if (M.Phase == `Live` or M.Phase == `Halftime`) and #CollectionService:GetTagged(`NHBleacherSeat`) > 0 then
+			for _, Seat in CollectionService:GetTagged(`NHBleacherSeat`) do
+				if Seat:GetAttribute(`Venue`) == M.Name then return M end
+			end
+		end
+	end
+	return nil
+end
+
+function Local.FreeBleacher(S, Venue: string): Model?
+	local PS = nil
+	pcall(function() PS = require(ServerScriptService.Services.Features.PlayerSeats) end)
+	local Best, BestD = nil, math.huge
+	for _, Seat in CollectionService:GetTagged(`NHBleacherSeat`) do
+		if Seat:GetAttribute(`Venue`) == Venue and Seat:IsA(`Model`) then
+			local Who = ChairBy[Seat]
+			local Taken = Who and Who ~= S and Who.Model and Who.Model.Parent
+			if not Taken and not (PS and PS.IsOccupied(Seat)) then
+				local D = if S.Root then (Seat:GetPivot().Position - S.Root.Position).Magnitude else 0
+				if D < BestD then Best, BestD = Seat, D end
+			end
+		end
+	end
+	if Best then ChairBy[Best] = S end
+	return Best
+end
+
+function Local.Watch(S, Job, Prev)
+	local M = Local.LiveMatch()
+	if not M then if Prev then Local.Assign(S, Prev.Fn, table.unpack(Prev.Args, 1, Prev.Args.n)) end return end
+	local Seat = nil
+	if not Local.Arrive(S, Job, M.Venue and M.Venue:GetPivot().Position) then return end
+	Seat = Local.FreeBleacher(S, M.Name)
+	if not Seat then return end
+	S.Model:SetAttribute(`NHActivity`, `Watching the match`)
+	local Front = (Seat:GetPivot() * CFrame.new(0, 0, -1.6)).Position
+	if Local.WalkTo(S, Job, Local.Floor(Front) or Front) and S.Job == Job then
+		Local.Sit(S, Seat, 0, `Sitting`)
+		local W = GestureCfg.Watch
+		local Resting = math.random() < W.Rest
+		local Score = (M.Score and M.Score.A or 0) + (M.Score and M.Score.B or 0)
+		local Cheer = (not Resting) and Gestures.Play(S, `CheerSeated_Upper`, { Force = true; Weight = W.Weight; Speed = W.Speed })
+		while S.Job == Job and not Paused and (M.Phase == `Live` or M.Phase == `Halftime`) do
+			local Now = (M.Score and M.Score.A or 0) + (M.Score and M.Score.B or 0)
+			if Now ~= Score then
+				Score = Now
+				-- a score: everyone cheers, full out, for a moment
+				local T = Gestures.Play(S, `CheerSeated_Upper`, { Force = true; Weight = 1; Speed = 1 })
+				task.wait(W.Burst)
+				if T and Cheer and not Resting then T:AdjustWeight(W.Weight, 0.5) T:AdjustSpeed(W.Speed)
+				elseif T then Gestures.Stop(S, 0.5) end
+			end
+			task.wait(0.5)
+		end
+		Gestures.Stop(S, 0.4)
+	end
+	if ChairBy[Seat] == S then ChairBy[Seat] = nil end
+	if S.Job == Job then Local.Unseat(S) end
+	if S.Job == Job and Prev then Local.Assign(S, Prev.Fn, table.unpack(Prev.Args, 1, Prev.Args.n)) end
+end
+
+-- once a second: a match that goes live draws the free Athletes (and a few others after school) to the bleachers
+local WatchingMatch = nil
+function Local.MatchTick()
+	local M = Local.LiveMatch()
+	if M == WatchingMatch then return end
+	WatchingMatch = M
+	if not M or Plan.Kind == `Class` or Plan.Kind == `Night` or Plan.Kind == `Morning` then return end
+	local Others = 0
+	for _, S in Students do
+		local Athlete = S.Clique == `Athletes`
+		local Extra = not Athlete and Plan.Kind == `AfterSchool` and Others < GestureCfg.Watch.Others and math.random() < 0.3
+		if (Athlete or Extra) and not S.InScene and not S.Reacting and S.LastJob and S.LastJob.Fn ~= Local.Watch then
+			if Extra then Others += 1 end
+			Local.Assign(S, Local.Watch, S.LastJob)
+		end
+	end
+end
+
 ---| the clock |---
 
 -- start a new job for one student (cancels whatever they were doing)
@@ -701,6 +884,9 @@ function Local.OnSegment(State)
 	local Hour = State.Hour or math.floor((State.MinuteOfDay or 0) / 60)
 	Plan = { Kind = Kind; SegName = Seg.Name; DayName = State.DayName or (typeof(State.Day) == `string` and State.Day or nil) }
 	for I, S in Students do
+		if S.SickUntil and os.clock() < S.SickUntil and Kind ~= `Night` and Kind ~= `Morning` and Kind ~= `Class` then
+			S.SickUntil = os.clock() -- (phase6-strafes) the next replan below is their normal job; the visit comes first
+		end
 		if Kind == `Night` or Kind == `Morning` then
 			if S.Model then Local.Assign(S, Local.Leave) else S.Job = {} end
 		elseif Kind == `BeforeSchool` or Kind == `Passing` then
@@ -874,6 +1060,11 @@ function Shared.OnStart()
 			local L = S.LastJob
 			if not (L and S.Model) or Paused then return end
 			S.ReplanNow = true
+			-- (phase6-strafes) got back up after being downed: the infirmary first (not in class), then the job
+			if S.SickUntil and L.Fn ~= Local.Infirmary and Plan.Kind ~= `Class` and workspace.School:FindFirstChild(`Infirmary`) then
+				Local.Assign(S, Local.Infirmary, L)
+				return
+			end
 			Local.Assign(S, L.Fn, table.unpack(L.Args, 1, L.Args.n))
 		end;
 	})
@@ -890,6 +1081,7 @@ function Shared.OnStart()
 					if not Ok2 then warn(`[Schedules] {Err}`) end
 				end
 			end
+			pcall(Local.MatchTick) -- (phase6-strafes) the watch-the-match job
 			local Ok3, Err3 = pcall(Local.SleepWake) -- (2.28)
 			if not Ok3 then warn(`[Schedules] sleep/wake: {Err3}`) end
 			task.wait(1)

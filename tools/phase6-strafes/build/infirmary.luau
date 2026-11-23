@@ -96,6 +96,7 @@ for I, Bed in { Bed1, Bed2 } do
 		RP.FilterDescendantsInstances = { Bed }
 		local Hit = workspace:Raycast(Cf.Position + Vector3.new(0, 10, 0), Vector3.new(0, -20, 0), RP)
 		local Top = if Hit then Hit.Position.Y else 1.1 + 2.1
+		Bed:SetAttribute("SeatHeight", Top - 1.1) -- Features.Seats: students sit on the edge (Schedules' infirmary visit)
 		marker("NHInfirmaryBed" .. I, Vector3.new(Cf.Position.X, Top, Cf.Position.Z), Vector3.new(0, 0, -1), { SeatHeight = Top - 1.1; Kind = "Bed" })
 		table.insert(Report, string.format("bed %d top %.2f (%s)", I, Top, if Hit then "raycast" else "default"))
 	end

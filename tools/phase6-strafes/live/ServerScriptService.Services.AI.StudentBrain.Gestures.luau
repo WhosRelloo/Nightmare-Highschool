@@ -303,6 +303,59 @@ local function probe()
 				return L
 			elseif Cmd == `Id` then
 				return { Id = idOf(A) }
+			elseif Cmd == `DownRecover` then -- the real Downed path, in the game VM
+				local S = student(A)
+				local Downed = require(ServerScriptService.Services.Features.Downed)
+				local Can = Downed.CanBeDowned(S.Model)
+				if Can then Downed.Down(S.Model, nil) task.wait(0.5) Downed.Recover(S.Model) task.wait(0.6) end
+				return { CanBeDowned = Can; Gesture = S.Gesture; Reacting = S.Reacting; Sick = S.SickUntil ~= nil }
+			elseif Cmd == `Near` then -- move the first player next to student A (Studio checks)
+				local S = student(A)
+				local P = Players:GetPlayers()[1]
+				local R = P and P.Character and P.Character:FindFirstChild(`HumanoidRootPart`)
+				if R and S and S.Root then R.CFrame = S.Root.CFrame * CFrame.new(0, 0, -(tonumber(Bv) or 6)) * CFrame.Angles(0, math.pi, 0) end
+				return { Ok = R ~= nil }
+			elseif Cmd == `Away` then
+				local P = Players:GetPlayers()[1]
+				local R = P and P.Character and P.Character:FindFirstChild(`HumanoidRootPart`)
+				if R then R.CFrame = R.CFrame + Vector3.new(0, 0, tonumber(A) or 200) end
+				return { Ok = R ~= nil }
+			elseif Cmd == `StartMatch` then
+				local M = require(ServerScriptService.Services.Sports.Matches)
+				local P = Players:GetPlayers()[1]
+				return { Live = M.ForceStart(A or `Gymnasium`, { P }, {}, true) }
+			elseif Cmd == `Score` then
+				local M = require(ServerScriptService.Services.Sports.Matches).Get(A or `Gymnasium`)
+				if M then M:Scored(`A`, 2, nil) end
+				return { Ok = M ~= nil }
+			elseif Cmd == `EndMatch` then
+				local M = require(ServerScriptService.Services.Sports.Matches).Get(A or `Gymnasium`)
+				if M then M:End(nil, `Test`) end
+				return { Ok = M ~= nil }
+			elseif Cmd == `Watchers` then
+				local L = {}
+				for I, S in (Host and Host.Students and Host.Students() or {}) do
+					if S.Seated and S.Seated.Name:find(`BleacherSeat`) then table.insert(L, { I = I; Seat = S.Seated.Name; Gesture = S.Gesture; Clique = S.Clique }) end
+				end
+				return L
+			elseif Cmd == `SitBleacher` then
+				local CS = game:GetService(`CollectionService`)
+				local P = Players:GetPlayers()[1]
+				local H = P and P.Character and P.Character:FindFirstChildOfClass(`Humanoid`)
+				local Seat = nil
+				for _, M in CS:GetTagged(`NHBleacherSeat`) do local St = M:FindFirstChild(`NHPlayerSeat`) if St and not St.Occupant then Seat = St break end end
+				if not (Seat and H) then return { Ok = false; Seats = #CS:GetTagged(`NHBleacherSeat`) } end
+				P.Character:PivotTo(Seat.CFrame + Vector3.new(0, 3, 0))
+				task.wait(0.2)
+				Seat:Sit(H)
+				task.wait(0.5)
+				return { Ok = H.SeatPart == Seat; Seat = Seat.Parent.Name; Prompt = Seat:FindFirstChild(`SitPrompt`) ~= nil }
+			elseif Cmd == `Stand` then
+				local P = Players:GetPlayers()[1]
+				local H = P and P.Character and P.Character:FindFirstChildOfClass(`Humanoid`)
+				if H then H.Sit = false H.Jump = true end
+				task.wait(0.5)
+				return { Seated = H and H.SeatPart ~= nil }
 			end
 			local Inf = ServerScriptService.Services.Features:FindFirstChild(`Infirmary`)
 			if Inf then

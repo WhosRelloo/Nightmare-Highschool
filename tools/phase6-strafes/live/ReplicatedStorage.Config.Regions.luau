@@ -26,6 +26,8 @@ Regions.Defs = {
 	R103 = { Name = `Room 103 · Chemistry`; Title = `Chemistry`; Kicker = `Room 103`; Kind = `School`; Priority = 5; Text = `Something on the back shelf is still bubbling.` };
 	R104 = { Name = `Room 104 · English`; Title = `English`; Kicker = `Room 104`; Kind = `School`; Priority = 5; Text = `The margins are full of other students' secrets.` };
 	R105 = { Name = `Room 105 · History`; Title = `History`; Kicker = `Room 105`; Kind = `School`; Priority = 5; Text = `The past is taught here. Some of it was there.` };
+	-- (phase6-strafes) the school nurse's room, south of the hallway extension opposite R106
+	Infirmary = { Name = `The Infirmary`; Title = `The Infirmary`; Kicker = `Nurse Agatha Thorne`; Kind = `School`; Priority = 5; Text = `Clean sheets, cold hands, and no questions written down.` };
 	R106 = { Name = `Room 106 · Detention`; Title = `Detention`; Kicker = `Room 106`; Kind = `School`; Priority = 5; Text = `Sit. Write your lines. Don't look at the window.` };
 	Archive = { Name = `The Archive`; Kind = `Restricted`; Priority = 5;
 		Text = `The oldest books keep the quietest secrets.`; Night = `Forbidden after dark. The books don't like company.` };
