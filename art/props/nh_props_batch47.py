@@ -43,17 +43,6 @@ import nh_props_batch40 as B40
 from nh_props_batch40 import Cards, frame, RNG, mk, poly_slab, blob, bar, UP
 from nh_props_batch43 import pprism
 
-_tube = P.tube
-
-
-def tube(name, points, radius, mat, closed=False, res=4, square=False, poly=False):
-    """nh_props.tube, but a square bar's faces turned outward (as built its normals point in, so the bake's AO blackens it and
-    Roblox would cull its outside)."""
-    ob = _tube(name, points, radius, mat, closed=closed, res=res, square=square, poly=poly)
-    if square:
-        ob.data.flip_normals()
-    return ob
-
 
 DEG = math.pi / 180
 PI = math.pi

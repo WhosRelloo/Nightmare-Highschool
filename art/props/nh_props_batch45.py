@@ -39,17 +39,6 @@ PI = math.pi
 RX, RY, RZ, T = B30.RX, B30.RY, B30.RZ, B30.T
 arch_xz, circ, rect, finial, castor, rivet = B43.arch_xz, B43.circ, B43.rect, B43.finial, B43.castor, B43.rivet
 
-_tube = P.tube
-
-
-def tube(name, points, radius, mat, closed=False, res=4, square=False, poly=False):
-    """nh_props.tube, but a square bar's faces are turned outward (its bevel profile winds the other way, so as built its
-    normals point in: the bake's AO then darkens it to black and Roblox would cull its outside)."""
-    ob = _tube(name, points, radius, mat, closed=closed, res=res, square=square, poly=poly)
-    if square:
-        ob.data.flip_normals()
-    return ob
-
 
 IA = json.load(open(os.path.join(P.HERE, "interiors_atlas.json")))
 for _k, _v in IA["regions"]["InteriorsPrint"].items():
@@ -548,7 +537,6 @@ def cash_register(M):
     return _dims()
 
 
-
 def bell_weight(name, s, mat, loc):
     """A brass bell weight `s` studs tall with a knob."""
     lathe(name, [(0, 0), (0.42 * s, 0), (0.44 * s, 0.06 * s), (0.36 * s, 0.4 * s), (0.22 * s, 0.62 * s), (0.18 * s, 0.7 * s), (0.2 * s, 0.76 * s),
@@ -860,7 +848,6 @@ def glass_cabinet_tall(M):
     box("Pane", (dw - 0.1, 0.02, z1 - z0 - 0.3), (hx + dw / 2, yd + 0.01, (z0 + z1) / 2), K["glass"], bevel=0.0)
     set_group("Main")
     return _dims()
-
 
 
 def shelf_goods(prefix, x0, x1, z, yf, depth, K, rnd, kinds):
@@ -1371,7 +1358,6 @@ def stock_crates(M):
         tube(f"Floor{j}", [(x, y, 0.01), (x + rnd.uniform(-0.3, 0.3), y + rnd.uniform(-0.2, 0.2), 0.01)], 0.008, K["straw"], poly=True)
     B43._ground(0)
     return _dims()
-
 
 
 # ================================================================== the bookshop

@@ -298,7 +298,9 @@ def tube(name, points, radius, mat, closed=False, res=4, square=False, poly=Fals
         ps = prof.splines.new("POLY")
         ps.points.add(3)
         r = radius
-        for i, (x, y) in enumerate([(-r, -r), (r, -r), (r, r), (-r, r)]):
+        # wound clockwise (seen down the path) so the bar's side faces point outward; the other way round they point
+        # in, the bake's AO darkens the bar and Roblox culls its outside (the caps face out either way)
+        for i, (x, y) in enumerate([(-r, -r), (-r, r), (r, r), (r, -r)]):
             ps.points[i].co = (x, y, 0, 1)
         ps.use_cyclic_u = True
         prof_ob = bpy.data.objects.new(name + "_prof", prof)
