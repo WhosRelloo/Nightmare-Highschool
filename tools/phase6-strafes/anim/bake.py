@@ -438,11 +438,18 @@ def _retime_ease(t, ease=0.2):
 
 
 def split(c, a, b, blend=0.3, slow=1.15, ease=0.2):
-    """Praying: Loop (a..b, seamless back to a), StandUp (a..end), KneelIn (the stand-up reversed, slower, eased in).
+    """Praying: Loop (a..b, seamless back to a), StandUp (from a's pose into b..end), KneelIn (the stand-up reversed,
+    slower, eased in).
     Every switch is frame-identical: KneelIn ends on frame a, Loop starts and ends on a, StandUp starts on a."""
     nb = max(2, int(round(blend * c.fps())))
     loop = _make_loop(c, a, b, nb)
-    stand = c.sub(a, c.n - 1)
+    # the stand-up leaves the loop from where the loop ends (frame a's pose) and eases into the source from frame b on,
+    # so it starts on an identical frame without replaying the kneel
+    stand = c.sub(b, c.n - 1)
+    for j in stand.P:
+        for k in range(min(nb, stand.n)):
+            w = smoothstep(k / nb)
+            stand.P[j][k] = interp(c.P[j][a], stand.P[j][k], w)
     stand.loop = False
     rev_P = {j: v[::-1].copy() for j, v in stand.P.items()}
     rev_t = (stand.t[-1] - stand.t[::-1]) * slow

@@ -10,9 +10,13 @@ return {
 		StrafeLeft = 126969213208550; StrafeRight = 84541589738848;
 	};
 	Studio = { StrafeLeftSquare = "NHG_StrafeLeft_Square"; StrafeRightSquare = "NHG_StrafeRight_Square" }; -- ServerStorage.NHGestures
-	Stride = { Walk = 5.9; Sprint = 13.5; CrouchWalk = 3.5; FastSprint = 18.0; Strafe = 5.8 };
-	ContactPhase = { Walk = 0; Strafe = 0 }; -- left-foot contact as a fraction of the cycle (filled from anim/out/manifest.json)
-	Length = { Walk = 1.17; Strafe = 1.033 };
+	-- Walk / Sprint / CrouchWalk / FastSprint: the spread method (twice the feet's widest split per cycle; matches the NPCs'
+	-- measured 5.3 studs/s on 1.8-stud legs). Strafes: the planted foot's ground speed of the baked square-chest clips
+	-- (anim/out/manifest.json "stance": the spread method overstates a sideways step).
+	Stride = { Walk = 5.9; Sprint = 13.5; CrouchWalk = 3.5; FastSprint = 18.0; Strafe = 4.8; StrafeLeft = 4.76; StrafeRight = 4.84 };
+	-- left-foot contact as a fraction of the cycle (Walk measured from 113454991107499; strafes from the bake manifest)
+	ContactPhase = { Walk = 0.057; Strafe = 0.226; StrafeLeft = 0.258; StrafeRight = 0.194 };
+	Length = { Walk = 1.167; Strafe = 1.033 };
 	CadenceMin = 0.3;
 	CadenceMax = 2.4;      -- owner, 2026-11-22: the stride fix on walk, sprint and crouch, capped at 2.4x playback
 	StrafeSpeed = 8.5;     -- owner: about 8.5 studs/s while strafing (CombatSpeed caps the walk band)

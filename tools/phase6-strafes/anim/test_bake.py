@@ -77,7 +77,7 @@ def test_split_switches_are_frame_identical():
     parts = B.split(src, a, b, blend=0.3)
     assert B.frame_distance(parts["KneelIn"], parts["KneelIn"].n - 1, parts["Loop"], 0) < 1e-6
     assert B.frame_distance(parts["Loop"], parts["Loop"].n - 1, parts["StandUp"], 0) < 1e-6
-    assert parts["KneelIn"].length() == pytest.approx(parts["StandUp"].length() * 1.15, rel=0.05)
+    assert parts["KneelIn"].length() == pytest.approx(parts["StandUp"].length() * 1.15 + 0.1, abs=0.02)  # 1.15x slower, +0.1 s eased start
 
 
 def test_upper_body_keeps_arms_and_head_only():

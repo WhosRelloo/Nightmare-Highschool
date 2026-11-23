@@ -36,7 +36,9 @@ Eq(L.Blocked({ NHApproach = false }, Cfg), false, "false does not block")
 Eq(L.Blocked({}, Cfg), false, "nothing blocks")
 -- rate: stride-matched, clamped
 Near(L.Rate(14.4, Cfg.Stride.Walk, 1.615, Cfg), math.min(Cfg.CadenceMax, 14.4 / (5.9 * 0.8075)), "walk rate", 1e-2)
-Near(L.Rate(8.5, Cfg.Stride.Strafe, 1.615, Cfg), 8.5 / (5.8 * 0.8075), "strafe rate", 1e-2)
+Near(L.Rate(8.5, Cfg.Stride.Strafe, 1.615, Cfg), 8.5 / (4.8 * 0.8075), "strafe rate", 1e-2)
+
+if L.Rate(8.5, Cfg.Stride.Strafe, 1.615, Cfg) >= Cfg.CadenceMax then table.insert(Fails, "strafe at 8.5 hits the cadence cap") end
 Near(L.Rate(0.1, Cfg.Stride.Walk, 2, Cfg), Cfg.CadenceMin, "rate floor")
 Near(L.Rate(40, Cfg.Stride.Walk, 2, Cfg), Cfg.CadenceMax, "rate cap")
 -- phase sync: contact phases line up
