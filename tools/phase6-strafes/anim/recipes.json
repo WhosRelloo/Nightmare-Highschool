@@ -1,6 +1,6 @@
 [
- {"name": "StrafeLeft_Square", "src": "Walk_Stand_Anims__Left_Strafe_Walking_R6", "do": [["square_chest", {"keep_yaw": 0}], ["foot_lock", {}]], "loop": true, "priority": "Core"},
- {"name": "StrafeRight_Square", "src": "Walk_Stand_Anims__Right_Strafe_Walking_R6", "do": [["square_chest", {"keep_yaw": 0}], ["foot_lock", {}]], "loop": true, "priority": "Core"},
+ {"name": "StrafeLeft_Square", "src": "Walk_Stand_Anims__Left_Strafe_Walking_R6", "do": [["square_chest", {"keep_yaw": 0}], ["foot_lock", {}]], "loop": true, "priority": "Core", "client": true},
+ {"name": "StrafeRight_Square", "src": "Walk_Stand_Anims__Right_Strafe_Walking_R6", "do": [["square_chest", {"keep_yaw": 0}], ["foot_lock", {}]], "loop": true, "priority": "Core", "client": true},
  {"name": "Talk", "src": "Cinematic_NPC_Gestures__Talking2_R6", "loop": true},
  {"name": "TalkRant", "src": "Cinematic_NPC_Gestures__TalkingGoinCrazy_R6", "loop": true},
  {"name": "Argue_A", "src": "Cinematic_NPC_Gestures__Standing_Arguing_R6", "do": [["decimate", {"fps": 15}]], "loop": true},

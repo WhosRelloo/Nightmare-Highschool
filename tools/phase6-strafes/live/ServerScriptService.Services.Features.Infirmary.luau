@@ -7,7 +7,7 @@
 	injury visuals or injury models.
 	  Infirmary.Treat(Player) -> (ok, reason?)   the ONLY entry point (the Nurse's prompt and her dialogue call it)
 	      the Nurse must be within Config.Gestures.Treat.Range; Care.CanTreat says yes or why not; then the interaction:
-	      both face each other, the player is planted and plays the Kit's own FirstAid clip, the Nurse plays Inspect then
+	      both face each other, the player is slowed (NHKitSlow 0.3, the Kit bandage's way) and plays the Kit's own FirstAid clip, the Nurse plays Inspect then
 	      ReachDown (StudentBrain.Gestures, Force), for Treat.Seconds. It cancels on a health drop, being downed, a combat
 	      tag starting, or walking more than Treat.CancelRange away ("Hold still."). On completion: Care.Apply(Player).
 	  Infirmary.Care                 the rules (child ModuleScript Care: CanTreat / Apply / Cost)
@@ -70,7 +70,7 @@ function Infirmary.Treat(P: Player): (boolean, string?)
 	Busy[P] = true
 	face(Root, NRoot.Position)
 	face(NRoot, Root.Position)
-	Char:SetAttribute(`NHKitSlow`, 0.01) -- planted (CombatSpeed applies NHKitSlow)
+	Char:SetAttribute(`NHKitSlow`, 0.3) -- slowed to the floor CombatSpeed allows (it clamps NHKitSlow at 0.3), as the Kit bandage does
 	local Track
 	local Id = KitConfig.Anims and KitConfig.Anims[T.PlayerClip]
 	if typeof(Id) == `number` and Id > 0 then

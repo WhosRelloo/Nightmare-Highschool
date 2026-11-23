@@ -542,7 +542,7 @@ def r4(v):
     return "0" if s in ("-0", "") else s
 
 
-def emit_lua(c, name, loop, priority, folder="NHGestures", publish="Gestures"):
+def emit_lua(c, name, loop, priority, folder="NHGestures", publish="Gestures", client=False):
     lines = []
     for i in range(c.n):
         parts = []
@@ -608,6 +608,7 @@ for _, path in {{ "{folder}", "NHPublish.{publish}" }} do
 	if old then old:Destroy() end
 	seq:Clone().Parent = f
 end
+{'local RS = game:GetService("ReplicatedStorage") local lf = RS:FindFirstChild("NHLocoClips") or Instance.new("Folder") lf.Name = "NHLocoClips" lf.Parent = RS local o2 = lf:FindFirstChild(seq.Name) if o2 then o2:Destroy() end seq:Clone().Parent = lf -- Studio: the client registers it' if client else ''}
 seq:Destroy()
 return string.format("built {name} (%d keyframes, %.3f s)", #SS.{folder}:FindFirstChild("{name}"):GetKeyframes(), {c.length():.3f})
 '''
@@ -695,7 +696,7 @@ def main():
             res = checks(full, clip, meta, r)
             pri = r.get("priority", "Action")
             open(os.path.join(HERE, "out", full + ".lua"), "w", encoding="utf-8", newline="\n").write(
-                emit_lua(clip, full, meta["loop"], pri))
+                emit_lua(clip, full, meta["loop"], pri, client=bool(r.get("client"))))
             entry = {"Studio": full, "Len": res["len"], "Loop": meta["loop"], "Priority": pri, "Src": r["src"]}
             for k in ("Carry", "bucket", "base", "window"):
                 if k in meta:

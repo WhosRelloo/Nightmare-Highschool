@@ -31,7 +31,11 @@ local Easing = false                                        -- Begin's 0.3 s inp
 local Approaching = false                                   -- an Approach is driving the character (fix round 1)
 local ApproachDepth = 0                                     -- (fix round 2) how many are running (Approaching = depth > 0)
 local OuterWas: number?, OuterRot: boolean? = nil, nil      -- (fix round 3) WalkSpeed / AutoRotate from before the outermost approach
-local STRIDE = { Walk = 10, CrouchWalk = 7, Sprint = 24, FastSprint = 30 } -- (fix round 2) studs/s at speed 1: AnimationController's own scales
+local STRIDE = { Walk = true, CrouchWalk = true, Sprint = true, FastSprint = true } -- (phase6-strafes) the gaits whose cadence the approach drives
+-- (phase6-strafes) the same stride-matched rate AnimationController uses (Config.Locomotion.Stride, the leg length);
+-- the strafes are deliberately NOT here: an approach never strafes (AnimationController gates on NHApproach)
+local LocoCfg = require(ReplicatedStorage:WaitForChild(`Config`):WaitForChild(`Locomotion`))
+local Loco = require(ReplicatedStorage:WaitForChild(`Functions`):WaitForChild(`Locomotion`))
 local WALK, RUN, CROUCH = 12, 25, 7                         -- the game's own speeds: Sprint's Release, Sprint's Activate, Services.Player.Crouch
 
 local function controls()
@@ -164,8 +168,12 @@ local function approach(Mark: CFrame, Opts: { Gait: string?, LeadIn: number?, Ar
 		if not Root.Parent then return end
 		local Flat = flat(Root.AssemblyLinearVelocity).Magnitude
 		for _, T in (Animator :: Animator):GetPlayingAnimationTracks() do
-			local Per = T.Animation and STRIDE[T.Animation.Name]
-			if Per and T.Priority == Enum.AnimationPriority.Core then T:AdjustSpeed(math.clamp(Flat / Per, 0.05, 2.5)) end
+			local Name = T.Animation and T.Animation.Name
+			if Name and STRIDE[Name] and T.Priority == Enum.AnimationPriority.Core then
+				local Leg = Root.Parent and Root.Parent:FindFirstChild(`Left Leg`)
+				local Len = if Leg and Leg:IsA(`BasePart`) then Leg.Size.Y else 2
+				T:AdjustSpeed(math.max(0.05, Loco.Rate(Flat, LocoCfg.Stride[Name], Len, LocoCfg)))
+			end
 		end
 	end) or nil
 	local function cadOff() if CadConn then CadConn:Disconnect() CadConn = nil end end

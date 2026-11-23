@@ -3,6 +3,9 @@
 
 local Players = game:GetService(`Players`)
 local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
+local RunService = game:GetService(`RunService`)
+local UserInputService = game:GetService(`UserInputService`)
+local KeyframeSequenceProvider = game:GetService(`KeyframeSequenceProvider`)
 
 ---| Modules |---
 
@@ -12,6 +15,12 @@ local Packets = require(ReplicatedStorage.Remotes.Packets)
 local Trove = require(ReplicatedStorage.Packages.Trove)
 
 local StateController = require(script.Parent.Parent.StateController)
+-- (phase6-strafes) stride-matched cadence and the directional walk (strafes, the reversed-walk backpedal):
+-- docs/superpowers/specs/2026-11-22-strafes-npc-gestures-design.md §1
+local LocoCfg = require(ReplicatedStorage.Config.Locomotion)
+local Loco = require(ReplicatedStorage.Functions.Locomotion)
+local StateManager = require(ReplicatedStorage.Packages.Bind.StateManager)
+local BUSY = { `Dodge`, `Sliding`, `Ragdoll`, `Downed`, `Carried`, `Gripped`, `Gripping`, `Paralyzed` } -- LockOn's list
 
 ---| Type Annotation |---
 
@@ -60,6 +69,13 @@ end
 local Local = {}
 local Shared = {}
 Shared.Controller = Animate.new()
+
+-- (phase6-strafes) the clip rate that keeps the feet planted at this ground speed (Functions.Locomotion.Rate)
+local LegLen = 2
+local function rate(Speed: number, Gait: string): number
+	return Loco.Rate(Speed, LocoCfg.Stride[Gait] or LocoCfg.Stride.Walk, LegLen, LocoCfg)
+end
+Shared.Rate = rate
 
 function Shared.OnStart()
 
@@ -166,6 +182,16 @@ function Shared.OnCharacterAdded(Character: Model)
 		:SetTracks(AnimationPack)
 		:PlayTrack(`Idle`, .1)
 
+	-- (phase6-strafes) the leg length for the cadence (heights change it), and the directional walk
+	local function readLeg()
+		local Leg = Character:FindFirstChild(`Left Leg`)
+		LegLen = if Leg and Leg:IsA(`BasePart`) then Leg.Size.Y else 2
+	end
+	readLeg()
+	task.delay(2, readLeg) -- the height is applied a moment after spawn
+	AnimationManager.CharacterTrove:Connect(Character:GetAttributeChangedSignal(`Height`), function() task.defer(readLeg) end)
+	Local.Directional(AnimationManager, Character, Humanoid)
+
 	-- Add cleanup for when character is destroyed
 	AnimationManager.CharacterTrove:Connect(Character.AncestryChanged, function(_, parent)
 		if not parent and AnimationManager.CharacterTrove then
@@ -181,7 +207,7 @@ function Shared.OnCharacterAdded(Character: Model)
 		if Humanoid:GetAttribute(`Crouch`) ~= true then return false end
 		if Speed > .01 and AnimationManager.TrackTable.CrouchWalk then
 			AnimationManager:PlayTrack(`CrouchWalk`, .15)
-				:SetSpeed(math.max(Speed, 1) / 7)
+				:SetSpeed(rate(math.max(Speed, 1), `CrouchWalk`)) -- (phase6-strafes) was / 7
 			return true
 		elseif Speed <= .01 and AnimationManager.TrackTable.Crouch then
 			if AnimationManager.Pose ~= `Crouch` then AnimationManager:PlayTrack(`Crouch`, .15) end
@@ -205,15 +231,15 @@ function Shared.OnCharacterAdded(Character: Model)
 			if Humanoid.WalkSpeed > 40 or Speed > 40 then
 
 				AnimationManager:PlayTrack(`FastSprint`, .2)
-					:SetSpeed(Speed / 30)
+					:SetSpeed(rate(Speed, `FastSprint`)) -- (phase6-strafes) stride-matched (was / 30)
 
 			elseif Humanoid.WalkSpeed > 20 or Speed > 20 then
 				AnimationManager:PlayTrack(`Sprint`, .1)
-					:SetSpeed(Speed / 24)
+					:SetSpeed(rate(Speed, `Sprint`)) -- (phase6-strafes) was / 24
 
-			else
+			elseif AnimationManager.Pose ~= `Walk8` then -- (phase6-strafes) the directional walk drives its own tracks
 				AnimationManager:PlayTrack(`Walk`, .1)
-					:SetSpeed(Speed / 10)
+					:SetSpeed(rate(Speed, `Walk`)) -- was / 10
 
 			end
 
@@ -270,6 +296,11 @@ function Shared.OnCharacterAdded(Character: Model)
 end
 
 function Animate.PlayTrack(self: AnimationManager, NewPose: string, Time: number)
+	-- (phase6-strafes) the directional walk keeps the Walk track itself; any other pose ends it first
+	if self.Pose == `Walk8` then
+		if NewPose == `Walk` then return self end
+		Local.EndDirectional(self, Time)
+	end
 	local CurrentTrack = self.TrackTable[self.Pose]
 	local CurrentSpeed = if CurrentTrack then CurrentTrack.Speed else 0
 
@@ -394,7 +425,9 @@ function Animate.SetTracks(self: AnimationManager, Tracks: { Animation })
 	end
 
 	self.TimePosition = {}
+	if self.Pose == `Walk8` then self.Pose = `Walk` end -- (phase6-strafes) the pack swap ends the directional walk
 	if self.Pose and not self.TrackTable[self.Pose] then self.Pose = nil end -- (audit) the new pack lacks this pose
+	Local.LoadDirectional(self) -- (phase6-strafes) StopAllTracks / the cleared table took the strafes with them
 
 	if self.Pose then
 		local CurrentTrack = self.TrackTable[self.Pose]
@@ -425,6 +458,146 @@ function Animate.StopAllTracks(self: AnimationManager)
 	end
 
 	return self
+end
+
+---| (phase6-strafes) the directional walk |---
+-- In lock-on, shift lock or first person (any input), moving at walk speed blends Walk, the reversed Walk (back) and
+-- the square-chest strafes by the move angle, their foot contacts phase-locked; the server caps the speed at
+-- Config.Locomotion.StrafeSpeed while it runs (NHStrafe -> Features.CombatSpeed). Off during cuts and approaches.
+
+local Directional = { Left = nil :: AnimationTrack?, Right = nil :: AnimationTrack? }
+local StrafeOn, Since, Sent = false, 0, nil :: boolean?
+local Remote: RemoteEvent? = nil
+
+local function strafeId(Square: string, Studio: string, Original: string): string?
+	local Id = LocoCfg.Ids[Square]
+	if Id and Id ~= 0 then return `rbxassetid://{Id}` end
+	if RunService:IsStudio() then
+		local F = ReplicatedStorage:FindFirstChild(`NHLocoClips`)
+		local KS = F and F:FindFirstChild(LocoCfg.Studio[Square])
+		if KS then
+			local Ok, Temp = pcall(function() return KeyframeSequenceProvider:RegisterKeyframeSequence(KS) end)
+			if Ok then return Temp end
+		end
+	end
+	local A = ReplicatedStorage.Assets.Animations.Movement:FindFirstChild(Studio)
+	if A and A:IsA(`Animation`) and A.AnimationId ~= `` then return A.AnimationId end
+	local O = LocoCfg.Ids[Original]
+	return if O and O ~= 0 then `rbxassetid://{O}` else nil
+end
+
+function Local.LoadDirectional(self)
+	for K, T in Directional do pcall(function() T:Stop(0) T:Destroy() end) Directional[K] = nil end
+	if not self.Animator then return end
+	for Side, Keys in { Left = { `StrafeLeftSquare`, `StrafeLeft`, `StrafeLeft` }, Right = { `StrafeRightSquare`, `StrafeRight`, `StrafeRight` } } do
+		local Id = strafeId(Keys[1], Keys[2], Keys[3])
+		if Id then
+			local A = Instance.new(`Animation`)
+			A.Name = `Strafe{Side}`
+			A.AnimationId = Id
+			local Ok, T = pcall(function() return self.Animator:LoadAnimation(A) end)
+			if Ok and T then
+				T.Priority = Enum.AnimationPriority.Core
+				T.Looped = true
+				Directional[Side] = T
+			end
+		end
+	end
+end
+
+local function send(On: boolean)
+	if Sent == On then return end
+	Sent = On
+	if not Remote then
+		local R = ReplicatedStorage:FindFirstChild(`Remotes`)
+		Remote = R and R:FindFirstChild(`NHStrafe`) :: RemoteEvent?
+	end
+	if Remote then Remote:FireServer({ On = On }) end
+end
+
+function Local.EndDirectional(self, Fade: number?)
+	for _, T in Directional do if T and T.IsPlaying then T:Stop(Fade or LocoCfg.Fade) end end
+	local Walk = self.TrackTable and self.TrackTable.Walk
+	if Walk then Walk:AdjustWeight(1, Fade or LocoCfg.Fade) end
+	if self.Pose == `Walk8` then self.Pose = `Walk` end
+	StrafeOn = false
+	send(false)
+end
+
+local function flags(Character: Model, Humanoid: Humanoid)
+	local P = Players.LocalPlayer
+	local F = {}
+	for _, N in LocoCfg.Blockers do
+		F[N] = P:GetAttribute(N) or Character:GetAttribute(N)
+	end
+	F.Busy = StateManager.HasState(Character, BUSY)
+	local Locked = false
+	pcall(function() Locked = require(script.Parent.InputController.Combat.LockOn.Core).Locked() ~= nil end)
+	if RunService:IsStudio() and P:GetAttribute(`NHStrafeTest`) == `Lock` then Locked = true end -- checks/strafecheck.lua
+	-- something else turned AutoRotate off (skateboard, football dive): not a facing mode
+	if Humanoid.AutoRotate == false and not Locked then F.Busy = true end
+	local Cam = workspace.CurrentCamera
+	local Head = Character:FindFirstChild(`Head`) :: BasePart?
+	return {
+		Locked = Locked;
+		MouseLocked = UserInputService.MouseBehavior == Enum.MouseBehavior.LockCenter;
+		FirstPerson = Cam ~= nil and Head ~= nil and (Cam.CFrame.Position - Head.Position).Magnitude < LocoCfg.FirstPersonDist;
+		Blocked = Loco.Blocked(F, LocoCfg);
+	}
+end
+
+function Local.Directional(self, Character: Model, Humanoid: Humanoid)
+	Local.LoadDirectional(self)
+	StrafeOn, Since, Sent = false, 0, nil
+	self.CharacterTrove:Connect(RunService.PreAnimation, function(Dt: number)
+		local Root = Humanoid.RootPart
+		local Walk = self.TrackTable.Walk
+		if not (Root and Walk and Directional.Left and Directional.Right) then return end
+		local Move = Humanoid.MoveDirection
+		local Gait = if self.Pose == `Walk8` then `Walk` else self.Pose
+		local F = flags(Character, Humanoid)
+		F.Gait = Gait
+		local Want = Loco.StrafeMode(F) and Move.Magnitude > 0.1 and Humanoid:GetAttribute(`Crouch`) ~= true
+		if Want then Since += Dt else Since = 0 end
+		if not StrafeOn then
+			if Want and Since >= LocoCfg.EnterHold and self.Pose == `Walk` then
+				StrafeOn = true
+				self.Pose = `Walk8`
+				send(true)
+			else
+				return
+			end
+		elseif not Want then
+			Local.EndDirectional(self)
+			return
+		end
+		-- the blend
+		local L = Root.CFrame:VectorToObjectSpace(Move)
+		local A = math.atan2(L.X, -L.Z)
+		local W = Loco.Weights(A)
+		local V = Root.AssemblyLinearVelocity
+		local Ground = Vector3.new(V.X, 0, V.Z).Magnitude
+		local WalkW = W.Walk + W.Back
+		local Sign = if W.Back > W.Walk then -1 else 1
+		if not Walk.IsPlaying then Walk:Play(0.1) end
+		Walk:AdjustWeight(math.max(WalkW, 0.001), 0.1)
+		Walk:AdjustSpeed(Sign * rate(Ground, `Walk`))
+		for Side, T in Directional do
+			local Wt = if Side == `Left` then W.Left else W.Right
+			if Wt > 0.02 then
+				if not T.IsPlaying then T:Play(LocoCfg.Fade, Wt) end
+				T:AdjustWeight(Wt, 0.1)
+				T:AdjustSpeed(rate(Ground, `Strafe{Side}`))
+				-- phase-lock the strafe's left-foot contact to the walk's (forward diagonals only; the backpedal is reversed)
+				if Sign > 0 and WalkW > 0.05 and T.Length > 0 and Walk.Length > 0 then
+					T.TimePosition = Loco.Phase(Walk.TimePosition, Walk.Length, T.Length, LocoCfg.ContactPhase.Walk, LocoCfg.ContactPhase[`Strafe{Side}`] or LocoCfg.ContactPhase.Strafe)
+				end
+			elseif T.IsPlaying then
+				T:Stop(LocoCfg.Fade)
+			end
+		end
+	end)
+	self.CharacterTrove:Add(function() StrafeOn = false send(false) end)
 end
 
 return Shared

@@ -188,5 +188,6 @@ for _, path in { "NHGestures", "NHPublish.Gestures" } do
 	if old then old:Destroy() end
 	seq:Clone().Parent = f
 end
+
 seq:Destroy()
 return string.format("built NHG_ShoveSpin_InPlace (%d keyframes, %.3f s)", #SS.NHGestures:FindFirstChild("NHG_ShoveSpin_InPlace"):GetKeyframes(), 4.533)

@@ -8,6 +8,9 @@ local Players = game:GetService(`Players`)
 
 local MULT = 0.8
 local FLOOR = 8
+-- (phase6-strafes) while the client's directional walk runs (lock-on, shift lock, first person: NHStrafe), the walk band
+-- is capped at Config.Locomotion.StrafeSpeed. A cap can only slow a player, so the client's boolean is safe to trust.
+local LocoCfg = require(game:GetService(`ReplicatedStorage`).Config.Locomotion)
 
 local Shared = {}
 
@@ -32,6 +35,9 @@ local function hook(P: Player, Char: Model)
 		local SprintM = Char:GetAttribute(`NH_SprintMult`)
 		if typeof(SprintM) == `number` and Raw >= 24 then M *= math.clamp(SprintM, 1, 1.2) end
 		local Want = if M ~= 1 and Raw > FLOOR then math.max(FLOOR, Raw * M) else Raw
+		if Char:GetAttribute(`NHStrafing`) and Raw <= LocoCfg.WalkBandMax and Raw > FLOOR then
+			Want = math.min(Want, LocoCfg.StrafeSpeed)
+		end
 		if math.abs(Hum.WalkSpeed - Want) > 1e-3 then
 			Busy = true
 			Hum.WalkSpeed = Want
@@ -61,10 +67,34 @@ local function hook(P: Player, Char: Model)
 	Char:GetAttributeChangedSignal(`NHWounded`):Connect(apply)
 	Char:GetAttributeChangedSignal(`NHKitSlow`):Connect(apply)
 	Char:GetAttributeChangedSignal(`NH_SprintMult`):Connect(apply)
+	Char:GetAttributeChangedSignal(`NHStrafing`):Connect(apply) -- (phase6-strafes)
 	onTag()
 end
 
+-- (phase6-strafes) the client's directional walk on / off -> the Character attribute NHStrafing (rate-limited)
+local function strafeRemote()
+	local RS = game:GetService(`ReplicatedStorage`)
+	local Folder = RS:WaitForChild(`Remotes`)
+	local R = Folder:FindFirstChild(`NHStrafe`) or Instance.new(`RemoteEvent`)
+	R.Name = `NHStrafe`
+	R.Parent = Folder
+	local Last = {} :: { [Player]: { number } }
+	R.OnServerEvent:Connect(function(P: Player, Msg: any)
+		local Now = os.clock()
+		local L = Last[P] or {}
+		Last[P] = L
+		while L[1] and Now - L[1] > 1 do table.remove(L, 1) end
+		if #L >= LocoCfg.RemoteRate then return end
+		table.insert(L, Now)
+		local On = typeof(Msg) == `table` and Msg.On == true
+		local C = P.Character
+		if C then C:SetAttribute(`NHStrafing`, if On then true else nil) end
+	end)
+	Players.PlayerRemoving:Connect(function(P) Last[P] = nil end)
+end
+
 function Shared.OnStart()
+	strafeRemote()
 	local function onPlayer(P: Player)
 		P.CharacterAdded:Connect(function(Char) task.spawn(hook, P, Char) end)
 		if P.Character then task.spawn(hook, P, P.Character) end

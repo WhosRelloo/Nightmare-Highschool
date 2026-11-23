@@ -83,5 +83,6 @@ for _, path in { "NHGestures", "NHPublish.Gestures" } do
 	if old then old:Destroy() end
 	seq:Clone().Parent = f
 end
+local RS = game:GetService("ReplicatedStorage") local lf = RS:FindFirstChild("NHLocoClips") or Instance.new("Folder") lf.Name = "NHLocoClips" lf.Parent = RS local o2 = lf:FindFirstChild(seq.Name) if o2 then o2:Destroy() end seq:Clone().Parent = lf -- Studio: the client registers it
 seq:Destroy()
 return string.format("built NHG_StrafeRight_Square (%d keyframes, %.3f s)", #SS.NHGestures:FindFirstChild("NHG_StrafeRight_Square"):GetKeyframes(), 1.033)

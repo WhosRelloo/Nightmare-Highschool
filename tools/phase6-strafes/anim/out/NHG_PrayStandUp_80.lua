@@ -159,5 +159,6 @@ for _, path in { "NHGestures", "NHPublish.Gestures" } do
 	if old then old:Destroy() end
 	seq:Clone().Parent = f
 end
+
 seq:Destroy()
 return string.format("built NHG_PrayStandUp_80 (%d keyframes, %.3f s)", #SS.NHGestures:FindFirstChild("NHG_PrayStandUp_80"):GetKeyframes(), 3.567)
