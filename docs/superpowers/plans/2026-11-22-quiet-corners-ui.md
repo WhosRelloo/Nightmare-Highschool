@@ -144,6 +144,22 @@ Mockups are in `docs/superpowers/mockups/2026-11-21-quietcorners/`. Every layout
     - `Link` without one still works (old clients).
 11. **The "Answered" seal on a question sheet** is the Bell Tower `Seal` art tinted crimson (as in the mockup), not the kit seal.
 12. **Version:** 2.38.0, assuming R2 ships as 2.37.0. If QC merges first, the owner picks the order.
+13. **Ink palette, fixed for contrast** (measured 2026-11-22 with Pillow from each art's text box; spec §9):
+    - The mockup's `InkDim` (92, 62, 46) and `InkRed` (130, 18, 24) give only 3.6:1 to 3.8:1 on the paper (170, 156, 134). The case-plate text (44, 26, 12) gives 2.8:1 on brass.
+    - The game uses Ink (40, 22, 16), **InkDim (48, 30, 22)**, **InkRed (96, 10, 16)** and **plate ink (24, 14, 8)**.
+    - Inactive book-tab labels use (220, 208, 188), because DIM fails on the leather tab (99, 76, 68).
+    - On the selected reply tab (velvet (131, 47, 55)), the reply text is Bone.
+    - **Measured `QcBg` values:**
+      - Slip, PromptTag, QuestionSheet, CardNote and AnswerCard paper: (170, 156, 134)
+      - Ribbon: (169, 155, 133)
+      - Book page: (181, 162, 130)
+      - CardRecord: (160, 137, 106)
+      - CardObject: (163, 132, 88)
+      - CasePlate: (133, 93, 36)
+      - CallingCard iron: (44, 39, 38)
+      - ReplyTab: (41, 37, 36)
+      - PromptCap: (46, 41, 40)
+      - CompassStrip: (47, 43, 42)
 
 ## Decision for the owner: what Quiet Corners replaces, restyles or adds
 
