@@ -1,0 +1,331 @@
+[
+ {
+  "name": "NoteInfo",
+  "w": 1024,
+  "h": 1024,
+  "out": 256,
+  "kind": "icon"
+ },
+ {
+  "name": "NoteGood",
+  "w": 1024,
+  "h": 1024,
+  "out": 256,
+  "kind": "icon"
+ },
+ {
+  "name": "NoteWarning",
+  "w": 1024,
+  "h": 1024,
+  "out": 256,
+  "kind": "icon"
+ },
+ {
+  "name": "NoteBad",
+  "w": 1024,
+  "h": 1024,
+  "out": 256,
+  "kind": "icon"
+ },
+ {
+  "name": "NoteMilestone",
+  "w": 1024,
+  "h": 1024,
+  "out": 256,
+  "kind": "icon"
+ },
+ {
+  "name": "BannerLevelUp",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "BannerPurchase",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "BannerEvolved",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "BannerQuestNew",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "BannerQuestStep",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "BannerQuestDone",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "BannerQuestFailed",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "BannerFullMoon",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "BannerNewMoon",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "BannerCrimsonMoon",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "BannerBlueMoon",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "BannerRecord",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "NpcOffer",
+  "w": 1024,
+  "h": 1024,
+  "out": 256,
+  "kind": "icon"
+ },
+ {
+  "name": "NpcTurnIn",
+  "w": 1024,
+  "h": 1024,
+  "out": 256,
+  "kind": "icon"
+ },
+ {
+  "name": "NpcRetry",
+  "w": 1024,
+  "h": 1024,
+  "out": 256,
+  "kind": "icon"
+ },
+ {
+  "name": "NpcActive",
+  "w": 1024,
+  "h": 1024,
+  "out": 256,
+  "kind": "icon"
+ },
+ {
+  "name": "ArrivalCrest",
+  "w": 1024,
+  "h": 1024,
+  "out": 1024,
+  "kind": "icon"
+ },
+ {
+  "name": "ClockDial",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "DiscoverFlag",
+  "w": 1024,
+  "h": 1024,
+  "out": 256,
+  "kind": "icon"
+ },
+ {
+  "name": "WaypointMark",
+  "w": 1024,
+  "h": 1024,
+  "out": 256,
+  "kind": "icon"
+ },
+ {
+  "name": "DuelRing",
+  "w": 1024,
+  "h": 1024,
+  "out": 256,
+  "kind": "icon"
+ },
+ {
+  "name": "SportShoot",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "SportPass",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "SportMove",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "SportEuro",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "SoccerKick",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "SoccerPass",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "SoccerDribble",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "SoccerTackle",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "SoccerFeint",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "SoccerRush",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "FootballThrow",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "FootballDive",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "FootballJuke",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "FootballHit",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "FootballSnap",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "GradeSeal",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "grey"
+ },
+ {
+  "name": "CoinYen",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "CardBack",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "HexRelic",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "HexAltar",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "grey"
+ },
+ {
+  "name": "CryptRune",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ }
+]
