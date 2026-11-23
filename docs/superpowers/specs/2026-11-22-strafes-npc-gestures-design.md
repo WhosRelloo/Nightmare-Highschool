@@ -552,3 +552,22 @@ All of the first round's questions are answered (§0, rulings 5-9).
 | V4 | The infirmary greybox and its props |
 | V5 | Treat: the bandage gestures on both sides |
 | V6 | Athletes cheering on the bleachers; a player seated beside them |
+
+## 13. Build deltas (phase6-strafes build, 2026-11-22)
+1. **Infirmary position:** re-measured in NH. It spans x 199–225 and z 13.5–39.5 (centre 212, 26.5), with the door at
+   x 215–219. The earlier centre, (214, 6, 24), would have run into the hallway's edge props. The Map place was
+   closed during the build, so it wasn't re-surveyed. Neither place has an infirmary.
+2. **Treat slows the player rather than freezing them.** It sets `NHKitSlow` to 0.3, because CombatSpeed clamps it
+   at 0.3. That's the Kit bandage's way.
+3. **Bleachers:** 64 seats, at the Gymnasium (3 banks × 2 rows × 8) and the Field (1 bank × 2 × 8). The Pitch's
+   mesh bleachers and the Ring's prop aren't seated in v1.
+4. **The strafe strides use the planted-foot ground speed** (4.76 and 4.84), not the spread method. The spread method
+   overstates a sideways step.
+5. **The square-chest foot lock leaves the lowest foot 0.06 below the rest floor.** It's an R6 rigid-leg limit.
+6. **The Praying stand-up** starts from the loop's end pose and eases into the source, so it doesn't replay the
+   kneel. KneelIn is that stand-up reversed: 4.2 s; StandUp is 3.6 s.
+7. **No local HTTP bridge:** the Studio Assistant refuses 127.0.0.1. `harness/pure.py` inlines the sources instead.
+8. **Deferred:**
+   - the AmbientNpcs patient lying on bed 1;
+   - the phone Tool during PhoneWalk (the gesture plays without the phone prop);
+   - `scaleprobe` (the scale buckets stay; R6 KeyframeSequence translations are absolute).
