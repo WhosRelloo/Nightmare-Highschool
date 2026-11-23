@@ -35,12 +35,12 @@
 
 ## 3. The wing library (7 styles, one skeleton)
 
-Every style is generated from one jointed skeleton: humerus, forearm, 3 or 4 digits with knuckles, a thumb claw and hooked tips. That's why one animation rig drives them all.
+Every style is generated from one jointed skeleton: humerus, forearm, 3 or 4 digits with knuckles, and clean tips (owner 2026-11-23: no thumb or fingertip hooks). That's why one animation rig drives them all.
 
 | Style | Look | Default palette / finish |
 |---|---|---|
 | **Nocturne** | bat: 4 digits, scalloped membrane, raised veins, rim, a healed notch | Wine / Obsidian |
-| **Wyrm** | drake: 3 long digits, thick bones, spikes down the leading edge, hooked tips | Wine / Bloodstone |
+| **Wyrm** | drake: 3 long digits, thick bones, spikes down the leading edge | Wine / Bloodstone |
 | **Tattered** | bat torn deep in every panel | Ashen / Bone |
 | **Fallen** | raven feathers: primaries, secondaries, 3 rows of coverts, an iridescent sheen | Raven / Obsidian |
 | **Ossuary** | bones only, grave-cloth tatters swaying between the digits | Wine / Bone |

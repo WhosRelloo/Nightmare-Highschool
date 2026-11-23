@@ -36,7 +36,7 @@
 - **Owner rules:**
   - cool, high quality, on theme, no gore;
   - animated and customizable;
-  - **still look like students**: face and uniform readable; no werewolf muzzle; no fur on the head; Wraith heads clear; no Wraith lower-body shroud; no claws on any race;
+  - **still look like students**: face and uniform readable; no werewolf muzzle; no fur on the head; Wraith heads clear; no Wraith lower-body shroud; no claws on any race; no thumb or fingertip hooks on wings;
   - sculpted geometry only.
 - **Art:**
   - PaintRigV3 opened read-only;
@@ -82,7 +82,7 @@
 ### Task 2: Bake the models
 
 - [ ] `form_models.py`:
-  - the wing per style as a skinned mesh, with Bones `Hum`, `Fore`, `D1a`/`D1b` to `D4a`/`D4b`, `Thumb`, and weights from the skeleton;
+  - the wing per style as a skinned mesh, with Bones `Hum`, `Fore`, `D1a`/`D1b` to `D4a`/`D4b` (no thumb), and weights from the skeleton;
   - the horns per style;
   - fur, bone and wrap regions per body (12), raycast-fitted as in the concepts.
 - [ ] PBR bakes: palette and finish sets as SurfaceAppearance textures (1024² membrane and feathers, 512² bones and horns).

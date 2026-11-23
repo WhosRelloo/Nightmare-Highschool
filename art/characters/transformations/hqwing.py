@@ -1,10 +1,10 @@
 """High-quality, animatable, customizable wings and horns for NH transformation concepts.
 
-WINGS: one jointed skeleton (humerus, forearm, digits with knuckles, thumb claw) drives every style. Each style is a set of parts
+WINGS: one jointed skeleton (humerus, forearm, digits with knuckles, no thumb or tip hooks) drives every style. Each style is a set of parts
 generated from the skeleton for a pose (fold, flap angle, digit lag, cycle time), always with the same topology, so an animation
 is one shape key per frame: flaps, folds, ripples and the digits' follow-through are real geometry.
   nocturne   bat: 4 digits, scalloped membrane, raised veins, rim, a healed notch
-  wyrm       drake: 3 long digits, thick bones, spikes on the leading edge, hooked tips
+  wyrm       drake: 3 long digits, thick bones, spikes on the leading edge
   tattered   bat torn deep in every panel
   fallen     raven feathers: primaries, secondaries and two rows of coverts, iridescent
   ossuary    bones only, with grave-cloth tatters hanging between the digits
@@ -194,11 +194,7 @@ class Wing:
         for K, T in Dg:
             r = [0.06, 0.05, 0.042, 0.038, 0.048, 0.034, 0.026, 0.018, 0.008]
             bones.add(tube_mesh(bezier(W, K, T, 9), [x * th * s for x in r], seg=12, base=bones.base()))
-        thp = S["thumb"]
-        bones.add(tube_mesh(bezier(W, thp, thp + (thp - W) * 0.6 + Vector((0, 0.05, -0.12)), 7), [x * th * s for x in (0.05, 0.045, 0.038, 0.03, 0.02, 0.01, 0.002)], seg=10, base=bones.base()))
-        for K, T in (Dg if self.style == "wyrm" else Dg[:1]):
-            hook = T + (T - K).normalized() * 0.18 * s + Vector((0, 0, -0.1))
-            bones.add(tube_mesh(bezier(T, T + (T - K).normalized() * 0.12 * s, hook, 6), [x * th * s for x in (0.02, 0.018, 0.014, 0.01, 0.006, 0.002)], seg=8, base=bones.base()))
+        # (owner 2026-11-23: no thumb or fingertip hooks on any wing)
         P["bones"] = bones
         rails = [resample([W, K, T], self.NU + 1) for K, T in Dg]
         main_a = resample([R, E, W, Dg[-1][0], Dg[-1][1]], self.NU + 1)
