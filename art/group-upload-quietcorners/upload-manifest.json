@@ -1,0 +1,1377 @@
+[
+ {
+  "file": "QcBookTL.png",
+  "tier": "A",
+  "key": "BookTL",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   582
+  ],
+  "source": "Book.png"
+ },
+ {
+  "file": "QcBookTR.png",
+  "tier": "A",
+  "key": "BookTR",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   582
+  ],
+  "source": "Book.png"
+ },
+ {
+  "file": "QcBookBL.png",
+  "tier": "A",
+  "key": "BookBL",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   582
+  ],
+  "source": "Book.png"
+ },
+ {
+  "file": "QcBookBR.png",
+  "tier": "A",
+  "key": "BookBR",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   582
+  ],
+  "source": "Book.png"
+ },
+ {
+  "file": "QcBookCornerGhoul.png",
+  "tier": "B",
+  "key": "BookCornerGhoul",
+  "set": "quietcorners",
+  "size": [
+   320,
+   320
+  ],
+  "source": "BookCornerGhoul.png"
+ },
+ {
+  "file": "QcBookCornerHuman.png",
+  "tier": "A",
+  "key": "BookCornerHuman",
+  "set": "quietcorners",
+  "size": [
+   320,
+   320
+  ],
+  "source": "BookCornerHuman.png"
+ },
+ {
+  "file": "QcBookCornerPriest.png",
+  "tier": "B",
+  "key": "BookCornerPriest",
+  "set": "quietcorners",
+  "size": [
+   320,
+   320
+  ],
+  "source": "BookCornerPriest.png"
+ },
+ {
+  "file": "QcBookCornerVampire.png",
+  "tier": "B",
+  "key": "BookCornerVampire",
+  "set": "quietcorners",
+  "size": [
+   320,
+   320
+  ],
+  "source": "BookCornerVampire.png"
+ },
+ {
+  "file": "QcBookCornerWerewolf.png",
+  "tier": "B",
+  "key": "BookCornerWerewolf",
+  "set": "quietcorners",
+  "size": [
+   320,
+   320
+  ],
+  "source": "BookCornerWerewolf.png"
+ },
+ {
+  "file": "QcBookCornerWraith.png",
+  "tier": "B",
+  "key": "BookCornerWraith",
+  "set": "quietcorners",
+  "size": [
+   320,
+   320
+  ],
+  "source": "BookCornerWraith.png"
+ },
+ {
+  "file": "QcBookTab.png",
+  "tier": "A",
+  "key": "BookTab",
+  "set": "quietcorners",
+  "size": [
+   400,
+   160
+  ],
+  "source": "BookTab.png"
+ },
+ {
+  "file": "QcBookTabOn.png",
+  "tier": "A",
+  "key": "BookTabOn",
+  "set": "quietcorners",
+  "size": [
+   400,
+   160
+  ],
+  "source": "BookTabOn.png"
+ },
+ {
+  "file": "QcCompassLubberGhoul.png",
+  "tier": "B",
+  "key": "CompassLubberGhoul",
+  "set": "quietcorners",
+  "size": [
+   96,
+   120
+  ],
+  "source": "CompassLubberGhoul.png"
+ },
+ {
+  "file": "QcCompassLubberHuman.png",
+  "tier": "A",
+  "key": "CompassLubberHuman",
+  "set": "quietcorners",
+  "size": [
+   96,
+   120
+  ],
+  "source": "CompassLubberHuman.png"
+ },
+ {
+  "file": "QcCompassLubberPriest.png",
+  "tier": "B",
+  "key": "CompassLubberPriest",
+  "set": "quietcorners",
+  "size": [
+   96,
+   120
+  ],
+  "source": "CompassLubberPriest.png"
+ },
+ {
+  "file": "QcCompassLubberVampire.png",
+  "tier": "B",
+  "key": "CompassLubberVampire",
+  "set": "quietcorners",
+  "size": [
+   96,
+   120
+  ],
+  "source": "CompassLubberVampire.png"
+ },
+ {
+  "file": "QcCompassLubberWerewolf.png",
+  "tier": "B",
+  "key": "CompassLubberWerewolf",
+  "set": "quietcorners",
+  "size": [
+   96,
+   120
+  ],
+  "source": "CompassLubberWerewolf.png"
+ },
+ {
+  "file": "QcCompassLubberWraith.png",
+  "tier": "B",
+  "key": "CompassLubberWraith",
+  "set": "quietcorners",
+  "size": [
+   96,
+   120
+  ],
+  "source": "CompassLubberWraith.png"
+ },
+ {
+  "file": "QcCompassStripGhoul.png",
+  "tier": "B",
+  "key": "CompassStripGhoul",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   96
+  ],
+  "source": "CompassStripGhoul.png"
+ },
+ {
+  "file": "QcCompassStripHuman.png",
+  "tier": "A",
+  "key": "CompassStripHuman",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   96
+  ],
+  "source": "CompassStripHuman.png"
+ },
+ {
+  "file": "QcCompassStripPriest.png",
+  "tier": "B",
+  "key": "CompassStripPriest",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   96
+  ],
+  "source": "CompassStripPriest.png"
+ },
+ {
+  "file": "QcCompassStripVampire.png",
+  "tier": "B",
+  "key": "CompassStripVampire",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   96
+  ],
+  "source": "CompassStripVampire.png"
+ },
+ {
+  "file": "QcCompassStripWerewolf.png",
+  "tier": "B",
+  "key": "CompassStripWerewolf",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   96
+  ],
+  "source": "CompassStripWerewolf.png"
+ },
+ {
+  "file": "QcCompassStripWraith.png",
+  "tier": "B",
+  "key": "CompassStripWraith",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   96
+  ],
+  "source": "CompassStripWraith.png"
+ },
+ {
+  "file": "QcCompassTicks.png",
+  "tier": "A",
+  "key": "CompassTicks",
+  "set": "quietcorners",
+  "size": [
+   600,
+   48
+  ],
+  "source": "CompassTicks.png"
+ },
+ {
+  "file": "QcPlateTrimGhoul.png",
+  "tier": "C",
+  "key": "PlateTrimGhoul",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   341
+  ],
+  "source": "PlateTrimGhoul.png"
+ },
+ {
+  "file": "QcPlateTrimHuman.png",
+  "tier": "C",
+  "key": "PlateTrimHuman",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   341
+  ],
+  "source": "PlateTrimHuman.png"
+ },
+ {
+  "file": "QcPlateTrimPriest.png",
+  "tier": "C",
+  "key": "PlateTrimPriest",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   341
+  ],
+  "source": "PlateTrimPriest.png"
+ },
+ {
+  "file": "QcPlateTrimVampire.png",
+  "tier": "C",
+  "key": "PlateTrimVampire",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   341
+  ],
+  "source": "PlateTrimVampire.png"
+ },
+ {
+  "file": "QcPlateTrimWerewolf.png",
+  "tier": "C",
+  "key": "PlateTrimWerewolf",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   341
+  ],
+  "source": "PlateTrimWerewolf.png"
+ },
+ {
+  "file": "QcPlateTrimWraith.png",
+  "tier": "C",
+  "key": "PlateTrimWraith",
+  "set": "quietcorners",
+  "size": [
+   1024,
+   341
+  ],
+  "source": "PlateTrimWraith.png"
+ },
+ {
+  "file": "QcPromptCapFill.png",
+  "tier": "A",
+  "key": "PromptCapFill",
+  "set": "quietcorners",
+  "size": [
+   256,
+   256
+  ],
+  "source": "PromptCapFill.png"
+ },
+ {
+  "file": "QcPromptCapGhoul.png",
+  "tier": "B",
+  "key": "PromptCapGhoul",
+  "set": "quietcorners",
+  "size": [
+   256,
+   256
+  ],
+  "source": "PromptCapGhoul.png"
+ },
+ {
+  "file": "QcPromptCapHuman.png",
+  "tier": "A",
+  "key": "PromptCapHuman",
+  "set": "quietcorners",
+  "size": [
+   256,
+   256
+  ],
+  "source": "PromptCapHuman.png"
+ },
+ {
+  "file": "QcPromptCapPriest.png",
+  "tier": "B",
+  "key": "PromptCapPriest",
+  "set": "quietcorners",
+  "size": [
+   256,
+   256
+  ],
+  "source": "PromptCapPriest.png"
+ },
+ {
+  "file": "QcPromptCapVampire.png",
+  "tier": "B",
+  "key": "PromptCapVampire",
+  "set": "quietcorners",
+  "size": [
+   256,
+   256
+  ],
+  "source": "PromptCapVampire.png"
+ },
+ {
+  "file": "QcPromptCapWerewolf.png",
+  "tier": "B",
+  "key": "PromptCapWerewolf",
+  "set": "quietcorners",
+  "size": [
+   256,
+   256
+  ],
+  "source": "PromptCapWerewolf.png"
+ },
+ {
+  "file": "QcPromptCapWraith.png",
+  "tier": "B",
+  "key": "PromptCapWraith",
+  "set": "quietcorners",
+  "size": [
+   256,
+   256
+  ],
+  "source": "PromptCapWraith.png"
+ },
+ {
+  "file": "QcPromptPipGhoul.png",
+  "tier": "B",
+  "key": "PromptPipGhoul",
+  "set": "quietcorners",
+  "size": [
+   96,
+   96
+  ],
+  "source": "PromptPipGhoul.png"
+ },
+ {
+  "file": "QcPromptPipHuman.png",
+  "tier": "A",
+  "key": "PromptPipHuman",
+  "set": "quietcorners",
+  "size": [
+   96,
+   96
+  ],
+  "source": "PromptPipHuman.png"
+ },
+ {
+  "file": "QcPromptPipPriest.png",
+  "tier": "B",
+  "key": "PromptPipPriest",
+  "set": "quietcorners",
+  "size": [
+   96,
+   96
+  ],
+  "source": "PromptPipPriest.png"
+ },
+ {
+  "file": "QcPromptPipVampire.png",
+  "tier": "B",
+  "key": "PromptPipVampire",
+  "set": "quietcorners",
+  "size": [
+   96,
+   96
+  ],
+  "source": "PromptPipVampire.png"
+ },
+ {
+  "file": "QcPromptPipWerewolf.png",
+  "tier": "B",
+  "key": "PromptPipWerewolf",
+  "set": "quietcorners",
+  "size": [
+   96,
+   96
+  ],
+  "source": "PromptPipWerewolf.png"
+ },
+ {
+  "file": "QcPromptPipWraith.png",
+  "tier": "B",
+  "key": "PromptPipWraith",
+  "set": "quietcorners",
+  "size": [
+   96,
+   96
+  ],
+  "source": "PromptPipWraith.png"
+ },
+ {
+  "file": "QcPromptTagGhoul.png",
+  "tier": "B",
+  "key": "PromptTagGhoul",
+  "set": "quietcorners",
+  "size": [
+   640,
+   128
+  ],
+  "source": "PromptTagGhoul.png"
+ },
+ {
+  "file": "QcPromptTagHuman.png",
+  "tier": "A",
+  "key": "PromptTagHuman",
+  "set": "quietcorners",
+  "size": [
+   640,
+   128
+  ],
+  "source": "PromptTagHuman.png"
+ },
+ {
+  "file": "QcPromptTagPriest.png",
+  "tier": "B",
+  "key": "PromptTagPriest",
+  "set": "quietcorners",
+  "size": [
+   640,
+   128
+  ],
+  "source": "PromptTagPriest.png"
+ },
+ {
+  "file": "QcPromptTagVampire.png",
+  "tier": "B",
+  "key": "PromptTagVampire",
+  "set": "quietcorners",
+  "size": [
+   640,
+   128
+  ],
+  "source": "PromptTagVampire.png"
+ },
+ {
+  "file": "QcPromptTagWerewolf.png",
+  "tier": "B",
+  "key": "PromptTagWerewolf",
+  "set": "quietcorners",
+  "size": [
+   640,
+   128
+  ],
+  "source": "PromptTagWerewolf.png"
+ },
+ {
+  "file": "QcPromptTagWraith.png",
+  "tier": "B",
+  "key": "PromptTagWraith",
+  "set": "quietcorners",
+  "size": [
+   640,
+   128
+  ],
+  "source": "PromptTagWraith.png"
+ },
+ {
+  "file": "QcSkipRingFill.png",
+  "tier": "A",
+  "key": "SkipRingFill",
+  "set": "quietcorners",
+  "size": [
+   256,
+   256
+  ],
+  "source": "SkipRingFill.png"
+ },
+ {
+  "file": "QcSkipRingGhoul.png",
+  "tier": "B",
+  "key": "SkipRingGhoul",
+  "set": "quietcorners",
+  "size": [
+   256,
+   256
+  ],
+  "source": "SkipRingGhoul.png"
+ },
+ {
+  "file": "QcSkipRingHuman.png",
+  "tier": "A",
+  "key": "SkipRingHuman",
+  "set": "quietcorners",
+  "size": [
+   256,
+   256
+  ],
+  "source": "SkipRingHuman.png"
+ },
+ {
+  "file": "QcSkipRingPriest.png",
+  "tier": "B",
+  "key": "SkipRingPriest",
+  "set": "quietcorners",
+  "size": [
+   256,
+   256
+  ],
+  "source": "SkipRingPriest.png"
+ },
+ {
+  "file": "QcSkipRingVampire.png",
+  "tier": "B",
+  "key": "SkipRingVampire",
+  "set": "quietcorners",
+  "size": [
+   256,
+   256
+  ],
+  "source": "SkipRingVampire.png"
+ },
+ {
+  "file": "QcSkipRingWerewolf.png",
+  "tier": "B",
+  "key": "SkipRingWerewolf",
+  "set": "quietcorners",
+  "size": [
+   256,
+   256
+  ],
+  "source": "SkipRingWerewolf.png"
+ },
+ {
+  "file": "QcSkipRingWraith.png",
+  "tier": "B",
+  "key": "SkipRingWraith",
+  "set": "quietcorners",
+  "size": [
+   256,
+   256
+  ],
+  "source": "SkipRingWraith.png"
+ },
+ {
+  "file": "QcSlipGhoul.png",
+  "tier": "B",
+  "key": "SlipGhoul",
+  "set": "quietcorners",
+  "size": [
+   800,
+   160
+  ],
+  "source": "SlipGhoul.png"
+ },
+ {
+  "file": "QcSlipHuman.png",
+  "tier": "A",
+  "key": "SlipHuman",
+  "set": "quietcorners",
+  "size": [
+   800,
+   160
+  ],
+  "source": "SlipHuman.png"
+ },
+ {
+  "file": "QcSlipPriest.png",
+  "tier": "B",
+  "key": "SlipPriest",
+  "set": "quietcorners",
+  "size": [
+   800,
+   160
+  ],
+  "source": "SlipPriest.png"
+ },
+ {
+  "file": "QcSlipVampire.png",
+  "tier": "B",
+  "key": "SlipVampire",
+  "set": "quietcorners",
+  "size": [
+   800,
+   160
+  ],
+  "source": "SlipVampire.png"
+ },
+ {
+  "file": "QcSlipWerewolf.png",
+  "tier": "B",
+  "key": "SlipWerewolf",
+  "set": "quietcorners",
+  "size": [
+   800,
+   160
+  ],
+  "source": "SlipWerewolf.png"
+ },
+ {
+  "file": "QcSlipWraith.png",
+  "tier": "B",
+  "key": "SlipWraith",
+  "set": "quietcorners",
+  "size": [
+   800,
+   160
+  ],
+  "source": "SlipWraith.png"
+ },
+ {
+  "file": "EvAnswerCardGhoul.png",
+  "tier": "B",
+  "key": "AnswerCardGhoul",
+  "set": "evidence",
+  "size": [
+   720,
+   360
+  ],
+  "source": "AnswerCardGhoul.png"
+ },
+ {
+  "file": "EvAnswerCardHuman.png",
+  "tier": "A",
+  "key": "AnswerCardHuman",
+  "set": "evidence",
+  "size": [
+   720,
+   360
+  ],
+  "source": "AnswerCardHuman.png"
+ },
+ {
+  "file": "EvAnswerCardPriest.png",
+  "tier": "B",
+  "key": "AnswerCardPriest",
+  "set": "evidence",
+  "size": [
+   720,
+   360
+  ],
+  "source": "AnswerCardPriest.png"
+ },
+ {
+  "file": "EvAnswerCardVampire.png",
+  "tier": "B",
+  "key": "AnswerCardVampire",
+  "set": "evidence",
+  "size": [
+   720,
+   360
+  ],
+  "source": "AnswerCardVampire.png"
+ },
+ {
+  "file": "EvAnswerCardWerewolf.png",
+  "tier": "B",
+  "key": "AnswerCardWerewolf",
+  "set": "evidence",
+  "size": [
+   720,
+   360
+  ],
+  "source": "AnswerCardWerewolf.png"
+ },
+ {
+  "file": "EvAnswerCardWraith.png",
+  "tier": "B",
+  "key": "AnswerCardWraith",
+  "set": "evidence",
+  "size": [
+   720,
+   360
+  ],
+  "source": "AnswerCardWraith.png"
+ },
+ {
+  "file": "EvCardMissing.png",
+  "tier": "A",
+  "key": "CardMissing",
+  "set": "evidence",
+  "size": [
+   440,
+   600
+  ],
+  "source": "CardMissing.png"
+ },
+ {
+  "file": "EvCardNote.png",
+  "tier": "A",
+  "key": "CardNote",
+  "set": "evidence",
+  "size": [
+   440,
+   600
+  ],
+  "source": "CardNote.png"
+ },
+ {
+  "file": "EvCardObject.png",
+  "tier": "A",
+  "key": "CardObject",
+  "set": "evidence",
+  "size": [
+   440,
+   600
+  ],
+  "source": "CardObject.png"
+ },
+ {
+  "file": "EvCardPhoto.png",
+  "tier": "A",
+  "key": "CardPhoto",
+  "set": "evidence",
+  "size": [
+   440,
+   600
+  ],
+  "source": "CardPhoto.png"
+ },
+ {
+  "file": "EvCardRecord.png",
+  "tier": "A",
+  "key": "CardRecord",
+  "set": "evidence",
+  "size": [
+   440,
+   600
+  ],
+  "source": "CardRecord.png"
+ },
+ {
+  "file": "EvCasePlateGhoul.png",
+  "tier": "B",
+  "key": "CasePlateGhoul",
+  "set": "evidence",
+  "size": [
+   1024,
+   128
+  ],
+  "source": "CasePlateGhoul.png"
+ },
+ {
+  "file": "EvCasePlateHuman.png",
+  "tier": "A",
+  "key": "CasePlateHuman",
+  "set": "evidence",
+  "size": [
+   1024,
+   128
+  ],
+  "source": "CasePlateHuman.png"
+ },
+ {
+  "file": "EvCasePlatePriest.png",
+  "tier": "B",
+  "key": "CasePlatePriest",
+  "set": "evidence",
+  "size": [
+   1024,
+   128
+  ],
+  "source": "CasePlatePriest.png"
+ },
+ {
+  "file": "EvCasePlateVampire.png",
+  "tier": "B",
+  "key": "CasePlateVampire",
+  "set": "evidence",
+  "size": [
+   1024,
+   128
+  ],
+  "source": "CasePlateVampire.png"
+ },
+ {
+  "file": "EvCasePlateWerewolf.png",
+  "tier": "B",
+  "key": "CasePlateWerewolf",
+  "set": "evidence",
+  "size": [
+   1024,
+   128
+  ],
+  "source": "CasePlateWerewolf.png"
+ },
+ {
+  "file": "EvCasePlateWraith.png",
+  "tier": "B",
+  "key": "CasePlateWraith",
+  "set": "evidence",
+  "size": [
+   1024,
+   128
+  ],
+  "source": "CasePlateWraith.png"
+ },
+ {
+  "file": "EvCork.png",
+  "tier": "C",
+  "key": "Cork",
+  "set": "evidence",
+  "size": [
+   512,
+   512
+  ],
+  "source": "Cork.png"
+ },
+ {
+  "file": "EvLensGhoul.png",
+  "tier": "B",
+  "key": "LensGhoul",
+  "set": "evidence",
+  "size": [
+   640,
+   640
+  ],
+  "source": "LensGhoul.png"
+ },
+ {
+  "file": "EvLensHuman.png",
+  "tier": "A",
+  "key": "LensHuman",
+  "set": "evidence",
+  "size": [
+   640,
+   640
+  ],
+  "source": "LensHuman.png"
+ },
+ {
+  "file": "EvLensPriest.png",
+  "tier": "B",
+  "key": "LensPriest",
+  "set": "evidence",
+  "size": [
+   640,
+   640
+  ],
+  "source": "LensPriest.png"
+ },
+ {
+  "file": "EvLensVampire.png",
+  "tier": "B",
+  "key": "LensVampire",
+  "set": "evidence",
+  "size": [
+   640,
+   640
+  ],
+  "source": "LensVampire.png"
+ },
+ {
+  "file": "EvLensWerewolf.png",
+  "tier": "B",
+  "key": "LensWerewolf",
+  "set": "evidence",
+  "size": [
+   640,
+   640
+  ],
+  "source": "LensWerewolf.png"
+ },
+ {
+  "file": "EvLensWraith.png",
+  "tier": "B",
+  "key": "LensWraith",
+  "set": "evidence",
+  "size": [
+   640,
+   640
+  ],
+  "source": "LensWraith.png"
+ },
+ {
+  "file": "EvQuestionSheet.png",
+  "tier": "A",
+  "key": "QuestionSheet",
+  "set": "evidence",
+  "size": [
+   1024,
+   398
+  ],
+  "source": "QuestionSheet.png"
+ },
+ {
+  "file": "EvSlot.png",
+  "tier": "A",
+  "key": "Slot",
+  "set": "evidence",
+  "size": [
+   440,
+   600
+  ],
+  "source": "Slot.png"
+ },
+ {
+  "file": "EvStampInk.png",
+  "tier": "A",
+  "key": "StampInk",
+  "set": "evidence",
+  "size": [
+   640,
+   240
+  ],
+  "source": "StampInk.png"
+ },
+ {
+  "file": "EvTackGhoul.png",
+  "tier": "B",
+  "key": "TackGhoul",
+  "set": "evidence",
+  "size": [
+   96,
+   96
+  ],
+  "source": "TackGhoul.png"
+ },
+ {
+  "file": "EvTackHuman.png",
+  "tier": "A",
+  "key": "TackHuman",
+  "set": "evidence",
+  "size": [
+   96,
+   96
+  ],
+  "source": "TackHuman.png"
+ },
+ {
+  "file": "EvTackPriest.png",
+  "tier": "B",
+  "key": "TackPriest",
+  "set": "evidence",
+  "size": [
+   96,
+   96
+  ],
+  "source": "TackPriest.png"
+ },
+ {
+  "file": "EvTackVampire.png",
+  "tier": "B",
+  "key": "TackVampire",
+  "set": "evidence",
+  "size": [
+   96,
+   96
+  ],
+  "source": "TackVampire.png"
+ },
+ {
+  "file": "EvTackWerewolf.png",
+  "tier": "B",
+  "key": "TackWerewolf",
+  "set": "evidence",
+  "size": [
+   96,
+   96
+  ],
+  "source": "TackWerewolf.png"
+ },
+ {
+  "file": "EvTackWraith.png",
+  "tier": "B",
+  "key": "TackWraith",
+  "set": "evidence",
+  "size": [
+   96,
+   96
+  ],
+  "source": "TackWraith.png"
+ },
+ {
+  "file": "EvThread.png",
+  "tier": "A",
+  "key": "Thread",
+  "set": "evidence",
+  "size": [
+   512,
+   24
+  ],
+  "source": "Thread.png"
+ },
+ {
+  "file": "EvWallTL.png",
+  "tier": "A",
+  "key": "WallTL",
+  "set": "evidence",
+  "size": [
+   1024,
+   576
+  ],
+  "source": "Wall.png"
+ },
+ {
+  "file": "EvWallTR.png",
+  "tier": "A",
+  "key": "WallTR",
+  "set": "evidence",
+  "size": [
+   1024,
+   576
+  ],
+  "source": "Wall.png"
+ },
+ {
+  "file": "EvWallBL.png",
+  "tier": "A",
+  "key": "WallBL",
+  "set": "evidence",
+  "size": [
+   1024,
+   576
+  ],
+  "source": "Wall.png"
+ },
+ {
+  "file": "EvWallBR.png",
+  "tier": "A",
+  "key": "WallBR",
+  "set": "evidence",
+  "size": [
+   1024,
+   576
+  ],
+  "source": "Wall.png"
+ },
+ {
+  "file": "DlCallingCardGhoul.png",
+  "tier": "B",
+  "key": "CallingCardGhoul",
+  "set": "dialogue",
+  "size": [
+   1024,
+   236
+  ],
+  "source": "CallingCardGhoul.png"
+ },
+ {
+  "file": "DlCallingCardHuman.png",
+  "tier": "A",
+  "key": "CallingCardHuman",
+  "set": "dialogue",
+  "size": [
+   1024,
+   236
+  ],
+  "source": "CallingCardHuman.png"
+ },
+ {
+  "file": "DlCallingCardPriest.png",
+  "tier": "B",
+  "key": "CallingCardPriest",
+  "set": "dialogue",
+  "size": [
+   1024,
+   236
+  ],
+  "source": "CallingCardPriest.png"
+ },
+ {
+  "file": "DlCallingCardVampire.png",
+  "tier": "B",
+  "key": "CallingCardVampire",
+  "set": "dialogue",
+  "size": [
+   1024,
+   236
+  ],
+  "source": "CallingCardVampire.png"
+ },
+ {
+  "file": "DlCallingCardWerewolf.png",
+  "tier": "B",
+  "key": "CallingCardWerewolf",
+  "set": "dialogue",
+  "size": [
+   1024,
+   236
+  ],
+  "source": "CallingCardWerewolf.png"
+ },
+ {
+  "file": "DlCallingCardWraith.png",
+  "tier": "B",
+  "key": "CallingCardWraith",
+  "set": "dialogue",
+  "size": [
+   1024,
+   236
+  ],
+  "source": "CallingCardWraith.png"
+ },
+ {
+  "file": "DlNib.png",
+  "tier": "A",
+  "key": "Nib",
+  "set": "dialogue",
+  "size": [
+   96,
+   96
+  ],
+  "source": "Nib.png"
+ },
+ {
+  "file": "DlReplyTabGhoul.png",
+  "tier": "B",
+  "key": "ReplyTabGhoul",
+  "set": "dialogue",
+  "size": [
+   1000,
+   128
+  ],
+  "source": "ReplyTabGhoul.png"
+ },
+ {
+  "file": "DlReplyTabHuman.png",
+  "tier": "A",
+  "key": "ReplyTabHuman",
+  "set": "dialogue",
+  "size": [
+   1000,
+   128
+  ],
+  "source": "ReplyTabHuman.png"
+ },
+ {
+  "file": "DlReplyTabOnGhoul.png",
+  "tier": "B",
+  "key": "ReplyTabOnGhoul",
+  "set": "dialogue",
+  "size": [
+   1000,
+   128
+  ],
+  "source": "ReplyTabOnGhoul.png"
+ },
+ {
+  "file": "DlReplyTabOnHuman.png",
+  "tier": "A",
+  "key": "ReplyTabOnHuman",
+  "set": "dialogue",
+  "size": [
+   1000,
+   128
+  ],
+  "source": "ReplyTabOnHuman.png"
+ },
+ {
+  "file": "DlReplyTabOnPriest.png",
+  "tier": "B",
+  "key": "ReplyTabOnPriest",
+  "set": "dialogue",
+  "size": [
+   1000,
+   128
+  ],
+  "source": "ReplyTabOnPriest.png"
+ },
+ {
+  "file": "DlReplyTabOnVampire.png",
+  "tier": "B",
+  "key": "ReplyTabOnVampire",
+  "set": "dialogue",
+  "size": [
+   1000,
+   128
+  ],
+  "source": "ReplyTabOnVampire.png"
+ },
+ {
+  "file": "DlReplyTabOnWerewolf.png",
+  "tier": "B",
+  "key": "ReplyTabOnWerewolf",
+  "set": "dialogue",
+  "size": [
+   1000,
+   128
+  ],
+  "source": "ReplyTabOnWerewolf.png"
+ },
+ {
+  "file": "DlReplyTabOnWraith.png",
+  "tier": "B",
+  "key": "ReplyTabOnWraith",
+  "set": "dialogue",
+  "size": [
+   1000,
+   128
+  ],
+  "source": "ReplyTabOnWraith.png"
+ },
+ {
+  "file": "DlReplyTabPriest.png",
+  "tier": "B",
+  "key": "ReplyTabPriest",
+  "set": "dialogue",
+  "size": [
+   1000,
+   128
+  ],
+  "source": "ReplyTabPriest.png"
+ },
+ {
+  "file": "DlReplyTabVampire.png",
+  "tier": "B",
+  "key": "ReplyTabVampire",
+  "set": "dialogue",
+  "size": [
+   1000,
+   128
+  ],
+  "source": "ReplyTabVampire.png"
+ },
+ {
+  "file": "DlReplyTabWerewolf.png",
+  "tier": "B",
+  "key": "ReplyTabWerewolf",
+  "set": "dialogue",
+  "size": [
+   1000,
+   128
+  ],
+  "source": "ReplyTabWerewolf.png"
+ },
+ {
+  "file": "DlReplyTabWraith.png",
+  "tier": "B",
+  "key": "ReplyTabWraith",
+  "set": "dialogue",
+  "size": [
+   1000,
+   128
+  ],
+  "source": "ReplyTabWraith.png"
+ },
+ {
+  "file": "DlRibbon.png",
+  "tier": "A",
+  "key": "Ribbon",
+  "set": "dialogue",
+  "size": [
+   1024,
+   140
+  ],
+  "source": "Ribbon.png"
+ },
+ {
+  "file": "DlToneAsk.png",
+  "tier": "A",
+  "key": "ToneAsk",
+  "set": "dialogue",
+  "size": [
+   96,
+   96
+  ],
+  "source": "ToneAsk.png"
+ },
+ {
+  "file": "DlToneKind.png",
+  "tier": "A",
+  "key": "ToneKind",
+  "set": "dialogue",
+  "size": [
+   96,
+   96
+  ],
+  "source": "ToneKind.png"
+ },
+ {
+  "file": "DlToneSly.png",
+  "tier": "A",
+  "key": "ToneSly",
+  "set": "dialogue",
+  "size": [
+   96,
+   96
+  ],
+  "source": "ToneSly.png"
+ },
+ {
+  "file": "DlToneThreat.png",
+  "tier": "A",
+  "key": "ToneThreat",
+  "set": "dialogue",
+  "size": [
+   96,
+   96
+  ],
+  "source": "ToneThreat.png"
+ }
+]
