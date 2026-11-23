@@ -1,0 +1,126 @@
+{
+ "ok": true,
+ "name": "GripWerewolf",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action4",
+ "authoredDuration": 2.8,
+ "bakedDuration": 2.8,
+ "passes": {
+  "spline": false,
+  "overlapFrames30": {},
+  "settle": "off",
+  "life": 0.35,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 84,
+ "poseKeys": 362,
+ "markers": 8,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: LeftShoulder at 2065°/s around 1.92 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "fail",
+   "detail": "the body moves 2.38 studs from the HumanoidRootPart at 0.6 s; limit 2",
+   "measured": {
+    "excursion": 2.38,
+    "returnGap": 0.5
+   }
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "fail",
+   "detail": "Right Leg sinks 0.17 studs into the ground at 2.05 s; limit 0.1",
+   "measured": {
+    "penetration": 0.17,
+    "groundedShare": 0.99
+   }
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "symmetricEasing",
+   "message": "Moves peak in speed at 47% of their duration: every move eases in and out the same amount. Measured gestures reach peak speed at 38% (they leave fast and arrive slowly); tired/old characters at ~25%; only snappy, energetic ones near 50%. Put a breakdown key early in the move or favour the arrival."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Left Arm moves in a straight line from 1.37 to 1.47 s (bows 1% of its 1.0-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Head moves in a straight line from 0.30 to 0.43 s (bows 2% of its 2.7-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Left Leg moves in a straight line from 0.27 to 0.47 s (bows 2% of its 2.4-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Left Leg moves in a straight line from 0.93 to 1.03 s (bows 2% of its 0.7-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Left Leg moves in a straight line from 1.10 to 1.20 s (bows 4% of its 0.8-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Left Leg moves in a straight line from 1.27 to 1.37 s (bows 3% of its 0.7-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "evenKeys",
+   "message": "Keys are evenly spaced (every 0.03 s). Action has rhythm: a quick strike between slower anticipation and recovery, holds of different lengths. Re-time the keys so the beats differ."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.4766793046195756,
+  "peakAt": 0.4666666666666667,
+  "action": {
+   "effector": "Right Arm",
+   "peakSpeed": 39.78725119833704,
+   "onset": 0.26666666666666666,
+   "peak": 0.36666666666666664,
+   "stop": 0.5,
+   "strike_s": 0.23333333333333334,
+   "followThrough_s": 0,
+   "hold_s": 0.03333333333333333,
+   "recovery_s": 1.7,
+   "windupBack": 0.6482198101339842,
+   "rootDrop": 0.40268922155688625,
+   "rootShift": 2.2156,
+   "torsoPeak_ms": 0
+  }
+ },
+ "sheet": "out\\GripWerewolf_sheet.png",
+ "graph": "out\\GripWerewolf_graph.png",
+ "trails": "out\\GripWerewolf_trails.png",
+ "luau": "out\\GripWerewolf.lua",
+ "luauBytes": 17233
+}

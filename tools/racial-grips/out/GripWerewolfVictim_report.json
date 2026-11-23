@@ -1,0 +1,98 @@
+{
+ "ok": true,
+ "name": "GripWerewolfVictim",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action4",
+ "authoredDuration": 2.8,
+ "bakedDuration": 2.8,
+ "passes": {
+  "spline": false,
+  "overlapFrames30": {},
+  "settle": "off",
+  "life": 0.35,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 76,
+ "poseKeys": 354,
+ "markers": 0,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: RightShoulder at 2398°/s around 0.8 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 0.52 studs of the HumanoidRootPart and returns within 0.1"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "skipped",
+   "detail": "only for locomotion or grounded"
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "symmetricEasing",
+   "message": "Moves peak in speed at 50% of their duration: every move eases in and out the same amount. Measured gestures reach peak speed at 38% (they leave fast and arrive slowly); tired/old characters at ~25%; only snappy, energetic ones near 50%. Put a breakdown key early in the move or favour the arrival."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Left Leg moves in a straight line from 0.53 to 0.67 s (bows 3% of its 0.9-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "evenKeys",
+   "message": "Keys are evenly spaced (every 0.03 s). Action has rhythm: a quick strike between slower anticipation and recovery, holds of different lengths. Re-time the keys so the beats differ."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.4716620372801614,
+  "peakAt": 0.5,
+  "action": {
+   "effector": "Right Arm",
+   "peakSpeed": 55.58667212104023,
+   "onset": 0.7666666666666667,
+   "peak": 0.8,
+   "stop": 0.9666666666666667,
+   "strike_s": 0.2,
+   "followThrough_s": 0,
+   "hold_s": 0,
+   "recovery_s": 1.0333333333333334,
+   "windupBack": 2.6689484115815074,
+   "rootDrop": 0.12923682634730538,
+   "rootShift": 0,
+   "torsoPeak_ms": 100
+  }
+ },
+ "sheet": "out\\GripWerewolfVictim_sheet.png",
+ "graph": "out\\GripWerewolfVictim_graph.png",
+ "trails": "out\\GripWerewolfVictim_trails.png",
+ "luau": "out\\GripWerewolfVictim.lua",
+ "luauBytes": 16632
+}
