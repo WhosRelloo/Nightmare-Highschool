@@ -1,0 +1,352 @@
+[
+ {
+  "name": "ClanSpins1",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "ClanSpins5",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "ClanSpins15",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "HeightSpins3",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "HeightSpins10",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "RaceSpins3",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "RaceSpins10",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "VariantSpins3",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "VariantSpins10",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TraitSpins5",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TraitSpins15",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "BloodlineBundle",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "IdentityBundle",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "NameChange",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "CapeVamp",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "CapeRogue",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "CapeFur",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "CloakRavenfeather",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "CloakMoonlit",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "CloakAshen",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "OutfitMidnightPrefect",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "OutfitCrimsonGala",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "OutfitGraveyardFormal",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "EyeGlowTint",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "DeckHellfire",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "DeckMoonwake",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "DeckBoneRail",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "LunchboxCoffin",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "LunchboxBatTin",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "LunchboxCrimsonBento",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "LanternCrimsonGlass",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "UmbrellaBatWing",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "ThermosRaven",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "PhoneWallpapers",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "PhoneCase",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "PhoneRingtones",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "DecorGothicStudy",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "DecorMoonlitLoft",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "DecorCrimsonCourt",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "GearTint",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "MomentLanternRelease",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "MomentCrimsonFireworks",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "MomentShoutout",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "PassExtraStudents",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "PassTailor",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "PassCollectorsDorm",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "PassGothicEmotes",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "PassGramophone",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "PassPrefectsSeal",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "NightSociety",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ }
+]

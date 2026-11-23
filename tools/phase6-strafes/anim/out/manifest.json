@@ -1,0 +1,840 @@
+{
+ "StrafeLeft_Square": {
+  "Studio": "NHG_StrafeLeft_Square",
+  "Len": 1.033,
+  "Loop": true,
+  "Priority": "Core",
+  "Src": "Walk_Stand_Anims__Left_Strafe_Walking_R6",
+  "base": "StrafeLeft_Square",
+  "stride": 8.022,
+  "stance": 4.764,
+  "contact_phase": 0.258
+ },
+ "StrafeRight_Square": {
+  "Studio": "NHG_StrafeRight_Square",
+  "Len": 1.033,
+  "Loop": true,
+  "Priority": "Core",
+  "Src": "Walk_Stand_Anims__Right_Strafe_Walking_R6",
+  "base": "StrafeRight_Square",
+  "stride": 7.982,
+  "stance": 4.835,
+  "contact_phase": 0.194
+ },
+ "Talk": {
+  "Studio": "NHG_Talk",
+  "Len": 3.767,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Talking2_R6",
+  "base": "Talk"
+ },
+ "TalkRant": {
+  "Studio": "NHG_TalkRant",
+  "Len": 4.8,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__TalkingGoinCrazy_R6",
+  "base": "TalkRant"
+ },
+ "Argue_A": {
+  "Studio": "NHG_Argue_A",
+  "Len": 20.8,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Standing_Arguing_R6",
+  "base": "Argue_A"
+ },
+ "Argue_B": {
+  "Studio": "NHG_Argue_B",
+  "Len": 20.8,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Standing_Arguing2_R6",
+  "base": "Argue_B"
+ },
+ "Point": {
+  "Studio": "NHG_Point",
+  "Len": 4.7,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Pointing_Forward_R6",
+  "base": "Point"
+ },
+ "PhoneTalk": {
+  "Studio": "NHG_PhoneTalk",
+  "Len": 38.833,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Talking_On_Phone_R6",
+  "base": "PhoneTalk"
+ },
+ "PhoneTalk_Upper": {
+  "Studio": "NHG_PhoneTalk_Upper",
+  "Len": 38.833,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Talking_On_Phone_R6",
+  "base": "PhoneTalk_Upper"
+ },
+ "PhonePace": {
+  "Studio": "NHG_PhonePace",
+  "Len": 37.633,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Pacing_And_Talking_On_A_Phone_R6",
+  "base": "PhonePace"
+ },
+ "PhonePaceWide": {
+  "Studio": "NHG_PhonePaceWide",
+  "Len": 42.233,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Talking_Phone_Pacing_R6",
+  "base": "PhonePaceWide"
+ },
+ "PrayKneelIn_80": {
+  "Studio": "NHG_PrayKneelIn_80",
+  "Len": 4.202,
+  "Loop": false,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Praying_R6",
+  "bucket": 80,
+  "base": "PrayKneelIn",
+  "window": [
+   0.3,
+   3.3
+  ]
+ },
+ "PrayKneelIn_90": {
+  "Studio": "NHG_PrayKneelIn_90",
+  "Len": 4.202,
+  "Loop": false,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Praying_R6",
+  "bucket": 90,
+  "base": "PrayKneelIn",
+  "window": [
+   0.3,
+   3.3
+  ]
+ },
+ "PrayKneelIn_100": {
+  "Studio": "NHG_PrayKneelIn_100",
+  "Len": 4.202,
+  "Loop": false,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Praying_R6",
+  "bucket": 100,
+  "base": "PrayKneelIn",
+  "window": [
+   0.3,
+   3.3
+  ]
+ },
+ "PrayLoop_80": {
+  "Studio": "NHG_PrayLoop_80",
+  "Len": 3.0,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Praying_R6",
+  "bucket": 80,
+  "base": "PrayLoop",
+  "window": [
+   0.3,
+   3.3
+  ]
+ },
+ "PrayLoop_90": {
+  "Studio": "NHG_PrayLoop_90",
+  "Len": 3.0,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Praying_R6",
+  "bucket": 90,
+  "base": "PrayLoop",
+  "window": [
+   0.3,
+   3.3
+  ]
+ },
+ "PrayLoop_100": {
+  "Studio": "NHG_PrayLoop_100",
+  "Len": 3.0,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Praying_R6",
+  "bucket": 100,
+  "base": "PrayLoop",
+  "window": [
+   0.3,
+   3.3
+  ]
+ },
+ "PrayStandUp_80": {
+  "Studio": "NHG_PrayStandUp_80",
+  "Len": 3.567,
+  "Loop": false,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Praying_R6",
+  "bucket": 80,
+  "base": "PrayStandUp",
+  "window": [
+   0.3,
+   3.3
+  ]
+ },
+ "PrayStandUp_90": {
+  "Studio": "NHG_PrayStandUp_90",
+  "Len": 3.567,
+  "Loop": false,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Praying_R6",
+  "bucket": 90,
+  "base": "PrayStandUp",
+  "window": [
+   0.3,
+   3.3
+  ]
+ },
+ "PrayStandUp_100": {
+  "Studio": "NHG_PrayStandUp_100",
+  "Len": 3.567,
+  "Loop": false,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Praying_R6",
+  "bucket": 100,
+  "base": "PrayStandUp",
+  "window": [
+   0.3,
+   3.3
+  ]
+ },
+ "KneelInspect_80": {
+  "Studio": "NHG_KneelInspect_80",
+  "Len": 4.933,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Kneeling_Inspecting_R6",
+  "bucket": 80,
+  "base": "KneelInspect"
+ },
+ "KneelInspect_90": {
+  "Studio": "NHG_KneelInspect_90",
+  "Len": 4.933,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Kneeling_Inspecting_R6",
+  "bucket": 90,
+  "base": "KneelInspect"
+ },
+ "KneelInspect_100": {
+  "Studio": "NHG_KneelInspect_100",
+  "Len": 4.933,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Kneeling_Inspecting_R6",
+  "bucket": 100,
+  "base": "KneelInspect"
+ },
+ "Inspect": {
+  "Studio": "NHG_Inspect",
+  "Len": 3.167,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Interaction_Anims__Inspecting_R6",
+  "base": "Inspect"
+ },
+ "ReachDown": {
+  "Studio": "NHG_ReachDown",
+  "Len": 3.0,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Cinematic_NPC_Gestures__Reaching_Down_R6",
+  "base": "ReachDown"
+ },
+ "Rummage": {
+  "Studio": "NHG_Rummage",
+  "Len": 4.833,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Interaction_Anims__Rummaging_R6",
+  "base": "Rummage"
+ },
+ "Gather_80": {
+  "Studio": "NHG_Gather_80",
+  "Len": 5.967,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Interaction_Anims__Gathering_Objects_R6",
+  "bucket": 80,
+  "base": "Gather"
+ },
+ "Gather_90": {
+  "Studio": "NHG_Gather_90",
+  "Len": 5.967,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Interaction_Anims__Gathering_Objects_R6",
+  "bucket": 90,
+  "base": "Gather"
+ },
+ "Gather_100": {
+  "Studio": "NHG_Gather_100",
+  "Len": 5.967,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Interaction_Anims__Gathering_Objects_R6",
+  "bucket": 100,
+  "base": "Gather"
+ },
+ "Shove_InPlace": {
+  "Studio": "NHG_Shove_InPlace",
+  "Len": 2.433,
+  "Loop": false,
+  "Priority": "Action2",
+  "Src": "Cinematic_NPC_Gestures__Shove_Reaction_R6",
+  "Carry": [
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.1,
+    0.0,
+    -0.3851,
+    0.0
+   ],
+   [
+    0.2,
+    0.0,
+    -0.7417,
+    0.0
+   ],
+   [
+    0.3,
+    0.0,
+    -1.0476,
+    0.0
+   ],
+   [
+    0.4,
+    0.0,
+    -1.3657,
+    0.0
+   ],
+   [
+    0.5,
+    0.0,
+    -1.725,
+    0.0
+   ],
+   [
+    0.6,
+    0.0,
+    -2.0813,
+    0.0
+   ],
+   [
+    0.7,
+    0.0,
+    -2.4122,
+    0.0
+   ],
+   [
+    0.8,
+    0.0,
+    -2.6859,
+    0.0
+   ],
+   [
+    0.9,
+    0.0,
+    -2.9517,
+    0.0
+   ],
+   [
+    1.0,
+    0.0,
+    -3.2184,
+    0.0
+   ],
+   [
+    1.1,
+    0.0,
+    -3.457,
+    0.0
+   ],
+   [
+    1.2,
+    0.0,
+    -3.6838,
+    0.0
+   ],
+   [
+    1.3,
+    0.0,
+    -3.9295,
+    0.0
+   ],
+   [
+    1.4,
+    0.0,
+    -4.1839,
+    0.0
+   ],
+   [
+    1.5,
+    0.0,
+    -4.4479,
+    0.0
+   ],
+   [
+    1.6,
+    0.0,
+    -4.7233,
+    0.0
+   ],
+   [
+    1.7,
+    0.0,
+    -5.0059,
+    0.0
+   ],
+   [
+    1.8,
+    0.0,
+    -5.297,
+    0.0
+   ],
+   [
+    1.9,
+    0.0,
+    -5.602,
+    0.0
+   ],
+   [
+    2.0,
+    0.0,
+    -5.9127,
+    0.0
+   ],
+   [
+    2.1,
+    0.0,
+    -6.1658,
+    0.0
+   ],
+   [
+    2.2,
+    0.0,
+    -6.435,
+    0.0
+   ],
+   [
+    2.3,
+    0.0,
+    -6.7603,
+    0.0
+   ],
+   [
+    2.4,
+    0.0,
+    -7.1155,
+    0.0
+   ],
+   [
+    2.433,
+    0.0,
+    -7.241,
+    0.0
+   ]
+  ],
+  "base": "Shove_InPlace"
+ },
+ "ShoveSpin_InPlace": {
+  "Studio": "NHG_ShoveSpin_InPlace",
+  "Len": 4.533,
+  "Loop": false,
+  "Priority": "Action2",
+  "Src": "Cinematic_NPC_Gestures__Shoved_Reaction_With_Spin_R6",
+  "Carry": [
+   [
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   [
+    0.1,
+    0.0,
+    -0.3117,
+    -0.5307
+   ],
+   [
+    0.2,
+    0.0,
+    -0.6067,
+    -1.1548
+   ],
+   [
+    0.3,
+    0.0,
+    -0.8846,
+    -2.3862
+   ],
+   [
+    0.4,
+    0.0,
+    -1.1609,
+    -2.8741
+   ],
+   [
+    0.5,
+    0.0,
+    -1.4561,
+    -3.2137
+   ],
+   [
+    0.6,
+    0.0,
+    -1.7302,
+    -1.8692
+   ],
+   [
+    0.7,
+    0.0,
+    -2.0558,
+    -2.3557
+   ],
+   [
+    0.8,
+    0.0,
+    -2.3852,
+    -1.8187
+   ],
+   [
+    0.9,
+    0.0,
+    -2.6904,
+    1.6826
+   ],
+   [
+    1.0,
+    0.0,
+    -3.0066,
+    3.0188
+   ],
+   [
+    1.1,
+    0.0,
+    -3.34,
+    2.1909
+   ],
+   [
+    1.2,
+    0.0,
+    -3.6451,
+    -8.3965
+   ],
+   [
+    1.3,
+    0.0,
+    -3.9312,
+    -39.7226
+   ],
+   [
+    1.4,
+    0.0,
+    -4.0879,
+    -87.2524
+   ],
+   [
+    1.5,
+    0.0,
+    -4.2416,
+    -114.2616
+   ],
+   [
+    1.6,
+    0.0,
+    -4.3973,
+    -130.2399
+   ],
+   [
+    1.7,
+    0.0,
+    -4.5744,
+    -141.5501
+   ],
+   [
+    1.8,
+    0.0,
+    -4.8251,
+    -152.6037
+   ],
+   [
+    1.9,
+    0.0,
+    -5.0731,
+    -163.4178
+   ],
+   [
+    2.0,
+    0.0,
+    -5.2026,
+    -178.9869
+   ],
+   [
+    2.1,
+    0.0,
+    -5.2118,
+    -195.5325
+   ],
+   [
+    2.2,
+    0.0,
+    -5.2678,
+    -207.9216
+   ],
+   [
+    2.3,
+    0.0,
+    -5.365,
+    -211.112
+   ],
+   [
+    2.4,
+    0.0,
+    -5.4775,
+    -208.6476
+   ],
+   [
+    2.5,
+    0.0,
+    -5.5498,
+    -205.6971
+   ],
+   [
+    2.6,
+    0.0,
+    -5.6196,
+    -203.1231
+   ],
+   [
+    2.7,
+    0.0,
+    -5.6937,
+    -200.5632
+   ],
+   [
+    2.8,
+    0.0,
+    -5.7547,
+    -198.2543
+   ],
+   [
+    2.9,
+    0.0,
+    -5.7772,
+    -196.3139
+   ],
+   [
+    3.0,
+    0.0,
+    -5.7711,
+    -192.7189
+   ],
+   [
+    3.1,
+    0.0,
+    -5.7573,
+    -190.3696
+   ],
+   [
+    3.2,
+    0.0,
+    -5.7311,
+    -190.4925
+   ],
+   [
+    3.3,
+    0.0,
+    -5.6945,
+    -191.2002
+   ],
+   [
+    3.4,
+    0.0,
+    -5.6591,
+    -192.6971
+   ],
+   [
+    3.5,
+    0.0,
+    -5.632,
+    -194.3385
+   ],
+   [
+    3.6,
+    0.0,
+    -5.6095,
+    -196.039
+   ],
+   [
+    3.7,
+    0.0,
+    -5.5947,
+    -197.9564
+   ],
+   [
+    3.8,
+    0.0,
+    -5.5942,
+    -199.8105
+   ],
+   [
+    3.9,
+    0.0,
+    -5.5893,
+    -201.3061
+   ],
+   [
+    4.0,
+    0.0,
+    -5.5938,
+    -201.6607
+   ],
+   [
+    4.1,
+    0.0,
+    -5.6008,
+    -201.7169
+   ],
+   [
+    4.2,
+    0.0,
+    -5.598,
+    -201.5739
+   ],
+   [
+    4.3,
+    0.0,
+    -5.5971,
+    -201.3437
+   ],
+   [
+    4.4,
+    0.0,
+    -5.5832,
+    -201.1423
+   ],
+   [
+    4.5,
+    0.0,
+    -5.5664,
+    -201.0782
+   ],
+   [
+    4.533,
+    0.0,
+    -5.5615,
+    -201.1503
+   ]
+  ],
+  "base": "ShoveSpin_InPlace"
+ },
+ "InjuredIdle": {
+  "Studio": "NHG_InjuredIdle",
+  "Len": 9.333,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Injured_Anims__Injured_Idle_R6",
+  "base": "InjuredIdle"
+ },
+ "InjuredHurt_80": {
+  "Studio": "NHG_InjuredHurt_80",
+  "Len": 6.033,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Injured_Anims__Injured_Hurting_Idle_R6",
+  "bucket": 80,
+  "base": "InjuredHurt"
+ },
+ "InjuredHurt_90": {
+  "Studio": "NHG_InjuredHurt_90",
+  "Len": 6.033,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Injured_Anims__Injured_Hurting_Idle_R6",
+  "bucket": 90,
+  "base": "InjuredHurt"
+ },
+ "InjuredHurt_100": {
+  "Studio": "NHG_InjuredHurt_100",
+  "Len": 6.033,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Injured_Anims__Injured_Hurting_Idle_R6",
+  "bucket": 100,
+  "base": "InjuredHurt"
+ },
+ "Dizzy": {
+  "Studio": "NHG_Dizzy",
+  "Len": 4.267,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Idle_Anims__Dizzy_Idle_R6",
+  "base": "Dizzy"
+ },
+ "LayingIdle": {
+  "Studio": "NHG_LayingIdle",
+  "Len": 2.133,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Idle_Anims__Laying_Idle_R6",
+  "base": "LayingIdle"
+ },
+ "CheerSeated_Upper": {
+  "Studio": "NHG_CheerSeated_Upper",
+  "Len": 4.333,
+  "Loop": true,
+  "Priority": "Action2",
+  "Src": "Cinematic_NPC_Gestures__Cheering_While_Sitting_R6",
+  "base": "CheerSeated_Upper"
+ },
+ "Bored": {
+  "Studio": "NHG_Bored",
+  "Len": 10.667,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Idle_Anims__Bored_R6",
+  "base": "Bored"
+ },
+ "SadIdle": {
+  "Studio": "NHG_SadIdle",
+  "Len": 2.667,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Idle_Anims__Sad_Idle_R6",
+  "base": "SadIdle"
+ },
+ "Duck": {
+  "Studio": "NHG_Duck",
+  "Len": 1.533,
+  "Loop": false,
+  "Priority": "Action2",
+  "Src": "Idle_Anims__Ducking_R6",
+  "base": "Duck"
+ },
+ "OrcIdle": {
+  "Studio": "NHG_OrcIdle",
+  "Len": 5.333,
+  "Loop": true,
+  "Priority": "Action",
+  "Src": "Idle_Anims__Orc_Idle_R6",
+  "base": "OrcIdle"
+ }
+}

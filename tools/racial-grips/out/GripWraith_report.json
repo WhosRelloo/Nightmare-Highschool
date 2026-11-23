@@ -1,0 +1,106 @@
+{
+ "ok": true,
+ "name": "GripWraith",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action4",
+ "authoredDuration": 3,
+ "bakedDuration": 3,
+ "passes": {
+  "spline": false,
+  "overlapFrames30": {},
+  "settle": "off",
+  "life": 0.35,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 81,
+ "poseKeys": 269,
+ "markers": 6,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: RightShoulder at 994°/s around 2.22 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 0.86 studs of the HumanoidRootPart and returns within 0"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "skipped",
+   "detail": "only for locomotion or grounded"
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "symmetricEasing",
+   "message": "Moves peak in speed at 50% of their duration: every move eases in and out the same amount. Measured gestures reach peak speed at 38% (they leave fast and arrive slowly); tired/old characters at ~25%; only snappy, energetic ones near 50%. Put a breakdown key early in the move or favour the arrival."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Left Arm moves in a straight line from 0.47 to 0.63 s (bows 3% of its 2.6-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Left Arm moves in a straight line from 0.77 to 1.03 s (bows 0% of its 1.5-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Head moves in a straight line from 0.83 to 1.00 s (bows 0% of its 0.9-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "evenKeys",
+   "message": "Keys are evenly spaced (every 0.03 s). Action has rhythm: a quick strike between slower anticipation and recovery, holds of different lengths. Re-time the keys so the beats differ."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.5054345950747194,
+  "peakAt": 0.5,
+  "action": {
+   "effector": "Right Arm",
+   "peakSpeed": 37.28173511778834,
+   "onset": 0.4,
+   "peak": 0.5333333333333333,
+   "stop": 0.7,
+   "strike_s": 0.3,
+   "followThrough_s": 0,
+   "hold_s": 0.03333333333333333,
+   "recovery_s": 0.4666666666666667,
+   "windupBack": 2.099282903155824,
+   "rootDrop": 2.255448203592814,
+   "rootShift": 0.8584,
+   "torsoPeak_ms": 33.333333333333336
+  }
+ },
+ "sheet": "out\\GripWraith_sheet.png",
+ "graph": "out\\GripWraith_graph.png",
+ "trails": "out\\GripWraith_trails.png",
+ "luau": "out\\GripWraith.lua",
+ "luauBytes": 12953
+}

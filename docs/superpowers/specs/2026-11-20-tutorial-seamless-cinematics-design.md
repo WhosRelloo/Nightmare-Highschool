@@ -345,3 +345,33 @@ Each ends with its reason.
       The Strikethrough, Collected and RollCall cuts were re-checked.
     - Reason: the slerp between two level cameras tilted the horizon in between (up to -1.8 deg), and the old placement
       yaw tilted framed shots (up to -1.6 deg). House style wants roll 0 on ground beats.
+21. **Placed animations start with an on-foot approach (`CineActor.Approach`), owner request 2026-11-21.**
+    - When an animation needs the character at a mark (the fence, the bus door), the character gets there on foot and flows
+      straight into it. Nothing is lerped, slid or teleported on screen; a root move is allowed only under full black.
+    - `Approach(Mark, { Gait, LeadIn, Arrive, BlendLead, OnNear })` drives the Humanoid at the gait's speed (Walk = the player's
+      walk speed, Run = 25, Crouch/Sneak = 7), so the game's own Walk, Sprint and CrouchWalk tracks play. No new animations.
+    - It arrives facing the mark: it walks to a lead-in point `LeadIn` studs behind the mark along its facing (skipped when
+      already within 30 degrees of the mark's heading and in line), then straight onto the mark. The few degrees left at the
+      stop turn over the next 0.45 s or more (45 degrees a second at most), inside the next piece's fade-in.
+    - `OnNear` fires `BlendLead` (0.2 s) before arrival; the cut starts the chain there. `CineActor.Chain` takes
+      `Opts.FadeIn` for the first piece only (pieces 2+ still switch instantly) and `Opts.Entry` (the phase a first loop
+      enters at, so the loop's exit can be timed to a shot). `CineActor.Preload` fetches every piece and `_End` pose.
+      `Controllers.Hometown` preloads FenceOver and TheBus when NHTutorial is set.
+    - Steering is `Humanoid:Move` toward the waypoint every frame. `MoveTo` was tried first: it stops about a stud short of its
+      point and times out after 8 s.
+    - Fallback: a walk that is blocked (no progress for 3 s), times out or falls ends with `CineActor.Fallback`: a `CineUI.Dip`
+      and a placement, with a warning.
+    - Events marked `noShift` run on the segment's own clock, so the approach starts as the beat ends, through the glide in.
+      `Ctx.Clock()` and `Ctx.Glide()` expose the clock; `Ctx.HoldEnd(fn)` holds a segment's end (3 s at most) while `fn()` is true,
+      so a re-seat still waiting for its clip never lands under the blend out.
+    - The fence: the vault mark is FenceZone turned 40 degrees left (FenceOver2's first frame faces 40 degrees right of its root)
+      and 0.6 studs back from the fence, measured so the body clears the gate during FenceOver1. The Garden beat ends 3.5 studs
+      from FenceZone (`enter:FenceZone:3.5`), so it never ends with you against the gate.
+    - The bus: `Approach(Stand, Walk)` from wherever you stand; the waiting loop enters at the phase that puts its exit on the
+      "You step on" shot, whenever you arrive.
+    - Other spots where the root is placed, audited: the fence dip and `Ctx.OnBlack` placements (under black), the chain re-seat
+      (a pose-to-identical-pose switch), `Tutorial.Resume` (on entering or respawning, not during a cut), the non-seamless cut's
+      `Arrive` (before the cut). None is on screen.
+22. **A cut with beats lists them in `Config.Cine Cuts[Id].Beats`.**
+    - Each walk-and-talk beat segment must be listed (`Beats = { Garden = true; Hide = true }`). The server holds the timeout only
+      while a listed beat runs, so an unlisted beat is timed out mid-beat (Length + TimeoutPad) and the cut ends under the player.

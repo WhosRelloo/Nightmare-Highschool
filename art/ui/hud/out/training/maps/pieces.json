@@ -1,0 +1,189 @@
+[
+ {
+  "name": "TrainGauge",
+  "w": 1024,
+  "h": 1024,
+  "out": 1024,
+  "kind": "gauge"
+ },
+ {
+  "name": "TrainNeedle",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainRing",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "ring",
+  "halo": [
+   255,
+   214,
+   130
+  ]
+ },
+ {
+  "name": "TrainRingHeavy",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "ring",
+  "halo": [
+   230,
+   70,
+   70
+  ]
+ },
+ {
+  "name": "TrainRingFake",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "ring"
+ },
+ {
+  "name": "TrainRateGood",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainRateGreat",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainRatePerfect",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainRateMiss",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainIconArms",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainIconTorso",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainIconLegs",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainStationPushUp",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainStationPullUp",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainStationSitUp",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainStationSquat",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainBadgeStreak",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainBadgeBest",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainBadgeDaily",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainIconSore",
+  "w": 1024,
+  "h": 1024,
+  "out": 512,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainGear",
+  "w": 1024,
+  "h": 1024,
+  "out": 256,
+  "kind": "icon"
+ },
+ {
+  "name": "TrainPlate",
+  "w": 1536,
+  "h": 384,
+  "out": [
+   768,
+   192
+  ],
+  "kind": "plate"
+ },
+ {
+  "name": "TrainKey",
+  "w": 512,
+  "h": 256,
+  "out": [
+   256,
+   128
+  ],
+  "kind": "plate"
+ },
+ {
+  "name": "TrainBarFrame",
+  "w": 2400,
+  "h": 144,
+  "out": [
+   1200,
+   72
+  ],
+  "kind": "plate"
+ }
+]

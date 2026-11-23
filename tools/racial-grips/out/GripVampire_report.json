@@ -1,0 +1,98 @@
+{
+ "ok": true,
+ "name": "GripVampire",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action4",
+ "authoredDuration": 3,
+ "bakedDuration": 3,
+ "passes": {
+  "spline": false,
+  "overlapFrames30": {},
+  "settle": "off",
+  "life": 0.35,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 87,
+ "poseKeys": 399,
+ "markers": 8,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: LeftHip at 1635°/s around 0.4 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 0.52 studs of the HumanoidRootPart and returns within 0.3"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "fail",
+   "detail": "Right Leg sinks 1.03 studs into the ground at 0.47 s; limit 0.1",
+   "measured": {
+    "penetration": 1.03,
+    "groundedShare": 1
+   }
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "straightPath",
+   "message": "Left Arm moves in a straight line from 2.50 to 2.63 s (bows 3% of its 0.7-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "evenKeys",
+   "message": "Keys are evenly spaced (every 0.03 s). Action has rhythm: a quick strike between slower anticipation and recovery, holds of different lengths. Re-time the keys so the beats differ."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.603004046680426,
+  "peakAt": 0.4444444444444444,
+  "action": {
+   "effector": "Left Leg",
+   "peakSpeed": 60.13771701531414,
+   "onset": 0.3,
+   "peak": 0.4,
+   "stop": 0.5,
+   "strike_s": 0.2,
+   "followThrough_s": 0,
+   "hold_s": 1.9,
+   "recovery_s": 0.3333333333333333,
+   "windupBack": 1.4361936141582436,
+   "rootDrop": 0.5073988023952095,
+   "rootShift": 0.4230221861794013,
+   "torsoPeak_ms": -33.333333333333336
+  }
+ },
+ "sheet": "out\\GripVampire_sheet.png",
+ "graph": "out\\GripVampire_graph.png",
+ "trails": "out\\GripVampire_trails.png",
+ "luau": "out\\GripVampire.lua",
+ "luauBytes": 18944
+}

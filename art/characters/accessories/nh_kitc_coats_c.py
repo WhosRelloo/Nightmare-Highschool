@@ -692,6 +692,9 @@ def toggle_set(name, z, X, xt=-0.17, xa=0.215):
                          (xt - 0.042, yt + 0.0005, z + 0.001), (xt - 0.004, yt, z)], 0.0042, X["cord"], sides=6)
 
 
+BELL_STEP = (-0.43, -0.34)   # the bell is wider below the elbow: its inner edge steps out higher than slv_xin's
+
+
 def bell_sleeve(name, P, X, flare=0.12):
     """Kit C's full sleeve (build_sleeve_k: the whole arm to the wrist, the front and back faces to the inner edge)
     widening to a bell below the elbow: the U-profile is pushed out along its normal, a little less toward the inner
@@ -703,7 +706,7 @@ def bell_sleeve(name, P, X, flare=0.12):
     rowsP = []
     for z in zs:
         ease = 0.003 * math.sin(math.pi * smooth(-0.8, 0.9, z))
-        prof = arm_wrap(d + ease, x_in=slv_xin(z), **kw)
+        prof = arm_wrap(d + ease, x_in=slv_xin(z, BELL_STEP), **kw)
         ex = flare * smooth(0.20, SLV_CUFF, z) ** 1.5
         row = []
         for k, (X_, Y_) in enumerate(prof):
@@ -722,7 +725,7 @@ def bell_sleeve(name, P, X, flare=0.12):
         c, s_ = math.cos(math.radians(a)), math.sin(math.radians(a))
         rowsP.append([Vector((1.5 + e[0] + (f[0] - e[0]) * c, e[1] + (f[1] - e[1]) * c, 1.0 + d * s_)) for e, f in zip(E0, Ed)])
     n = len(E0)
-    T = [(SLV_XIN + 0.01, lerp(-0.40, 0.40, k / (n - 1))) for k in range(n)]
+    T = [(SLV_XIN + C1.SLV_CAP, lerp(-0.40, 0.40, k / (n - 1))) for k in range(n)]
     for f in (0.0, 0.3, 0.6, 1.0):
         rowsP.append([Vector((1.5 + lerp(E0[k][0], T[k][0], f), lerp(E0[k][1], T[k][1], f), 1.0 + d)) for k in range(n)])
     G = [[rowsP[j][k] for j in range(len(rowsP))] for k in range(n)]

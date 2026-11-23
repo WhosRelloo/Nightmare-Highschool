@@ -176,21 +176,23 @@ def band_path(z):
     """the side band's plan path (x > 0) at height z: round the front vertical corner, along the side, round the
     back corner; returns a sampler u (0..1) -> (x, y). Below the cutaway it starts at y -0.45 (no front corner):
     on the deep bodies the depth fit pushes the band's front out toward the sheathed guard"""
+    # the corners are square (owner, 1.90.1: the coats' "open areas"): the front face runs flat out to x 1.0 + D_S
+    # before it turns, so it meets the sleeve's inner edge (x 1.02) with no groove between them. A rounded corner
+    # turned back from x 1.0 and left a slit down the arm's front where the arm showed through.
+    CORNER = [(0.0, 1.0), (0.6, 1.0), (0.93, 0.93), (1.0, 0.6), (1.0, 0.2)]
     pts = []
-    for a in (0, 20, 40, 60, 80):
-        t = math.radians(a)
-        pts.append(Vector((1.0 + D_S * math.sin(t), -0.5 - D_F * math.cos(t))))
+    for fx, fy in CORNER:
+        pts.append(Vector((1.0 + D_S * fx, -0.5 - D_F * fy)))
     for y in (-0.47, -0.30, -0.10, 0.10, 0.30, 0.47):
         pts.append(Vector((1.0 + D_S, y)))
-    for a in (80, 60, 40, 20, 0):
-        t = math.radians(a)
-        pts.append(Vector((1.0 + D_S * math.sin(t), 0.5 + D_F * math.cos(t))))
+    for fx, fy in CORNER[::-1]:
+        pts.append(Vector((1.0 + D_S * fx, 0.5 + D_F * fy)))
     L = [0.0]
     for a, b in zip(pts, pts[1:]):
         L.append(L[-1] + (b - a).length)
     u0 = 0.0
     if z < -0.08:
-        s_side = L[4] + abs(-0.45 - pts[4].y)   # pts[4] is the corner's end (x 1.0098, y -0.5)
+        s_side = L[4] + abs(-0.45 - pts[4].y)   # pts[4] is the corner's end (x 1.01, y -0.505)
         u0 = lerp(0.0, s_side / L[-1], smooth(-0.08, -0.20, z))
 
     def at(u):
@@ -393,12 +395,14 @@ def build_tail(name, P, X):
 
 
 # ================================================================== the sleeves (arms)
-SLEEVE_Z = [-0.535, -0.50, -0.42, -0.30, -0.18, -0.05, 0.10, 0.28, 0.46, 0.62, 0.76, 0.88, 0.96, 1.0]
-X_IN_TOP, X_IN_LOW = -0.43, -0.36   # arm-local inner edge (x 1.07 up top, 1.14 below the elbow)
+SLEEVE_Z = [-0.535, -0.50, -0.45, -0.38, -0.30, -0.18, -0.05, 0.10, 0.28, 0.46, 0.62, 0.76, 0.88, 0.96, 1.0]
+X_IN_TOP, X_IN_LOW = -0.48, -0.36   # arm-local inner edge (x 1.02 up top, 1.14 near the wrist, the scabbard's top edge)
+# (1.90.1, owner: the bare strip down the arm's front between the coat and the sleeve read as an open area: the edge
+# was x 1.07, stepping out from the elbow; now as Kit C's, nh_acc_batchc1.slv_xin, which acc_check passes)
 
 
 def x_in(z):
-    return lerp(X_IN_LOW, X_IN_TOP, smooth(-0.24, 0.04, z))
+    return lerp(X_IN_LOW, X_IN_TOP, smooth(-0.45, -0.38, z))
 
 
 def wrap_kw():
@@ -437,7 +441,7 @@ def build_sleeve(name, P, X):
     wire(name + "Seam", [tuple(p) for p in seam], 0.0032, X["thread"], sides=4)
     if P["cuff"] == "turnback":   # a turned-back velvet cuff, gilt piping, two buttons
         zs = [-0.535, -0.50, -0.44, -0.37, -0.30]
-        prof = [arm_wrap(0.040 + 0.004 * (j / 4), x_in=X_IN_LOW + 0.005, **wrap_kw()) for j in range(len(zs))]
+        prof = [arm_wrap(0.040 + 0.004 * (j / 4), x_in=x_in(z) + 0.005, **wrap_kw()) for j, z in enumerate(zs)]
         Gc = [[Vector((1.5 + prof[j][k][0], prof[j][k][1], z)) for j, z in enumerate(zs)] for k in range(len(prof[0]))]
         cloth(name + "Cuff", Gc, 0.014, X["cuff"], sleeve_hint)
         wire(name + "CuffPipe", [tuple(c[-1] + (c[-1] - Vector((1.5, 0, c[-1].z))).normalized() * 0.006 + Vector((0, 0, 0.004)))

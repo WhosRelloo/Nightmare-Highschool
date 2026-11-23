@@ -32,8 +32,15 @@ local Def = { Set = `Garden`; Seamless = true }
 -- (fix round 1, C1) FenceOver2's first frame faces 40 degrees to the right of its root (measured in Play: torso heading -40 as the
 -- piece starts), so the root squares up turned 40 degrees left of the fence's heading and the body faces the fence
 local APPROACH_YAW = 40
-local FENCE_DUR = 6.1        -- the square-up, the chain and the re-seat end 5.47 s in (measured, checks/sneakcheck.lua timeline), plus a beat; was 7.0 with 1.5 s dead
+local FENCE_DUR = 5.8        -- (task 14) the approach (about 1 s), the chain and the re-seat end about 5.2 s into the shots (measured, checks/sneakcheck.lua timeline), plus a beat; Ctx.HoldEnd holds the end (3 s at most) if a slow client re-seats later
+local ENTER_R = 3.5         -- (task 14) the Garden beat ends this close to FenceZone (it was 2): the on-foot approach covers the last stretch, so the beat never ends with you pressed against the gate
+local VAULT_BACK = 0.6     -- (task 14) the vault mark sits this far behind FenceZone (away from the fence): measured, the crouch walk's head leans 2 studs ahead of the root and was 0.3 inside the gate at z 82
+local LEAD_IN = 3.5         -- (task 14; 3.5 in fix round 3, was 3.0: a straighter last stretch, so the body faces the fence sooner) the approach's waypoint behind the vault mark along its heading, so the last steps run straight at it
+local ARRIVE = 0.25        -- and its stop radius
+local FADE_IN = 0.3        -- FenceOver1 fades in from the live crouch walk over this long
 local DIP_AT = 0.75          -- seconds into FenceOver2: the dip reaches black at its top (about 0.9 s)
+local SYNC_SHORT = 0.5     -- (fix round 1, I1) FenceOver2 may start this far short of the vault mark if the walk's exit phase comes round there (the root stops on it)
+local HANDOFF = 0.3        -- (fix round 1, I1) otherwise the stopped pose blends into FenceOver2 over this long
 
 function Def.Build(Ctx)
 	local Player = Players.LocalPlayer
@@ -45,6 +52,8 @@ function Def.Build(Ctx)
 	local Light = Ctx.Prop(`BedroomLight`, { Size = Vector3.new(2.1, 1.3, 0.1); CFrame = Ctx.CF(`LightWindow`);
 		Color = Color3.fromRGB(255, 210, 140); Material = Enum.Material.Neon; Transparency = 1 })
 	local Built = { start = `Garden`; Fails = 0; Armed = false }
+	local Climbing = false -- the chain and its re-seat are running or pending: the Fence shot holds its end for them (Ctx.HoldEnd)
+	Ctx.HoldEnd(function() return Climbing end)
 	Built.grade = Config.Looks.Night
 
 	---| Biscuit's clips: Sleep is the base loop, the rest play over it |---
@@ -189,7 +198,7 @@ function Def.Build(Ctx)
 			};
 			ends = {
 				{ on = `fail`; next = `Hide`; keepCrouch = true };
-				{ on = `enter:FenceZone`; next = `Fence`; keepCrouch = true };
+				{ on = `enter:FenceZone:{ENTER_R}`; next = `Fence`; keepCrouch = true };
 			};
 		} };
 		Hide = { beat = {
@@ -216,25 +225,18 @@ function Def.Build(Ctx)
 				{ t = 0; pos = Ctx.CF(`FenceZone`):PointToWorldSpace(Vector3.new(5.5, 2.6, 6.0)); look = Ctx.CF(`FenceZone`):PointToWorldSpace(Vector3.new(0, 2.4, -2.4)) };
 				{ t = FENCE_DUR; pos = Ctx.CF(`FenceZone`):PointToWorldSpace(Vector3.new(4.5, 2.5, 4.7)); look = Ctx.CF(`FenceZone`):PointToWorldSpace(Vector3.new(-0.2, 2.4, -3.0)) };
 			  } } };
-		}; events = { { t = 0; call = function()
+		}; events = { { t = 0; noShift = true; call = function() -- on the segment's own clock: the approach starts as the beat ends, through the glide in
 			if not Actor then return end
 			local Char = Player.Character
 			local Root = Char and Char:FindFirstChild(`HumanoidRootPart`) :: BasePart?
 			if not (Char and Root) then return end
-			-- square up to the fence over 0.35 s: position AND heading (you're already in the zone, up to 2 studs off it; CineActor
-			-- WalkTo would wait out its 3 s for a point the Humanoid's MoveTo stops about a stud short of)
+			Climbing = true -- the approach, the chain and the re-seat: the shot's end waits for all of it (3 s at most)
+			-- (task 14) you crouch-walk up to the vault mark ON FOOT (CineActor.Approach, the game's own CrouchWalk): the last steps run
+			-- straight along the mark's heading (FenceZone turned APPROACH_YAW left, so the body faces the fence as FenceOver2 starts), and
+			-- FenceOver1 fades in from the live crouch walk just before the stop. Nothing slides or turns on the spot
 			local Zone = Ctx.CF(`FenceZone`)
-			local From = Root.CFrame
-			local To = CFrame.new(Zone.X, From.Y, Zone.Z) * (Zone - Zone.Position) * CFrame.Angles(0, math.rad(APPROACH_YAW), 0)
-			local T0 = os.clock()
-			while Ctx.Alive() and os.clock() - T0 < 0.35 do
-				local A = (os.clock() - T0) / 0.35
-				Root.CFrame = From:Lerp(To, A * A * (3 - 2 * A))
-				RunService.Heartbeat:Wait()
-			end
-			if not Ctx.Alive() then return end
-			Root.CFrame = To
-			Root.AssemblyLinearVelocity = Vector3.zero
+			local Vault = CFrame.new(Zone.Position + (Zone - Zone.Position):VectorToWorldSpace(Vector3.new(0, 0, VAULT_BACK))) * (Zone - Zone.Position) * CFrame.Angles(0, math.rad(APPROACH_YAW), 0)
+			task.spawn(Actor.Preload, `FenceOver`, Ctx.Clip)
 			local TA = require(ReplicatedStorage.Config.TutorialAnim)
 			local Offset = TA.Chains.FenceOver[2].EndOffset
 			-- the re-seat's own root move (CineActor.Reseat writes this); the far side is placed so it lands on FenceLand
@@ -242,29 +244,124 @@ function Def.Build(Ctx)
 			local Seat = CFrame.new(Offset.X * S, 0, Offset.Z * S) * CFrame.Angles(0, math.rad(Offset.Yaw), 0)
 			local LandMark = Ctx.Mark(`FenceLand`)
 			if not LandMark then warn(`[Cine] TutorialSneak: no FenceLand mark in the Garden set: the climb lands where the clip's own motion does`) end
-			Actor.Chain(`FenceOver`, Ctx.Clip, nil, function(Piece: string)
-				if Piece ~= `FenceOver2` then return end
-				-- the climb starts: the game's crouch ends under the chain's own pose
-				if Remote then Remote:FireServer({ Kind = `BeatCrouch`; On = false }) end
-				-- and at the top of it (about 0.9 s in) the root moves to the far side under a 0.3 s dip to black
-				if LandMark then
-					task.delay(DIP_AT, function()
-						if not Ctx.Alive() then return end
-						local CineUI = require(Player.PlayerScripts.Controllers.Gui.CineUI)
-						local function place()
-							if not Ctx.Alive() or not Root.Parent then return end
-							local Land = LandMark.CFrame
-							Root.CFrame = CFrame.new(Land.X, Root.Position.Y, Land.Z) * (Land - Land.Position) * Seat:Inverse()
-							Root.AssemblyLinearVelocity = Vector3.zero
-						end
-						-- (final fix round) only at real black; if a newer lift won, the move waits for a fresh short dip of its own
-						pcall(CineUI.Dip, 0.3, function(Black: boolean?)
-							if Black == false then pcall(CineUI.Dip, 0.2, place) else place() end
-						end)
-					end)
+			local Started = false
+			-- (fix round 1, I1) FenceOver1 is the game's crouch walk baked into the chain. It enters at the LIVE crouch walk's own phase (so its
+			-- fade-in is in step) and plays at the root's speed over the clip's stride (CineActor.Chain Pace, fix round 2): its legs go exactly as far as the root does
+			-- and stop when the root stops. Its loop is cued on the walk: if its exit phase comes round in the last SYNC_SHORT studs, FenceOver2
+			-- starts right there and the approach stops on it (StopWhen). Otherwise, once stopped, the stopped pose is held on a cover track
+			-- (the same clip, Action2) while FenceOver1 is put on its exit (FenceOver2 takes over at once, underneath), and the cover fades out
+			-- over HANDOFF: the planted stop pose blends into the climb. No walking on the spot either way
+			local Animator = (Char:FindFirstChildOfClass(`Humanoid`) :: Humanoid):FindFirstChildOfClass(`Animator`)
+			-- the game's cadence rule, if this build has one (Config.Locomotion / Functions.Locomotion: phase6-strafes)
+			local LocoCfgM = ReplicatedStorage.Config:FindFirstChild(`Locomotion`)
+			local LocoFnM = ReplicatedStorage:FindFirstChild(`Functions`) and ReplicatedStorage.Functions:FindFirstChild(`Locomotion`)
+			local LocoCfg = if LocoCfgM and LocoCfgM:IsA(`ModuleScript`) then require(LocoCfgM) :: any else nil
+			local LocoFn = if LocoFnM and LocoFnM:IsA(`ModuleScript`) then require(LocoFnM) :: any else nil
+			local Exit = TA.Chains.FenceOver[1].Exit
+			local Over2, Stopped, LeftNow = false, false, math.huge
+			local Cover: AnimationTrack? = nil
+			local function liveWalk(): AnimationTrack?
+				if not Animator then return nil end
+				for _, T in Animator:GetPlayingAnimationTracks() do
+					if T.Animation and T.Animation.Name == `CrouchWalk` and T.Animation.Parent ~= nil then return T end
 				end
-			end)
-			if Ctx.Alive() then Actor.Reseat(`FenceOver2`, Offset, Ctx.Clip) end
+				return nil
+			end
+			local function piece1(): AnimationTrack?
+				local Id = Ctx.Clip(`FenceOver1_GameCrouchWalk`)
+				if not (Animator and Id) then return nil end
+				for _, T in Animator:GetPlayingAnimationTracks() do
+					if T.Animation and T.Animation.AnimationId == Id and T.Priority == Enum.AnimationPriority.Action then return T end
+				end
+				return nil
+			end
+			local function handoff()
+				if Over2 or Cover or not Ctx.Alive() or not Animator then return end
+				local T = piece1()
+				if not T then return end
+				-- a chain that only started after the stop (a fallback, a late OnNear) is still fading in: let it (frozen, Pace 0) reach full weight first
+				local W0 = os.clock()
+				while T.IsPlaying and T.WeightCurrent < 0.95 and os.clock() - W0 < FADE_IN + 0.15 and Ctx.Alive() do RunService.Heartbeat:Wait() end
+				if Over2 or Cover or not Ctx.Alive() or not T.IsPlaying then return end
+				local A = Instance.new(`Animation`)
+				A.AnimationId = T.Animation.AnimationId
+				local C = Animator:LoadAnimation(A)
+				C.Priority = Enum.AnimationPriority.Action2
+				C.Looped = true
+				C:Play(0, 1, 0)
+				C.TimePosition = T.TimePosition
+				Cover = C
+				task.delay(HANDOFF + 3, function() pcall(function() C:Stop(0) C:Destroy() A:Destroy() end) end)
+				Ctx.OnEnd(function() if C.IsPlaying then pcall(function() C:Stop(0.25) end) end end) -- (a Skip during the hand-off)
+				T.TimePosition = Exit                                   -- TutorialAnim.Play leaves the loop on its next step
+			end
+			local function climb()
+				if Started or not Ctx.Alive() then return end
+				Started = true
+				Climbing = true
+				task.spawn(function()
+					Actor.Chain(`FenceOver`, Ctx.Clip, { [1] = function()
+						while Ctx.Alive() and not Stopped and LeftNow > SYNC_SHORT do RunService.Heartbeat:Wait() end
+						if Stopped then handoff() end
+					end }, function(Piece: string)
+						if Piece ~= `FenceOver2` then return end
+						Over2 = true
+						if Cover then Cover:Stop(HANDOFF) end
+						-- the climb starts: the game's crouch ends under the chain's own pose
+						if Remote then Remote:FireServer({ Kind = `BeatCrouch`; On = false }) end
+						-- and at the top of it (about 0.9 s in) the root moves to the far side under a 0.3 s dip to black
+						if LandMark then
+							task.delay(DIP_AT, function()
+								if not Ctx.Alive() then return end
+								local CineUI = require(Player.PlayerScripts.Controllers.Gui.CineUI)
+								local function place()
+									if not Ctx.Alive() or not Root.Parent then return end
+									local Land = LandMark.CFrame
+									Root.CFrame = CFrame.new(Land.X, Root.Position.Y, Land.Z) * (Land - Land.Position) * Seat:Inverse()
+									Root.AssemblyLinearVelocity = Vector3.zero
+								end
+								-- (final fix round) only at real black; if a newer lift won, the move waits for a fresh short dip of its own
+								pcall(CineUI.Dip, 0.3, function(Black: boolean?)
+									if not Ctx.Alive() then return end
+									if Black == false then pcall(CineUI.Dip, 0.2, place) else place() end
+								end)
+							end)
+						end
+					end, { FadeIn = FADE_IN;
+						Entry = function(): number?
+							local L = liveWalk()
+							return if L and L.IsPlaying then L.TimePosition else nil
+						end;
+						-- (fix round 2, I-2) from the root's own speed. FenceOver1 is the game's CrouchWalk clip baked into the chain, so it plays at
+						-- whatever cadence the game's CrouchWalk does: where Config.Locomotion exists (the strafes build: the owner's stride fix) its
+						-- stride-matched rule (Functions.Locomotion.Rate, Stride.CrouchWalk over the leg length, clamped), else the old scale (7
+						-- studs/s at speed 1). One clip, one cadence: the fade-in from the live crouch walk stays in step and the feet don't skate
+						Pace = function(): number
+							if Stopped or not Root.Parent then return 0 end
+							local V = Root.AssemblyLinearVelocity
+							local Flat = Vector3.new(V.X, 0, V.Z).Magnitude
+							if Flat < 0.05 then return 0 end
+							if LocoCfg and LocoFn then
+								local Leg = Char:FindFirstChild(`Left Leg`)
+								return LocoFn.Rate(Flat, LocoCfg.Stride.CrouchWalk, if Leg and Leg:IsA(`BasePart`) then Leg.Size.Y else 2, LocoCfg)
+							end
+							return math.clamp(Flat / 7, 0, 1.2)
+						end })
+					if Ctx.Alive() then Actor.Reseat(`FenceOver2`, Offset, Ctx.Clip) end
+					Climbing = false
+				end)
+			end
+			-- OnNear starts the chain BlendLead before the stop, so FenceOver1 fades in from the live crouch walk
+			local Ok, Why = Actor.Approach(Vault, { Gait = `Sneak`; LeadIn = LEAD_IN; Arrive = ARRIVE; OnNear = climb;
+				OnLeft = function(L: number) LeftNow = L end; StopWhen = function() return Over2 end })
+			Stopped = true
+			if not Ctx.Alive() then Climbing = false return end
+			if not Ok then
+				-- a dip and a placement, with a warning: only when the walk is blocked, times out or falls; a death or a release ends it here
+				if not Actor.Fallback(Vault, Why, Ctx.Alive) then Climbing = false return end
+			end
+			climb()
+			handoff()                                                     -- (the chain's cue does it too, whichever comes first)
 		end } } };
 	}
 	return Built

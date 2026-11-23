@@ -1,0 +1,94 @@
+{
+ "ok": true,
+ "name": "GripHumanVictim",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action4",
+ "authoredDuration": 2.6,
+ "bakedDuration": 2.6,
+ "passes": {
+  "spline": false,
+  "overlapFrames30": {},
+  "settle": "off",
+  "life": 0.35,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 76,
+ "poseKeys": 325,
+ "markers": 0,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: RightShoulder at 1778°/s around 1.62 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 0 studs of the HumanoidRootPart and returns within 0"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "skipped",
+   "detail": "only for locomotion or grounded"
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "symmetricEasing",
+   "message": "Moves peak in speed at 50% of their duration: every move eases in and out the same amount. Measured gestures reach peak speed at 38% (they leave fast and arrive slowly); tired/old characters at ~25%; only snappy, energetic ones near 50%. Put a breakdown key early in the move or favour the arrival."
+  },
+  {
+   "consider": "evenKeys",
+   "message": "Keys are evenly spaced (every 0.03 s). Action has rhythm: a quick strike between slower anticipation and recovery, holds of different lengths. Re-time the keys so the beats differ."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.4619698638262426,
+  "peakAt": 0.5,
+  "action": {
+   "effector": "Right Arm",
+   "peakSpeed": 40.87574179047584,
+   "onset": 1.5666666666666667,
+   "peak": 1.6333333333333333,
+   "stop": 1.7,
+   "strike_s": 0.13333333333333333,
+   "followThrough_s": 0,
+   "hold_s": 0,
+   "recovery_s": 0.5,
+   "windupBack": 1.9177565876607414,
+   "rootDrop": 0.06110379241516983,
+   "rootShift": 0,
+   "torsoPeak_ms": 133.33333333333334
+  }
+ },
+ "sheet": "out\\GripHumanVictim_sheet.png",
+ "graph": "out\\GripHumanVictim_graph.png",
+ "trails": "out\\GripHumanVictim_trails.png",
+ "luau": "out\\GripHumanVictim.lua",
+ "luauBytes": 15118
+}

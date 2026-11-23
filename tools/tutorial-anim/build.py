@@ -564,7 +564,9 @@ PLAYER = '''
 -- returns once that hold is in place. A chain that ends on a loop returns with the loop still cycling.
 -- isCancelled (optional) is checked in every wait; once it returns true, Play stops all its tracks (Stop(0)) and returns
 -- (CineActor.Release: the Skip path).
-function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) -> string?, cues: { [number]: () -> () }?, onSwitch: ((string) -> ())?, isCancelled: (() -> boolean)?)
+-- entry (optional, task 14): the phase the FIRST piece enters at when it is a loop (seconds into it), in place of its authored Entry: a cut that has to
+-- leave a loop on a particular beat picks the entry so the exit phase lands there (the first piece fades in from the live pose, so any phase blends)
+function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) -> string?, cues: { [number]: () -> () }?, onSwitch: ((string) -> ())?, isCancelled: (() -> boolean)?, entry: number?)
 	local RunService = game:GetService("RunService")
 	local function cancelled(): boolean
 		return isCancelled ~= nil and isCancelled()
@@ -614,6 +616,7 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 	end
 	local prev: AnimationTrack? = nil
 	local over = 0
+	local firstEntry = entry
 	for k, st in steps do
 		if cancelled() then return stopAll() end
 		local t = loaded[st.Piece]
@@ -621,7 +624,8 @@ function TutorialAnim.Play(animator: Animator, chain: string, resolve: (string) 
 		t.Looped = st.Loop == true
 		t:Play(0)
 		if onSwitch then onSwitch(st.Piece) end
-		t.TimePosition = if st.Loop then ((st.Entry or 0) + over) % st.Length else math.max(0, over)
+		t.TimePosition = if st.Loop then ((firstEntry or st.Entry or 0) + over) % st.Length else math.max(0, over)
+		firstEntry = nil
 		if prev then prev:Stop(0) end
 		prev = t
 		over = 0

@@ -1,0 +1,1 @@
+ClanSpins1 ClanSpins5 ClanSpins15 HeightSpins3 HeightSpins10 RaceSpins3 RaceSpins10 VariantSpins3

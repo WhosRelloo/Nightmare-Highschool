@@ -23,3 +23,21 @@ tools/phase2-2250/harness/_*
 tools/phase3-2260/harness/_*
 tools/phase3-2260/anim/_*
 tools/phase3-2260/anim/review/*.err
+
+# local-only folders and junk (housekeeping 2026-11-22)
+/Studio/
+/Clothing/
+*.rar
+/graphify-out/
+/.animation-mcp/
+# stale vault copy
+/Changelog/
+# stray files created by tooling
+/Torso.Position.Y
+/Tray.IdleAfter
+art/Textures for Jr/nh_download_test.txt
+# underscore temp files in tool harnesses
+tools/*/harness/_*.lua
+tools/*/harness/_*.json
+poses/R15/
+backups/*.rbxm

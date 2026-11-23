@@ -24,7 +24,7 @@ local CANVAS_SETS = {
 	PosterBand = set(73093154751740, 79632058701398, 117419975024305, 104271770143494),
 	ThePlan = set(102309737570223, 123906876914059, 74424215072451, 104132500629485),
 	Biscuit = set(121465001224548), -- the kennel sign has a colour map only
-	Timetable = nil, -- MISSING: WF_Timetable_canvas* not uploaded
+	Timetable = set(97779368060155, 108125980375033, nil, 123170301420529), -- WF_Timetable_canvas (2026-11-22; no metalness map)
 }
 local CANVAS = {
 	WFBlackBus_Blind = "BusBlind", WFBlackBus_SideL = "BusSide", WFBlackBus_SideR = "BusSide",

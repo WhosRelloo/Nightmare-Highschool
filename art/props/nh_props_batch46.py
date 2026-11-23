@@ -37,16 +37,6 @@ import nh_props_batch43 as B43
 DEG = math.pi / 180
 PI = math.pi
 RX, RY, RZ, T = B30.RX, B30.RY, B30.RZ, B30.T
-_tube = P.tube
-
-
-def tube(name, points, radius, mat, closed=False, res=4, square=False, poly=False):
-    """nh_props.tube, but a square bar's faces are turned outward (as built its normals point in: the bake's AO darkens it
-    and Roblox would cull its outside). The same fix as batch 45's."""
-    ob = _tube(name, points, radius, mat, closed=closed, res=res, square=square, poly=poly)
-    if square:
-        ob.data.flip_normals()
-    return ob
 
 FONT = B43.FONT
 FONT_I = B43.FONT_I

@@ -1,0 +1,106 @@
+{
+ "ok": true,
+ "name": "GripHuman",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action4",
+ "authoredDuration": 2.6,
+ "bakedDuration": 2.6,
+ "passes": {
+  "spline": false,
+  "overlapFrames30": {},
+  "settle": "off",
+  "life": 0.35,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 78,
+ "poseKeys": 317,
+ "markers": 5,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: RightShoulder at 1249°/s around 2.02 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "fail",
+   "detail": "the body ends 1.31 studs from where it started, so it snaps back when the animation stops; limit 0.5",
+   "measured": {
+    "excursion": 1.37,
+    "returnGap": 1.31
+   }
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "fail",
+   "detail": "Right Leg sinks 1.22 studs into the ground at 2.07 s; limit 0.1",
+   "measured": {
+    "penetration": 1.22,
+    "groundedShare": 1
+   }
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "symmetricEasing",
+   "message": "Moves peak in speed at 50% of their duration: every move eases in and out the same amount. Measured gestures reach peak speed at 38% (they leave fast and arrive slowly); tired/old characters at ~25%; only snappy, energetic ones near 50%. Put a breakdown key early in the move or favour the arrival."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Head moves in a straight line from 0.17 to 0.33 s (bows 4% of its 2.3-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "evenKeys",
+   "message": "Keys are evenly spaced (every 0.03 s). Action has rhythm: a quick strike between slower anticipation and recovery, holds of different lengths. Re-time the keys so the beats differ."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.6503615526062234,
+  "peakAt": 0.5,
+  "action": {
+   "effector": "Right Arm",
+   "peakSpeed": 34.23533843456151,
+   "onset": 1.9,
+   "peak": 2.033333333333333,
+   "stop": 2.066666666666667,
+   "strike_s": 0.16666666666666666,
+   "followThrough_s": 0,
+   "hold_s": 0.03333333333333333,
+   "recovery_s": 0.5,
+   "windupBack": 1.7768796420987392,
+   "rootDrop": 0.23627844311377266,
+   "rootShift": 0.08016628273785947,
+   "torsoPeak_ms": -33.333333333333336
+  }
+ },
+ "sheet": "out\\GripHuman_sheet.png",
+ "graph": "out\\GripHuman_graph.png",
+ "trails": "out\\GripHuman_trails.png",
+ "luau": "out\\GripHuman.lua",
+ "luauBytes": 15620
+}

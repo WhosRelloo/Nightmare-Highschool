@@ -488,7 +488,7 @@ def sleeve_grid_z(zs, d=0.020):
         c, s_ = math.cos(math.radians(a)), math.sin(math.radians(a))
         rowsP.append([Vector((1.5 + e[0] + (f[0] - e[0]) * c, e[1] + (f[1] - e[1]) * c, 1.0 + d * s_)) for e, f in zip(E0, Ed)])
     n = len(E0)
-    T = [(SLV_XIN + 0.01, lerp(-0.40, 0.40, k / (n - 1))) for k in range(n)]
+    T = [(SLV_XIN + C1.SLV_CAP, lerp(-0.40, 0.40, k / (n - 1))) for k in range(n)]
     for f in (0.0, 0.3, 0.6, 1.0):
         rowsP.append([Vector((1.5 + lerp(E0[k][0], T[k][0], f), lerp(E0[k][1], T[k][1], f), 1.0 + d)) for k in range(n)])
     return [[rowsP[j][k] for j in range(len(rowsP))] for k in range(n)]

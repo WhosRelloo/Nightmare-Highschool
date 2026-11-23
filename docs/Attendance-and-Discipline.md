@@ -206,7 +206,7 @@ Verified with real presses:
 - E next to trash picked it up (1/5) and equip stayed false.
 - E away from any prompt toggled equip from false to true.
 
-**HUD:** the clock panel has a fifth line: "Record: Warning (3 pts)", "Detention owed: Room 106 (outside class)" (plus a door marker outside class time), or "Detention: trash 2/5".
+**HUD (2.36):** the conduct row under the clock: a wax seal tinted by level with "Warning · 3 pts", and a detention slip ("Detention owed · Room 106, outside class", or "Trash 2/5" during a session). The Room 106 marker still shows outside class time. The seal and slip are Bell Tower art (`Config.BellTowerArt`), with kit fallbacks; see [UI Kit](UI-Kit.md#the-bell-tower-cluster-236).
 
 ## Verified (Studio, single player)
 
@@ -283,3 +283,125 @@ Probation and Suspension now change how school treats you. Tuning is in `Config.
   - **Day Off:** prank the Ordinary's Commons. That's on campus, so doing it in class time risks Trespassing.
   - Each pays ¥25 and +8 Delinquents.
 - **Owed detentions** stop growing at 3 (`MaxDetentionsOwed`). An admin can still add more.
+
+## Notoriety: the Bells (2.37)
+
+
+Being noticed. Misdeeds that staff witness build **Heat** (0 to 100), and Heat rings up to five **Bells**. It is a live layer over the record: Notoriety never edits the Discipline ladder or its numbers, and it books only through `Discipline.ReportIncident` / `AddViolation`. Spec: `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-design.md` §3. Plan: `docs/superpowers/plans/2026-11-21-belltower-r2-bells.md`. Mirror: `tools/belltower-r2/`.
+
+- **Service:** `ServerScriptService.Services.School.Notoriety` (per-player Heat, tier, state, search and summons; ticks every 0.25 s).
+- **Maths:** `ReplicatedStorage.Functions.Notoriety` (pure; tested by `tools/belltower-r2/checks/nt_pure.lua` in the Edit VM).
+- **Tuning:** `ReplicatedStorage.Config.Notoriety` (every number below).
+
+### The five Bells
+
+| Bell | Heat | Name | What the school does in R2 |
+|---|---|---|---|
+| 1 | 10+ | **Murmur** | the Bell Rail shows; no staff action yet |
+| 2 | 25+ | **Noticed** | the Bell Rail shows; no staff action yet |
+| 3 | 45+ | **Named** | one hall monitor responds to the last-seen point (`HallMonitor.Respond`). Any monitor on duty who sees you chases you on sight (the **Wanted** chase, in any duty segment) |
+| 4 | 70+ | **Hunted** | every patrolling monitor on duty within 400 studs converges on the spot (`HallMonitor.Converge`), and the PA calls "A disturbance in {Where}. Staff, please attend." (no emergency flag, so at most once per segment) |
+| 5 | 90+ | **The Tolling** | an emergency PA: "All staff: a student is loose in {Where}. Find them." The Headmaster has no body yet |
+
+Each step runs once per rise (`Responded`, `Converged`, `Tolled`), and resets when the Heat clears.
+
+### The four states
+
+| State | Means |
+|---|---|
+| **Lit** | a hall monitor can see you right now (`HallMonitor.SeenBy`: on duty, line of sight with field of view, or chasing you and saw you in the last 0.5 s) |
+| **Search** | they lost sight of you less than 30 s ago and are working from the last-seen point |
+| **Tarnished** | the search is over, and they know who you are |
+| **Hollow** | the search is over, and nobody knows it was you |
+
+### Heat per witnessed misdeed
+
+| Misdeed | Heat | Booked as |
+|---|---|---|
+| Truancy | 12 | Truancy |
+| Trespassing, Curfew | 20 | Trespassing |
+| Vandalism (pranks, paint) | 15 | Vandalism |
+| Fighting | 25 | Fighting |
+| Contraband | 10 | Contraband |
+| Exposure (seen transformed by a monitor) | 30 | Exposure |
+| AssaultStaff (a hit on a hall monitor) | 45 | Fighting |
+
+- **Night** (22:00 to 06:00): ×1.5. **Probation or Suspension:** ×1.25. Both stack (Truancy at night on probation is 22.5).
+- A misdeed with no row adds no Heat.
+- **Where it comes from:**
+  - every staff report through `Discipline.ReportIncident`, which calls `Notoriety.OnReport`
+  - a hall monitor starting a chase (not a Wanted chase, which is the hunt itself)
+  - a hit on a hall monitor
+  - a character whose `Transformation` attribute turns on while a hall monitor sees them
+
+### Cooling
+
+- **None while Lit.** In Search (under 30 s unseen) Heat falls 1.5 a second, then 3 a second.
+- **×2** in a locker (`Hidden` on the character), in the Dorms, or off campus.
+- **×3 with an alibi:** in your timetable's room during a class (`ClassInRoom`), or serving detention (`DetentionActive`). The alibi wins over the ×2.
+- **The search radius** grows from 30 to 120 studs over the 30 s (`Functions.Notoriety.SearchRadius`). It's built for R4's map candles; in R2 monitors go to the last-seen point.
+- At Heat 0 the Bells clear.
+
+### Identified (the face)
+
+- You're identified when a monitor sees you within 25 studs, sees you for 2 s (Lit), or a staff report recognises you.
+- Staff then know your face until the end of the next in-game day (`Discipline.FaceKnownUntilDay`, saved). A new misdeed in that time starts identified.
+
+### Caught, escaped, summoned
+
+- **Caught:** a hall monitor's catch reports with `Caught = true`. `OnReport` returns the tier bonus (Bell 3 +1, Bell 4 +2, Bell 5 +3) and clears the Heat. `AddViolation(P, Type, { Bonus })` adds it, and the toast ends "· +N for running". The Contraband catch also carries `Caught = true`.
+- **A Wanted catch** books what started the hunt (`Notoriety.BookType`). A Wanted escape files no new report.
+- **Escaped and identified:** when the Heat reaches 0, a misdeed that wasn't booked becomes a **summons**. The toast reads "They know it was you. Report to Room 106 outside class by tomorrow."
+  - At most 3 are kept, in `Discipline.Summons` (`{ Type, Day, Witness }`, saved).
+  - **Serve:** walk into Room 106 (`workspace.School.R106.Zone`) outside class. Every summons is booked at once, **without** the tier bonus.
+  - **Ignore:** a summons more than 1 in-game day old is dropped and books **Skipped Detention** (+4).
+- **Escaped and unidentified:** nothing is booked (as before).
+
+### The `Exposure` violation
+
+`Config.Discipline.Violations.Exposure`: 3 points, "Seen transformed by staff". It exists so that being seen transformed has something to book.
+
+### Player attributes (the client reads only these)
+
+| Attribute | Values |
+|---|---|
+| `NHBells` | 1 to 5, or nil at 0 |
+| `NHBellState` | `Lit`, `Search`, `Tarnished`, `Hollow`, or nil |
+| `NHSearchWhere` | the region title at the last-seen point while in Search, or nil |
+| `NHSummons` | the number of summons owed, or nil |
+
+Server signal: `Notoriety.Changed(Player, Bells, State)`. Server API: `Witnessed(P, Misdeed, Pos?, Witness?)`, `OnReport(Incident) -> bonus`, `IsHunted(P)`, `BookType(P)` and `Get(P)`.
+
+### The test probe (Studio only)
+
+`ServerStorage.NHNotorietyProbe` is a BindableFunction made by the service when `RunService:IsStudio()`. It's driven by `tools/belltower-r2/harness/probe.py` and `checks/nt_server.lua`. Call it as `Invoke(Cmd, PlayerName, ...)`:
+
+| Command | Does |
+|---|---|
+| `Manual(Seen?, Mods?)` | stops the live tick for that player; `Seen` true or false fixes sight, nil asks `HallMonitor.SeenBy` |
+| `Live` | resumes the live tick |
+| `Reset` | clears Heat, identification, summons and the face |
+| `Witness(Misdeed)`, `Report(Type, Recognized, Caught)` | feed the service |
+| `Advance(Seconds)` | steps it in 0.25 s ticks |
+| `Serve`, `AgeSummons(Days)` | the summons paths |
+| `Get`, `Monitors` | read the state |
+
+### Rulings and spec deltas (R2)
+
+1. **Witnesses:** live sight (Lit and Search) comes from the hall monitors (the day monitor and night duty). Every staff report (teachers, monitors, custodian) adds Heat through `ReportIncident`. Student witnesses, snitches and heading them off are R3.
+2. **Identification:** only the face is tracked (25 studs, Lit 2 s, or a recognised report). Witness-note tokens are R3, so until then Hollow means not identified and Tarnished means identified.
+3. **Summons:** served in Room 106 outside class (NH Combat Test has no Headmaster's office; spec §3.8 says the office). Issued when the search ends (Heat 0), not at the next period change.
+4. **`Exposure`** (3 points) is new. Hitting staff books `Fighting`.
+5. **Scope:** watched wings and the map layer are R4; the notes row is R3. The Lead Card folding is in R2. `SearchRadius` is built and tested now; in R2 monitors respond to the last-seen point.
+6. **The Tolling:** an emergency PA plus every monitor converging. The Headmaster has no body.
+7. **Bell 4's PA** goes through `Broadcast.PA` without the emergency flag, so its once-per-segment limit applies.
+8. **Test seam:** the Studio-only `ServerStorage.NHNotorietyProbe`.
+9. **Version:** 2.37.0.
+10. **Contraband Heat 10:** in `Config.Notoriety` but not in spec §3.2, which has no contraband row.
+11. **The probation multiplier** also applies on Suspension (the spec says Probation).
+12. **Bells 1 and 2** draw no staff response in R2. The spec's "nearest staff walks to look" (Bell 1) and "recognise on sight" (Bell 2) wait for R3's notes. **Bell 5** cools like any other Bell; the spec's "ends only when caught, in the Dorms or off campus" and the campus-wide search are not built.
+13. **Quest witness reasons:** `HallMonitor.CheckWitness` is also called by Quests with the objective's `Witness` value. A reason with no row in `Config.Notoriety.Heat` adds no Heat, but it still becomes the stored misdeed, which a later Wanted catch books (`BookType` passes unknown names through). Not checked in Studio: check the quest `Witness` values against `Config.Heat` and against `Config.Discipline.Violations`.
+
+### Verified
+
+**Checked (2026-11-23, NH Combat Test, slot 2):** `nt_pure` PASS (Edit VM); `nt_server` PASS and `nt_monitor` PASS (responding 1) in Play. The live hunt was driven the same day: the monitor confronted (`Wanted`) and booked Fighting with `Bonus 1`; the summons toast and slip were photographed ([img](img/belltower-r2-summons.jpg)). Not checked: quest witness reasons, two players. Backup: `ServerStorage.NH_Backup.BellTower_R2_pre_20261121`.

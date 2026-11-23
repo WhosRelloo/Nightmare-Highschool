@@ -90,7 +90,9 @@ local function trigger(On: string?, Ctx, Clock: number, Root: BasePart, Idle: nu
 	if Kind == `idle` then return Idle >= (tonumber(A) or math.huge) end
 	if Kind == `enter` then
 		local M = Ctx.Mark(A)
-		return M ~= nil and ((M.Position - Root.Position) * Vector3.new(1, 0, 1)).Magnitude <= math.max(M.Size.X, M.Size.Z, 4) / 2
+		-- (task 14) `enter:<Mark>:<radius>`: an explicit radius in studs (the mark's own size, at least 4, is the default), so a beat can end
+		-- earlier and leave the last few studs to an on-foot approach
+		return M ~= nil and ((M.Position - Root.Position) * Vector3.new(1, 0, 1)).Magnitude <= (tonumber(B) or math.max(M.Size.X, M.Size.Z, 4) / 2)
 	end
 	if Kind == `near` then
 		local Pos = posOf(Ctx.Actor(A) or Ctx.Mark(A))

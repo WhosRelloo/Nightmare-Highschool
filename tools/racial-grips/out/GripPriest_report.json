@@ -1,0 +1,114 @@
+{
+ "ok": true,
+ "name": "GripPriest",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action4",
+ "authoredDuration": 3.2,
+ "bakedDuration": 3.2,
+ "passes": {
+  "spline": false,
+  "overlapFrames30": {},
+  "settle": "off",
+  "life": 0.35,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 95,
+ "poseKeys": 422,
+ "markers": 7,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: RightShoulder at 1429°/s around 2.45 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "fail",
+   "detail": "the body ends 1.03 studs from where it started, so it snaps back when the animation stops; limit 0.5",
+   "measured": {
+    "excursion": 1.14,
+    "returnGap": 1.03
+   }
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "fail",
+   "detail": "Left Leg sinks 1.25 studs into the ground at 2.5 s; limit 0.1",
+   "measured": {
+    "penetration": 1.25,
+    "groundedShare": 1
+   }
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "straightPath",
+   "message": "Head moves in a straight line from 1.30 to 1.40 s (bows 2% of its 0.6-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Head moves in a straight line from 2.03 to 2.17 s (bows 4% of its 0.6-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Head moves in a straight line from 2.37 to 2.50 s (bows 4% of its 1.3-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Head moves in a straight line from 2.70 to 2.87 s (bows 2% of its 0.6-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "evenKeys",
+   "message": "Keys are evenly spaced (every 0.03 s). Action has rhythm: a quick strike between slower anticipation and recovery, holds of different lengths. Re-time the keys so the beats differ."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.4253490961205244,
+  "peakAt": 0.5714285714285714,
+  "action": {
+   "effector": "Right Arm",
+   "peakSpeed": 38.64509263674609,
+   "onset": 2.3,
+   "peak": 2.433333333333333,
+   "stop": 2.566666666666667,
+   "strike_s": 0.26666666666666666,
+   "followThrough_s": 0,
+   "hold_s": 0.06666666666666667,
+   "recovery_s": 0.3333333333333333,
+   "windupBack": 0.4003462178356194,
+   "rootDrop": 0.4967973053892215,
+   "rootShift": 0.3349170544770128,
+   "torsoPeak_ms": 0
+  }
+ },
+ "sheet": "out\\GripPriest_sheet.png",
+ "graph": "out\\GripPriest_graph.png",
+ "trails": "out\\GripPriest_trails.png",
+ "luau": "out\\GripPriest.lua",
+ "luauBytes": 20246
+}

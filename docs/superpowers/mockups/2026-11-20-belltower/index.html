@@ -1,0 +1,504 @@
+<meta charset="utf-8">
+<title>The Bell Tower HUD</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Sorts+Mill+Goudy:ital@0;1&display=swap">
+<style>
+/* Layout: a dark gallery of game frames. Each frame is drawn at the game's 1920x1080 design pixels and scaled to fit;
+   "1:1" shows true size. Single dark look on purpose (it is a night-time game HUD). */
+:root {
+  --ink: #0d0b11;
+  --slate: #17141d;
+  --plate: #211d28;
+  --bone: #e4decf;
+  --dim: #a49b94;
+  --gold: #ebcd78;
+  --brass: #c99a4b;
+  --crimson: #c8283c;
+  --verd: #79a893;
+  --amber: #f0a948;
+  --display: "Sorts Mill Goudy", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --body: "EB Garamond", Garamond, "Times New Roman", serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--ink); color: var(--bone); font-family: var(--body); font-size: 18px; line-height: 1.5; margin: 0; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 40px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(38px, 6vw, 64px); color: var(--gold); letter-spacing: .01em; line-height: 1.05; }
+h2 { font-size: clamp(26px, 3.4vw, 36px); color: var(--bone); margin-bottom: 8px; }
+h3 { font-size: 22px; color: var(--gold); }
+p { margin: 0; max-width: 68ch; color: var(--dim); }
+.lede { font-size: 21px; color: var(--bone); margin-top: 14px; }
+.eyebrow { font-family: var(--body); font-size: 14px; letter-spacing: .22em; text-transform: uppercase; color: var(--brass); }
+section { margin-top: 64px; display: grid; gap: 18px; }
+.rule { height: 1px; background: linear-gradient(90deg, transparent, #6b5432 20%, #6b5432 80%, transparent); margin-top: 56px; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+button.tab { font-family: var(--body); font-size: 17px; color: var(--dim); background: var(--slate); border: 1px solid #3a3242; padding: 8px 16px; border-radius: 2px; cursor: pointer; }
+button.tab[aria-pressed="true"] { color: var(--ink); background: var(--gold); border-color: var(--gold); }
+button.tab:focus-visible, button.ghost:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+button.ghost { font-family: var(--body); font-size: 15px; color: var(--brass); background: none; border: 1px solid #4a3c2a; padding: 4px 12px; cursor: pointer; }
+.note { font-size: 16px; color: var(--dim); }
+.note b { color: var(--bone); font-weight: 500; }
+
+/* a scaled game frame */
+.frame { position: relative; width: 100%; overflow: hidden; border: 1px solid #2c2633; background: #000; }
+.frame.native { overflow-x: auto; }
+.stage { position: absolute; left: 0; top: 0; transform-origin: 0 0; overflow: hidden; }
+.frame.native .stage { position: relative; }
+
+/* the world behind the HUD: a night corridor in candlelight (CSS only, stands in for the game view) */
+.world { position: absolute; inset: 0; background:
+  radial-gradient(60% 70% at 22% 62%, rgba(230,150,70,.20), transparent 60%),
+  radial-gradient(30% 40% at 70% 30%, rgba(110,130,190,.16), transparent 70%),
+  repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 2px, transparent 2px 180px),
+  linear-gradient(180deg, #1b1622 0%, #120f17 55%, #0a080c 100%); }
+.world::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgba(0,0,0,.7)); }
+.world.night { background:
+  radial-gradient(28% 34% at 74% 22%, rgba(140,160,230,.22), transparent 70%),
+  radial-gradient(50% 60% at 20% 70%, rgba(200,110,60,.10), transparent 60%),
+  repeating-linear-gradient(90deg, rgba(255,255,255,.012) 0 2px, transparent 2px 180px),
+  linear-gradient(180deg, #0e0f19 0%, #0a0a11 60%, #050507 100%); }
+
+/* ---------------------------------------------------------------- HUD cluster (design px) */
+.hud { position: absolute; right: 28px; top: 24px; width: 470px; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; font-family: var(--body); }
+.plate { border: 30px solid transparent; border-image: url(art/TowerPlate.png) 60 fill / 30px stretch; }
+.clock { position: relative; display: flex; align-items: center; justify-content: flex-end; width: 100%; height: 176px; }
+.clock .plate { position: absolute; right: 120px; top: 34px; padding: 0 70px 0 0; min-width: 330px; }
+.clock .txt { display: grid; justify-items: end; margin: -16px -8px; gap: 0; text-align: right; }
+.t-day { font-family: var(--display); font-size: 28px; color: var(--bone); line-height: 1.15; white-space: nowrap; }
+.t-day b { font-weight: 400; color: var(--gold); }
+.t-seg { font-size: 20px; color: var(--dim); line-height: 1.25; white-space: nowrap; }
+.t-now { font-size: 20px; color: var(--gold); line-height: 1.3; white-space: nowrap; }
+.t-now.warn { color: var(--amber); }
+.dial { position: relative; width: 176px; height: 176px; flex: none; filter: drop-shadow(0 6px 10px rgba(0,0,0,.65)); }
+.dial img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.dial .moon { inset: 32.5%; width: 35%; height: 35%; }
+.dial .hand { transition: transform .6s cubic-bezier(.3,1.3,.5,1); }
+
+.bells { position: relative; width: 450px; height: 150px; }
+.bells .rail { position: absolute; right: -6px; top: 0; width: 450px; }
+.bell { position: absolute; top: 20px; width: 62px; height: 62px; transform-origin: 50% 6%; }
+.bell img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.bell .glow { position: absolute; inset: -45%; background: radial-gradient(closest-side at 50% 58%, rgba(235,205,120,.75), rgba(240,169,72,.25) 55%, transparent); mix-blend-mode: screen; }
+.bell.swing { animation: swing 1.2s ease-in-out infinite; }
+.bell.swing.dim img { animation: dim 1.2s ease-in-out infinite; }
+.bell.toll { animation: toll 2.4s ease-in-out infinite; }
+@keyframes swing { 0%,100% { transform: rotate(9deg); } 50% { transform: rotate(-9deg); } }
+@keyframes toll { 0%,100% { transform: rotate(0); } 8% { transform: rotate(7deg); } 20% { transform: rotate(-5deg); } 32% { transform: rotate(2deg); } 44% { transform: rotate(0); } }
+@keyframes dim { 0%,100% { filter: brightness(1); } 50% { filter: brightness(.55); } }
+.notes { position: absolute; right: 0; top: 96px; display: flex; gap: 6px; }
+.notes img { width: 44px; height: 44px; filter: drop-shadow(0 3px 4px rgba(0,0,0,.6)); }
+.status { width: 100%; text-align: right; font-size: 20px; color: var(--bone); margin-top: -4px; text-shadow: 0 2px 6px #000, 0 0 2px #000; white-space: nowrap; }
+.status .k { color: var(--crimson); font-family: var(--display); font-size: 22px; }
+.status .s { color: var(--dim); }
+
+.conduct { display: flex; align-items: center; gap: 10px; }
+.conduct .seal { width: 66px; height: 66px; filter: drop-shadow(0 4px 6px rgba(0,0,0,.6)); }
+.conduct .lvl { font-family: var(--display); font-size: 22px; color: var(--bone); text-shadow: 0 2px 6px #000; white-space: nowrap; }
+.conduct .lvl small { font-family: var(--body); font-size: 20px; color: var(--dim); }
+.slip { position: relative; width: 300px; height: 100px; background: url(art/Slip.png) center/100% 100% no-repeat; filter: drop-shadow(0 4px 6px rgba(0,0,0,.5)); transform: rotate(-1.5deg); }
+.slip span { position: absolute; left: 62px; top: 16px; right: 12px; font-size: 20px; line-height: 1.12; color: #3a1a14; }
+.slip span b { display: block; font-family: var(--display); font-weight: 400; color: #7a1018; font-size: 21px; }
+
+.lead { position: relative; width: 470px; height: 162px; background: url(art/LeadCard.png) center/100% 100% no-repeat; color: #2b1d12; }
+.lead .title { position: absolute; left: 15%; top: 16px; font-family: var(--display); font-size: 24px; color: #5a0f16; }
+.lead .obj { position: absolute; left: 15%; top: 52px; right: 52px; font-size: 20px; line-height: 1.2; }
+.lead .pips { position: absolute; left: 66px; bottom: 12px; display: flex; gap: 2px; align-items: center; }
+.lead .pips img { width: 34px; height: 34px; }
+.lead .pips span { font-size: 20px; margin-left: 6px; }
+.key { position: absolute; right: 52px; bottom: 16px; font-size: 20px; color: #3a2a1a; display: flex; align-items: center; gap: 6px; }
+.key kbd { font-family: var(--display); font-size: 20px; color: var(--gold); background: #1c1715; border: 2px solid #9a7438; border-radius: 4px; padding: 0 8px; line-height: 1.25; box-shadow: inset 0 -2px 0 #000; }
+.lead.folded { height: 64px; background-size: 100% auto; background-position: 0 0; }
+.lead.folded .title { top: 14px; font-size: 22px; }
+.lead.folded .obj, .lead.folded .pips { display: none; }
+.lead.folded .key { bottom: auto; top: 18px; }
+
+/* ---------------------------------------------------------------- legend cards */
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+.card { background: var(--slate); border: 1px solid #2c2633; padding: 18px; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.card img.big { width: 112px; height: 112px; justify-self: center; }
+.card h3 { font-size: 21px; }
+.card p { font-size: 16px; }
+.swatches { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; }
+.swatches figure { margin: 0; display: grid; justify-items: center; gap: 4px; font-size: 15px; color: var(--dim); }
+.swatches img { width: 74px; height: 74px; }
+
+/* ---------------------------------------------------------------- full-screen views (design px) */
+.dimmer { position: absolute; inset: 0; background: rgba(6,5,9,.78); }
+.panel { position: absolute; border: 60px solid transparent; border-image: url(art/TowerPlate.png) 60 fill / 60px stretch; filter: drop-shadow(0 20px 40px rgba(0,0,0,.8)); }
+.ptitle { position: absolute; left: 50%; transform: translateX(-50%); top: -104px; padding: 6px 48px; font-family: var(--display); font-size: 34px; color: var(--gold); white-space: nowrap; border: 24px solid transparent; border-image: url(art/TowerPlate.png) 60 fill / 24px stretch; }
+.big-dial { position: absolute; width: 600px; height: 600px; }
+.big-dial img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.big-dial .moon { inset: 32.5%; width: 35%; height: 35%; }
+.lbl { position: absolute; font-size: 20px; color: var(--bone); white-space: nowrap; text-shadow: 0 2px 4px #000; }
+.lbl i { font-style: normal; color: var(--dim); }
+.stamp { display: inline-block; font-family: var(--display); font-size: 20px; padding: 0 8px; border: 2px solid currentColor; transform: rotate(-4deg); line-height: 1.2; }
+.stamp.ok { color: #9fc48a; } .stamp.late { color: var(--amber); } .stamp.no { color: var(--crimson); }
+.col { position: absolute; display: grid; gap: 14px; align-content: start; }
+.kv { display: grid; grid-template-columns: 150px 1fr; gap: 6px 16px; font-size: 22px; }
+.kv dt { color: var(--dim); } .kv dd { margin: 0; color: var(--bone); }
+.kv dd.gold { color: var(--gold); } .kv dd.amber { color: var(--amber); }
+.sect { font-size: 20px; letter-spacing: .2em; text-transform: uppercase; color: var(--brass); border-bottom: 1px solid #4a3c2a; padding-bottom: 4px; }
+.moons { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+.moons figure { margin: 0; display: grid; justify-items: center; gap: 2px; font-size: 20px; color: var(--dim); text-align: center; line-height: 1.15; }
+.moons img { width: 64px; height: 64px; }
+.moons figure.hot { color: var(--gold); }
+.moons figure.cr { color: var(--crimson); }
+.paper { background: url(art/RecPage.png) center/cover; color: #2b1d12; padding: 28px 34px; box-shadow: 0 10px 24px rgba(0,0,0,.6); }
+.entry { display: grid; grid-template-columns: 1fr auto; gap: 2px 18px; padding: 10px 0; border-bottom: 1px solid rgba(90,40,20,.25); font-size: 22px; }
+.entry .w { grid-column: 1; font-size: 20px; color: #5b4632; font-style: italic; }
+.entry .pts { grid-row: 1 / span 2; grid-column: 2; align-self: center; font-family: var(--display); font-size: 26px; color: #7a1018; }
+.entry .pts.minus { color: #3d5e33; }
+.ladder { position: relative; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; }
+.ladder::before { content: ""; position: absolute; left: 40px; right: 40px; top: 50%; height: 6px; background: linear-gradient(90deg, #8a6a34, #e0b867 40%, #8a6a34); box-shadow: 0 2px 4px #000; }
+.ladder figure { position: relative; margin: 0; display: grid; justify-items: center; gap: 4px; font-size: 20px; color: var(--dim); }
+.ladder img { width: 78px; height: 78px; }
+.ladder figure.cur img { width: 120px; height: 120px; filter: drop-shadow(0 0 16px rgba(240,169,72,.55)); }
+.ladder figure.cur { color: var(--amber); }
+.gauge { height: 18px; background: #0b090d; border: 2px solid #6b5432; position: relative; }
+.gauge i { position: absolute; left: 0; top: 0; bottom: 0; background: linear-gradient(90deg, #b0681e, var(--amber)); }
+
+.map { position: absolute; inset: 70px 120px; background: url(art/MapSheet.png) center/cover; box-shadow: 0 20px 50px #000; }
+.hatch { position: absolute; background: repeating-linear-gradient(45deg, rgba(160,20,36,.55) 0 5px, transparent 5px 14px); outline: 3px solid rgba(160,20,36,.85); }
+.candle { position: absolute; width: 44px; height: 66px; transform: translate(-50%,-80%); }
+.candle.out { filter: grayscale(1) brightness(.45); }
+.maplbl { position: absolute; font-family: var(--display); font-size: 24px; color: #3a0a10; background: rgba(240,226,196,.88); padding: 2px 12px; border: 1px solid #7a1018; white-space: nowrap; }
+
+.compare { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.compare .card { position: relative; }
+.mini { position: relative; height: 300px; overflow: hidden; background: #0f0d13; border: 1px solid #2a2430; }
+.mini > div { position: absolute; transform-origin: 0 0; }
+.chosen { position: absolute; top: 12px; right: 12px; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink); background: var(--gold); padding: 2px 10px; }
+
+@media (prefers-reduced-motion: reduce) { .bell, .bell img { animation: none !important; } .dial .hand { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Nightmare Highschool · HUD concept · direction A</div>
+    <h1>The Bell Tower</h1>
+    <p class="lede">A new top-right HUD for the school clock, the notoriety Bells, your conduct record and the tracked quest. All the art on this page was baked for this concept with the game's own PBR shader. The moon icons, map and record parchment are existing art.</p>
+    <p class="note" style="margin-top:10px">The frames are drawn at the game's 1920×1080 design size and scaled to fit your screen. Use <b>1:1</b> to see true size. Game text is never below 20 design px.</p>
+  </header>
+
+  <section id="hud">
+    <div class="eyebrow">1 · In play</div>
+    <h2>The cluster, in five moments</h2>
+    <div class="row" role="group" aria-label="HUD state">
+      <button class="tab" data-state="calm" aria-pressed="true">Class soon</button>
+      <button class="tab" data-state="noticed">Noticed</button>
+      <button class="tab" data-state="hunted">Hunted</button>
+      <button class="tab" data-state="search">Searching</button>
+      <button class="tab" data-state="curfew">Curfew night</button>
+      <button class="ghost" data-native="hudFrame">1:1</button>
+    </div>
+    <div class="frame" id="hudFrame" data-w="760" data-h="640" style="max-width:760px"><div class="stage" style="width:760px;height:640px">
+      <div class="world" id="hudWorld"></div>
+      <div class="hud" id="hud1"></div>
+    </div></div>
+    <p class="note" id="hudCaption"></p>
+  </section>
+
+  <section>
+    <div class="eyebrow">2 · Vocabulary</div>
+    <h2>What each piece means</h2>
+    <div class="grid">
+      <div class="card"><img class="big" src="art/BellHollow.png" alt="Hollow bell: blackened iron with a brass lip"><h3>Hollow</h3><p>Something was seen, but nobody knows who did it. Slip away and it clears.</p></div>
+      <div class="card"><img class="big" src="art/BellTarnished.png" alt="Tarnished bell in verdigris brass"><h3>Tarnished</h3><p>A partial description is going round. The witness notes below the bells show what they know.</p></div>
+      <div class="card"><img class="big" src="art/BellLit.png" alt="Lit bell glowing at the mouth"><h3>Lit</h3><p>Someone can see you right now. Break line of sight.</p></div>
+      <div class="card"><img class="big" src="art/BellLit.png" alt="Lit bell, swinging and dimming" style="animation:swing 1.2s ease-in-out infinite;transform-origin:50% 6%"><h3>Swinging</h3><p>They've lost sight of you and are sweeping the area. Stay clear, hide, or get to class.</p></div>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <h3>Witness notes</h3>
+        <div class="swatches">
+          <figure><img src="art/NoteFace.png" alt="">Face</figure>
+          <figure><img src="art/NoteOutfit.png" alt="">Outfit</figure>
+          <figure><img src="art/NoteForm.png" alt="">Form</figure>
+          <figure><img src="art/NoteClique.png" alt="">Clique</figure>
+          <figure><img src="art/NoteWeapon.png" alt="">Weapon</figure>
+          <figure><img src="art/NoteCompanion.png" alt="">Companion</figure>
+        </div>
+        <p>Only what witnesses actually know is drawn. To shed a note: change at a wardrobe or locker, revert your form, stash the weapon, split up. A face can't be shed; it fades over in-game days.</p>
+      </div>
+      <div class="card">
+        <h3>The conduct seal</h3>
+        <div class="swatches">
+          <figure><img src="art/SealClear.png" alt="">Clear</figure>
+          <figure><img src="art/SealWarning.png" alt="">Warning</figure>
+          <figure><img src="art/SealDetention.png" alt="">Detention</figure>
+          <figure><img src="art/SealProbation.png" alt="">Probation</figure>
+          <figure><img src="art/SealSuspension.png" alt="">Suspended</figure>
+        </div>
+        <p>One greyscale seal, tinted per level in game. Suspension breaks it. It's hidden while you're Clear and owe nothing.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section>
+    <div class="eyebrow">3 · Full-screen views</div>
+    <h2>The Almanac</h2>
+    <p>Opened by clicking the dial. Today's timetable sits on the rim, your attendance is stamped onto past periods, and the moon calendar shows which nights are coming.</p>
+    <div class="row"><button class="ghost" data-native="almFrame">1:1</button></div>
+    <div class="frame" id="almFrame" data-w="1920" data-h="1080"><div class="stage" style="width:1920px;height:1080px">
+      <div class="world"></div><div class="dimmer"></div>
+      <div class="panel" style="left:150px;top:110px;width:1620px;height:880px">
+        <div class="ptitle">The Almanac · Tuesday, Week 3</div>
+        <div class="big-dial" style="left:40px;top:40px">
+          <img class="moon" src="art/IconMoonWaning.png" alt="">
+          <img src="art/Dial.png" alt="">
+          <img class="hand" id="almHand" src="art/DialHand.png" alt="">
+        </div>
+        <div class="lbl" style="left:40px;top:690px;font-size:20px">Crimson: classes · brass: breaks · black: curfew, dorms only</div>
+        <div class="col" style="left:740px;top:34px;width:760px;gap:8px">
+          <div class="sect">Now</div>
+          <dl class="kv"><dt>21:36</dt><dd>Night, until 12:00 AM · waning moon</dd>
+            <dt>Next</dt><dd>Curfew at 10:00 PM, 24 min</dd>
+            <dt>Tomorrow</dt><dd>Homeroom 8:00 AM, Room 101</dd></dl>
+          <div class="sect">Today</div>
+          <dl class="kv" style="grid-template-columns:150px 1fr auto">
+            <dt>8:00</dt><dd>Homeroom · R101</dd><dd><span class="stamp ok">Present</span></dd>
+            <dt>8:20</dt><dd>Mathematics · R102</dd><dd><span class="stamp late">Tardy</span></dd>
+            <dt>9:05</dt><dd>Chemistry · R103</dd><dd><span class="stamp ok">Present</span></dd>
+            <dt>10:00</dt><dd>English · R104</dd><dd><span class="stamp no">Absent</span></dd>
+            <dt>10:45</dt><dd>History · R105</dd><dd><span class="stamp ok">Present</span></dd>
+          </dl>
+          <div class="sect">Owed</div>
+          <dl class="kv"><dt>Detention</dt><dd class="amber">1 · Room 106, outside class (now is fine)</dd>
+            <dt>Summons</dt><dd>None</dd></dl>
+          <div class="sect">Coming nights</div>
+          <div class="moons">
+            <figure><img src="art/IconMoonWaning.png" alt="">Tue<br>waning</figure>
+            <figure><img src="art/IconMoonNew.png" alt="">Wed<br>new</figure>
+            <figure><img src="art/IconMoonWaxing.png" alt="">Thu<br>waxing</figure>
+            <figure class="hot"><img src="art/IconMoonFull.png" alt="">Fri<br>full</figure>
+            <figure><img src="art/IconMoonWaning.png" alt="">Mon<br>waning</figure>
+            <figure class="cr"><img src="art/IconMoonCrimson.png" alt="">Tue<br>crimson</figure>
+            <figure><img src="art/IconMoonWaxing.png" alt="">Wed<br>waxing</figure>
+          </div>
+          <p style="font-size:20px;color:var(--gold)">Friday's full moon: First Hunt can be done then.</p>
+          <div class="sect">Watched wings tonight</div>
+          <dl class="kv"><dt>East Wing</dt><dd>extra patrols, 2 h left</dd></dl>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <section>
+    <h2>The Conduct Ledger</h2>
+    <p>Opened from the seal, or from the Record's Conduct tab. It shows the ladder, what decays and when, the slips you owe and every entry with the witness who made it.</p>
+    <div class="row"><button class="ghost" data-native="ledFrame">1:1</button></div>
+    <div class="frame" id="ledFrame" data-w="1920" data-h="1080"><div class="stage" style="width:1920px;height:1080px">
+      <div class="world"></div><div class="dimmer"></div>
+      <div class="panel" style="left:150px;top:110px;width:1620px;height:880px">
+        <div class="ptitle">Conduct Ledger</div>
+        <div class="col" style="left:10px;top:20px;width:760px;gap:20px">
+          <div class="ladder">
+            <figure><img src="art/SealClear.png" alt="">Clear</figure>
+            <figure class="cur"><img src="art/SealWarning.png" alt="">Warning</figure>
+            <figure><img src="art/SealDetention.png" alt="">Detention</figure>
+            <figure><img src="art/SealProbation.png" alt="">Probation</figure>
+            <figure><img src="art/SealSuspension.png" alt="">Suspended</figure>
+          </div>
+          <dl class="kv"><dt>Points</dt><dd class="amber">3 · Detention at 5</dd>
+            <dt>Fading</dt><dd>−2 tomorrow, −1 per class attended. Clear in 2 days if you keep your head down.</dd></dl>
+          <div class="gauge"><i style="width:19%"></i></div>
+          <div class="sect">Slips owed</div>
+          <div class="row" style="gap:18px">
+            <div class="slip"><span><b>Detention</b>Room 106, after class</span></div>
+            <div class="slip" style="transform:rotate(1.2deg)"><span><b>Summons</b>The Headmaster, by Fri</span></div>
+          </div>
+          <p style="font-size:20px;color:var(--dim)">Click a slip to set its waypoint.</p>
+        </div>
+        <div class="col paper" style="left:810px;top:0;width:690px;height:740px;gap:0">
+          <div class="entry"><span>Seen fighting in the Commons</span><span class="pts">+4</span><span class="w">Reported by Odette Marsh to Mr. Hale · Tue 9:52 PM</span></div>
+          <div class="entry"><span>Tardy, Period 1 Mathematics</span><span class="pts">+1</span><span class="w">Ms. Sallow · Tue 8:23 AM</span></div>
+          <div class="entry"><span>Present, Period 2 Chemistry</span><span class="pts minus">−1</span><span class="w">Mr. Hale · Tue 9:05 AM</span></div>
+          <div class="entry"><span>Out after curfew, the Records Office</span><span class="pts">+3</span><span class="w">Caught by the Night Custodian · Mon 11:40 PM</span></div>
+          <div class="entry"><span>Detention served</span><span class="pts minus">−4</span><span class="w">Room 106 · Mon 4:10 PM</span></div>
+          <div class="entry" style="border:0"><span>Unidentified: a scuffle in the East Wing</span><span class="pts" style="color:#6d5a46">0</span><span class="w">Nobody knew who it was. Nothing booked.</span></div>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <section>
+    <h2>The Journal, and the map layer</h2>
+    <p>The tracked lead is pinned as a large Lead Card, with the others in a rack below. On the map, a watched wing is hatched in crimson, and a ring of candles marks where the search is sweeping. The searchers themselves are never shown.</p>
+    <div class="row"><button class="ghost" data-native="jrnFrame">1:1</button></div>
+    <div class="frame" id="jrnFrame" data-w="1920" data-h="1080"><div class="stage" style="width:1920px;height:1080px">
+      <div class="world night"></div><div class="dimmer"></div>
+      <div class="panel" style="left:90px;top:110px;width:760px;height:880px">
+        <div class="ptitle">Journal</div>
+        <div class="col" style="left:-14px;top:10px;width:670px;gap:16px">
+          <div class="sect">Tracked</div>
+          <div class="lead" style="width:660px;height:198px;background-size:100% 100%">
+            <div class="title" style="left:98px;top:22px;font-size:30px">First Hunt</div>
+            <div class="obj" style="left:98px;top:72px;font-size:22px">On a full-moon night, take down 3 prey with grip finishes.</div>
+            <div class="pips" style="left:92px;bottom:20px"><img src="art/PipFang.png" alt=""><img src="art/PipEmpty.png" alt=""><img src="art/PipEmpty.png" alt=""><span>1 of 3 · next full moon Fri</span></div>
+          </div>
+          <div class="sect">Other leads</div>
+          <div class="lead folded" style="width:660px"><div class="title">The Empty Desk</div><div class="key">Track</div></div>
+          <div class="lead folded" style="width:660px"><div class="title">The Answer Key</div><div class="key">Track</div></div>
+          <div class="lead folded" style="width:660px"><div class="title">Muscle for Hire</div><div class="key">Track</div></div>
+        </div>
+      </div>
+      <div class="map" style="left:930px;top:110px;right:auto;bottom:auto;width:900px;height:880px">
+        <div class="hatch" style="left:520px;top:120px;width:300px;height:250px"></div>
+        <div class="maplbl" style="left:540px;top:384px">East Wing · watched · 2 h</div>
+        <div id="ring"></div>
+        <div class="maplbl" style="left:120px;top:690px">Last seen · the Library · searching</div>
+        <img src="art/MapYou.png" alt="" style="position:absolute;left:620px;top:600px;width:56px;height:56px">
+      </div>
+    </div></div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section>
+    <div class="eyebrow">4 · Directions</div>
+    <h2>Three directions, one chosen</h2>
+    <p>A was chosen. B and C are shown at concept level, built from the same new bake, for comparison.</p>
+    <div class="compare">
+      <div class="card"><span class="chosen">Chosen</span><div class="mini" id="miniA"></div><h3>A · The Bell Tower</h3><p>Cast brass and black iron. Five bells under a timetable dial. It ties into the school bell and the existing skull-bell alert.</p></div>
+      <div class="card"><div class="mini" id="miniB"><div style="left:24px;top:28px;display:grid;gap:14px">
+        <div class="slip" style="transform:rotate(-3deg)"><span><b>NOTICED</b>East Wing · 9:52 PM</span></div>
+        <div class="slip" style="transform:rotate(2deg)"><span><b>NAMED</b>by Odette Marsh</span></div>
+        <div class="row"><img src="art/SealDetention.png" alt="" style="width:70px"><img src="art/SealDetention.png" alt="" style="width:70px"><img src="art/SealClear.png" alt="" style="width:70px;opacity:.35"></div>
+      </div></div><h3>B · The Prefect's Ledger</h3><p>Paper-led: notices pinned in crimson ink and stamped as they escalate. Calmer, but it reads slowly at a glance mid-chase.</p></div>
+      <div class="card"><div class="mini" id="miniC"><div style="left:20px;top:70px;width:340px;height:170px" class="plate">
+        <div class="row" style="gap:0;margin:-6px -10px;justify-content:space-between">
+          <img src="art/Candle.png" alt="" style="width:52px"><img src="art/Candle.png" alt="" style="width:52px"><img src="art/Candle.png" alt="" style="width:52px"><img src="art/Candle.png" alt="" style="width:52px;filter:grayscale(1) brightness(.4)"><img src="art/Candle.png" alt="" style="width:52px;filter:grayscale(1) brightness(.4)">
+        </div></div></div><h3>C · The Vigil</h3><p>Candles that light one by one. Beautiful, but it borrows the Vigil faction's candle, which muddles faction meaning.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">5 · The art</div>
+    <h2>The new bake</h2>
+    <p>Baked by <b style="color:var(--bone)">art/ui/hud/make_belltower.py</b> into <b style="color:var(--bone)">art/ui/hud/out/belltower/</b>, with the same GGX shader and the school's brass, iron and paper materials as Thornrose. The seal and bell glow are greyscale, so the game tints them with ImageColor3.</p>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(160px,1fr))">
+      <div class="card"><img src="art/Dial.png" alt="" style="width:100%"><p>Dial · 640</p></div>
+      <div class="card"><img src="art/DialHand.png" alt="" style="width:100%"><p>DialHand · 640</p></div>
+      <div class="card"><img src="art/BellRail.png" alt="" style="width:100%;margin-top:40px"><p>BellRail · 1400×220</p></div>
+      <div class="card"><img src="art/LeadCard.png" alt="" style="width:100%;margin-top:30px"><p>LeadCard · 1000×300</p></div>
+      <div class="card"><img src="art/TowerPlate.png" alt="" style="width:100%;margin-top:30px"><p>TowerPlate · 9-slice 600×200</p></div>
+      <div class="card"><img src="art/Candle.png" alt="" style="width:60%;justify-self:center"><p>Candle (search ring) · 128×192</p></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const STATES = {
+  calm: { night: false, day: "Tuesday", time: "9:57 AM", hour: 9 + 57/60, moon: "Waning",
+    seg: "Break, until 10:00 AM · waning moon", now: "English · Room 104 · in 3 min", nowWarn: false,
+    tier: 0, seal: "Warning", pts: 3, slips: [], lead: { title: "First Hunt", obj: "On a full-moon night, take down 3 prey with grip finishes.", got: 1, of: 3 },
+    caption: "Daytime between classes. The dial's hand sits in the Break gap between the crimson class arcs. The seal shows a Warning record, and the Lead Card is open because nobody is watching." },
+  noticed: { night: false, day: "Tuesday", time: "10:12 AM", hour: 10.2, moon: "Waning",
+    seg: "Period 3, until 10:40 AM · waning moon", now: "English · Room 104 · NOT IN CLASS", nowWarn: true,
+    tier: 2, bell: "Tarnished", notes: ["Outfit", "Clique"], status: ["Noticed", "A description is going round"],
+    status2: "Odette Marsh is going to tell Mr. Hale", seal: "Warning", pts: 3, slips: [], lead: { title: "First Hunt", folded: true },
+    caption: "Two tarnished bells. A student saw you skipping in your clique colours and is walking to a teacher. Head her off (talk, pay, or lean on her) before the report lands. The quest card folds to one line." },
+  hunted: { night: false, day: "Tuesday", time: "10:15 AM", hour: 10.25, moon: "Waning",
+    seg: "Period 3, until 10:40 AM · waning moon", now: "English · Room 104 · NOT IN CLASS", nowWarn: true,
+    tier: 4, bell: "Lit", swing: false, notes: ["Face", "Outfit", "Form", "Weapon"], status: ["Hunted", "every prefect on duty · Main Hall"],
+    seal: "Warning", pts: 3, slips: [], lead: { title: "First Hunt", folded: true },
+    caption: "Four lit bells that toll as each one is added. They know your face, outfit, transformed form and weapon. Getting caught now books Fighting plus a tier bonus. Escaping still leaves a summons, because they know your face." },
+  search: { night: false, day: "Tuesday", time: "10:17 AM", hour: 10.28, moon: "Waning",
+    seg: "Period 3, until 10:40 AM · waning moon", now: "Hide, or get to Room 104 for an alibi", nowWarn: true,
+    tier: 3, bell: "Lit", swing: true, notes: ["Outfit", "Form"], status: ["Searching", "last seen: the Library · 0:42"],
+    seal: "Warning", pts: 3, slips: [], lead: { title: "First Hunt", folded: true },
+    caption: "Line of sight is broken, so the bells swing and dim on each beat while searchers sweep from your last-seen point. You've reverted your form and changed your face mask, so only Outfit and Form are left. Sitting in your scheduled class cools you fastest." },
+  curfew: { night: true, day: "Tuesday", time: "11:14 PM", hour: 23 + 14/60, moon: "Full",
+    seg: "Night, until 12:00 AM · full moon", now: "Curfew · dorms only", nowWarn: true,
+    tier: 1, bell: "Hollow", notes: [], status: ["Murmur", "the custodian heard something"],
+    seal: "Detention", pts: 6, slips: [["Detention owed", "Room 106, after class"]],
+    lead: { title: "First Hunt", obj: "Full moon tonight: take down 3 prey with grip finishes.", got: 1, of: 3 },
+    caption: "A full-moon night after curfew. One hollow bell: someone heard you, but nobody knows who. At night each tier climbs one step faster. The Detention seal and its slip replace today's orange text line." },
+};
+
+function hourDeg(h) { return (h / 24) * 360 + 180; }
+
+function hudHTML(s) {
+  let h = `<div class="clock">
+    <div class="plate"><div class="txt">
+      <div class="t-day">${s.day} <b>${s.time}</b></div>
+      <div class="t-seg">${s.seg}</div>
+      <div class="t-now${s.nowWarn ? " warn" : ""}">${s.now}</div>
+    </div></div>
+    <div class="dial"><img class="moon" src="art/IconMoon${s.moon}.png" alt=""><img src="art/Dial.png" alt="">
+      <img class="hand" src="art/DialHand.png" alt="" style="transform:rotate(${hourDeg(s.hour)}deg)"></div>
+  </div>`;
+  if (s.tier > 0) {
+    let bells = "";
+    for (let i = 0; i < s.tier; i++) {
+      const x = 450 - 6 - (1400 - (150 + (4 - i) * 240)) * (450 / 1400) - 31 - 1;
+      const cls = s.swing ? "bell swing dim" : (i === s.tier - 1 ? "bell toll" : "bell");
+      const glow = s.bell === "Lit" ? `<div class="glow"></div>` : "";
+      bells += `<div class="${cls}" style="left:${x.toFixed(0)}px;animation-delay:${(i * 0.12).toFixed(2)}s">${glow}<img src="art/Bell${s.bell}.png" alt="${s.bell} bell"></div>`;
+    }
+    const notes = s.notes.map(n => `<img src="art/Note${n}.png" alt="${n}" title="${n}">`).join("");
+    h += `<div class="bells"><img class="rail" src="art/BellRail.png" alt="">${bells}<div class="notes">${notes}</div></div>
+      <div class="status"><span class="k">${s.status[0]}</span> · <span class="s">${s.status[1]}</span></div>`;
+    if (s.status2) h += `<div class="status" style="color:var(--amber)">${s.status2}</div>`;
+  }
+  if (s.seal !== "Clear" || s.slips.length) {
+    h += `<div class="conduct">${s.slips.map(sl => `<div class="slip"><span><b>${sl[0]}</b>${sl[1]}</span></div>`).join("")}
+      <img class="seal" src="art/Seal${s.seal}.png" alt=""><div class="lvl">${s.seal} <small>· ${s.pts} pts</small></div></div>`;
+  }
+  const L = s.lead;
+  if (L.folded) {
+    h += `<div class="lead folded"><div class="title">${L.title}</div><div class="key"><kbd>J</kbd> Journal</div></div>`;
+  } else {
+    let pips = "";
+    for (let i = 0; i < L.of; i++) pips += `<img src="art/${i < L.got ? "PipFang" : "PipEmpty"}.png" alt="">`;
+    h += `<div class="lead"><div class="title">${L.title}</div><div class="obj">${L.obj}</div>
+      <div class="pips">${pips}<span>${L.got}/${L.of}</span></div><div class="key"><kbd>J</kbd> Journal</div></div>`;
+  }
+  return h;
+}
+
+function setState(k) {
+  const s = STATES[k];
+  document.getElementById("hud1").innerHTML = hudHTML(s);
+  document.getElementById("hudWorld").className = "world" + (s.night ? " night" : "");
+  document.getElementById("hudCaption").textContent = s.caption;
+  document.querySelectorAll("button.tab").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.state === k)));
+}
+document.querySelectorAll("button.tab").forEach(b => b.addEventListener("click", () => setState(b.dataset.state)));
+setState("calm");
+
+document.getElementById("almHand").style.transform = `rotate(${hourDeg(21.6)}deg)`;
+
+// candles ring on the map
+(function () {
+  const ring = document.getElementById("ring"); let html = "";
+  for (let i = 0; i < 12; i++) {
+    const a = i / 12 * Math.PI * 2, x = 250 + Math.cos(a) * 150, y = 560 + Math.sin(a) * 110;
+    html += `<img class="candle${i % 5 === 3 ? " out" : ""}" src="art/Candle.png" alt="" style="left:${x.toFixed(0)}px;top:${y.toFixed(0)}px">`;
+  }
+  ring.innerHTML = html;
+})();
+
+// mini A: the noticed cluster at small scale
+document.getElementById("miniA").innerHTML = `<div id="miniAin" style="width:520px;height:560px;position:absolute;left:0;top:0"><div class="hud" style="right:24px;top:10px">${hudHTML(STATES.hunted)}</div></div>`;
+
+// scaling: fit each frame's stage to its width, unless shown 1:1
+function fit() {
+  document.querySelectorAll(".frame").forEach(f => {
+    const st = f.querySelector(".stage"); const w = +f.dataset.w, h = +f.dataset.h;
+    if (f.classList.contains("native")) { st.style.transform = "none"; f.style.height = h + "px"; return; }
+    const s = Math.min(1, f.clientWidth / w); st.style.transform = `scale(${s})`; f.style.height = (h * s) + "px";
+  });
+  const m = document.getElementById("miniA"), inner = document.getElementById("miniAin");
+  if (m && inner) { const s = Math.min(m.clientWidth / 520, 300 / 560); inner.style.transform = `scale(${s})`; inner.style.left = ((m.clientWidth - 520 * s) / 2) + "px"; }
+}
+document.querySelectorAll("[data-native]").forEach(b => b.addEventListener("click", () => {
+  const f = document.getElementById(b.dataset.native); f.classList.toggle("native");
+  b.textContent = f.classList.contains("native") ? "Fit" : "1:1"; fit();
+}));
+window.addEventListener("resize", fit); fit();
+</script>

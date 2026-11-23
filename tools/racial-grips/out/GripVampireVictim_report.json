@@ -1,0 +1,102 @@
+{
+ "ok": true,
+ "name": "GripVampireVictim",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action4",
+ "authoredDuration": 3,
+ "bakedDuration": 3,
+ "passes": {
+  "spline": false,
+  "overlapFrames30": {},
+  "settle": "off",
+  "life": 0.35,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 90,
+ "poseKeys": 365,
+ "markers": 0,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: RightShoulder at 1018°/s around 0.72 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 0.85 studs of the HumanoidRootPart and returns within 0.2"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "skipped",
+   "detail": "only for locomotion or grounded"
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "symmetricEasing",
+   "message": "Moves peak in speed at 50% of their duration: every move eases in and out the same amount. Measured gestures reach peak speed at 38% (they leave fast and arrive slowly); tired/old characters at ~25%; only snappy, energetic ones near 50%. Put a breakdown key early in the move or favour the arrival."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Right Leg moves in a straight line from 2.20 to 2.30 s (bows 2% of its 0.8-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "shortRecovery",
+   "message": "Recovery (0.10 s) is shorter than the strike (0.27 s). Weight shows in the follow-through: measured punches recover in 1.1-2.6x the strike time at about half its speed; fighting-game normals spend 1.5-2x their startup recovering. If this is a player move, mark where control returns instead of cutting the recovery."
+  },
+  {
+   "consider": "evenKeys",
+   "message": "Keys are evenly spaced (every 0.03 s). Action has rhythm: a quick strike between slower anticipation and recovery, holds of different lengths. Re-time the keys so the beats differ."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.5295375499145383,
+  "peakAt": 0.5,
+  "action": {
+   "effector": "Right Arm",
+   "peakSpeed": 29.368964002837366,
+   "onset": 0.6,
+   "peak": 0.7333333333333333,
+   "stop": 0.8666666666666667,
+   "strike_s": 0.26666666666666666,
+   "followThrough_s": 0,
+   "hold_s": 0.03333333333333333,
+   "recovery_s": 0.1,
+   "windupBack": 1.5978966616819816,
+   "rootDrop": 0.4285928143712572,
+   "rootShift": 0.8368101796407186,
+   "torsoPeak_ms": -33.333333333333336
+  }
+ },
+ "sheet": "out\\GripVampireVictim_sheet.png",
+ "graph": "out\\GripVampireVictim_graph.png",
+ "trails": "out\\GripVampireVictim_trails.png",
+ "luau": "out\\GripVampireVictim.lua",
+ "luauBytes": 17370
+}

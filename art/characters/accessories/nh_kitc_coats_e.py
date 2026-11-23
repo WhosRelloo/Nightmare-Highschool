@@ -532,7 +532,7 @@ def build_sleeve_e(name, X, zs, d_fn, puff=None, gathers=0.0, mat=None, paint_fn
         c, s_ = math.cos(math.radians(a)), math.sin(math.radians(a))
         rowsP.append([Vector((1.5 + E0[k][0] + (top[k].x - 1.5 - E0[k][0]) * c, E0[k][1] + (top[k].y - E0[k][1]) * c,
                               1.0 + dk[k] * s_)) for k in range(n)])
-    T = [((x_in if x_in is not None else C1.SLV_XIN) + 0.01, lerp(-0.40, 0.40, k / (n - 1))) for k in range(n)]
+    T = [((x_in if x_in is not None else C1.SLV_XIN) + C1.SLV_CAP, lerp(-0.40, 0.40, k / (n - 1))) for k in range(n)]
     d_in = d_fn(1.0)
     for f in (0.0, 0.3, 0.6, 1.0):
         rowsP.append([Vector((1.5 + lerp(E0[k][0], T[k][0], f), lerp(E0[k][1], T[k][1], f),

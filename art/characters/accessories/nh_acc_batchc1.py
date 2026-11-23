@@ -382,12 +382,15 @@ SLV_CUFF = -0.56    # the katana leaves no room lower: the drawn guard spans the
                     # -0.70 (back), x 1.02-1.23. On most bodies the arm meets them too (allowed: "hug"), but on the
                     # thinner and deeper arms it doesn't, and a sleeve there would show the katana through the cloth.
 SLV_XIN = -0.48     # arm-local inner edge (x 1.02): clear of the shell's band round the torso's front corner (x <= 1.01)
-SLV_XIN_LOW = -0.36 # below the elbow the inner edge steps out to x 1.14 (the scabbard's top edge)
+SLV_XIN_LOW = -0.36 # near the wrist the inner edge steps out to x 1.14 (the scabbard's top edge)
+SLV_CAP = 0.0       # the shoulder cap's inner edge past SLV_XIN (was 0.01, x 1.03: a notch at the shoulder top)
+SLV_STEP = (-0.45, -0.38)   # where it steps (was -0.45..-0.28, owner 1.90.1: the bare strip down the forearm's front
+                            # read as an open area): only as high as the scabbard needs
 
 
-def slv_xin(z):
-    return lerp(SLV_XIN_LOW, SLV_XIN, smooth(-0.45, -0.28, z))
-SLEEVE_Z_K = [SLV_CUFF, SLV_CUFF + 0.03, -0.45, -0.37, -0.28, -0.18, -0.05, 0.10, 0.28, 0.46, 0.62, 0.76, 0.88, 0.96, 1.0]
+def slv_xin(z, step=SLV_STEP):
+    return lerp(SLV_XIN_LOW, SLV_XIN, smooth(step[0], step[1], z))
+SLEEVE_Z_K = [SLV_CUFF, SLV_CUFF + 0.03, -0.48, -0.42, -0.37, -0.28, -0.18, -0.05, 0.10, 0.28, 0.46, 0.62, 0.76, 0.88, 0.96, 1.0]
 
 
 def sleeve_grid_k(d=0.020):
@@ -403,7 +406,7 @@ def sleeve_grid_k(d=0.020):
         c, s_ = math.cos(math.radians(a)), math.sin(math.radians(a))
         rowsP.append([Vector((1.5 + e[0] + (f[0] - e[0]) * c, e[1] + (f[1] - e[1]) * c, 1.0 + d * s_)) for e, f in zip(E0, Ed)])
     n = len(E0)
-    T = [(SLV_XIN + 0.01, lerp(-0.40, 0.40, k / (n - 1))) for k in range(n)]   # the cap over the arm top to x 1.03
+    T = [(SLV_XIN + SLV_CAP, lerp(-0.40, 0.40, k / (n - 1))) for k in range(n)]   # the cap over the arm top to x 1.02
     for f in (0.0, 0.3, 0.6, 1.0):
         rowsP.append([Vector((1.5 + lerp(E0[k][0], T[k][0], f), lerp(E0[k][1], T[k][1], f), 1.0 + d)) for k in range(n)])
     return [[rowsP[j][k] for j in range(len(rowsP))] for k in range(n)]

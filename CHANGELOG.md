@@ -2,6 +2,250 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [Unreleased]
+
+Work on branches that aren't merged into `main` yet. Nothing here is in NH Combat Test unless it says so.
+
+### `sky-2360`: painted skies and lighting, 2.36 pass (art and a proposed config, not wired)
+- **What it is:** the owner-approved sky and lighting pass (`docs/superpowers/specs/2026-11-21-sky-2360-design.md`):
+  Candlelit Gothic days and Moonlit Storybook nights, with Winter, Spring, Summer and Nightmare Nights as event seasons.
+- **Done:** 19 painted sky sets (17 new painters in `tools/vfx/skies2360.py`, next to the unchanged 2.16 Day and Dusk)
+  and the `NHWisp_A`/`NHWisp_B` wisps. The owner uploaded the 116 faces and 2 wisps, and their ids are in the proposed
+  `tools/sky-2360/proposed/ReplicatedStorage.Config.DayCycle.luau` (from `presets.py` and `gen_config.py`). Preview
+  renders are in `docs/img/sky-2360/`, and `docs/Sky-and-Lighting.md` holds the preset table, the upload list, the
+  wiring plan and the tests.
+- **Left:** the Studio wiring and its checks. The live skies are still 2.16's.
+
+### `phase6-strafes`: strafe walks, NPC gestures, the Infirmary (merged into `main` 2026-11-23, version at release)
+- Square-chest strafes at about 8.5 studs/s, the stride-matched cadence (capped 2.4x), 42 NPC gesture clips (published,
+  ids in `Config.Gestures`), Nurse Agatha Thorne's minimal `Infirmary.Treat`, bleacher seats and the Athletes' watch job.
+  Checks and open rows: `tools/phase6-strafes/REPORT.md` (owner eye: the strafe look in motion, the pray kneel, the
+  treatment gestures, the bleachers; the Infirmary room is still bare).
+
+## [2.38.0] - 2026-11-23: Quiet Corners (QC1–QC5): the HUD states, slips, prompts, compass, dialogue, the Evidence Wall and the book
+
+The whole-screen UI pass, built lean in one Studio day. Plan: `docs/superpowers/plans/2026-11-22-quiet-corners-ui.md`. Mirror and day report:
+`tools/quietcorners/` (`REPORT.md`). Screenshots: `docs/img/quietcorners-*.jpg`. Backup: `ServerStorage.NH_Backup.QuietCorners_pre_20261123` (14 scripts).
+
+### Added
+- **`Controllers.Gui.HudState`:** one HUD state (Calm, Active, Combat, Dialogue, Menu, Cut) and the `HudMode` setting (Always, Ghost,
+  Vanish; default Ghost). The Vitals (KitHud), TopLeft (TopBar) and Compass clusters fade through `QcFade` CanvasGroups; danger
+  (DOWNED, Bad slips) breaks through. Tab/View wakes every cluster for 4 s. Studio probe: `PlayerGui.NHQuietProbe` (re-made after each respawn).
+- **`Controllers.Gui.EvidenceWall`** (replaces the Case Files tab): the case plate, clue cards by kind (Note, Object, Record; Photo draws as
+  Object until a clue has a photo), questions with two slots each, red threads, the "Answered" seal, a bonus question, and the answer
+  cards once every non-bonus question is answered.
+- **`Functions.QuietCorners`** (the pure rules) and three art configs: `Config.QuietCornersArt`, `Config.DialogueArt`, `Config.EvidenceArt`
+  (125 uploads to group 15981569, all at their staged size).
+
+### Changed
+- **Slips** (`Gui.Notifications`): paper slips top-left under the top bar, newest on top, at most 3 (2 on phones), queued in combat,
+  cuts, dialogue and menus behind an "N waiting" stub; one detail line; click to open Texts, Evidence or the Journal.
+- **Prompts** (`Gui.PromptUi`): a key cap with the hold fill and a tag (22/20 px) on the nearest prompt only; a pip on the others.
+- **Compass** (`Gui.Compass`): new strip, lubber and ticks; letters 24/20 px, readout 20 px. Same markers and API.
+- **Dialogue** (`Gui.Dialogue`): the calling card with the speaker's animated clique crest (the shield when unaffiliated), the ribbon,
+  reply tabs with tone marks. The server sends `Clique` and `Tones` (`Social.Dialogue`).
+- **Journal** (`Gui.QuestJournal`): the open book. Tabs Journal, Evidence (opens the wall), Record (`StatsPanel.Toggle`), Settings.
+- **CineUI:** the skip button is the race `SkipRing`.
+- **Server:** `Investigation.Link(Player, Case, A, B, Question?)`: with a question id only that link matches, so a right pair under the
+  wrong question is a miss; without one it works as before. `Quests` passes the wall's question. The New insight, That doesn't fit and
+  Case breakthrough notifies carry `Open = "Evidence"` and the case. `Config.Cases` gains `Number`, clue `Kind`/`Order`/`Hidden` and the
+  three public `Questions` (Erased, Originals, and Warned as the bonus).
+
+### Rulings (plan)
+- One-day scope: QC1–QC5 lean; Almanac and Ledger later.
+- The Bell Tower is untouched: no ghost, fold or hide on the new states yet. `NHHudState` is published for the hook, which can land now
+  that R2 (2.37.0) is merged.
+- Fading goes through CanvasGroups pinned to the top or bottom edge; no tweens during a cut.
+- Uploads are capped at 1024 px: the book and the wall are 4 quadrants each; larger pieces are downscaled.
+- The slip detail is one line; routing by `Data.Open`, then by the title; unrouted slips aren't clickable; the rustle is the kit's Tick.
+- Danger: `Kind == "Bad"` breaks every queue.
+- The peek wakes every cluster for 4 s.
+- Dialogue: the ribbon grows upward; the trim and the tabs follow the local player's race, the crest follows the speaker's clique; over
+  5 replies the step tightens.
+- Questions are public; `Link` with a question id checks only that link; the server's `Needs` still decides.
+- The Answered seal is the Bell Tower `Seal` tinted crimson.
+- Ink palette fixed for contrast: Ink (40, 22, 16), InkDim (48, 30, 22), **InkRed (70, 6, 11)** (darkened again on the Studio day:
+  96, 10, 16 measured 3.9:1 on the Object card), plate ink (24, 14, 8).
+
+### Fixed on the Studio day
+- The probe vanished on respawn (PlayerGui is cleared); HudState re-makes it after each CharacterAdded.
+- Notifications and Dialogue chose the phone layout from the camera's ViewportSize, which ignores the kit's Studio phone preview; they
+  ask `Components.Viewport()` first.
+- Harness: `server.py` put a raw newline inside a Lua string (parse failure), and destroying its Script killed the deferred Quests sync
+  (the server checks now wait for it); `qc_wall_reset` gives the wall checks a fresh case.
+
+### Checked (NH Combat Test, slot 2, restored every round)
+- `qc_pure` PASS (Edit VM). The red round: `FAIL no NHQuietProbe` before the client code.
+- Round A: `qc_state`, `qc_slips`, `qc_prompts` (second prompt at 7 studs: the engine didn't show one at 9), `qc_compass`, `qc_fit` PASS;
+  `qc_notify_server` reaches the slips ("Clue found"); R1's `bt_contracts` unchanged.
+- Round B: `qc_dialogue`, `qc_dialogue_real` (Wendell Price), `qc_wall_server` (wrong question false, right question true), `qc_wall`,
+  `qc_book` PASS; `qc_fit` PASS with the wall, the book and a dialogue node open.
+- Art: 125 of 125 ids load at their manifest size.
+- Phone preview (844 x 390): `qc_fit` PASS with slips, the wall and the book; 2 slips; the book on one page.
+- **Not checked:** a real phone and the rest of the phone pass (the owner runs one mobile-resolution session at the end of the phases);
+  two players; the Bell Tower hook; photo clues; Almanac and Ledger; the prompt screenshot (screen_capture doesn't draw billboards; the
+  owner saw the prompt in Studio).
+- **Known issues:** cards pinned into a question's slots are blank; the wall's controls bar truncates "Right click" to "Right…"; the slip stack covers the
+  chat box; `qc_state` flaked once ("wake only the compass").
+
+## [2.37.1] - 2026-11-23: The quest card, readable
+
+The owner: the tracked-quest card's text "looks weird" and should be "better, on theme, and readable". Mirror: `tools/questcard/`
+(fresh `pre/` dump; `live/`, also copied to `tools/belltower-r2/live/`). [Before and after](docs/img/questcard-before-after.jpg).
+
+### Changed
+- **Type** (`Gui.QuestTracker`): the title is GrenzeGotisch SemiBold at 34 px (was Fantasy 24) in blood red (140, 22, 32: 6.5:1 on the paper; the owner asked for something more readable than black) for every quest ([shot](docs/img/questcard-red-title.jpg)); the objective is Merriweather at 20 px
+  (was Guru/Garamond, which is condensed and hard to read on the card); the count reads "0 of 3" in Merriweather Bold; the hint and the
+  "Journal" label are Fondamento at 23 px in a dimmer ink (92, 66, 46: 6.4:1 on the card paper). The timer is Merriweather Bold.
+- **Objective and hint:** the trailing "( ... )" of an objective's text (or a new optional `Hint` field) moves to its own line under the
+  objective, capitalised, as a sentence. 63 objectives had one ("Feed" / "Finish someone with a grip."). Hidden while the card is folded
+  and on the dropped-item line. `QuestTracker.SplitHint(Obj)` is shared.
+- **First Hunt** (`Config.Quests`, RiteWerewolf): "On a full-moon night, take down 3 prey (grip finishes)" is now "Under the full moon,
+  bring down 3 prey (finish each with a grip)".
+
+### Checked (Play, slot 2, restored)
+- The card on screen (First Hunt): title, objective on one line, the hint, "0 of 3", J and Journal clear of each other.
+- `bt_contracts` (card at default Y 200, under the cluster), `bt_bells` PASS (the fold), `bt_pips` PASS (needs 3 to 6 clear the J key).
+- **Not checked:** the Journal book still shows the full objective text with the brackets ("Next: ..."); a long objective on two lines;
+  a phone.
+
+## [2.37.0] - 2026-11-23: The Bell Tower, R2: the Bells
+
+
+R2 of `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-design.md` (§3, §4 item 2, §7 R2). The plan is `docs/superpowers/plans/2026-11-21-belltower-r2-bells.md`.
+- **Mirror:** `tools/belltower-r2/` (`live/` is the built scripts, `pre/` the scripts before R2).
+- **The Map place:** untouched.
+- **Art status:** the five bell pieces are uploaded to group 15981569, and their ids are in `Config.BellTowerArt`. Confirmed in Play. `BtBellGlow` was re-uploaded after the edge fix: id 96913118397929 (the old 122809646117990 is unused).
+
+### Added
+- **Notoriety** (`ServerScriptService.Services.School.Notoriety`): misdeeds that staff witness build Heat (0-100), and Heat rings up to five Bells: Murmur 10+, Noticed 25+, Named 45+, Hunted 70+, The Tolling 90+.
+  - **States:** Lit (a monitor sees you), Search (lost under 30 s ago), Tarnished (they know your face), Hollow (they don't).
+  - **Heat:** Truancy 12, Trespassing and Curfew 20, Vandalism 15, Fighting 25, Contraband 10, Exposure 30, hitting staff 45. ×1.5 at night, ×1.25 on Probation or Suspension.
+  - **Cooling:** none while Lit; 1.5/s in Search, then 3/s. ×2 in a locker, the Dorms or off campus; ×3 with an alibi (your class room in class, or serving detention).
+  - **Escalation:** at Bell 3 a monitor responds; at Bell 4 every monitor converges and the PA calls a disturbance; Bell 5 is an emergency PA.
+  - **Caught:** the violation plus a tier bonus (Bell 3 +1, Bell 4 +2, Bell 5 +3).
+  - **Escaped but identified:** a **summons**, served in Room 106 outside class, without the bonus. At most 3, and one ignored for a day books Skipped Detention (+4).
+  - Pure maths in `ReplicatedStorage.Functions.Notoriety`, every number in `ReplicatedStorage.Config.Notoriety`.
+  - The client reads only `NHBells`, `NHBellState`, `NHSearchWhere` and `NHSummons`.
+- **`Exposure` violation** (3 points, "Seen transformed by staff").
+- **Save data:** `Discipline.Summons` and `Discipline.FaceKnownUntilDay` (old saves get them through Reconcile).
+- **The Bell Rail** on the HUD: a forged rail under the clock plate with up to five bells (Hollow, Tarnished and Lit art; a gold glow while Lit; dimmed and swinging in Search), and a status line at 20 px ("Named · searching · The Library"). Each new bell tolls. Reduce Motion stops the swing and the kick.
+- **The art:** `BtBellHollow`, `BtBellTarnished`, `BtBellLit`, `BtBellGlow` (256 x 256) and `BtBellRail` (1400 x 220).
+- **Test seam:** `ServerStorage.NHNotorietyProbe` (Studio only) and `tools/belltower-r2/harness/probe.py`.
+
+### Changed
+- **`Discipline.AddViolation`** takes `{ Bonus }` and adds it, with "· +N for running" on the toast. **`Discipline.ReportIncident`** tells Notoriety about every report (`OnReport`), and a caught report carries the bonus back.
+- **`HallMonitor`:**
+  - a chase it starts, and a hit on a monitor, feed Notoriety
+  - its catches report `Caught = true`
+  - on duty, monitors chase a hunted student (Bell 3+) on sight with the new **Wanted** reason ("There you are! Don't move!"); a Wanted catch books what started the hunt, and a Wanted escape files no new report
+  - new `SeenBy`, `OnCampus` and `Converge`
+- **The conduct row** shows a Summons slip, with the Room 106 waypoint outside class.
+- **The Lead Card** folds to its title and `J` key while you have Bells.
+- **`BtBellGlow`** was re-baked so its alpha reaches 0 at every edge (it was 6-7 on the sides and 40 along the bottom, which could show a faint square when tinted).
+
+### Rulings and spec deltas
+- Live sight comes from the hall monitors only; every staff report adds Heat through `ReportIncident`. Student witnesses and snitches are R3.
+- Only the face is tracked (25 studs, 2 s Lit, or a recognised report; it lasts to the end of the next in-game day). Hollow means not identified and Tarnished means identified, until R3's notes.
+- The summons is served in Room 106 (there's no Headmaster's office in NH Combat Test yet), and it's issued when the search ends, not at the next period change.
+- `Exposure` is new; hitting staff books `Fighting`.
+- Watched wings and the map layer are R4, and the notes row is R3. `SearchRadius` (30-120 studs) is built and tested; in R2 monitors go to the last-seen point.
+- The Tolling is an emergency PA plus every monitor converging. The Headmaster has no body. Bell 4's PA uses the normal once-per-segment limit.
+- `Contraband` Heat 10 is not in spec §3.2.
+- The probation multiplier also applies on Suspension.
+- Bells 1 and 2 draw no staff response yet. Bell 5 cools like the others, and has no campus-wide search.
+- Quests call `HallMonitor.CheckWitness` with their objective's `Witness` value. A reason with no Heat row adds no Heat, but it becomes the misdeed a later Wanted catch books. Not checked in Studio (no quest with a `Witness` objective was run).
+
+### Checked
+- `nt_pure` (Edit VM): PASS.
+- `nt_server` (Play): PASS. Observation: `8 RespondOk=false monitors=1` (the one monitor on duty was not in range to respond at Bell 3).
+- `nt_monitor` (Play): PASS (responding 1).
+- `bt_pure_r2` and R1's `bt_pure` (Edit VM): PASS.
+- `bt_bells` and R1's five `bt_hud*` (owed, active, clear, suspended, warning) (Play): PASS. `bt_contracts`: as expected outside a class period.
+- The live hunt (Play, 2026-11-23): at Bell 3 on live sight the character was walked toward the Hall Monitor. The monitor closed in, confronted with reason `Wanted` and booked "Fighting on school grounds" with `Bonus 1` (5 points, a second detention owed); the Bells cleared. [Named, before](docs/img/belltower-r2-hunt-named.jpg), [booked](docs/img/belltower-r2-hunt-booked.jpg).
+- Screenshots: [Named, Lit](docs/img/belltower-r2-named-lit.jpg) and [The Tolling, Tarnished](docs/img/belltower-r2-tolling-tarnished.jpg). The [Summons](docs/img/belltower-r2-summons.jpg) (probe: Vandalism, identified, then a real summons): the toast and the Summons slip in the conduct row. The search and hunted rail states were checked by `bt_bells` but not photographed.
+- **Not checked:**
+  - two players
+  - students as witnesses (R3)
+  - the phone layout
+  - the Headmaster's office (there isn't one)
+- **Backup:** `ServerStorage.NH_Backup.BellTower_R2_pre_20261121` holds the scripts before R2.
+
+## [2.36.1] - 2026-11-21: The Bell Tower, R1 follow-ups
+
+The small items the final R1 review deferred. Mirror: `tools/belltower-r1/`. The Map place: untouched.
+
+### Fixed
+- **Lead Card pips:** at a need of 5 or 6 the fang pips and the count reached the `J` key. The `Pips` frame now runs to 4 px before the key (`UDim2.new(1, -130, 1, 0)`, not 60% of the foot), and pips are 26 px for a need over 4 (34 px otherwise). The largest objective Count today is 4.
+- **Lead Card follow lag:** the card moved on the 0.25 s tracker poll, so it could overlap the growing clock cluster for a moment (one `bt_hud active` flake). `Local.Follow` now also runs on the cluster `Panel`'s AbsoluteSize and AbsolutePosition signals and on ClockHud's `Enabled` (connected once, found lazily). With ShowClock off the card goes back to its default desktop Y (200).
+- **Detection meter label:** raised to `BellTower.MIN_TEXT` (20 px).
+- **Test slot drift:** `harness/start_play.lua` set the time to 09:57, in Break with Period 3 fifteen real seconds away, so Play runs booked real Absents on slot 2, and `restore.py` kept them. It now sets 12:30 (After School). A run at 12:30 added no Discipline entry. **Owner:** slot 2's history already holds those extra Absents (15 Absents in its last 16 entries, the newest on day 12665 at 9:57 AM). They are test noise, not play.
+
+### Changed
+- **`Functions.BellTower.Tints`** is typed `{ [string]: Color3 }` (strict mode).
+- **Spec header:** records the owner's approval of the written spec on 2026-11-20.
+- **Checks:**
+  - `bt_hud*.lua` (all five states) assert the art path when `TowerPlate` has an id: Plate and Tracker are ImageLabels, and the Seal is `Seal` (or `SealBroken` when suspended), tinted `Tints[level]`.
+  - `bt_contracts.lua`'s ShowClock check was a tautology. It now runs the real `UI.Settings` handler (`Settings.Apply("ShowClock")`, not saved) and checks the card's default Y.
+  - New `bt_pips.lua` covers needs 3 to 6.
+
+### Checked
+- `bt_pure` PASS (Edit VM).
+- In one Play run (start_play, snapshot, checks, restore.py in Play, stop): `bt_hud` owed, warning, clear, active and suspended all PASS. `bt_contracts`: hidden true, card at default Y 200, shown again, card under the cluster. `bt_pips` PASS.
+- Phone in the kit's Studio preview (`NHTouchTest`, `NHPhonePreview` 844 x 390): the card goes to the left column under the compass ([screenshot](docs/img/belltower-r1-phone-preview.jpg)).
+- **Not checked:**
+  - Studio's device emulator (a real phone-size viewport). The preview keeps the desktop viewport and doesn't build TouchControls, so no-overlap with the touch buttons and the true phone scale aren't verified.
+  - `bt_pips` measures a copy of the live Pips row filled by the same rule (read from QuestTracker's source), not the live tracker: the check runner gets its own module copies, with no profile.
+  - Filled fang pips on screen; two players; the longest quest title; the BellRim flash.
+
+## [2.36.0] - 2026-11-21: The Bell Tower, R1: the clock, conduct and quest cluster
+
+R1 of `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-design.md`. The plan is
+`docs/superpowers/plans/2026-11-20-belltower-r1-cluster.md`. This is 2.36.0 because `main` is at 2.34.0 and the phase 6 branch already uses 2.35.x.
+- **Mirror:** `tools/belltower-r1/` (`live/` is the built scripts, `pre/` the scripts before R1).
+- **The Map place:** untouched.
+- **Art status:** the nine art ids are in `ReplicatedStorage.Config.BellTowerArt` (group 15981569), so the Dial, TowerPlate, wax Seal, Slip, parchment Lead Card and fang pips are live. Any piece whose id is set back to 0 falls back to the kit look.
+- **Deviations from the spec (§4, §6):**
+  - the cluster `Panel` is 500 wide (only the Lead Card is 470)
+  - the dial stays 176 px on phones (no 140 px phone size yet)
+  - the "Now" line keeps the old class-line colours (green in class, red NOT IN CLASS, blue next, orange suspended) rather than gold-normal / amber-warning
+  - the `J` key is a hand-built key-cap, not a kit component
+  - the Seal has no image fallback while its id is 0 (only the tinted level text), where spec §6 said "today's kit panel draws instead"
+
+### Changed
+- **`Gui.ClockHud`** (rebuilt in place, same `ClockHud` ScreenGui and `Panel`):
+  - A 500 px wide cluster in the top right: a 176 px timetable Dial (the hand at the time, the moon in its window) and
+    the day, time, period and school-hours lines on an iron `TowerPlate` (340 wide, overlapping the dial by 30).
+  - A conduct row under it: a wax seal tinted by level with "Warning · 3 pts", and a detention slip ("Detention owed",
+    "Room 106, outside class", or "Trash 2/5" in a session). It replaces the old fifth "Record" line.
+  - Clicking the plate or dial still opens the Timetable. The PA line still types above the time.
+- **`Gui.QuestTracker`** (rebuilt in place, same `QuestTracker` and `Tracker`): a 470 px parchment Lead Card that sits 12 px
+  under the clock, fang pips for a counted objective of 2 to 6 (otherwise the count as text), and a `J` Journal key.
+- **Text floor:** game text in the cluster and on the Lead Card is at least 20 design px (`BellTower.MIN_TEXT`).
+- **No rules changed.** It reads the same Discipline, Detention and quest attributes and remotes.
+
+### Added
+- **The art** (`art/ui/hud/make_belltower.py`, staged in `art/group-upload-belltower/`): `BtDial`, `BtDialHand` (640 x 640),
+  `BtTowerPlate` (600 x 200), `BtSeal`, `BtSealBroken` (256 x 256), `BtSlip` (420 x 150), `BtLeadCard` (1000 x 300),
+  `BtPipEmpty` and `BtPipFang` (96 x 96). The ids and the 9-slice data live in `Config.BellTowerArt`.
+- **`Functions.BellTower`:** the pure view logic (`Image`, `HandAngle`, `Conduct`, `Pips`, `Tints`, `MIN_TEXT`).
+- **Docs:** [UI Kit](docs/UI-Kit.md#the-bell-tower-cluster-236) (art table, layout, API, fallbacks, contracts), Attendance and Discipline, School Simulation.
+
+### Checked
+- **Self-test:** `bt_pure` passes in the Edit VM.
+- **Live (slot 2, restored after every run):**
+  - `bt_hud`: the five states (owed, warning, clear, active, suspended) pass on the kit fallbacks and again with the art. `active` failed once ("tracker overlaps the clock cluster") right after a clear to active switch and passed on re-run, because the card follows the cluster on a 0.25 s poll.
+  - The contracts in Play: the Timetable hook and a real click (on the plate with the fallbacks, on the dial with the art), the Moments panel, the "In class" line, and the PA line: it types in full above the time and wraps to two lines at 20 px (TextFits true).
+  - Screenshots: [calm](docs/img/belltower-r1-calm.jpg), [detention owed](docs/img/belltower-r1-owed.jpg), [detention under way](docs/img/belltower-r1-active.jpg), [suspended](docs/img/belltower-r1-suspended.jpg), [Timetable](docs/img/belltower-r1-timetable-art.jpg), [PA line](docs/img/belltower-r1-pa-art.jpg); on the fallbacks: [cluster](docs/img/belltower-r1-fallback.jpg), [Timetable](docs/img/belltower-r1-timetable.jpg), [PA line](docs/img/belltower-r1-pa.jpg).
+- **Not checked:**
+  - the phone layout (no emulator run; spec §7 lists it in R1's acceptance)
+  - a two-player run
+  - filled fang pips and the Warning seal tint (not captured)
+  - the longest quest title ("Showdown: Captain Rhys Thorne") on the card
+  - Moments' BellRim flash around the new cluster (no period change seen)
+  - note: in the suspended screenshot SchoolFx's existing "SUSPENSION" stamp crosses the plate for a moment (pre-existing level-climb VFX, not R1)
+- **Backup:** `ServerStorage.NH_Backup.BellTower_pre_20261120` holds the pre-R1 ClockHud and QuestTracker.
+
 ## [2.35.0] - 2026-11-21: Seamless cinematics, slice 1 (Tutorial)
 
 The spec is `docs/superpowers/specs/2026-11-20-tutorial-seamless-cinematics-design.md` (its "Spec deltas" section lists
@@ -23,6 +267,10 @@ what the build changed). The plan is `docs/superpowers/plans/2026-11-20-tutorial
     travel is a `[fix]`).
 - **Your own character is the actor** (`Controllers.CineActor`): it walks onto marks, plays the `TutorialAnim` chains at
   Action priority, re-seats the root on the chain's last frame, and hands control back mid-stride.
+- **The character walks into every placed animation** (`CineActor.Approach`, task 14): before the fence vault and the bus
+  boarding, your character walks, runs or crouch-walks to the mark with the game's own locomotion. A lead-in waypoint
+  makes the last steps face the mark, and the first chain piece fades in just before the stop, so nothing slides or
+  turns on the spot. If the path is blocked, it falls back to a dip to black and a placement. No new animations.
 - **Walk-and-talk beats** (`Controllers.CineBeat`, `Functions.CineRigs`):
   - **Rigs:** `Follow`, `Lead`, `Side` and `Frame` (spring-damped), with a mouse or right-stick nudge of about 25° that
     springs back over 0.6 s.
@@ -86,11 +334,11 @@ what the build changed). The plan is `docs/superpowers/plans/2026-11-20-tutorial
   - **Playtests:** solo, death mid-beat, rejoin (driven through the bridge's `Tutorial.Enter`) and Reduce Motion (0.2 s dips,
     no handheld, roll 0) pass.
   - **Motion, from camera samples:** the sneak is 14 % still (longest still run 0.9 s). The Fence shot is now a moving hold.
-- **Older cuts (after the shared framing change):** `Strikethrough` on both paths (all right: grade S, all missed: grade D), `Collected`
-  and `RollCall` pass. The authored -8 deg tilt in `Strikethrough` is intact. The NPC talk cinematic has no check and is unchecked.
 - **Published player clips:** all 66 tutorial player clips are published and verified in Play: every id in `Config.CineClips` loads
   (Length > 0), and its Length and Looped match its KeyframeSequence and the chain step's loop flag. The chains now play from the
   published ids (`TheBus1_WaitBored` is `rbxassetid://74294967099318`, `FenceOver2` is `rbxassetid://137091473855957`).
+- **Older cuts (after the shared framing change):** `Strikethrough` on both paths (all right: grade S, all missed: grade D), `Collected`
+  and `RollCall` pass. The authored -8 deg tilt in `Strikethrough` is intact. The NPC talk cinematic has no check and is unchecked.
 - **Mirror:** all 21 scripts in `tools/phase6-2350/live/` match Studio.
 - **Details:** `tools/phase6-2350/REPORT.md`.
 
@@ -1481,6 +1729,43 @@ lined up so we can move them and size them however we want." That's concepts 1, 
 - **Whether UI clicks pick up the room's reverb tail.** If they do, the world sounds should move to the newer Audio
   API (the note on concept 3).
 - **The Map:** it has the boxes and the new places, but not these scripts, so nothing reads the boxes there yet.
+
+## [2.16.0] - 2026-11-13: Painted skies, one per time of day (art ready, waiting on uploads)
+
+Owner: "make new painted skies" (concept 58 in `docs/Environment-Ambience-Concepts.md`).
+- **Studio backup:** `ServerStorage.NH_Backup.Skies_pre_20261113` (`Config.DayCycle` and `Controllers.World.DayCycle`).
+
+### Added
+- **Four painted gothic skies and a blue-moon night.** They're original and use the house palette, with no blood or
+  gore. Each is six 1024 Sky faces in `art/group-upload-skies/` (30 PNGs) for the owner to upload to group 15981569.
+  - **The skies:** Day, Dusk/Dawn, Night (with a faint distant town silhouette on the horizon), and Storm.
+  - **The blue-moon variant:** NightBlue, the Night with a faint aurora-like band.
+  - **Not painted:** the moon and the stars. Roblox's Sky draws them, so the upper sky stays clean where the moon
+    travels.
+- **The generator:** `tools/vfx/make_skyboxes.py` (numpy + PIL).
+  - **How it paints:** every pixel is painted from its 3D direction, using 3D noise and a horizon strip that wraps all
+    the way round, so the faces meet with no seams.
+  - **How it checks:** it re-projects the written PNGs into `art/skies-preview/NHSkies_Preview.png` (panoramas, the
+    cube corners and the zenith) and measures every face edge in `art/skies-preview/seams.txt`.
+- **The sky swap in `Controllers.World.DayCycle`**, set in `Config.DayCycle.Skies`.
+  - **Schedule:** Night until 05:42, then dawn (the Dusk faces turned −133° with `SkyboxOrientation` so the glow sits
+    at sunrise), Day from 07:00, Dusk from 17:36 and Night from 19:36.
+  - **Hiding the swap:** two Sky layers can't blend. Each swap happens while the dusk or dawn haze is already up,
+    under an extra 3 s swell of Atmosphere haze (+1.2 at the peak), and the faces change at the peak.
+  - **Blue moon:** NightBlue replaces Night when `workspace.NHMoonEventTonight` is "Blue".
+  - **Overrides:** `workspace` attribute `NHSky = "Storm"` (or any set's name) overrides the schedule, for a future
+    weather system or an admin. The LocalPlayer attribute `NHSkyPreview` does the same on one client, for testing.
+  - **What it writes:** only the six Skybox faces and `SkyboxOrientation`. It never writes the moon texture,
+    `MoonAngularSize` or `StarCount`, which `World.FullMoon` and `World.MoonPhases` own.
+  - **Loading:** the faces are preloaded when the game starts.
+
+### Notes
+- **Ids in:** the owner uploaded all 30 faces to group 15981569. All five sets are complete in
+  `Config.DayCycle.Skies.Sets`, and each was checked rendering in Studio. The table is in
+  `art/group-upload-skies/README.md`.
+- **Face orientation:** measured in Studio with labelled test faces. Roblox shows `SkyboxLf` on +X and `SkyboxRt` on
+  −X. The script's header has the full mapping.
+- **Map:** not touched. It needs the same port once the ids exist.
 
 ## [2.15.0] - 2026-11-13: Fights in the world: crowds, study-group tag assists, beast stagger, and enemy NPCs on fists
 

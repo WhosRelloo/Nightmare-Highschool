@@ -29,6 +29,8 @@ return {
 		-- (2.25.0) a test cut for the interactive director (TestBridge / harness only; never in a quest)
 		__QteTest = { Name = `QTE test`; Length = 30; Set = `Hall`; Replay = true; Interactive = true; Hidden = true };
 		-- (2.35.0) seamless (spec 2026-11-20): the real character acts, the camera glides in and out, nothing anchors
+		-- (task 14 follow-up) A cut with walk-and-talk beats MUST list its beat segments in Beats = { <Segment> = true }: the server holds the timeout
+		-- only while a listed beat runs, so an unlisted beat is timed out mid-beat (Length + TimeoutPad) and the cut ends under the player.
 		__SeamlessTest = { Name = `Seamless test`; Length = 18; Set = `BusStop`; Seamless = true; Replay = true; Hidden = true; Beats = { Walk = true } };
 		-- (task 8 fix round 1) beatcheck: Length 6 is shorter than the cut on purpose (a beat holds the timeout)
 		__BeatHoldTest = { Name = `Beat hold test`; Length = 6; Set = `BusStop`; Seamless = true; Replay = true; Hidden = true; Beats = { Hold = true } };
