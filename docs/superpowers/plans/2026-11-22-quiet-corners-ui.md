@@ -1747,7 +1747,28 @@ All files are in `art/group-upload-quietcorners/`, staged by Task R1. The upload
 | **B** | any time (until then, the other races fall back to Human) | 75 | for each of Priest, Vampire, Werewolf, Ghoul and Wraith: `QcSlip`, `QcPromptCap`, `QcPromptTag`, `QcPromptPip`, `QcCompassStrip`, `QcCompassLubber`, `QcSkipRing`, `QcBookCorner`, `DlCallingCard`, `DlReplyTab`, `DlReplyTabOn`, `EvCasePlate`, `EvTack`, `EvAnswerCard`, `EvLens` (each `<Piece><Race>.png`) |
 | **C** | later (not drawn today) | 7 | `QcPlateTrim{Human,Priest,Vampire,Werewolf,Ghoul,Wraith}` (the Bell Tower plate, after R2), `EvCork` |
 
-## Open questions for the owner
+## Owner's decisions (2026-11-22)
+
+The owner approved the plan as recommended:
+- **Every replace / restyle / add decision** in the decision table.
+- **The peek:** Tab and View also wake the HUD (ruling 7 stands).
+- **The Bell Tower:** after the R2 merge, it folds in combat, hides in menus, and gets the `PlateTrim<Race>` plate. That is a follow-up task once R2 is in; it's not part of today.
+- **The cut line:** if the day runs long, the book is cut first.
+
+Defaults for the other questions:
+1. **Long notifications (Q4):** clicking a slip opens the book on the related page:
+   - a quest step opens the Journal at that quest;
+   - a clue or insight opens the Evidence page (the wall);
+   - texts still open the phone's Texts app.
+   - Any slip with no page opens the book's **Notices** page, a log of the session's notifications at full length.
+   - Every slip is clickable. This replaces ruling 5's "unrouted slips aren't clickable".
+   - The book gains a fifth tab, `Notices`, which fills the mockup's fifth tab slot. `Notifications` keeps the last 30 notifications (`Shared.History()`).
+   - `QuestJournal.OpenPage(Page, Arg?)` opens a page: `"Journal"` (with the quest id), `"Evidence"` (with the case id) or `"Notices"`.
+2. **The subtitle seal and the Texts app avatars (Q5):** swapping them for crests is a follow-up, not now.
+3. **Photo clues (Q6):** they show as Object cards for now (ruling 9 stands).
+4. **Tone marks (Q7):** no tones are written for existing NPC replies. Tones are for new content only, and the client shows a mark only when a choice sets `Tone`.
+
+## Questions answered (kept for the record)
 
 1. **The day's scope.** Is a lean book (Journal, Evidence, Record and Settings tabs; no Almanac or Ledger) acceptable for today? If the day runs long, it's the first thing cut, and today's Journal stays.
 2. **The Bell Tower hook.** Should the Bell Tower fold in combat and hide in dialogue and menus right after the R2 merge, along with the `PlateTrim<Race>` plate? It's about 30 minutes once R2 is in. Or should it stay full by design, as the danger home?
