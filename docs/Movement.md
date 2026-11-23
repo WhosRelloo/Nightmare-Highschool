@@ -58,7 +58,7 @@ The owner: the running speed and animation were too fast, and NPCs should follow
 
   | Speed | Now | Was | Written by |
   |---|---|---|---|
-  | Walk | 10 | 12 after a sprint, 14.4 after any state, 16 at spawn | Sprint's release and cancel, every StateManager reset, Crouch, Evolution, Cine, `StarterPlayer.CharacterWalkSpeed`, the `StarterCharacter` Humanoid |
+  | Walk | 10 | 12 after a sprint, 14.4 after any state, 16 at spawn | Sprint's release and cancel, every StateManager reset, Crouch, Evolution, Cine, `StarterPlayer.CharacterWalkSpeed`, the `StarterCharacter` and AI rig Humanoids (they override `CharacterWalkSpeed`) |
   | Sprint | 22 | 25 | Sprint |
   | Fast sprint | 30, after 2 s (`FastAfter`) | 40.5 | Sprint (a slide carries straight into it) |
   | Walk while attacking | 7 | 10 | StateManager `Attacking` |

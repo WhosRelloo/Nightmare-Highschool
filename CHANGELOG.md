@@ -12,8 +12,8 @@ Work on branches that aren't merged into `main` yet. Nothing here is in NH Comba
 - **Gaits** (`Functions.Locomotion.Gait`, `Config.Locomotion.Gaits`): one rule picks Walk / Sprint / FastSprint for
   players, AI NPCs (`Services.AI.AI.Animate`) and schedule students. All three play stride-matched to their own legs
   (`Loco.Rate`), and AI NPCs now skip the jump and fall clips while sprinting and play the landing, like players.
-- Checks and open rows: `tools/locomotion-pace/REPORT.md` (the `StarterCharacter` and AI rig Humanoids still carry
-  14.4; owner eye on the pace). Reference: `docs/Movement.md`.
+- Checks and open rows: `tools/locomotion-pace/REPORT.md` (the `StarterCharacter` and AI rig Humanoids set from
+  14.4 to 10, the fresh spawn not yet checked in Play; owner eye on the pace). Reference: `docs/Movement.md`.
 
 ### `phase6-strafes`: strafe walks, NPC gestures, the Infirmary (merged into `main` 2026-11-23, version at release)
 - Square-chest strafes at about 8.5 studs/s, the stride-matched cadence (capped 2.4x), 42 NPC gesture clips (published,

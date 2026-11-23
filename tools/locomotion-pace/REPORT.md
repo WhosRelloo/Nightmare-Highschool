@@ -58,9 +58,10 @@ sprint at 2.29×. A stun during the run reset the walk to 10 (8 under the combat
 at about 2.4×).
 
 ## Open
-- **The template Humanoids still say 14.4:** `StarterPlayer.StarterCharacter.Humanoid` (players spawned at 14.4 until
-  the first sprint or state reset) and `ServerScriptService.Services.AI.AI.Rig.Humanoid`. They need setting to 10 in
-  Edit; Play was stuck when this was written.
+- **A fresh spawn at 10 isn't checked in Play yet.** The template Humanoids held 14.4 and overrode
+  `CharacterWalkSpeed`: `StarterPlayer.StarterCharacter.Humanoid` (players spawned at 14.4 until the first sprint or state
+  reset) and `ServerScriptService.Services.AI.AI.Rig.Humanoid`. Both are set to 10 in Edit (2026-11-23, after the round).
+  The Studio MCP's start/stop was stuck ("Start play hasn't finished yet") for the rest of the session.
 - **Owner eye:** whether the new pace looks right in motion, above all on short bodies, which step at about 2× to keep
   their feet planted.
 - **Not saved:** the place needs the owner's word to save.
