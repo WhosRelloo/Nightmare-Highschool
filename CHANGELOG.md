@@ -16,22 +16,77 @@ Work on branches that aren't merged into `main` yet. Nothing here is in NH Comba
   wiring plan and the tests.
 - **Left:** the Studio wiring and its checks. The live skies are still 2.16's.
 
-### `ui-quietcorners`: Quiet Corners, the whole-screen UI (design and art, not built)
-- **What it is:** a new HUD direction (`docs/superpowers/specs/2026-11-21-quiet-corners-ui-design.md`): the corners
-  stay where players know them and the centre stays clear, with a `HudMode` setting (Always, Ghost, Vanish), paper-slip
-  notifications, the open-book menus, prompts on the object, race accents on blackened iron, the Evidence Wall for
-  investigations, and new dialogue art with a clique crest in place of the wax seal.
-- **Done:** the spec (waiting on the owner's review), the PBR art generators (`make_quietcorners.py`,
-  `make_evidence_wall.py`, `make_dialogue_ui.py`), fit-checked mockups in
-  `docs/superpowers/mockups/2026-11-21-quietcorners/`, the Unaffiliated crest and animated crests, and the group ids
-  for the 9 crests and 9 crest flipbooks (owner uploaded 2026-11-22).
-- **Left:** everything in game. No game code is written and Studio wasn't touched.
-
 ### `phase6-strafes`: strafe walks, NPC gestures, the Infirmary (merged into `main` 2026-11-23, version at release)
 - Square-chest strafes at about 8.5 studs/s, the stride-matched cadence (capped 2.4x), 42 NPC gesture clips (published,
   ids in `Config.Gestures`), Nurse Agatha Thorne's minimal `Infirmary.Treat`, bleacher seats and the Athletes' watch job.
   Checks and open rows: `tools/phase6-strafes/REPORT.md` (owner eye: the strafe look in motion, the pray kneel, the
   treatment gestures, the bleachers; the Infirmary room is still bare).
+
+## [2.38.0] - 2026-11-23: Quiet Corners (QC1–QC5): the HUD states, slips, prompts, compass, dialogue, the Evidence Wall and the book
+
+The whole-screen UI pass, built lean in one Studio day. Plan: `docs/superpowers/plans/2026-11-22-quiet-corners-ui.md`. Mirror and day report:
+`tools/quietcorners/` (`REPORT.md`). Screenshots: `docs/img/quietcorners-*.jpg`. Backup: `ServerStorage.NH_Backup.QuietCorners_pre_20261123` (14 scripts).
+
+### Added
+- **`Controllers.Gui.HudState`:** one HUD state (Calm, Active, Combat, Dialogue, Menu, Cut) and the `HudMode` setting (Always, Ghost,
+  Vanish; default Ghost). The Vitals (KitHud), TopLeft (TopBar) and Compass clusters fade through `QcFade` CanvasGroups; danger
+  (DOWNED, Bad slips) breaks through. Tab/View wakes every cluster for 4 s. Studio probe: `PlayerGui.NHQuietProbe` (re-made after each respawn).
+- **`Controllers.Gui.EvidenceWall`** (replaces the Case Files tab): the case plate, clue cards by kind (Note, Object, Record; Photo draws as
+  Object until a clue has a photo), questions with two slots each, red threads, the "Answered" seal, a bonus question, and the answer
+  cards once every non-bonus question is answered.
+- **`Functions.QuietCorners`** (the pure rules) and three art configs: `Config.QuietCornersArt`, `Config.DialogueArt`, `Config.EvidenceArt`
+  (125 uploads to group 15981569, all at their staged size).
+
+### Changed
+- **Slips** (`Gui.Notifications`): paper slips top-left under the top bar, newest on top, at most 3 (2 on phones), queued in combat,
+  cuts, dialogue and menus behind an "N waiting" stub; one detail line; click to open Texts, Evidence or the Journal.
+- **Prompts** (`Gui.PromptUi`): a key cap with the hold fill and a tag (22/20 px) on the nearest prompt only; a pip on the others.
+- **Compass** (`Gui.Compass`): new strip, lubber and ticks; letters 24/20 px, readout 20 px. Same markers and API.
+- **Dialogue** (`Gui.Dialogue`): the calling card with the speaker's animated clique crest (the shield when unaffiliated), the ribbon,
+  reply tabs with tone marks. The server sends `Clique` and `Tones` (`Social.Dialogue`).
+- **Journal** (`Gui.QuestJournal`): the open book. Tabs Journal, Evidence (opens the wall), Record (`StatsPanel.Toggle`), Settings.
+- **CineUI:** the skip button is the race `SkipRing`.
+- **Server:** `Investigation.Link(Player, Case, A, B, Question?)`: with a question id only that link matches, so a right pair under the
+  wrong question is a miss; without one it works as before. `Quests` passes the wall's question. The New insight, That doesn't fit and
+  Case breakthrough notifies carry `Open = "Evidence"` and the case. `Config.Cases` gains `Number`, clue `Kind`/`Order`/`Hidden` and the
+  three public `Questions` (Erased, Originals, and Warned as the bonus).
+
+### Rulings (plan)
+- One-day scope: QC1–QC5 lean; Almanac and Ledger later.
+- The Bell Tower is untouched: no ghost, fold or hide on the new states yet. `NHHudState` is published for the hook, which can land now
+  that R2 (2.37.0) is merged.
+- Fading goes through CanvasGroups pinned to the top or bottom edge; no tweens during a cut.
+- Uploads are capped at 1024 px: the book and the wall are 4 quadrants each; larger pieces are downscaled.
+- The slip detail is one line; routing by `Data.Open`, then by the title; unrouted slips aren't clickable; the rustle is the kit's Tick.
+- Danger: `Kind == "Bad"` breaks every queue.
+- The peek wakes every cluster for 4 s.
+- Dialogue: the ribbon grows upward; the trim and the tabs follow the local player's race, the crest follows the speaker's clique; over
+  5 replies the step tightens.
+- Questions are public; `Link` with a question id checks only that link; the server's `Needs` still decides.
+- The Answered seal is the Bell Tower `Seal` tinted crimson.
+- Ink palette fixed for contrast: Ink (40, 22, 16), InkDim (48, 30, 22), **InkRed (70, 6, 11)** (darkened again on the Studio day:
+  96, 10, 16 measured 3.9:1 on the Object card), plate ink (24, 14, 8).
+
+### Fixed on the Studio day
+- The probe vanished on respawn (PlayerGui is cleared); HudState re-makes it after each CharacterAdded.
+- Notifications and Dialogue chose the phone layout from the camera's ViewportSize, which ignores the kit's Studio phone preview; they
+  ask `Components.Viewport()` first.
+- Harness: `server.py` put a raw newline inside a Lua string (parse failure), and destroying its Script killed the deferred Quests sync
+  (the server checks now wait for it); `qc_wall_reset` gives the wall checks a fresh case.
+
+### Checked (NH Combat Test, slot 2, restored every round)
+- `qc_pure` PASS (Edit VM). The red round: `FAIL no NHQuietProbe` before the client code.
+- Round A: `qc_state`, `qc_slips`, `qc_prompts` (second prompt at 7 studs: the engine didn't show one at 9), `qc_compass`, `qc_fit` PASS;
+  `qc_notify_server` reaches the slips ("Clue found"); R1's `bt_contracts` unchanged.
+- Round B: `qc_dialogue`, `qc_dialogue_real` (Wendell Price), `qc_wall_server` (wrong question false, right question true), `qc_wall`,
+  `qc_book` PASS; `qc_fit` PASS with the wall, the book and a dialogue node open.
+- Art: 125 of 125 ids load at their manifest size.
+- Phone preview (844 x 390): `qc_fit` PASS with slips, the wall and the book; 2 slips; the book on one page.
+- **Not checked:** a real phone and the rest of the phone pass (the owner runs one mobile-resolution session at the end of the phases);
+  two players; the Bell Tower hook; photo clues; Almanac and Ledger; the prompt screenshot (screen_capture doesn't draw billboards; the
+  owner saw the prompt in Studio).
+- **Known issues:** cards pinned into a question's slots are blank; the wall's controls bar truncates "Right click" to "Right…"; the slip stack covers the
+  chat box; `qc_state` flaked once ("wake only the compass").
 
 ## [2.37.1] - 2026-11-23: The quest card, readable
 
