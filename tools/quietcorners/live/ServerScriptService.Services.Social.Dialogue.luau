@@ -189,6 +189,10 @@ function Local.Show(Player: Player, S, NodeId: string?)
 	if RepConfig.Npcs[S.NpcId] then
 		State = select(2, Reputation.Relationship(Player, S.NpcId))
 	end
+	-- (2.38) Quiet Corners: the speaker's clique crest (none = Unaffiliated on the client) and each reply's tone mark
+	local Clique = Npc.Clique or (if Npc.Faction == `Vigil` then `Vigil` elseif Npc.Faction == `CrimsonCourt` then `Court` else nil) or ctx.CliqueId
+	local Tones = {}
+	for I, Choice in Offered do Tones[I] = if typeof(Choice.Tone) == `string` then Choice.Tone else false end
 	Packets.DialogueEvent:FireClient(Player, {
 		Type = `Node`;
 		Id = S.Id;
@@ -198,6 +202,8 @@ function Local.Show(Player: Player, S, NodeId: string?)
 		Color = Faction and Faction.Color or Npc.Color or Color3.fromRGB(240, 240, 240);
 		Text = Text;
 		Choices = Labels;
+		Clique = Clique; -- (2.38)
+		Tones = Tones; -- (2.38)
 		Model = S.Model; -- (1.35.1) who's talking: the client frames them (Gui.Dialogue talk cinematic)
 	})
 end

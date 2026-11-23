@@ -60,6 +60,11 @@ local Flushing = false
 function Local.Reduced(): boolean return Player:GetAttribute(`NHReducedMotion`) == true end
 
 function Local.Phone(): boolean
+	-- (S5) the kit's viewport, so Studio's NHPhonePreview counts (the camera's ViewportSize ignores it)
+	if Kit.Viewport then
+		local Ok, Vp = pcall(Kit.Viewport)
+		if Ok and typeof(Vp) == `Vector2` then return QC.Phone(Vp) end
+	end
 	local Cam = workspace.CurrentCamera
 	return Cam ~= nil and QC.Phone(Cam.ViewportSize)
 end

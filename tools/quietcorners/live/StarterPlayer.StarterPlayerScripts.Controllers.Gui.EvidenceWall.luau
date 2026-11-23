@@ -68,7 +68,7 @@ local Shared = {}
 
 local rgb = Color3.fromRGB
 local COL = {
-	Ink = rgb(40, 22, 16); InkDim = rgb(48, 30, 22); InkRed = rgb(96, 10, 16); PlateInk = rgb(24, 14, 8);
+	Ink = rgb(40, 22, 16); InkDim = rgb(48, 30, 22); InkRed = rgb(70, 6, 11); PlateInk = rgb(24, 14, 8); -- (S4) InkRed was 96,10,16: 3.9 contrast on the Object card, 4.6+ on every card now
 	Gold = rgb(230, 190, 108); Bone = rgb(236, 226, 206); Dim = rgb(200, 188, 168); Chalk = rgb(226, 222, 210);
 	Crimson = rgb(220, 52, 62); Thread = rgb(170, 28, 44); StampRed = rgb(176, 20, 30); Slate = rgb(40, 36, 46);
 }

@@ -578,7 +578,8 @@ function Local.Layout()
 	if not Ui then return end
 	local Cam = workspace.CurrentCamera
 	local Vp = if Cam then Cam.ViewportSize else Vector2.new(1920, 1080)
-	local Phone = QC.Phone(Vp)
+	local KitVp = if Kit.Viewport then select(2, pcall(Kit.Viewport)) else nil -- (S5) Studio's NHPhonePreview counts for the phone layout
+	local Phone = QC.Phone(if typeof(KitVp) == `Vector2` then KitVp else Vp)
 	local Scale = Local.Scale()
 	local Abs = Ui.Gui.AbsoluteSize
 	local DW = (if Abs.X > 0 then Abs.X else Vp.X) / Scale

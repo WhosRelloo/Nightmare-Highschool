@@ -1001,7 +1001,7 @@ function Local.OnAction(Player: Player, Message)
 			Shared.Abandon(Player, Message.Quest)
 		end
 	elseif Action == `Link` and typeof(Message.Case) == `string` then
-		Investigation.Link(Player, Message.Case, Message.A, Message.B)
+		Investigation.Link(Player, Message.Case, Message.A, Message.B, if typeof(Message.Question) == `string` then Message.Question else nil) -- (2.38) the wall's question id
 	elseif Action == `Deduce` and typeof(Message.Case) == `string` then
 		Investigation.Deduce(Player, Message.Case, Message.Option)
 	end

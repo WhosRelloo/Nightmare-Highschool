@@ -7,6 +7,8 @@
 	evidence board (server checks the pair) -> answer the case's deduction question.
 
 	Quests wires this up with Init({ Get, Sync, IsOpen, Changed }) so there is no require cycle.
+
+	(2.38) Link takes the question id (the Evidence Wall): a right pair under the wrong question is a miss.
 ]]
 
 ---| Services |---
@@ -85,10 +87,11 @@ function Shared.Find(Player: Player, CaseId: string, ClueId: string, Pos: Vector
 	return Shared.Grant(Player, CaseId, ClueId, Pos)
 end
 
-function Shared.Link(Player: Player, CaseId: string, A: string, B: string): (boolean, string)
+function Shared.Link(Player: Player, CaseId: string, A: string, B: string, Question: string?): (boolean, string)
 	local C = Shared.Get(Player, CaseId)
 	local Secret = Secrets[CaseId]
 	if not C or not Secret or typeof(A) ~= `string` or typeof(B) ~= `string` or A == B then return false, `Pick two different clues.` end
+	if Question ~= nil and (typeof(Question) ~= `string` or #Question > 32) then return false, `` end
 	if not C.Clues[A] or not C.Clues[B] then return false, `You haven't found both of those.` end
 
 	local Now = os.clock()
@@ -96,13 +99,13 @@ function Shared.Link(Player: Player, CaseId: string, A: string, B: string): (boo
 	LastLink[Player] = Now
 
 	for _, Link in Secret.Links do
-		if (Link.A == A and Link.B == B) or (Link.A == B and Link.B == A) then
+		if (Question == nil or Link.Id == Question) and ((Link.A == A and Link.B == B) or (Link.A == B and Link.B == A)) then
 			for _, Known in C.Insights do
 				if Known.Id == Link.Id then return false, `You've already connected those.` end
 			end
 			table.insert(C.Insights, { Id = Link.Id; Text = Link.Text; A = A; B = B })
 			Hooks.Sync(Player)
-			Hooks.Notify(Player, { Title = `New insight`; Text = Link.Text; Kind = `Good`; Duration = 8 })
+			Hooks.Notify(Player, { Title = `New insight`; Text = Link.Text; Kind = `Good`; Duration = 8; Open = `Evidence`; Case = CaseId })
 			Hooks.Changed(Player, CaseId, `Link`)
 			Fx.Fire(Player, `LinkHit`, { Case = CaseId; A = A; B = B }) -- VFX P2-13: the string draws itself on the board
 			return true, Link.Text
@@ -129,13 +132,13 @@ function Shared.Deduce(Player: Player, CaseId: string, Option: number): (boolean
 	LastDeduce[Player] = Now
 
 	if Option ~= Secret.Answer then
-		Hooks.Notify(Player, { Title = `That doesn't fit`; Text = Secret.Wrong; Kind = `Warning`; Duration = 5 })
+		Hooks.Notify(Player, { Title = `That doesn't fit`; Text = Secret.Wrong; Kind = `Warning`; Duration = 5; Open = `Evidence`; Case = CaseId })
 		return false, Secret.Wrong
 	end
 	C.Solved = true
 	C.SolvedText = Secret.Solved
 	Hooks.Sync(Player)
-	Hooks.Notify(Player, { Title = `Case breakthrough`; Text = Secret.Solved; Kind = `Good`; Duration = 8 })
+	Hooks.Notify(Player, { Title = `Case breakthrough`; Text = Secret.Solved; Kind = `Good`; Duration = 8; Open = `Evidence`; Case = CaseId })
 	Hooks.Changed(Player, CaseId, `Deduce`)
 	Fx.Fire(Player, `Solved`, { Case = CaseId; Name = Cases[CaseId] and Cases[CaseId].Name }) -- VFX P2-13: the SOLVED stamp
 	return true, Secret.Solved
