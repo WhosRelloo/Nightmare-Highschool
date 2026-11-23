@@ -649,7 +649,7 @@ function QC.Tone(T: any): string? return if typeof(T) == "string" and QC.TONES[T
 
 -- the card's second line: drop the relation first, then the clique, until it fits
 function QC.CardSub(Clique: string?, Role: string?, Relation: string?, Fits: (string) -> boolean): string
-	local function join(...) local P = {} for _, S in { ... } do if S and S ~= "" then table.insert(P, S) end end return table.concat(P, " · ") end
+	local function join(...) local P = {} for I = 1, select("#", ...) do local S = select(I, ...) if S and S ~= "" then table.insert(P, S) end end return table.concat(P, " · ") end
 	for _, T in { join(Clique, Role, Relation), join(Clique, Role), join(Role, Relation), join(Role), join(Clique) } do
 		if T ~= "" and Fits(T) then return T end
 	end
