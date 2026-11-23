@@ -404,4 +404,4 @@ Server signal: `Notoriety.Changed(Player, Bells, State)`. Server API: `Witnessed
 
 ### Verified
 
-**Checked (2026-11-23, NH Combat Test, slot 2):** `nt_pure` PASS (Edit VM); `nt_server` PASS and `nt_monitor` PASS (responding 1) in Play. Not checked: the live hunt (not driven), the summons screenshot, quest witness reasons, two players. Backup: `ServerStorage.NH_Backup.BellTower_R2_pre_20261121`.
+**Checked (2026-11-23, NH Combat Test, slot 2):** `nt_pure` PASS (Edit VM); `nt_server` PASS and `nt_monitor` PASS (responding 1) in Play. The live hunt was driven the same day: the monitor confronted (`Wanted`) and booked Fighting with `Bonus 1`; the summons toast and slip were photographed ([img](img/belltower-r2-summons.jpg)). Not checked: quest witness reasons, two players. Backup: `ServerStorage.NH_Backup.BellTower_R2_pre_20261121`.

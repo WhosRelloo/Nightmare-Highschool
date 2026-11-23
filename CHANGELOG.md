@@ -86,8 +86,8 @@ R2 of `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-desig
 - `nt_monitor` (Play): PASS (responding 1).
 - `bt_pure_r2` and R1's `bt_pure` (Edit VM): PASS.
 - `bt_bells` and R1's five `bt_hud*` (owed, active, clear, suspended, warning) (Play): PASS. `bt_contracts`: as expected outside a class period.
-- The live hunt was not driven (the character was not walked to a monitor).
-- Screenshots: [Named, Lit](docs/img/belltower-r2-named-lit.jpg) and [The Tolling, Tarnished](docs/img/belltower-r2-tolling-tarnished.jpg). The search, hunted and summons states were checked by `bt_bells` but not photographed.
+- The live hunt (Play, 2026-11-23): at Bell 3 on live sight the character was walked toward the Hall Monitor. The monitor closed in, confronted with reason `Wanted` and booked "Fighting on school grounds" with `Bonus 1` (5 points, a second detention owed); the Bells cleared. [Named, before](docs/img/belltower-r2-hunt-named.jpg), [booked](docs/img/belltower-r2-hunt-booked.jpg).
+- Screenshots: [Named, Lit](docs/img/belltower-r2-named-lit.jpg) and [The Tolling, Tarnished](docs/img/belltower-r2-tolling-tarnished.jpg). The [Summons](docs/img/belltower-r2-summons.jpg) (probe: Vandalism, identified, then a real summons): the toast and the Summons slip in the conduct row. The search and hunted rail states were checked by `bt_bells` but not photographed.
 - **Not checked:**
   - two players
   - students as witnesses (R3)
