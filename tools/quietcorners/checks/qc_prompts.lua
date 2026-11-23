@@ -6,7 +6,7 @@ if not Root then return "FAIL no character" end
 local Fails = {}
 local function Ok(C, W) if not C then table.insert(Fails, W) end end
 local Parts = {}
-for I, D in { 5, 9 } do
+for I, D in { 5, 7 } do -- (S3) the engine did not show a prompt at 9 studs in this place; 7 shows both
 	local Part = Instance.new("Part") Part.Anchored = true Part.CanCollide = false Part.Transparency = 1 Part.Size = Vector3.one
 	Part.CFrame = Root.CFrame * CFrame.new(I == 1 and -2 or 2, 0, -D) Part.Name = "QcPromptTest" .. I Part.Parent = workspace
 	local Pr = Instance.new("ProximityPrompt") Pr.ActionText = I == 1 and "Open" or "Read" Pr.ObjectText = "Mathematics · Room 12"

@@ -157,16 +157,21 @@ function Shared.OnStart()
 		Local.Apply()
 	end)
 	if RunService:IsStudio() then
-		local PG = Player:WaitForChild("PlayerGui")
-		local B = PG:FindFirstChild("NHQuietProbe") or Instance.new("BindableFunction")
-		B.Name = "NHQuietProbe"
-		B.OnInvoke = function(Cmd, ...)
-			local Fn = Probes[Cmd]
-			if not Fn then return { Error = "unknown command " .. tostring(Cmd) } end
-			local Ok, R = pcall(Fn, ...)
-			return if Ok then R else { Error = tostring(R) }
+		-- (2.38 S3) a respawn clears PlayerGui of everything but ResetOnSpawn=false guis, so the probe is put back after each one
+		local function MakeProbe()
+			local PG = Player:WaitForChild("PlayerGui")
+			local B = PG:FindFirstChild("NHQuietProbe") or Instance.new("BindableFunction")
+			B.Name = "NHQuietProbe"
+			B.OnInvoke = function(Cmd, ...)
+				local Fn = Probes[Cmd]
+				if not Fn then return { Error = "unknown command " .. tostring(Cmd) } end
+				local Ok, R = pcall(Fn, ...)
+				return if Ok then R else { Error = tostring(R) }
+			end
+			B.Parent = PG
 		end
-		B.Parent = PG
+		MakeProbe()
+		Player.CharacterAdded:Connect(function() task.wait(0.5) MakeProbe() end)
 	end
 end
 

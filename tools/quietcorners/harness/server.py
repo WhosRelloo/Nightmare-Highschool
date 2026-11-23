@@ -9,7 +9,7 @@ while ("]" + "=" * n + "]") in body:
     n += 1
 o, c = "[" + "=" * n + "[", "]" + "=" * n + "]"
 lua = ('local S = Instance.new("Script")\n'
-       f'S.Source = "local ok, r = pcall(function()\n" .. {o}{body}{c} .. "\nend) script:SetAttribute(\'Out\', ok and tostring(r) or (\'ERR \' .. tostring(r)))"\n'
+       f'S.Source = "local ok, r = pcall(function()\\n" .. {o}{body}{c} .. "\\nend) script:SetAttribute(\'Out\', ok and tostring(r) or (\'ERR \' .. tostring(r)))"\n'
        'S.Parent = game.ServerScriptService\n'
        'local t0 = os.clock()\n'
        'while S:GetAttribute("Out") == nil and os.clock() - t0 < 60 do task.wait(0.25) end\n'
