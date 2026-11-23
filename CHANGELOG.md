@@ -2,6 +2,27 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
+## [2.37.1] - 2026-11-23: The quest card, readable
+
+The owner: the tracked-quest card's text "looks weird" and should be "better, on theme, and readable". Mirror: `tools/questcard/`
+(fresh `pre/` dump; `live/`, also copied to `tools/belltower-r2/live/`). [Before and after](docs/img/questcard-before-after.jpg).
+
+### Changed
+- **Type** (`Gui.QuestTracker`): the title is GrenzeGotisch SemiBold at 34 px (was Fantasy 24); the objective is Merriweather at 20 px
+  (was Guru/Garamond, which is condensed and hard to read on the card); the count reads "0 of 3" in Merriweather Bold; the hint and the
+  "Journal" label are Fondamento at 23 px in a dimmer ink (92, 66, 46: 6.4:1 on the card paper). The timer is Merriweather Bold.
+- **Objective and hint:** the trailing "( ... )" of an objective's text (or a new optional `Hint` field) moves to its own line under the
+  objective, capitalised, as a sentence. 63 objectives had one ("Feed" / "Finish someone with a grip."). Hidden while the card is folded
+  and on the dropped-item line. `QuestTracker.SplitHint(Obj)` is shared.
+- **First Hunt** (`Config.Quests`, RiteWerewolf): "On a full-moon night, take down 3 prey (grip finishes)" is now "Under the full moon,
+  bring down 3 prey (finish each with a grip)".
+
+### Checked (Play, slot 2, restored)
+- The card on screen (First Hunt): title, objective on one line, the hint, "0 of 3", J and Journal clear of each other.
+- `bt_contracts` (card at default Y 200, under the cluster), `bt_bells` PASS (the fold), `bt_pips` PASS (needs 3 to 6 clear the J key).
+- **Not checked:** the Journal book still shows the full objective text with the brackets ("Next: ..."); a long objective on two lines;
+  a phone.
+
 ## [2.37.0] - 2026-11-23: The Bell Tower, R2: the Bells
 
 
