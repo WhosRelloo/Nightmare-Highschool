@@ -6,6 +6,15 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 Work on branches that aren't merged into `main` yet. Nothing here is in NH Combat Test unless it says so.
 
+### `locomotion-pace`: slower run, NPCs on the players' animation rules (installed in NH Combat Test, not saved)
+- **Speeds** (`Config.Locomotion.Speeds`): walk 10 everywhere (was 12, 14.4 after states, 16 at spawn), sprint 22 (was
+  25), fast sprint 30 after 2 s (was 40.5), the attack walk 7 (was 10), carrying 8 (was 12), NPC patrol 10 (was 12).
+- **Gaits** (`Functions.Locomotion.Gait`, `Config.Locomotion.Gaits`): one rule picks Walk / Sprint / FastSprint for
+  players, AI NPCs (`Services.AI.AI.Animate`) and schedule students. All three play stride-matched to their own legs
+  (`Loco.Rate`), and AI NPCs now skip the jump and fall clips while sprinting and play the landing, like players.
+- Checks and open rows: `tools/locomotion-pace/REPORT.md` (the `StarterCharacter` and AI rig Humanoids still carry
+  14.4; owner eye on the pace). Reference: `docs/Movement.md`.
+
 ### `phase6-strafes`: strafe walks, NPC gestures, the Infirmary (merged into `main` 2026-11-23, version at release)
 - Square-chest strafes at about 8.5 studs/s, the stride-matched cadence (capped 2.4x), 42 NPC gesture clips (published,
   ids in `Config.Gestures`), Nurse Agatha Thorne's minimal `Infirmary.Treat`, bleacher seats and the Athletes' watch job.
