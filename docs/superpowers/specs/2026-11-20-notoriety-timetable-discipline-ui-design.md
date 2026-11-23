@@ -4,7 +4,7 @@
 2026-11-20. R1's code is built (below).
 **R1 status:** R1 built in 2.36.0 (plan `docs/superpowers/plans/2026-11-20-belltower-r1-cluster.md`). The 9 art ids are in
 `Config.BellTowerArt`, so R1 runs on the new art (kit fallbacks remain for any id set to 0). Not yet seen: the phone layout from §7's R1 acceptance.
-**R2 status:** R2 built in 2.37.0 (plan `docs/superpowers/plans/2026-11-21-belltower-r2-bells.md`). TODO(Studio): installed and checked. **R2 deltas:** a summons is served by walking into Room 106 outside class, because NH Combat Test has no Headmaster's office yet (§3.8 says the office), and it's issued when the search ends (Heat 0), not at the next period change. The other R2 rulings are listed in `docs/Attendance-and-Discipline.md` (Notoriety: the Bells).
+**R2 status:** R2 built in 2.37.0 (plan `docs/superpowers/plans/2026-11-21-belltower-r2-bells.md`). Installed and checked in NH Combat Test on 2026-11-23. **R2 deltas:** a summons is served by walking into Room 106 outside class, because NH Combat Test has no Headmaster's office yet (§3.8 says the office), and it's issued when the search ends (Heat 0), not at the next period change. The other R2 rulings are listed in `docs/Attendance-and-Discipline.md` (Notoriety: the Bells).
 **Spec delta:** ClockHud and QuestTracker were rebuilt in place instead of getting a new `Controllers.Gui.BellTower`,
 because Timetable, Moments, TouchControls, SchoolFx and GamepadControls depend on their instance names (see the plan's
 Architecture). R1 also differs from §4 and §6 in five places: the cluster `Panel` is 500 wide (only the Lead Card is 470);

@@ -286,7 +286,6 @@ Probation and Suspension now change how school treats you. Tuning is in `Config.
 
 ## Notoriety: the Bells (2.37)
 
-> **Draft (TODO(Studio)):** written from the plan before the Studio install. Replace each TODO(Studio) with the check results, and correct anything the fresh dump changes.
 
 Being noticed. Misdeeds that staff witness build **Heat** (0 to 100), and Heat rings up to five **Bells**. It is a live layer over the record: Notoriety never edits the Discipline ladder or its numbers, and it books only through `Discipline.ReportIncident` / `AddViolation`. Spec: `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-design.md` §3. Plan: `docs/superpowers/plans/2026-11-21-belltower-r2-bells.md`. Mirror: `tools/belltower-r2/`.
 
@@ -405,4 +404,4 @@ Server signal: `Notoriety.Changed(Player, Bells, State)`. Server API: `Witnessed
 
 ### Verified
 
-TODO(Studio): `nt_pure` (Edit VM), `nt_server` and `nt_monitor` (Server, Play), the live hunt, and the summons screenshot. Backup: `ServerStorage.NH_Backup.BellTower_R2_pre_20261121`.
+**Checked (2026-11-23, NH Combat Test, slot 2):** `nt_pure` PASS (Edit VM); `nt_server` PASS and `nt_monitor` PASS (responding 1) in Play. Not checked: the live hunt (not driven), the summons screenshot, quest witness reasons, two players. Backup: `ServerStorage.NH_Backup.BellTower_R2_pre_20261121`.

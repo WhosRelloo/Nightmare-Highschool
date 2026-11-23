@@ -349,7 +349,6 @@ R1 of the Bell Tower rebuilt the top-right clock panel (`ClockHud`) and the ques
 ### The Bell Rail (2.37)
 R2 of the Bell Tower adds the **Bell Rail** to the cluster: a forged rail under the clock plate with up to five bells, and a status line under them. It shows while the server's Notoriety service gives you Bells (see [Attendance and Discipline](Attendance-and-Discipline.md#notoriety-the-bells-237)). The plan is `docs/superpowers/plans/2026-11-21-belltower-r2-bells.md`.
 
-> **Draft (TODO(Studio)):** written from the plan before the install. Confirm against the installed ClockHud and replace each TODO(Studio).
 
 - **Art** (`art/ui/hud/make_belltower.py` `export_r2()`, staged in `art/group-upload-belltower/`, uploaded to group 15981569, ids in `art/group-upload-belltower/ids-r2.json` and `Config.BellTowerArt`):
 
@@ -358,7 +357,7 @@ R2 of the Bell Tower adds the **Bell Rail** to the cluster: a forged rail under 
   | `BellHollow` | `BtBellHollow.png` | 256 x 256 | 73177035232417 | the bells while Hollow (blackened iron) |
   | `BellTarnished` | `BtBellTarnished.png` | 256 x 256 | 132965538168678 | the bells while Tarnished (verdigris brass) |
   | `BellLit` | `BtBellLit.png` | 256 x 256 | 82432772953626 | the bells while Lit or in Search (hot brass) |
-  | `BellGlow` | `BtBellGlow.png` | 256 x 256 | 122809646117990 | a greyscale halo behind each bell while Lit, tinted Gold. (2.37) The file was re-baked to reach alpha 0 at every edge; TODO(Studio): the new id if the owner re-uploads |
+  | `BellGlow` | `BtBellGlow.png` | 256 x 256 | 96913118397929 | a greyscale halo behind each bell while Lit, tinted Gold. (2.37) Re-baked to reach alpha 0 at every edge and re-uploaded (the old id 122809646117990 is unused) |
   | `BellRail` | `BtBellRail.png` | 1400 x 220 | 126038840460786 | the rail with five hooks |
 
 - **Fallback** (an id of 0): each bell draws the kit's `Theme.Images.Bell`, tinted per state by `BellTower.BellTint` (Hollow grey-violet, Tarnished verdigris, Lit and Search gold). The rail and glow are left out.
@@ -380,7 +379,7 @@ R2 of the Bell Tower adds the **Bell Rail** to the cluster: a forged rail under 
 - **The conduct row** shows a **Summons** slip ("Summons" or "Summons ×N", "Room 106, outside class") after a detention in progress and before an owed detention, from `NHSummons`. It sets the Room 106 waypoint outside class.
 - **The Lead Card folds** while `NHBells` is above 0: the Objective, Pips and Timer hide, leaving the title and the `J` key. The card still follows the taller cluster (2.36.1's signals).
 - **Contracts:** all of R1's still hold. `Panel` stays ClockHud's only direct Frame child, the "In class" line and `ShowPA` are unchanged, and `QuestTracker.Tracker` keeps AnchorPoint.X above 0.5 on desktop. `tools/belltower-r2/checks/bt_bells.lua` checks the first, plus the 20 px floor, the rail under the plate and the fold.
-- **Checked:** TODO(Studio): `bt_pure_r2` and R1's `bt_pure` (Edit VM); `bt_bells`, R1's `bt_hud*` and `bt_contracts` (Play); screenshots `img/belltower-r2-{murmur,search,hunted,tolling,summons}.jpg`.
+- **Checked (2026-11-23):** `bt_pure_r2` and R1's `bt_pure` PASS (Edit VM); `bt_bells` and R1's five `bt_hud*` PASS, `bt_contracts` as expected outside class (Play). Screenshots: [Named, Lit](img/belltower-r2-named-lit.jpg), [The Tolling, Tarnished](img/belltower-r2-tolling-tarnished.jpg).
 
 ### Health bar: Thornrose
 The owner asked for "a completely new and cooler and on theme design". Three all-new concepts were mocked up (Vigil, Reliquary, Thornrose: [options](img/health-thornrose-options.jpg)), and the owner picked **Thornrose**: a briar of black iron (`KitHud` `Local.SkinThorn`, over the kit's `HealthBar`).

@@ -2,14 +2,13 @@
 
 All notable changes to the NH Combat Test dev place. The newest entries come first.
 
-## [2.37.0] - TODO(Studio: date): The Bell Tower, R2: the Bells
+## [2.37.0] - 2026-11-23: The Bell Tower, R2: the Bells
 
-> **Draft:** written before the Studio install. Every TODO(Studio) is filled in from the real runs.
 
 R2 of `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-design.md` (§3, §4 item 2, §7 R2). The plan is `docs/superpowers/plans/2026-11-21-belltower-r2-bells.md`.
 - **Mirror:** `tools/belltower-r2/` (`live/` is the built scripts, `pre/` the scripts before R2).
 - **The Map place:** untouched.
-- **Art status:** the five bell pieces are uploaded to group 15981569, and their ids are in `Config.BellTowerArt`. TODO(Studio): confirm, and note a re-uploaded `BtBellGlow` if there is one.
+- **Art status:** the five bell pieces are uploaded to group 15981569, and their ids are in `Config.BellTowerArt`. Confirmed in Play. `BtBellGlow` was re-uploaded after the edge fix: id 96913118397929 (the old 122809646117990 is unused).
 
 ### Added
 - **Notoriety** (`ServerScriptService.Services.School.Notoriety`): misdeeds that staff witness build Heat (0-100), and Heat rings up to five Bells: Murmur 10+, Noticed 25+, Named 45+, Hunted 70+, The Tolling 90+.
@@ -48,16 +47,16 @@ R2 of `docs/superpowers/specs/2026-11-20-notoriety-timetable-discipline-ui-desig
 - `Contraband` Heat 10 is not in spec §3.2.
 - The probation multiplier also applies on Suspension.
 - Bells 1 and 2 draw no staff response yet. Bell 5 cools like the others, and has no campus-wide search.
-- Quests call `HallMonitor.CheckWitness` with their objective's `Witness` value. A reason with no Heat row adds no Heat, but it becomes the misdeed a later Wanted catch books. TODO(Studio): the result of checking those values.
+- Quests call `HallMonitor.CheckWitness` with their objective's `Witness` value. A reason with no Heat row adds no Heat, but it becomes the misdeed a later Wanted catch books. Not checked in Studio (no quest with a `Witness` objective was run).
 
 ### Checked
-- TODO(Studio): `nt_pure` (Edit VM).
-- TODO(Studio): `nt_server`, including the `8 RespondOk=… monitors=N` observation.
-- TODO(Studio): `nt_monitor (responding N)`.
-- TODO(Studio): `bt_pure_r2`, plus R1's `bt_pure` (Edit VM).
-- TODO(Studio): `bt_bells`, plus R1's five `bt_hud*` and `bt_contracts` (Play).
-- TODO(Studio): the live hunt observation.
-- TODO(Studio): screenshots: [murmur](docs/img/belltower-r2-murmur.jpg), [search](docs/img/belltower-r2-search.jpg), [hunted](docs/img/belltower-r2-hunted.jpg), [tolling](docs/img/belltower-r2-tolling.jpg), [summons](docs/img/belltower-r2-summons.jpg).
+- `nt_pure` (Edit VM): PASS.
+- `nt_server` (Play): PASS. Observation: `8 RespondOk=false monitors=1` (the one monitor on duty was not in range to respond at Bell 3).
+- `nt_monitor` (Play): PASS (responding 1).
+- `bt_pure_r2` and R1's `bt_pure` (Edit VM): PASS.
+- `bt_bells` and R1's five `bt_hud*` (owed, active, clear, suspended, warning) (Play): PASS. `bt_contracts`: as expected outside a class period.
+- The live hunt was not driven (the character was not walked to a monitor).
+- Screenshots: [Named, Lit](docs/img/belltower-r2-named-lit.jpg) and [The Tolling, Tarnished](docs/img/belltower-r2-tolling-tarnished.jpg). The search, hunted and summons states were checked by `bt_bells` but not photographed.
 - **Not checked:**
   - two players
   - students as witnesses (R3)
