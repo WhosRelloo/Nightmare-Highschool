@@ -659,6 +659,10 @@ def checks(name, clip, meta, recipe):
         res["max_torso_yaw"] = round(max(abs(torso_yaw_deg(clip, i)) for i in range(clip.n)), 2)
         ok &= res["max_torso_yaw"] <= 1.0
         res["stride"] = round(stride(clip), 3)
+        res["stance"] = round(stance_speed(clip), 3)   # the planted-foot ground speed at 1x: Config.Locomotion.Stride.Strafe
+        res["jitter"] = round(stance_jitter(clip), 3)
+        res["lowest_foot"] = round(lowest_foot(clip), 3)
+        ok &= res["jitter"] <= 0.05 and res["lowest_foot"] >= -3.08
         res["contact_phase"] = round(contact_phase(clip), 3)
     if meta.get("loop") and not recipe.get("allow_seam"):
         ok &= res["seam"] <= 1.5
@@ -689,7 +693,7 @@ def main():
             for k in ("Carry", "bucket", "base", "window"):
                 if k in meta:
                     entry[k] = meta[k]
-            for k in ("stride", "contact_phase"):
+            for k in ("stride", "stance", "contact_phase"):
                 if k in res:
                     entry[k] = res[k]
             manifest[name] = entry
