@@ -98,6 +98,7 @@ end
 
 local Activities = require(SSS.School.Activities)
 local Lesson = { Ran = false }
+local RiteNote = ""
 local StateSeen = {}
 local function body()
 local function first0(K) local L0 = Admin.Lists() local I = L0[K] and L0[K][1] return I and (if typeof(I) == "table" then I.Id else I) end
@@ -116,11 +117,36 @@ if typeof(Admin.InspectFor(P, Me)) ~= "table" then table.insert(Fails, "Inspect 
 Ran += 1
 want(false, "Ban", { Days = 0; Reason = "test" }, Me, "Permanent bans are owner-only")
 want(false, "GiveYen", { Amount = 200000 }, Me, "needs an owner")
+-- (polish) race rites: listed for the owner, refused below owner by the ^Rite gate in QuestStart's Run
+local Rites = {}
+for _, It in Admin.Lists().Quests do if string.find(It.Id, "^Rite") then table.insert(Rites, It.Id) end end
+if #Rites == 0 then table.insert(Fails, "Lists.Quests has no rite to test the owner gate with") end
+for _, Id in Rites do want(false, "QuestStart", { Id = Id }, Me, "Race rites are owner-only") end
 P:SetAttribute("NHTestLevel", 0)
 task.wait(0.3)
 want(false, "Warn", {}, Me, "Not staff")
 P:SetAttribute("NHTestLevel", nil)
 task.wait(0.3)
+-- (polish) the owner gets past the rite gate: a rite that can start now starts, then is dropped (restore.py and the
+-- Quests put-back cover the rest). If none can start for slot 2's race, the refusal must be Quests' state message
+-- and never the owner gate.
+do
+	local Q = require(SSS.Quests.Quests)
+	local Pick
+	for _, Id in Rites do if Q.CanStart(P, Id) == true then Pick = Id break end end
+	if Pick then
+		want(true, "QuestStart", { Id = Pick }, Me)
+		if not Q.IsActive(P, Pick) then table.insert(Fails, "rite " .. Pick .. " not active after the owner started it") end
+		want(true, "QuestAbandon", { Id = Pick }, Me)
+		if Q.IsActive(P, Pick) then table.insert(Fails, "rite " .. Pick .. " still active after QuestAbandon") end
+		RiteNote = "owner started and dropped " .. Pick
+	elseif Rites[1] then
+		local A, B = go("QuestStart", { Id = Rites[1] }, Me)
+		Ran += 1
+		if A == true or string.find(tostring(B), "owner-only", 1, true) then table.insert(Fails, "owner on a rite with no start: " .. tostring(A) .. " " .. tostring(B)) end
+		RiteNote = "none startable; owner refusal was state: " .. tostring(B)
+	end
+end
 
 -- arguments
 want(false, "Speed", { Value = 500 }, Me, "Speed must be 0 to 120")
@@ -268,6 +294,6 @@ for K, V in Attr0 do if Now[K] == nil then
 end end
 if Clock.GetState().Day ~= Before.Day then table.insert(Fails, "clock day not put back") end
 if Admin.Locked() then table.insert(Fails, "ServerLock left on") end
-local Tail = `\nstate-refused ({#StateSeen}): {table.concat(StateSeen, " | ")}\nput back: {table.concat(Undo, ", ")} (direct write, in place: {if #Direct > 0 then table.concat(Direct, ", ") else "none"})\nattribute drift: {table.concat(Drift, ", ")}`
+local Tail = `\nstate-refused ({#StateSeen}): {table.concat(StateSeen, " | ")}\nput back: {table.concat(Undo, ", ")} (direct write, in place: {if #Direct > 0 then table.concat(Direct, ", ") else "none"})\nattribute drift: {table.concat(Drift, ", ")}\nrites: {RiteNote}`
 if #Fails > 0 then return "FAIL " .. #Fails .. " of " .. Ran .. "\n" .. table.concat(Fails, "\n") .. Tail end
 return "PASS console_play_run (" .. Ran .. " calls)" .. Tail
