@@ -3,7 +3,9 @@ The MCP's execute_luau gets a fresh module graph on both sides (on the server, i
 OnStart and sees no loaded profiles; on the client, its require of the StaffConsole controller is not the one the
 game runs). So the check goes in a Script under ServerScriptService (Server, the default) or a LocalScript under
 PlayerGui (Client), as restore.py does, and the result comes back through an attribute. Prints the result; exit 1
-unless it starts with PASS."""
+unless it starts with PASS.
+On a timeout the check is not destroyed mid-run: it gets the attribute Stop (checks poll it and clean up) and up to
+90 s more to answer; console_play_run.lua then puts slot 2 back and clears NHTestLevel before it returns."""
 import os, subprocess, sys
 RBXC = r"E:/Rensei/Rensei-Game-Design/Art/Tools/rbxc.py"
 src = open(sys.argv[1], encoding="utf-8").read()
@@ -24,6 +26,12 @@ script:SetAttribute("Out", if ok then tostring(r) else "FAIL error: " .. tostrin
 S.Parent = %s
 local t0 = os.clock()
 while S:GetAttribute("Out") == nil and os.clock() - t0 < %d do task.wait(0.5) end
+-- timed out: never destroy a check mid-run (it would skip its put-back); ask it to stop and give it time to clean up
+if S:GetAttribute("Out") == nil then
+	S:SetAttribute("Stop", true)
+	local t1 = os.clock()
+	while S:GetAttribute("Out") == nil and os.clock() - t1 < 90 do task.wait(0.5) end
+end
 local r = S:GetAttribute("Out")
 S:Destroy()
 return tostring(r or "FAIL timeout")''' % (cls, src, parent, timeout)

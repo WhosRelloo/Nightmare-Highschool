@@ -196,6 +196,9 @@ Shared.Handlers = {
 	Close = function() Shared.Toggle(false) end;
 	Palette = function()
 		if not U then return end
+		-- (fix round 1) the palette takes the keys: no card stays selected under it (Enter must never hold a danger Run)
+		local Sel = GuiService.SelectedObject
+		if Sel and Sel:IsDescendantOf(U.Gui) then GuiService.SelectedObject = nil end
 		Palette.Open(U.Board, { Defs = defs();
 			OnRun = function(D) task.spawn(run, D, Values[D.Id] or {}) end;
 			OnJump = function(D) S.Side = D.Side S.Section = D.Section Shared.Redraw() end;

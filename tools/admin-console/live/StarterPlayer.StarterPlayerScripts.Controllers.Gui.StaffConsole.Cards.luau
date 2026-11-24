@@ -121,6 +121,13 @@ end
 Cards.Holding = false
 local CurrentStop = nil :: (() -> ())?
 local HOLD_KEYS = { [Enum.KeyCode.ButtonA] = true; [Enum.KeyCode.Return] = true }
+-- (fix round 1) a key that a TextBox is taking (Enter on a palette query) never holds a selected Run: the box may
+-- already have let go of focus by the time UserInputService sees the key, so a just-released box counts too
+local BoxReleasedAt = -math.huge
+UserInputService.TextBoxFocusReleased:Connect(function() BoxReleasedAt = os.clock() end)
+local function typing(): boolean
+	return UserInputService:GetFocusedTextBox() ~= nil or os.clock() - BoxReleasedAt < 0.25
+end
 -- the shell closes the console mid-hold: cancel it (a hidden gui may never see the button let go)
 function Cards.CancelHold() if CurrentStop then CurrentStop() end end
 function Cards.Hold(Button: GuiButton, Ring: GuiObject?, Reduced: boolean, OnDone: () -> ()): any
@@ -145,7 +152,8 @@ function Cards.Hold(Button: GuiButton, Ring: GuiObject?, Reduced: boolean, OnDon
 		local Token = {}
 		local V = Instance.new("NumberValue")
 		local Tw = TweenService:Create(V, TweenInfo.new(SC.DANGER_HOLD, Enum.EasingStyle.Linear), { Value = 1 })
-		local Conns = { Button.Destroying:Connect(stop) }
+		-- alt-tab mid-hold: the window loses focus, the let-go may never arrive, so it cancels
+		local Conns = { Button.Destroying:Connect(stop), UserInputService.WindowFocusReleased:Connect(stop) }
 		Holding = { Token = Token; Tween = Tw; Conns = Conns }
 		if Input then
 			local Key = HOLD_KEYS[Input.KeyCode] == true
@@ -190,7 +198,7 @@ function Cards.Hold(Button: GuiButton, Ring: GuiObject?, Reduced: boolean, OnDon
 	end)
 	-- A / Return on the selected button (the gamepad and keyboard UI selection)
 	local KeyConn = UserInputService.InputBegan:Connect(function(I)
-		if HOLD_KEYS[I.KeyCode] and GuiService.SelectedObject == Button and not Holding then begin(I) end
+		if HOLD_KEYS[I.KeyCode] and GuiService.SelectedObject == Button and not Holding and not typing() then begin(I) end
 	end)
 	Button.Destroying:Connect(function() KeyConn:Disconnect() end)
 	Button.InputEnded:Connect(function(I)

@@ -6,6 +6,9 @@
 -- changes on slot 2 (look and build, identity and gear, race, progress, places found, club, titles, attendance,
 -- classes) is copied from the profile before the run and put back just before the last command (Kill), so the
 -- respawn rebuilds the character from it; the clock (day, time, speed) goes back too.
+-- (fix round 1) The run is one xpcall: whatever stops it (an error, or run_live.py's "Stop" attribute on a timeout),
+-- the put-back still runs and NHTestLevel is cleared. Put-back writes go into the profile's own tables (services
+-- keep references to them). Attribute drift fails unless it is on the allow-list below, with its reason.
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local HttpService = game:GetService("HttpService")
@@ -16,6 +19,7 @@ if not P then return "FAIL no player" end
 local Fails, Ran, Seen = {}, 0, {}
 local function go(Cmd, Args, Target)
 	task.wait(0.2) -- Dispatch's 0.15 s rate limit
+	if script:GetAttribute("Stop") then error("stopped by run_live.py (timeout)", 0) end
 	return Admin.Dispatch(P, Cmd, Target, Args or {})
 end
 local function want(Ok, Cmd, Args, Target, Expect)
@@ -54,8 +58,21 @@ local Before = {
 	Day = St0.Day;
 	ClockSpeed = (ClockPart and ClockPart:GetAttribute("RealSecondsPerGameHour")) or require(RS.Config.SchoolSchedule).RealSecondsPerGameHour;
 }
-local Undo = {}
+local Undo, Direct = {}, {}
+-- put a saved value back into the profile's existing table, so no service is left holding an orphan
+local function into(Prof, K, V)
+	local T = Prof[K]
+	if typeof(T) == "table" and typeof(V) == "table" then
+		for X in T do T[X] = nil end
+		for X, Y in deep(V) do T[X] = Y end
+	else
+		Prof[K] = deep(V)
+	end
+end
+local PutBackDone = false
 local function putBack()
+	if PutBackDone then return end
+	PutBackDone = true
 	local Prof = Data.GetProfile(P)
 	local UPDATE = { Appearance = { "SetAppearance", "appearance" }; Identity = { "SetIdentity", "identity" }; Progress = { "SetProgress", "progress" };
 		Regions = { "SetRegions", "regions" }; Sports = { "SetSports", "sports" }; Attendance = { "SetAttendance", "attendance" } }
@@ -66,18 +83,23 @@ local function putBack()
 		if json(Prof[K]) ~= json(Saved[K]) then
 			local U = UPDATE[K]
 			if U then pcall(Data.UpdateState, P, { type = U[1]; [U[2]] = deep(Saved[K]) }) end
-			if json(Prof[K]) ~= json(Saved[K]) then Prof[K] = deep(Saved[K]) end
+			if json(Prof[K]) ~= json(Saved[K]) then into(Prof, K, Saved[K]) table.insert(Direct, K) end
 			table.insert(Undo, K)
 		end
 	end
 	pcall(function() require(SSS.Social.Reputation).Sync(P) end)
 	pcall(function() local I = require(SSS.Player.Identity) if I.Mirror then I.Mirror(P, I.Get(P)) end end)
 	pcall(function() require(SSS.Sports.Clubs).Notify(P) end)
+	pcall(function() require(SSS.Player.Height).Apply(P) end) -- height mirrors and body (a stopped run has no respawn)
 	pcall(function() local Pg = require(SSS.Player.Progression) Pg.Apply(P) Pg.Notify(P) end)
 	P:SetAttribute("Level", Attr0.Level)
 	pcall(function() Clock.SetSpeed(Before.ClockSpeed) Clock.SetTime("12:30", Before.Day) end)
 end
 
+local Activities = require(SSS.School.Activities)
+local Lesson = { Ran = false }
+local StateSeen = {}
+local function body()
 -- levels (NHTestLevel, Studio only)
 P:SetAttribute("NHTestLevel", 1)
 task.wait(0.3)
@@ -103,13 +125,18 @@ want(false, "Heal", {}, nil, "Pick a player first")
 
 -- commands that may fairly be refused in this state: each needs this exact refusal message, never just "not true"
 local StateOk = {
-	StartLesson = "Couldn't start it", -- 12:30 is After School: no class in R101 (Activities.TryStart: "No ... class right now")
 }
-local StateSeen = {}
 
 -- every safe command once (Kick, Ban, Unban and Shutdown are left out: they would end the Play session)
 local L = Admin.Lists()
 local function first(K) local I = L[K] and L[K][1] return I and (if typeof(I) == "table" then I.Id else I) end
+-- (fix round 1) the quest: the first in the list that can start now. A dare is open only on its own day (Quests.DareFor),
+-- so first("Quests") alone is refused on most days ("not open to them yet").
+local QuestId = first("Quests")
+pcall(function()
+	local Q = require(SSS.Quests.Quests)
+	for _, It in L.Quests do if Q.CanStart(P, It.Id) == true then QuestId = It.Id break end end
+end)
 local Runs = {
 	{ "Mute" }, { "Unmute" }, { "Freeze" }, { "Freeze" }, { "Jail" }, { "Spectate" }, { "Bring" }, { "Goto" },
 	{ "Note", { Text = "console test" } }, { "Note", { Text = "" } },
@@ -124,20 +151,36 @@ local Runs = {
 	{ "RegionsAll" }, { "RegionsReset" }, { "SetClub", { Club = first("Clubs") } },
 	{ "MatchStart", { Venue = first("Venues") } }, { "MatchEnd", { Venue = first("Venues") }, true },
 	{ "SetTime", { Time = "12:30" }, true }, { "ClockSpeed", { Value = 60 }, true }, { "SkipToPeriod", { Segment = first("Segments") }, true }, { "RingBell", nil, true },
-	{ "StartLesson", { Room = "R101" } }, { "SetDisciplinePoints", { Value = 0 } }, { "ClearDiscipline" }, { "LiftSuspension" }, { "ExcuseToday" },
+	{ "SetDisciplinePoints", { Value = 0 } }, { "ClearDiscipline" }, { "LiftSuspension" }, { "ExcuseToday" },
 	{ "OweDetention" }, { "ClearDetention" },
-	{ "QuestStart", { Id = first("Quests") } }, { "QuestAbandon", { Id = first("Quests") } }, { "QuestReset" },
+	{ "QuestStart", { Id = QuestId } }, { "QuestAbandon", { Id = QuestId } }, { "QuestReset" },
 	{ "FullMoon", nil, true }, { "GotoRegion", { Id = first("Regions") }, true },
 	{ "SpawnDelinquents", nil, true }, { "SpawnDelinquent", { Role = "Brute" }, true }, { "SpawnWolves", nil, true },
 	{ "SpawnBeast", { Beast = first("Beasts") }, true }, { "SpawnSparring", { Tier = "Easy" }, true }, { "ClearEnemies", nil, true },
 	{ "Invisible", nil, true }, { "Invisible", nil, true },
 	{ "TeleportTo", { Position = (P.Character and P.Character:GetPivot().Position or Vector3.zero) + Vector3.new(0, 0, 4) }, true },
+	-- (fix round 1) after the quest rows: the lesson needs the clock in a class period (tomorrow), and a dare that sees
+	-- school hours on another day is no longer open, so QuestStart would be refused if this ran first
+	{ "StartLesson", { Room = "R102" } },
 	{ "Kill" }, -- last: the respawn
 }
 for _, R in Runs do
 	local Cmd, Args, NoTarget = R[1], R[2], R[3]
 	Seen[Cmd] = true
 	if Cmd == "Kill" then putBack() end
+	-- StartLesson's success path: skip to Period 1 (Mathematics in R102), be in the room (a hall pass counts as in
+	-- class: Attendance.InClass), then it must start; it is quit at once and the clock goes back to 12:30 today.
+	-- (Not R101: that is Homeroom, which has no lesson in Config.Activities.Subjects, so it can never start.)
+	if Cmd == "StartLesson" then
+		local A0, B0 = go("SkipToPeriod", { Segment = "Period 1" }, nil)
+		Ran += 1
+		if A0 ~= true then table.insert(Fails, `SkipToPeriod Period 1 refused: {tostring(B0)}`) end
+		Lesson.Ran = true
+		P:SetAttribute("NHHallPass", "R102")
+		local t1 = os.clock()
+		while P:GetAttribute("ClassInRoom") ~= true and os.clock() - t1 < 10 do task.wait(0.25) end
+		if P:GetAttribute("ClassInRoom") ~= true then table.insert(Fails, "StartLesson setup: ClassInRoom never true in Period 1") end
+	end
 	local A, B = go(Cmd, Args, if NoTarget then nil else Me)
 	Ran += 1
 	if A ~= true then
@@ -147,12 +190,29 @@ for _, R in Runs do
 	end
 	-- the clock goes straight back to 12:30 today after a jump, so no class gets booked while the run goes on
 	if Cmd == "SkipToPeriod" or Cmd == "FullMoon" then Clock.SetTime("12:30", Before.Day) end
-	-- a lesson that did start is walked out of at once
-	if Cmd == "StartLesson" and A == true then pcall(require(SSS.School.Activities).ActionForTests, P, "Quit") end
+	-- the lesson is walked out of at once, and the clock goes back
+	if Cmd == "StartLesson" then
+		if A == true then
+			Activities.ActionForTests(P, "Quit")
+			if Activities.GetSessionForTests(P) ~= nil then table.insert(Fails, "StartLesson: the lesson didn't end on Quit") end
+		end
+		P:SetAttribute("NHHallPass", nil)
+		Clock.SetTime("12:30", Before.Day)
+	end
 end
 for _, Id in { "Kick", "Ban", "Unban", "Shutdown" } do Seen[Id] = true end
 for _, D in Admin.Registry(3) do if not Seen[D.Id] then table.insert(Fails, D.Id .. " not run") end end
+end
+
+-- the run, then always: NHTestLevel and the hall pass cleared, any lesson quit, everything put back
+local OkRun, Err = xpcall(body, debug.traceback)
+if not OkRun then table.insert(Fails, "run stopped: " .. tostring(Err):sub(1, 300)) end
 P:SetAttribute("NHTestLevel", nil)
+if Lesson.Ran then
+	P:SetAttribute("NHHallPass", nil)
+	if Activities.GetSessionForTests(P) then pcall(Activities.ActionForTests, P, "Quit") end
+end
+putBack()
 
 -- after the respawn: everything outside the snapshot is as it was
 local t0 = os.clock()
@@ -162,13 +222,29 @@ until (H and H.Health > 0) or os.clock() - t0 > 20
 task.wait(2)
 local Prof = Data.GetProfile(P)
 for _, K in KEYS do if json(Prof[K]) ~= json(Saved[K]) then table.insert(Fails, `profile {K} not put back`) end end
-for _, K in { "Level", "SubRace", "RaceTier", "Race", "Title", "HeightText", "Slot", "Enrolled" } do
+for _, K in { "Level", "SubRace", "RaceTier", "Race", "Title", "HeightText", "Slot", "Enrolled", "Club", "ClubRank", "NHTestLevel", "NHHallPass" } do
 	if P:GetAttribute(K) ~= Attr0[K] then table.insert(Fails, `attribute {K}: {tostring(P:GetAttribute(K))}, was {tostring(Attr0[K])}`) end
 end
+-- attributes allowed to differ after the run, each with its reason; any other drift fails
+local DRIFT_OK = {
+	DetentionsOwed = "Discipline: Owe/ClearDetention set it; restore.py puts the discipline record back after the run";
+	DetentionActive = "Detention: whether a detention session runs; Jail / Owe / ClearDetention start or end one, restore.py puts the owed count back";
+	DetentionCollected = "Detention: a running session's progress; it goes when ClearDetention ends the session";
+	DetentionTotal = "Detention: a running session's goal; it goes when ClearDetention ends the session";
+	DisciplinePoints = "Discipline: SetDisciplinePoints / ClearDiscipline change it; restore.py puts the discipline record back";
+	DisciplineLevel = "Discipline: follows DisciplinePoints; restore.py puts the discipline record back";
+}
 local Drift = {}
-for K, V in P:GetAttributes() do if Attr0[K] ~= V then table.insert(Drift, `{K}={tostring(V)} (was {tostring(Attr0[K])})`) end end
+local Now = P:GetAttributes()
+for K, V in Now do if Attr0[K] ~= V then
+	if DRIFT_OK[K] then table.insert(Drift, `{K}={tostring(V)} (was {tostring(Attr0[K])}; allowed: {DRIFT_OK[K]})`)
+	else table.insert(Fails, `attribute drift {K}={tostring(V)} (was {tostring(Attr0[K])})`) end
+end end
+for K, V in Attr0 do if Now[K] == nil then
+	if DRIFT_OK[K] then table.insert(Drift, `{K}=nil (was {tostring(V)}; allowed)`) else table.insert(Fails, `attribute drift {K}=nil (was {tostring(V)})`) end
+end end
 if Clock.GetState().Day ~= Before.Day then table.insert(Fails, "clock day not put back") end
 if Admin.Locked() then table.insert(Fails, "ServerLock left on") end
-local Tail = `\nstate-refused ({#StateSeen}): {table.concat(StateSeen, " | ")}\nput back: {table.concat(Undo, ", ")}\nattribute drift: {table.concat(Drift, ", ")}`
+local Tail = `\nstate-refused ({#StateSeen}): {table.concat(StateSeen, " | ")}\nput back: {table.concat(Undo, ", ")} (direct write, in place: {if #Direct > 0 then table.concat(Direct, ", ") else "none"})\nattribute drift: {table.concat(Drift, ", ")}`
 if #Fails > 0 then return "FAIL " .. #Fails .. " of " .. Ran .. "\n" .. table.concat(Fails, "\n") .. Tail end
 return "PASS console_play_run (" .. Ran .. " calls)" .. Tail
