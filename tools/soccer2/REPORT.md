@@ -77,7 +77,7 @@ frames in 30 s), so `motion_audit.py` sees every frame twice. The demo's waits a
 | frozen frames | < 3 % | 50.1 % | 51.8 % |
 | duplicated frames in motion | none | 5.4 % | 26.1 % |
 | fall / rise | | 1.11 | 0.82 |
-| creeping hold (demo about 2.9-3.6 s) | no frozen frames | | a 1.48 s hold at 2.52 s of the stretch |
+| creeping hold (demo 2.7-3.4 s, stretch about 1.9-2.6 s) | no frozen frames | | a 1.48 s hold at 2.52 s of the stretch |
 
 **Not passed:** moving fraction, frozen frames, duplicates, and the creeping hold: a 1.48 s hold falls in the creep
 window. The doubled frames explain much of the frozen and duplicate figures, but not all of them, and this wasn't verified.
