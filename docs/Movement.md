@@ -34,7 +34,7 @@ The mode has to hold for 0.12 s before the blend starts, and it fades out over 0
     the local KeyframeSequences in `ReplicatedStorage.NHLocoClips`.
 
 ## Speed and cadence
-- **The strafe speed cap:** 8.5 studs/s.
+- **The strafe speed cap:** 7 studs/s (was 8.5 until 2026-11-23).
   - The client tells the server through `ReplicatedStorage.Remotes.NHStrafe`. The server sets the Character
     attribute `NHStrafing`, and CombatSpeed caps the walk band at `StrafeSpeed`.
   - It's a cap, so hunger, a combat tag and kit slows still apply.
@@ -59,17 +59,17 @@ The owner: the running speed and animation were too fast, and NPCs should follow
   | Speed | Now | Was | Written by |
   |---|---|---|---|
   | Walk | 10 | 12 after a sprint, 14.4 after any state, 16 at spawn | Sprint's release and cancel, every StateManager reset, Crouch, Evolution, Cine, `StarterPlayer.CharacterWalkSpeed`, the `StarterCharacter` and AI rig Humanoids (they override `CharacterWalkSpeed`) |
-  | Sprint | 22 | 25 | Sprint |
-  | Fast sprint | 30, after 2 s (`FastAfter`) | 40.5 | Sprint (a slide carries straight into it) |
+  | Sprint | 20 (22 on the first pass) | 25 | Sprint |
+  | Fast sprint | 27 (30 on the first pass), after 2 s (`FastAfter`) | 40.5 | Sprint (a slide carries straight into it) |
   | Walk while attacking | 7 | 10 | StateManager `Attacking` |
   | Carrying someone | 8 | 12 | `Config.Downed.CarryWalkSpeed` |
   | NPC patrol | 10 | 12 | `Config.NPC.PatrolSpeed` |
 
   Unchanged: crouch 7, crawl 4, stuns and slows 5, FlashStep 40, the NPC chase and sprint tiers (15–18 / 19–24).
-  The two top tiers (23, 24) now outrun a player's first two seconds of sprint (22); the fast sprint (30) still
+  The top three tiers (21, 23, 24) now outrun a player's first two seconds of sprint (20); the fast sprint (27) still
   outruns all of them.
 - **Gaits:** `Functions.Locomotion.Gait(Set, Ground, Cfg)` picks the clip from the faster of the set speed and the
-  ground speed: Walk up to `Gaits.WalkMax` (12), Sprint up to `Gaits.SprintMax` (26), FastSprint above. The same call
+  ground speed: Walk up to `Gaits.WalkMax` (12), Sprint up to `Gaits.SprintMax` (23), FastSprint above. The same call
   runs in the player's `AnimationController`, the AI NPCs' `Services.AI.AI.Animate`, and the schedule students
   (`Features.Schedules`; they have no fast sprint, so Sprint plays above 12). Before, players and AI NPCs switched at 20
   and 40, and students ran above 10.
@@ -78,7 +78,8 @@ The owner: the running speed and animation were too fast, and NPCs should follow
   `RUN_PACE` 16 times leg / 1.8.
 - **Jump, fall and land:** AI NPCs now skip the jump and fall clips while sprinting and play the `Land` one-shot on
   touchdown, the way players do.
-- **What the clips play at now** (2-stud legs): walk 1.69×, sprint 1.63×, fast sprint 1.67×. Shorter bodies step
+- **What the clips play at now** (2-stud legs): walk 1.69×, sprint 1.48×, fast sprint 1.5×, strafes about 1.46×
+  (measured at the first pass's 22 / 30: 1.63× / 1.67×). Shorter bodies step
   quicker to keep their feet planted: on a 0.86-height player (1.615-stud legs) it's about 2.06× for all three, where
   before the walk and fast sprint hit the 2.4× cap and slid.
 - **Measured in Play** (2026-11-23, slot 2): `tools/locomotion-pace/REPORT.md`.

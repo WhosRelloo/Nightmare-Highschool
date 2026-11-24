@@ -7,8 +7,8 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 Work on branches that aren't merged into `main` yet. Nothing here is in NH Combat Test unless it says so.
 
 ### `locomotion-pace`: slower run, NPCs on the players' animation rules (installed in NH Combat Test, not saved)
-- **Speeds** (`Config.Locomotion.Speeds`): walk 10 everywhere (was 12, 14.4 after states, 16 at spawn), sprint 22 (was
-  25), fast sprint 30 after 2 s (was 40.5), the attack walk 7 (was 10), carrying 8 (was 12), NPC patrol 10 (was 12).
+- **Speeds** (`Config.Locomotion.Speeds`): walk 10 everywhere (was 12, 14.4 after states, 16 at spawn), sprint 20 (was
+  25), fast sprint 27 after 2 s (was 40.5), strafes 7 (was 8.5), the attack walk 7 (was 10), carrying 8 (was 12), NPC patrol 10 (was 12).
 - **Gaits** (`Functions.Locomotion.Gait`, `Config.Locomotion.Gaits`): one rule picks Walk / Sprint / FastSprint for
   players, AI NPCs (`Services.AI.AI.Animate`) and schedule students. All three play stride-matched to their own legs
   (`Loco.Rate`), and AI NPCs now skip the jump and fall clips while sprinting and play the landing, like players.

@@ -20,16 +20,18 @@ return {
 	-- (locomotion-pace, owner 2026-11-23: "the running speed and animation is too fast") the one place the walk and sprint
 	-- speeds live. Sprint writes Sprint, then FastSprint after FastAfter seconds; StateManager's resets, Crouch, Evolution
 	-- and Cine hand back Walk; StarterPlayer.CharacterWalkSpeed matches Walk. Attacking: the walk while an attack plays.
-	-- At these the clips play at about 1.7x (walk), 1.6x (sprint) and 1.7x (fast sprint) instead of 2 to 2.4x.
-	Speeds = { Walk = 10; Sprint = 22; FastSprint = 30; FastAfter = 2; Attacking = 7 };
+	-- At these the clips play at about 1.7x (walk), 1.5x (sprint) and 1.5x (fast sprint) instead of 2 to 2.4x.
+	-- (owner, 2026-11-23, second pass: "make the run slower") sprint 20 (was 22), fast sprint 27 (was 30). Sprint stays over
+	-- 19 (the sports' stamina drain reads Speed > 19) and over 17 (Stealth's sprint check).
+	Speeds = { Walk = 10; Sprint = 20; FastSprint = 27; FastAfter = 2; Attacking = 7 };
 	-- which clip a ground speed plays (Functions.Locomotion.Gait), for players and every humanoid NPC alike: the walk up to
 	-- WalkMax, the sprint clip up to SprintMax, the fast sprint above. WalkMax 12: over a player's walk (10) and an NPC's
 	-- patrol, under the students' flight (13 to 15, StudentBrain) and the AI chase (15 to 18), so those run instead of
-	-- walking at 2.4x. SprintMax 26: between the sprint (22) and the fast sprint (30).
-	Gaits = { WalkMax = 12; SprintMax = 26 };
+	-- walking at 2.4x. SprintMax 23: between the sprint (20) and the fast sprint (27).
+	Gaits = { WalkMax = 12; SprintMax = 23 };
 	CadenceMin = 0.3;
 	CadenceMax = 2.4;      -- owner, 2026-11-22: the stride fix on walk, sprint and crouch, capped at 2.4x playback
-	StrafeSpeed = 8.5;     -- owner: about 8.5 studs/s while strafing (CombatSpeed caps the walk band)
+	StrafeSpeed = 7;       -- owner: slower strafes (was 8.5, 2026-11-23); CombatSpeed caps the walk band at this
 	WalkBandMax = 20;
 	EnterHold = 0.12;
 	Fade = 0.15;
