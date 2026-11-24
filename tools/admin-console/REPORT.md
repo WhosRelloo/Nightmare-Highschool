@@ -13,7 +13,7 @@ Run through `run_live.py`, which runs each check as a Script or LocalScript insi
 - `PASS console_play_run (81 calls)`: 12 level and argument refusals, plus all 66 registry commands through the real
   `Admin.Dispatch` (Kick, Ban, Unban and Shutdown left out: they would end the Play session).
   - State-refused: none (`StateOk` is empty). Start a lesson is tested for success in R102 during Period 1. The brief's R101
-    is Homeroom, which has no lesson, so it can never start one (the console's room list still offers it).
+    is Homeroom, which has no lesson, so it can never start one (the polish round took it out of the room list).
   - The run always puts slot 2 back (`xpcall`, then `putBack`), even on a timeout: `run_live.py` sets a `Stop` attribute
     rather than destroying the script. Saved values are copied into the existing profile tables in place.
   - Attribute drift fails the run unless it is on the allow-list. Only DetentionsOwed drifted, and `restore.py` puts it back.
@@ -66,6 +66,18 @@ otherwise, and it was wrong.
 
 ## Screenshots
 `docs/superpowers/mockups/2026-11-23-admin-console/play-{moderate-student,moderate-server,test-character,test-progress,test-school,test-story,test-world,test-spawns,test-self}.png`
+
+## Polish round (branch `admin-console-polish`, 2643e91)
+- Give spins uses the Race icon (it was the Gear icon, same as Give gear).
+- Lesson rooms come from the timetable rooms that have a subject (`lessonRooms()`): R102-R105. R101 is refused.
+- The Start a lesson refusal gives the real reason (already in a lesson, not enrolled, no class in that room now, not in the
+  room). A student already in a lesson is now refused; before, the console said "Started".
+- Start and Drop a quest pick from `Lists.Quests`. Race rites are listed as "Race rite: ..." but `Run` still refuses them
+  below level 3.
+- Remove title matches the typed text or its filtered form, so a title the filter changed can still be removed.
+- Comments fixed in `Admin.luau`, `Config.Cmdr` and `install_new.py`.
+- Checks: PASS console_pure, console_registry (66), play_server; in Play, PASS console_play_run (100 calls, now with the rite gate: level 2 refused on every rite), console_play_client
+  and console_play_carried. CineState, Seen and Origin were nil before and after. Backup: `NH_Backup.AdminConsolePolish_20261123`.
 
 ## Not run
 - `graphify update .`: graphify is not installed.

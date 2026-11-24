@@ -34,8 +34,10 @@ Server cards come from `Features.Admin.Meta` (one entry per command); client car
 - **Progress (9 + Inspect):** Set level, Stat points, Grant title, Remove title, All places found, Reset places (danger),
   Club, Start a match, End a match; the client card Inspect (a read-only view of their slot).
 - **School (11):** Set time, Clock speed, Skip to a period, Ring the bell, Start a lesson, Discipline points, Clear
-  discipline, Lift suspension, Excuse today, Owe detention, Clear detention.
-- **Story (3):** Start a quest, Drop a quest, Reset quests (danger).
+  discipline, Lift suspension, Excuse today, Owe detention, Clear detention. Start a lesson offers only rooms with a
+  timetabled subject (R102-R105), and a refusal says why (no class right now, already in a lesson, not enrolled, not in the room).
+- **Story (3):** Start a quest, Drop a quest (both pick from the quest list; race rites are listed but owner-only),
+  Reset quests (danger).
 - **World (2):** Full moon tonight, Go to a place.
 - **Spawns (6):** Delinquent crew, One delinquent, Wolf pack, Beast, Sparring partner, Clear enemies (danger).
 - **Self (2 + client tools):** Invisible, Teleport to a point; the client cards Fly, Noclip, ESP and Ctrl+click teleport.
