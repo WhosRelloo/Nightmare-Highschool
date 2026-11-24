@@ -70,11 +70,11 @@ the bake's table and the bake re-run.
 | Strike Foward Jog_R6 | 0.43 |
 | Kick Soccerball_R6 (left) and KickSoccerball_Right | 0.23 |
 | Soccer Pass_R6 | 0.47 |
-| Chip_R6 | 0.47 |
+| Chip_R6 | 0.53 |
 | Scissor Kick_R6 | 0.68 |
 | Soccer Penalty Kick_R6 | 0.73 |
 | Soccer Spin_R6 | 0.23 (`Contacts = {0.23, 0.60}`, two markers) |
-| Soccer Tackle_R6 | 0.10 |
+| Soccer Tackle_R6 | 0.53 |
 
 ### 1.3 The mirror (Kick Soccerball to the right foot)
 For each pose: swap the Left/Right Arm and Left/Right Leg poses. For every joint, build its Torso-space transform
