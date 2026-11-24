@@ -1,6 +1,6 @@
 # The Staff Console, phase 2: the new Test tools and row flags (design)
 
-Status: design approved in chat by the owner (2026-11-24), section by section. Plan: to be written next
+Status: design approved in chat by the owner (2026-11-24), section by section, then the written spec. The plan and its 9 spec deltas were approved the same day. Plan:
 (`docs/superpowers/plans/2026-11-24-admin-console-2.md`).
 Parent spec: `docs/superpowers/specs/2026-11-23-admin-console-design.md` (§4 Test side, §8 phase 2). This file narrows
 and settles that spec for phase 2. Where they differ, this file wins for phase 2.

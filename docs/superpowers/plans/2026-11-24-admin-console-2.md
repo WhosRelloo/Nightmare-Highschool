@@ -56,7 +56,7 @@ or changes it, see "Spec deltas" below. The owner approves them before Task 1.
     compares against what Studio now runs.
 - **Out of scope:** reports, the Inbox, auto-flags, health graphs, REPORTED (phase 3); new sky art; a Headmaster body.
 
-## Spec deltas (settled by this plan; the owner approves before Task 1)
+## Spec deltas (settled by this plan; approved by the owner 2026-11-24)
 
 1. **Preview just for me is a client tool card** (`ToolPreview` in `StaffConsole.Tools`), like Fly and ESP, instead of
    a server Meta entry with `Local = true`. Same result: it never reaches the server and is not logged. The registry
