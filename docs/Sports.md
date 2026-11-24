@@ -138,15 +138,16 @@ Built to play close to a Blue Lock-style Roblox soccer game the user supplied as
 
 **Grave Rovers Tryout** (Coach Mallory): pass Target Practice, then play a full soccer game. Reward: 20 yen and +3 popularity.
 
-**Animations** (`Config.Sports.SoccerAnims`): clips from the group library (15981569), the closest fit per move.
-- **Rules (the user's call):** no combat clips, and no movement clips except the slide.
-- **Used:**
-  - **Tackle:** "SLIDING"
-  - **Keeper throw:** "Activate"
-  - **Goal celebration:** "Isagi Celebration", cut after the 3.5 s goal pause
-- **Procedural poses (no fitting clip exists):** kick, charge, pass, volley, header, dribble, feint, the ankle-break fall and the keeper dive.
-- **Playback:** every clip plays once, at Action2 priority, and stops with its move. Some movement clips are saved looping, so the loop is turned off.
-- **What the group's soccer uploads turned out to be** (each checked for length, rig and moving joints): camera and letterbox cutscene rigs, character ultimates, long character cutscenes and a dragon rig. None are gameplay moves.
+**Animations** (`Config.Sports.SoccerAnims`, soccer 2.0): the FIER soccer clips, baked into `ReplicatedStorage.NHSoccerClips` with their timing data in `Config.SoccerClips`.
+- **Slots:** each move names a slot (Kick, KickRun, Pass, Volley, Dribble, Feint, Tackle, the falls, the keeper's dives, catch and steps, the idles and the jog). A slot plays its FIER clip, or its 1.1 clip (`Was`) or the procedural pose when the FIER clip has no id.
+- **Kicks:** the charge plays the kick's wind-up and creeps (about 0.09x) toward the contact. The kick then meets the ball 0.05 s after the server's kick.
+- **Tackle:** the clip starts at 0.18 s, so the slide's low point lands at the end of the 0.35 s slide.
+- **Dive and dribble:** they follow their clip's own travel curve over the 1.1 distances (17 and 11 studs).
+- **Falls:** they last as long as the stun, then Fallen Idle.
+- **Release:** one-shot clips play to their end, but once the move is over and the player moves, they fade out (0.2 s).
+- **In a match:** the Soccer pack swaps the walk and idle for the FIER jog and idles. It uses Jog Backward for the backpedal; in the keeper's box the keeper gets their own idle and side steps. Sprint keeps the game's run. Leaving the match or respawning gives the normal pack back.
+- **Unchanged:** the keeper throw ("Activate"), the goal celebration ("Isagi Celebration", cut after the 3.5 s goal pause) and the procedural header.
+- **Publishing:** Studio plays the clips through temporary ids. The owner publishes them to the group (`tools/soccer2/PUBLISH_LIST.md`).
 
 **Venue additions** (`Workspace.Sports.Pitch.Soccer`):
 - ball-only walls and ceiling

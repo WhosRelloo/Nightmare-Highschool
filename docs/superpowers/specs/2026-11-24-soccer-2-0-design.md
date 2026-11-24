@@ -121,17 +121,21 @@ rig's own Motor6Ds.
 | Header | none | the procedural pose, unchanged |
 
 ## 3. Kicks and contact timing (`Controllers.Gui.Soccer`)
-`Lead = 0.05`, `Margin = 0.10`.
-- **`S_Charge`:** plays the Kick slot from 0 at speed 1. At `HoldAt = ContactAt − Margin` the speed drops to
-  `Creep = Lead / T.Kick.MaxHold`, so the clip reaches `ContactAt − Lead` exactly when the charge would auto-release:
-  always moving, never past the kick point. A charge with no kick stops the track after `T.Kick.MaxHold + 0.5` s.
+`Lead = 0.05`, `Margin = 0.10`, and the Kick charge's own `KickMargin = 0.20` (owner, 2026-11-24: the 0.10 creep read
+frozen).
+- **`S_Charge`:** plays the Kick slot from 0 at speed 1. At `HoldAt = ContactAt − KickMargin` the speed drops to
+  `Creep = (KickMargin − Lead) / T.Kick.MaxHold` (about 0.09x), so the clip reaches `ContactAt − Lead` exactly when the
+  charge would auto-release: always moving, never past the kick point. A charge with no kick stops the track after `T.Kick.MaxHold + 0.5` s.
 - **`S_Kick`:** plays the kick's slot at `TimePosition = max(ContactAt − Lead, the charge track's position)` and speed
   1, so the foot meets the ball 0.05 s after the server's kick. A tap with no charge starts there straight away. A
   running shot (KickRun) replaces the charge track.
-- **Pass and Volley** start at `ContactAt − Lead` too.
+- **Pass and Volley** start at `ContactAt − Lead` too. **Tackle** starts at `ContactAt − 0.35` (0.18 s), so its low
+  point lands at the end of the 0.35 s slide (owner, 2026-11-24).
 - One soccer clip plays at a time per character: starting one stops the others (fade 0.08 s).
-- FIER clips play to their end (Looped false except the loops above); the 1.1 `LENGTH` cut applies only to `Was` clips
-  and procedural poses. `STOP_AFTER` (the celebration) is unchanged.
+- FIER clips play to their end (Looped false except the loops above) unless the player moves after the move is over:
+  once the 1.1 length (or the dash time) has passed and `MoveDirection.Magnitude > 0.1`, the clip stops with a 0.2 s
+  fade (owner, 2026-11-24). Falls follow the stun. The 1.1 `LENGTH` cut applies only to `Was` clips and procedural
+  poses. `STOP_AFTER` (the celebration) is unchanged.
 
 ## 4. Clips that move the body
 **The rule:** a move keeps its 1.1 distance and timing; the clip only shapes the motion.
