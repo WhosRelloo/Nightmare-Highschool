@@ -83,6 +83,7 @@ function M.DashPath(Root: BasePart, Track: AnimationTrack, Clip: any, Dir: Vecto
 	local D = if typeof(Dir) == `Vector3` then Vector3.new(Dir.X, 0, Dir.Z) else Vector3.zero
 	if D.Magnitude < 0.1 then D = Vector3.new(Root.CFrame.LookVector.X, 0, Root.CFrame.LookVector.Z) end
 	D = D.Unit
+	if Clip == nil then return end
 	local Att = Instance.new(`Attachment`) Att.Parent = Root
 	local LV = Instance.new(`LinearVelocity`)
 	LV.Attachment0 = Att LV.RelativeTo = Enum.ActuatorRelativeTo.World LV.VelocityConstraintMode = Enum.VelocityConstraintMode.Plane
@@ -93,12 +94,15 @@ function M.DashPath(Root: BasePart, Track: AnimationTrack, Clip: any, Dir: Vecto
 	local T0 = os.clock()
 	local Conn: RBXScriptConnection? = nil
 	local function finish() if Conn then Conn:Disconnect() end LV:Destroy() Att:Destroy() end
-	Conn = RunService.Heartbeat:Connect(function()
-		local t = Track.TimePosition
-		if Mine ~= Token or not Track.IsPlaying or t >= t1 or not Root.Parent or os.clock() - T0 > Time + 0.5 then finish() return end
-		local t2 = math.min(t + 1 / 30, t1)
-		local V = if t2 - t > 1e-4 then Dist * (Anim.Progress(Clip, t2, t0, t1) - Anim.Progress(Clip, t, t0, t1)) / (t2 - t) * Rate else 0
-		LV.PlaneVelocity = Vector2.new(D.X, D.Z) * V
+	Conn = RunService.Heartbeat:Connect(function(dt: number)
+		local Ok = pcall(function()
+			local t = Track.TimePosition
+			if Mine ~= Token or not Track.IsPlaying or t >= t1 or not Root.Parent or os.clock() - T0 > Time + 0.5 then finish() return end
+			local t2 = math.min(t + dt * Rate, t1)
+			local V = if t2 - t > 1e-4 then Dist * (Anim.Progress(Clip, t2, t0, t1) - Anim.Progress(Clip, t, t0, t1)) / (t2 - t) * Rate else 0
+			LV.PlaneVelocity = Vector2.new(D.X, D.Z) * V
+		end)
+		if not Ok then finish() end
 	end)
 end
 
