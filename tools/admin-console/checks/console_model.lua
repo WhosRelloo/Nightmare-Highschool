@@ -64,5 +64,14 @@ Ok, Why = M.Ready(Defs[4], {}, nil)
 Eq(Ok, false, "required arg missing") Eq(Why, "Message is needed", "required message")
 Eq((M.Ready(Defs[4], { Text = "hi" }, nil)), true, "required arg given")
 
+local Rich = { Id = "Rich"; Target = "none"; Args = {
+	{ Name = "N"; Kind = "number"; Required = true; Label = "Amount"; Min = 1; Max = 10 };
+	{ Name = "C"; Kind = "choice"; Label = "Kind"; Choices = { "a", "b" } } } }
+Eq((M.Ready(Rich, { N = 11 }, nil)), false, "number above Max refused")
+Eq((M.Ready(Rich, { N = "abc" }, nil)), false, "non-numeric number refused")
+Eq((M.Ready(Rich, { N = 5; C = "z" }, nil)), false, "unknown choice refused")
+Eq((M.Ready(Rich, { N = "5"; C = "a" }, nil)), true, "valid filled card passes")
+Eq((M.Ready({ Id = "Opt"; Target = "optional"; Args = {} }, {}, nil)), true, "optional target needs no pick")
+
 if #Fails > 0 then return "FAIL " .. #Fails .. "\n" .. table.concat(Fails, "\n") end
 return "PASS console_model"

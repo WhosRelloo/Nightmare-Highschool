@@ -88,13 +88,14 @@ function Model.Push(S: any, Ok: boolean, Text: string, Title: string?)
 	while #S.Feed > FEED_MAX do table.remove(S.Feed) end
 end
 
-function Model.Ready(Def: any, Values: any, Selected: number?): (boolean, string?)
+-- Can the card run? Same rules the server applies (StaffConsole.CheckArgs), so a ready card is never refused for its values.
+-- Lists (optional) is the snapshot's Lists, for choice args that draw from a list.
+function Model.Ready(Def: any, Values: any, Selected: number?, Lists: any?): (boolean, string?)
 	if Def.Target == "required" and not Selected then return false, "Pick a student on the left first" end
-	for _, A in Def.Args or {} do
-		local V = Values[A.Name]
-		if A.Required and (V == nil or V == "") then return false, `{A.Label or A.Name} is needed` end
-	end
-	return true
+	local Shared = require(game:GetService("ReplicatedStorage").Functions.StaffConsole)
+	local Ok, Why = Shared.CheckArgs(Def.Args or {}, Values or {}, Lists)
+	if not Ok then return false, Why end
+	return true, nil
 end
 
 return Model
