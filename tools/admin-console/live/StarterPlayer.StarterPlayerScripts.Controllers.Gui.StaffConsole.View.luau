@@ -1,6 +1,7 @@
 --[[ StaffConsole.View (client): draws the console from the shell's state (spec §3). Redraw(Ctx) rebuilds the dynamic
 	parts; the board and frame are built once. Ctx = { S (Model state), Info, Status, Defs (server + tools), Values,
-	Lists, Inspect, Handlers = { Side, Section, Pick, Filter, Run, Fav, Palette, Close, Pick } }. ]]
+	Lists, Inspect, History, HistoryFor(UserId), LogResult, Handlers = { Side, Section, Pick, Filter, Run, Fav, Palette, Close,
+	LogDay, LogQuery, LogChip, LogPage, OpenLogRow, WantHistory, Remove } }. ]]
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local Kit = require(ReplicatedStorage:WaitForChild("UI"):WaitForChild("Components"))
@@ -154,8 +155,16 @@ local function grid(Dyn: Instance, Ctx: any)
 	for I, D in List do
 		local Col, Row = (I - 1) % Cols, (I - 1) // Cols
 		Ctx.Values[D.Id] = Ctx.Values[D.Id] or {}
+		local Note = nil
+		if D.Id == "Unban" then
+			local Id = tonumber(Ctx.Values.Unban and Ctx.Values.Unban.UserId)
+			if Id then
+				H.WantHistory(Id)
+				Note = Model.UnbanNote(Ctx.HistoryFor(Id)) or "Checking their record…"
+			end
+		end
 		Cards.Card(G, D, UDim2.fromOffset(Col * 392, Row * 180), {
-			Values = Ctx.Values[D.Id]; Lists = Ctx.Lists; Fav = table.find(S.Favs, D.Id) ~= nil; Reduced = Ctx.Reduced;
+			Values = Ctx.Values[D.Id]; Lists = Ctx.Lists; Fav = table.find(S.Favs, D.Id) ~= nil; Reduced = Ctx.Reduced; Note = Note;
 			OnRun = H.Run; OnFav = H.Fav; Redraw = H.Redraw;
 			-- on the board, not the dynamic layer, so the shell's status refresh doesn't take it away (it waits for it)
 			OnPick = function(A, Choices, Done) Cards.Picker(Dyn.Parent :: Instance, A.Label or A.Name, Choices, Done) end;
@@ -172,6 +181,102 @@ local function feed(Dyn: Instance, Ctx: any)
 			UDim2.fromOffset(18, 8 + (I - 1) * 22), UDim2.fromOffset(740, 22))
 	end
 	if #Ctx.S.Feed == 0 then Text(F, "Hint", "Results show here.", 20, FACE.Body, COL.Dim, UDim2.fromOffset(18, 8), UDim2.fromOffset(740, 26)) end
+end
+
+-- the Log section (spec 1b §5): a day picker (today and the 6 days before), search, chips, 50 rows a page. A row opens
+-- its target's history in the right-hand panel, even if they're offline.
+local function logView(Dyn: Instance, Ctx: any)
+	local H, L = Ctx.Handlers, Ctx.S.Log
+	local X, W = Ctx.X, Ctx.W
+	local function strip(Name: string, PX: number, PY: number, PW: number): Instance
+		local F = New("Frame", { Name = Name; BackgroundTransparency = 1; Position = UDim2.fromOffset(PX, PY); Size = UDim2.fromOffset(PW, 40) }, Dyn)
+		New("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal; Padding = UDim.new(0, 6); SortOrder = Enum.SortOrder.LayoutOrder }, F)
+		return F
+	end
+	local Days = strip("LogDays", X, 160, W)
+	local Now = os.time()
+	for Off = 0, 6 do
+		local B = Cards.Chip(Days, "Day_" .. Off, Model.DayLabel(Off, Now), L.Day == Off)
+		local Holder = B.Parent :: any
+		Holder.LayoutOrder = Off
+		B.Activated:Connect(function() H.LogDay(Off) end)
+	end
+	local Box = New("TextBox", { Name = "LogSearch"; PlaceholderText = "Staff, student, UserId or action"; Text = L.Query; TextSize = 20; FontFace = FACE.Body;
+		TextColor3 = COL.Bone; PlaceholderColor3 = COL.Dim; BackgroundColor3 = COL.IronHi; ClearTextOnFocus = false;
+		Position = UDim2.fromOffset(X, 208); Size = UDim2.fromOffset(330, 40); TextXAlignment = Enum.TextXAlignment.Left }, Dyn)
+	New("UICorner", { CornerRadius = UDim.new(0, 8) }, Box)
+	New("UIPadding", { PaddingLeft = UDim.new(0, 12); PaddingRight = UDim.new(0, 8) }, Box)
+	Box.FocusLost:Connect(function() H.LogQuery(Box.Text) end)
+	local Chips = strip("LogChips", X + 340, 210, W - 340)
+	for I, C in { "All", "Moderate", "Test", "Refused" } do
+		local B = Cards.Chip(Chips, "Chip_" .. C, C, L.Chip == C)
+		local Holder = B.Parent :: any
+		Holder.LayoutOrder = I
+		B.Activated:Connect(function() H.LogChip(C) end)
+	end
+	local List = New("ScrollingFrame", { Name = "LogRows"; BackgroundTransparency = 1; Position = UDim2.fromOffset(X, 258); Size = UDim2.fromOffset(W + 8, 438);
+		CanvasSize = UDim2.new(); AutomaticCanvasSize = Enum.AutomaticSize.Y; ScrollBarThickness = 6; Selectable = false }, Dyn)
+	New("UIListLayout", { Padding = UDim.new(0, 4); SortOrder = Enum.SortOrder.LayoutOrder }, List)
+	local R = Ctx.LogResult
+	if R == nil then Text(List, "Status", "Loading…", 20, FACE.Body, COL.Dim, UDim2.new(), UDim2.fromOffset(W, 28)) return end
+	if not R.Ok then Text(List, "Status", R.Error or "Log unavailable", 20, FACE.Bold, COL.Crimson, UDim2.new(), UDim2.fromOffset(W, 28)) return end
+	for I, E in R.Rows do
+		local B = New("TextButton", { Name = "LogRow_" .. I; Text = ""; AutoButtonColor = true; BackgroundColor3 = COL.IronHi; BackgroundTransparency = 0.3;
+			Size = UDim2.fromOffset(W - 4, 52); LayoutOrder = I }, List)
+		New("UICorner", { CornerRadius = UDim.new(0, 6) }, B)
+		Text(B, "Head", Model.LogHead(E), 20, FACE.Bold, if E.Ok then COL.Bone else COL.Crimson, UDim2.fromOffset(10, 3), UDim2.new(1, -20, 0, 24))
+		Text(B, "Detail", if E.Detail ~= "" then E.Detail else "—", 20, FACE.Body, COL.Dim, UDim2.fromOffset(10, 26), UDim2.new(1, -20, 0, 24))
+		B.Activated:Connect(function() H.OpenLogRow(E) end)
+	end
+	if #R.Rows == 0 then Text(List, "Status", "Nothing logged for this day.", 20, FACE.Body, COL.Dim, UDim2.new(), UDim2.fromOffset(W, 28)) end
+	local function pageButton(Name: string, Label: string, PX: number, Delta: number, On: boolean)
+		local B = New("TextButton", { Name = Name; Text = Label; TextSize = 20; FontFace = FACE.Bold; TextColor3 = if On then COL.Bone else COL.Dim;
+			BackgroundColor3 = COL.IronHi; AutoButtonColor = On; Active = On; Position = UDim2.fromOffset(PX, 702); Size = UDim2.fromOffset(100, 40) }, Dyn)
+		New("UICorner", { CornerRadius = UDim.new(0, 8) }, B)
+		if On then B.Activated:Connect(function() H.LogPage(Delta) end) end
+	end
+	pageButton("LogPrev", "Prev", X, -1, R.Page > 1)
+	local Pg = Text(Dyn, "LogPage", `Page {R.Page} of {R.Pages} · {R.Total} entries`, 20, FACE.Body, COL.Dim, UDim2.fromOffset(X + 110, 710), UDim2.fromOffset(W - 220, 28))
+	Pg.TextXAlignment = Enum.TextXAlignment.Center
+	pageButton("LogNext", "Next", X + W - 100, 1, R.Page < R.Pages)
+end
+
+-- the saved record (spec 1b §5): the summary line, then newest first with one icon per kind; lifted or ended bans and
+-- mutes greyed; at level 3 a remove button on each, with the 0.8 s hold
+local function history(Body: Instance, Ctx: any, Next: () -> number, line: (string, number?, Color3?, boolean?) -> ())
+	local H = Ctx.History
+	line("History", 22, COL.Brass, true)
+	if H == nil then line("Loading…", 20, COL.Dim) return end
+	if not H.Ok then line(H.Error or "History unavailable", 20, COL.Crimson, true) return end
+	local Now = os.time()
+	local Rows = Model.Timeline(H.Record, Ctx.S.Level, Now)
+	if #Rows == 0 then line("Nothing on record.", 20, COL.Dim) return end
+	line(Model.Summary(H.Record, Now), 20, COL.Bone, true)
+	for I, R in Rows do
+		local F = New("Frame", { Name = "Entry_" .. I; BackgroundTransparency = 1; Size = UDim2.new(1, -8, 0, 0); AutomaticSize = Enum.AutomaticSize.Y; LayoutOrder = Next() }, Body)
+		New("UIPadding", { PaddingBottom = UDim.new(0, 6) }, F)
+		local Img = Art.Image(R.Kind)
+		if Img then
+			New("ImageLabel", { Name = "Icon"; Image = Img; BackgroundTransparency = 1; ImageTransparency = if R.Lifted then 0.5 else 0;
+				Position = UDim2.fromOffset(0, 2); Size = UDim2.fromOffset(28, 28) }, F)
+		end
+		local Right = if R.CanRemove then 44 else 0
+		Text(F, "Head", `{R.Who} · {os.date("%d %b %H:%M", R.At)}`, 20, FACE.Body, COL.Dim,
+			UDim2.fromOffset(34, 0), UDim2.new(1, -34 - Right, 0, 24))
+		-- the state goes after the text, which wraps: at the end of the head line it was cut off
+		local Body2 = Text(F, "Text", (if R.Text ~= "" then R.Text else R.Kind) .. (if R.State then ` ({R.State})` else ""), 20, FACE.Body, if R.Lifted then COL.Dim else COL.Bone,
+			UDim2.fromOffset(34, 24), UDim2.new(1, -34 - Right, 0, 0), true)
+		Body2.AutomaticSize = Enum.AutomaticSize.Y
+		if R.Lifted then Body2.TextTransparency = 0.35 end
+		if R.CanRemove then
+			local B = New("TextButton", { Name = "Remove"; Text = "✕"; TextSize = 20; FontFace = FACE.Bold; TextColor3 = COL.Bone; BackgroundColor3 = COL.Velvet;
+				AnchorPoint = Vector2.new(1, 0); Position = UDim2.new(1, 0, 0, 4); Size = UDim2.fromOffset(36, 36) }, F)
+			New("UICorner", { CornerRadius = UDim.new(0, 8) }, B)
+			local Ring = New("ImageLabel", { Name = "HoldRing"; Image = Art.Image("HoldRing") or "rbxassetid://0"; BackgroundTransparency = 1; ImageTransparency = 1;
+				AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromOffset(36, 36); ZIndex = 3 }, B)
+			Cards.Hold(B, Ring, Ctx.Reduced, function() Ctx.Handlers.Remove(R) end)
+		end
+	end
 end
 
 local function context(Dyn: Instance, Ctx: any)
@@ -199,26 +304,37 @@ local function context(Dyn: Instance, Ctx: any)
 		end
 		return
 	end
-	if not P then line("Pick a student on the left.", 20, COL.Dim) return end
-	line(P.Display or P.Name, 26, COL.Brass, true)
-	N += 1
-	local Id = New("TextBox", { Name = "UserId"; Text = tostring(P.UserId); TextEditable = false; ClearTextOnFocus = false; TextSize = 20; FontFace = FACE.Body;
-		TextColor3 = COL.Dim; BackgroundColor3 = COL.IronHi; Size = UDim2.new(1, -8, 0, 36); LayoutOrder = N }, Body)
-	New("UICorner", { CornerRadius = UDim.new(0, 6) }, Id)
-	line(`{P.Sub or P.Race or "?"}{if P.Tier then " · Tier " .. ({ "I", "II", "III" })[P.Tier] else ""}{if P.Height then " · " .. P.Height else ""}`)
-	line(`Health {P.Health}/{P.MaxHealth} · {P.Ping} ms · staff level {P.Level}`)
-	local Flags = Model.Flags(P)
-	if #Flags > 0 then line(table.concat(Flags, "  "), 20, COL.Crimson, true) end
-	local I = Ctx.Inspect
-	if S.Side == "Test" and I and I.UserId == P.UserId then
-		line("Inspector", 22, COL.Brass, true)
-		line(`Slot {I.Slot or "?"} · ¥{I.Yen} · Level {I.Level or "?"} ({I.Exp or 0} EXP, {I.Points or 0} points)`)
-		line(`Discipline {I.Discipline.Points or 0} ({I.Discipline.Level or "Clear"}), owes {I.Discipline.Owed or 0}`)
-		line(`Places {I.Regions}/{I.RegionsTotal} · Club {I.Club ~= "" and I.Club or "none"}`)
-		line(`Title {I.Title ~= "" and I.Title or "none"} · {#I.Titles} titles`)
-		if #I.Quests > 0 then line("Quests: " .. table.concat(I.Quests, ", ")) end
-		if I.Note then line(`Note ({I.Note.By}): {I.Note.Text}`, 20, COL.Dim) end
+	if not P and not (S.Selected and S.Offline) then line("Pick a student on the left.", 20, COL.Dim) return end
+	local function idBox(UserId: number)
+		N += 1
+		local Id = New("TextBox", { Name = "UserId"; Text = tostring(UserId); TextEditable = false; ClearTextOnFocus = false; TextSize = 20; FontFace = FACE.Body;
+			TextColor3 = COL.Dim; BackgroundColor3 = COL.IronHi; Size = UDim2.new(1, -8, 0, 36); LayoutOrder = N }, Body)
+		New("UICorner", { CornerRadius = UDim.new(0, 6) }, Id)
 	end
+	if P then
+		line(P.Display or P.Name, 26, COL.Brass, true)
+		idBox(P.UserId)
+		line(`{P.Sub or P.Race or "?"}{if P.Tier then " · Tier " .. ({ "I", "II", "III" })[P.Tier] else ""}{if P.Height then " · " .. P.Height else ""}`)
+		line(`Health {P.Health}/{P.MaxHealth} · {P.Ping} ms · staff level {P.Level}`)
+		local Flags = Model.Flags(P)
+		if #Flags > 0 then line(table.concat(Flags, "  "), 20, COL.Crimson, true) end
+		local I = Ctx.Inspect
+		if S.Side == "Test" and I and I.UserId == P.UserId then
+			line("Inspector", 22, COL.Brass, true)
+			line(`Slot {I.Slot or "?"} · ¥{I.Yen} · Level {I.Level or "?"} ({I.Exp or 0} EXP, {I.Points or 0} points)`)
+			line(`Discipline {I.Discipline.Points or 0} ({I.Discipline.Level or "Clear"}), owes {I.Discipline.Owed or 0}`)
+			line(`Places {I.Regions}/{I.RegionsTotal} · Club {I.Club ~= "" and I.Club or "none"}`)
+			line(`Title {I.Title ~= "" and I.Title or "none"} · {#I.Titles} titles`)
+			if #I.Quests > 0 then line("Quests: " .. table.concat(I.Quests, ", ")) end
+			if I.Note then line(`Note ({I.Note.By}): {I.Note.Text}`, 20, COL.Dim) end
+		end
+	else
+		local H = Ctx.History
+		line(if H and H.Ok and H.Name then H.Name else `UserId {S.Selected}`, 26, COL.Brass, true)
+		idBox(S.Selected)
+		line("Not in this server", 20, COL.Dim)
+	end
+	if S.Side == "Moderate" then history(Body, Ctx, function() N += 1 return N end, line) end
 end
 
 function View.Redraw(U: any, Ctx: any)
@@ -239,7 +355,7 @@ function View.Redraw(U: any, Ctx: any)
 	end
 	topBar(Dyn, Ctx)
 	sections(Dyn, Ctx)
-	grid(Dyn, Ctx)
+	if Ctx.S.Side == "Moderate" and Ctx.S.Section == "Log" then logView(Dyn, Ctx) else grid(Dyn, Ctx) end
 	feed(Dyn, Ctx)
 	if Phone then
 		button("Students", "Students", 1180, Ctx.Handlers.PhoneRail, COL.IronHi)

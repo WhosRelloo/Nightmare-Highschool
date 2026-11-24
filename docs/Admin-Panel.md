@@ -52,7 +52,7 @@ Arguments are checked on the server (`StaffConsole.CheckArgs`) before a command 
 - **Controller:** LB / RB change section, the D-pad moves between cards, A runs, Y makes a favourite, B closes. The
   `NHStaffConsole` entry in `GamepadControls` marks the console as a menu.
 - **Phone:** the rail and the context card open as overlays that sink taps, so a tap never reaches a card underneath.
-- **Favourites** last for the session (saved favourites come in 1b). With Reduce Motion on, the hold ring fills without
+- **Favourites** and the last side are saved (1b). With Reduce Motion on, the hold ring fills without
   spinning.
 
 ## Danger list (hold 0.8 s to confirm)
@@ -60,8 +60,48 @@ Kick, Ban, Kill, Shutdown, Clear enemies, Freeze all, Server lock, Bring all, Re
 while the mouse button, A or Return is held on the card's Run. Releasing, moving off the button or the selection, losing
 window focus, a redraw or closing the console cancels it. Return held while typing (the palette) never runs a danger card.
 
+## Saved records, the Log and saved favourites (1b, 2026-11-23)
+- **What is saved, and where** (Studio uses `[Test] ` stores, so it never touches live data):
+  - `NHStaffRecords_v1`: each player's notes, warnings, bans and mutes, 50 of each (oldest dropped).
+  - `NHStaffLog_v1`: every console action, run or refused, kept by day and by server. Test-side actions are removed
+    after 7 days.
+  - `NHStaffPrefs_v1`: each staff member's favourites and last side.
+- **Warn, Note, Mute, Unmute, Ban and Unban** write the record straight away. The result says "Saved", or "Saved later
+  (DataStore busy)" when the write waits and is retried. A note needs text now.
+- **Mute lengths:** 10 min, 1 h, 1 day, Until unmuted. A mute holds across rejoins and ends on time.
+- **Who may lift a ban:** a permanent ban, or one set before 1b (no ban on record), only the owner; over 30 days an admin;
+  30 days or less a moderator. The Unban card shows the ban it would lift once a UserId is typed.
+- **History timeline:** the right-hand panel on the Moderate side, for the picked student. A summary line at the top
+  ("1 note · 2 bans (lifted) · muted until Wed 25 Nov 05:06"), then newest first. Lifted or ended bans and mutes are
+  greyed and marked. The owner's ✕ (hold 0.8 s) removes an entry, and the removal is logged. Removing a ban or mute entry
+  doesn't lift it: Unban and Unmute stay the only way. The card version is Remove history entry (owner, danger).
+- **The Log section** (Moderate, key 3):
+  - a day picker for this week;
+  - search by staff, student, UserId or action;
+  - the chips All, Moderate, Test and Refused (refused rows are red);
+  - 50 rows a page with Prev and Next.
+  A row opens that student's history, even if they're offline.
+- **Favourites and side** come back the next time you open the console.
+- **Limits:**
+  - A crash can lose up to 30 s of the log.
+  - A mute or ban set in one server reaches a player in another only when they next join (phase 3 adds live delivery).
+  - "Not staff" and "Slow down" refusals aren't logged.
+  - Cards with many options scroll their options row sideways (Mute, Remove history entry, Ban).
+- **Decisions the 1b plan made** (for the owner's review):
+  - lifting a ban over 30 days needs an admin;
+  - log entries keep the UserIds as well as the names;
+  - a note can't be empty;
+  - Remove history entry takes a UserId, online or not;
+  - an offline UserId whose rank can't be read counts as the owner, so a lower rank can't act on them;
+  - a failed record read on join leaves that visit unmuted;
+  - the Play checks use a Studio-only switch to skip the Roblox ban service;
+  - the log is searched and paged on the server;
+  - mutes store their length in minutes;
+  - bans and mutes that ended on time are greyed like lifted ones.
+- Test record: `tools/admin-console/REPORT.md` ("Phase 1b").
+
 ## 1b and later
-- **1b:** saved staff records (warn and note history), the Log section, saved favourites.
+- **1b:** done (above).
 - **2:** new Test tools (World, Story, Bell Tower and Form tools) and the REPORTED, TRANSFORMED, WANTED and NEW flags.
 - **3:** the Inbox, player reports, flags and health graphs.
 

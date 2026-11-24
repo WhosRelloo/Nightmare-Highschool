@@ -10,6 +10,12 @@
 	                                      Status() -> { Server, Players, Locked } (nil for level 0)
 	                                      Run(Command, TargetUserId?, Args) -> ok, message  (= Shared.Dispatch)
 	                                      Inspect(UserId) -> a read-only summary of that student's loaded slot
+	                                      History(UserId) -> { Ok, UserId, Name, Record } | { Ok = false, Error }
+	                                      LogDay(Offset, Filter) -> { Ok, Day, Rows, Total, Page, Pages } | { Ok = false, Error }
+	                                      Prefs() -> { Ok, Favs, Side };  SavePrefs(Favs, Side) -> boolean
+	1b (2026-11-23): saved records (Warn, Note, Mute, Unmute, Ban, Unban write them; Remove history entry is owner-only
+	and logged), mute lengths re-applied on join, the saved staff log (every Dispatch call except "Not staff" and
+	"Slow down"), and the History, LogDay, Prefs and SavePrefs remotes. Stores: Features.StaffRecords.
 	                                      Client (RemoteEvent): server -> admin client effects (spectate, notices)
 
 	1.18 added (the systems since 1.8): school & discipline (set points, lift suspension, excuse today, detention
@@ -26,9 +32,12 @@ local ServerScriptService = game:GetService(`ServerScriptService`)
 local TextChatService = game:GetService(`TextChatService`)
 local TextService = game:GetService(`TextService`)
 local Stats = game:GetService(`Stats`)
+local GroupService = game:GetService(`GroupService`)
 
 local StaffConsole = require(ReplicatedStorage.Functions.StaffConsole)
 local Meta = require(script:WaitForChild(`Meta`))
+local Records = require(ReplicatedStorage.Functions.StaffRecords)
+local StaffRecords = require(ServerScriptService.Services.Features.StaffRecords)
 
 local ADMIN_RANK = 254
 local OWNER_RANK = 255
@@ -36,13 +45,16 @@ local LOG_MAX = 200
 
 local Shared = {}
 local Log = {} :: { any }
-local Muted = {} :: { [number]: boolean }
+local Muted = {} :: { [number]: number } -- UserId -> Until (os.time(); 0 = until unmuted); filled from the saved record on join
 local God = {} :: { [Player]: boolean }
 local Frozen = {} :: { [Player]: boolean }
 local RankCache = {} :: { [Player]: number }
 local LastRun = {} :: { [Player]: number }
 local StartedAt = os.time()
 local Folder, ClientEvent
+-- Studio only: the Play checks set it so Ban and Unban write the record without the Roblox Ban API (or a kick)
+Shared.TestSkipBanApi = false
+local OfflineRank = {} :: { [number]: { R: number, At: number } }
 
 local function svc(path: string)
 	local node = ServerScriptService.Services
@@ -83,6 +95,40 @@ function Shared.Level(P: Player): number
 		Rank = if Studio then 0 else rankOf(P);
 	})
 end
+
+-- a UserId's group rank without a Player (cached 10 min); nil when the lookup fails
+local function rankOfId(UserId: number): number?
+	if game.CreatorType ~= Enum.CreatorType.Group then return if UserId == game.CreatorId then 255 else 0 end
+	local C = OfflineRank[UserId]
+	if C and os.clock() - C.At < 600 then return C.R end
+	local Ok, Groups = pcall(GroupService.GetGroupsAsync, GroupService, UserId)
+	if not Ok then return nil end
+	local R = 0
+	for _, G in Groups do if G.Id == game.CreatorId then R = G.Rank end end
+	OfflineRank[UserId] = { R = R; At = os.clock() }
+	return R
+end
+
+-- the staff level of any UserId: their own level when they're here; else the lists and the group rank. A failed
+-- lookup counts as the owner, so "no targeting up" fails closed.
+function Shared.LevelOf(UserId: number): number
+	local P = Players:GetPlayerByUserId(UserId)
+	if P then return Shared.Level(P) end
+	local Rank = rankOfId(UserId)
+	if Rank == nil then return 3 end
+	local c = cmdrCfg()
+	return StaffConsole.LevelFrom({
+		Studio = false;
+		Owner = table.find(c.Owner or {}, UserId) ~= nil;
+		Admin = table.find(c.Admin or {}, UserId) ~= nil;
+		Tester = table.find(c.Testers or {}, UserId) ~= nil;
+		Rank = Rank;
+	})
+end
+
+function Shared.MutedUntil(UserId: number): number? return Muted[UserId] end
+
+local function saved(Msg: string, Ok: boolean): string return `{Msg} · {StaffRecords.Status(Ok)}` end
 
 local function log(Admin: Player, Command: string, Target: string?, Detail: string?)
 	table.insert(Log, 1, { T = os.time(); Admin = Admin.Name; Command = Command; Target = Target or ``; Detail = Detail or `` })
@@ -131,25 +177,71 @@ C.Ban = { Target = true; Run = function(A, T, a)
 	if days == 0 and lvl < 3 then return false, `Permanent bans are owner-only` end
 	if days > 30 and lvl < 2 then return false, `Moderators can ban for up to 30 days` end
 	local reason = str(a.Reason, 200)
+	-- the record first: a kick ends T, the record only needs the UserId
+	local Entry = { By = A.UserId; At = os.time(); Days = days; Reason = reason }
+	local _, Saved = StaffRecords.Write(T.UserId, function(R) Records.Push(R, `Bans`, Entry) end)
+	local Length = if days == 0 then `ever` else days .. ` day(s)`
+	if Shared.TestSkipBanApi and RunService:IsStudio() then return true, saved(`Banned {T.Name} for {Length} (test: Ban API skipped)`, Saved) end
 	local ok, err = pcall(Players.BanAsync, Players, {
 		UserIds = { T.UserId }; ApplyToUniverse = true;
 		Duration = if days == 0 then -1 else math.floor(days * 86400);
 		DisplayReason = if reason ~= `` then reason else `Banned by staff`; PrivateReason = `By {A.Name} ({A.UserId})`;
 	})
-	if not ok then T:Kick(`Banned by staff: {reason}`) return true, `Ban API unavailable here ({err}); kicked instead` end
-	return true, `Banned {T.Name} for {if days == 0 then `ever` else days .. ` day(s)`}`
+	if not ok then T:Kick(`Banned by staff: {reason}`) return true, saved(`Ban API unavailable here ({err}); kicked instead`, Saved) end
+	return true, saved(`Banned {T.Name} for {Length}`, Saved)
 end }
+-- (1b) the latest ban not lifted decides who may lift it: permanent (or none on record, set before 1b) the owner;
+-- over 30 days an admin; else a moderator
 C.Unban = { Run = function(A, _, a)
 	local id = tonumber(a.UserId)
 	if not id then return false, `Enter a UserId` end
-	local ok, err = pcall(Players.UnbanAsync, Players, { UserIds = { id }; ApplyToUniverse = true })
-	return ok, if ok then `Unbanned {id}` else tostring(err)
+	local lvl = Shared.Level(A)
+	if not StaffConsole.CanTarget(lvl, Shared.LevelOf(id), id == A.UserId) then return false, `Can't use that on a higher rank` end
+	local Rec, Err = StaffRecords.Get(id, true)
+	if not Rec then return false, `{Err}: try again` end
+	local Ban = Records.OpenBan(Rec)
+	local Need = Records.UnbanLevel(Ban)
+	if lvl < Need then
+		return false, if Need == 3 then `Permanent bans can only be lifted by the owner` else `A ban over 30 days needs an admin to lift`
+	end
+	if not (Shared.TestSkipBanApi and RunService:IsStudio()) then
+		local ok, err = pcall(Players.UnbanAsync, Players, { UserIds = { id }; ApplyToUniverse = true })
+		if not ok then return false, tostring(err) end
+	end
+	if not Ban then return true, `Unbanned {id} (no ban on record)` end
+	local At, By, Now = Ban.At, Ban.By, os.time()
+	local _, Saved = StaffRecords.Write(id, function(R)
+		local I = Records.Find(R, `Bans`, At, By)
+		if I then R.Bans[I].Lifted = { By = A.UserId; At = Now } end
+	end)
+	return true, saved(`Unbanned {id}`, Saved)
 end }
-C.Mute = { Target = true; Run = function(A, T) Muted[T.UserId] = true; notify(T, `You've been muted`, `Staff muted your chat`, `Warning`) return true, `Muted {T.Name}` end }
-C.Unmute = { Target = true; Run = function(A, T) Muted[T.UserId] = nil; notify(T, `Chat restored`, nil, `Good`) return true, `Unmuted {T.Name}` end }
+C.Mute = { Target = true; Run = function(A, T, a)
+	local Now = os.time()
+	local Until = Records.MuteUntil(tonumber(a.Minutes) or 0, Now)
+	Muted[T.UserId] = Until
+	local reason = str(a.Reason, 120)
+	local Entry = { By = A.UserId; At = Now; Until = Until; Reason = if reason ~= `` then reason else nil }
+	local _, Saved = StaffRecords.Write(T.UserId, function(R) Records.Push(R, `Mutes`, Entry) end)
+	local Label = Records.MuteLabel(Entry)
+	notify(T, `You've been muted`, if Until == 0 then `Staff muted your chat` else `Staff muted your chat for {Label}`, `Warning`)
+	return true, saved(`Muted {T.Name} ({Label})`, Saved)
+end }
+C.Unmute = { Target = true; Run = function(A, T)
+	Muted[T.UserId] = nil
+	local Now = os.time()
+	local _, Saved = StaffRecords.Write(T.UserId, function(R)
+		for _, M in R.Mutes do if Records.MuteOn(M, Now) then M.Lifted = { By = A.UserId; At = Now } end end
+	end)
+	notify(T, `Chat restored`, nil, `Good`)
+	return true, saved(`Unmuted {T.Name}`, Saved)
+end }
 C.Warn = { Target = true; Run = function(A, T, a)
-	notify(T, `Warning from staff`, str(a.Reason, 160) ~= `` and str(a.Reason, 160) or `Please follow the school rules`, `Bad`)
-	return true, `Warned {T.Name}`
+	local reason = str(a.Reason, 160)
+	notify(T, `Warning from staff`, if reason ~= `` then reason else `Please follow the school rules`, `Bad`)
+	local Entry = { By = A.UserId; At = os.time(); Reason = reason }
+	local _, Saved = StaffRecords.Write(T.UserId, function(R) Records.Push(R, `Warnings`, Entry) end)
+	return true, saved(`Warned {T.Name}`, Saved)
 end }
 C.Freeze = { Target = true; Run = function(A, T)
 	local _, H, R = char(T)
@@ -462,7 +554,6 @@ end }
 -- (the systems added since the desk shipped in 1.8)
 
 local Locked = false                                   -- server lock: new non-staff joiners are turned away
-local Notes = {} :: { [number]: { Text: string, By: string, T: number } } -- staff notes on a student (this server)
 local BELL = `rbxassetid://9113584435`
 
 local function profile(T: Player)
@@ -786,8 +877,18 @@ C.ServerLock = { Run = function(A)
 end }
 C.Note = { Target = true; Run = function(A, T, a)
 	local text = str(a.Text, 300)
-	Notes[T.UserId] = if text ~= `` then { Text = text; By = A.Name; T = os.time() } else nil
-	return true, if text ~= `` then `Noted on {T.Name}` else `Cleared the note on {T.Name}`
+	if text == `` then return false, `Note is needed` end
+	local Entry = { By = A.UserId; At = os.time(); Text = text }
+	local _, Saved = StaffRecords.Write(T.UserId, function(R) Records.Push(R, `Notes`, Entry) end)
+	return true, saved(`Noted on {T.Name}`, Saved)
+end }
+-- (1b) owner-only (Meta Level 3), Danger; TargetId is the picked UserId, who may be offline. Removing a ban or mute
+-- entry doesn't lift it: Unban and Unmute stay the only way. The result message (the log's Detail) has the entry's text.
+C.RemoveRecordEntry = { Target = true; Run = function(A, T, a, TargetId)
+	local Entry, Saved, Err = StaffRecords.RemoveEntry(TargetId, a.List, a.At, a.By)
+	if not Entry then return false, Err end
+	local Who = if T then T.Name else StaffRecords.NameOf(TargetId)
+	return true, saved(`Removed from {Who}'s {string.lower(a.List)}: {Records.EntryText(a.List, Entry)}`, Saved)
 end }
 
 -- the Inspect remote: admins and up only (the console offers Inspect at level 2, Tools.luau), and no targeting up
@@ -801,6 +902,13 @@ function Shared.InspectFor(P: Player, UserId: any)
 end
 
 -- read-only look at a student's loaded slot (Info's Inspect)
+-- the newest saved note, for the inspector
+local function latestNote(UserId: number)
+	local R = StaffRecords.Cached(UserId)
+	local N = R and R.Notes[#R.Notes]
+	return if N then { Text = N.Text; By = StaffRecords.NameOf(N.By); T = N.At } else nil
+end
+
 function Shared.Inspect(Admin: Player, T: Player)
 	local Prof = profile(T)
 	if not Prof then return nil end
@@ -829,7 +937,7 @@ function Shared.Inspect(Admin: Player, T: Player)
 		Discipline = { Points = d.Points; Level = d.Level; Owed = d.DetentionsOwed; Suspended = d.SuspendedUntilDay; Probation = d.ProbationUntilDay };
 		Attendance = Att; Titles = s.Titles or {}; Title = s.Title or ``;
 		Regions = #rs.Found; RegionsTotal = rs.Total; Club = sports.Club or ``; Quests = active;
-		Arcade = arcade; Kills = Prof.Kills or 0; Note = Notes[T.UserId];
+		Arcade = arcade; Kills = Prof.Kills or 0; Note = latestNote(T.UserId);
 	}
 end
 
@@ -884,7 +992,6 @@ function Shared.Lists()
 end
 
 function Shared.Locked(): boolean return Locked end
-function Shared.NoteFor(UserId: number) return Notes[UserId] end
 
 ---------------------------------------------------------------- remotes
 
@@ -897,6 +1004,11 @@ function Shared.Registry(Level: number)
 	return Out
 end
 
+local function hasNote(UserId: number): boolean
+	local R = StaffRecords.Cached(UserId)
+	return R ~= nil and #R.Notes > 0
+end
+
 local function playerList()
 	local list = {}
 	for _, P in Players:GetPlayers() do
@@ -906,9 +1018,9 @@ local function playerList()
 			Health = H and math.floor(H.Health) or 0; MaxHealth = H and math.floor(H.MaxHealth) or 0;
 			Race = P:GetAttribute(`Race`) or (C0 and C0:GetAttribute(`Race`)) or `?`;
 			Height = P:GetAttribute(`HeightText`); Sub = P:GetAttribute(`SubRace`); Tier = P:GetAttribute(`RaceTier`);
-			Muted = Muted[P.UserId] == true; God = God[P] == true; Frozen = Frozen[P] == true;
+			Muted = Muted[P.UserId] ~= nil; God = God[P] == true; Frozen = Frozen[P] == true;
 			Ping = math.floor((P:GetNetworkPing() or 0) * 1000); Level = Shared.Level(P);
-			Note = Notes[P.UserId] ~= nil; InMenu = P:GetAttribute(`InMainMenu`) == true;
+			Note = hasNote(P.UserId); InMenu = P:GetAttribute(`InMainMenu`) == true;
 		})
 	end
 	return list
@@ -943,11 +1055,8 @@ local function snapshot(Admin: Player)
 	}
 end
 
-function Shared.Dispatch(P: Player, Command: any, TargetUserId: any, Args: any)
-	local lvl = Shared.Level(P)
-	if lvl < 1 then return false, `Not staff` end
-	if os.clock() - (LastRun[P] or 0) < 0.15 then return false, `Slow down` end
-	LastRun[P] = os.clock()
+-- returns ok, message, and the target's name and UserId for the log
+local function dispatch(P: Player, lvl: number, Command: any, TargetUserId: any, Args: any): (any, any, string?, number?)
 	local def = typeof(Command) == `string` and C[Command] or nil
 	local m = def and Meta[Command]
 	if not m then return false, `Unknown command` end
@@ -968,15 +1077,41 @@ function Shared.Dispatch(P: Player, Command: any, TargetUserId: any, Args: any)
 			Args[K] = Out
 		end
 	end
-	local T
-	if m.Target ~= `none` then
+	local T, TargetId
+	if m.Target == `user` then
+		TargetId = tonumber(TargetUserId)
+		if not TargetId then return false, `Pick a student first` end
+		T = Players:GetPlayerByUserId(TargetId)
+		if not StaffConsole.CanTarget(lvl, Shared.LevelOf(TargetId), TargetId == P.UserId) then
+			return false, `Can't use that on a higher rank`, StaffRecords.NameOf(TargetId), TargetId
+		end
+	elseif m.Target ~= `none` then
 		T = Players:GetPlayerByUserId(tonumber(TargetUserId) or 0)
 		if not T and m.Target == `required` then return false, `Pick a player first` end
-		if T and not StaffConsole.CanTarget(lvl, Shared.Level(T), T == P) then return false, `Can't use that on a higher rank` end
+		if T and not StaffConsole.CanTarget(lvl, Shared.Level(T), T == P) then return false, `Can't use that on a higher rank`, T.Name, T.UserId end
+		TargetId = T and T.UserId
+	elseif Command == `Unban` then
+		TargetId = tonumber(Args.UserId)
 	end
-	local ok, a, b = pcall(def.Run, P, T, Args)
-	if not ok then warn(`[Admin] {Command} failed: {a}`) return false, `Failed: {tostring(a):sub(1, 120)}` end
+	local TName = if T then T.Name elseif TargetId then StaffRecords.NameOf(TargetId) else nil
+	local ok, a, b = pcall(def.Run, P, T, Args, TargetId)
+	if not ok then warn(`[Admin] {Command} failed: {a}`) return false, `Failed: {tostring(a):sub(1, 120)}`, TName, TargetId end
 	log(P, Command, T and T.Name, typeof(Args.Reason) == `string` and Args.Reason or (Args.Amount and tostring(Args.Amount)) or nil)
+	return a, b, TName, TargetId
+end
+
+function Shared.Dispatch(P: Player, Command: any, TargetUserId: any, Args: any)
+	local lvl = Shared.Level(P)
+	if lvl < 1 then return false, `Not staff` end
+	if os.clock() - (LastRun[P] or 0) < 0.15 then return false, `Slow down` end
+	LastRun[P] = os.clock()
+	local a, b, TName, TargetId = dispatch(P, lvl, Command, TargetUserId, Args)
+	-- (1b) the saved log: every call past the two checks above, run or refused (Features.StaffRecords buffers it)
+	local m = typeof(Command) == `string` and Meta[Command] or nil
+	StaffRecords.LogAdd({
+		At = os.time(); Staff = P.Name; StaffId = P.UserId; Action = if typeof(Command) == `string` then Command else `?`;
+		Target = TName; TargetId = TargetId; Detail = tostring(b or ``); Side = m and m.Side; Ok = a == true;
+	})
 	return a, b
 end
 
@@ -1014,6 +1149,67 @@ function Shared.OnStart()
 		if Shared.Level(P) < 1 then return nil end
 		return { Server = serverInfo(); Players = playerList(); Locked = Locked }
 	end
+	-- (1b) record, log and prefs remotes: level 1, checked here
+	-- at most 8 reads a second per player: the console makes short bursts (a log row opens its history, the Unban card
+	-- checks a record while the log loads), so a flat gap between calls would refuse real use
+	local Reads = {} :: { [Player]: { number } }
+	local function slow(P: Player): boolean
+		local Now = os.clock()
+		local L = Reads[P] or {}
+		while L[1] and Now - L[1] > 1 do table.remove(L, 1) end
+		Reads[P] = L
+		if #L >= 8 then return true end
+		table.insert(L, Now)
+		return false
+	end
+	-- a copy of the record with ByName on every entry and every Lifted (the client shows names, not UserIds)
+	local function withNames(Rec: any): any
+		local Out = Records.Blank()
+		for _, List in Records.LISTS do
+			for _, E in Rec[List] do
+				local Copy = table.clone(E)
+				Copy.ByName = StaffRecords.NameOf(E.By)
+				if typeof(E.Lifted) == `table` then Copy.Lifted = table.clone(E.Lifted) Copy.Lifted.ByName = StaffRecords.NameOf(E.Lifted.By) end
+				table.insert(Out[List], Copy)
+			end
+		end
+		return Out
+	end
+	local HistoryRF = Instance.new(`RemoteFunction`); HistoryRF.Name = `History`; HistoryRF.Parent = Folder
+	HistoryRF.OnServerInvoke = function(P: Player, UserId: any)
+		local lvl = Shared.Level(P)
+		if lvl < 1 then return nil end
+		if slow(P) then return { Ok = false; Error = `Slow down` } end
+		local Id = tonumber(UserId)
+		if not Id or Id ~= math.floor(Id) then return { Ok = false; Error = `Bad UserId` } end
+		if not StaffConsole.CanTarget(lvl, Shared.LevelOf(Id), Id == P.UserId) then return { Ok = false; Error = `Can't view a higher rank's history` } end
+		local Rec, Err = StaffRecords.Get(Id)
+		if not Rec then return { Ok = false; Error = Err } end
+		return { Ok = true; UserId = Id; Name = StaffRecords.NameOf(Id); Record = withNames(Rec) }
+	end
+	local LogRF = Instance.new(`RemoteFunction`); LogRF.Name = `LogDay`; LogRF.Parent = Folder
+	LogRF.OnServerInvoke = function(P: Player, Offset: any, Filter: any)
+		if Shared.Level(P) < 1 then return nil end
+		if slow(P) then return { Ok = false; Error = `Slow down` } end
+		local R, Err = StaffRecords.LogDay(Offset, Filter)
+		if not R then return { Ok = false; Error = Err } end
+		R.Ok = true
+		return R
+	end
+	local PrefsRF = Instance.new(`RemoteFunction`); PrefsRF.Name = `Prefs`; PrefsRF.Parent = Folder
+	PrefsRF.OnServerInvoke = function(P: Player)
+		if Shared.Level(P) < 1 then return nil end
+		local R, Err = StaffRecords.PrefsGet(P.UserId)
+		if not R then return { Ok = false; Error = Err } end
+		R.Ok = true
+		return R
+	end
+	local SavePrefsRF = Instance.new(`RemoteFunction`); SavePrefsRF.Name = `SavePrefs`; SavePrefsRF.Parent = Folder
+	SavePrefsRF.OnServerInvoke = function(P: Player, Favs: any, Side: any)
+		if Shared.Level(P) < 1 then return false end
+		StaffRecords.PrefsSet(P.UserId, Favs, Side)
+		return true
+	end
 	InspectRF.OnServerInvoke = Shared.InspectFor
 	Folder.Parent = ReplicatedStorage
 
@@ -1029,7 +1225,7 @@ function Shared.OnStart()
 		if ch:IsA(`TextChannel`) then
 			ch.ShouldDeliverCallback = function(msg)
 				local src = msg.TextSource
-				return not (src and Muted[src.UserId])
+				return not (src and Muted[src.UserId] ~= nil)
 			end
 		end
 	end
@@ -1046,8 +1242,32 @@ function Shared.OnStart()
 			if C0 and C0:GetAttribute(`Downed`) then local D = svc(`Features.Downed`) if D then pcall(D.Recover, C0) end end
 		end
 	end)
-	Players.PlayerRemoving:Connect(function(P) God[P] = nil Frozen[P] = nil RankCache[P] = nil LastRun[P] = nil end)
+	-- (1b) timed mutes end on time while they're here
+	task.spawn(function()
+		while true do
+			task.wait(1)
+			local Now = os.time()
+			for Id, Until in Muted do
+				if Until ~= 0 and Until <= Now then
+					Muted[Id] = nil
+					local P = Players:GetPlayerByUserId(Id)
+					if P then notify(P, `Chat restored`, `Your mute has ended`, `Good`) end
+				end
+			end
+		end
+	end)
+	Players.PlayerRemoving:Connect(function(P) God[P] = nil Frozen[P] = nil RankCache[P] = nil LastRun[P] = nil Reads[P] = nil Muted[P.UserId] = nil end)
+	-- (1b) an open mute on their saved record is applied again when they join (and the record stays cached for the
+	-- NOTE / MUTED row flags). A failed read leaves them unmuted for this visit (spec delta 7).
+	local function loadRecord(P: Player)
+		local Rec, Err = StaffRecords.Get(P.UserId, true)
+		if not Rec then warn(`[Admin] record read for {P.Name} failed ({Err}): an open mute isn't applied this visit`) return end
+		local M = Records.OpenMute(Rec, os.time())
+		if M and P.Parent then Muted[P.UserId] = M.Until end
+	end
+	for _, P in Players:GetPlayers() do task.spawn(loadRecord, P) end
 	Players.PlayerAdded:Connect(function(P)
+		task.spawn(loadRecord, P)
 		-- server lock (QOL): staff only while it's on
 		if Locked then task.defer(function() if Shared.Level(P) == 0 then P:Kick(`This server is locked by staff for now. Try another server.`) end end) end
 		P.CharacterAdded:Connect(function(C0)

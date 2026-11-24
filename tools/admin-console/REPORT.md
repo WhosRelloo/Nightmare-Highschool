@@ -93,3 +93,78 @@ otherwise, and it was wrong.
 
 ## Not run
 - `graphify update .`: graphify is not installed.
+
+## Phase 1b (branch `admin-console-1b`, plan `docs/superpowers/plans/2026-11-23-admin-console-1b.md`)
+
+### Edit checks (2026-11-24)
+- Baseline before 1b: `PASS console_pure`, `PASS console_registry (66 commands)`, `PASS console_model`.
+- `PASS records_rules`, `PASS records_store`, `PASS console_pure`, `PASS console_registry (67 commands)`,
+  `PASS console_play_server (static: Edit)`.
+
+### Fixes found while running the plan
+- `JobKey()`: Studio has a JobId in Edit and Play, so the spec's `day_<n>_studio` key now comes from
+  `RunService:IsStudio()`, not from an empty JobId (records_store caught it).
+- `FlushLog()` race: the 30 s loop's save could hold entries while a second `FlushLog` returned at once, so
+  "flush, then read" missed them (records_play_a round 1: the refused removal and the refused Unban). Now one save
+  runs at a time and entries being written stay readable. records_store case 13 covers it.
+
+### Play round, server (Task 3, round 2)
+- Cine before: CineState=nil Seen=nil Origin=nil. Fresh slot 2 snapshot (round_start.sh).
+- `PASS console_play_server (static: Play)`
+- `PASS console_play_run (104 calls)`
+- `PASS records_play_a (19 calls)`
+- `PASS records_cleanup (removed 8)`
+- restore.py, cine after: CineState=nil Seen=nil Origin=nil.
+- Round 1 (before the FlushLog fix): console_play_server and console_play_run passed, records_play_a failed 2 of 19
+  (the race above), and records_cleanup passed (removed 8).
+- Model (Task 4): `PASS console_model`.
+
+### More fixes found while running the plan
+- `pre1b/` Cards, View and ConsoleArt had CRLF endings and Studio has LF, so `install_inplace.py` refused them (a long
+  bracket turns each CRLF into two newlines). The `pre1b/` copies are now LF; Studio's text matched them line for line.
+- View: `(B.Parent :: any).LayoutOrder = ...` at the start of a line is ambiguous Luau (it reads as a call on the line
+  before), so the install's parse check refused it. Now `local Holder = B.Parent :: any` first.
+- Shell: `run()` calls the history and log fetches, which the plan defined later as locals. They're now declared
+  before `run()` and defined after `mustWait()`.
+- The History / LogDay read limit was a flat 0.1 s gap, which refused the console's own bursts (a log row opens its
+  history at once): records_play_client failed 3. Now at most 8 reads a second per player.
+
+### Play round, client (Task 5, round 2)
+- Cine before and after: CineState=nil Seen=nil Origin=nil; fresh snapshot, restore.py at the end.
+- `PASS records_play_a (19 calls)`, `PASS console_play_client` (14 Student cards), `PASS records_play_client`,
+  `PASS records_cleanup (removed 8)`.
+- Round 1 (flat 0.1 s limit): records_play_client failed 3 (a log search and a history read refused as "Slow down",
+  so no timeline drawn).
+
+### Restart round (Task 6)
+- Session A (fresh snapshot; cine before and after nil/nil/nil): `PASS console_play_run (104 calls)`,
+  `PASS records_play_a (19 calls)`. Today's log then held 434 entries over 9 pages.
+- Real input, session A:
+  - Right-click on Card_Warn (real mouse, `user_mouse_input`): Warn became a favourite.
+  - Tab (real key): Moderate to Test, and the store then held `{ Side = Test, Favs = { Warn } }` after 7 s.
+  - Key Three opened the Log section. Typing "Warn" into LogSearch plus Return gave "Page 1 of 1 · 8 entries"; clearing
+    it gave "Page 1 of 9 · 434 entries".
+  - Not by mouse: day chips, filter chips, Prev / Next. A synthetic left click never fires `GuiButton.Activated`
+    (tried the Side tab, the Log tab by position and by instance path; none fired). Right clicks and holds work because
+    cards and the hold ring listen for InputBegan / InputEnded. Days, chips and paging were driven through the probe
+    (records_play_client: Page 2, Refused, Day 1).
+- Stop Play, start Play (session B; fresh snapshot; cine before and after nil/nil/nil):
+  - `PASS records_play_client (after restart)`: opened on the Test side with Warn still a favourite.
+  - `PASS records_play_b`: the open 1-day mute was applied again on join; the note, the lifted ban and the removal
+    row read back; the removed warning stayed gone.
+  - Remove hold on the timeline (real mouse on `Entry_1.Remove`): 300 ms left 8 entries (cancelled); 1100 ms gave
+    "Removed from WhosRello's mutes: Muted (1 day): 1b restart · Saved" and 7 entries.
+  - `PASS records_cleanup (removed 7)`; the owner's stored prefs were back to none.
+- Two fixes from the screenshots, checked in one more round (`PASS records_play_a`, `PASS records_cleanup (removed 8)`):
+  - The summary named only the time ("muted until 04:58") for a mute ending tomorrow. Now it adds the day when it isn't
+    today: "muted until Wed 25 Nov 05:06".
+  - "· lifted" at the end of a timeline head line was cut off. It now follows the entry text: "7-day ban: 1b test (lifted)".
+- Screenshots: `docs/superpowers/mockups/2026-11-23-admin-console/play-1b-log.png`, `play-1b-timeline.png`.
+
+### Open issues for the owner
+- Cards with many options overflow their single options row, which scrolls sideways: Mute's "Until unmuted" chip and
+  its Reason box, and Remove history entry's Bans / Mutes chips and its At / By boxes, are hidden until scrolled
+  (the Ban card's "Forever" chip already did this in 1a). The timeline's ✕ is the easy way to remove an entry.
+- Removing a mute entry doesn't lift the mute (spec §2). The player stays muted in this server until it ends or
+  Unmute runs, but the summary no longer mentions it, and a rejoin won't apply it again.
+- graphify isn't installed, so `graphify update .` wasn't run.

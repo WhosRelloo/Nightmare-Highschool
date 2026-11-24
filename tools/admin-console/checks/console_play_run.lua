@@ -30,6 +30,7 @@ local function want(Ok, Cmd, Args, Target, Expect)
 	if Expect and not string.find(tostring(B), Expect, 1, true) then table.insert(Fails, `{Cmd}: message "{tostring(B)}", want "{Expect}"`) end
 end
 local Me = P.UserId
+local T0 = os.time() -- (1b) this run's record entries are the ones By Me since T0
 
 -- record what this run changes outside slot 2's snapshot, to put back at the end
 local Data = require(SSS.Player.Data)
@@ -158,6 +159,9 @@ want(false, "Heal", {}, nil, "Pick a player first")
 want(false, "GotoRegion", { Id = first0("Regions"); Send = true }, nil, "Pick a student first")
 -- (final review fix 2) CheckArgs stays strict: an empty club is refused, "None" is the way out
 want(false, "SetClub", { Club = "" }, Me, "Club is needed")
+-- (1b) a note needs text now (removing one is the owner's Remove history entry)
+want(false, "Note", { Text = "" }, Me, "Note is needed")
+want(false, "Mute", {}, Me, "Length is needed")
 
 -- commands that may fairly be refused in this state: each needs this exact refusal message, never just "not true"
 local StateOk = {
@@ -178,8 +182,8 @@ pcall(function()
 	for _, It in L.Quests do if not string.find(It.Id, "^Rite") and Q.CanStart(P, It.Id) == true then QuestId = It.Id break end end
 end)
 local Runs = {
-	{ "Mute" }, { "Unmute" }, { "Freeze" }, { "Freeze" }, { "Jail" }, { "Spectate" }, { "Bring" }, { "Goto" },
-	{ "Note", { Text = "console test" } }, { "Note", { Text = "" } },
+	{ "Mute", { Minutes = 10; Reason = "console test" } }, { "Unmute" }, { "Freeze" }, { "Freeze" }, { "Jail" }, { "Spectate" }, { "Bring" }, { "Goto" },
+	{ "Note", { Text = "console test" } },
 	{ "Announce", { Text = "Console test, please ignore" } }, { "ServerLock" }, { "ServerLock" }, { "BringAll" },
 	{ "FreezeAll", { On = true } }, { "FreezeAll", { On = false } },
 	{ "Heal" }, { "Revive" }, { "God" }, { "God" }, { "Speed", { Value = 16 } },
@@ -248,6 +252,19 @@ for _, R in Runs do
 		P:SetAttribute("NHHallPass", nil)
 		Clock.SetTime("12:30", Before.Day)
 	end
+end
+-- (1b) clean up this run's saved record entries, as the owner, through the new command (so it runs too)
+do
+	local SR = require(SSS.Features.StaffRecords)
+	local Rec = SR.Get(Me, true)
+	local N = 0
+	for _, List in { "Notes", "Warnings", "Bans", "Mutes" } do
+		for _, E in table.clone(Rec and Rec[List] or {}) do
+			if E.By == Me and E.At >= T0 then want(true, "RemoveRecordEntry", { List = List; At = E.At; By = E.By }, Me, "Removed") N += 1 end
+		end
+	end
+	if N == 0 then table.insert(Fails, "no record entries from this run to clean up (Warn, Mute and Note should have written some)") end
+	Seen.RemoveRecordEntry = true
 end
 for _, Id in { "Kick", "Ban", "Unban", "Shutdown" } do Seen[Id] = true end
 for _, D in Admin.Registry(3) do if not Seen[D.Id] then table.insert(Fails, D.Id .. " not run") end end

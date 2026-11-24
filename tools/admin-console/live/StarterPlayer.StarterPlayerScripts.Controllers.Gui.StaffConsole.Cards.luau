@@ -64,6 +64,7 @@ local function chip(Parent: Instance, Name: string, Text: string, On: boolean, D
 		Size = UDim2.fromScale(1, 1); AutoButtonColor = true; Selectable = true }, Holder)
 	return B
 end
+Cards.Chip = chip
 
 -- Values[ArgName] holds the card's current option values (the shell keeps one table per card id).
 -- Opts = { OnPick: (Arg, Choices, Done) -> () } opens the shared picker for long lists.
@@ -73,8 +74,11 @@ function Cards.Options(Row: Instance, Def: any, Values: any, Lists: any, Opts: a
 		if A.Kind == "choice" then
 			local Choices = A.Choices
 			if Choices and #Choices <= 5 and not A.From then
-				for _, C in Choices do
-					local Text = if A.Name == "Days" then (if C == 0 then "Forever" else C .. "d") elseif A.Name == "Tier" and typeof(C) == "number" then ({ "I", "II", "III" })[C] else tostring(C)
+				for I, C in Choices do
+					-- (1b) Labels (Mute's lengths) name each choice in order
+					local Text = if A.Labels and A.Labels[I] then A.Labels[I]
+						elseif A.Name == "Days" then (if C == 0 then "Forever" else C .. "d")
+						elseif A.Name == "Tier" and typeof(C) == "number" then ({ "I", "II", "III" })[C] else tostring(C)
 					local B = chip(Row, "Opt_" .. A.Name .. "_" .. tostring(C), Text, Values[A.Name] == C, A.Name == "Days" and C == 0)
 					B.Activated:Connect(function() Values[A.Name] = C Opts.Redraw() end)
 				end
@@ -210,13 +214,14 @@ function Cards.Hold(Button: GuiButton, Ring: GuiObject?, Reduced: boolean, OnDon
 	return { Begin = function() begin(nil) end; Stop = stop }
 end
 
--- one card. Opts = { Values, Lists, Selected, Fav: boolean, OnRun(Def, Values), OnFav(Def), OnPick, Redraw, Reduced }
+-- one card. Opts = { Values, Lists, Selected, Fav: boolean, OnRun(Def, Values), OnFav(Def), OnPick, Redraw, Reduced, Note? }
 function Cards.Card(Parent: Instance, Def: any, Pos: UDim2, Opts: any): GuiObject
 	local C = Cards.Piece("Card", Parent, Pos, UDim2.fromOffset(380, 168), { Name = "Card_" .. Def.Id })
 	-- the art's icon well: a ring centred at (38, 38), about 48 px across inside; corner brackets 12-36 px in from each corner
 	Cards.Icon(C, Def, UDim2.fromOffset(18, 18), 40)
 	Cards.Text(C, "Title", (if Opts.Fav then "★ " else "") .. Def.Title, 22, FACE.Bold, if Def.Danger then COL.Crimson else COL.Bone, UDim2.fromOffset(76, 16), UDim2.fromOffset(264, 28))
-	Cards.Text(C, "Help", Def.Help, 20, FACE.Body, COL.Dim, UDim2.fromOffset(76, 44), UDim2.fromOffset(284, 50), true)
+	-- (1b) Note: a line in place of the help (the Unban card shows the ban it would lift)
+	Cards.Text(C, "Help", Opts.Note or Def.Help, 20, FACE.Body, if Opts.Note then COL.Brass else COL.Dim, UDim2.fromOffset(76, 44), UDim2.fromOffset(284, 50), true)
 	local Row = New("ScrollingFrame", { Name = "Options"; BackgroundTransparency = 1; Position = UDim2.fromOffset(24, 108); Size = UDim2.fromOffset(230, 44);
 		CanvasSize = UDim2.new(); AutomaticCanvasSize = Enum.AutomaticSize.X; ScrollingDirection = Enum.ScrollingDirection.X; ScrollBarThickness = 3;
 		ScrollBarImageColor3 = COL.Brass; ScrollBarImageTransparency = 0.4; Selectable = false }, C)

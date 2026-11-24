@@ -18,16 +18,21 @@ for Id, D in Meta do
 	local Ok, Why = S.Validate(Id, D)
 	if not Ok then table.insert(Fails, Why) end
 end
-if N ~= 66 then table.insert(Fails, "commands in Admin: " .. N .. ", want 66") end
+if N ~= 67 then table.insert(Fails, "commands in Admin: " .. N .. ", want 67") end
 -- danger list (spec §5 + §2b)
 local DANGER = { Kick = true, Ban = true, Kill = true, Shutdown = true, ClearEnemies = true, FreezeAll = true,
-	ServerLock = true, BringAll = true, QuestReset = true, RegionsReset = true }
+	ServerLock = true, BringAll = true, QuestReset = true, RegionsReset = true, RemoveRecordEntry = true }
 for Id, D in Meta do
 	if (DANGER[Id] == true) ~= (D.Danger == true) then table.insert(Fails, Id .. " danger is " .. tostring(D.Danger)) end
 end
--- owner-only by level: Shutdown only (the rest are checked inside Run)
+-- owner-only by level: Shutdown and Remove history entry (the rest are checked inside Run)
+local OWNER = { Shutdown = true, RemoveRecordEntry = true }
 for Id, D in Meta do
-	if (D.Level == 3) ~= (Id == "Shutdown") then table.insert(Fails, Id .. " level " .. D.Level) end
+	if (D.Level == 3) ~= (OWNER[Id] == true) then table.insert(Fails, Id .. " level " .. D.Level) end
+end
+-- only Remove history entry takes an offline UserId
+for Id, D in Meta do
+	if (D.Target == "user") ~= (Id == "RemoveRecordEntry") then table.insert(Fails, Id .. " target " .. D.Target) end
 end
 -- every icon exists in the art config (when it is installed)
 local Art = game.ReplicatedStorage.Config:FindFirstChild("ConsoleArt")
@@ -38,6 +43,7 @@ end
 -- every section has at least one card
 for Side, List in S.SECTIONS do
 	for _, Sec in List do
+		if S.CARDLESS and S.CARDLESS[Sec] then continue end
 		local Any = false
 		for _, D in Meta do if D.Side == Side and D.Section == Sec then Any = true end end
 		if not Any then table.insert(Fails, Side .. "/" .. Sec .. " has no server card") end

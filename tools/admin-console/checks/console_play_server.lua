@@ -9,8 +9,8 @@ local function Eq(Got, Want, What) if Got ~= Want then table.insert(Fails, What 
 Eq(typeof(Admin.Dispatch), "function", "Dispatch")
 Eq(typeof(Admin.Registry), "function", "Registry")
 if typeof(Admin.Registry) == "function" then
-	Eq(#Admin.Registry(3), 66, "registry at level 3")
-	-- level 1: Student 12 + Server 4 (Shutdown is level 3); level 2: those 16 + the Test side's 49
+	Eq(#Admin.Registry(3), 67, "registry at level 3")
+	-- level 1: Student 12 + Server 4 (Shutdown and RemoveRecordEntry are level 3); level 2: those 16 + the Test side's 49
 	Eq(#Admin.Registry(1), 16, "registry at level 1")
 	Eq(#Admin.Registry(2), 65, "registry at level 2 (all but Shutdown)")
 	Eq(#Admin.Registry(0), 0, "registry at level 0")

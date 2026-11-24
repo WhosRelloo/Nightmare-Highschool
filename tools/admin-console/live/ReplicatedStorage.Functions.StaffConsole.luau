@@ -7,14 +7,17 @@ local Shared = {}
 
 Shared.DANGER_HOLD = 0.8
 Shared.SECTIONS = {
-	Moderate = { "Student", "Server" },
+	Moderate = { "Student", "Server", "Log" },
 	Test = { "Character", "Progress", "School", "Story", "World", "Spawns", "Self" },
 }
 Shared.SIDE_LEVEL = { Moderate = 1, Test = 2 }
+-- sections the console draws itself, with no cards (1b: the saved staff log). The registry check skips them.
+Shared.CARDLESS = { Log = true }
 Shared.LEVEL_NAMES = { "a moderator", "an admin", "the owner" }
 
 local KINDS = { number = true, text = true, choice = true, toggle = true, position = true }
-local TARGETS = { none = true, required = true, optional = true }
+-- user (1b): a picked UserId, online or not; Run gets it as its 4th argument (Remove history entry)
+local TARGETS = { none = true, required = true, optional = true, user = true }
 
 -- 0 none, 1 moderator, 2 admin, 3 owner. In Studio: 3, or the server-set test level (0-3), or 0 for NHTestNotAdmin.
 function Shared.LevelFrom(F: any): number

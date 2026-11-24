@@ -6,6 +6,18 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 Work on branches that aren't merged into `main` yet. Nothing here is in NH Combat Test unless it says so.
 
+### `admin-console-1b`: the staff console, phase 1b (installed in NH Combat Test, place not saved, not merged)
+Docs: `docs/Admin-Panel.md`. Spec: `docs/superpowers/specs/2026-11-23-admin-console-1b-design.md`. Plan:
+`docs/superpowers/plans/2026-11-23-admin-console-1b.md`. Record: `tools/admin-console/REPORT.md`. Backup:
+`ServerStorage.NH_Backup.AdminConsole1b_20261124`.
+- **Saved player records:** warnings, notes, bans and mutes, with a history timeline and summary line in the console.
+- **Mute lengths** (10 min, 1 h, 1 day, Until unmuted), held across rejoins.
+- **Owner-only lifting of permanent bans**, and owner-only, logged removal of history entries (Remove history entry, 67
+  commands).
+- **The saved staff log** with a Log section: a day picker, search, the chips All / Moderate / Test / Refused, and pages.
+- **Saved favourites and last side.**
+- Not saved: the place needs the owner's word to save.
+
 ### `race-transformations`: form meshes and motion (merged into `main` 2026-11-23, in NH Combat Test)
 - Wings, horns and body pieces for every race's forms, built by `Controllers.Character.FormParts` when a player
   transforms; wing motion, hanging chains and tatters (`Functions.FormDangles`, rope physics), the Bloodline preview.

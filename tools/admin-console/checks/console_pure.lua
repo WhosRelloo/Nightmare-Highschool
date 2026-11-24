@@ -118,5 +118,10 @@ if typeof(S.CanTarget) == "function" then
 	Eq(S.CanTarget(1, nil, false), true, "unknown target level counts as 0")
 end
 
+-- 1b: the Log section (no cards) and the "user" target (a UserId, online or not)
+Eq(S.SECTIONS.Moderate[3], "Log", "Log is the third Moderate section")
+Eq(S.CARDLESS and S.CARDLESS.Log, true, "Log has no cards")
+local UserDef = table.clone(Good) UserDef.Target = "user" UserDef.Level = 3
+Eq((S.Validate("RemoveRecordEntry", UserDef)), true, "target mode user is valid")
 if #Fails > 0 then return "FAIL " .. #Fails .. "\n" .. table.concat(Fails, "\n") end
 return "PASS console_pure"

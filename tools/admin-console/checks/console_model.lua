@@ -77,5 +77,53 @@ Eq(OkC, true, "clean: ready") Eq(WhyC, nil, "clean: no reason")
 Eq(typeof(Clean), "table", "clean values returned") Eq(Clean and Clean.N, 5, "clean number is a number") Eq(Clean and Clean.Extra, nil, "undeclared arg dropped")
 Eq(select(3, M.Ready(Rich, { N = 11 }, nil)), nil, "refused card returns no values")
 
+-- 1b: offline picks, user targets, prefs, the timeline, the summary, the Unban note, log labels
+local S2 = M.New()
+Eq(S2.Log and S2.Log.Day, 0, "log starts on today") Eq(S2.Log and S2.Log.Chip, "All", "log starts on All")
+M.Pick(S2, 9, true)
+Eq(S2.Offline, true, "an offline pick") Eq(S2.Selected, 9, "picked 9")
+M.Pick(S2, 3)
+Eq(S2.Offline, false, "an online pick")
+Eq((M.Ready({ Id = "W"; Target = "required"; Args = {} }, {}, 9, nil, true)), false, "required needs them in the server")
+Eq(select(2, M.Ready({ Id = "W"; Target = "required"; Args = {} }, {}, 9, nil, true)), "They're not in this server: only their history works", "offline message")
+Eq((M.Ready({ Id = "R"; Target = "user"; Args = {} }, {}, nil)), false, "user target needs a pick")
+Eq((M.Ready({ Id = "R"; Target = "user"; Args = {} }, {}, 9, nil, true)), true, "user target works offline")
+
+local SECTIONS1B = { Moderate = { "Student", "Server", "Log" }, Test = { "Character", "Progress", "School", "Story", "World", "Spawns", "Self" } }
+local S3 = M.New()
+M.SetLevel(S3, 2, SECTIONS1B)
+M.LoadPrefs(S3, { Favs = { "Warn", "Gone", "Warn" }; Side = "Test" }, { { Id = "Warn" }, { Id = "Goto" } }, SECTIONS1B)
+Eq(#S3.Favs, 1, "prefs: unknown and repeated ids dropped") Eq(S3.Favs[1], "Warn", "prefs: known fav kept")
+Eq(S3.Side, "Test", "prefs: saved side") Eq(S3.Section, "Character", "prefs: the side's first section")
+local S4 = M.New()
+M.SetLevel(S4, 1, SECTIONS1B)
+M.LoadPrefs(S4, { Favs = {}; Side = "Test" }, {}, SECTIONS1B)
+Eq(S4.Side, "Moderate", "prefs: a side the level doesn't allow is ignored")
+
+local Rec = {
+	Warnings = { { By = 1; At = 100; Reason = "spam"; ByName = "mod" } };
+	Notes = { { By = 1; At = 300; Text = "watch them"; ByName = "mod" } };
+	Bans = { { By = 2; At = 200; Days = 7; Reason = "x"; Lifted = { By = 2; At = 250 } } };
+	Mutes = { { By = 1; At = 400; Until = 0 } };
+}
+local TL = M.Timeline(Rec, 3, 1000)
+Eq(#TL, 4, "timeline entries") Eq(TL[1].Kind, "Mute", "newest first") Eq(TL[1].Lifted, false, "an open mute isn't greyed")
+Eq(TL[2].Kind, "Note", "then the note") Eq(TL[2].Who, "mod", "who: ByName")
+Eq(TL[3].Kind, "Ban", "then the ban") Eq(TL[3].State, "lifted", "a lifted ban") Eq(TL[3].Lifted, true, "greyed")
+Eq(TL[3].Who, "2", "who without ByName: the UserId") Eq(TL[3].Text, "7-day ban: x", "ban text")
+Eq(TL[4].Kind, "Warn", "oldest last") Eq(TL[1].CanRemove, true, "the owner can remove")
+Eq(M.Timeline(Rec, 2, 1000)[1].CanRemove, false, "an admin can't")
+Eq(M.Timeline({ Mutes = { { By = 1; At = 0; Until = 600 } } }, 3, 1000)[1].State, "ended", "a mute that ended on time")
+Eq(M.Summary(Rec, 1000), "1 warning · 1 note · 1 ban (lifted) · muted until unmuted", "summary")
+local D = function() return "D" end
+Eq(M.UnbanNote(nil, D), nil, "no note while loading")
+Eq(M.UnbanNote({ Ok = false; Error = "History unavailable" }, D), "History unavailable", "unban note: the error")
+Eq(M.UnbanNote({ Ok = true; Record = {} }, D), "No ban on record: counts as permanent (owner only)", "unban note: none")
+Eq(M.UnbanNote({ Ok = true; Record = { Bans = { { By = 2; At = 5; Days = 0; ByName = "boss" } } } }, D), "Lifts: permanent ban by boss, D (owner only)", "unban note: permanent")
+Eq(M.UnbanNote({ Ok = true; Record = { Bans = { { By = 2; At = 5; Days = 7; ByName = "mod" } } } }, D), "Lifts: 7-day ban by mod, D", "unban note: 7 days")
+Eq(M.DayLabel(0, 86400 * 10 + 5), "Today", "day 0") Eq(M.DayLabel(1, 86400 * 10 + 5), "Yesterday", "day 1")
+Eq(M.DayLabel(2, 86400 * 10 + 5), "Fri 09", "day 2 (UTC day 8 = Fri 9 Jan 1970)")
+Eq(M.LogHead({ At = 0; Staff = "mod"; Action = "Warn"; Target = "kid" }, function() return "09:00" end), "09:00 · mod · Warn · kid", "log head")
+Eq(M.LogHead({ At = 0; Staff = "mod"; Action = "Announce" }, function() return "09:00" end), "09:00 · mod · Announce", "log head without a target")
 if #Fails > 0 then return "FAIL " .. #Fails .. "\n" .. table.concat(Fails, "\n") end
 return "PASS console_model"

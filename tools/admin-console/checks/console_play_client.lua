@@ -9,7 +9,7 @@ local G = P.PlayerGui:FindFirstChild("NHStaffConsole")
 Eq(G and G.Enabled, true, "gui on")
 local I = B:Invoke("Console", "Info")
 Eq(I.Level, 3, "studio level") Eq(I.Side, "Moderate", "start side") Eq(I.Section, "Student", "start section")
-Eq(#I.Cards, 13, "student cards (12 + Stop spectating)")
+Eq(#I.Cards, 14, "student cards (13 + Stop spectating)")
 Eq(B:Invoke("Console", "Side", "Test"), "Test", "test side")
 for _, Sec in { "Character", "Progress", "School", "Story", "World", "Spawns", "Self" } do
 	Eq(B:Invoke("Console", "Section", Sec), Sec, "section " .. Sec)
@@ -22,6 +22,13 @@ for _, Sec in { "Character", "Progress", "School", "Story", "World", "Spawns", "
 end
 local R = B:Invoke("Console", "Search", "tp")
 Eq(R[1], "Goto", "tp finds Go to")
+-- (1b) the Log section draws (rows may be empty on a fresh day; the chrome is always there)
+local L = B:Invoke("Console", "Log", { Day = 0; Query = ""; Chip = "All"; Page = 1 })
+Eq(L.Ok, true, "log reads today")
+task.wait(0.5)
+for _, N in { "LogDays", "Day_0", "Day_6", "LogSearch", "Chip_All", "Chip_Refused", "LogRows", "LogPrev", "LogNext", "LogPage" } do
+	if not G:FindFirstChild(N, true) then table.insert(Fails, "Log section: no " .. N) end
+end
 -- every text label at 20+ px
 for _, L in G:GetDescendants() do
 	if (L:IsA("TextLabel") or L:IsA("TextButton") or L:IsA("TextBox")) and L.Text ~= "" and L.TextSize < 20 then

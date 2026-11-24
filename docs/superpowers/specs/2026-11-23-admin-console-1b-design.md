@@ -1,6 +1,6 @@
 # The Staff Console, phase 1b: saved records, the Log, saved favourites (design)
 
-Status: design approved in chat by the owner (2026-11-23); waiting for the owner's review of this file before the plan.
+Status: design approved in chat by the owner (2026-11-23); implemented on branch admin-console-1b (plan docs/superpowers/plans/2026-11-23-admin-console-1b.md); the plan's decisions are waiting for the owner's review.
 Parent spec: `docs/superpowers/specs/2026-11-23-admin-console-design.md` (§2b picks 1, 4 and 6; §5; §7 "Saved records";
 §8 phase 1b; §10). This file narrows and settles that spec for 1b. Where they differ, this file wins for 1b.
 Builds on: branch `admin-console-polish` (1a plus the polish round).

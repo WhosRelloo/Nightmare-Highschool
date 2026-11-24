@@ -6,6 +6,8 @@
 	Keys: F3 open/close, 1-7 sections, Tab side, Ctrl+K palette, Esc closes (on GuiService.MenuOpened: Roblox keeps
 	Escape). Controller: LB / RB sections, A run, Y favourite, B closes.
 	Studio probe (HudState.Probe "Console"): Open, Close, Side, Section, Search, Info, Pick.
+	1b: the picked student's saved history (History remote, cached 30 s here), the Log section (LogDay), saved
+	favourites and side (Prefs on the first open, SavePrefs on every change). Probe adds: Log, OpenRow, History, Fav, Prefs.
 ]]
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -28,6 +30,13 @@ local Open = false
 local Info, Status, Inspect = nil :: any, nil :: any, nil :: any
 local Values = {} :: { [string]: any }
 local Busy = false
+local Hist = {} :: { [number]: { At: number, R: any, Loading: boolean? } }
+local LogResult = nil :: any
+local LogToken = 0
+-- commands that change a saved record: the history is fetched again after one runs
+local RECORD = { Warn = true, Note = true, Mute = true, Unmute = true, Ban = true, Unban = true, RemoveRecordEntry = true }
+-- defined after mustWait (they use it); declared here so run() above them can call them
+local fetchHistory, wantHistory, fetchLog, loadPrefs, savePrefs
 
 local function remotes()
 	local F = ReplicatedStorage:FindFirstChild("NHAdmin")
@@ -43,8 +52,11 @@ local function defs(): any
 end
 
 local function ctx(): any
+	local Sel = S.Selected and Hist[S.Selected]
 	return { S = S; Info = Info; Status = Status; Defs = defs(); Values = Values; Lists = Info and Info.Lists; Inspect = Inspect;
-		Reduced = Kit.ReducedMotion and Kit.ReducedMotion() or false; Handlers = Shared.Handlers }
+		Reduced = Kit.ReducedMotion and Kit.ReducedMotion() or false; Handlers = Shared.Handlers;
+		History = Sel and Sel.R; LogResult = LogResult;
+		HistoryFor = function(Id: number) local H = Hist[Id] return H and H.R end }
 end
 
 -- a redraw rebuilds the dynamic layer, so the gamepad selection is found again by its full name
@@ -80,7 +92,7 @@ end
 
 local function run(D: any, Vals: any)
 	Vals = Vals or {}
-	local Ok, Why, Clean = Model.Ready(D, Vals, S.Selected, Info and Info.Lists)
+	local Ok, Why, Clean = Model.Ready(D, Vals, S.Selected, Info and Info.Lists, S.Offline)
 	if not Ok then Model.Push(S, false, Why :: string, D.Title) Shared.Redraw() return end
 	Vals = Clean or {} -- the checked values (declared args only, numbers as numbers), as the server will see them
 	if D.Local then
@@ -99,6 +111,11 @@ local function run(D: any, Vals: any)
 	Model.Push(S, OkCall and A == true, if OkCall then tostring(B or (if A then "Done" else "Failed")) else "Request failed", D.Title)
 	pcall(Kit.PlaySound, if OkCall and A then "Click" else "Error", 0.6)
 	task.spawn(Shared.Refresh)
+	if RECORD[D.Id] then
+		local Who = if D.Id == "Unban" then tonumber(Vals.UserId) else S.Selected
+		if Who then task.spawn(fetchHistory, Who) end
+	end
+	if S.Side == "Moderate" and S.Section == "Log" then task.spawn(fetchLog) end
 end
 
 -- Tools' Ctrl+click and other callers: run by id
@@ -108,6 +125,7 @@ end
 
 -- a student who left: drop the pick and the inspector (before any redraw guard, so it never lingers)
 local function prune(List: any)
+	if S.Offline then return end -- picked from the Log: never in the player list
 	if not (S.Selected and typeof(List) == "table") then return end
 	for _, P in List do if P.UserId == S.Selected then return end end
 	S.Selected = nil
@@ -121,6 +139,60 @@ local function mustWait(): boolean
 	return U ~= nil and ((Box ~= nil and Box:IsDescendantOf(U.Gui)) or U.Board:FindFirstChild("Picker") ~= nil)
 end
 
+function fetchHistory(UserId: number?): any
+	local F = remotes()
+	if not (F and UserId and F:FindFirstChild("History")) then return nil end
+	Hist[UserId] = { At = os.clock(); R = Hist[UserId] and Hist[UserId].R; Loading = true }
+	local Ok, R = pcall(F.History.InvokeServer, F.History, UserId)
+	local Res = if Ok and typeof(R) == "table" then R else { Ok = false; Error = "History unavailable" }
+	Hist[UserId] = { At = os.clock(); R = Res }
+	if not mustWait() then Shared.Redraw(true) end
+	return Res
+end
+
+function wantHistory(UserId: number?, Force: boolean?)
+	if not UserId then return end
+	local H = Hist[UserId]
+	if H and (H.Loading or (not Force and os.clock() - H.At < 30)) then return end
+	task.spawn(fetchHistory, UserId)
+end
+
+function fetchLog(): any
+	local F = remotes()
+	if not (F and F:FindFirstChild("LogDay")) then return nil end
+	LogToken += 1
+	local Mine = LogToken
+	local L = S.Log
+	local Ok, R = pcall(F.LogDay.InvokeServer, F.LogDay, L.Day, { Query = L.Query; Chip = L.Chip; Page = L.Page })
+	if Mine ~= LogToken then return LogResult end -- a newer request won
+	LogResult = if Ok and typeof(R) == "table" then R else { Ok = false; Error = "Log unavailable" }
+	if LogResult.Ok then L.Page = LogResult.Page end
+	if not mustWait() then Shared.Redraw() end
+	return LogResult
+end
+
+-- saved favourites and side: read on the first open, written on every change (the server saves 5 s after the last)
+function loadPrefs()
+	if S.PrefsTried then return end
+	local F = remotes()
+	if not (F and F:FindFirstChild("Prefs")) then return end
+	S.PrefsTried = true
+	local Ok, R = pcall(F.Prefs.InvokeServer, F.Prefs)
+	if Ok and typeof(R) == "table" and R.Ok then
+		S.PrefsOk = true
+		Model.LoadPrefs(S, R, defs(), (Info and Info.Sections) or SC.SECTIONS)
+	else
+		Model.Push(S, false, "Saved favourites unavailable: changes this visit won't be kept", "Favourites")
+	end
+end
+
+-- never over the stored ones when they couldn't be read
+function savePrefs()
+	local F = remotes()
+	if not (F and S.PrefsOk and F:FindFirstChild("SavePrefs")) then return end
+	task.spawn(pcall, F.SavePrefs.InvokeServer, F.SavePrefs, table.clone(S.Favs), S.Side)
+end
+
 function Shared.Refresh()
 	local F = remotes()
 	if not F then return end
@@ -129,6 +201,7 @@ function Shared.Refresh()
 		Info = R
 		Model.SetLevel(S, (R and R.Level) or 0, (R and R.Sections) or SC.SECTIONS)
 		prune(R and R.Players)
+		if (R and R.Level or 0) >= 1 then loadPrefs() end
 	end
 	if Cards.Holding then return end -- the next status tick redraws
 	Shared.Redraw()
@@ -158,7 +231,7 @@ local function bind()
 			local Sel = GuiService.SelectedObject
 			local CardObj = Sel and Sel:FindFirstAncestorWhichIsA("GuiObject")
 			while CardObj and not string.match(CardObj.Name, "^Card_") do CardObj = CardObj.Parent :: any end
-			if CardObj then Model.ToggleFav(S, string.sub(CardObj.Name, 6)) Shared.Redraw() end
+			if CardObj then Model.ToggleFav(S, string.sub(CardObj.Name, 6)) savePrefs() Shared.Redraw() end
 		end
 		return Enum.ContextActionResult.Sink
 	end, false, 3000, Enum.KeyCode.ButtonL1, Enum.KeyCode.ButtonR1, Enum.KeyCode.ButtonB, Enum.KeyCode.ButtonY)
@@ -184,14 +257,48 @@ end
 function Shared.IsOpen() return Open end
 
 Shared.Handlers = {
-	Side = function(Side: string) if table.find(Model.Sides(S.Level), Side) then S.Side = Side S.Section = ((Info and Info.Sections or SC.SECTIONS)[Side] or {})[1] Shared.Redraw() end end;
-	Section = function(Name: string) if table.find((Info and Info.Sections or SC.SECTIONS)[S.Side] or {}, Name) then S.Section = Name Shared.Redraw() end end;
-	Pick = function(UserId: number) Model.Pick(S, UserId) Inspect = nil S.PhoneRail = false Shared.Redraw() end;
+	Side = function(Side: string)
+		if not table.find(Model.Sides(S.Level), Side) then return end
+		S.Side = Side
+		S.Section = ((Info and Info.Sections or SC.SECTIONS)[Side] or {})[1]
+		savePrefs()
+		Shared.Redraw()
+		if Side == "Moderate" then wantHistory(S.Selected) end
+	end;
+	Section = function(Name: string)
+		if not table.find((Info and Info.Sections or SC.SECTIONS)[S.Side] or {}, Name) then return end
+		S.Section = Name
+		if Name == "Log" then LogResult = nil task.spawn(fetchLog) end
+		Shared.Redraw()
+	end;
+	Pick = function(UserId: number)
+		Model.Pick(S, UserId, false) Inspect = nil S.PhoneRail = false Shared.Redraw()
+		if S.Side == "Moderate" then wantHistory(UserId, true) end
+	end;
 	PhoneRail = function() S.PhoneRail = not S.PhoneRail S.PhoneContext = false Shared.Redraw() end;
 	PhoneContext = function() S.PhoneContext = not S.PhoneContext S.PhoneRail = false Shared.Redraw() end;
 	Filter = function(Q: string) S.Filter = Q Shared.Redraw() end;
 	Run = function(D: any, Vals: any) task.spawn(run, D, Vals) end;
-	Fav = function(D: any) Model.ToggleFav(S, D.Id) Shared.Redraw() end;
+	Fav = function(D: any) Model.ToggleFav(S, D.Id) savePrefs() Shared.Redraw() end;
+	LogDay = function(Off: number) S.Log.Day = Off S.Log.Page = 1 LogResult = nil Shared.Redraw() task.spawn(fetchLog) end;
+	LogQuery = function(Q: string) if Q == S.Log.Query then return end S.Log.Query = Q S.Log.Page = 1 task.spawn(fetchLog) end;
+	LogChip = function(C: string) S.Log.Chip = C S.Log.Page = 1 Shared.Redraw() task.spawn(fetchLog) end;
+	LogPage = function(Delta: number) S.Log.Page = math.max(1, S.Log.Page + Delta) task.spawn(fetchLog) end;
+	OpenLogRow = function(E: any)
+		if not E.TargetId then return end
+		local Here = false
+		for _, P in (Status and Status.Players) or (Info and Info.Players) or {} do if P.UserId == E.TargetId then Here = true end end
+		Model.Pick(S, E.TargetId, not Here)
+		Inspect = nil
+		Shared.Redraw()
+		wantHistory(E.TargetId, true)
+	end;
+	WantHistory = function(Id: number) wantHistory(Id) end;
+	Remove = function(Row: any)
+		for _, D in defs() do
+			if D.Id == "RemoveRecordEntry" then task.spawn(run, D, { List = Row.List; At = Row.At; By = Row.By }) return end
+		end
+	end;
 	Redraw = function() Shared.Redraw() end;
 	Close = function() Shared.Toggle(false) end;
 	Palette = function()
@@ -257,6 +364,35 @@ function Shared.OnStart()
 				for _, E in S.Feed do table.insert(Feed, E.Text) end
 				return { Open = Open; Side = S.Side; Section = S.Section; Cards = Ids; Feed = Feed; Level = S.Level; Selected = S.Selected }
 			end
+			if Cmd == "Log" then -- A = { Day?, Query?, Chip?, Page? }: open the Log section with these and return what it shows
+				if typeof(A) == "table" then
+					if A.Day ~= nil then S.Log.Day = A.Day end
+					if A.Query ~= nil then S.Log.Query = A.Query end
+					if A.Chip ~= nil then S.Log.Chip = A.Chip end
+					if A.Page ~= nil then S.Log.Page = A.Page end
+				end
+				S.Side = "Moderate" S.Section = "Log" -- not through Handlers.Side: a probe never saves prefs
+				local R = fetchLog()
+				local Rows = {}
+				for _, E in (R and R.Rows) or {} do table.insert(Rows, { Text = Model.LogHead(E); Ok = E.Ok; TargetId = E.TargetId; Action = E.Action }) end
+				return { Ok = R and R.Ok; Error = R and R.Error; Total = R and R.Total; Page = R and R.Page; Pages = R and R.Pages; Rows = Rows }
+			end
+			if Cmd == "OpenRow" then
+				local E = LogResult and LogResult.Rows and LogResult.Rows[A]
+				if E then Shared.Handlers.OpenLogRow(E) end
+				return S.Selected
+			end
+			if Cmd == "History" then
+				local Id = tonumber(A) or S.Selected
+				if Id and Id ~= S.Selected then Model.Pick(S, Id, Players:GetPlayerByUserId(Id) == nil) end
+				local R = fetchHistory(Id)
+				Shared.Redraw()
+				local Ok2 = R and R.Ok
+				return { Ok = Ok2; Error = R and R.Error; Summary = if Ok2 then Model.Summary(R.Record, os.time()) else nil;
+					Count = if Ok2 then #Model.Timeline(R.Record, S.Level, os.time()) else 0 }
+			end
+			if Cmd == "Fav" then Shared.Handlers.Fav({ Id = A }) return table.clone(S.Favs) end
+			if Cmd == "Prefs" then return { Favs = table.clone(S.Favs); Side = S.Side; Ok = S.PrefsOk } end
 			return nil
 		end)
 	end)

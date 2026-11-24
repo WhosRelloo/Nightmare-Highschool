@@ -18,7 +18,9 @@ return {
 	-- Moderate / Student
 	Warn = { Side = M; Section = "Student"; Title = "Warn"; Help = "Send them a staff warning"; Icon = "Warn"; Level = 1; Target = "required"; Danger = false; Synonyms = { "caution" };
 		Args = { A("Reason", "text", { Max = 160 }) } };
-	Mute = { Side = M; Section = "Student"; Title = "Mute"; Help = "Stop their chat in this server"; Icon = "Mute"; Level = 1; Target = "required"; Danger = false; Synonyms = { "silence" }; Args = {} };
+	Mute = { Side = M; Section = "Student"; Title = "Mute"; Help = "Stop their chat (saved: it holds if they rejoin)"; Icon = "Mute"; Level = 1; Target = "required"; Danger = false; Synonyms = { "silence" };
+		Args = { A("Minutes", "choice", { Label = "Length"; Choices = { 10, 60, 1440, 0 }; Labels = { "10 min", "1 h", "1 day", "Until unmuted" }; Required = true }),
+			A("Reason", "text", { Max = 120 }) } };
 	Unmute = { Side = M; Section = "Student"; Title = "Unmute"; Help = "Give their chat back"; Icon = "Mute"; Level = 1; Target = "required"; Danger = false; Synonyms = { "unsilence" }; Args = {} };
 	Freeze = { Side = M; Section = "Student"; Title = "Freeze"; Help = "Hold them in place (again to thaw)"; Icon = "Freeze"; Level = 1; Target = "required"; Danger = false; Synonyms = { "anchor", "thaw" }; Args = {} };
 	Jail = { Side = M; Section = "Student"; Title = "Detention"; Help = "Send them to the detention room"; Icon = "Jail"; Level = 1; Target = "required"; Danger = false; Synonyms = { "jail" }; Args = {} };
@@ -29,10 +31,14 @@ return {
 		Args = { A("Reason", "text", { Max = 120 }) } };
 	Ban = { Side = M; Section = "Student"; Title = "Ban"; Help = "Ban from every server (permanent: owner only)"; Icon = "Ban"; Level = 1; Target = "required"; Danger = true; Synonyms = { "banish" };
 		Args = { A("Days", "choice", { Label = "Length"; Choices = { 1, 7, 30, 0 }; Required = true }), A("Reason", "text", { Max = 200 }) } };
-	Unban = { Side = M; Section = "Student"; Title = "Unban"; Help = "Lift a ban by UserId"; Icon = "Ban"; Level = 1; Target = "none"; Danger = false; Synonyms = { "pardon" };
+	Unban = { Side = M; Section = "Student"; Title = "Unban"; Help = "Lift a ban by UserId (permanent: owner only)"; Icon = "Ban"; Level = 1; Target = "none"; Danger = false; Synonyms = { "pardon" };
 		Args = { A("UserId", "number", { Min = 1; Max = 1e12; Required = true }) } };
-	Note = { Side = M; Section = "Student"; Title = "Note"; Help = "A staff note on them (empty clears it)"; Icon = "Note"; Level = 1; Target = "required"; Danger = false; Synonyms = { "memo" };
-		Args = { A("Text", "text", { Max = 300 }) } };
+	Note = { Side = M; Section = "Student"; Title = "Note"; Help = "A staff note on their record"; Icon = "Note"; Level = 1; Target = "required"; Danger = false; Synonyms = { "memo" };
+		Args = { A("Text", "text", { Label = "Note"; Max = 300; Required = true }) } };
+	RemoveRecordEntry = { Side = M; Section = "Student"; Title = "Remove history entry"; Help = "Take one entry off their record (logged)"; Icon = "Note"; Level = 3; Target = "user"; Danger = true; Synonyms = { "erase", "delete record" };
+		Args = { A("List", "choice", { Choices = { "Notes", "Warnings", "Bans", "Mutes" }; Required = true }),
+			A("At", "number", { Label = "Time"; Min = 0; Max = 1e10; Required = true }),
+			A("By", "number", { Label = "Staff UserId"; Min = -1e12; Max = 1e12; Required = true }) } };
 
 	-- Moderate / Server
 	Announce = { Side = M; Section = "Server"; Title = "Announce"; Help = "A message to everyone in this server"; Icon = "Announce"; Level = 1; Target = "none"; Danger = false; Synonyms = { "broadcast", "message" };
