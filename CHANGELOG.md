@@ -6,6 +6,20 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 Work on branches that aren't merged into `main` yet. Nothing here is in NH Combat Test unless it says so.
 
+### `admin-console`: the staff console, phase 1a (installed in NH Combat Test, place not saved)
+Docs: `docs/Admin-Panel.md`. Mirror and checks: `tools/admin-console/` (`REPORT.md`). Backup:
+`ServerStorage.NH_Backup.AdminConsole1a_pre_20261123`.
+- **The console replaces the desk** (F3): Moderate and Test sides, with sections and cards drawn from the server's
+  registry. The old `Controllers.Gui.AdminPanel` is moved to the backup folder, and `GamepadControls` lists `NHStaffConsole`.
+- **Levels 0-3**, with a new `Config.Cmdr.Testers` list for level 2. Studio is level 3 unless `NHTestLevel` is set.
+- **66 commands with argument checks** on the server (level 1 = 16, level 2 = 65, level 3 = 66).
+- **The danger hold:** Kick, Ban, Kill, Shutdown, Clear enemies, Freeze all, Server lock, Bring all, Reset quests and Reset
+  places need a 0.8 s hold (mouse, A or Return). Releasing, moving off, losing focus or a redraw cancels it.
+- **Ctrl+K** command palette, and **favourites** for the session.
+- **The Esc fix pattern:** Roblox keeps Escape, so the console closes on `GuiService.MenuOpened` (and Esc from the palette
+  closes it too).
+- Not saved: the place needs the owner's word to save.
+
 ### `phase6-strafes`: strafe walks, NPC gestures, the Infirmary (merged into `main` 2026-11-23, version at release)
 - Square-chest strafes at about 8.5 studs/s, the stride-matched cadence (capped 2.4x), 42 NPC gesture clips (published,
   ids in `Config.Gestures`), Nurse Agatha Thorne's minimal `Infirmary.Treat`, bleacher seats and the Athletes' watch job.

@@ -1,14 +1,96 @@
-# Admin Panel: the Headmaster's Desk (NH Combat Test)
+# Admin Panel: the Staff Console (NH Combat Test)
+
+Staff console, phase 1a (2026-11-23, branch `admin-console`). It replaces the Headmaster's Desk. Press **F3** to open or
+close it. Spec: `docs/superpowers/specs/2026-11-23-admin-console-design.md`. Mirror and checks: `tools/admin-console/`
+(`pre/` originals, `live/` installed sources, `checks/` the pure and Play checks). The old desk is in
+`ServerStorage.NH_Backup.AdminConsole1a_pre_20261123.AdminPanel`. To restore it, move it back into
+`StarterPlayerScripts.Controllers.Gui` and put back the `GamepadControls` backup from the same folder (its menu entry was
+`NHAdminPanel`; it is now `NHStaffConsole`).
+
+## Who gets which level
+Every request is checked on the server, rate-limited and logged. Nobody can target someone of a higher level.
+
+| Level | Who | Gets |
+|---|---|---|
+| 0 | everyone else | nothing, and no hint the console exists |
+| 1 Moderator | group rank 254 | the Moderate side; bans up to 30 days |
+| 2 Admin | `Config.Cmdr.Admin` or `Config.Cmdr.Testers` | + the Test side |
+| 3 Owner | rank 255+ or `Config.Cmdr.Owner` | + permanent bans, Shutdown, Yen over ¥100,000, race rites |
+
+In Studio everyone is level 3 unless the server sets the player attribute `NHTestLevel` (0-3) or `NHTestNotAdmin` (= 0).
+Commands per level (registry): level 1 = 16, level 2 = 65, level 3 = 66.
+
+## Sides, sections and cards
+Server cards come from `Features.Admin.Meta` (one entry per command); client cards come from `StaffConsole.Tools.Defs`.
+
+**Moderate side** (level 1 unless marked)
+- **Student (12 + 1):** Warn, Mute, Unmute, Freeze, Detention, Spectate, Bring, Go to, Kick (danger), Ban (danger), Unban,
+  Note; plus the client card Stop spectating (13 cards on screen).
+- **Server (5):** Announce, Server lock (danger), Bring all (danger), Freeze all (danger), Shutdown (danger, level 3).
+
+**Test side** (level 2)
+- **Character (16):** Heal, Revive, God mode, Kill (danger), Speed, Race, Tier, Spin height, Height, Build, Transform,
+  Give Yen, Give EXP, Give gear, Give spins, Name change.
+- **Progress (9 + Inspect):** Set level, Stat points, Grant title, Remove title, All places found, Reset places (danger),
+  Club, Start a match, End a match; the client card Inspect (a read-only view of their slot).
+- **School (11):** Set time, Clock speed, Skip to a period, Ring the bell, Start a lesson, Discipline points, Clear
+  discipline, Lift suspension, Excuse today, Owe detention, Clear detention.
+- **Story (3):** Start a quest, Drop a quest, Reset quests (danger).
+- **World (2):** Full moon tonight, Go to a place.
+- **Spawns (6):** Delinquent crew, One delinquent, Wolf pack, Beast, Sparring partner, Clear enemies (danger).
+- **Self (2 + client tools):** Invisible, Teleport to a point; the client cards Fly, Noclip, ESP and Ctrl+click teleport.
+
+Arguments are checked on the server (`StaffConsole.CheckArgs`) before a command runs, and a refusal says why.
+
+## Keys and controller
+- **Keyboard and mouse:** F3 opens and closes; 1-7 pick a section; Tab switches Moderate / Test; **Ctrl+K** opens the
+  palette (it finds by name, help or synonym: "tp" finds Go to; Up / Down move, Return picks); right-click a card to make it
+  a favourite. Esc closes: Roblox keeps Escape for its own menu, so the console closes on `GuiService.MenuOpened`, and Esc
+  from the palette closes the console too.
+- **Controller:** LB / RB change section, the D-pad moves between cards, A runs, Y makes a favourite, B closes. The
+  `NHStaffConsole` entry in `GamepadControls` marks the console as a menu.
+- **Phone:** the rail and the context card open as overlays that sink taps, so a tap never reaches a card underneath.
+- **Favourites** last for the session (saved favourites come in 1b). With Reduce Motion on, the hold ring fills without
+  spinning.
+
+## Danger list (hold 0.8 s to confirm)
+Kick, Ban, Kill, Shutdown, Clear enemies, Freeze all, Server lock, Bring all, Reset quests, Reset places. The ring fills
+while the mouse button, A or Return is held on the card's Run. Releasing, moving off the button or the selection, losing
+window focus, a redraw or closing the console cancels it. Return held while typing (the palette) never runs a danger card.
+
+## 1b and later
+- **1b:** saved staff records (warn and note history), the Log section, saved favourites.
+- **2:** new Test tools (World, Story, Bell Tower and Form tools) and the REPORTED, TRANSFORMED, WANTED and NEW flags.
+- **3:** the Inbox, player reports, flags and health graphs.
+
+## Test record (1a, Studio Play on slot 2, 2026-11-23)
+- `console_play_run` (server, through the real `Dispatch`): **PASS, 81 calls**. Every level 0-3 refusal and argument
+  refusal, and all 66 registry commands. Kick, Ban, Unban and Shutdown were left out because they would end the session.
+  Start a lesson succeeds in R102 during Period 1 (R101 is Homeroom and has no lesson). The run puts the slot back and
+  fails on any attribute drift outside a short allow-list.
+- `console_play_client`: **PASS**. Sections and cards drawn (Student = 13), "tp" finds Go to, no text under 20 px.
+- `console_play_carried`: **PASS**. The phone overlays sink taps (0 leaks), and a student who leaves is unpicked.
+- Real input: Freeze all doesn't fire on a 300 ms hold and fires at 1100 ms. Moving the mouse off cancels. A or Return
+  held 1100 ms on a selected Run fires; 300 ms doesn't. Return in the palette never fires a danger card. Key Two goes to
+  Server. Ctrl+K opens the palette. Esc in the palette closes the console. The scroll position holds through the 1 s refresh.
+- Cutover re-check: F3 opens only the console, `PlayerGui` has no `NHAdminPanel`, and all three checks pass again.
+- CineState, Seen and Origin were nil before and after every round.
+- Not verified: dragging a finger off (touch), a real gamepad, alt-tab (checked in code only).
+- Outside slot 2, which can't be undone: Warn and Note "console test" wrote to the owner's `NHStaffRecords_v1`, and every
+  Dispatch wrote to `NHStaffLog_v1`.
+- Screenshots: `docs/superpowers/mockups/2026-11-23-admin-console/play-*.png`. Full record: `tools/admin-console/REPORT.md`.
+
+# Before 1a: the Headmaster's Desk (1.8 to 1.75)
 
 Added in 1.8 (2026-11-02). It's a staff panel built only from the game's UI kit (Panel, TabBar, Buttons, Search, Toggles, Sliders, Section headers) with the school crest. Press **F3** to open it.
 
-## Who can open it
+### Who can open it
 - Group rank **254+** in the owning group, the `Config.Cmdr` admin and owner lists, and **anyone in Studio**.
 - **Owner-only:** shutdown, permanent bans, and Yen grants over ¥100k. These need the owner rank or `Config.Cmdr` owner.
 - **Everyone else** gets nothing, not even a hint that the panel exists.
 - **No targeting up:** staff can't target someone of a higher rank.
 
-## Files
+### Files
 | Where | What |
 |---|---|
 | `ServerScriptService.Services.Features.Admin` | The back end: permission checks, rate limits, the action log, every command |
@@ -19,7 +101,7 @@ The Luau sources are kept outside this repo (the repo holds no `.luau` files).
 
 Other UI can open the desk by setting the player attribute `NHAdminOpen` to `true`, `false` or a tab number. The server still decides who gets in.
 
-## Tabs
+### Tabs
 - **Students:** search, health, race, ping, and tags for owner, staff, muted, frozen and god mode.
 - **Moderation:**
   - **Everyone (1.18):** bring everyone to you, freeze everyone, or thaw everyone. These skip staff and anyone in the main menu.
@@ -60,7 +142,7 @@ Other UI can open the desk by setting the player attribute `NHAdminOpen` to `tru
 - **Teleport effects (1.75):** your own moves (Go to, Go to a place, Ctrl+click teleport, Cmdr `to`) play the staff flock: crows for admins, bats for the owner. Students you bring land in a small swirl of your birds. While you're invisible, moves are silent. See [[Admin-Teleport-VFX]].
 - **Server:** students, uptime, physics FPS, memory, school clock, enemy and wolf counts, and the staff log (the last 200 actions).
 
-## Quality of life (1.18)
+### Quality of life (1.18)
 - **Find a command:** the search box at the top right looks through every tab. Pick a result to jump to its tab; the button gets a gold ring.
 - **Favourites:** right-click any button to pin it to a Favourites row at the top of every tab. Right-click again to unpin. Pins last for this session.
 - **Recent students:** the last five students you picked float to the top of the list, tagged "recent".
@@ -68,11 +150,11 @@ Other UI can open the desk by setting the player attribute `NHAdminOpen` to `tru
 - **Copy a UserId:** the selected student's UserId sits in a box next to their name, so you can select it and copy it.
 - **Row tags:** rows also show NOTE and IN MENU.
 
-## Safety
+### Safety
 - **Server-side:** every request is checked on the server, never trusted from the client. It's rate-limited and written to the action log.
 - **Confirm twice:** destructive buttons (Kick, Ban, Kill, Shutdown, Clear enemies) need a second click within 3 seconds.
 
-## Verified
+### Verified
 **[PT]** Every 1.8 command was run in Studio on the spare save slot (slot II), and any data it changed was restored.
 
 **1.18, tested in Studio Play on slot II at 17:30 (after school):**
