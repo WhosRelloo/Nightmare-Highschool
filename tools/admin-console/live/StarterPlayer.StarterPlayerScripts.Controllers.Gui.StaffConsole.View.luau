@@ -20,14 +20,22 @@ function View.Build(): any
 	if Kit.Phone and Kit.Phone() then Kit.AutoScale(Gui) else Kit.AutoScale(Gui, { fitWidth = 1600; fitHeight = 900; fitMargin = 16 }) end
 	local Frame = Piece("Frame", Board, UDim2.new(), UDim2.fromScale(1, 1))
 	if not Art.Image("Frame") then (Frame :: any).BackgroundColor3 = Color3.fromRGB(18, 16, 21) end
+	if Art.Image("Frame") then
+		-- the uploaded Frame has a stray brass plate baked in at its centre (design 730-870 x 414-492), which shows between
+		-- the card columns: cover it with a patch of the frame's own leather 400 px to its left. Roblox keeps the upload at
+		-- 1024x576, so the rect is in those pixels (0.64 a design px).
+		New("ImageLabel", { Name = "PlateCover"; Image = Art.Image("Frame"); BackgroundTransparency = 1; Position = UDim2.fromOffset(730, 414);
+			Size = UDim2.fromOffset(140, 78); ImageRectOffset = Vector2.new(330 * 0.64, 414 * 0.64); ImageRectSize = Vector2.new(140 * 0.64, 78 * 0.64) }, Board)
+	end
 	if Art.Image("Crest") then New("ImageLabel", { Name = "Crest"; Image = Art.Image("Crest"); BackgroundTransparency = 1; Position = UDim2.fromOffset(768, 14); Size = UDim2.fromOffset(64, 72) }, Board) end
 	return { Gui = Gui; Board = Board; Dyn = nil :: Instance? }
 end
 
 local function tile(Parent: Instance, X: number, Name: string, Label: string, Value: string, OnClick: (() -> ())?)
-	local T = Piece("Tile", Parent, UDim2.fromOffset(X, 18), UDim2.fromOffset(150, 56), { Name = "Tile_" .. Name })
-	Text(T, "Label", Label, 20, FACE.Body, COL.Dim, UDim2.fromOffset(12, 4), UDim2.fromOffset(130, 24))
-	Text(T, "Value", Value, 22, FACE.Bold, COL.Bone, UDim2.fromOffset(12, 26), UDim2.fromOffset(130, 28))
+	-- the tile's brass rim is 6 px: the two lines sit inside it
+	local T = Piece("Tile", Parent, UDim2.fromOffset(X, 16), UDim2.fromOffset(166, 60), { Name = "Tile_" .. Name })
+	Text(T, "Label", Label, 20, FACE.Body, COL.Dim, UDim2.fromOffset(14, 8), UDim2.fromOffset(140, 22))
+	Text(T, "Value", Value, 20, FACE.Bold, COL.Bone, UDim2.fromOffset(14, 30), UDim2.fromOffset(140, 22))
 	if OnClick then
 		local B = New("TextButton", { Name = "Hit"; Text = ""; BackgroundTransparency = 1; Size = UDim2.fromScale(1, 1) }, T)
 		B.Activated:Connect(OnClick)
@@ -49,10 +57,10 @@ local function topBar(Dyn: Instance, Ctx: any)
 	New("UIPadding", { PaddingLeft = UDim.new(0, 14) }, PB)
 	PB.Activated:Connect(H.Palette)
 	local St = Ctx.Status and Ctx.Status.Server or {}
-	tile(Dyn, 880, "Players", "Players", `{St.Players or "?"}/{St.MaxPlayers or "?"}`, nil)
-	tile(Dyn, 1040, "Fps", "Server FPS", tostring(St.Fps or "?"), nil)
-	tile(Dyn, 1200, "Clock", "School time", St.Clock or "—", function() if S.Level >= 2 then H.Side("Test") H.Section("School") end end)
-	tile(Dyn, 1360, "Lock", "Server", if Ctx.Status and Ctx.Status.Locked then "Locked" else "Open", function() H.Side("Moderate") H.Section("Server") end)
+	tile(Dyn, 860, "Players", "Players", `{St.Players or "?"}/{St.MaxPlayers or "?"}`, nil)
+	tile(Dyn, 1034, "Fps", "Server FPS", tostring(St.Fps or "?"), nil)
+	tile(Dyn, 1208, "Clock", "School time", St.Clock or "—", function() if S.Level >= 2 then H.Side("Test") H.Section("School") end end)
+	tile(Dyn, 1382, "Lock", "Server", if Ctx.Status and Ctx.Status.Locked then "Locked" else "Open", function() H.Side("Moderate") H.Section("Server") end)
 end
 
 -- phones: the rail and the context open over the cards; a blank button under each takes the taps that land in its gaps,
@@ -68,9 +76,10 @@ local function rail(Dyn: Instance, Ctx: any)
 	sink(Dyn, Ctx, "RailSink", 40, 110, 394, 744)
 	Piece("Side", Dyn, UDim2.fromOffset(40, 110), UDim2.fromOffset(394, 744), { Name = "Rail" })
 	local Box = New("TextBox", { Name = "StudentSearch"; PlaceholderText = "Search students"; Text = S.Filter; TextSize = 20; FontFace = FACE.Body;
-		TextColor3 = COL.Bone; PlaceholderColor3 = COL.Dim; BackgroundColor3 = COL.IronHi; ClearTextOnFocus = false;
-		Position = UDim2.fromOffset(92, 126); Size = UDim2.fromOffset(290, 40); TextXAlignment = Enum.TextXAlignment.Left }, Dyn)
-	New("UIPadding", { PaddingLeft = UDim.new(0, 12) }, Box)
+		TextColor3 = COL.Bone; PlaceholderColor3 = COL.Dim; BackgroundColor3 = COL.IronHi; BackgroundTransparency = if Art.Image("Search") then 1 else 0;
+		ClearTextOnFocus = false; Position = UDim2.fromOffset(91, 128); Size = UDim2.fromOffset(292, 40); TextXAlignment = Enum.TextXAlignment.Left; ZIndex = 2 }, Dyn)
+	New("UIPadding", { PaddingLeft = UDim.new(0, 16); PaddingRight = UDim.new(0, 12) }, Box)
+	Piece("Search", Dyn, UDim2.fromOffset(91, 128), UDim2.fromOffset(292, 40), { Name = "StudentSearchArt" })
 	Box.FocusLost:Connect(function() H.Filter(Box.Text) end)
 	Box:GetPropertyChangedSignal("Text"):Connect(function() S.Filter = Box.Text end)
 	local L = New("ScrollingFrame", { Name = "Rows"; BackgroundTransparency = 1; Position = UDim2.fromOffset(91, 180); Size = UDim2.fromOffset(300, 660);
@@ -80,10 +89,14 @@ local function rail(Dyn: Instance, Ctx: any)
 	for _, P in Rows do
 		local On = P.UserId == S.Selected
 		local R = Piece(if On then "RowOn" else "Row", L, UDim2.new(), UDim2.fromOffset(292, 70), { Name = "Row_" .. P.UserId })
-		Text(R, "Name", P.Display ~= P.Name and `{P.Display} (@{P.Name})` or P.Name, 22, FACE.Bold, if On then COL.Brass else COL.Bone, UDim2.fromOffset(14, 6), UDim2.fromOffset(268, 28))
+		-- the row art's portrait well: a ring centred at (33, 36), about 42 px across inside; the text starts right of it
+		local Face = New("ImageLabel", { Name = "Face"; Image = `rbxthumb://type=AvatarHeadShot&id={P.UserId}&w=48&h=48`; BackgroundTransparency = 1;
+			Position = UDim2.fromOffset(14, 17); Size = UDim2.fromOffset(38, 38) }, R)
+		New("UICorner", { CornerRadius = UDim.new(0.5, 0) }, Face)
+		Text(R, "Name", P.Display ~= P.Name and `{P.Display} (@{P.Name})` or P.Name, 22, FACE.Bold, if On then COL.Brass else COL.Bone, UDim2.fromOffset(66, 9), UDim2.fromOffset(214, 28))
 		local Flags = Model.Flags(P)
 		Text(R, "Sub", `{P.Sub or P.Race or "?"} · {P.Ping or 0} ms` .. (if #Flags > 0 then "  " .. table.concat(Flags, " ") else ""), 20, FACE.Body,
-			if #Flags > 0 then COL.Crimson else COL.Dim, UDim2.fromOffset(14, 36), UDim2.fromOffset(268, 26))
+			if #Flags > 0 then COL.Crimson else COL.Dim, UDim2.fromOffset(66, 36), UDim2.fromOffset(214, 24))
 		local B = New("TextButton", { Name = "Hit"; Text = ""; BackgroundTransparency = 1; Size = UDim2.fromScale(1, 1) }, R)
 		B.Activated:Connect(function() H.Pick(P.UserId) end)
 	end
@@ -98,10 +111,22 @@ local function sections(Dyn: Instance, Ctx: any)
 		local On = Name == S.Section
 		local P = Piece(if On then "TabOn" else "Tab", Dyn, UDim2.fromOffset(Ctx.X + (I - 1) * (W + 6), 110), UDim2.fromOffset(W, 44), { Name = "Section_" .. Name })
 		local B = New("TextButton", { Name = "Hit"; Text = ""; BackgroundTransparency = if Art.Image("Tab") then 1 else 0; BackgroundColor3 = if On then COL.Brass else COL.IronHi; Size = UDim2.fromScale(1, 1) }, P)
+		-- TabOn has a red gem at its bottom centre (design 69-81 x 33-44, 300x88 upload so no downscale). The tab is 9-sliced,
+		-- so at any width but its own 150 the gem is stretched or squashed: cover it with the plain rim beside it, then draw
+		-- the gem again at its own size in the middle
+		if On and Art.Image("TabOn") and W ~= 150 then
+			local Half = math.ceil(6 * math.max(1, (W - 24) / 126)) + 2
+			New("ImageLabel", { Name = "GemCover"; Image = Art.Image("TabOn"); BackgroundTransparency = 1; ImageRectOffset = Vector2.new(40, 64);
+				ImageRectSize = Vector2.new(40, 24); Position = UDim2.fromOffset(math.floor(W / 2) - Half, 32); Size = UDim2.fromOffset(Half * 2, 12) }, P)
+			New("ImageLabel", { Name = "Gem"; Image = Art.Image("TabOn"); BackgroundTransparency = 1; ImageRectOffset = Vector2.new(138, 66);
+				ImageRectSize = Vector2.new(24, 22); Position = UDim2.fromOffset(math.floor(W / 2) - 6, 33); Size = UDim2.fromOffset(12, 11) }, P)
+		end
 		local Img = Art.Image("Sec" .. Name)
 		local TX = 8
 		if Img and W >= 140 then New("ImageLabel", { Image = Img; BackgroundTransparency = 1; Position = UDim2.fromOffset(6, 6); Size = UDim2.fromOffset(32, 32) }, P) TX = 42 end
-		Text(P, "Label", Name, 20, FACE.Bold, if On then COL.Iron else COL.Bone, UDim2.fromOffset(TX, 10), UDim2.fromOffset(W - TX - 4, 26))
+		local Lbl = Text(P, "Label", Name, 20, FACE.Bold, if On then COL.Iron else COL.Bone, UDim2.fromOffset(TX, 0), UDim2.new(1, -TX - 8, 1, 0))
+		Lbl.TextYAlignment = Enum.TextYAlignment.Center
+		if TX == 8 then Lbl.TextXAlignment = Enum.TextXAlignment.Center end
 		B.Activated:Connect(function() H.Section(Name) end)
 	end
 end

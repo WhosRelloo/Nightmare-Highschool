@@ -55,9 +55,10 @@ function Cards.Icon(Parent: Instance, Def: any, Pos: UDim2, Size: number)
 	New("ImageLabel", { Name = "Icon"; Image = Img; BackgroundTransparency = 1; Position = Pos; Size = UDim2.fromOffset(Size, Size) }, Parent)
 end
 
+-- chips fit their text (about 11 px a character at 20 px bold, plus the 12 px sliced ends and some air)
 local function chip(Parent: Instance, Name: string, Text: string, On: boolean, Danger: boolean?, W: number?): TextButton
 	local Piece = if Danger then "ChipDanger" elseif On then "ChipOn" else "Chip"
-	local Holder = Cards.Piece(Piece, Parent, UDim2.new(), UDim2.fromOffset(W or 96, 40))
+	local Holder = Cards.Piece(Piece, Parent, UDim2.new(), UDim2.fromOffset(math.max(W or 0, 56, utf8.len(Text) * 11 + 30), 36))
 	local B = New("TextButton", { Name = Name; Text = Text; TextSize = 20; FontFace = FACE.Bold; TextColor3 = if On then COL.Iron else COL.Bone;
 		BackgroundTransparency = if Art.Image(Piece) then 1 else 0; BackgroundColor3 = if On then COL.Brass else COL.IronHi;
 		Size = UDim2.fromScale(1, 1); AutoButtonColor = true; Selectable = true }, Holder)
@@ -82,7 +83,7 @@ function Cards.Options(Row: Instance, Def: any, Values: any, Lists: any, Opts: a
 				local Cur = Values[A.Name]
 				local Shown = Label
 				for _, It in List do if It == Cur or (typeof(It) == "table" and It.Id == Cur) then Shown = if typeof(It) == "table" then It.Name else tostring(It) end end
-				local B = chip(Row, "Opt_" .. A.Name, Shown .. " ▾", Cur ~= nil, false, 200)
+				local B = chip(Row, "Opt_" .. A.Name, Shown .. " ▾", Cur ~= nil, false)
 				B.Activated:Connect(function()
 					Opts.OnPick(A, List, function(V) Values[A.Name] = V Opts.Redraw() end)
 				end)
@@ -90,8 +91,9 @@ function Cards.Options(Row: Instance, Def: any, Values: any, Lists: any, Opts: a
 		elseif A.Kind == "number" or A.Kind == "text" then
 			local Box = New("TextBox", { Name = "Opt_" .. A.Name; PlaceholderText = Label; Text = if Values[A.Name] ~= nil then tostring(Values[A.Name]) else "";
 				TextSize = 20; FontFace = FACE.Body; TextColor3 = COL.Bone; PlaceholderColor3 = COL.Dim; BackgroundColor3 = COL.IronHi;
-				ClearTextOnFocus = false; Size = UDim2.fromOffset(if A.Kind == "number" then 100 else 220, 40); TextXAlignment = Enum.TextXAlignment.Left }, Row)
+				ClearTextOnFocus = false; Size = UDim2.fromOffset(if A.Kind == "number" then 100 else 220, 36); TextXAlignment = Enum.TextXAlignment.Left }, Row)
 			New("UICorner", { CornerRadius = UDim.new(0, 8) }, Box)
+			New("UIStroke", { Color = COL.Brass; Thickness = 1; Transparency = 0.5; ApplyStrokeMode = Enum.ApplyStrokeMode.Border }, Box)
 			New("UIPadding", { PaddingLeft = UDim.new(0, 10) }, Box)
 			Box:GetPropertyChangedSignal("Text"):Connect(function()
 				if A.Kind == "number" then
@@ -105,7 +107,7 @@ function Cards.Options(Row: Instance, Def: any, Values: any, Lists: any, Opts: a
 		elseif A.Kind == "toggle" then
 			local On = Values[A.Name] ~= false
 			Values[A.Name] = On
-			local B = chip(Row, "Opt_" .. A.Name, Label .. (if On then ": on" else ": off"), On, false, 160)
+			local B = chip(Row, "Opt_" .. A.Name, Label .. (if On then ": on" else ": off"), On, false)
 			B.Activated:Connect(function() Values[A.Name] = not (Values[A.Name] ~= false) Opts.Redraw() end)
 		end
 	end
@@ -211,24 +213,26 @@ end
 -- one card. Opts = { Values, Lists, Selected, Fav: boolean, OnRun(Def, Values), OnFav(Def), OnPick, Redraw, Reduced }
 function Cards.Card(Parent: Instance, Def: any, Pos: UDim2, Opts: any): GuiObject
 	local C = Cards.Piece("Card", Parent, Pos, UDim2.fromOffset(380, 168), { Name = "Card_" .. Def.Id })
-	Cards.Icon(C, Def, UDim2.fromOffset(16, 16), 56)
-	Cards.Text(C, "Title", (if Opts.Fav then "★ " else "") .. Def.Title, 22, FACE.Bold, if Def.Danger then COL.Crimson else COL.Bone, UDim2.fromOffset(84, 14), UDim2.fromOffset(260, 28))
-	Cards.Text(C, "Help", Def.Help, 20, FACE.Body, COL.Dim, UDim2.fromOffset(84, 44), UDim2.fromOffset(280, 50), true)
-	local Row = New("ScrollingFrame", { Name = "Options"; BackgroundTransparency = 1; Position = UDim2.fromOffset(16, 104); Size = UDim2.fromOffset(252, 48);
-		CanvasSize = UDim2.new(); AutomaticCanvasSize = Enum.AutomaticSize.X; ScrollingDirection = Enum.ScrollingDirection.X; ScrollBarThickness = 4; Selectable = false }, C)
-	New("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal; Padding = UDim.new(0, 6); SortOrder = Enum.SortOrder.LayoutOrder }, Row)
+	-- the art's icon well: a ring centred at (38, 38), about 48 px across inside; corner brackets 12-36 px in from each corner
+	Cards.Icon(C, Def, UDim2.fromOffset(18, 18), 40)
+	Cards.Text(C, "Title", (if Opts.Fav then "★ " else "") .. Def.Title, 22, FACE.Bold, if Def.Danger then COL.Crimson else COL.Bone, UDim2.fromOffset(76, 16), UDim2.fromOffset(264, 28))
+	Cards.Text(C, "Help", Def.Help, 20, FACE.Body, COL.Dim, UDim2.fromOffset(76, 44), UDim2.fromOffset(284, 50), true)
+	local Row = New("ScrollingFrame", { Name = "Options"; BackgroundTransparency = 1; Position = UDim2.fromOffset(24, 108); Size = UDim2.fromOffset(230, 44);
+		CanvasSize = UDim2.new(); AutomaticCanvasSize = Enum.AutomaticSize.X; ScrollingDirection = Enum.ScrollingDirection.X; ScrollBarThickness = 3;
+		ScrollBarImageColor3 = COL.Brass; ScrollBarImageTransparency = 0.4; Selectable = false }, C)
+	New("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal; VerticalAlignment = Enum.VerticalAlignment.Top; Padding = UDim.new(0, 6); SortOrder = Enum.SortOrder.LayoutOrder }, Row)
 	Cards.Options(Row, Def, Opts.Values, Opts.Lists, Opts)
 	local NeedsPos = false
 	for _, A in Def.Args do if A.Kind == "position" then NeedsPos = true end end
 	local Label = if NeedsPos then "Ctrl+click" elseif Def.Danger then "Hold" else "Run"
 	local RunB = New("TextButton", { Name = "Run"; Text = Label; TextSize = 20; FontFace = FACE.Bold; TextColor3 = if Def.Danger then COL.Bone else COL.Iron;
-		BackgroundColor3 = if Def.Danger then COL.Velvet else COL.Brass; Position = UDim2.fromOffset(276, 112); Size = UDim2.fromOffset(92, 44);
+		BackgroundColor3 = if Def.Danger then COL.Velvet else COL.Brass; Position = UDim2.fromOffset(262, 108); Size = UDim2.fromOffset(92, 40);
 		AutoButtonColor = true; Selectable = not NeedsPos; Active = not NeedsPos }, C)
 	New("UICorner", { CornerRadius = UDim.new(0, 8) }, RunB)
 	if not NeedsPos then
 		if Def.Danger then
 			local Ring = New("ImageLabel", { Name = "HoldRing"; Image = Art.Image("HoldRing") or "rbxassetid://0"; BackgroundTransparency = 1; ImageTransparency = 1;
-				AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromOffset(44, 44); ZIndex = 3 }, RunB)
+				AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromOffset(40, 40); ZIndex = 3 }, RunB)
 			Cards.Hold(RunB, Ring, Opts.Reduced, function() Opts.OnRun(Def, Opts.Values) end)
 		else
 			RunB.Activated:Connect(function() Opts.OnRun(Def, Opts.Values) end)

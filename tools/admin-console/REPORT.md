@@ -79,5 +79,17 @@ otherwise, and it was wrong.
 - Checks: PASS console_pure, console_registry (66), play_server; in Play, PASS console_play_run (100 calls, now with the rite gate: level 2 refused on every rite), console_play_client
   and console_play_carried. CineState, Seen and Origin were nil before and after. Backup: `NH_Backup.AdminConsolePolish_20261123`.
 
+## Console art and layout (branch `admin-console-polish`)
+- `Config.ConsoleArt` has all 20 uploaded piece ids. Only chips and tabs are 9-sliced (12 px). Every other piece is
+  stretched whole: slicing smeared the card's icon well, and Roblox shrinks uploads over 1024 px (Frame, Feed, Rail, Side).
+- Layout lined up to the art: the card icon is centred in its well (40 px at 18, 18), with the text to its right and the
+  options and Run inside the corner brackets. Chips fit their text. Each student row shows a headshot in its well. Section
+  labels are centred, the tiles are wider (the school time fits), and the student search uses the Search art.
+- Two fixes for art defects, done in code so nothing needs re-uploading:
+  - the Frame upload has a stray brass plate at its centre, which is covered with a patch of the frame's own leather;
+  - the TabOn gem is redrawn at its own size on tabs that aren't 150 px wide.
+- Checks: PASS console_pure, console_play_client, console_play_carried. CineState, Seen and Origin were nil before and
+  after every round. Backups: `NH_Backup.ConsoleArt_pieces*`, `ConsoleLayout_20261123`, `ConsoleLayout2_20261123`.
+
 ## Not run
 - `graphify update .`: graphify is not installed.

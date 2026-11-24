@@ -19,8 +19,10 @@ lines += ["}", "-- the 9-slice centre of each piece at design px (half the 2x re
 for n in names:
     w, h = Image.open(os.path.join(ART, n + ".png")).size
     w, h = w // 2, h // 2
-    m = 12 if n in ("Chip", "ChipOn", "ChipDanger", "Tab", "TabOn", "Search", "Tile") else 20
-    if n in ("HoldRing", "Medal", "Crest"): m = 0
+    # only pieces drawn at changing widths are 9-sliced (12 px border). Every other piece is drawn at its own design size,
+    # so it is stretched whole (0): slicing it would smear art that crosses the border (the card's icon well), and
+    # Roblox shrinks uploads over 1024 px (Frame, Feed, Rail, Side), which would put a pixel slice rect in the wrong place.
+    m = 12 if n in ("Chip", "ChipOn", "ChipDanger", "Tab", "TabOn") else 0
     lines.append(f"\t{n} = {{ {m}, {m}, {w - m}, {h - m}, {w}, {h} }};")
 lines += ["}",
           "function Shared.Image(Name: string): string?",
