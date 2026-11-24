@@ -1,0 +1,1493 @@
+{
+ "NHWing_Nocturne_L.fbx": {
+  "kind": "wing",
+  "style": "Nocturne",
+  "side": "L",
+  "attach_from_torso": [
+   0.0,
+   0.72,
+   0.5
+  ],
+  "pieces": {
+   "NocturneLMembrane": {
+    "centre": [
+     -2.3258,
+     0.2039,
+     0.5496
+    ],
+    "tris": 3152
+   },
+   "NocturneLFrame": {
+    "centre": [
+     -2.2895,
+     0.2051,
+     0.5047
+    ],
+    "tris": 1608
+   }
+  },
+  "bones": {
+   "Root": [
+    -0.42,
+    0.0,
+    -0.0
+   ],
+   "Hum": [
+    -0.42,
+    0.0,
+    -0.0
+   ],
+   "Fore": [
+    -1.0162,
+    0.5368,
+    0.2808
+   ],
+   "D1a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D1b": [
+    -2.7534,
+    1.4992,
+    0.6962
+   ],
+   "D2a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D2b": [
+    -3.1834,
+    1.1485,
+    0.7747
+   ],
+   "D3a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D3b": [
+    -3.0612,
+    0.5751,
+    0.8033
+   ],
+   "D4a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D4b": [
+    -2.6504,
+    0.3166,
+    0.7961
+   ]
+  },
+  "max_influences": 4,
+  "tint": {
+   "NocturneLMembrane": "WingPalette",
+   "NocturneLFrame": "WingFinish"
+  },
+  "maps": {
+   "NocturneLMembrane": "membrane",
+   "NocturneLFrame": "bone"
+  }
+ },
+ "NHWing_Nocturne_R.fbx": {
+  "kind": "wing",
+  "style": "Nocturne",
+  "side": "R",
+  "attach_from_torso": [
+   0.0,
+   0.72,
+   0.5
+  ],
+  "pieces": {
+   "NocturneRMembrane": {
+    "centre": [
+     2.3258,
+     0.2039,
+     0.5496
+    ],
+    "tris": 3152
+   },
+   "NocturneRFrame": {
+    "centre": [
+     2.2895,
+     0.2051,
+     0.5047
+    ],
+    "tris": 1608
+   }
+  },
+  "bones": {
+   "Root": [
+    0.42,
+    0.0,
+    -0.0
+   ],
+   "Hum": [
+    0.42,
+    0.0,
+    -0.0
+   ],
+   "Fore": [
+    1.0162,
+    0.5368,
+    0.2808
+   ],
+   "D1a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D1b": [
+    2.7534,
+    1.4992,
+    0.6962
+   ],
+   "D2a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D2b": [
+    3.1834,
+    1.1485,
+    0.7747
+   ],
+   "D3a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D3b": [
+    3.0612,
+    0.5751,
+    0.8033
+   ],
+   "D4a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D4b": [
+    2.6504,
+    0.3166,
+    0.7961
+   ]
+  },
+  "max_influences": 4,
+  "tint": {
+   "NocturneRMembrane": "WingPalette",
+   "NocturneRFrame": "WingFinish"
+  },
+  "maps": {
+   "NocturneRMembrane": "membrane",
+   "NocturneRFrame": "bone"
+  }
+ },
+ "NHWing_Wyrm_L.fbx": {
+  "kind": "wing",
+  "style": "Wyrm",
+  "side": "L",
+  "attach_from_torso": [
+   0.0,
+   0.72,
+   0.5
+  ],
+  "pieces": {
+   "WyrmLMembrane": {
+    "centre": [
+     -2.5509,
+     0.2686,
+     0.6265
+    ],
+    "tris": 2364
+   },
+   "WyrmLFrame": {
+    "centre": [
+     -2.4957,
+     0.2715,
+     0.5594
+    ],
+    "tris": 1380
+   }
+  },
+  "bones": {
+   "Root": [
+    -0.42,
+    0.0,
+    -0.0
+   ],
+   "Hum": [
+    -0.42,
+    0.0,
+    -0.0
+   ],
+   "Fore": [
+    -1.0162,
+    0.5368,
+    0.2808
+   ],
+   "D1a": [
+    -2.4753,
+    0.9006,
+    0.6567
+   ],
+   "D1b": [
+    -3.2105,
+    1.6106,
+    0.7998
+   ],
+   "D2a": [
+    -2.4753,
+    0.9006,
+    0.6567
+   ],
+   "D2b": [
+    -3.5709,
+    0.7855,
+    0.8991
+   ],
+   "D3a": [
+    -2.4753,
+    0.9006,
+    0.6567
+   ],
+   "D3b": [
+    -3.0136,
+    0.3027,
+    0.8981
+   ]
+  },
+  "max_influences": 4,
+  "tint": {
+   "WyrmLMembrane": "WingPalette",
+   "WyrmLFrame": "WingFinish"
+  },
+  "maps": {
+   "WyrmLMembrane": "membrane",
+   "WyrmLFrame": "bone"
+  }
+ },
+ "NHWing_Wyrm_R.fbx": {
+  "kind": "wing",
+  "style": "Wyrm",
+  "side": "R",
+  "attach_from_torso": [
+   0.0,
+   0.72,
+   0.5
+  ],
+  "pieces": {
+   "WyrmRMembrane": {
+    "centre": [
+     2.5509,
+     0.2686,
+     0.6265
+    ],
+    "tris": 2364
+   },
+   "WyrmRFrame": {
+    "centre": [
+     2.4954,
+     0.2715,
+     0.5592
+    ],
+    "tris": 1380
+   }
+  },
+  "bones": {
+   "Root": [
+    0.42,
+    0.0,
+    -0.0
+   ],
+   "Hum": [
+    0.42,
+    0.0,
+    -0.0
+   ],
+   "Fore": [
+    1.0162,
+    0.5368,
+    0.2808
+   ],
+   "D1a": [
+    2.4753,
+    0.9006,
+    0.6567
+   ],
+   "D1b": [
+    3.2105,
+    1.6106,
+    0.7998
+   ],
+   "D2a": [
+    2.4753,
+    0.9006,
+    0.6567
+   ],
+   "D2b": [
+    3.5709,
+    0.7855,
+    0.8991
+   ],
+   "D3a": [
+    2.4753,
+    0.9006,
+    0.6567
+   ],
+   "D3b": [
+    3.0136,
+    0.3027,
+    0.8981
+   ]
+  },
+  "max_influences": 4,
+  "tint": {
+   "WyrmRMembrane": "WingPalette",
+   "WyrmRFrame": "WingFinish"
+  },
+  "maps": {
+   "WyrmRMembrane": "membrane",
+   "WyrmRFrame": "bone"
+  }
+ },
+ "NHWing_Tattered_L.fbx": {
+  "kind": "wing",
+  "style": "Tattered",
+  "side": "L",
+  "attach_from_torso": [
+   0.0,
+   0.72,
+   0.5
+  ],
+  "pieces": {
+   "TatteredLMembrane": {
+    "centre": [
+     -2.3258,
+     0.2039,
+     0.5496
+    ],
+    "tris": 3152
+   },
+   "TatteredLFrame": {
+    "centre": [
+     -2.2895,
+     0.2051,
+     0.5047
+    ],
+    "tris": 1608
+   }
+  },
+  "bones": {
+   "Root": [
+    -0.42,
+    0.0,
+    -0.0
+   ],
+   "Hum": [
+    -0.42,
+    0.0,
+    -0.0
+   ],
+   "Fore": [
+    -1.0162,
+    0.5368,
+    0.2808
+   ],
+   "D1a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D1b": [
+    -2.7534,
+    1.4992,
+    0.6962
+   ],
+   "D2a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D2b": [
+    -3.1834,
+    1.1485,
+    0.7747
+   ],
+   "D3a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D3b": [
+    -3.0612,
+    0.5751,
+    0.8033
+   ],
+   "D4a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D4b": [
+    -2.6504,
+    0.3166,
+    0.7961
+   ]
+  },
+  "max_influences": 4,
+  "tint": {
+   "TatteredLMembrane": "WingPalette",
+   "TatteredLFrame": "WingFinish"
+  },
+  "maps": {
+   "TatteredLMembrane": "membrane",
+   "TatteredLFrame": "bone"
+  }
+ },
+ "NHWing_Tattered_R.fbx": {
+  "kind": "wing",
+  "style": "Tattered",
+  "side": "R",
+  "attach_from_torso": [
+   0.0,
+   0.72,
+   0.5
+  ],
+  "pieces": {
+   "TatteredRMembrane": {
+    "centre": [
+     2.3258,
+     0.2039,
+     0.5496
+    ],
+    "tris": 3152
+   },
+   "TatteredRFrame": {
+    "centre": [
+     2.2895,
+     0.2051,
+     0.5047
+    ],
+    "tris": 1608
+   }
+  },
+  "bones": {
+   "Root": [
+    0.42,
+    0.0,
+    -0.0
+   ],
+   "Hum": [
+    0.42,
+    0.0,
+    -0.0
+   ],
+   "Fore": [
+    1.0162,
+    0.5368,
+    0.2808
+   ],
+   "D1a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D1b": [
+    2.7534,
+    1.4992,
+    0.6962
+   ],
+   "D2a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D2b": [
+    3.1834,
+    1.1485,
+    0.7747
+   ],
+   "D3a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D3b": [
+    3.0612,
+    0.5751,
+    0.8033
+   ],
+   "D4a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D4b": [
+    2.6504,
+    0.3166,
+    0.7961
+   ]
+  },
+  "max_influences": 4,
+  "tint": {
+   "TatteredRMembrane": "WingPalette",
+   "TatteredRFrame": "WingFinish"
+  },
+  "maps": {
+   "TatteredRMembrane": "membrane",
+   "TatteredRFrame": "bone"
+  }
+ },
+ "NHWing_Fallen_L.fbx": {
+  "kind": "wing",
+  "style": "Fallen",
+  "side": "L",
+  "attach_from_torso": [
+   0.0,
+   0.72,
+   0.5
+  ],
+  "pieces": {
+   "FallenLMembrane": {
+    "centre": [
+     -3.1389,
+     0.631,
+     0.6784
+    ],
+    "tris": 15312
+   },
+   "FallenLFrame": {
+    "centre": [
+     -2.395,
+     0.8332,
+     0.5492
+    ],
+    "tris": 1008
+   }
+  },
+  "bones": {
+   "Root": [
+    -0.42,
+    0.0,
+    -0.0
+   ],
+   "Hum": [
+    -0.42,
+    0.0,
+    -0.0
+   ],
+   "Fore": [
+    -1.0162,
+    0.5368,
+    0.2808
+   ],
+   "D1a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D1b": [
+    -2.9751,
+    1.5519,
+    0.7392
+   ],
+   "D2a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D2b": [
+    -3.3356,
+    0.7268,
+    0.8385
+   ],
+   "D3a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D3b": [
+    -2.7783,
+    0.244,
+    0.8375
+   ]
+  },
+  "max_influences": 4,
+  "tint": {
+   "FallenLMembrane": "WingPalette",
+   "FallenLFrame": "WingFinish"
+  },
+  "maps": {
+   "FallenLMembrane": "feather",
+   "FallenLFrame": "bone"
+  }
+ },
+ "NHWing_Fallen_R.fbx": {
+  "kind": "wing",
+  "style": "Fallen",
+  "side": "R",
+  "attach_from_torso": [
+   0.0,
+   0.72,
+   0.5
+  ],
+  "pieces": {
+   "FallenRMembrane": {
+    "centre": [
+     3.1727,
+     0.6755,
+     0.6784
+    ],
+    "tris": 15312
+   },
+   "FallenRFrame": {
+    "centre": [
+     2.395,
+     0.8332,
+     0.5492
+    ],
+    "tris": 1008
+   }
+  },
+  "bones": {
+   "Root": [
+    0.42,
+    0.0,
+    -0.0
+   ],
+   "Hum": [
+    0.42,
+    0.0,
+    -0.0
+   ],
+   "Fore": [
+    1.0162,
+    0.5368,
+    0.2808
+   ],
+   "D1a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D1b": [
+    2.9751,
+    1.5519,
+    0.7392
+   ],
+   "D2a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D2b": [
+    3.3356,
+    0.7268,
+    0.8385
+   ],
+   "D3a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D3b": [
+    2.7783,
+    0.244,
+    0.8375
+   ]
+  },
+  "max_influences": 4,
+  "tint": {
+   "FallenRMembrane": "WingPalette",
+   "FallenRFrame": "WingFinish"
+  },
+  "maps": {
+   "FallenRMembrane": "feather",
+   "FallenRFrame": "bone"
+  }
+ },
+ "NHWing_Ossuary_L.fbx": {
+  "kind": "wing",
+  "style": "Ossuary",
+  "side": "L",
+  "attach_from_torso": [
+   0.0,
+   0.72,
+   0.5
+  ],
+  "pieces": {
+   "OssuaryLMembrane": {
+    "centre": [
+     -2.2867,
+     -0.2493,
+     0.5619
+    ],
+    "tris": 528
+   },
+   "OssuaryLFrame": {
+    "centre": [
+     -2.2795,
+     0.8822,
+     0.4935
+    ],
+    "tris": 1224
+   }
+  },
+  "bones": {
+   "Root": [
+    -0.42,
+    0.0,
+    -0.0
+   ],
+   "Hum": [
+    -0.42,
+    0.0,
+    -0.0
+   ],
+   "Fore": [
+    -1.0162,
+    0.5368,
+    0.2808
+   ],
+   "D1a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D1b": [
+    -2.7534,
+    1.4992,
+    0.6962
+   ],
+   "D2a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D2b": [
+    -3.1834,
+    1.1485,
+    0.7747
+   ],
+   "D3a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D3b": [
+    -3.0612,
+    0.5751,
+    0.8033
+   ],
+   "D4a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D4b": [
+    -2.6504,
+    0.3166,
+    0.7961
+   ]
+  },
+  "max_influences": 4,
+  "tint": {
+   "OssuaryLMembrane": "WingPalette",
+   "OssuaryLFrame": "WingFinish"
+  },
+  "maps": {
+   "OssuaryLMembrane": "cloth",
+   "OssuaryLFrame": "bone"
+  }
+ },
+ "NHWing_Ossuary_R.fbx": {
+  "kind": "wing",
+  "style": "Ossuary",
+  "side": "R",
+  "attach_from_torso": [
+   0.0,
+   0.72,
+   0.5
+  ],
+  "pieces": {
+   "OssuaryRMembrane": {
+    "centre": [
+     2.2867,
+     -0.2493,
+     0.5619
+    ],
+    "tris": 528
+   },
+   "OssuaryRFrame": {
+    "centre": [
+     2.2795,
+     0.8822,
+     0.4935
+    ],
+    "tris": 1224
+   }
+  },
+  "bones": {
+   "Root": [
+    0.42,
+    0.0,
+    -0.0
+   ],
+   "Hum": [
+    0.42,
+    0.0,
+    -0.0
+   ],
+   "Fore": [
+    1.0162,
+    0.5368,
+    0.2808
+   ],
+   "D1a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D1b": [
+    2.7534,
+    1.4992,
+    0.6962
+   ],
+   "D2a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D2b": [
+    3.1834,
+    1.1485,
+    0.7747
+   ],
+   "D3a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D3b": [
+    3.0612,
+    0.5751,
+    0.8033
+   ],
+   "D4a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D4b": [
+    2.6504,
+    0.3166,
+    0.7961
+   ]
+  },
+  "max_influences": 4,
+  "tint": {
+   "OssuaryRMembrane": "WingPalette",
+   "OssuaryRFrame": "WingFinish"
+  },
+  "maps": {
+   "OssuaryRMembrane": "cloth",
+   "OssuaryRFrame": "bone"
+  }
+ },
+ "NHWing_Wraithveil_L.fbx": {
+  "kind": "wing",
+  "style": "Wraithveil",
+  "side": "L",
+  "attach_from_torso": [
+   0.0,
+   0.72,
+   0.5
+  ],
+  "pieces": {
+   "WraithveilLMembrane": {
+    "centre": [
+     -2.8327,
+     0.3808,
+     1.1644
+    ],
+    "tris": 2800
+   },
+   "WraithveilLFrame": {
+    "centre": [
+     -2.2874,
+     0.882,
+     0.5027
+    ],
+    "tris": 1224
+   }
+  },
+  "bones": {
+   "Root": [
+    -0.42,
+    0.0,
+    -0.0
+   ],
+   "Hum": [
+    -0.42,
+    0.0,
+    -0.0
+   ],
+   "Fore": [
+    -1.0162,
+    0.5368,
+    0.2808
+   ],
+   "D1a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D1b": [
+    -2.7534,
+    1.4992,
+    0.6962
+   ],
+   "D2a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D2b": [
+    -3.1834,
+    1.1485,
+    0.7747
+   ],
+   "D3a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D3b": [
+    -3.0612,
+    0.5751,
+    0.8033
+   ],
+   "D4a": [
+    -2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D4b": [
+    -2.6504,
+    0.3166,
+    0.7961
+   ]
+  },
+  "max_influences": 4,
+  "tint": {
+   "WraithveilLMembrane": "WingPalette",
+   "WraithveilLFrame": "WingFinish"
+  },
+  "maps": {
+   "WraithveilLMembrane": "mist",
+   "WraithveilLFrame": "bone"
+  }
+ },
+ "NHWing_Wraithveil_R.fbx": {
+  "kind": "wing",
+  "style": "Wraithveil",
+  "side": "R",
+  "attach_from_torso": [
+   0.0,
+   0.72,
+   0.5
+  ],
+  "pieces": {
+   "WraithveilRMembrane": {
+    "centre": [
+     2.8329,
+     0.3806,
+     1.1638
+    ],
+    "tris": 2800
+   },
+   "WraithveilRFrame": {
+    "centre": [
+     2.2874,
+     0.882,
+     0.5027
+    ],
+    "tris": 1224
+   }
+  },
+  "bones": {
+   "Root": [
+    0.42,
+    0.0,
+    -0.0
+   ],
+   "Hum": [
+    0.42,
+    0.0,
+    -0.0
+   ],
+   "Fore": [
+    1.0162,
+    0.5368,
+    0.2808
+   ],
+   "D1a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D1b": [
+    2.7534,
+    1.4992,
+    0.6962
+   ],
+   "D2a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D2b": [
+    3.1834,
+    1.1485,
+    0.7747
+   ],
+   "D3a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D3b": [
+    3.0612,
+    0.5751,
+    0.8033
+   ],
+   "D4a": [
+    2.2399,
+    0.8419,
+    0.5961
+   ],
+   "D4b": [
+    2.6504,
+    0.3166,
+    0.7961
+   ]
+  },
+  "max_influences": 4,
+  "tint": {
+   "WraithveilRMembrane": "WingPalette",
+   "WraithveilRFrame": "WingFinish"
+  },
+  "maps": {
+   "WraithveilRMembrane": "mist",
+   "WraithveilRFrame": "bone"
+  }
+ },
+ "NHWing_Rime_L.fbx": {
+  "kind": "wing",
+  "style": "Rime",
+  "side": "L",
+  "attach_from_torso": [
+   0.0,
+   0.72,
+   0.5
+  ],
+  "pieces": {
+   "RimeLMembrane": {
+    "centre": [
+     -2.5057,
+     0.2649,
+     0.6632
+    ],
+    "tris": 2148
+   },
+   "RimeLFrame": {
+    "centre": [
+     -2.4656,
+     0.8684,
+     0.5674
+    ],
+    "tris": 1008
+   }
+  },
+  "bones": {
+   "Root": [
+    -0.42,
+    0.0,
+    -0.0
+   ],
+   "Hum": [
+    -0.42,
+    0.0,
+    -0.0
+   ],
+   "Fore": [
+    -1.0162,
+    0.5368,
+    0.2808
+   ],
+   "D1a": [
+    -2.3811,
+    0.8771,
+    0.6325
+   ],
+   "D1b": [
+    -3.1163,
+    1.5871,
+    0.7756
+   ],
+   "D2a": [
+    -2.3811,
+    0.8771,
+    0.6325
+   ],
+   "D2b": [
+    -3.4768,
+    0.762,
+    0.8748
+   ],
+   "D3a": [
+    -2.3811,
+    0.8771,
+    0.6325
+   ],
+   "D3b": [
+    -2.9195,
+    0.2792,
+    0.8738
+   ]
+  },
+  "max_influences": 4,
+  "tint": {
+   "RimeLMembrane": "WingPalette",
+   "RimeLFrame": "WingFinish"
+  },
+  "maps": {
+   "RimeLMembrane": "ice",
+   "RimeLFrame": "bone"
+  }
+ },
+ "NHWing_Rime_R.fbx": {
+  "kind": "wing",
+  "style": "Rime",
+  "side": "R",
+  "attach_from_torso": [
+   0.0,
+   0.72,
+   0.5
+  ],
+  "pieces": {
+   "RimeRMembrane": {
+    "centre": [
+     2.5054,
+     0.2739,
+     0.6516
+    ],
+    "tris": 2148
+   },
+   "RimeRFrame": {
+    "centre": [
+     2.4656,
+     0.8685,
+     0.5674
+    ],
+    "tris": 1008
+   }
+  },
+  "bones": {
+   "Root": [
+    0.42,
+    0.0,
+    -0.0
+   ],
+   "Hum": [
+    0.42,
+    0.0,
+    -0.0
+   ],
+   "Fore": [
+    1.0162,
+    0.5368,
+    0.2808
+   ],
+   "D1a": [
+    2.3811,
+    0.8771,
+    0.6325
+   ],
+   "D1b": [
+    3.1163,
+    1.5871,
+    0.7756
+   ],
+   "D2a": [
+    2.3811,
+    0.8771,
+    0.6325
+   ],
+   "D2b": [
+    3.4768,
+    0.762,
+    0.8748
+   ],
+   "D3a": [
+    2.3811,
+    0.8771,
+    0.6325
+   ],
+   "D3b": [
+    2.9195,
+    0.2792,
+    0.8738
+   ]
+  },
+  "max_influences": 4,
+  "tint": {
+   "RimeRMembrane": "WingPalette",
+   "RimeRFrame": "WingFinish"
+  },
+  "maps": {
+   "RimeRMembrane": "ice",
+   "RimeRFrame": "bone"
+  }
+ },
+ "NHHorns_Ram.fbx": {
+  "kind": "horns",
+  "style": "Ram",
+  "attach_from_head": [
+   0,
+   0,
+   0
+  ],
+  "pieces": {
+   "RamHorns": {
+    "centre": [
+     0.001,
+     0.5938,
+     0.3011
+    ],
+    "tris": 3696
+   },
+   "RamTip": {
+    "centre": [
+     0.0,
+     0.3865,
+     0.0325
+    ],
+    "tris": 1008
+   }
+  },
+  "tint": {
+   "RamHorns": "HornFinish",
+   "RamTip": "HornTip"
+  },
+  "maps": {
+   "RamHorns": "horn",
+   "RamTip": "horn"
+  }
+ },
+ "NHHorns_Demon.fbx": {
+  "kind": "horns",
+  "style": "Demon",
+  "attach_from_head": [
+   0,
+   0,
+   0
+  ],
+  "pieces": {
+   "DemonHorns": {
+    "centre": [
+     -0.0001,
+     0.8624,
+     0.6458
+    ],
+    "tris": 3696
+   },
+   "DemonTip": {
+    "centre": [
+     0.0,
+     1.2118,
+     1.2436
+    ],
+    "tris": 1008
+   }
+  },
+  "tint": {
+   "DemonHorns": "HornFinish",
+   "DemonTip": "HornTip"
+  },
+  "maps": {
+   "DemonHorns": "horn",
+   "DemonTip": "horn"
+  }
+ },
+ "NHHorns_Wendigo.fbx": {
+  "kind": "horns",
+  "style": "Wendigo",
+  "attach_from_head": [
+   0,
+   0,
+   0
+  ],
+  "pieces": {
+   "WendigoHorns": {
+    "centre": [
+     0.0,
+     1.2233,
+     0.1207
+    ],
+    "tris": 5840
+   }
+  },
+  "tint": {
+   "WendigoHorns": "HornFinish"
+  },
+  "maps": {
+   "WendigoHorns": "horn"
+  }
+ },
+ "NHHorns_Thorn.fbx": {
+  "kind": "horns",
+  "style": "Thorn",
+  "attach_from_head": [
+   0,
+   0,
+   0
+  ],
+  "pieces": {
+   "ThornHorns": {
+    "centre": [
+     0.0,
+     0.8015,
+     0.2038
+    ],
+    "tris": 7616
+   }
+  },
+  "tint": {
+   "ThornHorns": "HornFinish"
+  },
+  "maps": {
+   "ThornHorns": "horn"
+  }
+ },
+ "NHHorns_Broken.fbx": {
+  "kind": "horns",
+  "style": "Broken",
+  "attach_from_head": [
+   0,
+   0,
+   0
+  ],
+  "pieces": {
+   "BrokenHorns": {
+    "centre": [
+     0.04,
+     0.8608,
+     0.6444
+    ],
+    "tris": 4032
+   },
+   "BrokenTip": {
+    "centre": [
+     0.61,
+     1.212,
+     1.2436
+    ],
+    "tris": 504
+   }
+  },
+  "tint": {
+   "BrokenHorns": "HornFinish",
+   "BrokenTip": "HornTip"
+  },
+  "maps": {
+   "BrokenHorns": "horn",
+   "BrokenTip": "horn"
+  }
+ },
+ "NHHorns_Sovereign.fbx": {
+  "kind": "horns",
+  "style": "Sovereign",
+  "attach_from_head": [
+   0,
+   0,
+   0
+  ],
+  "pieces": {
+   "SovereignHorns": {
+    "centre": [
+     -0.001,
+     1.2124,
+     0.1155
+    ],
+    "tris": 3696
+   },
+   "SovereignTip": {
+    "centre": [
+     -0.0001,
+     1.8204,
+     0.0578
+    ],
+    "tris": 1008
+   },
+   "SovereignHalo": {
+    "centre": [
+     0.0,
+     0.75,
+     0.75
+    ],
+    "tris": 3520
+   }
+  },
+  "tint": {
+   "SovereignHorns": "HornFinish",
+   "SovereignTip": "HornTip",
+   "SovereignHalo": "HornFinish"
+  },
+  "maps": {
+   "SovereignHorns": "horn",
+   "SovereignTip": "horn",
+   "SovereignHalo": "horn"
+  }
+ },
+ "NHHorns_Bull.fbx": {
+  "kind": "horns",
+  "style": "Bull",
+  "attach_from_head": [
+   0,
+   0,
+   0
+  ],
+  "pieces": {
+   "BullHorns": {
+    "centre": [
+     0.0,
+     0.5172,
+     -0.4377
+    ],
+    "tris": 3696
+   },
+   "BullTip": {
+    "centre": [
+     -0.0,
+     0.7324,
+     -0.7048
+    ],
+    "tris": 1008
+   }
+  },
+  "tint": {
+   "BullHorns": "HornFinish",
+   "BullTip": "HornTip"
+  },
+  "maps": {
+   "BullHorns": "horn",
+   "BullTip": "horn"
+  }
+ }
+}

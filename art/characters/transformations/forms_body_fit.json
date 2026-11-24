@@ -1,0 +1,3603 @@
+{
+ "NHFormBody_standard.fbx": {
+  "V2Spines": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.2439,
+    0.5977
+   ],
+   "tris": 288,
+   "maps": "horn",
+   "tint": "HornFinish"
+  },
+  "W1Mantle": {
+   "part": "Torso",
+   "centre": [
+    -0.0042,
+    -0.113,
+    0.2574
+   ],
+   "tris": 8400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Mantle": {
+   "part": "Torso",
+   "centre": [
+    -0.0002,
+    -0.107,
+    0.3272
+   ],
+   "tris": 9000,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Back": {
+   "part": "Torso",
+   "centre": [
+    -0.0004,
+    -0.2734,
+    0.5451
+   ],
+   "tris": 7600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0018,
+    -0.1629,
+    0.0001
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0185,
+    0.0605,
+    0.0037
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinR": {
+   "part": "Right Leg",
+   "centre": [
+    0.0175,
+    0.0163,
+    0.0003
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0001,
+    -0.1529,
+    0.0001
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0161,
+    -0.0034,
+    -0.0004
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinL": {
+   "part": "Left Leg",
+   "centre": [
+    -0.0266,
+    -0.1026,
+    0.0011
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Moon": {
+   "part": "Torso",
+   "centre": [
+    -0.0299,
+    0.2181,
+    -0.5334
+   ],
+   "tris": 300,
+   "maps": "glow",
+   "tint": "Glow"
+  },
+  "G1Ribs": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.148,
+    -0.55
+   ],
+   "tris": 912,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1Spine": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.09,
+    0.54
+   ],
+   "tris": 840,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurR": {
+   "part": "Right Arm",
+   "centre": [
+    0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G2WrapR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0182,
+    -0.2878,
+    -0.0133
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2WrapL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0382,
+    -0.2892,
+    0.0297
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Chest": {
+   "part": "Torso",
+   "centre": [
+    0.002,
+    0.175,
+    0.002
+   ],
+   "tris": 288,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Moss": {
+   "part": "Torso",
+   "centre": [
+    -0.011,
+    -0.1023,
+    0.0001
+   ],
+   "tris": 2520,
+   "maps": "fur",
+   "tint": "Moss"
+  },
+  "G2Nails": {
+   "part": "Torso",
+   "centre": [
+    -0.05,
+    0.1825,
+    -0.5984
+   ],
+   "tris": 78,
+   "maps": "horn",
+   "tint": "Iron"
+  },
+  "R1Capelet": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.4918,
+    -0.0
+   ],
+   "tris": 336,
+   "maps": "mist",
+   "tint": "WingPalette"
+  },
+  "R2SpikeR": {
+   "part": "Right Arm",
+   "centre": [
+    0.4656,
+    1.1895,
+    0.0851
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeR": {
+   "part": "Right Leg",
+   "centre": [
+    0.0,
+    -0.4,
+    -0.5339
+   ],
+   "tris": 200,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2SpikeL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.4929,
+    1.0991,
+    0.1402
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeL": {
+   "part": "Left Leg",
+   "centre": [
+    0.0,
+    -0.4,
+    -0.5337
+   ],
+   "tris": 200,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2Chains": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.5625,
+    -0.0
+   ],
+   "tris": 4864,
+   "maps": "horn",
+   "tint": "Chain"
+  },
+  "R2Hang": {
+   "part": "Left Arm",
+   "centre": [
+    0.0,
+    -1.485,
+    -0.12
+   ],
+   "tris": 512,
+   "maps": "horn",
+   "tint": "Chain"
+  }
+ },
+ "NHFormBody_female.fbx": {
+  "V2Spines": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.2439,
+    0.5195
+   ],
+   "tris": 288,
+   "maps": "horn",
+   "tint": "HornFinish"
+  },
+  "W1Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0302,
+    0.272,
+    0.0314
+   ],
+   "tris": 8400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.041,
+    0.4724,
+    0.0477
+   ],
+   "tris": 9000,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Back": {
+   "part": "Torso",
+   "centre": [
+    -0.0144,
+    -0.2365,
+    0.5801
+   ],
+   "tris": 7600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffR": {
+   "part": "Right Arm",
+   "centre": [
+    -0.1095,
+    -0.1087,
+    -0.1305
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0112,
+    0.0028,
+    -0.0035
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinR": {
+   "part": "Right Leg",
+   "centre": [
+    0.0571,
+    -0.303,
+    -0.001
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0609,
+    -0.453,
+    0.0086
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.2038,
+    -0.0094,
+    -0.027
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinL": {
+   "part": "Left Leg",
+   "centre": [
+    -0.0547,
+    -0.219,
+    0.003
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Moon": {
+   "part": "Torso",
+   "centre": [
+    -0.0304,
+    0.2178,
+    -0.4577
+   ],
+   "tris": 300,
+   "maps": "glow",
+   "tint": "Glow"
+  },
+  "G1Ribs": {
+   "part": "Torso",
+   "centre": [
+    -0.0,
+    0.1482,
+    -0.4717
+   ],
+   "tris": 912,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1Spine": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.09,
+    0.4808
+   ],
+   "tris": 840,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurR": {
+   "part": "Right Arm",
+   "centre": [
+    0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G2WrapR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0253,
+    -0.306,
+    -0.0003
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2WrapL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0042,
+    -0.2981,
+    -0.0128
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Chest": {
+   "part": "Torso",
+   "centre": [
+    0.005,
+    0.175,
+    0.0187
+   ],
+   "tris": 288,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Moss": {
+   "part": "Torso",
+   "centre": [
+    0.001,
+    0.6817,
+    0.0033
+   ],
+   "tris": 2520,
+   "maps": "fur",
+   "tint": "Moss"
+  },
+  "G2Nails": {
+   "part": "Torso",
+   "centre": [
+    -0.05,
+    0.1825,
+    -0.5177
+   ],
+   "tris": 78,
+   "maps": "horn",
+   "tint": "Iron"
+  },
+  "R1Capelet": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.4918,
+    -0.0
+   ],
+   "tris": 336,
+   "maps": "mist",
+   "tint": "WingPalette"
+  },
+  "R2SpikeR": {
+   "part": "Right Arm",
+   "centre": [
+    0.3858,
+    1.1423,
+    0.103
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeR": {
+   "part": "Right Leg",
+   "centre": [
+    -0.0046,
+    -0.4005,
+    -0.4485
+   ],
+   "tris": 190,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2SpikeL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.4614,
+    1.1236,
+    0.0199
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeL": {
+   "part": "Left Leg",
+   "centre": [
+    0.0046,
+    -0.4005,
+    -0.4466
+   ],
+   "tris": 190,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2Chains": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.5625,
+    -0.0
+   ],
+   "tris": 4864,
+   "maps": "horn",
+   "tint": "Chain"
+  },
+  "R2Hang": {
+   "part": "Left Arm",
+   "centre": [
+    0.0,
+    -1.485,
+    -0.12
+   ],
+   "tris": 512,
+   "maps": "horn",
+   "tint": "Chain"
+  }
+ },
+ "NHFormBody_lean.fbx": {
+  "V2Spines": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.2439,
+    0.4738
+   ],
+   "tris": 288,
+   "maps": "horn",
+   "tint": "HornFinish"
+  },
+  "W1Mantle": {
+   "part": "Torso",
+   "centre": [
+    -0.0318,
+    0.0978,
+    0.055
+   ],
+   "tris": 8400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0432,
+    -0.0548,
+    0.0537
+   ],
+   "tris": 9000,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Back": {
+   "part": "Torso",
+   "centre": [
+    0.0192,
+    -0.2596,
+    0.4977
+   ],
+   "tris": 7600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffR": {
+   "part": "Right Arm",
+   "centre": [
+    0.057,
+    -0.1485,
+    -0.1649
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmR": {
+   "part": "Right Arm",
+   "centre": [
+    0.039,
+    0.0455,
+    0.0382
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinR": {
+   "part": "Right Leg",
+   "centre": [
+    0.0921,
+    -0.338,
+    0.0275
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0861,
+    -0.1444,
+    -0.0166
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0092,
+    -0.0021,
+    0.0673
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinL": {
+   "part": "Left Leg",
+   "centre": [
+    -0.0973,
+    -0.0508,
+    0.0437
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Moon": {
+   "part": "Torso",
+   "centre": [
+    -0.0303,
+    0.2178,
+    -0.4339
+   ],
+   "tris": 300,
+   "maps": "glow",
+   "tint": "Glow"
+  },
+  "G1Ribs": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.1496,
+    -0.4324
+   ],
+   "tris": 912,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1Spine": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.09,
+    0.4163
+   ],
+   "tris": 840,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurR": {
+   "part": "Right Arm",
+   "centre": [
+    0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G2WrapR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0017,
+    -0.26,
+    -0.0168
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2WrapL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0433,
+    -0.2895,
+    0.007
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Chest": {
+   "part": "Torso",
+   "centre": [
+    0.005,
+    0.175,
+    0.0023
+   ],
+   "tris": 288,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Moss": {
+   "part": "Torso",
+   "centre": [
+    -0.0077,
+    -0.0449,
+    -0.0128
+   ],
+   "tris": 2520,
+   "maps": "fur",
+   "tint": "Moss"
+  },
+  "G2Nails": {
+   "part": "Torso",
+   "centre": [
+    -0.05,
+    0.1825,
+    -0.4862
+   ],
+   "tris": 78,
+   "maps": "horn",
+   "tint": "Iron"
+  },
+  "R1Capelet": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.4918,
+    -0.0
+   ],
+   "tris": 336,
+   "maps": "mist",
+   "tint": "WingPalette"
+  },
+  "R2SpikeR": {
+   "part": "Right Arm",
+   "centre": [
+    0.4419,
+    1.1102,
+    0.0503
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeR": {
+   "part": "Right Leg",
+   "centre": [
+    0.0248,
+    -0.4007,
+    -0.4093
+   ],
+   "tris": 168,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2SpikeL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.3789,
+    1.1616,
+    0.0021
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeL": {
+   "part": "Left Leg",
+   "centre": [
+    -0.0262,
+    -0.4007,
+    -0.4111
+   ],
+   "tris": 168,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2Chains": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.5625,
+    -0.0
+   ],
+   "tris": 5120,
+   "maps": "horn",
+   "tint": "Chain"
+  },
+  "R2Hang": {
+   "part": "Left Arm",
+   "centre": [
+    0.0,
+    -1.485,
+    -0.12
+   ],
+   "tris": 512,
+   "maps": "horn",
+   "tint": "Chain"
+  }
+ },
+ "NHFormBody_athletic.fbx": {
+  "V2Spines": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.2439,
+    0.5441
+   ],
+   "tris": 288,
+   "maps": "horn",
+   "tint": "HornFinish"
+  },
+  "W1Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0299,
+    0.2075,
+    -0.0132
+   ],
+   "tris": 8400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0432,
+    0.4106,
+    0.0597
+   ],
+   "tris": 9000,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Back": {
+   "part": "Torso",
+   "centre": [
+    0.029,
+    -0.2707,
+    0.6134
+   ],
+   "tris": 7600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0817,
+    -0.1095,
+    -0.099
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0201,
+    0.0179,
+    -0.0447
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinR": {
+   "part": "Right Leg",
+   "centre": [
+    0.0548,
+    -0.0224,
+    -0.0413
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0484,
+    -0.4545,
+    0.028
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.2158,
+    -0.0105,
+    -0.0332
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinL": {
+   "part": "Left Leg",
+   "centre": [
+    -0.053,
+    -0.2369,
+    -0.018
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Moon": {
+   "part": "Torso",
+   "centre": [
+    -0.0304,
+    0.2179,
+    -0.5252
+   ],
+   "tris": 300,
+   "maps": "glow",
+   "tint": "Glow"
+  },
+  "G1Ribs": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.1491,
+    -0.517
+   ],
+   "tris": 912,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1Spine": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.09,
+    0.4879
+   ],
+   "tris": 840,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurR": {
+   "part": "Right Arm",
+   "centre": [
+    0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G2WrapR": {
+   "part": "Right Arm",
+   "centre": [
+    0.041,
+    -0.2598,
+    -0.0062
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2WrapL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0384,
+    -0.3071,
+    0.0086
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Chest": {
+   "part": "Torso",
+   "centre": [
+    0.002,
+    0.175,
+    -0.0011
+   ],
+   "tris": 288,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Moss": {
+   "part": "Torso",
+   "centre": [
+    -0.0011,
+    -0.1,
+    -0.0099
+   ],
+   "tris": 2520,
+   "maps": "fur",
+   "tint": "Moss"
+  },
+  "G2Nails": {
+   "part": "Torso",
+   "centre": [
+    -0.05,
+    0.1825,
+    -0.5775
+   ],
+   "tris": 78,
+   "maps": "horn",
+   "tint": "Iron"
+  },
+  "R1Capelet": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.4918,
+    -0.0
+   ],
+   "tris": 336,
+   "maps": "mist",
+   "tint": "WingPalette"
+  },
+  "R2SpikeR": {
+   "part": "Right Arm",
+   "centre": [
+    0.4199,
+    1.1876,
+    0.0653
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeR": {
+   "part": "Right Leg",
+   "centre": [
+    -0.0046,
+    -0.4006,
+    -0.4692
+   ],
+   "tris": 198,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2SpikeL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.4972,
+    1.1294,
+    0.0232
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeL": {
+   "part": "Left Leg",
+   "centre": [
+    0.0046,
+    -0.4006,
+    -0.4723
+   ],
+   "tris": 198,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2Chains": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.5625,
+    -0.0
+   ],
+   "tris": 4864,
+   "maps": "horn",
+   "tint": "Chain"
+  },
+  "R2Hang": {
+   "part": "Left Arm",
+   "centre": [
+    0.0,
+    -1.485,
+    -0.12
+   ],
+   "tris": 512,
+   "maps": "horn",
+   "tint": "Chain"
+  }
+ },
+ "NHFormBody_muscular.fbx": {
+  "V2Spines": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.2439,
+    0.5405
+   ],
+   "tris": 288,
+   "maps": "horn",
+   "tint": "HornFinish"
+  },
+  "W1Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0273,
+    0.2014,
+    0.0059
+   ],
+   "tris": 8400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0432,
+    -0.2353,
+    0.0019
+   ],
+   "tris": 9000,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Back": {
+   "part": "Torso",
+   "centre": [
+    0.0114,
+    -0.2675,
+    0.5783
+   ],
+   "tris": 7600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffR": {
+   "part": "Right Arm",
+   "centre": [
+    -0.0641,
+    -0.1494,
+    -0.0701
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0352,
+    0.0602,
+    0.0172
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinR": {
+   "part": "Right Leg",
+   "centre": [
+    0.0437,
+    -0.0224,
+    -0.016
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0265,
+    -0.3147,
+    0.072
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0073,
+    0.0356,
+    -0.0382
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinL": {
+   "part": "Left Leg",
+   "centre": [
+    -0.045,
+    -0.1962,
+    -0.0309
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Moon": {
+   "part": "Torso",
+   "centre": [
+    -0.0303,
+    0.2179,
+    -0.5549
+   ],
+   "tris": 300,
+   "maps": "glow",
+   "tint": "Glow"
+  },
+  "G1Ribs": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.1499,
+    -0.5392
+   ],
+   "tris": 912,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1Spine": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.09,
+    0.4839
+   ],
+   "tris": 840,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurR": {
+   "part": "Right Arm",
+   "centre": [
+    0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G2WrapR": {
+   "part": "Right Arm",
+   "centre": [
+    -0.001,
+    -0.283,
+    0.0008
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2WrapL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0485,
+    -0.3061,
+    0.0008
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Chest": {
+   "part": "Torso",
+   "centre": [
+    0.002,
+    0.175,
+    -0.0024
+   ],
+   "tris": 288,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Moss": {
+   "part": "Torso",
+   "centre": [
+    -0.0017,
+    -0.1012,
+    -0.0118
+   ],
+   "tris": 2520,
+   "maps": "fur",
+   "tint": "Moss"
+  },
+  "G2Nails": {
+   "part": "Torso",
+   "centre": [
+    -0.05,
+    0.1825,
+    -0.6078
+   ],
+   "tris": 78,
+   "maps": "horn",
+   "tint": "Iron"
+  },
+  "R1Capelet": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.4918,
+    -0.0
+   ],
+   "tris": 336,
+   "maps": "mist",
+   "tint": "WingPalette"
+  },
+  "R2SpikeR": {
+   "part": "Right Arm",
+   "centre": [
+    0.4484,
+    1.1145,
+    -0.1007
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeR": {
+   "part": "Right Leg",
+   "centre": [
+    -0.0039,
+    -0.4012,
+    -0.5074
+   ],
+   "tris": 200,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2SpikeL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.3846,
+    1.1106,
+    -0.0651
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeL": {
+   "part": "Left Leg",
+   "centre": [
+    0.0039,
+    -0.4012,
+    -0.5075
+   ],
+   "tris": 200,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2Chains": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.5625,
+    -0.0
+   ],
+   "tris": 4864,
+   "maps": "horn",
+   "tint": "Chain"
+  },
+  "R2Hang": {
+   "part": "Left Arm",
+   "centre": [
+    0.0,
+    -1.485,
+    -0.12
+   ],
+   "tris": 512,
+   "maps": "horn",
+   "tint": "Chain"
+  }
+ },
+ "NHFormBody_stocky.fbx": {
+  "V2Spines": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.2439,
+    0.6382
+   ],
+   "tris": 288,
+   "maps": "horn",
+   "tint": "HornFinish"
+  },
+  "W1Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0055,
+    0.2534,
+    -0.0117
+   ],
+   "tris": 8400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Mantle": {
+   "part": "Torso",
+   "centre": [
+    -0.0131,
+    0.3815,
+    0.0724
+   ],
+   "tris": 9000,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Back": {
+   "part": "Torso",
+   "centre": [
+    -0.0016,
+    -0.2672,
+    0.643
+   ],
+   "tris": 7600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffR": {
+   "part": "Right Arm",
+   "centre": [
+    -0.1097,
+    -0.162,
+    -0.0054
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0432,
+    0.0854,
+    0.0202
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinR": {
+   "part": "Right Leg",
+   "centre": [
+    0.0534,
+    -0.0224,
+    -0.0193
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffL": {
+   "part": "Left Arm",
+   "centre": [
+    0.0207,
+    -0.517,
+    0.0007
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmL": {
+   "part": "Left Arm",
+   "centre": [
+    0.0121,
+    0.0365,
+    -0.0353
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinL": {
+   "part": "Left Leg",
+   "centre": [
+    -0.0577,
+    -0.2009,
+    -0.0151
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Moon": {
+   "part": "Torso",
+   "centre": [
+    -0.0302,
+    0.2179,
+    -0.616
+   ],
+   "tris": 300,
+   "maps": "glow",
+   "tint": "Glow"
+  },
+  "G1Ribs": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.1519,
+    -0.613
+   ],
+   "tris": 912,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1Spine": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.09,
+    0.6019
+   ],
+   "tris": 840,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurR": {
+   "part": "Right Arm",
+   "centre": [
+    0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G2WrapR": {
+   "part": "Right Arm",
+   "centre": [
+    -0.0009,
+    -0.2956,
+    0.0007
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2WrapL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0145,
+    -0.2942,
+    0.0174
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Chest": {
+   "part": "Torso",
+   "centre": [
+    0.002,
+    0.175,
+    -0.0018
+   ],
+   "tris": 288,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Moss": {
+   "part": "Torso",
+   "centre": [
+    -0.0022,
+    -0.0903,
+    -0.0119
+   ],
+   "tris": 2520,
+   "maps": "fur",
+   "tint": "Moss"
+  },
+  "G2Nails": {
+   "part": "Torso",
+   "centre": [
+    -0.05,
+    0.1825,
+    -0.6716
+   ],
+   "tris": 78,
+   "maps": "horn",
+   "tint": "Iron"
+  },
+  "R1Capelet": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.4918,
+    -0.0
+   ],
+   "tris": 336,
+   "maps": "mist",
+   "tint": "WingPalette"
+  },
+  "R2SpikeR": {
+   "part": "Right Arm",
+   "centre": [
+    0.481,
+    1.1495,
+    -0.0041
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeR": {
+   "part": "Right Leg",
+   "centre": [
+    -0.0032,
+    -0.4009,
+    -0.5063
+   ],
+   "tris": 200,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2SpikeL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.4199,
+    1.1876,
+    0.1097
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeL": {
+   "part": "Left Leg",
+   "centre": [
+    0.0032,
+    -0.4009,
+    -0.5076
+   ],
+   "tris": 200,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2Chains": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.5625,
+    -0.001
+   ],
+   "tris": 4864,
+   "maps": "horn",
+   "tint": "Chain"
+  },
+  "R2Hang": {
+   "part": "Left Arm",
+   "centre": [
+    0.0,
+    -1.485,
+    -0.12
+   ],
+   "tris": 512,
+   "maps": "horn",
+   "tint": "Chain"
+  }
+ },
+ "NHFormBody_heavy.fbx": {
+  "V2Spines": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.2439,
+    0.5585
+   ],
+   "tris": 288,
+   "maps": "horn",
+   "tint": "HornFinish"
+  },
+  "W1Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0568,
+    0.0726,
+    -0.0841
+   ],
+   "tris": 8400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Mantle": {
+   "part": "Torso",
+   "centre": [
+    -0.0146,
+    0.2415,
+    -0.0326
+   ],
+   "tris": 9000,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Back": {
+   "part": "Torso",
+   "centre": [
+    -0.0098,
+    -0.2979,
+    0.5565
+   ],
+   "tris": 7600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffR": {
+   "part": "Right Arm",
+   "centre": [
+    -0.1332,
+    -0.108,
+    -0.1093
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0103,
+    0.0338,
+    -0.0169
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinR": {
+   "part": "Right Leg",
+   "centre": [
+    0.0558,
+    -0.3696,
+    0.0198
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0244,
+    -0.4017,
+    0.038
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.1957,
+    -0.0107,
+    -0.0354
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinL": {
+   "part": "Left Leg",
+   "centre": [
+    -0.0578,
+    0.0063,
+    -0.1301
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Moon": {
+   "part": "Torso",
+   "centre": [
+    -0.0301,
+    0.2181,
+    -0.6232
+   ],
+   "tris": 300,
+   "maps": "glow",
+   "tint": "Glow"
+  },
+  "G1Ribs": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.1483,
+    -0.6248
+   ],
+   "tris": 912,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1Spine": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.09,
+    0.555
+   ],
+   "tris": 840,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurR": {
+   "part": "Right Arm",
+   "centre": [
+    0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G2WrapR": {
+   "part": "Right Arm",
+   "centre": [
+    -0.0007,
+    -0.2048,
+    0.0015
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2WrapL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.02,
+    -0.279,
+    0.0089
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Chest": {
+   "part": "Torso",
+   "centre": [
+    0.002,
+    0.175,
+    -0.0028
+   ],
+   "tris": 288,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Moss": {
+   "part": "Torso",
+   "centre": [
+    0.0343,
+    0.4835,
+    -0.0652
+   ],
+   "tris": 2520,
+   "maps": "fur",
+   "tint": "Moss"
+  },
+  "G2Nails": {
+   "part": "Torso",
+   "centre": [
+    -0.05,
+    0.1825,
+    -0.6941
+   ],
+   "tris": 78,
+   "maps": "horn",
+   "tint": "Iron"
+  },
+  "R1Capelet": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.4918,
+    -0.0
+   ],
+   "tris": 336,
+   "maps": "mist",
+   "tint": "WingPalette"
+  },
+  "R2SpikeR": {
+   "part": "Right Arm",
+   "centre": [
+    0.3618,
+    1.1719,
+    -0.0272
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeR": {
+   "part": "Right Leg",
+   "centre": [
+    -0.004,
+    -0.4011,
+    -0.4589
+   ],
+   "tris": 200,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2SpikeL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.4524,
+    1.1194,
+    0.1308
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeL": {
+   "part": "Left Leg",
+   "centre": [
+    0.004,
+    -0.4011,
+    -0.458
+   ],
+   "tris": 200,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2Chains": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.5625,
+    0.0014
+   ],
+   "tris": 4992,
+   "maps": "horn",
+   "tint": "Chain"
+  },
+  "R2Hang": {
+   "part": "Left Arm",
+   "centre": [
+    0.0,
+    -1.485,
+    -0.12
+   ],
+   "tris": 512,
+   "maps": "horn",
+   "tint": "Chain"
+  }
+ },
+ "NHFormBody_petite.fbx": {
+  "V2Spines": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.2439,
+    0.4898
+   ],
+   "tris": 288,
+   "maps": "horn",
+   "tint": "HornFinish"
+  },
+  "W1Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0682,
+    0.2246,
+    0.0418
+   ],
+   "tris": 8400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0303,
+    0.1225,
+    0.0467
+   ],
+   "tris": 9000,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Back": {
+   "part": "Torso",
+   "centre": [
+    0.0007,
+    -0.2587,
+    0.4637
+   ],
+   "tris": 7600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffR": {
+   "part": "Right Arm",
+   "centre": [
+    0.1138,
+    -0.2209,
+    -0.0497
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmR": {
+   "part": "Right Arm",
+   "centre": [
+    0.039,
+    0.0459,
+    0.0381
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinR": {
+   "part": "Right Leg",
+   "centre": [
+    0.081,
+    -0.3449,
+    0.01
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.097,
+    -0.1345,
+    0.0106
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.225,
+    -0.0001,
+    0.0795
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinL": {
+   "part": "Left Leg",
+   "centre": [
+    -0.0913,
+    -0.0513,
+    -0.0127
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Moon": {
+   "part": "Torso",
+   "centre": [
+    -0.0305,
+    0.2178,
+    -0.4275
+   ],
+   "tris": 300,
+   "maps": "glow",
+   "tint": "Glow"
+  },
+  "G1Ribs": {
+   "part": "Torso",
+   "centre": [
+    -0.0,
+    0.149,
+    -0.4406
+   ],
+   "tris": 912,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1Spine": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.09,
+    0.4375
+   ],
+   "tris": 840,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurR": {
+   "part": "Right Arm",
+   "centre": [
+    0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G2WrapR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0212,
+    -0.2814,
+    0.0078
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2WrapL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0518,
+    -0.2981,
+    -0.0041
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Chest": {
+   "part": "Torso",
+   "centre": [
+    0.005,
+    0.175,
+    0.0126
+   ],
+   "tris": 288,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Moss": {
+   "part": "Torso",
+   "centre": [
+    0.006,
+    0.1321,
+    0.0005
+   ],
+   "tris": 2520,
+   "maps": "fur",
+   "tint": "Moss"
+  },
+  "G2Nails": {
+   "part": "Torso",
+   "centre": [
+    -0.05,
+    0.1825,
+    -0.4879
+   ],
+   "tris": 78,
+   "maps": "horn",
+   "tint": "Iron"
+  },
+  "R1Capelet": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.4918,
+    -0.0
+   ],
+   "tris": 336,
+   "maps": "mist",
+   "tint": "WingPalette"
+  },
+  "R2SpikeR": {
+   "part": "Right Arm",
+   "centre": [
+    0.4222,
+    1.1533,
+    0.0615
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeR": {
+   "part": "Right Leg",
+   "centre": [
+    0.0245,
+    -0.4007,
+    -0.4041
+   ],
+   "tris": 172,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2SpikeL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.5049,
+    1.1161,
+    -0.0661
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeL": {
+   "part": "Left Leg",
+   "centre": [
+    -0.0277,
+    -0.4007,
+    -0.4051
+   ],
+   "tris": 172,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2Chains": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.5625,
+    -0.0
+   ],
+   "tris": 5120,
+   "maps": "horn",
+   "tint": "Chain"
+  },
+  "R2Hang": {
+   "part": "Left Arm",
+   "centre": [
+    0.0,
+    -1.485,
+    -0.12
+   ],
+   "tris": 512,
+   "maps": "horn",
+   "tint": "Chain"
+  }
+ },
+ "NHFormBody_toned.fbx": {
+  "V2Spines": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.2439,
+    0.5279
+   ],
+   "tris": 288,
+   "maps": "horn",
+   "tint": "HornFinish"
+  },
+  "W1Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0247,
+    0.2585,
+    0.007
+   ],
+   "tris": 8400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0646,
+    0.4626,
+    0.0724
+   ],
+   "tris": 9000,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Back": {
+   "part": "Torso",
+   "centre": [
+    0.0448,
+    -0.2619,
+    0.5336
+   ],
+   "tris": 7600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0797,
+    -0.1123,
+    -0.1348
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0101,
+    0.0004,
+    -0.0332
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinR": {
+   "part": "Right Leg",
+   "centre": [
+    0.0475,
+    -0.0224,
+    -0.0269
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0678,
+    -0.4443,
+    0.0383
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.1851,
+    -0.0083,
+    -0.1119
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinL": {
+   "part": "Left Leg",
+   "centre": [
+    -0.0586,
+    0.0073,
+    -0.0138
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Moon": {
+   "part": "Torso",
+   "centre": [
+    -0.0304,
+    0.2178,
+    -0.4799
+   ],
+   "tris": 300,
+   "maps": "glow",
+   "tint": "Glow"
+  },
+  "G1Ribs": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.1488,
+    -0.485
+   ],
+   "tris": 912,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1Spine": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.09,
+    0.4831
+   ],
+   "tris": 840,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurR": {
+   "part": "Right Arm",
+   "centre": [
+    0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G2WrapR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0447,
+    -0.2875,
+    -0.0007
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2WrapL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0055,
+    -0.2928,
+    -0.002
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Chest": {
+   "part": "Torso",
+   "centre": [
+    0.005,
+    0.175,
+    0.0093
+   ],
+   "tris": 288,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Moss": {
+   "part": "Torso",
+   "centre": [
+    -0.0105,
+    0.7004,
+    -0.0023
+   ],
+   "tris": 2520,
+   "maps": "fur",
+   "tint": "Moss"
+  },
+  "G2Nails": {
+   "part": "Torso",
+   "centre": [
+    -0.05,
+    0.1825,
+    -0.5395
+   ],
+   "tris": 78,
+   "maps": "horn",
+   "tint": "Iron"
+  },
+  "R1Capelet": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.4918,
+    -0.0
+   ],
+   "tris": 336,
+   "maps": "mist",
+   "tint": "WingPalette"
+  },
+  "R2SpikeR": {
+   "part": "Right Arm",
+   "centre": [
+    0.431,
+    1.1393,
+    0.0451
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeR": {
+   "part": "Right Leg",
+   "centre": [
+    -0.0046,
+    -0.4008,
+    -0.4473
+   ],
+   "tris": 196,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2SpikeL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.4482,
+    1.1209,
+    -0.145
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeL": {
+   "part": "Left Leg",
+   "centre": [
+    0.0046,
+    -0.4008,
+    -0.4511
+   ],
+   "tris": 196,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2Chains": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.5625,
+    -0.0
+   ],
+   "tris": 4864,
+   "maps": "horn",
+   "tint": "Chain"
+  },
+  "R2Hang": {
+   "part": "Left Arm",
+   "centre": [
+    0.0,
+    -1.485,
+    -0.12
+   ],
+   "tris": 512,
+   "maps": "horn",
+   "tint": "Chain"
+  }
+ },
+ "NHFormBody_curvy.fbx": {
+  "V2Spines": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.2439,
+    0.5299
+   ],
+   "tris": 288,
+   "maps": "horn",
+   "tint": "HornFinish"
+  },
+  "W1Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0181,
+    0.3079,
+    0.014
+   ],
+   "tris": 8400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0627,
+    0.4792,
+    0.08
+   ],
+   "tris": 9000,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Back": {
+   "part": "Torso",
+   "centre": [
+    0.0662,
+    -0.2411,
+    0.5862
+   ],
+   "tris": 7600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0761,
+    -0.1073,
+    -0.1301
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0105,
+    0.0049,
+    -0.033
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinR": {
+   "part": "Right Leg",
+   "centre": [
+    0.049,
+    -0.024,
+    0.0144
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0633,
+    -0.4304,
+    0.0239
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.1953,
+    -0.0091,
+    -0.1086
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinL": {
+   "part": "Left Leg",
+   "centre": [
+    -0.05,
+    0.0044,
+    -0.0101
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Moon": {
+   "part": "Torso",
+   "centre": [
+    -0.0305,
+    0.2178,
+    -0.4675
+   ],
+   "tris": 300,
+   "maps": "glow",
+   "tint": "Glow"
+  },
+  "G1Ribs": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.1477,
+    -0.4907
+   ],
+   "tris": 912,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1Spine": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.09,
+    0.4997
+   ],
+   "tris": 840,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurR": {
+   "part": "Right Arm",
+   "centre": [
+    0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G2WrapR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0396,
+    -0.2841,
+    -0.0004
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2WrapL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.038,
+    -0.2751,
+    0.0044
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Chest": {
+   "part": "Torso",
+   "centre": [
+    0.005,
+    0.175,
+    0.0098
+   ],
+   "tris": 288,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Moss": {
+   "part": "Torso",
+   "centre": [
+    0.001,
+    0.5027,
+    0.0289
+   ],
+   "tris": 2520,
+   "maps": "fur",
+   "tint": "Moss"
+  },
+  "G2Nails": {
+   "part": "Torso",
+   "centre": [
+    -0.05,
+    0.1825,
+    -0.5306
+   ],
+   "tris": 78,
+   "maps": "horn",
+   "tint": "Iron"
+  },
+  "R1Capelet": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.4918,
+    -0.0
+   ],
+   "tris": 336,
+   "maps": "mist",
+   "tint": "WingPalette"
+  },
+  "R2SpikeR": {
+   "part": "Right Arm",
+   "centre": [
+    0.3588,
+    1.1756,
+    0.0093
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeR": {
+   "part": "Right Leg",
+   "centre": [
+    -0.0042,
+    -0.4011,
+    -0.4788
+   ],
+   "tris": 190,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2SpikeL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.5032,
+    1.1137,
+    0.0488
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeL": {
+   "part": "Left Leg",
+   "centre": [
+    0.0042,
+    -0.4011,
+    -0.4795
+   ],
+   "tris": 190,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2Chains": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.5625,
+    -0.0
+   ],
+   "tris": 4864,
+   "maps": "horn",
+   "tint": "Chain"
+  },
+  "R2Hang": {
+   "part": "Left Arm",
+   "centre": [
+    0.0,
+    -1.485,
+    -0.12
+   ],
+   "tris": 512,
+   "maps": "horn",
+   "tint": "Chain"
+  }
+ },
+ "NHFormBody_strong.fbx": {
+  "V2Spines": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.2439,
+    0.5291
+   ],
+   "tris": 288,
+   "maps": "horn",
+   "tint": "HornFinish"
+  },
+  "W1Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0168,
+    0.2401,
+    0.0022
+   ],
+   "tris": 8400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0424,
+    -0.1542,
+    0.0786
+   ],
+   "tris": 9000,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Back": {
+   "part": "Torso",
+   "centre": [
+    0.0078,
+    -0.2499,
+    0.5607
+   ],
+   "tris": 7600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0755,
+    -0.1104,
+    -0.0902
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0256,
+    0.0013,
+    -0.0218
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinR": {
+   "part": "Right Leg",
+   "centre": [
+    0.0437,
+    -0.0224,
+    -0.0171
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.04,
+    -0.4147,
+    0.0396
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0537,
+    -0.0119,
+    -0.0376
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinL": {
+   "part": "Left Leg",
+   "centre": [
+    -0.0538,
+    0.0046,
+    -0.0197
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Moon": {
+   "part": "Torso",
+   "centre": [
+    -0.0305,
+    0.2179,
+    -0.5168
+   ],
+   "tris": 300,
+   "maps": "glow",
+   "tint": "Glow"
+  },
+  "G1Ribs": {
+   "part": "Torso",
+   "centre": [
+    -0.0,
+    0.1492,
+    -0.5141
+   ],
+   "tris": 912,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1Spine": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.09,
+    0.4904
+   ],
+   "tris": 840,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurR": {
+   "part": "Right Arm",
+   "centre": [
+    0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G2WrapR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0362,
+    -0.2971,
+    -0.0001
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2WrapL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0372,
+    -0.3064,
+    -0.001
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Chest": {
+   "part": "Torso",
+   "centre": [
+    0.002,
+    0.175,
+    0.0023
+   ],
+   "tris": 288,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Moss": {
+   "part": "Torso",
+   "centre": [
+    -0.0026,
+    0.6712,
+    -0.0097
+   ],
+   "tris": 2520,
+   "maps": "fur",
+   "tint": "Moss"
+  },
+  "G2Nails": {
+   "part": "Torso",
+   "centre": [
+    -0.05,
+    0.1825,
+    -0.5772
+   ],
+   "tris": 78,
+   "maps": "horn",
+   "tint": "Iron"
+  },
+  "R1Capelet": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.4918,
+    -0.0
+   ],
+   "tris": 336,
+   "maps": "mist",
+   "tint": "WingPalette"
+  },
+  "R2SpikeR": {
+   "part": "Right Arm",
+   "centre": [
+    0.4453,
+    1.1431,
+    0.1117
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeR": {
+   "part": "Right Leg",
+   "centre": [
+    -0.0039,
+    -0.4008,
+    -0.4975
+   ],
+   "tris": 198,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2SpikeL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.4705,
+    1.1266,
+    0.2074
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeL": {
+   "part": "Left Leg",
+   "centre": [
+    0.0039,
+    -0.4008,
+    -0.4977
+   ],
+   "tris": 198,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2Chains": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.5625,
+    -0.0
+   ],
+   "tris": 4864,
+   "maps": "horn",
+   "tint": "Chain"
+  },
+  "R2Hang": {
+   "part": "Left Arm",
+   "centre": [
+    0.0,
+    -1.485,
+    -0.12
+   ],
+   "tris": 512,
+   "maps": "horn",
+   "tint": "Chain"
+  }
+ },
+ "NHFormBody_plus.fbx": {
+  "V2Spines": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.2439,
+    0.5594
+   ],
+   "tris": 288,
+   "maps": "horn",
+   "tint": "HornFinish"
+  },
+  "W1Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0481,
+    0.0093,
+    -0.0031
+   ],
+   "tris": 8400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Mantle": {
+   "part": "Torso",
+   "centre": [
+    0.0274,
+    0.4258,
+    0.0641
+   ],
+   "tris": 9000,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Back": {
+   "part": "Torso",
+   "centre": [
+    0.0175,
+    -0.2572,
+    0.6149
+   ],
+   "tris": 7600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0324,
+    -0.0964,
+    -0.1109
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0425,
+    0.0318,
+    -0.0173
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinR": {
+   "part": "Right Leg",
+   "centre": [
+    0.0602,
+    -0.0224,
+    0.0206
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1CuffL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0362,
+    -0.4458,
+    -0.0066
+   ],
+   "tris": 2600,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2ArmL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.1962,
+    -0.0072,
+    -0.0108
+   ],
+   "tris": 5400,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W1ShinL": {
+   "part": "Left Leg",
+   "centre": [
+    -0.0574,
+    0.0073,
+    0.0197
+   ],
+   "tris": 1700,
+   "maps": "fur",
+   "tint": "Fur"
+  },
+  "W2Moon": {
+   "part": "Torso",
+   "centre": [
+    -0.03,
+    0.2182,
+    -0.5138
+   ],
+   "tris": 300,
+   "maps": "glow",
+   "tint": "Glow"
+  },
+  "G1Ribs": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.1467,
+    -0.5325
+   ],
+   "tris": 912,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1Spine": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.09,
+    0.5565
+   ],
+   "tris": 840,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurR": {
+   "part": "Right Arm",
+   "centre": [
+    0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G1SpurL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.6059,
+    0.6084,
+    0.0086
+   ],
+   "tris": 144,
+   "maps": "bone",
+   "tint": "WingFinish"
+  },
+  "G2WrapR": {
+   "part": "Right Arm",
+   "centre": [
+    0.0408,
+    -0.2812,
+    0.0008
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2WrapL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.0335,
+    -0.3061,
+    0.0008
+   ],
+   "tris": 568,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Chest": {
+   "part": "Torso",
+   "centre": [
+    0.002,
+    0.175,
+    0.0084
+   ],
+   "tris": 288,
+   "maps": "cloth",
+   "tint": "None"
+  },
+  "G2Moss": {
+   "part": "Torso",
+   "centre": [
+    0.001,
+    0.4831,
+    0.0172
+   ],
+   "tris": 2520,
+   "maps": "fur",
+   "tint": "Moss"
+  },
+  "G2Nails": {
+   "part": "Torso",
+   "centre": [
+    -0.05,
+    0.1825,
+    -0.5865
+   ],
+   "tris": 78,
+   "maps": "horn",
+   "tint": "Iron"
+  },
+  "R1Capelet": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.4918,
+    -0.0
+   ],
+   "tris": 336,
+   "maps": "mist",
+   "tint": "WingPalette"
+  },
+  "R2SpikeR": {
+   "part": "Right Arm",
+   "centre": [
+    0.5286,
+    1.0775,
+    -0.056
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeR": {
+   "part": "Right Leg",
+   "centre": [
+    -0.0046,
+    -0.4011,
+    -0.4438
+   ],
+   "tris": 200,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2SpikeL": {
+   "part": "Left Arm",
+   "centre": [
+    -0.4683,
+    1.1586,
+    -0.0939
+   ],
+   "tris": 432,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2RimeL": {
+   "part": "Left Leg",
+   "centre": [
+    0.0046,
+    -0.4011,
+    -0.4433
+   ],
+   "tris": 200,
+   "maps": "ice",
+   "tint": "None"
+  },
+  "R2Chains": {
+   "part": "Torso",
+   "centre": [
+    0.0,
+    0.5625,
+    -0.0
+   ],
+   "tris": 4864,
+   "maps": "horn",
+   "tint": "Chain"
+  },
+  "R2Hang": {
+   "part": "Left Arm",
+   "centre": [
+    0.0,
+    -1.485,
+    -0.12
+   ],
+   "tris": 512,
+   "maps": "horn",
+   "tint": "Chain"
+  }
+ },
+ "NHFormHead.fbx": {
+  "G1Jaw": {
+   "part": "Head",
+   "centre": [
+    0.0001,
+    -0.2784,
+    -0.5741
+   ],
+   "tris": 304,
+   "maps": "bone",
+   "tint": "WingFinish"
+  }
+ }
+}
