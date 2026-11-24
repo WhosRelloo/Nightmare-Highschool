@@ -17,6 +17,7 @@ local function id(T) return T and T.Animation and T.Animation.AnimationId end
 local TT = AC.Controller.TrackTable
 if id(TT.Walk) ~= (Clips.Id("Jog")) then table.insert(Fails, "Walk is " .. tostring(id(TT.Walk))) end
 -- a solo match can start with the ball at the player's feet (HasSportBall set by the server): the idle follows it
+local StartBall = P.Character:GetAttribute("HasSportBall")
 local StartIdle = if P.Character:GetAttribute("HasSportBall") then "IdleBall" else "Idle"
 if id(TT.Idle) ~= (Clips.Id(StartIdle)) then table.insert(Fails, "Idle is " .. tostring(id(TT.Idle)) .. ", want " .. StartIdle) end
 if not (TT.Idle and TT.Idle.Looped and TT.Walk and TT.Walk.Looped) then table.insert(Fails, "Idle / Walk don't loop") end
@@ -35,5 +36,6 @@ if id(AC.Controller.TrackTable.Idle) ~= (Clips.Id("IdleBall")) then table.insert
 P.Character:SetAttribute("HasSportBall", nil)
 task.wait(0.6)
 if id(AC.Controller.TrackTable.Idle) ~= (Clips.Id("Idle")) then table.insert(Fails, "the idle after the ball is " .. tostring(id(AC.Controller.TrackTable.Idle))) end
+P.Character:SetAttribute("HasSportBall", StartBall) -- put the server's value back
 if #Fails > 0 then return "FAIL soccer_play_pack\n" .. table.concat(Fails, "\n") end
 return "PASS soccer_play_pack"

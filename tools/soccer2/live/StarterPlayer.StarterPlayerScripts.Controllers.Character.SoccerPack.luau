@@ -148,7 +148,13 @@ end
 
 function Local.Step()
 	local Want = Local.IsSoccer()
-	if Want and not On then Local.Apply() elseif not Want and On then Local.Restore() end
+	if Want and not On then Local.Apply()
+	elseif not Want and On then Local.Restore()
+	elseif not Want then
+		-- a respawn can clear On before InSport goes: never leave the override set outside a match
+		local AC = ac()
+		if AC and AC.Overridden() then AC.Override(nil) end
+	end
 	if not On then return end
 	if Local.IsKeeper() ~= Keeper then Local.Override() end
 	local Idle = Local.WantIdle()
@@ -165,7 +171,13 @@ function Shared.OnStart()
 		end
 	end)
 	-- a new body starts on the default pack; the next tick re-applies (Apply waits for the controller to be on it)
-	Player.CharacterAdded:Connect(function() On = false IdleSlot = nil end)
+	Player.CharacterAdded:Connect(function()
+		On = false
+		IdleSlot = nil
+		Keeper = false
+		local AC = ac()
+		if AC then AC.Override(nil) end -- the next Step turns the pack back on if the match goes on
+	end)
 end
 
 -- (soccer-2.0) Studio checks
