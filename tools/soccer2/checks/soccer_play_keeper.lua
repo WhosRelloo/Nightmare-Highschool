@@ -50,7 +50,7 @@ Sports.State = function()
 	C.InZone = inBox(Zone, Root.Position)
 	return C, At
 end
-Sports.HasBall = function() return HoldBall or OrigHasBall() end
+Sports.HasBall = function() return HoldBall end -- the test owns HasBall: a solo match starts with the real ball at the feet
 local Start = Root.Position
 local StartAuto = Hum.AutoRotate
 local Dir = Vector3.zero
