@@ -68,7 +68,9 @@ Cards.Chip = chip
 
 -- Values[ArgName] holds the card's current option values (the shell keeps one table per card id).
 -- Opts = { OnPick: (Arg, Choices, Done) -> () } opens the shared picker for long lists.
-function Cards.Options(Row: Instance, Def: any, Values: any, Lists: any, Opts: any)
+-- Returns the controls it made, in order (chip holders and text boxes, each 36 px tall): Cards.Card places them.
+function Cards.Options(Row: Instance, Def: any, Values: any, Lists: any, Opts: any): { GuiObject }
+	local Items = {}
 	for _, A in Def.Args do
 		local Label = A.Label or A.Name
 		if A.Kind == "choice" then
@@ -80,6 +82,7 @@ function Cards.Options(Row: Instance, Def: any, Values: any, Lists: any, Opts: a
 						elseif A.Name == "Days" then (if C == 0 then "Forever" else C .. "d")
 						elseif A.Name == "Tier" and typeof(C) == "number" then ({ "I", "II", "III" })[C] else tostring(C)
 					local B = chip(Row, "Opt_" .. A.Name .. "_" .. tostring(C), Text, Values[A.Name] == C, A.Name == "Days" and C == 0)
+					table.insert(Items, B.Parent :: any)
 					B.Activated:Connect(function() Values[A.Name] = C Opts.Redraw() end)
 				end
 			else
@@ -88,6 +91,7 @@ function Cards.Options(Row: Instance, Def: any, Values: any, Lists: any, Opts: a
 				local Shown = Label
 				for _, It in List do if It == Cur or (typeof(It) == "table" and It.Id == Cur) then Shown = if typeof(It) == "table" then It.Name else tostring(It) end end
 				local B = chip(Row, "Opt_" .. A.Name, Shown .. " ▾", Cur ~= nil, false)
+				table.insert(Items, B.Parent :: any)
 				B.Activated:Connect(function()
 					Opts.OnPick(A, List, function(V) Values[A.Name] = V Opts.Redraw() end)
 				end)
@@ -96,6 +100,7 @@ function Cards.Options(Row: Instance, Def: any, Values: any, Lists: any, Opts: a
 			local Box = New("TextBox", { Name = "Opt_" .. A.Name; PlaceholderText = Label; Text = if Values[A.Name] ~= nil then tostring(Values[A.Name]) else "";
 				TextSize = 20; FontFace = FACE.Body; TextColor3 = COL.Bone; PlaceholderColor3 = COL.Dim; BackgroundColor3 = COL.IronHi;
 				ClearTextOnFocus = false; Size = UDim2.fromOffset(if A.Kind == "number" then 100 else 220, 36); TextXAlignment = Enum.TextXAlignment.Left }, Row)
+			table.insert(Items, Box)
 			New("UICorner", { CornerRadius = UDim.new(0, 8) }, Box)
 			New("UIStroke", { Color = COL.Brass; Thickness = 1; Transparency = 0.5; ApplyStrokeMode = Enum.ApplyStrokeMode.Border }, Box)
 			New("UIPadding", { PaddingLeft = UDim.new(0, 10) }, Box)
@@ -112,9 +117,11 @@ function Cards.Options(Row: Instance, Def: any, Values: any, Lists: any, Opts: a
 			local On = Values[A.Name] ~= false
 			Values[A.Name] = On
 			local B = chip(Row, "Opt_" .. A.Name, Label .. (if On then ": on" else ": off"), On, false)
+			table.insert(Items, B.Parent :: any)
 			B.Activated:Connect(function() Values[A.Name] = not (Values[A.Name] ~= false) Opts.Redraw() end)
 		end
 	end
+	return Items
 end
 
 -- the hold ring: a danger card's Run button runs only after a 0.8 s hold; letting go early cancels.
@@ -222,16 +229,37 @@ function Cards.Card(Parent: Instance, Def: any, Pos: UDim2, Opts: any): GuiObjec
 	Cards.Text(C, "Title", (if Opts.Fav then "★ " else "") .. Def.Title, 22, FACE.Bold, if Def.Danger then COL.Crimson else COL.Bone, UDim2.fromOffset(76, 16), UDim2.fromOffset(264, 28))
 	-- (1b) Note: a line in place of the help (the Unban card shows the ban it would lift)
 	Cards.Text(C, "Help", Opts.Note or Def.Help, 20, FACE.Body, if Opts.Note then COL.Brass else COL.Dim, UDim2.fromOffset(76, 44), UDim2.fromOffset(284, 50), true)
-	local Row = New("ScrollingFrame", { Name = "Options"; BackgroundTransparency = 1; Position = UDim2.fromOffset(24, 108); Size = UDim2.fromOffset(230, 44);
-		CanvasSize = UDim2.new(); AutomaticCanvasSize = Enum.AutomaticSize.X; ScrollingDirection = Enum.ScrollingDirection.X; ScrollBarThickness = 3;
-		ScrollBarImageColor3 = COL.Brass; ScrollBarImageTransparency = 0.4; Selectable = false }, C)
-	New("UIListLayout", { FillDirection = Enum.FillDirection.Horizontal; VerticalAlignment = Enum.VerticalAlignment.Top; Padding = UDim.new(0, 6); SortOrder = Enum.SortOrder.LayoutOrder }, Row)
-	Cards.Options(Row, Def, Opts.Values, Opts.Lists, Opts)
+	-- the options: one 230 px row beside Run when they fit. (2026-11-24) Otherwise the card grows: they wrap onto
+	-- full-width rows under the help, with Run beside the last row when it has room, else under it. Nothing hides in a
+	-- sideways scroll any more (Ban's Forever and reason, Mute's Until unmuted and reason, Remove history entry's boxes).
+	-- The grid stacks each row of cards by its tallest card.
+	local Row = New("Frame", { Name = "Options"; BackgroundTransparency = 1; Position = UDim2.fromOffset(24, 108); Size = UDim2.fromOffset(230, 44) }, C)
+	local Items = Cards.Options(Row, Def, Opts.Values, Opts.Lists, Opts)
+	local Total = 0
+	for I, It in Items do Total += It.Size.X.Offset + (if I > 1 then 6 else 0) end
+	local RunPos = UDim2.fromOffset(262, 108)
+	if Total <= 230 then
+		local X = 0
+		for _, It in Items do It.Position = UDim2.fromOffset(X, 0) X += It.Size.X.Offset + 6 end
+	else
+		local X, Y = 0, 0
+		for _, It in Items do
+			local W = It.Size.X.Offset
+			if X > 0 and X + W > 332 then X = 0 Y += 42 end
+			It.Position = UDim2.fromOffset(X, Y)
+			X += W + 6
+		end
+		Row.Position = UDim2.fromOffset(24, 100)
+		Row.Size = UDim2.fromOffset(332, Y + 36)
+		local RunY = if X - 6 <= 230 then 100 + Y else 100 + Y + 44
+		RunPos = UDim2.fromOffset(262, RunY)
+		C.Size = UDim2.fromOffset(380, RunY + 60)
+	end
 	local NeedsPos = false
 	for _, A in Def.Args do if A.Kind == "position" then NeedsPos = true end end
 	local Label = if NeedsPos then "Ctrl+click" elseif Def.Danger then "Hold" else "Run"
 	local RunB = New("TextButton", { Name = "Run"; Text = Label; TextSize = 20; FontFace = FACE.Bold; TextColor3 = if Def.Danger then COL.Bone else COL.Iron;
-		BackgroundColor3 = if Def.Danger then COL.Velvet else COL.Brass; Position = UDim2.fromOffset(262, 108); Size = UDim2.fromOffset(92, 40);
+		BackgroundColor3 = if Def.Danger then COL.Velvet else COL.Brass; Position = RunPos; Size = UDim2.fromOffset(92, 40);
 		AutoButtonColor = true; Selectable = not NeedsPos; Active = not NeedsPos }, C)
 	New("UICorner", { CornerRadius = UDim.new(0, 8) }, RunB)
 	if not NeedsPos then

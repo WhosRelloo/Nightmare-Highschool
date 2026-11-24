@@ -68,7 +68,7 @@ spec). Every path below is relative to `E:/NH-admin` unless it starts with a dri
 - **Out of scope (spec §7):** reports, the Inbox and auto-flags (phase 3); MessagingService delivery (a mute or ban set
   in one server reaches a player elsewhere only when they next join); health graphs; new Test tools (phase 2).
 
-## Spec deltas (settled by this plan; the owner reviews them with the plan)
+## Spec deltas (settled by this plan; approved by the owner 2026-11-24)
 
 1. **Bans over 30 days** need level 2 to lift (the spec covers 0 and 1-30; this matches who may set them).
 2. **The log skips two refusals:** `Not staff` and `Slow down`. They would let anyone flood the 2000-entry key.

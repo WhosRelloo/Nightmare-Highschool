@@ -161,10 +161,18 @@ otherwise, and it was wrong.
   - "· lifted" at the end of a timeline head line was cut off. It now follows the entry text: "7-day ban: 1b test (lifted)".
 - Screenshots: `docs/superpowers/mockups/2026-11-23-admin-console/play-1b-log.png`, `play-1b-timeline.png`.
 
+### Crowded cards fixed (2026-11-24)
+- Cards whose options don't fit one 230 px row now grow taller (`Cards.Card`): the options wrap onto 332 px rows under
+  the help text, and Run sits beside the last row when it has room, else under it. `View` stacks each row of cards by its
+  tallest card. Ban is 202 px tall, Mute 244, Remove history entry 246; the rest stay 168.
+- `console_play_client` now also checks, on Student, Server and every Test section, that each option is inside its card
+  and clear of Run, Run is inside the card, no two cards overlap, and Ban, Mute and Remove history entry use the tall
+  layout: `PASS console_play_client`. Slot 2 restored; cine nil/nil/nil before and after.
+- Screenshots: `docs/superpowers/mockups/2026-11-23-admin-console/play-1b-cards-ban.png`,
+  `play-1b-cards-mute-remove.png`.
+- The plan's decisions (its "Spec deltas") were approved by the owner on 2026-11-24.
+
 ### Open issues for the owner
-- Cards with many options overflow their single options row, which scrolls sideways: Mute's "Until unmuted" chip and
-  its Reason box, and Remove history entry's Bans / Mutes chips and its At / By boxes, are hidden until scrolled
-  (the Ban card's "Forever" chip already did this in 1a). The timeline's ✕ is the easy way to remove an entry.
 - Removing a mute entry doesn't lift the mute (spec §2). The player stays muted in this server until it ends or
   Unmute runs, but the summary no longer mentions it, and a rejoin won't apply it again.
 - graphify isn't installed, so `graphify update .` wasn't run.

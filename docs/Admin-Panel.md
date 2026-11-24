@@ -86,8 +86,9 @@ window focus, a redraw or closing the console cancels it. Return held while typi
   - A crash can lose up to 30 s of the log.
   - A mute or ban set in one server reaches a player in another only when they next join (phase 3 adds live delivery).
   - "Not staff" and "Slow down" refusals aren't logged.
-  - Cards with many options scroll their options row sideways (Mute, Remove history entry, Ban).
-- **Decisions the 1b plan made** (for the owner's review):
+- **Cards with many options** (Ban, Mute, Remove history entry) grow taller and wrap their options onto more rows, so
+  every option shows without scrolling (2026-11-24).
+- **Decisions the 1b plan made** (approved by the owner 2026-11-24):
   - lifting a ban over 30 days needs an admin;
   - log entries keep the UserIds as well as the names;
   - a note can't be empty;

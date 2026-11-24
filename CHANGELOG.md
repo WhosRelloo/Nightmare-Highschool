@@ -6,7 +6,7 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 Work on branches that aren't merged into `main` yet. Nothing here is in NH Combat Test unless it says so.
 
-### `admin-console-1b`: the staff console, phase 1b (installed in NH Combat Test, place not saved, not merged)
+### `admin-console-1b`: the staff console, phase 1b (merged into `main` 2026-11-24, installed in NH Combat Test, place not saved)
 Docs: `docs/Admin-Panel.md`. Spec: `docs/superpowers/specs/2026-11-23-admin-console-1b-design.md`. Plan:
 `docs/superpowers/plans/2026-11-23-admin-console-1b.md`. Record: `tools/admin-console/REPORT.md`. Backup:
 `ServerStorage.NH_Backup.AdminConsole1b_20261124`.
@@ -16,6 +16,8 @@ Docs: `docs/Admin-Panel.md`. Spec: `docs/superpowers/specs/2026-11-23-admin-cons
   commands).
 - **The saved staff log** with a Log section: a day picker, search, the chips All / Moderate / Test / Refused, and pages.
 - **Saved favourites and last side.**
+- **Cards with many options grow taller** (Ban, Mute, Remove history entry), so no option hides in a sideways scroll.
+- **The plan's decisions** were approved by the owner (2026-11-24).
 - Not saved: the place needs the owner's word to save.
 
 ### `race-transformations`: form meshes and motion (merged into `main` 2026-11-23, in NH Combat Test)

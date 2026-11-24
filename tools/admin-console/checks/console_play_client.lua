@@ -3,6 +3,39 @@ local B = P.PlayerGui:WaitForChild("NHQuietProbe", 10)
 if not B then return "FAIL no probe" end
 local Fails = {}
 local function Eq(Got, Want, What) if Got ~= Want then table.insert(Fails, What .. ": got " .. tostring(Got) .. ", want " .. tostring(Want)) end end
+-- (2026-11-24) the card layout: every option sits inside its card and clear of Run, Run sits inside the card, and no
+-- two cards overlap (cards with many options grow taller instead of scrolling them sideways)
+local function inside(A: GuiObject, B: GuiObject): boolean
+	local a, b = A.AbsolutePosition, B.AbsolutePosition
+	return a.X >= b.X - 0.5 and a.Y >= b.Y - 0.5 and a.X + A.AbsoluteSize.X <= b.X + B.AbsoluteSize.X + 0.5
+		and a.Y + A.AbsoluteSize.Y <= b.Y + B.AbsoluteSize.Y + 0.5
+end
+local function overlap(A: GuiObject, B: GuiObject): boolean
+	local a, b = A.AbsolutePosition, B.AbsolutePosition
+	return a.X < b.X + B.AbsoluteSize.X - 1 and b.X < a.X + A.AbsoluteSize.X - 1
+		and a.Y < b.Y + B.AbsoluteSize.Y - 1 and b.Y < a.Y + A.AbsoluteSize.Y - 1
+end
+local Tall = {}
+local function layout(G: Instance, Where: string)
+	local All = {}
+	for _, C in G:GetDescendants() do
+		if C:IsA("GuiObject") and string.sub(C.Name, 1, 5) == "Card_" and C:FindFirstChild("Options") then
+			table.insert(All, C)
+			if C.Size.Y.Offset > 168 then Tall[string.sub(C.Name, 6)] = C.Size.Y.Offset end
+			local Run = C:FindFirstChild("Run") :: GuiObject?
+			if Run and not inside(Run, C) then table.insert(Fails, Where .. ": Run spills out of " .. C.Name) end
+			for _, O in C.Options:GetChildren() do
+				if O:IsA("GuiObject") then
+					if not inside(O, C) then table.insert(Fails, Where .. ": " .. O.Name .. " spills out of " .. C.Name) end
+					if Run and overlap(O, Run) then table.insert(Fails, Where .. ": " .. O.Name .. " under Run on " .. C.Name) end
+				end
+			end
+		end
+	end
+	for I = 1, #All do for J = I + 1, #All do
+		if overlap(All[I], All[J]) then table.insert(Fails, Where .. ": " .. All[I].Name .. " overlaps " .. All[J].Name) end
+	end end
+end
 Eq(B:Invoke("Console", "Open"), true, "opens")
 task.wait(1)
 local G = P.PlayerGui:FindFirstChild("NHStaffConsole")
@@ -10,6 +43,10 @@ Eq(G and G.Enabled, true, "gui on")
 local I = B:Invoke("Console", "Info")
 Eq(I.Level, 3, "studio level") Eq(I.Side, "Moderate", "start side") Eq(I.Section, "Student", "start section")
 Eq(#I.Cards, 14, "student cards (13 + Stop spectating)")
+layout(G, "Student")
+Eq(B:Invoke("Console", "Section", "Server"), "Server", "section Server")
+task.wait(0.3)
+layout(G, "Server")
 Eq(B:Invoke("Console", "Side", "Test"), "Test", "test side")
 for _, Sec in { "Character", "Progress", "School", "Story", "World", "Spawns", "Self" } do
 	Eq(B:Invoke("Console", "Section", Sec), Sec, "section " .. Sec)
@@ -19,6 +56,11 @@ for _, Sec in { "Character", "Progress", "School", "Story", "World", "Spawns", "
 	for _, Id in Cards do
 		if not G:FindFirstChild("Card_" .. Id, true) then table.insert(Fails, "no Card_" .. Id .. " drawn in " .. Sec) end
 	end
+	layout(G, Sec)
+end
+-- the three cards that used to scroll their options grow instead
+for _, Id in { "Ban", "Mute", "RemoveRecordEntry" } do
+	if not Tall[Id] then table.insert(Fails, Id .. " card is not the tall layout") end
 end
 local R = B:Invoke("Console", "Search", "tp")
 Eq(R[1], "Goto", "tp finds Go to")

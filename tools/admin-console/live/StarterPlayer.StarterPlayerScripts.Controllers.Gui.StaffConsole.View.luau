@@ -152,8 +152,11 @@ local function grid(Dyn: Instance, Ctx: any)
 		CanvasSize = UDim2.new(); AutomaticCanvasSize = Enum.AutomaticSize.Y; ScrollBarThickness = 6; Selectable = false }, Dyn)
 	local List = Model.Cards(Ctx.Defs, S.Side, S.Section)
 	local Cols = math.max(1, math.floor((Ctx.W + 12) / 392))
+	-- (2026-11-24) cards with many options are taller (Cards.Card): each row starts under the tallest card of the last
+	local RowY, RowH = 0, 0
 	for I, D in List do
-		local Col, Row = (I - 1) % Cols, (I - 1) // Cols
+		local Col = (I - 1) % Cols
+		if Col == 0 and I > 1 then RowY += RowH + 12 RowH = 0 end
 		Ctx.Values[D.Id] = Ctx.Values[D.Id] or {}
 		local Note = nil
 		if D.Id == "Unban" then
@@ -163,12 +166,13 @@ local function grid(Dyn: Instance, Ctx: any)
 				Note = Model.UnbanNote(Ctx.HistoryFor(Id)) or "Checking their record…"
 			end
 		end
-		Cards.Card(G, D, UDim2.fromOffset(Col * 392, Row * 180), {
+		local Card = Cards.Card(G, D, UDim2.fromOffset(Col * 392, RowY), {
 			Values = Ctx.Values[D.Id]; Lists = Ctx.Lists; Fav = table.find(S.Favs, D.Id) ~= nil; Reduced = Ctx.Reduced; Note = Note;
 			OnRun = H.Run; OnFav = H.Fav; Redraw = H.Redraw;
 			-- on the board, not the dynamic layer, so the shell's status refresh doesn't take it away (it waits for it)
 			OnPick = function(A, Choices, Done) Cards.Picker(Dyn.Parent :: Instance, A.Label or A.Name, Choices, Done) end;
 		})
+		RowH = math.max(RowH, Card.Size.Y.Offset)
 	end
 	if #List == 0 then Text(G, "Empty", "Nothing here for your level.", 20, FACE.Body, COL.Dim, UDim2.fromOffset(8, 8), UDim2.fromOffset(700, 30)) end
 end
