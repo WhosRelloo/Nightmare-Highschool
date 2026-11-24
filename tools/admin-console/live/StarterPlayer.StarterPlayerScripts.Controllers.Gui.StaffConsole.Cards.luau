@@ -1,6 +1,7 @@
 --[[ StaffConsole.Cards (client): one action card, its option controls, the list picker and the hold ring (spec §4-§5). ]]
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local GuiService = game:GetService("GuiService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Kit = require(ReplicatedStorage:WaitForChild("UI"):WaitForChild("Components"))
 local Theme = Kit.Theme
@@ -113,8 +114,13 @@ end
 -- the hold ring: a danger card's Run button runs only after a 0.8 s hold; letting go early cancels.
 -- Cards.Holding is true while any hold runs (the shell holds its status redraw for it). A button destroyed mid-hold (a
 -- redraw) cancels the hold: it never fires. Returns { Begin, Stop } for checks/console_hold.lua.
+-- (Task 8) Keys: a GuiButton never gets InputBegan for Return (and a selected button not for gamepad A), so A / Return
+-- are read from UserInputService while this button is the selected object; moving the selection off cancels.
+-- Pointers: a mouse or touch that moves off the button cancels (MouseLeave isn't reliable for touch), and so does
+-- that input ending anywhere (a finger lifted off the button never reaches its InputEnded).
 Cards.Holding = false
 local CurrentStop = nil :: (() -> ())?
+local HOLD_KEYS = { [Enum.KeyCode.ButtonA] = true; [Enum.KeyCode.Return] = true }
 -- the shell closes the console mid-hold: cancel it (a hidden gui may never see the button let go)
 function Cards.CancelHold() if CurrentStop then CurrentStop() end end
 function Cards.Hold(Button: GuiButton, Ring: GuiObject?, Reduced: boolean, OnDone: () -> ()): any
@@ -122,19 +128,43 @@ function Cards.Hold(Button: GuiButton, Ring: GuiObject?, Reduced: boolean, OnDon
 	local function stop()
 		if Holding then
 			Holding.Tween:Cancel()
-			if Holding.Gone then Holding.Gone:Disconnect() end
+			for _, C in Holding.Conns do C:Disconnect() end
 			Holding = nil
 			Cards.Holding = false
 			if CurrentStop == stop then CurrentStop = nil end
 		end
 		if Ring then (Ring :: any).ImageTransparency = 1 end
 	end
-	local function begin()
+	local function off(P: Vector3): boolean
+		local A, S = Button.AbsolutePosition, Button.AbsoluteSize
+		return P.X < A.X or P.Y < A.Y or P.X > A.X + S.X or P.Y > A.Y + S.Y
+	end
+	-- Input: the InputObject that started it (a pointer or a key), nil for a check's plain Begin()
+	local function begin(Input: InputObject?)
 		stop()
 		local Token = {}
 		local V = Instance.new("NumberValue")
 		local Tw = TweenService:Create(V, TweenInfo.new(SC.DANGER_HOLD, Enum.EasingStyle.Linear), { Value = 1 })
-		Holding = { Token = Token; Tween = Tw; Gone = Button.Destroying:Connect(stop) }
+		local Conns = { Button.Destroying:Connect(stop) }
+		Holding = { Token = Token; Tween = Tw; Conns = Conns }
+		if Input then
+			local Key = HOLD_KEYS[Input.KeyCode] == true
+			table.insert(Conns, UserInputService.InputEnded:Connect(function(I)
+				if I == Input or (Key and I.KeyCode == Input.KeyCode) then stop() end
+			end))
+			if Key then
+				table.insert(Conns, GuiService:GetPropertyChangedSignal("SelectedObject"):Connect(function()
+					if GuiService.SelectedObject ~= Button then stop() end
+				end))
+			else
+				table.insert(Conns, UserInputService.InputChanged:Connect(function(I)
+					local T = I.UserInputType
+					if (T == Enum.UserInputType.Touch and (I == Input or Input.UserInputType == Enum.UserInputType.Touch)) or T == Enum.UserInputType.MouseMovement then
+						if off(I.Position) then stop() end
+					end
+				end))
+			end
+		end
 		Cards.Holding = true
 		CurrentStop = stop
 		if Ring then
@@ -143,7 +173,7 @@ function Cards.Hold(Button: GuiButton, Ring: GuiObject?, Reduced: boolean, OnDon
 		Tw.Completed:Connect(function(State)
 			local Mine = Holding and Holding.Token == Token
 			if Mine then
-				if Holding.Gone then Holding.Gone:Disconnect() end
+				for _, C in Holding.Conns do C:Disconnect() end
 				Holding = nil
 				Cards.Holding = false
 				if CurrentStop == stop then CurrentStop = nil end
@@ -156,12 +186,18 @@ function Cards.Hold(Button: GuiButton, Ring: GuiObject?, Reduced: boolean, OnDon
 	end
 	Button.InputBegan:Connect(function(I)
 		local T = I.UserInputType
-		if not (T == Enum.UserInputType.MouseButton1 or T == Enum.UserInputType.Touch or I.KeyCode == Enum.KeyCode.ButtonA or I.KeyCode == Enum.KeyCode.Return) then return end
-		begin()
+		if T == Enum.UserInputType.MouseButton1 or T == Enum.UserInputType.Touch then begin(I) end
 	end)
-	Button.InputEnded:Connect(stop)
+	-- A / Return on the selected button (the gamepad and keyboard UI selection)
+	local KeyConn = UserInputService.InputBegan:Connect(function(I)
+		if HOLD_KEYS[I.KeyCode] and GuiService.SelectedObject == Button and not Holding then begin(I) end
+	end)
+	Button.Destroying:Connect(function() KeyConn:Disconnect() end)
+	Button.InputEnded:Connect(function(I)
+		if not HOLD_KEYS[I.KeyCode] then stop() end
+	end)
 	Button.MouseLeave:Connect(stop)
-	return { Begin = begin; Stop = stop }
+	return { Begin = function() begin(nil) end; Stop = stop }
 end
 
 -- one card. Opts = { Values, Lists, Selected, Fav: boolean, OnRun(Def, Values), OnFav(Def), OnPick, Redraw, Reduced }

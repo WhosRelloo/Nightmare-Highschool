@@ -198,7 +198,8 @@ Shared.Handlers = {
 		if not U then return end
 		Palette.Open(U.Board, { Defs = defs();
 			OnRun = function(D) task.spawn(run, D, Values[D.Id] or {}) end;
-			OnJump = function(D) S.Side = D.Side S.Section = D.Section Shared.Redraw() end })
+			OnJump = function(D) S.Side = D.Side S.Section = D.Section Shared.Redraw() end;
+			OnEscape = function() Shared.Toggle(false) end })
 	end;
 }
 

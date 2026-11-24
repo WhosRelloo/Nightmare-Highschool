@@ -6,7 +6,7 @@ local Cards = require(script.Parent:WaitForChild("Cards"))
 local New, Piece, Text, COL, FACE = Cards.New, Cards.Piece, Cards.Text, Cards.COL, Cards.FACE
 local Palette = {}
 
--- Opts = { Defs, OnRun(Def), OnJump(Def) }
+-- Opts = { Defs, OnRun(Def), OnJump(Def), OnEscape() }
 function Palette.Open(Board: Instance, Opts: any): GuiObject
 	local Old = Board:FindFirstChild("Palette")
 	if Old then Old:Destroy() end
@@ -31,7 +31,12 @@ function Palette.Open(Board: Instance, Opts: any): GuiObject
 		end
 	end
 	Box:GetPropertyChangedSignal("Text"):Connect(function() Hits = SC.Search(Opts.Defs, Box.Text) Hi = 1 draw() end)
-	Box.FocusLost:Connect(function(Enter) if Enter and Hits[Hi] then Palette.Choose(P, Hits[Hi], Opts) end end)
+	-- (Task 8) Esc while typing: Roblox gives Escape to the focused box (no menu opens, so MenuOpened never fires);
+	-- it closes the palette and, as Esc does everywhere else, the console
+	Box.FocusLost:Connect(function(Enter, Cause)
+		if Enter and Hits[Hi] then Palette.Choose(P, Hits[Hi], Opts) return end
+		if Cause and Cause.KeyCode == Enum.KeyCode.Escape and P.Parent then P:Destroy() if Opts.OnEscape then Opts.OnEscape() end end
+	end)
 	P:SetAttribute("Open", true)
 	Palette.Move = function(D: number) if P.Parent and #Hits > 0 then Hi = math.clamp(Hi + D, 1, math.min(8, #Hits)) draw() end end
 	task.defer(function() Box:CaptureFocus() end)
