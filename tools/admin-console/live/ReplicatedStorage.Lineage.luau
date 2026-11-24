@@ -281,8 +281,12 @@ end
 
 -- nights from tonight to the next full moon (0 = tonight)
 function Lineage.NightsUntilFull(day, hour)
-	if Lineage.MoonPhase(day, hour) == "Full" and Lineage.MoonOverride(day, hour) then return 0 end
 	local n = Lineage.NightOf(day, hour) % 4
+	if Lineage.MoonOverride(day, hour) then
+		-- an override that is not Full: tonight is not full, count from tomorrow on the normal cycle
+		if Lineage.MoonPhase(day, hour) == "Full" then return 0 end
+		return if n == 0 then 4 else 4 - n
+	end
 	return if n == 0 then 0 else 4 - n
 end
 

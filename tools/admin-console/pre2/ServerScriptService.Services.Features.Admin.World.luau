@@ -11,10 +11,11 @@ local SEASONS = { `Autumn`, `Winter`, `Spring`, `Summer`, `Nightmare` }
 
 return function(H)
 	local A = H.Meta
-	local function clockDay(): (number, number)
+	local function clockDay(): (number?, number?)
 		local SC = H.svc(`School.SchoolClock`)
 		local S = SC and SC.GetState()
-		return S and S.Day or 0, S and S.Hour or 12
+		if not S then return nil, nil end
+		return S.Day, S.Hour
 	end
 	return {
 		TimePreset = {
@@ -50,6 +51,7 @@ return function(H)
 				if not Ok then return false, Why end
 				local Lin = require(ReplicatedStorage.Lineage)
 				local Day, Hour = clockDay()
+				if not (Day and Hour) then return false, `The school clock is missing` end
 				local Old = Lin.MoonOverride(Day, Hour) or `Auto`
 				if a.Moon == `Auto` then
 					workspace:SetAttribute(`NHMoonOverride`, nil)
