@@ -218,6 +218,7 @@ end
 function Lineage.IsFullMoon(day, hour)
 	if type(day) ~= "number" or type(hour) ~= "number" then return false end
 	if not SchoolTime.InWindow(hour, "Night") then return false end
+	if Lineage.MoonOverride(day, hour) then return Lineage.MoonPhase(day, hour) == "Full" end
 	local night = if hour < 6 then day - 1 else day
 	return night % Lineage.FullMoonEvery == 0
 end
@@ -236,8 +237,19 @@ Lineage.MoonIcons = { Full = "rbxassetid://104532707497388", Waning = "rbxasseti
 function Lineage.NightOf(day, hour)
 	return if hour < 6 then day - 1 else day
 end
+-- (console 2) the staff console's "Moon tonight": workspace NHMoonOverride (a moon name) for the night
+-- NHMoonOverrideNight (Lineage.NightOf). It ends by itself when that night is over. Replicated, so both sides agree.
+Lineage.MOON_CHOICES = { "Full", "Waxing", "Waning", "New", "Crimson", "Blue" }
+function Lineage.MoonOverride(day, hour)
+	if type(day) ~= "number" or type(hour) ~= "number" then return nil end
+	local Name = workspace:GetAttribute("NHMoonOverride")
+	if type(Name) ~= "string" or not table.find(Lineage.MOON_CHOICES, Name) then return nil end
+	if workspace:GetAttribute("NHMoonOverrideNight") ~= Lineage.NightOf(day, hour) then return nil end
+	return Name
+end
 function Lineage.MoonPhase(day, hour)
 	if type(day) ~= "number" or type(hour) ~= "number" then return "Full" end
+	local O = Lineage.MoonOverride(day, hour) if O then return if O == "Crimson" or O == "Blue" then "Full" else O end
 	return Lineage.MoonPhases[Lineage.NightOf(day, hour) % 4 + 1]
 end
 function Lineage.IsNewMoon(day, hour)
@@ -254,6 +266,7 @@ Lineage.MoonEventEvery = 16
 -- "Crimson" | "Blue" | nil for the night that (day, hour) belongs to (by day: the coming night)
 function Lineage.MoonEvent(day, hour)
 	if type(day) ~= "number" or type(hour) ~= "number" then return nil end
+	local O = Lineage.MoonOverride(day, hour) if O then return if O == "Crimson" or O == "Blue" then O else nil end
 	local n = Lineage.NightOf(day, hour)
 	if n % Lineage.MoonEventEvery ~= 0 then return nil end
 	return if (n // Lineage.MoonEventEvery) % 2 == 0 then "Crimson" else "Blue"
@@ -268,6 +281,7 @@ end
 
 -- nights from tonight to the next full moon (0 = tonight)
 function Lineage.NightsUntilFull(day, hour)
+	if Lineage.MoonPhase(day, hour) == "Full" and Lineage.MoonOverride(day, hour) then return 0 end
 	local n = Lineage.NightOf(day, hour) % 4
 	return if n == 0 then 0 else 4 - n
 end
