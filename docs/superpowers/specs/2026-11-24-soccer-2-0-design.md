@@ -2,7 +2,7 @@
 
 **Status:** design approved by the owner 2026-11-24. The owner said "Continue" on the written spec (2026-11-24); the
 planning checks below were settled from the Studio code the same day, and the dash rule (section 4) follows the
-recommended option the owner continued with.
+recommended option the owner continued with. Implemented on soccer-2 (2026-11-24); see tools/soccer2/REPORT.md.
 **Concept:** `docs/superpowers/research/2026-11-24-soccer-2-concept.md`, section 3 (the clip map) and "2.0".
 **Plan:** `docs/superpowers/plans/2026-11-24-soccer-2-0.md`.
 **Place:** NH Combat Test (placeId 98950102230473). The soccer code lives only in Studio; the repo holds the bake
