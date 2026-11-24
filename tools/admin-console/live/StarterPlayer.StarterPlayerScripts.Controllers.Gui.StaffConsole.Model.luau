@@ -90,12 +90,14 @@ end
 
 -- Can the card run? Same rules the server applies (StaffConsole.CheckArgs), so a ready card is never refused for its values.
 -- Lists (optional) is the snapshot's Lists, for choice args that draw from a list.
-function Model.Ready(Def: any, Values: any, Selected: number?, Lists: any?): (boolean, string?)
-	if Def.Target == "required" and not Selected then return false, "Pick a student on the left first" end
+-- A ready card also returns the cleaned values (CheckArgs' Out: declared args only, numbers as numbers, text cut to
+-- Max), which the shell sends instead of the raw box values.
+function Model.Ready(Def: any, Values: any, Selected: number?, Lists: any?): (boolean, string?, any)
+	if Def.Target == "required" and not Selected then return false, "Pick a student on the left first", nil end
 	local Shared = require(game:GetService("ReplicatedStorage").Functions.StaffConsole)
-	local Ok, Why = Shared.CheckArgs(Def.Args or {}, Values or {}, Lists)
-	if not Ok then return false, Why end
-	return true, nil
+	local Ok, Out = Shared.CheckArgs(Def.Args or {}, Values or {}, Lists)
+	if not Ok then return false, Out, nil end
+	return true, nil, Out
 end
 
 return Model

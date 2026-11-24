@@ -110,36 +110,58 @@ function Cards.Options(Row: Instance, Def: any, Values: any, Lists: any, Opts: a
 	end
 end
 
--- the hold ring: a danger card's Run button runs only after a 0.8 s hold; letting go early cancels
-function Cards.Hold(Button: GuiButton, Ring: GuiObject?, Reduced: boolean, OnDone: () -> ())
+-- the hold ring: a danger card's Run button runs only after a 0.8 s hold; letting go early cancels.
+-- Cards.Holding is true while any hold runs (the shell holds its status redraw for it). A button destroyed mid-hold (a
+-- redraw) cancels the hold: it never fires. Returns { Begin, Stop } for checks/console_hold.lua.
+Cards.Holding = false
+local CurrentStop = nil :: (() -> ())?
+-- the shell closes the console mid-hold: cancel it (a hidden gui may never see the button let go)
+function Cards.CancelHold() if CurrentStop then CurrentStop() end end
+function Cards.Hold(Button: GuiButton, Ring: GuiObject?, Reduced: boolean, OnDone: () -> ()): any
 	local Holding = nil :: any
 	local function stop()
-		if Holding then Holding.Tween:Cancel() Holding = nil end
+		if Holding then
+			Holding.Tween:Cancel()
+			if Holding.Gone then Holding.Gone:Disconnect() end
+			Holding = nil
+			Cards.Holding = false
+			if CurrentStop == stop then CurrentStop = nil end
+		end
 		if Ring then (Ring :: any).ImageTransparency = 1 end
 	end
-	Button.InputBegan:Connect(function(I)
-		local T = I.UserInputType
-		if not (T == Enum.UserInputType.MouseButton1 or T == Enum.UserInputType.Touch or I.KeyCode == Enum.KeyCode.ButtonA or I.KeyCode == Enum.KeyCode.Return) then return end
+	local function begin()
 		stop()
 		local Token = {}
 		local V = Instance.new("NumberValue")
 		local Tw = TweenService:Create(V, TweenInfo.new(SC.DANGER_HOLD, Enum.EasingStyle.Linear), { Value = 1 })
-		Holding = { Token = Token; Tween = Tw }
+		Holding = { Token = Token; Tween = Tw; Gone = Button.Destroying:Connect(stop) }
+		Cards.Holding = true
+		CurrentStop = stop
 		if Ring then
 			V.Changed:Connect(function(X) (Ring :: any).ImageTransparency = 1 - X * 0.9 if not Reduced then (Ring :: any).Rotation = X * 360 end end)
 		end
 		Tw.Completed:Connect(function(State)
-			if State == Enum.PlaybackState.Completed and Holding and Holding.Token == Token then
+			local Mine = Holding and Holding.Token == Token
+			if Mine then
+				if Holding.Gone then Holding.Gone:Disconnect() end
 				Holding = nil
+				Cards.Holding = false
+				if CurrentStop == stop then CurrentStop = nil end
 				if Ring then (Ring :: any).ImageTransparency = 1 end
-				OnDone()
 			end
 			V:Destroy()
+			if State == Enum.PlaybackState.Completed and Mine and Button.Parent ~= nil then OnDone() end
 		end)
 		Tw:Play()
+	end
+	Button.InputBegan:Connect(function(I)
+		local T = I.UserInputType
+		if not (T == Enum.UserInputType.MouseButton1 or T == Enum.UserInputType.Touch or I.KeyCode == Enum.KeyCode.ButtonA or I.KeyCode == Enum.KeyCode.Return) then return end
+		begin()
 	end)
 	Button.InputEnded:Connect(stop)
 	Button.MouseLeave:Connect(stop)
+	return { Begin = begin; Stop = stop }
 end
 
 -- one card. Opts = { Values, Lists, Selected, Fav: boolean, OnRun(Def, Values), OnFav(Def), OnPick, Redraw, Reduced }

@@ -72,6 +72,10 @@ Eq((M.Ready(Rich, { N = "abc" }, nil)), false, "non-numeric number refused")
 Eq((M.Ready(Rich, { N = 5; C = "z" }, nil)), false, "unknown choice refused")
 Eq((M.Ready(Rich, { N = "5"; C = "a" }, nil)), true, "valid filled card passes")
 Eq((M.Ready({ Id = "Opt"; Target = "optional"; Args = {} }, {}, nil)), true, "optional target needs no pick")
+local OkC, WhyC, Clean = M.Ready(Rich, { N = "5"; C = "a"; Extra = 1 }, nil)
+Eq(OkC, true, "clean: ready") Eq(WhyC, nil, "clean: no reason")
+Eq(typeof(Clean), "table", "clean values returned") Eq(Clean and Clean.N, 5, "clean number is a number") Eq(Clean and Clean.Extra, nil, "undeclared arg dropped")
+Eq(select(3, M.Ready(Rich, { N = 11 }, nil)), nil, "refused card returns no values")
 
 if #Fails > 0 then return "FAIL " .. #Fails .. "\n" .. table.concat(Fails, "\n") end
 return "PASS console_model"

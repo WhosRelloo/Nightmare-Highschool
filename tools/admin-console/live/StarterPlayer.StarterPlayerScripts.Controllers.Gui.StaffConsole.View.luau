@@ -55,8 +55,17 @@ local function topBar(Dyn: Instance, Ctx: any)
 	tile(Dyn, 1360, "Lock", "Server", if Ctx.Status and Ctx.Status.Locked then "Locked" else "Open", function() H.Side("Moderate") H.Section("Server") end)
 end
 
+-- phones: the rail and the context open over the cards; a blank button under each takes the taps that land in its gaps,
+-- so they never reach the card buttons beneath (art pieces and labels don't sink input)
+local function sink(Dyn: Instance, Ctx: any, Name: string, X: number, Y: number, W: number, H: number)
+	if not Ctx.Phone then return end
+	New("TextButton", { Name = Name; Text = ""; AutoButtonColor = false; Selectable = false; Active = true; BackgroundTransparency = 1;
+		Position = UDim2.fromOffset(X, Y); Size = UDim2.fromOffset(W, H) }, Dyn)
+end
+
 local function rail(Dyn: Instance, Ctx: any)
 	local S, H = Ctx.S, Ctx.Handlers
+	sink(Dyn, Ctx, "RailSink", 40, 110, 394, 744)
 	Piece("Side", Dyn, UDim2.fromOffset(40, 110), UDim2.fromOffset(394, 744), { Name = "Rail" })
 	local Box = New("TextBox", { Name = "StudentSearch"; PlaceholderText = "Search students"; Text = S.Filter; TextSize = 20; FontFace = FACE.Body;
 		TextColor3 = COL.Bone; PlaceholderColor3 = COL.Dim; BackgroundColor3 = COL.IronHi; ClearTextOnFocus = false;
@@ -142,6 +151,7 @@ end
 
 local function context(Dyn: Instance, Ctx: any)
 	local S = Ctx.S
+	sink(Dyn, Ctx, "ContextSink", 1240, 110, 320, 696)
 	local C = Piece("Rail", Dyn, UDim2.fromOffset(1240, 110), UDim2.fromOffset(320, 696), { Name = "Context" })
 	local Body = New("ScrollingFrame", { Name = "Body"; BackgroundTransparency = 1; Position = UDim2.fromOffset(20, 20); Size = UDim2.fromOffset(284, 656);
 		CanvasSize = UDim2.new(); AutomaticCanvasSize = Enum.AutomaticSize.Y; ScrollBarThickness = 6 }, C)
@@ -195,6 +205,7 @@ function View.Redraw(U: any, Ctx: any)
 	-- phones: the centre takes the whole board (3 card columns); the rail and the context open over it (spec §5)
 	local Phone = Kit.Phone and Kit.Phone() or false
 	Ctx.X, Ctx.W = if Phone then 40 else 450, if Phone then 1520 else 772
+	Ctx.Phone = Phone
 	local function button(Name: string, Label: string, X: number, Fn: () -> (), Color: Color3)
 		local B = New("TextButton", { Name = Name; Text = Label; TextSize = 20; FontFace = FACE.Bold; TextColor3 = COL.Bone; BackgroundColor3 = Color;
 			Position = UDim2.fromOffset(X, 820); Size = UDim2.fromOffset(120, 44); ZIndex = 5 }, Dyn)

@@ -18,6 +18,7 @@ local Model = require(script:WaitForChild("Model"))
 local View = require(script:WaitForChild("View"))
 local Palette = require(script:WaitForChild("Palette"))
 local Tools = require(script:WaitForChild("Tools"))
+local Cards = require(script:WaitForChild("Cards"))
 
 local Player = Players.LocalPlayer
 local Shared = {}
@@ -79,8 +80,9 @@ end
 
 local function run(D: any, Vals: any)
 	Vals = Vals or {}
-	local Ok, Why = Model.Ready(D, Vals, S.Selected, Info and Info.Lists)
+	local Ok, Why, Clean = Model.Ready(D, Vals, S.Selected, Info and Info.Lists)
 	if not Ok then Model.Push(S, false, Why :: string, D.Title) Shared.Redraw() return end
+	Vals = Clean or {} -- the checked values (declared args only, numbers as numbers), as the server will see them
 	if D.Local then
 		local Ok2, Msg = Tools.Do(D.Id, Vals, S.Selected)
 		if D.Id == "ToolInspect" and Ok2 and S.Selected then Inspect = Tools.Inspect(S.Selected) end
@@ -104,6 +106,21 @@ local function runId(Id: string, Args: any?, _Target: number?)
 	for _, D in defs() do if D.Id == Id then run(D, Args) return end end
 end
 
+-- a student who left: drop the pick and the inspector (before any redraw guard, so it never lingers)
+local function prune(List: any)
+	if not (S.Selected and typeof(List) == "table") then return end
+	for _, P in List do if P.UserId == S.Selected then return end end
+	S.Selected = nil
+	Inspect = nil
+end
+
+-- a redraw now would destroy a danger card's Run mid-hold (Cards.Hold cancels it), a focused TextBox or an open picker
+local function mustWait(): boolean
+	if Cards.Holding then return true end
+	local Box = UserInputService:GetFocusedTextBox()
+	return U ~= nil and ((Box ~= nil and Box:IsDescendantOf(U.Gui)) or U.Board:FindFirstChild("Picker") ~= nil)
+end
+
 function Shared.Refresh()
 	local F = remotes()
 	if not F then return end
@@ -111,7 +128,9 @@ function Shared.Refresh()
 	if Ok then
 		Info = R
 		Model.SetLevel(S, (R and R.Level) or 0, (R and R.Sections) or SC.SECTIONS)
+		prune(R and R.Players)
 	end
+	if Cards.Holding then return end -- the next status tick redraws
 	Shared.Redraw()
 end
 
@@ -121,9 +140,8 @@ local function refreshStatus()
 	local Ok, R = pcall(F.Status.InvokeServer, F.Status)
 	if not (Ok and R) then return end
 	Status = R
-	-- the redraw rebuilds every control: don't pull a TextBox out from under the typist or close an open picker
-	local Box = UserInputService:GetFocusedTextBox()
-	if U and ((Box and Box:IsDescendantOf(U.Gui)) or U.Board:FindFirstChild("Picker")) then return end
+	prune(R.Players)
+	if mustWait() then return end
 	Shared.Redraw(true)
 end
 
@@ -156,6 +174,7 @@ function Shared.Toggle(On: boolean?)
 	if Open then bind() Shared.Refresh() task.spawn(refreshStatus)
 	else
 		ContextActionService:UnbindAction("NHConsolePad")
+		Cards.CancelHold()
 		for _, N in { "Palette", "Picker" } do local X = U.Board:FindFirstChild(N) if X then X:Destroy() end end
 		local Sel = GuiService.SelectedObject
 		if Sel and U and Sel:IsDescendantOf(U.Gui) then GuiService.SelectedObject = nil end
