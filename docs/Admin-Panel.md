@@ -76,8 +76,11 @@ window focus, a redraw or closing the console cancels it. Return held while typi
 - Cutover re-check: F3 opens only the console, `PlayerGui` has no `NHAdminPanel`, and all three checks pass again.
 - CineState, Seen and Origin were nil before and after every round.
 - Not verified: dragging a finger off (touch), a real gamepad, alt-tab (checked in code only).
-- Outside slot 2, which can't be undone: Warn and Note "console test" wrote to the owner's `NHStaffRecords_v1`, and every
-  Dispatch wrote to `NHStaffLog_v1`.
+- Nothing was written outside slot 2. In 1a the staff log and notes live in memory only. The saved stores
+  (`NHStaffRecords_v1`, `NHStaffLog_v1`) come in 1b.
+- Final review fixes: Go to a place sends the selected student; Club has a "None" choice to take them out; Inspect needs
+  level 2 on the server too; "no targeting up" is one tested rule (`StaffConsole.CanTarget`). Re-check: all checks PASS
+  (`console_play_run` 87 calls).
 - Screenshots: `docs/superpowers/mockups/2026-11-23-admin-console/play-*.png`. Full record: `tools/admin-console/REPORT.md`.
 
 # Before 1a: the Headmaster's Desk (1.8 to 1.75)

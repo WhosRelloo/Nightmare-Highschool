@@ -49,8 +49,20 @@ CineState, Seen and Origin were nil before and after every Play round (Tasks 7, 
 interrupted Task 8 run).
 
 ## Outside slot 2
-Warn and Note "console test" wrote to the owner's real `NHStaffRecords_v1`, and every Dispatch wrote to `NHStaffLog_v1`.
-`putBack` can't undo these; each re-run of `console_play_run` adds more.
+Nothing. In 1a the staff log and staff notes are in memory only (`Admin.luau` Log and Notes), and they are gone when the
+server stops. `NHStaffRecords_v1` and `NHStaffLog_v1` are the 1b design (spec §7): no script in the place names them, and
+`ListDataStoresAsync("NHStaff")` returns no stores (checked in the final fix round). An earlier draft of this report said
+otherwise, and it was wrong.
+
+## Final review fixes (49bc83c)
+- Go to a place sends the selected student again (`Target = "optional"`).
+- Club has a "None (leave their club)" choice.
+- The Inspect remote needs level 2, the same as the console card.
+- "No targeting up" is one pure rule, `StaffConsole.CanTarget` (only a higher level is refused), used by Dispatch and Inspect
+  and tested in `console_pure`.
+- Studio matched every `live/` mirror byte for byte before and after the install.
+- Re-check: PASS console_pure, registry (16/65/66), play_server, model, tools; in Play, PASS console_play_run (87 calls),
+  console_play_client and console_play_carried. CineState, Seen and Origin were nil before and after.
 
 ## Screenshots
 `docs/superpowers/mockups/2026-11-23-admin-console/play-{moderate-student,moderate-server,test-character,test-progress,test-school,test-story,test-world,test-spawns,test-self}.png`
