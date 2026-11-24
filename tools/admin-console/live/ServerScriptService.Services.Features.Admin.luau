@@ -114,7 +114,9 @@ local function str(v, max)
 end
 
 ---------------------------------------------------------------- commands
--- each: { Level = 1|2, Target = true if it needs a player, Run = function(Admin, Target, Args) -> ok, msg }
+-- each: { Target = true if it needs a player (Dispatch hands it in), Run = function(Admin, Target, Args) -> ok, msg }.
+-- Level, Target mode (required / optional / none), Args and the rest of the card live in Admin.Meta; Dispatch checks the
+-- level and Args (StaffConsole.CheckArgs) before it calls Run, and Run keeps the owner-only rules (rites, big Yen, bans).
 local C = {}
 
 -- moderation
@@ -490,6 +492,20 @@ local function segments()
 	return ok and cfg.Segments or {}
 end
 
+-- the rooms that can hold a lesson: a timetable room whose subject has a minigame (Config.Activities.Subjects). R101 is
+-- Homeroom, which has none. Activities.SubjectForRoom reads the same two tables.
+local function lessonRooms(): { string }
+	local Out = {}
+	local ok = pcall(function()
+		local Subjects = require(ReplicatedStorage.Config.Activities).Subjects
+		for _, Class in require(ReplicatedStorage.Config.Classes).Periods do
+			if Subjects[Class.Subject] and not table.find(Out, Class.Room) then table.insert(Out, Class.Room) end
+		end
+		table.sort(Out)
+	end)
+	return if ok then Out else {}
+end
+
 local function regionBox(Id: string): BasePart?
 	local F = workspace:FindFirstChild(`Regions`)
 	-- (audit) boxes are found by their RegionId attribute (the Name as a fallback), like the client; with several
@@ -565,9 +581,18 @@ end }
 C.StartLesson = { Target = true; Run = function(A, T, a)
 	local Room = str(a.Room, 8)
 	local Act = svc(`School.Activities`)
-	if not (Act and Room:match(`^R10[1-5]$`)) then return false, `Pick a classroom` end
+	if not (Act and table.find(lessonRooms(), Room)) then return false, `Pick a classroom that has a lesson` end
+	if Act.IsInActivity(T) then return false, `{T.Name} is in a lesson already` end
 	local ok = Act.StartForTests(T, Room)
-	return ok == true, if ok then `Started a {Room} lesson for {T.Name}` else `Couldn't start it (are they in a lesson already?)`
+	if ok == true then return true, `Started a {Room} lesson for {T.Name}` end
+	-- Activities only tells the player why (a notification), so the same checks, in the same order, give the reason here
+	if T:GetAttribute(`Enrolled`) == false then return false, `{T.Name} isn't enrolled yet` end
+	local SC = svc(`School.SchoolClock`)
+	local Seg = SC and SC.GetState().Segment
+	local Cls = Seg and Seg.Kind == `Class` and require(ReplicatedStorage.Config.Classes).Periods[Seg.Name]
+	if not Cls or Cls.Room ~= Room then return false, `No class in {Room} right now{if Seg then ` (it's {Seg.Name})` else ``}: skip to its period first` end
+	if T:GetAttribute(`ClassInRoom`) ~= true then return false, `{T.Name} isn't in {Room}: take them there first` end
+	return false, `Couldn't start it ({T.Name} is downed, or a substitute's errand is on)`
 end }
 C.SkipToPeriod = { Run = function(A, _, a)
 	local SC = svc(`School.SchoolClock`)
@@ -630,7 +655,17 @@ C.RemoveTitle = { Target = true; Run = function(A, T, a)
 	local s = R and R.Get(T)
 	local title = str(a.Title, 40)
 	if not s then return false, `No record loaded` end
+	-- GrantTitle stores the filtered text, so match what was granted: the text as typed, or as the filter returns it
 	local i = table.find(s.Titles, title)
+	if not i then
+		local okF, Out = pcall(function()
+			return TextService:FilterStringAsync(title, A.UserId, Enum.TextFilterContext.PublicChat):GetNonChatStringForBroadcastAsync()
+		end)
+		if okF and typeof(Out) == `string` then
+			i = table.find(s.Titles, Out)
+			if i then title = Out end
+		end
+	end
 	if not i then return false, `{T.Name} doesn't have {title}` end
 	table.remove(s.Titles, i)
 	if s.Title == title then s.Title = `` end
@@ -800,14 +835,15 @@ end
 
 -- the desk's pick lists (sent with Info)
 local function buildLists()
-	local L = { Quests = {}; Regions = {}; Clubs = {}; Venues = {}; Segments = {}; Beasts = {}; Races = {}; Gear = {}; Rooms = { `R101`, `R102`, `R103`, `R104`, `R105` } }
+	local L = { Quests = {}; Regions = {}; Clubs = {}; Venues = {}; Segments = {}; Beasts = {}; Races = {}; Gear = {}; Rooms = lessonRooms() }
 	pcall(function() -- (beasts) the Spawns tab's beast buttons
 		for id, d in require(ReplicatedStorage.Config.Beasts).Defs do table.insert(L.Beasts, { Id = id; Name = d.Name or id }) end
 		table.sort(L.Beasts, function(x, y) return x.Name < y.Name end)
 	end)
 	pcall(function()
 		for id, q in require(ReplicatedStorage.Config.Quests).Quests do
-			if not id:match(`^Rite`) then table.insert(L.Quests, { Id = id; Name = q.Title or q.Name or id }) end
+			-- race rites are listed so the owner can pick one; QuestStart still refuses them below owner
+			table.insert(L.Quests, { Id = id; Name = (if id:match(`^Rite`) then `Race rite: ` else ``) .. (q.Title or q.Name or id) })
 		end
 		table.sort(L.Quests, function(x, y) return x.Name < y.Name end)
 	end)

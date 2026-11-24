@@ -67,7 +67,7 @@ return {
 		Args = { A("Amount", "number", { Min = 0; Max = 1e6; Required = true }), A("Category", "choice", { Choices = { "Combat", "Class", "Quest", "Social", "Sport" } }) } };
 	GiveGear = { Side = T; Section = "Character"; Title = "Give gear"; Help = "Any gear item"; Icon = "Gear"; Level = 2; Target = "required"; Danger = false; Synonyms = { "item" };
 		Args = { A("Id", "choice", { Label = "Gear"; From = "Gear"; Required = true }) } };
-	GiveSpins = { Side = T; Section = "Character"; Title = "Give spins"; Help = "Race spins"; Icon = "Gear"; Level = 2; Target = "required"; Danger = false; Synonyms = { "spin" };
+	GiveSpins = { Side = T; Section = "Character"; Title = "Give spins"; Help = "Race spins"; Icon = "Race"; Level = 2; Target = "required"; Danger = false; Synonyms = { "spin" };
 		Args = { A("Amount", "number", { Min = 1; Max = 50; Required = true }) } };
 	GiveNameChange = { Side = T; Section = "Character"; Title = "Name change"; Help = "A free name change"; Icon = "SecCharacter"; Level = 2; Target = "required"; Danger = false; Synonyms = { "rename" }; Args = {} };
 
@@ -109,9 +109,9 @@ return {
 
 	-- Test / Story
 	QuestStart = { Side = T; Section = "Story"; Title = "Start a quest"; Help = "Start a quest by id (rites: owner)"; Icon = "SecStory"; Level = 2; Target = "required"; Danger = false; Synonyms = { "quest" };
-		Args = { A("Id", "text", { Label = "Quest id"; Max = 40; Required = true }) } };
+		Args = { A("Id", "choice", { Label = "Quest"; From = "Quests"; Required = true }) } };
 	QuestAbandon = { Side = T; Section = "Story"; Title = "Drop a quest"; Help = "Drop one of their quests"; Icon = "SecStory"; Level = 2; Target = "required"; Danger = false; Synonyms = { "abandon" };
-		Args = { A("Id", "text", { Label = "Quest id"; Max = 40; Required = true }) } };
+		Args = { A("Id", "choice", { Label = "Quest"; From = "Quests"; Required = true }) } };
 	QuestReset = { Side = T; Section = "Story"; Title = "Reset quests"; Help = "Clear every quest they have"; Icon = "SecStory"; Level = 2; Target = "required"; Danger = true; Synonyms = { "quests reset" }; Args = {} };
 
 	-- Test / World

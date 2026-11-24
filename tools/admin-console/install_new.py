@@ -1,5 +1,5 @@
-"""Install mirror files into NH Combat Test (Edit mode) as fresh ModuleScripts.
-usage: python -X utf8 -I install.py <file.luau> [...]   (paths to tools/quietcorners/live/<dotted path>.luau)"""
+"""Install mirror files into NH Combat Test (Edit mode) as fresh ModuleScripts (new scripts only: existing ones go through install_inplace.py).
+usage: python -X utf8 -I install_new.py <file.luau> [...]   (paths to tools/admin-console/live/<dotted path>.luau)"""
 import os, subprocess, sys
 RBXC = r"E:/Rensei/Rensei-Game-Design/Art/Tools/rbxc.py"
 PLACE = "placeId: 98950102230473"

@@ -52,7 +52,7 @@ return {
 		3585755651 --// zoac
 	};
 
-	-- (console 1a) testers: level 2 (the Test side) in live servers, no moderation beyond level 1's
+	-- (console 1a) testers: level 2 (the Test side) in live servers. Level 2 also lifts the moderators' 30-day ban cap (Admin.Ban); only owners ban for good, give Yen over 100,000 or start race rites
 	Testers = {
 	};
 	

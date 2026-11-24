@@ -146,9 +146,10 @@ local function first(K) local I = L[K] and L[K][1] return I and (if typeof(I) ==
 local RealClub = L.Clubs[2] and L.Clubs[2].Id
 if first("Clubs") ~= "None" then table.insert(Fails, "Lists.Clubs doesn't start with None") end
 local QuestId = first("Quests")
+for _, It in L.Quests do if not string.find(It.Id, "^Rite") then QuestId = It.Id break end end
 pcall(function()
 	local Q = require(SSS.Quests.Quests)
-	for _, It in L.Quests do if Q.CanStart(P, It.Id) == true then QuestId = It.Id break end end
+	for _, It in L.Quests do if not string.find(It.Id, "^Rite") and Q.CanStart(P, It.Id) == true then QuestId = It.Id break end end
 end)
 local Runs = {
 	{ "Mute" }, { "Unmute" }, { "Freeze" }, { "Freeze" }, { "Jail" }, { "Spectate" }, { "Bring" }, { "Goto" },
