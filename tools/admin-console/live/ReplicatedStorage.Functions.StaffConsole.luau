@@ -66,6 +66,9 @@ function Shared.CheckArgs(Schema: any, Args: any, Lists: any): (boolean, any)
 			Out[A.Name] = V
 		elseif A.Kind == "position" then
 			if typeof(V) ~= "Vector3" then return false, `{Label} must be a position` end
+			for _, C in { V.X, V.Y, V.Z } do
+				if C ~= C or math.abs(C) == math.huge or math.abs(C) > 1e6 then return false, `{Label} must be a position` end
+			end
 			Out[A.Name] = V
 		end
 	end
