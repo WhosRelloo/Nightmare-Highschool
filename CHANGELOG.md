@@ -6,7 +6,16 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 Work on branches that aren't merged into `main` yet. Nothing here is in NH Combat Test unless it says so.
 
-### `locomotion-pace`: slower run, NPCs on the players' animation rules (installed in NH Combat Test, not saved)
+### `race-transformations`: form meshes and motion (merged into `main` 2026-11-23, in NH Combat Test)
+- Wings, horns and body pieces for every race's forms, built by `Controllers.Character.FormParts` when a player
+  transforms; wing motion, hanging chains and tatters (`Functions.FormDangles`, rope physics), the Bloodline preview.
+  Import notes and checks: `docs/Forms-Import.md`. Werewolves keep the full wolf.
+
+### `admin-console`: the Headmaster's Console, design and art (merged into `main` 2026-11-23; no code yet)
+- Spec `docs/superpowers/specs/2026-11-23-admin-console-design.md` (waiting for the owner's review before the plan),
+  mockups, 20 rendered console pieces and 49 icons (uploaded; ids in `art/ui/hud/console/ICONS.md`).
+
+### `locomotion-pace`: slower run, NPCs on the players' animation rules (merged into `main` 2026-11-23, in NH Combat Test)
 - **Speeds** (`Config.Locomotion.Speeds`): walk 10 everywhere (was 12, 14.4 after states, 16 at spawn), sprint 20 (was
   25), fast sprint 27 after 2 s (was 40.5), strafes 7 (was 8.5), the attack walk 7 (was 10), carrying 8 (was 12), NPC patrol 10 (was 12).
 - **Gaits** (`Functions.Locomotion.Gait`, `Config.Locomotion.Gaits`): one rule picks Walk / Sprint / FastSprint for
