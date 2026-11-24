@@ -31,6 +31,12 @@ function Shared.LevelFrom(F: any): number
 	return 0
 end
 
+-- No targeting up (spec §6, Ruling 6): only a higher-level target is refused; equal, lower and yourself are allowed.
+function Shared.CanTarget(ActorLevel: number, TargetLevel: number, IsSelf: boolean?): boolean
+	if IsSelf then return true end
+	return (tonumber(TargetLevel) or 0) <= (tonumber(ActorLevel) or 0)
+end
+
 local function inList(List: any, V: any): boolean
 	for _, It in List or {} do
 		if It == V or (typeof(It) == "table" and It.Id == V) then return true end

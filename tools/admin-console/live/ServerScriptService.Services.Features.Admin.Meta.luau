@@ -82,7 +82,7 @@ return {
 		Args = { A("Title", "text", { Max = 40; Required = true }) } };
 	RegionsAll = { Side = T; Section = "Progress"; Title = "All places found"; Help = "Mark every place found"; Icon = "Clues"; Level = 2; Target = "required"; Danger = false; Synonyms = { "regions", "places" }; Args = {} };
 	RegionsReset = { Side = T; Section = "Progress"; Title = "Reset places"; Help = "Forget every place found"; Icon = "Clues"; Level = 2; Target = "required"; Danger = true; Synonyms = { "regions reset" }; Args = {} };
-	SetClub = { Side = T; Section = "Progress"; Title = "Club"; Help = "Put them in a club"; Icon = "SecProgress"; Level = 2; Target = "required"; Danger = false; Synonyms = { "sports" };
+	SetClub = { Side = T; Section = "Progress"; Title = "Club"; Help = "Put them in a club, or None to take them out"; Icon = "SecProgress"; Level = 2; Target = "required"; Danger = false; Synonyms = { "sports", "leave club" };
 		Args = { A("Club", "choice", { From = "Clubs"; Required = true }) } };
 	MatchStart = { Side = T; Section = "Progress"; Title = "Start a match"; Help = "Force a match at a venue with them"; Icon = "SecProgress"; Level = 2; Target = "required"; Danger = false; Synonyms = { "match" };
 		Args = { A("Venue", "choice", { From = "Venues"; Required = true }) } };
@@ -116,8 +116,8 @@ return {
 
 	-- Test / World
 	FullMoon = { Side = T; Section = "World"; Title = "Full moon tonight"; Help = "Make tonight a full moon"; Icon = "Moon"; Level = 2; Target = "none"; Danger = false; Synonyms = { "moon" }; Args = {} };
-	GotoRegion = { Side = T; Section = "World"; Title = "Go to a place"; Help = "You, or the selected student, to any place"; Icon = "GoTo"; Level = 2; Target = "none"; Danger = false; Synonyms = { "region", "place" };
-		Args = { A("Id", "choice", { Label = "Place"; From = "Regions"; Required = true }), A("Send", "toggle", { Label = "Send them" }), A("Target", "number", { Min = 1; Max = 1e12 }) } };
+	GotoRegion = { Side = T; Section = "World"; Title = "Go to a place"; Help = "You, or the selected student, to any place"; Icon = "GoTo"; Level = 2; Target = "optional"; Danger = false; Synonyms = { "region", "place" };
+		Args = { A("Id", "choice", { Label = "Place"; From = "Regions"; Required = true }), A("Send", "toggle", { Label = "Send them" }) } };
 
 	-- Test / Spawns
 	SpawnDelinquents = { Side = T; Section = "Spawns"; Title = "Delinquent crew"; Help = "A crew in front of you"; Icon = "Beast"; Level = 2; Target = "none"; Danger = false; Synonyms = { "gang" }; Args = {} };

@@ -103,5 +103,20 @@ Eq(P.Id, "Kick", "public id") Eq(P.Run, nil, "public has no Run") Eq(P.Title, "K
 Eq(S.DANGER_HOLD, 0.8, "hold time")
 Eq(#S.SECTIONS.Test, 7, "test sections") Eq(S.SECTIONS.Moderate[1], "Student", "first moderate section")
 
+-- no targeting up (spec §6; Ruling 6: only a higher target is refused)
+Eq(typeof(S.CanTarget), "function", "CanTarget exists")
+if typeof(S.CanTarget) == "function" then
+	Eq(S.CanTarget(1, 2, false), false, "moderator on an admin refused")
+	Eq(S.CanTarget(2, 3, false), false, "admin on the owner refused")
+	Eq(S.CanTarget(0, 1, false), false, "none on a moderator refused")
+	Eq(S.CanTarget(2, 2, false), true, "equal level allowed")
+	Eq(S.CanTarget(3, 3, false), true, "owner on owner allowed")
+	Eq(S.CanTarget(2, 1, false), true, "lower allowed")
+	Eq(S.CanTarget(3, 0, false), true, "on a student allowed")
+	Eq(S.CanTarget(1, 3, true), true, "self allowed (whatever the levels say)")
+	Eq(S.CanTarget(2, 2, nil), true, "IsSelf may be left out")
+	Eq(S.CanTarget(1, nil, false), true, "unknown target level counts as 0")
+end
+
 if #Fails > 0 then return "FAIL " .. #Fails .. "\n" .. table.concat(Fails, "\n") end
 return "PASS console_pure"

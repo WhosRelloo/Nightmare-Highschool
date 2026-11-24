@@ -670,7 +670,8 @@ C.SetClub = { Target = true; Run = function(A, T, a)
 	local Cl = svc(`Sports.Clubs`)
 	local id = str(a.Club, 20)
 	if not Cl then return false, `Clubs missing` end
-	if id == `` then Cl.Leave(T) return true, `{T.Name} left their club` end
+	-- "None" (the first choice in Lists.Clubs) takes them out of their club; CheckArgs never lets an empty value through
+	if id == `None` or id == `` then Cl.Leave(T) return true, `{T.Name} left their club` end
 	local ok, err = Cl.Join(T, id)
 	return ok, if ok then `{T.Name} joined {id}` else tostring(err)
 end }
@@ -704,14 +705,14 @@ C.FullMoon = { Run = function(A)
 	SC.SetTime(`22:00`, d)
 	return true, `Tonight is a full moon (day {d}, 22:00). Students in school may be marked for skipped classes.`
 end }
-C.GotoRegion = { Run = function(A, _, a)
+-- Target "optional": Dispatch hands in the selected student (already through the no-targeting-up check); Send moves them
+C.GotoRegion = { Run = function(A, T, a)
 	local B = regionBox(str(a.Id, 30))
 	if not B then return false, `Unknown place` end
 	local Who = A
 	if a.Send == true then
-		Who = Players:GetPlayerByUserId(tonumber(a.Target) or 0)
+		Who = T
 		if not Who then return false, `Pick a student first` end
-		if Who ~= A and Shared.Level(Who) > Shared.Level(A) then return false, `Can't use that on a higher rank` end
 	end
 	-- the floor of the box (its bottom plus a little), at its centre
 	local Pos = B.Position - Vector3.new(0, B.Size.Y / 2 - 3.5, 0)
@@ -753,6 +754,16 @@ C.Note = { Target = true; Run = function(A, T, a)
 	Notes[T.UserId] = if text ~= `` then { Text = text; By = A.Name; T = os.time() } else nil
 	return true, if text ~= `` then `Noted on {T.Name}` else `Cleared the note on {T.Name}`
 end }
+
+-- the Inspect remote: admins and up only (the console offers Inspect at level 2, Tools.luau), and no targeting up
+function Shared.InspectFor(P: Player, UserId: any)
+	local lvl = Shared.Level(P)
+	if lvl < 2 then return nil end
+	local T = Players:GetPlayerByUserId(tonumber(UserId) or 0)
+	if not T or not StaffConsole.CanTarget(lvl, Shared.Level(T), T == P) then return nil end
+	local ok, r = pcall(Shared.Inspect, P, T)
+	return ok and r or nil
+end
 
 -- read-only look at a student's loaded slot (Info's Inspect)
 function Shared.Inspect(Admin: Player, T: Player)
@@ -808,6 +819,7 @@ local function buildLists()
 	pcall(function()
 		for id, c in require(ReplicatedStorage.Config.Sports).Clubs do table.insert(L.Clubs, { Id = id; Name = c.Name }) end
 		table.sort(L.Clubs, function(x, y) return x.Name < y.Name end)
+		table.insert(L.Clubs, 1, { Id = `None`; Name = `None (leave their club)` }) -- SetClub: take them out
 	end)
 	pcall(function()
 		local M = svc(`Sports.Matches`)
@@ -924,7 +936,7 @@ function Shared.Dispatch(P: Player, Command: any, TargetUserId: any, Args: any)
 	if m.Target ~= `none` then
 		T = Players:GetPlayerByUserId(tonumber(TargetUserId) or 0)
 		if not T and m.Target == `required` then return false, `Pick a player first` end
-		if T and T ~= P and Shared.Level(T) > lvl then return false, `Can't use that on a higher rank` end
+		if T and not StaffConsole.CanTarget(lvl, Shared.Level(T), T == P) then return false, `Can't use that on a higher rank` end
 	end
 	local ok, a, b = pcall(def.Run, P, T, Args)
 	if not ok then warn(`[Admin] {Command} failed: {a}`) return false, `Failed: {tostring(a):sub(1, 120)}` end
@@ -966,14 +978,7 @@ function Shared.OnStart()
 		if Shared.Level(P) < 1 then return nil end
 		return { Server = serverInfo(); Players = playerList(); Locked = Locked }
 	end
-	InspectRF.OnServerInvoke = function(P: Player, UserId: any)
-		local lvl = Shared.Level(P)
-		if lvl < 1 then return nil end
-		local T = Players:GetPlayerByUserId(tonumber(UserId) or 0)
-		if not T or (T ~= P and Shared.Level(T) > lvl) then return nil end
-		local ok, r = pcall(Shared.Inspect, P, T)
-		return ok and r or nil
-	end
+	InspectRF.OnServerInvoke = Shared.InspectFor
 	Folder.Parent = ReplicatedStorage
 
 	Info.OnServerInvoke = function(P: Player)

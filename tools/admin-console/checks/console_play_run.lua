@@ -100,14 +100,20 @@ local Activities = require(SSS.School.Activities)
 local Lesson = { Ran = false }
 local StateSeen = {}
 local function body()
+local function first0(K) local L0 = Admin.Lists() local I = L0[K] and L0[K][1] return I and (if typeof(I) == "table" then I.Id else I) end
 -- levels (NHTestLevel, Studio only)
 P:SetAttribute("NHTestLevel", 1)
 task.wait(0.3)
 want(false, "Heal", {}, Me, "Needs an admin")
 want(false, "Shutdown", {}, nil, "Needs the owner")
 want(true, "Warn", { Reason = "console test" }, Me)
+-- (final review fix 3) the Inspect remote is level 2, as the console offers it
+if Admin.InspectFor(P, Me) ~= nil then table.insert(Fails, "Inspect answered a moderator") end
+Ran += 1
 P:SetAttribute("NHTestLevel", 2)
 task.wait(0.3)
+if typeof(Admin.InspectFor(P, Me)) ~= "table" then table.insert(Fails, "Inspect refused an admin") end
+Ran += 1
 want(false, "Ban", { Days = 0; Reason = "test" }, Me, "Permanent bans are owner-only")
 want(false, "GiveYen", { Amount = 200000 }, Me, "needs an owner")
 P:SetAttribute("NHTestLevel", 0)
@@ -122,6 +128,10 @@ want(false, "SetHeight", { Pick = "Huge" }, Me, "Unknown Height")
 want(false, "SpawnSparring", { Tier = "Godlike" }, nil, "Unknown Difficulty")
 want(false, "Announce", { Text = "" }, nil, "Message is needed")
 want(false, "Heal", {}, nil, "Pick a player first")
+-- (final review fix 1) "Send them" needs the selected student, now Dispatch's target (Target = "optional")
+want(false, "GotoRegion", { Id = first0("Regions"); Send = true }, nil, "Pick a student first")
+-- (final review fix 2) CheckArgs stays strict: an empty club is refused, "None" is the way out
+want(false, "SetClub", { Club = "" }, Me, "Club is needed")
 
 -- commands that may fairly be refused in this state: each needs this exact refusal message, never just "not true"
 local StateOk = {
@@ -132,6 +142,9 @@ local L = Admin.Lists()
 local function first(K) local I = L[K] and L[K][1] return I and (if typeof(I) == "table" then I.Id else I) end
 -- (fix round 1) the quest: the first in the list that can start now. A dare is open only on its own day (Quests.DareFor),
 -- so first("Quests") alone is refused on most days ("not open to them yet").
+-- (final review fix 2) Lists.Clubs starts with "None" (take them out): the join uses the first real club
+local RealClub = L.Clubs[2] and L.Clubs[2].Id
+if first("Clubs") ~= "None" then table.insert(Fails, "Lists.Clubs doesn't start with None") end
 local QuestId = first("Quests")
 pcall(function()
 	local Q = require(SSS.Quests.Quests)
@@ -148,13 +161,13 @@ local Runs = {
 	{ "GiveYen", { Amount = 10 } }, { "GiveYen", { Amount = -10 } }, { "GiveExp", { Amount = 10; Category = "Combat" } },
 	{ "GiveGear", { Id = first("Gear") } }, { "GiveSpins", { Amount = 1 } }, { "GiveNameChange" },
 	{ "SetLevel", { Value = 5 } }, { "SetStatPoints", { Value = 3 } }, { "GrantTitle", { Title = "Tester" } }, { "RemoveTitle", { Title = "Tester" } },
-	{ "RegionsAll" }, { "RegionsReset" }, { "SetClub", { Club = first("Clubs") } },
+	{ "RegionsAll" }, { "RegionsReset" }, { "SetClub", { Club = RealClub } }, { "SetClub", { Club = "None" } },
 	{ "MatchStart", { Venue = first("Venues") } }, { "MatchEnd", { Venue = first("Venues") }, true },
 	{ "SetTime", { Time = "12:30" }, true }, { "ClockSpeed", { Value = 60 }, true }, { "SkipToPeriod", { Segment = first("Segments") }, true }, { "RingBell", nil, true },
 	{ "SetDisciplinePoints", { Value = 0 } }, { "ClearDiscipline" }, { "LiftSuspension" }, { "ExcuseToday" },
 	{ "OweDetention" }, { "ClearDetention" },
 	{ "QuestStart", { Id = QuestId } }, { "QuestAbandon", { Id = QuestId } }, { "QuestReset" },
-	{ "FullMoon", nil, true }, { "GotoRegion", { Id = first("Regions") }, true },
+	{ "FullMoon", nil, true }, { "GotoRegion", { Id = first("Regions") }, true }, { "GotoRegion", { Id = first("Regions"); Send = true } },
 	{ "SpawnDelinquents", nil, true }, { "SpawnDelinquent", { Role = "Brute" }, true }, { "SpawnWolves", nil, true },
 	{ "SpawnBeast", { Beast = first("Beasts") }, true }, { "SpawnSparring", { Tier = "Easy" }, true }, { "ClearEnemies", nil, true },
 	{ "Invisible", nil, true }, { "Invisible", nil, true },
@@ -187,6 +200,15 @@ for _, R in Runs do
 		local Msg = StateOk[Cmd]
 		if Msg and typeof(B) == "string" and string.find(B, Msg, 1, true) then table.insert(StateSeen, `{Cmd}: {B}`)
 		else table.insert(Fails, `{Cmd} refused: {tostring(B)}`) end
+	end
+	if Cmd == "SetClub" and A == true then
+		local Want = if Args.Club == "None" then nil else Args.Club
+		if P:GetAttribute("Club") ~= Want then table.insert(Fails, `SetClub {Args.Club}: Club attribute is {tostring(P:GetAttribute("Club"))}`) end
+		if Args.Club == "None" and not string.find(tostring(B), "left their club", 1, true) then table.insert(Fails, `SetClub None: "{tostring(B)}"`) end
+	end
+	-- (one player in Play: the selected student is you, so Run reports "You went"; without a target it is refused above)
+	if Cmd == "GotoRegion" and Args.Send == true and A == true and not string.find(tostring(B), "went to", 1, true) then
+		table.insert(Fails, `GotoRegion Send: "{tostring(B)}", want "... went to ..."`)
 	end
 	-- the clock goes straight back to 12:30 today after a jump, so no class gets booked while the run goes on
 	if Cmd == "SkipToPeriod" or Cmd == "FullMoon" then Clock.SetTime("12:30", Before.Day) end
