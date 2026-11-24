@@ -1,5 +1,5 @@
 # Jitter audit: reads a per-frame dump of rig-part positions ({"parts": {name: [[cx,cy,cz,tx,ty,tz],...]}, "cam": [[name,x,y,z,qw,qx,qy,qz],...]})
-# (trailer.py "jitter" mode writes it) and reports 1-frame POPS, direction REVERSALS and ABRUPT STOPS outside camera cuts.
+# (tools/soccer2/checks/soccer_demo.lua writes it; rows are Heartbeat frames, assumed 60 per second) and reports 1-frame POPS, direction REVERSALS and ABRUPT STOPS outside camera cuts.
 # Gate: pops/stops should only appear on deliberate impact frames.
 import json, math, collections, sys
 d = json.load(open(sys.argv[1]))

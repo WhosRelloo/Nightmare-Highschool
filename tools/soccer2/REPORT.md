@@ -39,7 +39,7 @@ off the root's facing. Soccer 2.0 doesn't touch the strafe walk.
 | 3 Slots and resolution (`Config.Sports.SoccerAnims`, `Clips.Id`, `Drive`, `DashPath`) | 022db3d..5b79426 | `PASS soccer_clips_resolve` (Play) |
 | 4 Kick, charge, moves, falls (`Controllers.Gui.Soccer`) | 5b79426..9523505 | `PASS live, InSport=Pitch`, `PASS soccer_play_moves`, `PASS ended` |
 | 5 Soccer pack (`AnimationController.Override`, `SoccerPack`) | 9523505..59acb75 | `PASS soccer_play_pack`, `PASS respawned` (killed mid-match), `PASS soccer_play_pack_after` |
-| 6 Demo, audits, docs | this commit | above |
+| 6 Demo, audits, docs | 59acb75..936f7a5 (+ report fix) | above |
 
 ## Strides and contact times
 
@@ -67,9 +67,9 @@ Contact times (s) after the eye check:
 `PASS soccer_demo 331 frames, 248396 bytes`. Video `docs/superpowers/mockups/2026-11-24-soccer-2-0/demo.mp4` (re-encoded
 to 1280 wide and 30 fps to commit it), dump `demo_dump.json`.
 
-**The video gates measure the capture, not the clips.** Studio's `video_capture` records 30 fps inside a 60 fps stream
-(903 frames in 30 s), and the game ran at about half speed while recording: 5.5 s of demo spans about 10 s of video
-(0.8-10.6 s). Every frame shows up twice to `motion_audit.py`. The numbers are reported as measured:
+**The video gates are skewed by the capture.** Studio's `video_capture` records 30 fps inside a 60 fps stream (903
+frames in 30 s), so `motion_audit.py` sees every frame twice. The demo's waits add up to 9.1 s and the action spans
+0.8-10.6 s of video, so the game ran at normal speed. The numbers are reported as measured:
 
 | Gate | Target | Whole 30 s | Action stretch (0.8-10.6 s) |
 |---|---|---|---|
@@ -79,25 +79,40 @@ to 1280 wide and 30 fps to commit it), dump `demo_dump.json`.
 | fall / rise | | 1.11 | 0.82 |
 | creeping hold (demo about 2.9-3.6 s) | no frozen frames | | a 1.48 s hold at 2.52 s of the stretch |
 
-Not passed: moving fraction, frozen frames, duplicates. The 30 fps capture and the half-speed game explain the frozen and
-duplicated frames. The creep can't be judged from this video: at half speed its slow wind-up reads as a hold. Sheets:
+**Not passed:** moving fraction, frozen frames, duplicates, and the creeping hold: a 1.48 s hold falls in the creep
+window. The doubled frames explain much of the frozen and duplicate figures, but not all of them, and this wasn't verified.
+The creep may be too slow to register at this frame size, but that wasn't verified either. Sheets:
 `audit/sheet_*.jpg` and `audit_action/sheet_*.jpg`, strips `audit/strip_3.0_4.0.jpg` and `audit_action/strip_2.0_3.0.jpg`,
 graph `audit/motion.png`. By eye the sheets show the jog, the charge crouch, the kick, the backpedal and the dive in
 order. The character is small in the frame.
 
-Dump audits (`demo_dump.json`, game-clock frames):
+Dump audits (`demo_dump.json`, one row per Heartbeat):
 
-- **Jitter** (`jitter_audit.py`): no cuts. 24 single-frame pops, at 2.03, 2.60, 3.38, 4.53 and 4.85 s, among others. The
-  big ones are 2.60 s (torso and head, the kick) and 4.53 s (right arm, the dive). 16 abrupt stops (1.43, 1.65, 1.68,
-  2.10, 4.35, 4.45 s, ...). Direction reversals peak at 2.5 s (12) and 4.0 s (14). Camera: no rotation spikes.
-- **Physics** (`physics_audit.py`): the planted foot skates 4.14-10.63 studs/s per second bucket (target < 0.6).
-  Planted-foot slide averages 5.6-15.8 studs/s. Below the floor: Right Leg 15 frames (3.52-5.50 s, min -0.82), Left
-  Leg 2 frames (2.82 s, -0.31), Right Arm 42 frames (4.78-5.47 s, -0.81: the dive). One airborne arc at 4.93-5.15 s.
-  Off-balance: 8 frames around 4.5-5.0 s (the dive). Fastest root travel 76 studs/s at 4.60 s (the dive dash).
-- **Not passed:** the skate target. The dump is world space, so the jog's root travel (about 6.75 studs/s) shows up as
-  foot speed. The audit scripts are sed copies of the skill's video-keypoint scripts, so the skate figure here is an
-  upper bound, not a measured slide. Pops and abrupt stops aren't only on the kick, dribble and dive impact frames: the
-  ones at 1.4-2.1 s fall in the jog and charge. Reported, not re-animated (brief rule).
+**Time base.** The audits assume 60 rows per second. The dump has 331 rows over the demo's 9.1 s of waits, about 36 Hz,
+and no timestamps. The figures below are the audits' raw output: multiply their times by about 1.65 and divide their
+speeds by about 1.65 to get rough real values. The real times are in brackets. They are estimates because the frame
+rate wasn't constant. The demo's own timeline: jog 0.5-2.3 s, charge 2.7 s, kick 3.4 s, dribble 4.3 s, backpedal 5.6 s,
+dive 7.5 s.
+
+- **Jitter** (`jitter_audit.py`): no cuts.
+  - 24 single-frame pops, including 2.03 (about 3.4), 2.60 (about 4.3), 3.38 (about 5.6), 4.53 (about 7.5) and 4.85 (about 8.0) s.
+  - The big ones are 2.60 (torso and head, around the kick and dribble start) and 4.53 (right arm, the dive start).
+  - 16 abrupt stops, at 1.43 (about 2.4), 1.65-1.68 (about 2.7), 2.10 (about 3.5), and 4.35-4.45 (about 7.2-7.3) s, among others.
+  - Direction reversals peak at 2.5 (12) and 4.0 (14) raw.
+  - **Camera not measured:** the demo writes a constant camera rotation, so the audit can't see rotation spikes.
+- **Physics** (`physics_audit.py`):
+  - The planted foot skates 4.14-10.63 studs/s raw, about 2.5-6.4 real (target < 0.6).
+  - Planted-foot slide averages 5.6-15.8 raw, about 3.4-9.6 real.
+  - Below the floor:
+    - Right Leg 15 frames (min -0.82);
+    - Left Leg 2 frames (-0.31);
+    - Right Arm 42 frames (-0.81, the dive).
+  - One airborne arc and 8 off-balance frames, both in the dive.
+  - Fastest root travel: 76 raw, about 46 real studs/s (the dive dash).
+- **Not passed:** the skate target. The dump is world space, so root travel (the jog, about 6.75 studs/s) counts as foot
+  speed. The audit scripts are sed copies of the skill's video-keypoint scripts, so the skate figure is an upper bound,
+  not a measured slide. Pops and abrupt stops aren't only on impact frames: the stops at about 2.4-2.7 s fall at the
+  jog's end and the charge. Reported, not re-animated (brief rule). A re-run should record per-row time.
 
 ## Cine (every round)
 
@@ -113,8 +128,8 @@ and `InSport` was left on the player until Play stopped. The final round ran it 
 - **Publishing:** the 24 clips play through temporary ids in Studio only. See `tools/soccer2/PUBLISH_LIST.md`.
 - **The goal cut** (spec: later).
 - **2.1 / 2.2 triggers:** Chip, Stall (2.1) and Penalty (2.2) are baked and have slots, but nothing plays them yet.
-- **The video gates:** re-record when Studio can capture at 60 fps and at full speed (a lighter scene or a smaller
-  viewport).
+- **The video and dump gates:** re-record with per-row time and the real camera rotation in the dump, and a closer
+  camera. Studio's capture is 30 fps.
 - Deferred minors are listed in the SDD ledger for the final review.
 
 **Place not saved.**
