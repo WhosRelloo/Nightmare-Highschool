@@ -54,6 +54,8 @@ local StartedAt = os.time()
 local Folder, ClientEvent
 -- Studio only: the Play checks set it so Ban and Unban write the record without the Roblox Ban API (or a kick)
 Shared.TestSkipBanApi = false
+-- (phase 2, Studio only) the Play check sets this to try the live-server rule for Season, Moon and Sky
+Shared.TestLiveMode = false
 local OfflineRank = {} :: { [number]: { R: number, At: number } }
 
 local function svc(path: string)
@@ -939,6 +941,30 @@ function Shared.Inspect(Admin: Player, T: Player)
 		Regions = #rs.Found; RegionsTotal = rs.Total; Club = sports.Club or ``; Quests = active;
 		Arcade = arcade; Kills = Prof.Kills or 0; Note = latestNote(T.UserId);
 	}
+end
+
+---------------------------------------------------------------- (phase 2) group modules
+
+-- Season, Moon tonight and Sky: Studio always (unless the Play check asks for the live rule); live, the owner only
+function Shared.ServerWide(A: Player): (boolean, string?)
+	local Studio = RunService:IsStudio() and not Shared.TestLiveMode
+	return StaffConsole.ServerWideOk(Shared.Level(A), Studio)
+end
+
+local H = {
+	svc = svc; str = str; profile = profile; today = today; Level = function(P) return Shared.Level(P) end;
+	ServerWide = function(A) return Shared.ServerWide(A) end; notify = notify;
+	Meta = function(Name: string, Kind: string, Extra: any?) local T = Extra or {} T.Name = Name T.Kind = Kind return T end;
+}
+Shared.GROUPS = { `World`, `Story`, `BellTower` }
+for _, Name in Shared.GROUPS do
+	local Mod = script:FindFirstChild(Name)
+	if not Mod then warn(`[Admin] Admin.{Name} missing: its cards are not in the console`) continue end
+	for Id, E in require(Mod)(H) do
+		if C[Id] or Meta[Id] then error(`[Admin] Admin.{Name}: the id {Id} is already taken`) end
+		C[Id] = { Run = E.Run }
+		Meta[Id] = E.Meta
+	end
 end
 
 -- the desk's pick lists (sent with Info)
