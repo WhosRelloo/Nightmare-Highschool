@@ -307,7 +307,7 @@ function Local.Play(Char: Model, Kind: string, Opts: { Slot: string?, At: number
 	-- one soccer clip at a time per body
 	for K, Other in Tracks[Char] do if K ~= Key and Other.IsPlaying then Other:Stop(0.08) end end
 	Tr:Play(0.08)
-	if Opts and Opts.At then Tr.TimePosition = Opts.At end
+	Tr.TimePosition = (Opts and Opts.At) or 0
 	Tr:AdjustSpeed(Opts and Opts.Speed or 1)
 	-- FIER clips play out; 1.1 clips are cut to the move; long clips are cut to the moment
 	local Cut = STOP_AFTER[Kind] or (if Fier then nil else LENGTH[Kind])
@@ -330,21 +330,24 @@ function Local.Data(Slot: string): any?
 end
 
 -- (soccer-2.0) the charge: 1x to MARGIN before contact, then a creep that reaches the kick point at MaxHold
-local Charging = {} :: { [Model]: AnimationTrack }
+local Charging = {} :: { [Model]: { Tr: AnimationTrack, Id: number } }
+local ChargeId = 0
 function Local.Charge(Char: Model?)
 	if not Char then return end
 	local Tr = Local.Pose(Char, `Charge`)
 	local C = Local.Data(`Kick`)
 	if not (Tr and C) then return end
-	Charging[Char] = Tr
+	ChargeId += 1
+	local Mine = { Tr = Tr, Id = ChargeId }
+	Charging[Char] = Mine
 	local HoldAt, Creep = Anim.Hold(C, LEAD, MARGIN, T.Kick.MaxHold)
 	task.spawn(function()
 		local T0 = os.clock()
-		while Tr.IsPlaying and Charging[Char] == Tr and Tr.TimePosition < HoldAt and os.clock() - T0 < 2 do RunService.Heartbeat:Wait() end
-		if not (Tr.IsPlaying and Charging[Char] == Tr) then return end
+		while Tr.IsPlaying and Charging[Char] == Mine and Tr.TimePosition < HoldAt and os.clock() - T0 < 2 do RunService.Heartbeat:Wait() end
+		if not (Tr.IsPlaying and Charging[Char] == Mine) then return end
 		Tr:AdjustSpeed(Creep)
 		task.delay(T.Kick.MaxHold + 0.5, function()
-			if Charging[Char] == Tr then Charging[Char] = nil if Tr.IsPlaying then Tr:Stop(0.2) end end
+			if Charging[Char] == Mine then Charging[Char] = nil if Tr.IsPlaying then Tr:Stop(0.2) end end
 		end)
 	end)
 end
@@ -360,7 +363,8 @@ function Local.Kick(Char: Model?, Kind: string)
 	end
 	local C = Slot and Local.Data(Slot)
 	local At = if C then Anim.StartAt(C, LEAD) else nil
-	local Held = Charging[Char]
+	local Rec = Charging[Char]
+	local Held = if Rec then Rec.Tr else nil
 	Charging[Char] = nil
 	if At and Held and Held.IsPlaying and Slot == `Kick` then
 		Held.TimePosition = math.max(Held.TimePosition, At)
