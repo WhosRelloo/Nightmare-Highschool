@@ -85,6 +85,11 @@ function Model.Flags(P: any): { string }
 	if P.Frozen then table.insert(Out, "FROZEN") end
 	if P.InMenu then table.insert(Out, "IN MENU") end
 	if P.God then table.insert(Out, "GOD") end
+	-- (phase 2) from the player list: the Transformation attribute, NHBells, the Prologue not seen yet, a cut or Wickfield
+	if P.Transformed == true then table.insert(Out, "TRANSFORMED") end
+	if (tonumber(P.Bells) or 0) >= 3 then table.insert(Out, "WANTED") end
+	if P.New == true then table.insert(Out, "NEW") end
+	if P.InCutscene == true then table.insert(Out, "IN CUTSCENE") end
 	return Out
 end
 

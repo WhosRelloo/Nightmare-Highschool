@@ -123,5 +123,14 @@ Eq(S.SECTIONS.Moderate[3], "Log", "Log is the third Moderate section")
 Eq(S.CARDLESS and S.CARDLESS.Log, true, "Log has no cards")
 local UserDef = table.clone(Good) UserDef.Target = "user" UserDef.Level = 3
 Eq((S.Validate("RemoveRecordEntry", UserDef)), true, "target mode user is valid")
+-- (phase 2) server-wide World cards: Studio always; live only the owner
+Eq(S.ServerWideOk(2, true), true, "studio level 2 server-wide")
+Eq(S.ServerWideOk(0, true), true, "studio level 0 server-wide (Dispatch refuses level 0 earlier)")
+Eq(S.ServerWideOk(3, false), true, "live owner server-wide")
+local Ok2, Why2 = S.ServerWideOk(2, false)
+Eq(Ok2, false, "live level 2 refused") Eq(Why2, "Owner only in live servers; use Preview just for me", "the refusal")
+Eq(S.ServerWideOk(1, false), false, "live level 1 refused")
+Eq(S.ServerWideOk(nil, false), false, "live no level refused")
+Eq(S.SERVER_WIDE_REFUSAL, "Owner only in live servers; use Preview just for me", "refusal constant")
 if #Fails > 0 then return "FAIL " .. #Fails .. "\n" .. table.concat(Fails, "\n") end
 return "PASS console_pure"
