@@ -20,6 +20,12 @@ Near(H, 0.13, "hold at") Near(C, 0.05 / 1.6, "creep rate")
 Near(H + C * 1.6, 0.18, "the creep reaches the kick point at MaxHold")
 local H2, C2 = A.Hold({ Length = 1, ContactAt = 0.04 }, 0.05, 0.10, 1.6)
 Near(H2, 0, "hold clamps at 0") Near(C2, 0, "no creep room, no creep")
+-- (final-review C) the Kick charge has its own margin, 0.20: the creep moves (>= 0.08x over the 1.6 s hold)
+local Data = load("ReplicatedStorage.Config.SoccerClips.luau")
+Near(A.KickMargin, 0.20, "the Kick's margin")
+local KH, KC = A.Hold(Data.Clips["KickSoccerball_Right"], 0.05, A.KickMargin, 1.6)
+Near(KH, 0.03, "Kick hold at") Near(KH + KC * 1.6, 0.18, "the Kick creep reaches the kick point at MaxHold")
+if KC < 0.08 then table.insert(Fails, string.format("the Kick creep is %.3fx, want >= 0.08x", KC)) end
 -- a straight dash path: still for 1 s, 10 studs left over 1..2 s, still to 3 s
 local P = {}
 for I = 0, 90 do local t = I / 30 local x = if t <= 1 then 0 elseif t >= 2 then -10 else -10 * (t - 1) table.insert(P, { t, x, 0 }) end

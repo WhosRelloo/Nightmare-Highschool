@@ -7,6 +7,7 @@
 		Drive(Track, Clip, DashTime, Cap) -> (Rate, Time, t0, t1)   the clip through its travel window at the fitted rate
 		DashPath(Root, Track, Clip, Dir, Dist, Rate, t0, t1, Time)  the mover's dash: Dist studs along Dir on the clip's curve
 		Cancel()                  stops a running DashPath (a new dash takes over)
+		Seek(Track, At, Speed)    TimePosition = At now, or once a loading clip has a Length (At + the time since, x Speed)
 	Spec: docs/superpowers/specs/2026-11-24-soccer-2-0-design.md §2, §4.
 ]]
 local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
@@ -63,11 +64,27 @@ function M.Id(Slot: string): (string?, boolean)
 	return nil, false
 end
 
+-- (soccer-2.0 final) a published clip that hasn't loaded has Length 0, and a TimePosition set then is lost: wait for the
+-- Length (up to 1 s) and jump to where the clip would be by now
+function M.Seek(Track: AnimationTrack, At: number, Speed: number?)
+	if Track.Length > 0 then Track.TimePosition = At return end
+	if At <= 0 then return end
+	local T0 = os.clock()
+	task.spawn(function()
+		while Track.Length <= 0 and os.clock() - T0 < 1 do RunService.Heartbeat:Wait() end
+		if Track.Length > 0 and Track.IsPlaying then
+			Track.TimePosition = math.min(At + (os.clock() - T0) * (Speed or 1), Track.Length)
+		end
+	end)
+end
+
 function M.Drive(Track: AnimationTrack, Clip: any, DashTime: number, Cap: number): (number, number, number, number)
 	local Rate, Time, t0, t1 = Anim.Fit(Clip, DashTime, Cap)
-	Track.TimePosition = t0
+	M.Seek(Track, t0, Rate)
 	Track:AdjustSpeed(Rate)
 	task.spawn(function()
+		local L0 = os.clock()
+		while Track.Length <= 0 and Track.IsPlaying and os.clock() - L0 < 1 do RunService.Heartbeat:Wait() end
 		local T0 = os.clock()
 		while Track.IsPlaying and Track.TimePosition < t1 and os.clock() - T0 < Time + 1 do RunService.Heartbeat:Wait() end
 		if Track.IsPlaying and math.abs(Track.Speed - Rate) < 1e-3 then Track:AdjustSpeed(1) end
@@ -91,18 +108,30 @@ function M.DashPath(Root: BasePart, Track: AnimationTrack, Clip: any, Dir: Vecto
 	LV.PlaneVelocity = Vector2.zero
 	LV.MaxForce = 60000
 	LV.Parent = Root
-	local T0 = os.clock()
+	local L0 = os.clock()
+	local T0 = L0
 	local Conn: RBXScriptConnection? = nil
 	local function finish() if Conn then Conn:Disconnect() end LV:Destroy() Att:Destroy() end
 	Conn = RunService.Heartbeat:Connect(function(dt: number)
-		local Ok = pcall(function()
+		local Ok, Err = pcall(function()
+			if Mine ~= Token or not Track.IsPlaying or not Root.Parent then finish() return end
+			-- (soccer-2.0 final) a clip still loading: hold still (up to 1 s), and the dash's time starts once it has loaded
+			if Track.Length <= 0 then
+				if os.clock() - L0 > 1 then finish() return end
+				T0 = os.clock()
+				LV.PlaneVelocity = Vector2.zero
+				return
+			end
 			local t = Track.TimePosition
-			if Mine ~= Token or not Track.IsPlaying or t >= t1 or not Root.Parent or os.clock() - T0 > Time + 0.5 then finish() return end
+			if t >= t1 or os.clock() - T0 > Time + 0.5 then finish() return end
 			local t2 = math.min(t + dt * Rate, t1)
 			local V = if t2 - t > 1e-4 then Dist * (Anim.Progress(Clip, t2, t0, t1) - Anim.Progress(Clip, t, t0, t1)) / (t2 - t) * Rate else 0
 			LV.PlaneVelocity = Vector2.new(D.X, D.Z) * V
 		end)
-		if not Ok then finish() end
+		if not Ok then
+			warn("[Soccer clips] DashPath: " .. tostring(Err))
+			finish()
+		end
 	end)
 end
 

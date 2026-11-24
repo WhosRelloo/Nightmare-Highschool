@@ -8,6 +8,7 @@
 ]]
 local Players = game:GetService(`Players`)
 local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
+local ContentProvider = game:GetService(`ContentProvider`)
 
 local Player = Players.LocalPlayer
 local Controllers = script.Parent.Parent
@@ -20,6 +21,10 @@ local On = false
 local IdleSlot = nil :: string?
 local Keeper = false
 local SportsMod = nil :: any
+local Preloaded = false
+local RestoreFailed = false                           -- (soccer-2.0 final) a failed Restore is retried on the next Step
+local IdleCache = {} :: { [string]: AnimationTrack }  -- (soccer-2.0 final) one idle track per idle clip on this body
+local IdleFor = nil :: Animator?
 
 local function ac(): any?
 	local Ok, AC = pcall(require, script.Parent:WaitForChild(`AnimationController`))
@@ -78,13 +83,21 @@ function Local.Override()
 	if not AC then return end
 	local D = Clips.Data()
 	local St = (D and D.Stride) or {}
-	local O = { Stride = { Walk = St.SoccerJog; Back = St.SoccerJogBack }; Back = (Clips.Id(`JogBack`)) }
+	-- (soccer-2.0 final) a stride is the FIER clip's, so it is set only when that clip resolved (a partial publish keeps
+	-- Default's stride for a gait whose clip is missing)
+	local _, JogFier = Clips.Id(`Jog`)
+	local Back, BackFier = Clips.Id(`JogBack`)
+	local O = { Stride = {}; Back = Back }
+	if JogFier then O.Stride.Walk = St.SoccerJog end
+	if Back and BackFier then O.Stride.Back = St.SoccerJogBack end
 	Keeper = Local.IsKeeper()
 	if Keeper then
-		O.Left = (Clips.Id(`KeeperStepLeft`))
-		O.Right = (Clips.Id(`KeeperStepRight`))
-		O.Stride.StrafeLeft = St.KeeperStep
-		O.Stride.StrafeRight = St.KeeperStep
+		local L, LFier = Clips.Id(`KeeperStepLeft`)
+		local R, RFier = Clips.Id(`KeeperStepRight`)
+		O.Left = L
+		O.Right = R
+		if L and LFier then O.Stride.StrafeLeft = St.KeeperStep end
+		if R and RFier then O.Stride.StrafeRight = St.KeeperStep end
 	end
 	AC.Override(O)
 end
@@ -98,15 +111,45 @@ function Local.SetIdle(Slot: string)
 	if not Id then return end
 	IdleSlot = Slot
 	pcall(function()
+		if IdleFor ~= AM.Animator then IdleCache = {} IdleFor = AM.Animator end
 		local Old = AM.TrackTable.Idle
 		local Playing = AM.Pose == `Idle` and Old.IsPlaying
-		local New = AM.Animator:LoadAnimation(anim(`Idle`, Id))
-		New.Priority = Enum.AnimationPriority.Idle
-		New.Looped = true
+		-- (soccer-2.0 final) reuse this body's track for the clip (no LoadAnimation per possession change)
+		local New = IdleCache[Id]
+		if not New then
+			New = AM.Animator:LoadAnimation(anim(`Idle`, Id))
+			New.Priority = Enum.AnimationPriority.Idle
+			New.Looped = true
+			IdleCache[Id] = New
+		end
+		if New == Old then return end
 		AM.TrackTable.Idle = New
 		Old:Stop(0.2)
-		task.delay(0.3, function() pcall(function() Old:Destroy() end) end)
+		if not table.find(Local.Cached(), Old) then task.delay(0.3, function() pcall(function() Old:Destroy() end) end) end
 		if Playing then New:Play(0.2) end
+	end)
+end
+
+function Local.Cached(): { AnimationTrack }
+	local L = {}
+	for _, T in IdleCache do table.insert(L, T) end
+	return L
+end
+
+-- (soccer-2.0 final) every slot's clip loads before its first play (a kick's jump to contact needs the Length)
+function Local.Preload()
+	if Preloaded then return end
+	Preloaded = true
+	task.spawn(function()
+		pcall(function()
+			local Config = require(ReplicatedStorage:WaitForChild(`Config`):WaitForChild(`Sports`))
+			local List = {}
+			for Slot in Config.SoccerAnims do
+				local Id = Clips.Id(Slot)
+				if Id then table.insert(List, anim(Slot, Id)) end
+			end
+			ContentProvider:PreloadAsync(List)
+		end)
 	end)
 end
 
@@ -118,12 +161,19 @@ function Local.Apply()
 	if not (AM and AM.Animator and Char and AM.Animator:IsDescendantOf(Char) and AM.TrackTable.Idle) then return end
 	local Pack = Local.Pack()
 	if not Pack then return end
+	Local.Preload()
 	On = true
+	RestoreFailed = false
 	Local.Override()
 	pcall(function()
 		AM:StopAllTracks():SetTracks(Pack):PlayTrack(`Idle`, 0.2)
 		for _, N in { `Idle`, `Walk` } do local T = AM.TrackTable[N] if T then T.Looped = true end end
 	end)
+	-- the pack's own Idle track is the Idle clip's cached one
+	IdleCache = {}
+	IdleFor = AM.Animator
+	local IdleId = Clips.Id(`Idle`)
+	if IdleId and AM.TrackTable.Idle then IdleCache[IdleId] = AM.TrackTable.Idle end
 	IdleSlot = `Idle`
 	local Want = Local.WantIdle()
 	if Want ~= IdleSlot then Local.SetIdle(Want) end
@@ -133,8 +183,11 @@ function Local.Restore()
 	On = false
 	IdleSlot = nil
 	Keeper = false
+	local Retry = RestoreFailed
+	RestoreFailed = false
+	Clips.Cancel() -- (soccer-2.0 final, spec §6) a running clip dash ends with the match
 	local AC = ac()
-	if not AC then return end
+	if not AC then RestoreFailed = true return end
 	AC.Override(nil)
 	local AM = AC.Controller
 	local Char = Player.Character
@@ -143,13 +196,22 @@ function Local.Restore()
 	local Hum = Char:FindFirstChildWhichIsA(`Humanoid`)
 	local W = Char:GetAttribute(`Weapon`)
 	local Pack = (Hum and Hum:GetAttribute(`Equip`) and W and ReplicatedStorage.Assets.Animations.Weapons:FindFirstChild(W)) or ReplicatedStorage.Assets.Animations.Default
-	pcall(function() AM:StopAllTracks():SetTracks(Pack.Movement):PlayTrack(`Idle`, 0.15) end)
+	local Ok, Err = pcall(function() AM:StopAllTracks():SetTracks(Pack.Movement):PlayTrack(`Idle`, 0.15) end)
+	-- the soccer idles SetTracks didn't take with it
+	local Cur = AM.TrackTable and AM.TrackTable.Idle
+	for _, T in IdleCache do if T ~= Cur then pcall(function() T:Stop(0) T:Destroy() end) end end
+	IdleCache = {}
+	IdleFor = nil
+	if not Ok then
+		RestoreFailed = true -- (soccer-2.0 final) the next Step tries again
+		if not Retry then warn(`[SoccerPack] Restore failed, retrying: {Err}`) end
+	end
 end
 
 function Local.Step()
 	local Want = Local.IsSoccer()
 	if Want and not On then Local.Apply()
-	elseif not Want and On then Local.Restore()
+	elseif not Want and (On or RestoreFailed) then Local.Restore()
 	elseif not Want then
 		-- a respawn can clear On before InSport goes: never leave the override set outside a match
 		local AC = ac()
@@ -175,6 +237,9 @@ function Shared.OnStart()
 		On = false
 		IdleSlot = nil
 		Keeper = false
+		RestoreFailed = false -- a new body starts on the default pack
+		IdleCache = {}
+		IdleFor = nil
 		local AC = ac()
 		if AC then AC.Override(nil) end -- the next Step turns the pack back on if the match goes on
 	end)

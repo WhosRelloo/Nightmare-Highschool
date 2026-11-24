@@ -8,8 +8,12 @@
 	Progress(Clip, t, t0, t1)          0..1 along the window's displacement by clip time t (clamped, never decreasing)
 	KickSlot(Speed, RunSpeed)          "KickRun" at or above RunSpeed, else "Kick"
 	DiveSlot(RightDot)                 "KeeperDiveRight" when the dive goes right (RightDot >= 0), else "KeeperDiveLeft"
+	KickMargin                         0.20: the Kick charge's Hold margin (every other clip keeps 0.10), a creep of about 0.1x
 	Spec: docs/superpowers/specs/2026-11-24-soccer-2-0-design.md §3-4. ]]
 local A = {}
+
+-- (soccer-2.0 final, the owner's ruling) the Kick (and KickRun) charge creeps from 0.20 before contact, so it moves
+A.KickMargin = 0.20
 
 export type Clip = { Length: number, ContactAt: number?, Loop: boolean?, Path: { { number } }? }
 

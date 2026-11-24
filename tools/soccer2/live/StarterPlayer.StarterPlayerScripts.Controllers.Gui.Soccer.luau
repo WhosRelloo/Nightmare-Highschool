@@ -273,13 +273,58 @@ local LENGTH = { Charge = 1.6; Shot = 0.5; Pass = 0.4; Swing = 0.35; Volley = 0.
 -- the fall by cause)
 local SLOT = { Charge = `Kick`; Shot = `Kick`; Pass = `Pass`; Swing = `Kick`; Volley = `Volley`; Header = `Header`; Dribble = `Dribble`; Feint = `Feint`; Tackle = `Tackle`; Dive = `KeeperDiveRight`; Throw = `KeeperThrow`; Celebrate = `Celebrate`; Fall = `Tackled` }
 local STOP_AFTER = { Celebrate = 3.4 }   -- long clips are cut to the moment
-local LEAD, MARGIN = 0.05, 0.10          -- the foot meets the ball LEAD s after the server's kick; a charge creeps from MARGIN before contact
+local LEAD, MARGIN = 0.05, 0.10          -- the foot meets the ball LEAD s after the server's kick; clips creep from MARGIN before contact
+local KICK_MARGIN = Anim.KickMargin      -- (soccer-2.0 final) the Kick charge creeps from 0.20 before contact (about 0.1x), never frozen
+local TACKLE_SLIDE = 0.35                -- the tackle's slide (the 1.1 dash time); the clip starts ContactAt - this
 local RUN_SPEED = 6                      -- a shot at this flat speed or more is the running shot
 local R6 = CFrame.Angles
 local rad = math.rad
 local Tracks = {} :: { [Model]: { [string]: AnimationTrack } }
+local Charging = {} :: { [Model]: { Tr: AnimationTrack, Id: number } }
+local Falls = {} :: { [Model]: number }   -- (soccer-2.0 final) a per-body fall token: a newer fall takes over
+-- (soccer-2.0 final) a one-shot's watch: once its move is over (Until), the clip lets go of the body when the player moves
+local Watch = setmetatable({}, { __mode = `k` }) :: { [AnimationTrack]: { Until: number } }
 
 local function smooth(x: number): number x = math.clamp(x, 0, 1) return x * x * (3 - 2 * x) end
+
+-- (soccer-2.0 final) is this body walking? MoveDirection; another player's body also by its ground speed (their
+-- MoveDirection is set on their own client)
+local function moving(Char: Model, Hum: Humanoid): boolean
+	if Hum.MoveDirection.Magnitude > 0.1 then return true end
+	if Char == Player.Character then return false end
+	local R = Char:FindFirstChild(`HumanoidRootPart`) :: BasePart?
+	local V = if R then R.AssemblyLinearVelocity else Vector3.zero
+	return Vector3.new(V.X, 0, V.Z).Magnitude > 2
+end
+
+-- (soccer-2.0 final) after After s (the move), stop the clip with a 0.2 s fade as soon as the body moves; standing still,
+-- it plays to its end. A replay of the track (or a newer watch) ends this one.
+function Local.LetGo(Char: Model, Tr: AnimationTrack, After: number)
+	local Hum = Char:FindFirstChildOfClass(`Humanoid`)
+	if not Hum then return end
+	local W = { Until = os.clock() + After }
+	Watch[Tr] = W
+	task.spawn(function()
+		while Watch[Tr] == W and Tr.IsPlaying and Char.Parent do
+			if os.clock() >= W.Until and moving(Char, Hum) then
+				Watch[Tr] = nil
+				Tr:Stop(0.2)
+				return
+			end
+			RunService.Heartbeat:Wait()
+		end
+		if Watch[Tr] == W then Watch[Tr] = nil end
+	end)
+end
+
+-- (soccer-2.0 final) a body's soccer state goes with it (respawns, players leaving)
+local function body(Char: Model)
+	if Tracks[Char] then return end
+	Tracks[Char] = {}
+	local function clear() Tracks[Char] = nil Charging[Char] = nil Falls[Char] = nil end
+	Char.Destroying:Once(clear)
+	Char.AncestryChanged:Connect(function() if not Char:IsDescendantOf(game) then clear() end end)
+end
 
 -- a filled slot plays its clip (the FIER clip, or the 1.1 one); returns the track, or nil for the procedural pose.
 -- Opts: Slot (instead of SLOT[Kind]), At (TimePosition), Speed.
@@ -290,7 +335,7 @@ function Local.Play(Char: Model, Kind: string, Opts: { Slot: string?, At: number
 	local Hum = Char:FindFirstChildOfClass(`Humanoid`)
 	local Animator = Hum and Hum:FindFirstChildOfClass(`Animator`)
 	if not Animator then return nil end
-	Tracks[Char] = Tracks[Char] or {}
+	body(Char)
 	local Key = Slot .. (if Fier then `` else `~`)
 	local Tr = Tracks[Char][Key]
 	if not Tr then
@@ -306,12 +351,17 @@ function Local.Play(Char: Model, Kind: string, Opts: { Slot: string?, At: number
 	end
 	-- one soccer clip at a time per body
 	for K, Other in Tracks[Char] do if K ~= Key and Other.IsPlaying then Other:Stop(0.08) end end
+	Watch[Tr] = nil
+	local Speed = (Opts and Opts.Speed) or 1
 	Tr:Play(0.08)
-	Tr.TimePosition = (Opts and Opts.At) or 0
-	Tr:AdjustSpeed(Opts and Opts.Speed or 1)
-	-- FIER clips play out; 1.1 clips are cut to the move; long clips are cut to the moment
+	-- (soccer-2.0 final) a clip still loading has Length 0 and would lose the jump: Seek makes it once it has loaded
+	Clips.Seek(Tr, (Opts and Opts.At) or 0, Speed)
+	Tr:AdjustSpeed(Speed)
+	-- FIER clips play to their end unless the player moves after the move is over (falls follow the stun, the charge
+	-- holds); 1.1 clips are cut to the move; long clips are cut to the moment
 	local Cut = STOP_AFTER[Kind] or (if Fier then nil else LENGTH[Kind])
-	if Cut then task.delay(Cut, function() if Tr.IsPlaying then Tr:Stop(0.2) end end) end
+	if Cut then task.delay(Cut, function() if Tr.IsPlaying then Tr:Stop(0.2) end end)
+	elseif not Tr.Looped and Kind ~= `Fall` and Kind ~= `Charge` then Local.LetGo(Char, Tr, LENGTH[Kind] or 0.5) end
 	return Tr
 end
 
@@ -329,8 +379,7 @@ function Local.Data(Slot: string): any?
 	return if Fier then Clips.Clip(Slot) else nil
 end
 
--- (soccer-2.0) the charge: 1x to MARGIN before contact, then a creep that reaches the kick point at MaxHold
-local Charging = {} :: { [Model]: { Tr: AnimationTrack, Id: number } }
+-- (soccer-2.0) the charge: 1x to KICK_MARGIN before contact, then a creep that reaches the kick point at MaxHold
 local ChargeId = 0
 function Local.Charge(Char: Model?)
 	if not Char then return end
@@ -340,7 +389,7 @@ function Local.Charge(Char: Model?)
 	ChargeId += 1
 	local Mine = { Tr = Tr, Id = ChargeId }
 	Charging[Char] = Mine
-	local HoldAt, Creep = Anim.Hold(C, LEAD, MARGIN, T.Kick.MaxHold)
+	local HoldAt, Creep = Anim.Hold(C, LEAD, KICK_MARGIN, T.Kick.MaxHold)
 	task.spawn(function()
 		local T0 = os.clock()
 		while Tr.IsPlaying and Charging[Char] == Mine and Tr.TimePosition < HoldAt and os.clock() - T0 < 2 do RunService.Heartbeat:Wait() end
@@ -369,6 +418,7 @@ function Local.Kick(Char: Model?, Kind: string)
 	if At and Held and Held.IsPlaying and Slot == `Kick` then
 		Held.TimePosition = math.max(Held.TimePosition, At)
 		Held:AdjustSpeed(1)
+		Local.LetGo(Char, Held, LENGTH[Kind] or 0.5)
 		return
 	end
 	Local.Pose(Char, Kind, nil, { Slot = Slot; At = At })
@@ -382,6 +432,8 @@ function Local.Move(Char: Model?, Kind: string, Slot: string, Side: number?, Me:
 	local Tr = Local.Pose(Char, Kind, Side, { Slot = Slot })
 	if Tr and C and C.Path then
 		local Rate, DashTime, t0, t1 = Clips.Drive(Tr, C, Time, 2)
+		local W = Watch[Tr]
+		if W then W.Until = os.clock() + DashTime end -- the move is over at the dash's end
 		local R = if Me then Local.Root() else nil
 		if R then Clips.DashPath(R, Tr, C, Dir, Dist, Rate, t0, t1, DashTime) end
 	elseif Me then
@@ -394,17 +446,21 @@ function Local.Fall(Char: Model?, Slot: string, Side: number?)
 	if not Char then return end
 	local Tr = Local.Pose(Char, `Fall`, Side, { Slot = Slot })
 	if not (Tr and Local.Data(Slot)) then return end
+	-- (soccer-2.0 final) this fall's token: a newer fall on the body takes over, and this loop exits without Fallen Idle
+	local Mine = (Falls[Char] or 0) + 1
+	Falls[Char] = Mine
 	local function stunned(): boolean return (Char:GetAttribute(`SportStun`) or 0) > workspace:GetServerTimeNow() end
+	local function current(): boolean return Falls[Char] == Mine end
 	task.spawn(function()
 		local T0 = os.clock()
 		task.wait(0.6) -- a fall always reads, even on a short stun
-		while Char.Parent and Tr.IsPlaying and stunned() and os.clock() - T0 < 6 do RunService.Heartbeat:Wait() end
-		if not Char.Parent then return end
+		while current() and Char.Parent and Tr.IsPlaying and stunned() and os.clock() - T0 < 6 do RunService.Heartbeat:Wait() end
+		if not (current() and Char.Parent) then return end
 		if Tr.IsPlaying then Tr:Stop(0.25) return end
 		if not stunned() then return end
 		local Lie = Local.Play(Char, `Fall`, { Slot = `Fallen` })
-		while Lie and Char.Parent and stunned() and os.clock() - T0 < 6 do RunService.Heartbeat:Wait() end
-		if Lie and Lie.IsPlaying then Lie:Stop(0.3) end
+		while Lie and current() and Char.Parent and stunned() and os.clock() - T0 < 6 do RunService.Heartbeat:Wait() end
+		if Lie and Lie.IsPlaying and current() then Lie:Stop(0.3) end
 	end)
 end
 
@@ -704,8 +760,10 @@ function Local.OnFx(Kind: string, D)
 		Local.Move(Char, `Dribble`, `Dribble`, math.random() < 0.5 and 1 or -1, Me, D.Dir, T.Dribble.Dash * 0.5, T.Dribble.Time)
 	elseif Kind == `S_Feint` then Local.Pose(Char, `Feint`, -1)
 	elseif Kind == `S_Tackle` then
-		Local.Pose(Char, `Tackle`)
-		if Me then Local.Dash(D.Dir, T.Tackle.Dash, 0.35) end
+		-- (soccer-2.0 final) the clip starts at ContactAt - the slide, so its low point lands at the slide's end
+		local C = Local.Data(`Tackle`)
+		Local.Pose(Char, `Tackle`, nil, { At = if C and C.ContactAt then math.max(0, C.ContactAt - TACKLE_SLIDE) else nil })
+		if Me then Local.Dash(D.Dir, T.Tackle.Dash, TACKLE_SLIDE) end
 	elseif Kind == `S_Dive` then
 		local R = Char and Char:FindFirstChild(`HumanoidRootPart`) :: BasePart?
 		local Dot = if R and typeof(D.Dir) == `Vector3` then R.CFrame.RightVector:Dot(D.Dir) else 1

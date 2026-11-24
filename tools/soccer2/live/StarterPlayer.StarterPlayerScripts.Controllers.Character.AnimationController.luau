@@ -82,7 +82,8 @@ end
 Shared.Rate = rate
 function Shared.Override(O)
 	Over = O
-	if Shared.Controller.Animator then Local.LoadDirectional(Shared.Controller) end
+	-- (soccer-2.0 final) the old directional tracks fade out (no pop at the keeper's box edge)
+	if Shared.Controller.Animator then Local.LoadDirectional(Shared.Controller, 0.2) end
 end
 function Shared.Overridden(): boolean return Over ~= nil end
 
@@ -499,8 +500,17 @@ local function strafeId(Square: string, Studio: string, Original: string): strin
 	return if O and O ~= 0 then `rbxassetid://{O}` else nil
 end
 
-function Local.LoadDirectional(self)
-	for K, T in Directional do pcall(function() T:Stop(0) T:Destroy() end) Directional[K] = nil end
+function Local.LoadDirectional(self, Fade: number?)
+	for K, T in Directional do
+		if Fade and T.IsPlaying then
+			-- (soccer-2.0 final) an Override swap: the playing track fades, then goes
+			pcall(function() T:Stop(Fade) end)
+			task.delay(Fade + 0.05, function() pcall(function() T:Destroy() end) end)
+		else
+			pcall(function() T:Stop(0) T:Destroy() end)
+		end
+		Directional[K] = nil
+	end
 	if not self.Animator then return end
 	for Side, Keys in { Left = { `StrafeLeftSquare`, `StrafeLeft`, `StrafeLeft` }, Right = { `StrafeRightSquare`, `StrafeRight`, `StrafeRight` } } do
 		local Id = (Over and Over[Side]) or strafeId(Keys[1], Keys[2], Keys[3])
@@ -611,7 +621,8 @@ function Local.Directional(self, Character: Model, Humanoid: Humanoid)
 				T:AdjustWeight(Wt, 0.1)
 				T:AdjustSpeed(rate(Ground, if Side == `Back` then `Back` else `Strafe{Side}`))
 				-- phase-lock the strafe's left-foot contact to the walk's (forward diagonals only; the backpedal is reversed)
-				if Side ~= `Back` and Sign > 0 and WalkW > 0.05 and T.Length > 0 and Walk.Length > 0 then
+				-- (soccer-2.0 final) not while an override supplies its own strafes (Default's ContactPhase isn't theirs)
+				if Side ~= `Back` and Sign > 0 and WalkW > 0.05 and T.Length > 0 and Walk.Length > 0 and not (Over and (Over.Left or Over.Right)) then
 					T.TimePosition = Loco.Phase(Walk.TimePosition, Walk.Length, T.Length, LocoCfg.ContactPhase.Walk, LocoCfg.ContactPhase[`Strafe{Side}`] or LocoCfg.ContactPhase.Strafe)
 				end
 			elseif T.IsPlaying then

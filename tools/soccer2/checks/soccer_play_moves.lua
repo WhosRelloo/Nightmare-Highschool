@@ -1,5 +1,8 @@
 -- soccer_play_moves (soccer-2.0 Task 4, Client, Play, during a solo match from soccer_match_start.lua): the charge,
 -- kick, dribble, dive and fall clips through the real Fx handler (Controllers.Gui.Soccer FxForTests).
+-- Final-review round: A (a one-shot lets go once the player moves after the move; standing still it plays out),
+-- B (the Tackle starts at ContactAt - 0.35), C (the Kick charge's creep moves). Moves the player with Humanoid:Move
+-- written after the ControlModule (as tools/phase6-strafes/checks/strafecheck.lua does).
 local Players = game:GetService("Players")
 local RS = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -20,10 +23,15 @@ local function flat(V) return Vector3.new(V.X, 0, V.Z) end
 local Centre = workspace.Sports.Pitch:GetBoundingBox().Position
 local function toCentre() local D = flat(Centre - Root.Position) return if D.Magnitude > 1 then D.Unit else flat(Root.CFrame.LookVector).Unit end
 local function face(Look) Root.CFrame = CFrame.lookAt(Root.Position, Root.Position + Look) end
+local Hum = Char:FindFirstChildOfClass("Humanoid")
+local MoveDir = Vector3.zero
+RunService:BindToRenderStep("NHSoccerMovesTestMove", Enum.RenderPriority.Input.Value + 1, function() if MoveDir.Magnitude > 0 then Hum:Move(MoveDir, false) end end)
+local MoveConn = RunService.PreSimulation:Connect(function() if MoveDir.Magnitude > 0 then Hum:Move(MoveDir, false) end end)
+local function cleanup() MoveDir = Vector3.zero pcall(function() RunService:UnbindFromRenderStep("NHSoccerMovesTestMove") end) MoveConn:Disconnect() Hum:Move(Vector3.zero, false) end
 -- 1. the charge creeps, then the kick lands Lead before contact
 local Kick = Clips.Clip("Kick")
-if not Kick then return "FAIL no clip data for Kick" end
-local HoldAt, Creep = Anim.Hold(Kick, 0.05, 0.10, T.Kick.MaxHold)
+if not Kick then cleanup() return "FAIL no clip data for Kick" end
+local HoldAt, Creep = Anim.Hold(Kick, 0.05, Anim.KickMargin, T.Kick.MaxHold)
 Soccer.FxForTests("S_Charge", { Player = P })
 task.wait(0.05)
 local Tr = track("Kick")
@@ -34,12 +42,23 @@ else
 	while Tr.TimePosition < HoldAt and os.clock() - T0 < 1 do RunService.Heartbeat:Wait() end
 	task.wait(0.1)
 	Near(Tr.Speed, Creep, "charge creep speed", 1e-3)
+	-- C: the creep moves: at least 0.05 s of clip over 0.8 s
+	local A0 = Tr.TimePosition
+	task.wait(0.8)
+	local Rise = Tr.TimePosition - A0
+	if not (Tr.IsPlaying and Rise >= 0.05) then table.insert(Fails, string.format("C: the charge rose %.3f s of clip over 0.8 s (want >= 0.05, playing %s)", Rise, tostring(Tr.IsPlaying))) end
 	if Tr.TimePosition > Anim.StartAt(Kick, 0.05) + 1e-3 then table.insert(Fails, "the charge crept past the kick point") end
 end
 Soccer.FxForTests("S_Kick", { Player = P; Kind = "Shot"; Power = 0.5 })
 Tr = track("Kick")
 if Tr then Near(Tr.TimePosition, Anim.StartAt(Kick, 0.05), "kick start", 0.02) Near(Tr.Speed, 1, "kick speed", 1e-3) end
-task.wait(0.8)
+-- A: standing still, the kick plays to its end
+if Tr then
+	local Most, K0 = Tr.TimePosition, os.clock()
+	while Tr.IsPlaying and os.clock() - K0 < 1.5 do Most = math.max(Most, Tr.TimePosition) RunService.Heartbeat:Wait() end
+	if Most < Tr.Length - 0.06 then table.insert(Fails, string.format("A: standing still, the kick stopped at %.3f of %.3f", Most, Tr.Length)) end
+end
+task.wait(0.2)
 stopAll()
 -- 2. the dribble: 11 studs (1.1), the Spin clip through its window at the fitted rate
 local Spin = Clips.Clip("Dribble")
@@ -65,6 +84,32 @@ local _, DT = Anim.Fit(Clips.Clip("KeeperDiveRight"), T.Keeper.DiveTime, 2)
 task.wait(DT + 0.4)
 local Want = T.Keeper.DiveDash * T.Keeper.DiveTime
 Near(flat(Root.Position - From).Magnitude, Want, "dive distance", Want * 0.1)
+-- A: the dive's move is over: walking lets the clip go (stopped or fading) within 0.5 s
+if DR and DR.IsPlaying then
+	MoveDir = flat(Root.CFrame.LookVector).Unit
+	local M0, Let = os.clock(), false
+	while os.clock() - M0 < 0.5 do
+		RunService.Heartbeat:Wait()
+		if not DR.IsPlaying or DR.WeightTarget < 0.5 then Let = true break end
+	end
+	MoveDir = Vector3.zero
+	if not Let then table.insert(Fails, "A: the dive clip still holds the body 0.5 s into a walk") end
+else
+	table.insert(Fails, "A: the dive clip ended before the walk (nothing to let go)")
+end
+task.wait(0.3)
+stopAll()
+-- B: the Tackle starts at ContactAt - 0.35
+local TC = Clips.Clip("Tackle")
+face(toCentre()) task.wait(0.2)
+Soccer.FxForTests("S_Tackle", { Player = P; Dir = flat(Root.CFrame.LookVector).Unit })
+local TT = track("Tackle")
+if not (TT and TT.IsPlaying) then table.insert(Fails, "B: no Tackle track playing")
+else
+	if TT.TimePosition < 0.15 then table.insert(Fails, string.format("B: the Tackle starts at %.3f (want >= 0.15)", TT.TimePosition)) end
+	if TC and TC.ContactAt then Near(TT.TimePosition, TC.ContactAt - 0.35, "B: tackle start", 0.03) end
+end
+task.wait(0.8)
 stopAll()
 -- 4. a fall follows the stun (a client-side stand-in for the server's SportStun)
 Char:SetAttribute("SportStun", workspace:GetServerTimeNow() + 1.2)
@@ -76,5 +121,6 @@ task.wait(2.2)
 for K, Tr2 in Soccer.TracksForTests(Char) do if Tr2.IsPlaying then table.insert(Fails, "still playing after the stun: " .. K) end end
 Char:SetAttribute("SportStun", nil)
 stopAll()
+cleanup()
 if #Fails > 0 then return "FAIL soccer_play_moves\n" .. table.concat(Fails, "\n") end
 return "PASS soccer_play_moves"
