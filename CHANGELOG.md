@@ -6,7 +6,7 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 Work on branches that aren't merged into `main` yet. Nothing here is in NH Combat Test unless it says so.
 
-### `soccer-2`: Soccer 2.0, the FIER clips (installed in NH Combat Test, place not saved, not merged)
+### `soccer-2`: Soccer 2.0, the FIER clips (merged into `main` 2026-11-24, installed in NH Combat Test, place not saved)
 - **24 FIER soccer clips** baked into `ReplicatedStorage.NHSoccerClips` (travel removed, Contact markers, a right-foot
   kick), with generated timing data in `Config.SoccerClips`.
 - **Kicks meet the ball** 0.05 s after the server's kick; a charged shot creeps through its wind-up.
