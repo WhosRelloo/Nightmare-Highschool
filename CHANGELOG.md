@@ -15,6 +15,7 @@ Work on branches that aren't merged into `main` yet. Nothing here is in NH Comba
 - **In a soccer match** the FIER jog and idles replace the default walk and idle (Jog Backward for the backpedal,
   the keeper's side steps for strafes); sprint keeps the game's run.
 - Studio plays the clips through temporary ids until the owner publishes them (`tools/soccer2/PUBLISH_LIST.md`).
+- **Polish (`soccer-2-polish`):** a remote dive's clip is released 0.3 s later (the mover's dash reaches other clients late); a body that streams out drops its connections and destroys its cached tracks; a clip that never loads warns once and runs the plain 1.1 dash; a replayed clip's older Seek is retired (per-track token); a failing pack Restore retries at 1 s, 2 s, 4 s; the unused `MARGIN` constant is gone.
 
 ### `admin-console-1b`: the staff console, phase 1b (merged into `main` 2026-11-24, installed in NH Combat Test, place not saved)
 Docs: `docs/Admin-Panel.md`. Spec: `docs/superpowers/specs/2026-11-23-admin-console-1b-design.md`. Plan:

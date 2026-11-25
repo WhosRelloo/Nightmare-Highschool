@@ -5,7 +5,8 @@
 		                          fier = the FIER clip plays (its timing data applies)
 		Clip(Slot) -> data?       the slot's Config.SoccerClips.Clips entry
 		Drive(Track, Clip, DashTime, Cap) -> (Rate, Time, t0, t1)   the clip through its travel window at the fitted rate
-		DashPath(Root, Track, Clip, Dir, Dist, Rate, t0, t1, Time)  the mover's dash: Dist studs along Dir on the clip's curve
+		DashPath(Root, Track, Clip, Dir, Dist, Rate, t0, t1, Time, Slot?)  the mover's dash: Dist studs along Dir on the clip's curve
+		                          (a clip that never loads: warns once and runs the plain 1.1 dash, Dist / Time over Time)
 		Cancel()                  stops a running DashPath (a new dash takes over)
 		Seek(Track, At, Speed)    TimePosition = At now, or once a loading clip has a Length (At + the time since, x Speed)
 	Spec: docs/superpowers/specs/2026-11-24-soccer-2-0-design.md §2, §4.
@@ -22,6 +23,8 @@ local Data = nil :: any
 local Temp = {} :: { [string]: string }
 local Warned = {} :: { [string]: boolean }
 local Token = 0
+local Seeks = setmetatable({}, { __mode = `k` }) :: { [AnimationTrack]: number }   -- (polish) a track's newest Seek
+local TestId = nil :: { [string]: string }?   -- (polish) Studio checks: a slot's id swapped for a bogus one
 
 function M.Data(): any?
 	if Data == nil then
@@ -40,6 +43,7 @@ function M.Clip(Slot: string): any?
 end
 
 function M.Id(Slot: string): (string?, boolean)
+	if TestId and TestId[Slot] then return TestId[Slot], true end   -- (polish) Studio checks
 	local E = Config.SoccerAnims[Slot]
 	if type(E) == `number` then return `rbxassetid://{E}`, false end
 	if type(E) ~= `table` then return nil, false end
@@ -67,11 +71,15 @@ end
 -- (soccer-2.0 final) a published clip that hasn't loaded has Length 0, and a TimePosition set then is lost: wait for the
 -- Length (up to 1 s) and jump to where the clip would be by now
 function M.Seek(Track: AnimationTrack, At: number, Speed: number?)
+	-- (polish) a per-track token: a newer Seek (a replay inside the first, loading second) retires an older waiting one
+	local Mine = (Seeks[Track] or 0) + 1
+	Seeks[Track] = Mine
 	if Track.Length > 0 then Track.TimePosition = At return end
 	if At <= 0 then return end
 	local T0 = os.clock()
 	task.spawn(function()
-		while Track.Length <= 0 and os.clock() - T0 < 1 do RunService.Heartbeat:Wait() end
+		while Track.Length <= 0 and os.clock() - T0 < 1 and Seeks[Track] == Mine do RunService.Heartbeat:Wait() end
+		if Seeks[Track] ~= Mine then return end
 		if Track.Length > 0 and Track.IsPlaying then
 			Track.TimePosition = math.min(At + (os.clock() - T0) * (Speed or 1), Track.Length)
 		end
@@ -94,7 +102,15 @@ end
 
 function M.Cancel() Token += 1 end
 
-function M.DashPath(Root: BasePart, Track: AnimationTrack, Clip: any, Dir: Vector3?, Dist: number, Rate: number, t0: number, t1: number, Time: number)
+-- (polish) Studio checks: swap a slot's id (nil puts it back); a bogus id is a clip that never loads
+function M.TestId(Slot: string, Id: string?)
+	if not RunService:IsStudio() then return end
+	TestId = TestId or {}
+	TestId[Slot] = Id
+	if next(TestId) == nil then TestId = nil end
+end
+
+function M.DashPath(Root: BasePart, Track: AnimationTrack, Clip: any, Dir: Vector3?, Dist: number, Rate: number, t0: number, t1: number, Time: number, Slot: string?)
 	Token += 1
 	local Mine = Token
 	local D = if typeof(Dir) == `Vector3` then Vector3.new(Dir.X, 0, Dir.Z) else Vector3.zero
@@ -110,14 +126,27 @@ function M.DashPath(Root: BasePart, Track: AnimationTrack, Clip: any, Dir: Vecto
 	LV.Parent = Root
 	local L0 = os.clock()
 	local T0 = L0
+	local Plain = nil :: number?   -- (polish) the clip never loaded: when the plain 1.1 dash began
 	local Conn: RBXScriptConnection? = nil
 	local function finish() if Conn then Conn:Disconnect() end LV:Destroy() Att:Destroy() end
 	Conn = RunService.Heartbeat:Connect(function(dt: number)
 		local Ok, Err = pcall(function()
-			if Mine ~= Token or not Track.IsPlaying or not Root.Parent then finish() return end
+			if Mine ~= Token or not Root.Parent or not (Plain or Track.IsPlaying) then finish() return end
 			-- (soccer-2.0 final) a clip still loading: hold still (up to 1 s), and the dash's time starts once it has loaded
+			if Plain then
+				-- (polish) the 1.1 dash (Gui.Soccer Local.Dash): Dist studs at Dist / Time over Time, flat along Dir
+				if os.clock() - Plain >= Time then finish() return end
+				LV.PlaneVelocity = Vector2.new(D.X, D.Z) * (Dist / Time)
+				return
+			end
 			if Track.Length <= 0 then
-				if os.clock() - L0 > 1 then finish() return end
+				if os.clock() - L0 > 1 then
+					Plain = os.clock()
+					local Key = `never:{Slot or Track.Name}`
+					if not Warned[Key] then Warned[Key] = true warn(`[Soccer clips] {Slot or Track.Name} never loaded; plain dash`) end
+					LV.PlaneVelocity = Vector2.new(D.X, D.Z) * (Dist / Time)
+					return
+				end
 				T0 = os.clock()
 				LV.PlaneVelocity = Vector2.zero
 				return
