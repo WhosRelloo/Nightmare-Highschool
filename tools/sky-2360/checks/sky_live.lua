@@ -18,7 +18,11 @@ local function with(Attrs, Fn)
 	for K in Attrs do P:SetAttribute(K, nil) end
 	if not Ok_ then table.insert(Fails, "error: " .. tostring(E)) end
 end
--- moons at 23:00 (NightWeight 1)
+-- moons at 23:00 (NightWeight 1). The base has no moon: tonight's real phase (workspace NHMoonPhase) is pinned to Waxing on
+-- this client for the whole check (restored at the end), or a real full or new moon would already be in the base and would
+-- override the season night skies
+local RealPhase = workspace:GetAttribute("NHMoonPhase")
+workspace:SetAttribute("NHMoonPhase", "Waxing")
 local Base = DC.LookAt(23)
 table.insert(Notes, ("night base: Brightness %.2f Exposure %.2f Ambient %s"):format(Base.Brightness, Base.ExposureCompensation, rgb(Base.Ambient)))
 with({ NHMoonPhasePreview = "Full" }, function()
@@ -84,6 +88,7 @@ Ok(#Pre >= 1 and #Pre <= 3, "preloaded " .. table.concat(Pre, ","))
 local I = SM.Info()
 table.insert(Notes, ("hour %.2f set %s preloaded %s | motion tier %s beams %d weight %.2f wind %s"):format(Hour, tostring(Set), table.concat(Pre, ","), I.Tier, I.Beams, I.Weight, tostring(I.Wind)))
 Ok(I.Active and I.Wind.Magnitude > 0, "wind set")
+workspace:SetAttribute("NHMoonPhase", RealPhase)
 script:SetAttribute("Out", (#Fails == 0 and "PASS sky_live" or ("FAIL\n" .. table.concat(Fails, "\n"))) .. "\n" .. table.concat(Notes, "\n"))
 ]==]
 S.Parent = P.PlayerGui
