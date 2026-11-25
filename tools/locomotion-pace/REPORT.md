@@ -60,10 +60,9 @@ sprint at 2.29×. A stun during the run reset the walk to 10 (8 under the combat
 at about 2.4×).
 
 ## Open
-- **A fresh spawn at 10 isn't checked in Play yet.** The template Humanoids held 14.4 and overrode
-  `CharacterWalkSpeed`: `StarterPlayer.StarterCharacter.Humanoid` (players spawned at 14.4 until the first sprint or state
-  reset) and `ServerScriptService.Services.AI.AI.Rig.Humanoid`. Both are set to 10 in Edit (2026-11-23, after the round).
-  The Studio MCP's start/stop was stuck ("Start play hasn't finished yet") for the rest of the session.
+- **A fresh spawn at 10: checked in Play (2026-11-24).** `tools/locomotion-pace/checks/spawn10.lua` (Server): `PASS spawn10 |
+  StarterPlayer.CharacterWalkSpeed 10; StarterCharacter.Humanoid 10; AI Rig.Humanoid 10; fresh spawn WalkSpeed 10`. The
+  template Humanoids had held 14.4 and overrode `CharacterWalkSpeed` until they were set to 10 in Edit on 2026-11-23.
 - **Owner eye:** whether the new pace looks right in motion, above all on short bodies, which step at about 2× to keep
   their feet planted.
 - **Not saved:** the place needs the owner's word to save.

@@ -112,9 +112,15 @@ Screenshots: `docs/img/sky-2360/studio/` ([sheet](docs/img/sky-2360/studio/sheet
 - Screenshots at 06:00, 12:00, 18:30, 23:00 (full, new, crimson, blue), Winter noon, Nightmare Nights 23:00 and the storm.
 - Storm flashes: `NHStormFlash` peaked at 0.12 brightness.
 - Wisps at High: 3 beams at full night weight; faint streaks in the sky ([shot](docs/img/sky-2360/studio/2300-wisps-high.jpg)).
-- **Not checked:** the Performance Simulator at Q1/Q4/Q10/Q21, a phone RAM tier, a console profile; 02:00 on every moon; Spring and
-  Summer on screen; the Wickfield hometown; client memory with the events off; the sky-turn seam check (so `SkyTurn` stays off);
-  Night Sight against the brighter base; a real night with `NHMoonEventTonight` set by the server.
+- **Checked later in Play (2026-11-24, `tools/sky-2360/checks/sky_open.lua`, `PASS sky_open`):** 02:00 on every moon (the
+  same sky as 23:00, at 0.83 of its brightness on every moon: Waxing 1.00, Full 1.25, New 0.40, Crimson 1.00, Blue 1.00);
+  the Spring and Summer skies at 06:00, 12:00, 18:30 and 23:00 all have faces (Spring 6 Dawn, 12 SpringDay, 18.5 SpringDusk;
+  Summer 6 Dawn, 12 SummerDay, 18.5 still SummerDay); and a Crimson night set by the server (`NHMoonEventTonight`, through
+  `sky_event_on.lua` / `sky_event_off.lua`) reaches the client: Moon Crimson, 23:00 sky NightCrimson. `sky_live.lua` now pins
+  the client's moon to Waxing for the whole check, since a real full or new moon changed its base and season skies.
+- **Not checked:** the Performance Simulator at Q1/Q4/Q10/Q21, a phone RAM tier, a console profile; Spring and Summer on
+  screen (checked by numbers only); the Wickfield hometown; client memory with the events off; the sky-turn seam check (so
+  `SkyTurn` stays off); Night Sight against the brighter base.
 - **For the owner's eye:** the crimson-moon and Nightmare nights wash the scene red, so the crimson uniform blends in; the wisps
   are very subtle; the storm darkens only the sky (the ground keeps the hour's light).
 
