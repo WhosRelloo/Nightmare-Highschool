@@ -22,6 +22,7 @@ local Running = setmetatable({}, { __mode = "k" }) :: { [Instance]: Tween }
 local Candles = {} :: { [ImageLabel]: { Size: UDim2, T: number, Phase: number, Holder: GuiObject? } }
 local Glints = {} :: { [Instance]: { Prop: string, A: Color3, B: Color3, Phase: number, Holder: GuiObject? } }
 local Opening = setmetatable({}, { __mode = "k" }) :: { [GuiObject]: number }
+local Tokens = setmetatable({}, { __mode = "k" }) :: { [Instance]: number } -- newest delayed call per Fill / SmokeIn
 local Beat: RBXScriptConnection? = nil
 
 function Motion.Reduced(): boolean
@@ -67,11 +68,18 @@ function Motion.SmokeIn(Label: TextLabel, Delay: number?)
 	if Motion.Reduced() then
 		return
 	end
-	local T0, S0, P0 = Label.TextTransparency, Label.TextStrokeTransparency, Label.Position
-	Label.TextTransparency, Label.TextStrokeTransparency = 1, 1
-	Label.Position = P0 + UDim2.fromOffset(-8, 0)
+	-- How it was built is read once: a second call mid-drift must not take a half-faded state as the target.
+	if Label:GetAttribute("NHSmokePos") == nil then
+		Label:SetAttribute("NHSmokeT", Label.TextTransparency)
+		Label:SetAttribute("NHSmokeS", Label.TextStrokeTransparency)
+		Label:SetAttribute("NHSmokePos", Label.Position)
+	end
+	local T0, S0, P0 = Label:GetAttribute("NHSmokeT") :: number, Label:GetAttribute("NHSmokeS") :: number, Label:GetAttribute("NHSmokePos") :: UDim2
+	local Mine = (Tokens[Label] or 0) + 1
+	Tokens[Label] = Mine
+	settle(Label, { TextTransparency = 1, TextStrokeTransparency = 1, Position = P0 + UDim2.fromOffset(-8, 0) })
 	local function go()
-		if Label.Parent then
+		if Label.Parent and Tokens[Label] == Mine then
 			Motion.Play(Label, 0.35, { TextTransparency = T0, TextStrokeTransparency = S0, Position = P0 })
 		end
 	end
@@ -183,13 +191,56 @@ end
 
 ---| Panels |---
 
+-- Kit.FadeOut records a subtree's current transparency as its base once, and Kit.FadeIn returns to that base. So the
+-- bases are recorded first, while the subtree is at how it was built, before any helper here changes a transparency.
+local function remember(Root: GuiObject)
+	local Rem = (Kit :: any)._rememberBase
+	if not Rem then
+		return
+	end
+	Rem(Root)
+	for _, D in Root:GetDescendants() do
+		Rem(D)
+	end
+end
+
+-- Drives every remembered transparency to 1 at once. A zero-length tween replaces any tween running on the property
+-- (a plain assignment would be undone by it), so this also cancels an unfinished Kit.FadeIn.
+local function hide(Root: GuiObject)
+	remember(Root)
+	local Zero = TweenInfo.new(0)
+	local function one(D: Instance)
+		if D:GetAttribute("NHBaseT") == nil then
+			return
+		end
+		local Goal: { [string]: any } = {}
+		if D:IsA("TextLabel") or D:IsA("TextButton") then
+			Goal.TextTransparency, Goal.TextStrokeTransparency = 1, 1
+		elseif D:IsA("ImageLabel") then
+			Goal.ImageTransparency = 1
+		elseif D:IsA("UIStroke") then
+			Goal.Transparency = 1
+		end
+		if D:IsA("GuiObject") then
+			Goal.BackgroundTransparency = 1
+		end
+		if next(Goal) then
+			TweenService:Create(D, Zero, Goal):Play()
+		end
+	end
+	one(Root)
+	for _, D in Root:GetDescendants() do
+		one(D)
+	end
+end
+
 -- Sections fade up one after another (Step apart). They sit in list layouts, so they don't move.
 function Motion.Rise(Items: { GuiObject }, Step: number?)
 	if Motion.Reduced() then
 		return
 	end
 	for I, Item in Items do
-		Kit.FadeOut(Item, 0.01)
+		hide(Item)
 		task.delay(0.05 + (I - 1) * (Step or 0.15), function()
 			if Item.Parent then
 				Kit.FadeIn(Item, 0.4)
@@ -204,10 +255,15 @@ function Motion.Fill(Bar: GuiObject, Delay: number?)
 	if not Fill or Motion.Reduced() then
 		return
 	end
-	local Target = Fill.Size
-	Fill.Size = UDim2.new(0, 0, Target.Y.Scale, Target.Y.Offset)
+	if Fill:GetAttribute("NHFillTarget") == nil then
+		Fill:SetAttribute("NHFillTarget", Fill.Size) -- read once: a second call mid-fill must not take a part-filled size
+	end
+	local Target = Fill:GetAttribute("NHFillTarget") :: UDim2
+	local Mine = (Tokens[Fill] or 0) + 1
+	Tokens[Fill] = Mine
+	settle(Fill, { Size = UDim2.new(0, 0, Target.Y.Scale, Target.Y.Offset) })
 	task.delay(Delay or 0, function()
-		if Fill.Parent then
+		if Fill.Parent and Tokens[Fill] == Mine then
 			Motion.Play(Fill, 1.1, { Size = Target }, Enum.EasingStyle.Quart)
 		end
 	end)
@@ -259,6 +315,7 @@ function Motion.Open(Panel: GuiObject)
 		end
 		return
 	end
+	hide(Panel)
 	S.Scale = 0.985
 	Panel.Position = Base + UDim2.fromOffset(0, 10)
 	Motion.Play(S, 0.3, { Scale = 1 })
@@ -274,6 +331,7 @@ function Motion.Close(Panel: GuiObject)
 		Panel.Visible = false
 		return
 	end
+	remember(Panel)
 	Motion.Play(scaler(Panel), 0.2, { Scale = 0.985 })
 	Kit.FadeOut(Panel, 0.2)
 	task.delay(0.22, function()
