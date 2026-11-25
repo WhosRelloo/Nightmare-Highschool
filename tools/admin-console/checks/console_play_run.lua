@@ -50,6 +50,20 @@ end
 local KEYS = { "Appearance", "Identity", "Lineage", "Progress", "Regions", "Sports", "Social", "Attendance", "Classes", "Inventory", "Armory", "Training" }
 local Prof0 = Data.GetProfile(P)
 if not Prof0 then return "FAIL no profile loaded (run this with run_live.py)" end
+-- (flaky fix) settle before the snapshot. Slot 2 entered mid-class has a live class tracker: ClassRoom / ClassInRoom set and
+-- Attendance.InProgress open. The run moves the clock to 12:30, and the tracker (Attendance.UpdatePlayer, every tick) then
+-- legitimately finalizes that record (Attendance, report card / Social, Discipline) and clears the two attributes, so a
+-- snapshot taken mid-class can never match, and putting Attendance back re-opens the record for the tracker to close again.
+-- So: go to 12:30 today, drop the unfinished record the way a suspension does (no penalty), and wait for the attributes to clear.
+do
+	local At = Prof0.Attendance
+	Clock.SetTime("12:30", Clock.GetState().Day)
+	if typeof(At) == "table" then At.InProgress = false end
+	local tS = os.clock()
+	repeat task.wait(0.25) until (P:GetAttribute("ClassRoom") == nil and P:GetAttribute("ClassInRoom") == nil) or os.clock() - tS > 10
+	task.wait(0.5) -- a tick that was already past its check
+	if typeof(At) == "table" then At.InProgress = false end
+end
 local Saved = {}
 for _, K in KEYS do Saved[K] = deep(Prof0[K]) end
 local Attr0 = P:GetAttributes()
