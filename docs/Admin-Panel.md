@@ -37,7 +37,8 @@ Server cards come from `Features.Admin.Meta` (one entry per command); client car
   discipline, Lift suspension, Excuse today, Owe detention, Clear detention. Start a lesson offers only rooms with a
   timetabled subject (R102-R105), and a refusal says why (no class right now, already in a lesson, not enrolled, not in the room).
   Phase 2 adds the Bell Tower cards here: Set Heat, Set Bells, Give a summons, Clear notoriety (danger), Hall monitors
-  (danger, on or off) and Who's Wanted.
+  (danger, on or off) and Who's Wanted. Set Heat 0 and Set Bells 0 clear the Bells but keep owed summons; only Clear
+  notoriety drops those. Set Bells puts Heat at the middle of that bell (17.5, 35, 57.5, 80, 100).
 - **Story (10):** Start a quest, Drop a quest (both pick from the quest list; race rites are listed but owner-only),
   Reset quests (danger); phase 2 adds Play a cutscene (Replay on saves nothing), Cutscene seen, Tutorial: enter,
   Tutorial: jump to (Garden, Fence, Bus), Tutorial: leave, Give a clue and Reset a case (danger).
