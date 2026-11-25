@@ -14,6 +14,13 @@ Two kinds of post, matching the server's channels:
 - 2026-11-02, **The Living School** (1.10 to 1.11): [post](announcements/2026-11-02-the-living-school.md)
 
 ## Game updates
+- [2026-11-25-chat-by-candlelight](game-updates/2026-11-25-chat-by-candlelight.md)
+- [2026-11-24-console-soccer-infirmary](game-updates/2026-11-24-console-soccer-infirmary.md)
+- [2026-11-23-skies](game-updates/2026-11-23-skies.md)
+- [2026-11-23-quiet-corners](game-updates/2026-11-23-quiet-corners.md)
+- [2026-11-23-the-bells](game-updates/2026-11-23-the-bells.md)
+- [2026-11-21-the-bell-tower](game-updates/2026-11-21-the-bell-tower.md)
+- [2026-11-21-the-first-morning](game-updates/2026-11-21-the-first-morning.md)
 - [2026-11-18-path-wardrobe](game-updates/2026-11-18-path-wardrobe.md)
 - [2026-11-18-trophies](game-updates/2026-11-18-trophies.md)
 - [2026-11-18-the-permanent-record](game-updates/2026-11-18-the-permanent-record.md)
