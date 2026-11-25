@@ -125,7 +125,6 @@ function Tools.PreviewAttrs(V: any): { [string]: any }
 	V = V or {}
 	local function on(X) return if X ~= nil and X ~= "Off" then X else nil end
 	local Season = on(V.Season)
-	if Season == "Autumn" then Season = nil end
 	local Moon = on(V.Moon)
 	return { NHSeasonPreview = Season; NHMoonPhasePreview = Moon; NHMoonPreview = if Moon == "Full" then true else nil; NHSkyPreview = on(V.Sky) }
 end

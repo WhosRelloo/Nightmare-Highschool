@@ -901,13 +901,30 @@ C.Note = { Target = true; Run = function(A, T, a)
 	local _, Saved = StaffRecords.Write(T.UserId, function(R) Records.Push(R, `Notes`, Entry) end)
 	return true, saved(`Noted on {T.Name}`, Saved)
 end }
--- (1b) owner-only (Meta Level 3), Danger; TargetId is the picked UserId, who may be offline. Removing a ban or mute
--- entry doesn't lift it: Unban and Unmute stay the only way. The result message (the log's Detail) has the entry's text.
+-- (1b) owner-only (Meta Level 3), Danger; TargetId is the picked UserId, who may be offline. Removing a ban entry
+-- doesn't unban: Unban stays the only way (it calls the Roblox ban API). Removing a mute entry that is still on does
+-- lift the live mute, like Unmute: Muted is cleared, or set to the Until of another mute still on in their record (what
+-- loadRecord would give on a rejoin). A mute that had already ended or been lifted changes nothing else. The result
+-- message (the log's Detail) has the entry's text and the outcome.
 C.RemoveRecordEntry = { Target = true; Run = function(A, T, a, TargetId)
 	local Entry, Saved, Err = StaffRecords.RemoveEntry(TargetId, a.List, a.At, a.By)
 	if not Entry then return false, Err end
 	local Who = if T then T.Name else StaffRecords.NameOf(TargetId)
-	return true, saved(`Removed from {Who}'s {string.lower(a.List)}: {Records.EntryText(a.List, Entry)}`, Saved)
+	local Text = `Removed from {Who}'s {string.lower(a.List)}: {Records.EntryText(a.List, Entry)}`
+	local Now = os.time()
+	if a.List == `Mutes` and Records.MuteOn(Entry, Now) then
+		local Rec = StaffRecords.Cached(TargetId)
+		local Other = Rec and Records.OpenMute(Rec, Now)
+		if Other then
+			if T then Muted[TargetId] = Other.Until end -- offline: nothing to set here; a rejoin's loadRecord applies it
+			Text ..=`; still muted by another entry`
+		else
+			Muted[TargetId] = nil
+			if T then notify(T, `Chat restored`, nil, `Good`) end
+			Text ..= `; mute lifted`
+		end
+	end
+	return true, saved(Text, Saved)
 end }
 
 -- the Inspect remote: admins and up only (the console offers Inspect at level 2, Tools.luau), and no targeting up

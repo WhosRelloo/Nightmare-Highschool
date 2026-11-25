@@ -359,7 +359,13 @@ end
 
 function Shared.SetHeat(P: Player, Heat: number)
 	Heat = math.clamp(tonumber(Heat) or 0, 0, 100)
-	if Heat <= 0 then Shared.Clear(P) return end
+	if Heat <= 0 then
+		-- reset like Clear, but keep the owed summons (only Clear notoriety drops those)
+		Local.Reset(P)
+		Local.Publish(P)
+		Shared.Changed:Fire(P, 0, ``)
+		return
+	end
 	local S = Local.Get(P)
 	local Old = S.Tier
 	S.Heat = Heat
