@@ -386,6 +386,22 @@ C.Transform = { Target = true; Run = function(A, T)
 	Tr.Toggle(T.Character)
 	return true, `Toggled {T.Name}'s transformation`
 end }
+-- (console 2) the form's direction: the game's own Look path (Lineage.SetLook saves it, sets RaceLooks, RaceCosmetics re-dresses)
+C.FormDirection = { Target = true; Run = function(A, T, a)
+	if not profile(T) then return false, `Their profile isn't loaded` end
+	local Race = T:GetAttribute(`Race`)
+	local Forms = require(ReplicatedStorage.Config.Forms)
+	local R = Race and Forms.Races and Forms.Races[Race]
+	if not (R and R.Directions) then return false, `{T.Name} has no form (no race form at Tier I)` end
+	local Dir
+	for _, D in R.Directions do if D.Id == a.Direction then Dir = D end end
+	if not Dir then return false, `Their race has no direction {a.Direction}` end
+	local Lin = require(ReplicatedStorage.Lineage)
+	if not Lin.SetLook then return false, `Couldn't set their form direction` end
+	local Ok, Why = Lin.SetLook(T, `FormDirection`, Dir.Id)
+	if not Ok then return false, if typeof(Why) == `string` and Why ~= `` then Why else `Couldn't set their form direction` end
+	return true, `Set {T.Name}'s form to {Dir.Name} (direction {Dir.Id})`
+end }
 C.Bring = { Target = true; Run = function(A, T)
 	local _, _, R = char(A)
 	if not (R and T.Character) then return false, `No character` end
@@ -933,6 +949,10 @@ function Shared.Inspect(Admin: Player, T: Player)
 	end
 	local sports = typeof(Prof.Sports) == `table` and Prof.Sports or {}
 	local arcade = typeof(Prof.Arcade) == `table` and Prof.Arcade.Best or {}
+	local Nt = svc(`School.Notoriety`)
+	local nt = Nt and Nt.Get(T) or {}
+	local Tu = svc(`World.Tutorial`)
+	local Lin = typeof(Prof.Lineage) == `table` and Prof.Lineage or {}
 	return {
 		Name = T.Name; UserId = T.UserId; Slot = T:GetAttribute(`Slot`); Race = T:GetAttribute(`SubRace`) or T:GetAttribute(`Race`);
 		Yen = Prof.Yen or 0; Level = P.Level; Exp = P.Exp; Points = P.Points; Stats = P.Stats;
@@ -940,6 +960,9 @@ function Shared.Inspect(Admin: Player, T: Player)
 		Attendance = Att; Titles = s.Titles or {}; Title = s.Title or ``;
 		Regions = #rs.Found; RegionsTotal = rs.Total; Club = sports.Club or ``; Quests = active;
 		Arcade = arcade; Kills = Prof.Kills or 0; Note = latestNote(T.UserId);
+		Heat = nt.Heat; Bells = nt.Tier; BellState = nt.State; Summons = nt.Summons;
+		FormDirection = typeof(Lin.Looks) == `table` and Lin.Looks.FormDirection or nil;
+		Checkpoint = Tu and Tu.CheckpointOf(T) or nil;
 	}
 end
 
@@ -969,7 +992,8 @@ end
 
 -- the desk's pick lists (sent with Info)
 local function buildLists()
-	local L = { Quests = {}; Regions = {}; Clubs = {}; Venues = {}; Segments = {}; Beasts = {}; Races = {}; Gear = {}; Rooms = lessonRooms() }
+	local L = { Quests = {}; Regions = {}; Clubs = {}; Venues = {}; Segments = {}; Beasts = {}; Races = {}; Gear = {}; Rooms = lessonRooms();
+		Cutscenes = {}; Cases = {}; Clues = {}; Misdeeds = {} }
 	pcall(function() -- (beasts) the Spawns tab's beast buttons
 		for id, d in require(ReplicatedStorage.Config.Beasts).Defs do table.insert(L.Beasts, { Id = id; Name = d.Name or id }) end
 		table.sort(L.Beasts, function(x, y) return x.Name < y.Name end)
@@ -1008,6 +1032,28 @@ local function buildLists()
 		for _, it in require(ReplicatedStorage.Config.Gear).Items do table.insert(L.Gear, { Id = it.Id; Name = it.Name }) end
 		table.sort(L.Gear, function(x, y) return x.Name < y.Name end)
 	end)
+	pcall(function() -- (console 2) Play a cutscene / Cutscene seen
+		for id, c in require(ReplicatedStorage.Config.Cine).Cuts do
+			if not c.Hidden then table.insert(L.Cutscenes, { Id = id; Name = c.Name or id }) end
+		end
+		table.sort(L.Cutscenes, function(x, y) return x.Name < y.Name end)
+	end)
+	pcall(function() -- (console 2) Give a clue / Reset a case
+		for caseId, c in require(ReplicatedStorage.Config.Cases) do
+			if typeof(c) == `table` then
+				table.insert(L.Cases, { Id = caseId; Name = c.Name or caseId })
+				for clueId, k in c.Clues or {} do
+					table.insert(L.Clues, { Id = `{caseId}/{clueId}`; Name = `{c.Name or caseId}: {k.Name or clueId}`; Order = (c.Number or 0) * 100 + (k.Order or 0) })
+				end
+			end
+		end
+		table.sort(L.Cases, function(x, y) return x.Name < y.Name end)
+		table.sort(L.Clues, function(x, y) return x.Order < y.Order end)
+	end)
+	pcall(function() -- (console 2) Give a summons: the misdeeds Admin.BellTower lists (Config.Notoriety.Heat keys)
+		for id in require(ReplicatedStorage.Config.Notoriety).Heat do table.insert(L.Misdeeds, { Id = id; Name = id }) end
+		table.sort(L.Misdeeds, function(x, y) return x.Name < y.Name end)
+	end)
 	return L
 end
 
@@ -1037,6 +1083,8 @@ end
 
 local function playerList()
 	local list = {}
+	local Q = svc(`Quests.Quests`)
+	local Cn = svc(`World.Cine`)
 	for _, P in Players:GetPlayers() do
 		local C0, H = char(P)
 		table.insert(list, {
@@ -1047,6 +1095,11 @@ local function playerList()
 			Muted = Muted[P.UserId] ~= nil; God = God[P] == true; Frozen = Frozen[P] == true;
 			Ping = math.floor((P:GetNetworkPing() or 0) * 1000); Level = Shared.Level(P);
 			Note = hasNote(P.UserId); InMenu = P:GetAttribute(`InMainMenu`) == true;
+			-- (console 2) the four new flags and the Bell Tower lines
+			Transformed = C0 ~= nil and C0:GetAttribute(`Transformation`) ~= nil;
+			Bells = P:GetAttribute(`NHBells`); BellState = P:GetAttribute(`NHBellState`); Summons = P:GetAttribute(`NHSummons`);
+			InCutscene = P:GetAttribute(`NHTutorial`) == true or (Cn ~= nil and Cn.IsWatching(P) == true);
+			New = (function() local Ok, S = pcall(Q.CineState, P) return Ok and typeof(S) == `table` and S.Prologue ~= `Seen` end)();
 		})
 	end
 	return list

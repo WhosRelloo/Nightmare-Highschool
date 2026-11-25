@@ -67,6 +67,8 @@ return {
 	SetBuild = { Side = T; Section = "Character"; Title = "Build"; Help = "Their body type and step"; Icon = "Height"; Level = 2; Target = "required"; Danger = false; Synonyms = { "body type" };
 		Args = { A("Build", "choice", { Choices = { "Average", "Skinny", "Conditioned", "Heavy" }; Required = true }), A("Step", "number", { Min = 0; Max = 2 }) } };
 	Transform = { Side = T; Section = "Character"; Title = "Transform"; Help = "Into their race's form, or back"; Icon = "Transform"; Level = 2; Target = "required"; Danger = false; Synonyms = { "form" }; Args = {} };
+	FormDirection = { Side = T; Section = "Character"; Title = "Form direction"; Help = "Which of their race's two forms they turn into"; Icon = "Transform"; Level = 2; Target = "required"; Danger = false; Synonyms = { "form look" };
+		Args = { A("Direction", "choice", { Choices = { "1", "2" }; Labels = { "Direction 1", "Direction 2" }; Required = true }) } };
 	GiveYen = { Side = T; Section = "Character"; Title = "Give Yen"; Help = "Add or take Yen (over ¥100,000: owner)"; Icon = "Yen"; Level = 2; Target = "required"; Danger = false; Synonyms = { "money", "cash" };
 		Args = { A("Amount", "number", { Min = -1e7; Max = 1e7; Required = true }) } };
 	GiveExp = { Side = T; Section = "Character"; Title = "Give EXP"; Help = "EXP in one category"; Icon = "Exp"; Level = 2; Target = "required"; Danger = false; Synonyms = { "xp" };
