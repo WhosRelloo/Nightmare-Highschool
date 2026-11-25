@@ -116,6 +116,7 @@ function M.DashPath(Root: BasePart, Track: AnimationTrack, Clip: any, Dir: Vecto
 	local D = if typeof(Dir) == `Vector3` then Vector3.new(Dir.X, 0, Dir.Z) else Vector3.zero
 	if D.Magnitude < 0.1 then D = Vector3.new(Root.CFrame.LookVector.X, 0, Root.CFrame.LookVector.Z) end
 	D = D.Unit
+	warn(`[Soccer diag] DashPath {Slot} start dist={Dist} time={Time} rate={Rate} t0={t0} t1={t1} tp={Track.TimePosition} len={Track.Length} playing={Track.IsPlaying}`)
 	if Clip == nil then return end
 	local Att = Instance.new(`Attachment`) Att.Parent = Root
 	local LV = Instance.new(`LinearVelocity`)
@@ -128,14 +129,21 @@ function M.DashPath(Root: BasePart, Track: AnimationTrack, Clip: any, Dir: Vecto
 	local T0 = L0
 	local Plain = nil :: number?   -- (polish) the clip never loaded: when the plain 1.1 dash began
 	local Conn: RBXScriptConnection? = nil
-	local function finish() if Conn then Conn:Disconnect() end LV:Destroy() Att:Destroy() end
+	local Why = `?`
+	local N = 0
+	local function finish()
+		-- DIAG (temporary): why the dash ended
+		warn(`[Soccer diag] DashPath {Slot} end: {Why} ticks={N} tok={Mine}/{Token} playing={Track.IsPlaying} len={Track.Length} t={Track.TimePosition} t0={t0} t1={t1} dist={Dist} time={Time}`)
+		if Conn then Conn:Disconnect() end LV:Destroy() Att:Destroy()
+	end
 	Conn = RunService.Heartbeat:Connect(function(dt: number)
 		local Ok, Err = pcall(function()
-			if Mine ~= Token or not Root.Parent or not (Plain or Track.IsPlaying) then finish() return end
+			N += 1
+			if Mine ~= Token or not Root.Parent or not (Plain or Track.IsPlaying) then Why = `guard token={Mine ~= Token} root={not Root.Parent}` finish() return end
 			-- (soccer-2.0 final) a clip still loading: hold still (up to 1 s), and the dash's time starts once it has loaded
 			if Plain then
 				-- (polish) the 1.1 dash (Gui.Soccer Local.Dash): Dist studs at Dist / Time over Time, flat along Dir
-				if os.clock() - Plain >= Time then finish() return end
+				if os.clock() - Plain >= Time then Why = `plain done` finish() return end
 				LV.PlaneVelocity = Vector2.new(D.X, D.Z) * (Dist / Time)
 				return
 			end
@@ -152,13 +160,14 @@ function M.DashPath(Root: BasePart, Track: AnimationTrack, Clip: any, Dir: Vecto
 				return
 			end
 			local t = Track.TimePosition
-			if t >= t1 or os.clock() - T0 > Time + 0.5 then finish() return end
+			if t >= t1 or os.clock() - T0 > Time + 0.5 then Why = `done t>=t1:{t >= t1}` finish() return end
 			local t2 = math.min(t + dt * Rate, t1)
 			local V = if t2 - t > 1e-4 then Dist * (Anim.Progress(Clip, t2, t0, t1) - Anim.Progress(Clip, t, t0, t1)) / (t2 - t) * Rate else 0
 			LV.PlaneVelocity = Vector2.new(D.X, D.Z) * V
 		end)
 		if not Ok then
 			warn("[Soccer clips] DashPath: " .. tostring(Err))
+			Why = `error`
 			finish()
 		end
 	end)
