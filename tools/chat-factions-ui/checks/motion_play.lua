@@ -47,7 +47,7 @@ for _ in Seen do N += 1 end
 Ok(N >= 3, "the candle doesn't flicker (" .. N .. " distinct size/colour pairs)")
 Flame.ImageTransparency = 0.7
 task.wait(0.2)
-Ok(Flame.ImageTransparency == 0.7, "the candle loop still writes ImageTransparency (" .. Flame.ImageTransparency .. ")")
+Ok(math.abs(Flame.ImageTransparency - 0.7) < 0.001, "the candle loop still writes ImageTransparency (" .. Flame.ImageTransparency .. ")")
 
 local Bar = Instance.new("Frame")
 local Fill = Instance.new("Frame")
@@ -69,7 +69,7 @@ end
 Motion.Pips(Pips, 3, Color3.new(1, 1, 0), Color3.new(0, 0, 0), 0)
 Ok(Pips[1].BackgroundColor3 == Color3.new(0, 0, 0), "Pips don't start off")
 task.wait(0.9)
-Ok(Pips[3].BackgroundColor3 == Color3.new(1, 1, 0) and Pips[4].BackgroundColor3 == Color3.new(0, 0, 0), "Pips end")
+Ok((Pips[3].BackgroundColor3.R + Pips[3].BackgroundColor3.G + (1 - Pips[3].BackgroundColor3.B)) > 2.99 and Pips[4].BackgroundColor3 == Color3.new(0, 0, 0), "Pips end")
 
 local Panel = Instance.new("Frame")
 Panel.Visible = false
@@ -78,12 +78,12 @@ local T = Instance.new("TextLabel")
 T.Parent = Panel
 Motion.Open(Panel)
 task.wait(0.5)
-Ok(Panel.Visible and T.TextTransparency == 0 and Panel.NHOpenScale.Scale == 1, "Open end")
+Ok(Panel.Visible and math.abs(T.TextTransparency) < 0.001 and math.abs(Panel.NHOpenScale.Scale - 1) < 0.001, "Open end")
 Motion.Close(Panel)
 task.wait(0.1)
 Motion.Open(Panel) -- reopened mid-close
 task.wait(0.5)
-Ok(Panel.Visible and T.TextTransparency == 0, "reopened mid-close but hidden or faded")
+Ok(Panel.Visible and math.abs(T.TextTransparency) < 0.001, "reopened mid-close but hidden or faded")
 Motion.Close(Panel)
 task.wait(0.5)
 Ok(not Panel.Visible, "Close end")
