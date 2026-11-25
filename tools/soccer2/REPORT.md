@@ -3,6 +3,28 @@
 Branch `soccer-2`. Plan `docs/superpowers/plans/2026-11-24-soccer-2-0.md`, spec
 `docs/superpowers/specs/2026-11-24-soccer-2-0-design.md`. Installed in NH Combat Test (Edit). **Place not saved.**
 
+## Published ids (2026-11-25)
+
+The owner published the 23 FIER clips to the group (15981569). Their ids, the newest set from the itemconfiguration
+API, are now `Id` beside each `Clip` in `SoccerAnims` (9fb0e24). Installed in Edit, with the backup
+`SoccerAnimIds_pre_20261125`, and the readback matches the mirror. In Edit, all 25 slot ids load through
+KeyframeSequenceProvider, and each loop flag matches PUBLISH_LIST. Play round (slot 2 fresh snapshot, restored after):
+```
+PASS CineState=nil Seen=nil Origin=nil
+PASS soccer_clips_resolve
+PASS live, InSport=Pitch
+PASS soccer_play_pack
+PASS soccer_play_moves
+PASS soccer_play_keeper
+PASS soccer_play_polish
+PASS respawned
+PASS ended
+PASS soccer_play_pack_after
+restored
+PASS CineState=nil Seen=nil Origin=nil
+```
+Restoring slot 2 took two runs. The first run printed nothing, and the second printed `restored`. **Place not saved.**
+
 ## Final re-run (Task 6 Step 6, 2026-11-24)
 
 Edit:
