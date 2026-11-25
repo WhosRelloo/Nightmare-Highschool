@@ -6,6 +6,16 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 Work on branches that aren't merged into `main` yet. Nothing here is in NH Combat Test unless it says so.
 
+### `soccer-2`: Soccer 2.0, the FIER clips (merged into `main` 2026-11-24, installed in NH Combat Test, place not saved)
+- **24 FIER soccer clips** baked into `ReplicatedStorage.NHSoccerClips` (travel removed, Contact markers, a right-foot
+  kick), with generated timing data in `Config.SoccerClips`.
+- **Kicks meet the ball** 0.05 s after the server's kick; a charged shot creeps through its wind-up.
+- **Dive and dribble** follow their clip's own travel curve over the 1.1 distances (17 and 11 studs).
+- **Falls** last as long as the stun; the keeper catches and holds the ball with the FIER clips.
+- **In a soccer match** the FIER jog and idles replace the default walk and idle (Jog Backward for the backpedal,
+  the keeper's side steps for strafes); sprint keeps the game's run.
+- Studio plays the clips through temporary ids until the owner publishes them (`tools/soccer2/PUBLISH_LIST.md`).
+
 ### `admin-console-1b`: the staff console, phase 1b (merged into `main` 2026-11-24, installed in NH Combat Test, place not saved)
 Docs: `docs/Admin-Panel.md`. Spec: `docs/superpowers/specs/2026-11-23-admin-console-1b-design.md`. Plan:
 `docs/superpowers/plans/2026-11-23-admin-console-1b.md`. Record: `tools/admin-console/REPORT.md`. Backup:

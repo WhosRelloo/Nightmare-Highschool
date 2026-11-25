@@ -1,0 +1,54 @@
+{
+ "duration": 9.88,
+ "moving_frac": 0.622,
+ "hold_frac": 0.378,
+ "frozen_frac": 0.518,
+ "dup_in_motion": 0.261,
+ "holds": [
+  [
+   0.02,
+   0.12
+  ],
+  [
+   2.12,
+   0.32
+  ],
+  [
+   2.52,
+   1.48
+  ],
+  [
+   4.65,
+   0.65
+  ],
+  [
+   6.98,
+   0.22
+  ],
+  [
+   8.02,
+   0.25
+  ],
+  [
+   8.65,
+   0.12
+  ],
+  [
+   9.78,
+   0.12
+  ]
+ ],
+ "cuts": [],
+ "peaks": 7,
+ "rise_frames60": 11.0,
+ "fall_frames60": 9.0,
+ "fall_over_rise": 0.82,
+ "cam_still_frac": 0.8,
+ "cam_pan_px_s_median": 7,
+ "cam_pan_px_s_p90": 25,
+ "cam_zoom_pct_s_p90": 3.2,
+ "cam_roll_deg_s_p90": 1.6,
+ "horizon_deg_min": -1.8,
+ "horizon_deg_max": -0.1,
+ "note": "pan px/s measured at 640 px width; horizon only valid when a dark-over-light floor line is visible"
+}
