@@ -1,5 +1,6 @@
 --[[
-	Factions panel (client). Toggle with P or the "Factions" button (left edge, for touch).
+	Factions panel (client). Toggle with L, the Phone's Factions app, or the gamepad quick menu (the left-edge button
+	is hidden since 2026-11-25, chat-factions-ui).
 	Read-only view of PlayerData.Social: reputation, each faction's rank, standing, initiation,
 	perks, mission and leader relationship, plus earned titles (Equip sends SocialAction).
 	Everything shown is computed by the server; this file only draws it.
@@ -132,6 +133,7 @@ function Local.Build()
 		Name = `Toggle`; text = if UserInputService.KeyboardEnabled then `Factions [L]` else `Factions`; textSize = 16;
 		AnchorPoint = Vector2.new(0, 0.5); Position = UDim2.new(0, 8, 0.5, 0); Size = UDim2.new(0, 132, 0, 44); Parent = Gui;
 	})
+	Toggle.Visible = false -- (chat-factions-ui, owner 2026-11-25) no left-edge button: L, the Phone or the quick menu
 	-- phones: up a little, so the left column (compass, quest tracker, these two) clears the KitHud bar
 	local function PhonePlace()
 		local Toggle = Gui:FindFirstChild(`Toggle`)
