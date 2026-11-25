@@ -6,7 +6,7 @@ and **Factions panel** (https://claude.ai/artifact/FoddZEToJYXSaaU1P8sNKK).
 
 ## Goal
 
-Rebuild the top-left chat window and the Factions panel (P) so they share one look: the UI kit's iron frame and candle,
+Rebuild the top-left chat window and the Factions panel (L) so they share one look: the UI kit's iron frame and candle,
 as quiet as the "Whispers" direction. They should be animated, but subtly. Player-facing behaviour stays what it is
 today; only the look and motion change.
 
@@ -32,9 +32,9 @@ Chat (from the 2.1.0 header of `Gui.Chat`):
   marked.
 
 Factions panel:
-- P and the left-edge Factions button toggle it (touch placement is unchanged), and Close closes it.
+- L (`TOGGLE_KEY`) and the left-edge Factions button toggle it (touch placement is unchanged), and Close closes it.
 - It reads only `PlayerData.Social`, through the same `StateController.ProfileUpdated` re-render.
-- It shows the same content in the same order: Reputation (and the equipped title), one card per faction in
+- It shows the same content in the same order: Reputation (the equipped title and the four category bars: Popularity, Intimidation, Trust, Academics), one card per faction in
   `Config.Factions.Factions` (name, tagline, rank, status, standing, the initiation, mission, activity and perk lines
   as today), Titles (Equip / unequip through `Packets.SocialAction` `EquipTitle`), and Rumours (`Config.Factions.Planned`).
 - `Shared.Toggle(Open?)` and `Shared.OnStart` keep their signatures.
@@ -48,9 +48,9 @@ Both screens:
 - Faction colours come from `Config.Factions` (`Def.Color`), never hard-coded.
 
 Chat:
-- **Quiet:** no panel, frame, header or bar, just the lines, each with a soft dark shadow (`TextStrokeTransparency` and
-  a faint shadow label) so it reads over any scene. A soft dark vignette sits behind the line block and fades with the
-  lines.
+- **Quiet:** no panel, frame, header or bar, just the lines, each with a dark text stroke (`TextStrokeTransparency` 0.3)
+  so it reads over any scene. A soft dark vignette (the kit's `Glow` image tinted black) sits behind the line block while
+  quiet. On touch-only devices the bar stays faint (0.6) when quiet, so there is still something to tap.
 - **Awake** (on /, the mouse over the window, or a new message): the panel, the iron edge, the header (channel name,
   candle, count) and the input bar fade up over about 0.25 s.
 - **Fading back:** after `IDLE_AFTER` (10 s) quiet with the bar unfocused and the mouse away, the frame fades out over
@@ -61,7 +61,7 @@ Factions panel:
 - The title is "Who's Who After Dark", with the candle. The Close button is an × in a thin iron box.
 - Each faction card has a faint wash of its colour and a fine edge in that colour.
 - Rank is shown as five pips (Outsider to Inner Circle), filled up to the player's rank in the faction colour.
-- The reputation bar is a slim bar in candle gold.
+- The reputation bars keep the kit bar (`Kit.Bar`); they fill on open.
 - Titles are buttons, and the worn one is gold. Rumours are italic and dim.
 
 ## Motion
@@ -71,13 +71,13 @@ flicker, glow and shimmer don't run.
 
 | Helper | Used for | Motion |
 |---|---|---|
-| `Motion.SmokeIn(Label, Delay?)` | each new chat line; Rumours lines | from transparent, 8 px left and letter-spaced, to settled, over 0.35 s (Quad Out). A shadow label follows. |
-| `Motion.Wake(Group, On)` | the chat frame, header and bar | the group's transparency fades up (0.25 s) or down (0.6 s) together; an interrupted tween is replaced, never stacked. |
+| `Motion.SmokeIn(Label, Delay?)` | each new chat line; Rumours lines | from transparent and 8 px left to settled, over 0.35 s (Quad Out). Roblox text has no letter-spacing, so there is none. |
+| `Motion.Wake(Items, On, Instant?)` | the chat frame, header, bar and vignette | each item `{ Inst, AwakeGoal, QuietGoal }` tweens to its goal, up in 0.25 s or down in 0.6 s; an interrupted tween is replaced, never stacked. |
 | `Motion.Candle(Flame)` | the candle in both headers | a flicker on one Heartbeat-driven loop shared by every candle: size and transparency wobble, about 1.7 s a cycle, stopped when the flame leaves the DataModel or is hidden. |
 | `Motion.Glint(Stroke, Base, Lit)` | the chat frame's iron edge; the faction cards' edges | a slow colour breath between two colours, about 5 s a cycle, on the shared loop. |
-| `Motion.Rise(Items, Step)` | Factions panel sections on open | each item fades up and moves 6 px up, staggered by `Step` (0.15 s). |
-| `Motion.Fill(Bar, Fraction)` | the reputation bar | it fills from 0 over 1.1 s after the panel opens. |
-| `Motion.Pips(Pips, Count, Color)` | rank pips | they light one at a time, 0.15 s apart. |
+| `Motion.Rise(Items, Step)` | Factions panel sections on open | each item fades up (`Kit.FadeIn`), staggered by `Step` (0.15 s). The sections sit in a list layout, so they don't move. |
+| `Motion.Fill(Bar, Delay?)` | the reputation and faction bars | the kit bar's `Fill` grows from 0 to its built size over 1.1 s. |
+| `Motion.Pips(Pips, Count, On, Off, Delay?)` | rank pips | they light one at a time, 0.15 s apart. |
 | `Motion.Open(Panel)` / `Motion.Close(Panel)` | the Factions panel | it scales from 0.985 and rises 10 px while fading in over 0.3 s; Close is the reverse over 0.2 s, then hides it. |
 
 The shared loop runs only while something is animating: it disconnects when no candle or glint is registered. One
@@ -93,8 +93,8 @@ Heartbeat connection serves both screens.
 ## Checks
 
 - **Edit:** a `Motion` pure check that runs every helper on a throwaway ScreenGui and asserts end states, with
-  ReducedMotion on and off. A preview check: `Chat.Preview` and a new `FactionsPanel.Preview(Gui, Social)` build without
-  errors, and their screenshots are compared with the mockups.
+  ReducedMotion on. The animated paths are checked in Play (`motion_play`), where tweens and Heartbeat run.
+  `Chat.Preview` still builds in Edit. The Factions panel needs `StateController`, so its screenshots are taken in Play.
 - **Play (slot 2, restored):**
   - A chat check (Client): send a message and see it arrive in the window. Then:
     - after `IDLE_AFTER` the frame is hidden and the lines stay;
@@ -103,7 +103,7 @@ Heartbeat connection serves both screens.
     - Up recalls the last line;
     - `SetShown(false)` hides everything.
   - With `NHCanChat=false` there's no window.
-  - A Factions check (Client): P opens it; the reputation bar's end size matches the server's reputation, the pips
+  - A Factions check (Client): `Toggle(true)` opens it; the reputation bar's end size matches the server's reputation, the pips
     match the rank, and Equip title sends `SocialAction`. With ReducedMotion on, everything is at its end state at once.
   - Screenshots of quiet chat, awake chat, and the open panel go in `docs/superpowers/mockups/2026-11-25-chat-factions-ui/`.
 - Every round records cine `PASS` before and after, as usual.
