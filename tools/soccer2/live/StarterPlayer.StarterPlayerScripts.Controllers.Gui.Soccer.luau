@@ -273,8 +273,9 @@ local LENGTH = { Charge = 1.6; Shot = 0.5; Pass = 0.4; Swing = 0.35; Volley = 0.
 -- the fall by cause)
 local SLOT = { Charge = `Kick`; Shot = `Kick`; Pass = `Pass`; Swing = `Kick`; Volley = `Volley`; Header = `Header`; Dribble = `Dribble`; Feint = `Feint`; Tackle = `Tackle`; Dive = `KeeperDiveRight`; Throw = `KeeperThrow`; Celebrate = `Celebrate`; Fall = `Tackled` }
 local STOP_AFTER = { Celebrate = 3.4 }   -- long clips are cut to the moment
-local LEAD, MARGIN = 0.05, 0.10          -- the foot meets the ball LEAD s after the server's kick; clips creep from MARGIN before contact
+local LEAD = 0.05                         -- the foot meets the ball LEAD s after the server's kick (the Kick charge's creep margin is KICK_MARGIN)
 local KICK_MARGIN = Anim.KickMargin      -- (soccer-2.0 final) the Kick charge creeps from 0.20 before contact (about 0.1x), never frozen
+local REMOTE_SLACK = 0.3                -- (polish) a remote body's release waits this long past the move's end
 local TACKLE_SLIDE = 0.35                -- the tackle's slide (the 1.1 dash time); the clip starts ContactAt - this
 local RUN_SPEED = 6                      -- a shot at this flat speed or more is the running shot
 local R6 = CFrame.Angles
@@ -304,9 +305,12 @@ function Local.LetGo(Char: Model, Tr: AnimationTrack, After: number)
 	if not Hum then return end
 	local W = { Until = os.clock() + After }
 	Watch[Tr] = W
+	-- (polish) on another client Until is the Fx time plus the dash time, but the mover's dash reaches them about a round trip
+	-- later: the body is still at dash speed when Until arrives, so wait that long more before letting go
+	local Slack = if Char == Player.Character then 0 else REMOTE_SLACK
 	task.spawn(function()
 		while Watch[Tr] == W and Tr.IsPlaying and Char.Parent do
-			if os.clock() >= W.Until and moving(Char, Hum) then
+			if os.clock() >= W.Until + Slack and moving(Char, Hum) then
 				Watch[Tr] = nil
 				Tr:Stop(0.2)
 				return
@@ -318,12 +322,27 @@ function Local.LetGo(Char: Model, Tr: AnimationTrack, After: number)
 end
 
 -- (soccer-2.0 final) a body's soccer state goes with it (respawns, players leaving)
+local Conns = {} :: { [Model]: { RBXScriptConnection } }   -- (polish) a body's connections, dropped with it
 local function body(Char: Model)
 	if Tracks[Char] then return end
+	local Cs = {} :: { RBXScriptConnection }
 	Tracks[Char] = {}
-	local function clear() Tracks[Char] = nil Charging[Char] = nil Falls[Char] = nil end
-	Char.Destroying:Once(clear)
-	Char.AncestryChanged:Connect(function() if not Char:IsDescendantOf(game) then clear() end end)
+	Conns[Char] = Cs
+	local Done = false
+	local function clear()
+		if Done then return end   -- Destroying and AncestryChanged both fire
+		Done = true
+		for _, C in Cs do C:Disconnect() end
+		Conns[Char] = nil
+		local Own = Tracks[Char]
+		local Ch = Charging[Char]
+		Tracks[Char] = nil Charging[Char] = nil Falls[Char] = nil
+		-- (polish) the cached tracks (clips, the charge, the fall) are stopped and destroyed with the body
+		if Own then for _, Tr in Own do pcall(function() Tr:Stop(0) Tr:Destroy() end) end end
+		if Ch then pcall(function() Ch.Tr:Stop(0) Ch.Tr:Destroy() end) end
+	end
+	table.insert(Cs, Char.Destroying:Once(clear))
+	table.insert(Cs, Char.AncestryChanged:Connect(function() if not Char:IsDescendantOf(game) then clear() end end))
 end
 
 -- a filled slot plays its clip (the FIER clip, or the 1.1 one); returns the track, or nil for the procedural pose.
@@ -435,7 +454,7 @@ function Local.Move(Char: Model?, Kind: string, Slot: string, Side: number?, Me:
 		local W = Watch[Tr]
 		if W then W.Until = os.clock() + DashTime end -- the move is over at the dash's end
 		local R = if Me then Local.Root() else nil
-		if R then Clips.DashPath(R, Tr, C, Dir, Dist, Rate, t0, t1, DashTime) end
+		if R then Clips.DashPath(R, Tr, C, Dir, Dist, Rate, t0, t1, DashTime, Slot) end
 	elseif Me then
 		Local.Dash(Dir, Dist / Time, Time)
 	end
@@ -952,5 +971,8 @@ end
 -- (soccer-2.0) Studio checks drive the server's Fx through the real handler (tools/soccer2/checks)
 function Shared.FxForTests(Kind: string, D: any) if RunService:IsStudio() then Local.OnFx(Kind, D) end end
 function Shared.TracksForTests(Char: Model): { [string]: AnimationTrack } return Tracks[Char] or {} end
+-- (polish) Studio checks: a body's live connection count (0 once cleared); Play, for a body that isn't the local player's
+function Shared.ConnsForTests(Char: Model): number local C = Conns[Char] return if C then #C else 0 end
+function Shared.PlayForTests(Char: Model, Kind: string, Opts: any?): AnimationTrack? if RunService:IsStudio() then return Local.Play(Char, Kind, Opts) end return nil end
 
 return Shared

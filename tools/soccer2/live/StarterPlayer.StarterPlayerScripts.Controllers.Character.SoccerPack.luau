@@ -22,7 +22,9 @@ local IdleSlot = nil :: string?
 local Keeper = false
 local SportsMod = nil :: any
 local Preloaded = false
-local RestoreFailed = false                           -- (soccer-2.0 final) a failed Restore is retried on the next Step
+local RestoreFailed = false                           -- (soccer-2.0 final) a failed Restore is retried on a later Step
+local RetryAt = 0                                     -- (polish) not before this clock
+local RetryGap = 0                                    -- (polish) the backoff: 1 s, 2 s, then 4 s (cap)
 local IdleCache = {} :: { [string]: AnimationTrack }  -- (soccer-2.0 final) one idle track per idle clip on this body
 local IdleFor = nil :: Animator?
 
@@ -164,6 +166,7 @@ function Local.Apply()
 	Local.Preload()
 	On = true
 	RestoreFailed = false
+	RetryGap = 0
 	Local.Override()
 	pcall(function()
 		AM:StopAllTracks():SetTracks(Pack):PlayTrack(`Idle`, 0.2)
@@ -184,10 +187,18 @@ function Local.Restore()
 	IdleSlot = nil
 	Keeper = false
 	local Retry = RestoreFailed
+	local Prev = RetryGap
 	RestoreFailed = false
+	RetryGap = 0 -- a pass clears it; a failure below sets it again
+	-- (polish) a failed Restore backs off: 1 s, 2 s, then 4 s between tries, so the retries don't reload the tracks at 4 Hz
+	local function fail()
+		RestoreFailed = true
+		RetryGap = if Prev > 0 then math.min(Prev * 2, 4) else 1
+		RetryAt = os.clock() + RetryGap
+	end
 	Clips.Cancel() -- (soccer-2.0 final, spec §6) a running clip dash ends with the match
 	local AC = ac()
-	if not AC then RestoreFailed = true return end
+	if not AC then fail() return end
 	AC.Override(nil)
 	local AM = AC.Controller
 	local Char = Player.Character
@@ -203,7 +214,7 @@ function Local.Restore()
 	IdleCache = {}
 	IdleFor = nil
 	if not Ok then
-		RestoreFailed = true -- (soccer-2.0 final) the next Step tries again
+		fail() -- (soccer-2.0 final) a later Step tries again
 		if not Retry then warn(`[SoccerPack] Restore failed, retrying: {Err}`) end
 	end
 end
@@ -211,7 +222,7 @@ end
 function Local.Step()
 	local Want = Local.IsSoccer()
 	if Want and not On then Local.Apply()
-	elseif not Want and (On or RestoreFailed) then Local.Restore()
+	elseif not Want and (On or (RestoreFailed and os.clock() >= RetryAt)) then Local.Restore()
 	elseif not Want then
 		-- a respawn can clear On before InSport goes: never leave the override set outside a match
 		local AC = ac()
@@ -238,6 +249,8 @@ function Shared.OnStart()
 		IdleSlot = nil
 		Keeper = false
 		RestoreFailed = false -- a new body starts on the default pack
+		RetryGap = 0
+		RetryAt = 0
 		IdleCache = {}
 		IdleFor = nil
 		local AC = ac()
