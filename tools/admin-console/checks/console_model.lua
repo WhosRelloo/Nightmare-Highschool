@@ -125,5 +125,11 @@ Eq(M.DayLabel(0, 86400 * 10 + 5), "Today", "day 0") Eq(M.DayLabel(1, 86400 * 10 
 Eq(M.DayLabel(2, 86400 * 10 + 5), "Fri 09", "day 2 (UTC day 8 = Fri 9 Jan 1970)")
 Eq(M.LogHead({ At = 0; Staff = "mod"; Action = "Warn"; Target = "kid" }, function() return "09:00" end), "09:00 · mod · Warn · kid", "log head")
 Eq(M.LogHead({ At = 0; Staff = "mod"; Action = "Announce" }, function() return "09:00" end), "09:00 · mod · Announce", "log head without a target")
+-- (phase 2) the four new flags, after the old ones
+local F2 = M.Flags({ Note = true; Transformed = true; Bells = 3; New = true; InCutscene = true })
+Eq(table.concat(F2, ","), "NOTE,TRANSFORMED,WANTED,NEW,IN CUTSCENE", "phase 2 flags in order")
+Eq(table.concat(M.Flags({ Bells = 2 }), ","), "", "Bell 2 is not WANTED")
+Eq(table.concat(M.Flags({ Bells = 5 }), ","), "WANTED", "Bell 5 is WANTED")
+Eq(table.concat(M.Flags({ Transformed = false; New = false; InCutscene = false }), ","), "", "false flags stay off")
 if #Fails > 0 then return "FAIL " .. #Fails .. "\n" .. table.concat(Fails, "\n") end
 return "PASS console_model"

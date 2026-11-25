@@ -15,6 +15,15 @@ Shared.SIDE_LEVEL = { Moderate = 1, Test = 2 }
 Shared.CARDLESS = { Log = true }
 Shared.LEVEL_NAMES = { "a moderator", "an admin", "the owner" }
 
+-- (phase 2) Season, Moon tonight and Sky change the world for the whole server: allowed in Studio, and in a live
+-- server only for the owner. Testers there use Preview just for me (a client tool).
+Shared.SERVER_WIDE_REFUSAL = "Owner only in live servers; use Preview just for me"
+function Shared.ServerWideOk(Level: number?, Studio: boolean): (boolean, string?)
+	if Studio then return true end
+	if (tonumber(Level) or 0) >= 3 then return true end
+	return false, Shared.SERVER_WIDE_REFUSAL
+end
+
 local KINDS = { number = true, text = true, choice = true, toggle = true, position = true }
 -- user (1b): a picked UserId, online or not; Run gets it as its 4th argument (Remove history entry)
 local TARGETS = { none = true, required = true, optional = true, user = true }

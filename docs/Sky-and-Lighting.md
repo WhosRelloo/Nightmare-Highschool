@@ -155,6 +155,11 @@ config as `Skies.Sets216`, so a rollback is a copy-paste.
    - **Moon:** pick `Moon[name]` from `workspace.NHMoonEventTonight` (`Crimson` / `Blue`), else the Lineage phase
      (`Full` / `New` / `Waxing` / `Waning`), else `Seasons[S].Moon`. Apply Mul, Add and Set at NightWeight. Its `Sky`
      replaces `Night` (Nightmare's own `NightmareNight` wins over the crimson modifier's sky).
+   - **Staff moon override (2026-11-24):** the console's Moon tonight sets `workspace.NHMoonOverride` (a phase) and
+     `NHMoonOverrideNight` (that night). While the night matches, Lineage's `MoonPhase`, `MoonEvent`, `IsFullMoon` and
+     `NightsUntilFull` answer with the override, so the sky and everything else that reads Lineage agree. A non-Full
+     override counts the next full moon from tomorrow. Preview just for me uses the player's own `NHSeasonPreview`,
+     `NHMoonPhasePreview` and `NHSkyPreview` instead, on their client only.
    - **Colour adds:** Luau `Color3` can't be added, so add channel-wise and clamp.
    - **Preload:** replace the preload-everything loop with `Skies.Preload = "ShownAndNext"`. Preload the shown set
      and the next one in the schedule (plus the moon or season replacement for the coming night). Event sets load only

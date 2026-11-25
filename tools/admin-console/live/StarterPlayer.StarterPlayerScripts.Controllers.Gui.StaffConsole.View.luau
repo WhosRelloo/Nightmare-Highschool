@@ -327,6 +327,11 @@ local function context(Dyn: Instance, Ctx: any)
 			line("Inspector", 22, COL.Brass, true)
 			line(`Slot {I.Slot or "?"} · ¥{I.Yen} · Level {I.Level or "?"} ({I.Exp or 0} EXP, {I.Points or 0} points)`)
 			line(`Discipline {I.Discipline.Points or 0} ({I.Discipline.Level or "Clear"}), owes {I.Discipline.Owed or 0}`)
+			if I.Heat ~= nil then
+				line(`Heat {math.floor(I.Heat)} · Bell {I.Bells or 0}{if I.BellState and I.BellState ~= "" then " · " .. I.BellState else ""}{if (I.Summons or 0) > 0 then ` · {I.Summons} summons` else ""}`)
+			end
+			if I.FormDirection then line(`Form direction {I.FormDirection}`) end
+			if I.Checkpoint then line(`Tutorial: {I.Checkpoint}`) end
 			line(`Places {I.Regions}/{I.RegionsTotal} · Club {I.Club ~= "" and I.Club or "none"}`)
 			line(`Title {I.Title ~= "" and I.Title or "none"} · {#I.Titles} titles`)
 			if #I.Quests > 0 then line("Quests: " .. table.concat(I.Quests, ", ")) end

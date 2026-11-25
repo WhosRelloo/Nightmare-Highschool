@@ -1,7 +1,8 @@
 --[[ StaffConsole.Tools (client): the console's own-client tools, moved from the 1.18 desk (AdminPanel) unchanged:
 	Fly (WASD / Space / Ctrl, Shift for speed), Noclip, ESP (names + health through walls), Ctrl+click teleport, Stop
 	spectating, and the Inspect card (Features.Admin's Inspect remote). Level 2 (the Test side), except Stop
-	spectating (level 1, the Student section). No OnStart: StaffConsole calls Init. ]]
+	spectating (level 1, the Student section), Preview just for me (the sky's preview attributes on this client only).
+	No OnStart: StaffConsole calls Init. ]]
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
@@ -110,6 +111,24 @@ Tools.Defs = {
 	card("ToolInspect", "Progress", "Inspect", "Their loaded slot, read only (in the side panel)", "SecProgress", 2, "required", { "inspector" }),
 }
 
+-- (phase 2) Preview just for me: the sky's own preview attributes on this client only (DayCycle, MoonPhases,
+-- FullMoon and SkyMotion read them). Nothing goes to the server, so it isn't logged and testers may use it live.
+local PV = card("ToolPreview", "World", "Preview just for me", "A season, moon or sky on your screen only", "Moon", 2, "none", { "preview", "my sky" })
+PV.Args = {
+	{ Name = "Season"; Kind = "choice"; Choices = { "Off", "Autumn", "Winter", "Spring", "Summer", "Nightmare" } };
+	{ Name = "Moon"; Kind = "choice"; Choices = { "Off", "Full", "Waxing", "Waning", "New", "Crimson", "Blue" } };
+	{ Name = "Sky"; Kind = "choice"; Choices = { "Off", "Storm" } };
+}
+table.insert(Tools.Defs, PV)
+
+function Tools.PreviewAttrs(V: any): { [string]: any }
+	V = V or {}
+	local function on(X) return if X ~= nil and X ~= "Off" then X else nil end
+	local Season = on(V.Season)
+	local Moon = on(V.Moon)
+	return { NHSeasonPreview = Season; NHMoonPhasePreview = Moon; NHMoonPreview = if Moon == "Full" then true else nil; NHSkyPreview = on(V.Sky) }
+end
+
 function Tools.State() return table.clone(On) end
 
 function Tools.Do(Id: string, _Values: any, Selected: number?): (boolean, string)
@@ -123,6 +142,15 @@ function Tools.Do(Id: string, _Values: any, Selected: number?): (boolean, string
 		return true, "Camera back on you"
 	end
 	if Id == "ToolInspect" then return Selected ~= nil, if Selected then "Inspecting" else "Pick a student first" end
+	if Id == "ToolPreview" then
+		local A = Tools.PreviewAttrs(_Values)
+		for _, K in { "NHSeasonPreview", "NHMoonPhasePreview", "NHMoonPreview", "NHSkyPreview" } do Player:SetAttribute(K, A[K]) end
+		local Parts = {}
+		if A.NHSeasonPreview then table.insert(Parts, A.NHSeasonPreview) end
+		if A.NHMoonPhasePreview then table.insert(Parts, A.NHMoonPhasePreview .. " moon") end
+		if A.NHSkyPreview then table.insert(Parts, A.NHSkyPreview) end
+		return true, if #Parts > 0 then "Preview on your screen: " .. table.concat(Parts, ", ") else "Preview off"
+	end
 	return false, "Unknown tool"
 end
 

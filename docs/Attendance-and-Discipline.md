@@ -159,6 +159,8 @@ Systems report what they see with `Discipline.ReportIncident({Type, Suspect, Wit
 
 **Body:** an NPC built from the existing AI rig, with a "Hall Monitor" name tag and speech bubbles. It spawns at `workspace.School.MonitorSpawn`.
 
+**Off switch (staff console, 2026-11-24):** `HallMonitor.SetEnabled(On)` and `IsEnabled()`. Off ends every chase, despawns the monitors and stops new spawns, with `workspace.NHMonitorsOff = true` while off; On spawns them again. It isn't saved: a new server starts with them on.
+
 **When it works:** Before School through After School, patrolling `workspace.School.PatrolRoute`. Off duty, it waits at the spawn.
 
 **Truancy (class periods only):**
@@ -370,7 +372,7 @@ Each step runs once per rise (`Responded`, `Converged`, `Tolled`), and resets wh
 | `NHSearchWhere` | the region title at the last-seen point while in Search, or nil |
 | `NHSummons` | the number of summons owed, or nil |
 
-Server signal: `Notoriety.Changed(Player, Bells, State)`. Server API: `Witnessed(P, Misdeed, Pos?, Witness?)`, `OnReport(Incident) -> bonus`, `IsHunted(P)`, `BookType(P)` and `Get(P)`.
+Server signal: `Notoriety.Changed(Player, Bells, State)`. Server API: `Witnessed(P, Misdeed, Pos?, Witness?)`, `OnReport(Incident) -> bonus`, `IsHunted(P)`, `BookType(P)` and `Get(P)`. Staff console (2026-11-24): `SetHeat(P, Heat)` (clamped 0-100, re-tiers and escalates as a rise does; 0 resets the Bells but keeps owed summons), `Clear(P)` (Heat 0, state cleared, summons dropped, nothing booked) and `AddSummons(P, Type)`.
 
 ### The test probe (Studio only)
 

@@ -54,6 +54,8 @@ local StartedAt = os.time()
 local Folder, ClientEvent
 -- Studio only: the Play checks set it so Ban and Unban write the record without the Roblox Ban API (or a kick)
 Shared.TestSkipBanApi = false
+-- (phase 2, Studio only) the Play check sets this to try the live-server rule for Season, Moon and Sky
+Shared.TestLiveMode = false
 local OfflineRank = {} :: { [number]: { R: number, At: number } }
 
 local function svc(path: string)
@@ -383,6 +385,23 @@ C.Transform = { Target = true; Run = function(A, T)
 	if not (Tr and T.Character) then return false, `No character` end
 	Tr.Toggle(T.Character)
 	return true, `Toggled {T.Name}'s transformation`
+end }
+-- (console 2) the form's direction: the game's own Look path (Lineage.SetLook saves it, sets RaceLooks, RaceCosmetics re-dresses)
+C.FormDirection = { Target = true; Run = function(A, T, a)
+	local Data = svc(`Player.Data`) -- (profile() is defined further down, so it isn't in scope here)
+	if not (Data and Data.GetProfile(T)) then return false, `Their profile isn't loaded` end
+	local Race = T:GetAttribute(`Race`)
+	local Forms = require(ReplicatedStorage.Config.Forms)
+	local R = Race and Forms.Races and Forms.Races[Race]
+	if not (R and R.Directions) then return false, `{T.Name} has no form (no race form at Tier I)` end
+	local Dir
+	for _, D in R.Directions do if D.Id == a.Direction then Dir = D end end
+	if not Dir then return false, `Their race has no direction {a.Direction}` end
+	local Lin = require(ReplicatedStorage.Lineage)
+	if not Lin.SetLook then return false, `Couldn't set their form direction` end
+	local Ok, Why = Lin.SetLook(T, `FormDirection`, Dir.Id)
+	if not Ok then return false, if typeof(Why) == `string` and Why ~= `` then Why else `Couldn't set their form direction` end
+	return true, `Set {T.Name}'s form to {Dir.Name} (direction {Dir.Id})`
 end }
 C.Bring = { Target = true; Run = function(A, T)
 	local _, _, R = char(A)
@@ -882,13 +901,30 @@ C.Note = { Target = true; Run = function(A, T, a)
 	local _, Saved = StaffRecords.Write(T.UserId, function(R) Records.Push(R, `Notes`, Entry) end)
 	return true, saved(`Noted on {T.Name}`, Saved)
 end }
--- (1b) owner-only (Meta Level 3), Danger; TargetId is the picked UserId, who may be offline. Removing a ban or mute
--- entry doesn't lift it: Unban and Unmute stay the only way. The result message (the log's Detail) has the entry's text.
+-- (1b) owner-only (Meta Level 3), Danger; TargetId is the picked UserId, who may be offline. Removing a ban entry
+-- doesn't unban: Unban stays the only way (it calls the Roblox ban API). Removing a mute entry that is still on does
+-- lift the live mute, like Unmute: Muted is cleared, or set to the Until of another mute still on in their record (what
+-- loadRecord would give on a rejoin). A mute that had already ended or been lifted changes nothing else. The result
+-- message (the log's Detail) has the entry's text and the outcome.
 C.RemoveRecordEntry = { Target = true; Run = function(A, T, a, TargetId)
 	local Entry, Saved, Err = StaffRecords.RemoveEntry(TargetId, a.List, a.At, a.By)
 	if not Entry then return false, Err end
 	local Who = if T then T.Name else StaffRecords.NameOf(TargetId)
-	return true, saved(`Removed from {Who}'s {string.lower(a.List)}: {Records.EntryText(a.List, Entry)}`, Saved)
+	local Text = `Removed from {Who}'s {string.lower(a.List)}: {Records.EntryText(a.List, Entry)}`
+	local Now = os.time()
+	if a.List == `Mutes` and Records.MuteOn(Entry, Now) then
+		local Rec = StaffRecords.Cached(TargetId)
+		local Other = Rec and Records.OpenMute(Rec, Now)
+		if Other then
+			if T then Muted[TargetId] = Other.Until end -- offline: nothing to set here; a rejoin's loadRecord applies it
+			Text ..=`; still muted by another entry`
+		else
+			Muted[TargetId] = nil
+			if T then notify(T, `Chat restored`, nil, `Good`) end
+			Text ..= `; mute lifted`
+		end
+	end
+	return true, saved(Text, Saved)
 end }
 
 -- the Inspect remote: admins and up only (the console offers Inspect at level 2, Tools.luau), and no targeting up
@@ -931,6 +967,13 @@ function Shared.Inspect(Admin: Player, T: Player)
 	end
 	local sports = typeof(Prof.Sports) == `table` and Prof.Sports or {}
 	local arcade = typeof(Prof.Arcade) == `table` and Prof.Arcade.Best or {}
+	local Nt = svc(`School.Notoriety`)
+	local nt = {}
+	if Nt then local Ok, R = pcall(Nt.Get, T) if Ok and typeof(R) == `table` then nt = R end end
+	local Tu = svc(`World.Tutorial`)
+	local Lin = typeof(Prof.Lineage) == `table` and Prof.Lineage or {}
+	local Checkpoint = nil
+	if Tu then local Ok, R = pcall(Tu.CheckpointOf, T) if Ok then Checkpoint = R end end
 	return {
 		Name = T.Name; UserId = T.UserId; Slot = T:GetAttribute(`Slot`); Race = T:GetAttribute(`SubRace`) or T:GetAttribute(`Race`);
 		Yen = Prof.Yen or 0; Level = P.Level; Exp = P.Exp; Points = P.Points; Stats = P.Stats;
@@ -938,12 +981,40 @@ function Shared.Inspect(Admin: Player, T: Player)
 		Attendance = Att; Titles = s.Titles or {}; Title = s.Title or ``;
 		Regions = #rs.Found; RegionsTotal = rs.Total; Club = sports.Club or ``; Quests = active;
 		Arcade = arcade; Kills = Prof.Kills or 0; Note = latestNote(T.UserId);
+		Heat = nt.Heat; Bells = nt.Tier; BellState = nt.State; Summons = nt.Summons;
+		FormDirection = typeof(Lin.Looks) == `table` and Lin.Looks.FormDirection or nil;
+		Checkpoint = Checkpoint;
 	}
+end
+
+---------------------------------------------------------------- (phase 2) group modules
+
+-- Season, Moon tonight and Sky: Studio always (unless the Play check asks for the live rule); live, the owner only
+function Shared.ServerWide(A: Player): (boolean, string?)
+	local Studio = RunService:IsStudio() and not Shared.TestLiveMode
+	return StaffConsole.ServerWideOk(Shared.Level(A), Studio)
+end
+
+local H = {
+	svc = svc; str = str; profile = profile; today = today; Level = function(P) return Shared.Level(P) end;
+	ServerWide = function(A) return Shared.ServerWide(A) end; notify = notify;
+	Meta = function(Name: string, Kind: string, Extra: any?) local T = Extra or {} T.Name = Name T.Kind = Kind return T end;
+}
+Shared.GROUPS = { `World`, `Story`, `BellTower` }
+for _, Name in Shared.GROUPS do
+	local Mod = script:FindFirstChild(Name)
+	if not Mod then warn(`[Admin] Admin.{Name} missing: its cards are not in the console`) continue end
+	for Id, E in require(Mod)(H) do
+		if C[Id] or Meta[Id] then error(`[Admin] Admin.{Name}: the id {Id} is already taken`) end
+		C[Id] = { Run = E.Run }
+		Meta[Id] = E.Meta
+	end
 end
 
 -- the desk's pick lists (sent with Info)
 local function buildLists()
-	local L = { Quests = {}; Regions = {}; Clubs = {}; Venues = {}; Segments = {}; Beasts = {}; Races = {}; Gear = {}; Rooms = lessonRooms() }
+	local L = { Quests = {}; Regions = {}; Clubs = {}; Venues = {}; Segments = {}; Beasts = {}; Races = {}; Gear = {}; Rooms = lessonRooms();
+		Cutscenes = {}; Cases = {}; Clues = {}; Misdeeds = {} }
 	pcall(function() -- (beasts) the Spawns tab's beast buttons
 		for id, d in require(ReplicatedStorage.Config.Beasts).Defs do table.insert(L.Beasts, { Id = id; Name = d.Name or id }) end
 		table.sort(L.Beasts, function(x, y) return x.Name < y.Name end)
@@ -982,6 +1053,28 @@ local function buildLists()
 		for _, it in require(ReplicatedStorage.Config.Gear).Items do table.insert(L.Gear, { Id = it.Id; Name = it.Name }) end
 		table.sort(L.Gear, function(x, y) return x.Name < y.Name end)
 	end)
+	pcall(function() -- (console 2) Play a cutscene / Cutscene seen
+		for id, c in require(ReplicatedStorage.Config.Cine).Cuts do
+			if not c.Hidden then table.insert(L.Cutscenes, { Id = id; Name = c.Name or id }) end
+		end
+		table.sort(L.Cutscenes, function(x, y) return x.Name < y.Name end)
+	end)
+	pcall(function() -- (console 2) Give a clue / Reset a case
+		for caseId, c in require(ReplicatedStorage.Config.Cases) do
+			if typeof(c) == `table` then
+				table.insert(L.Cases, { Id = caseId; Name = c.Name or caseId })
+				for clueId, k in c.Clues or {} do
+					table.insert(L.Clues, { Id = `{caseId}/{clueId}`; Name = `{c.Name or caseId}: {k.Name or clueId}`; Order = (c.Number or 0) * 100 + (k.Order or 0) })
+				end
+			end
+		end
+		table.sort(L.Cases, function(x, y) return x.Name < y.Name end)
+		table.sort(L.Clues, function(x, y) return x.Order < y.Order end)
+	end)
+	pcall(function() -- (console 2) Give a summons: the misdeeds Admin.BellTower lists (Config.Notoriety.Heat keys)
+		for id in require(ReplicatedStorage.Config.Notoriety).Heat do table.insert(L.Misdeeds, { Id = id; Name = id }) end
+		table.sort(L.Misdeeds, function(x, y) return x.Name < y.Name end)
+	end)
 	return L
 end
 
@@ -1011,6 +1104,8 @@ end
 
 local function playerList()
 	local list = {}
+	local Q = svc(`Quests.Quests`)
+	local Cn = svc(`World.Cine`)
 	for _, P in Players:GetPlayers() do
 		local C0, H = char(P)
 		table.insert(list, {
@@ -1021,6 +1116,11 @@ local function playerList()
 			Muted = Muted[P.UserId] ~= nil; God = God[P] == true; Frozen = Frozen[P] == true;
 			Ping = math.floor((P:GetNetworkPing() or 0) * 1000); Level = Shared.Level(P);
 			Note = hasNote(P.UserId); InMenu = P:GetAttribute(`InMainMenu`) == true;
+			-- (console 2) the four new flags and the Bell Tower lines
+			Transformed = C0 ~= nil and C0:GetAttribute(`Transformation`) ~= nil;
+			Bells = P:GetAttribute(`NHBells`); BellState = P:GetAttribute(`NHBellState`); Summons = P:GetAttribute(`NHSummons`);
+			InCutscene = P:GetAttribute(`NHTutorial`) == true or (Cn ~= nil and Cn.IsWatching(P) == true);
+			New = Q ~= nil and (function() local Ok, S = pcall(Q.CineState, P) return Ok and typeof(S) == `table` and S.Prologue ~= `Seen` end)() or false;
 		})
 	end
 	return list

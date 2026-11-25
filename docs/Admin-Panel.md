@@ -29,16 +29,21 @@ Server cards come from `Features.Admin.Meta` (one entry per command); client car
 - **Server (5):** Announce, Server lock (danger), Bring all (danger), Freeze all (danger), Shutdown (danger, level 3).
 
 **Test side** (level 2)
-- **Character (16):** Heal, Revive, God mode, Kill (danger), Speed, Race, Tier, Spin height, Height, Build, Transform,
-  Give Yen, Give EXP, Give gear, Give spins, Name change.
+- **Character (17):** Heal, Revive, God mode, Kill (danger), Speed, Race, Tier, Spin height, Height, Build, Transform,
+  Form direction (phase 2), Give Yen, Give EXP, Give gear, Give spins, Name change.
 - **Progress (9 + Inspect):** Set level, Stat points, Grant title, Remove title, All places found, Reset places (danger),
   Club, Start a match, End a match; the client card Inspect (a read-only view of their slot).
 - **School (11):** Set time, Clock speed, Skip to a period, Ring the bell, Start a lesson, Discipline points, Clear
   discipline, Lift suspension, Excuse today, Owe detention, Clear detention. Start a lesson offers only rooms with a
   timetabled subject (R102-R105), and a refusal says why (no class right now, already in a lesson, not enrolled, not in the room).
-- **Story (3):** Start a quest, Drop a quest (both pick from the quest list; race rites are listed but owner-only),
-  Reset quests (danger).
-- **World (2):** Full moon tonight, Go to a place.
+  Phase 2 adds the Bell Tower cards here: Set Heat, Set Bells, Give a summons, Clear notoriety (danger), Hall monitors
+  (danger, on or off) and Who's Wanted.
+- **Story (10):** Start a quest, Drop a quest (both pick from the quest list; race rites are listed but owner-only),
+  Reset quests (danger); phase 2 adds Play a cutscene (Replay on saves nothing), Cutscene seen, Tutorial: enter,
+  Tutorial: jump to (Garden, Fence, Bus), Tutorial: leave, Give a clue and Reset a case (danger).
+- **World (6 + client tool):** Full moon tonight, Go to a place; phase 2 adds Time preset, Season, Moon tonight (Full,
+  Waxing, Waning, New, Crimson, Blue, or Auto) and Sky. Season, Moon and Sky change the whole server, so in a live
+  server only the owner may run them; testers get the client card Preview just for me, which changes only their own sky.
 - **Spawns (6):** Delinquent crew, One delinquent, Wolf pack, Beast, Sparring partner, Clear enemies (danger).
 - **Self (2 + client tools):** Invisible, Teleport to a point; the client cards Fly, Noclip, ESP and Ctrl+click teleport.
 
@@ -56,7 +61,8 @@ Arguments are checked on the server (`StaffConsole.CheckArgs`) before a command 
   spinning.
 
 ## Danger list (hold 0.8 s to confirm)
-Kick, Ban, Kill, Shutdown, Clear enemies, Freeze all, Server lock, Bring all, Reset quests, Reset places. The ring fills
+Kick, Ban, Kill, Shutdown, Clear enemies, Freeze all, Server lock, Bring all, Reset quests, Reset places, and (phase 2)
+Reset a case, Clear notoriety, Hall monitors. The ring fills
 while the mouse button, A or Return is held on the card's Run. Releasing, moving off the button or the selection, losing
 window focus, a redraw or closing the console cancels it. Return held while typing (the palette) never runs a danger card.
 
@@ -73,8 +79,9 @@ window focus, a redraw or closing the console cancels it. Return held while typi
   30 days or less a moderator. The Unban card shows the ban it would lift once a UserId is typed.
 - **History timeline:** the right-hand panel on the Moderate side, for the picked student. A summary line at the top
   ("1 note · 2 bans (lifted) · muted until Wed 25 Nov 05:06"), then newest first. Lifted or ended bans and mutes are
-  greyed and marked. The owner's ✕ (hold 0.8 s) removes an entry, and the removal is logged. Removing a ban or mute entry
-  doesn't lift it: Unban and Unmute stay the only way. The card version is Remove history entry (owner, danger).
+  greyed and marked. The owner's ✕ (hold 0.8 s) removes an entry, and the removal is logged. Removing a ban entry
+  doesn't unban: Unban stays the only way. Removing a mute that is still on lifts it, as Unmute does, unless another
+  mute on their record is still on; the log line says which (2026-11-24). The card version is Remove history entry (owner, danger).
 - **The Log section** (Moderate, key 3):
   - a day picker for this week;
   - search by staff, student, UserId or action;
@@ -103,8 +110,11 @@ window focus, a redraw or closing the console cancels it. Return held while typi
 
 ## 1b and later
 - **1b:** done (above).
-- **2:** new Test tools (World, Story, Bell Tower and Form tools) and the REPORTED, TRANSFORMED, WANTED and NEW flags.
-- **3:** the Inbox, player reports, flags and health graphs.
+- **2:** done (2026-11-24): the new Test cards above and the row flags TRANSFORMED, WANTED (Bell 3 or more), NEW (the
+  Prologue not seen yet) and IN CUTSCENE. The Test context card adds Heat, Bells, bell state, summons owed, form
+  direction and the tutorial checkpoint. Spec `docs/superpowers/specs/2026-11-24-admin-console-2-design.md`; test record
+  `tools/admin-console/REPORT.md` ("Phase 2").
+- **3:** the Inbox, player reports, the REPORTED flag, auto-flags and health graphs.
 
 ## Test record (1a, Studio Play on slot 2, 2026-11-23)
 - `console_play_run` (server, through the real `Dispatch`): **PASS, 81 calls**. Every level 0-3 refusal and argument
