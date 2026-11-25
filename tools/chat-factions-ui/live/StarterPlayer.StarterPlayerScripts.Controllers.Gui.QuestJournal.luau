@@ -262,11 +262,11 @@ function Local.Build()
 	local Toggle = Components.Button({
 		text = if UserInputService.KeyboardEnabled then `Journal [J]` else `Journal`;
 		style = `ghost`; onClick = function() Shared.Toggle() end;
-		Name = `Toggle`; AnchorPoint = Vector2.new(0, 0.5); Position = UDim2.new(0, 8, 0.5, 78); -- below the Factions button
+		Name = `Toggle`; AnchorPoint = Vector2.new(0, 0.5); Position = UDim2.new(0, 8, 0.5, 78); -- where it sat under the old left-edge Factions button
 		Size = UDim2.fromOffset(150, 44); Parent = Gui;
 	})
 	Toggle.Visible = false -- (chat-factions-ui, owner 2026-11-25) no left-edge button: J, the Phone or the quick menu
-	-- phones: beside the Factions button instead of under it (the left column is short; see FactionsPanel)
+	-- phones: the old beside-the-column spot (kept so the hidden button's layout is unchanged if it is shown again)
 	local function PhonePlace()
 		if Components.Phone and Components.Phone() then
 			Toggle.Position = UDim2.new(0, 148, 0.5, -55)

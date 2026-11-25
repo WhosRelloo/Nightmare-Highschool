@@ -628,18 +628,20 @@ Reserved keys (in `Settings.ReservedKeys`) can't be rebound. **M** opens the men
 ## Motion (`ReplicatedStorage.UI.Motion`, 2026-11-25)
 
 Shared animations for the iron-and-candle screens (the chat window and the Factions panel). Every helper honours
-Settings > Reduce Motion (`NHReducedMotion`): the end state at once, and no flicker or glint.
+Settings > Reduce Motion (`NHReducedMotion`): the end state at once, and no flicker or glint. The candle and glint loop
+reads the setting every step, so turning it on (or the saved setting arriving after start-up) stills them at once, and
+turning it off lets them carry on.
 
 | Helper | Does |
 |---|---|
 | `SmokeIn(Label, Delay?)` | fades a line in from 8 px left (0.35 s); the built state is read once, so a second call mid-drift still lands on it |
 | `Wake(Items, On, Instant?)` | each `{ Inst, AwakeGoal, QuietGoal }` tweens up (0.25 s) or down (0.6 s) |
-| `Candle(Flame, Holder?)` | a flame flickers in size and brightness (`ImageColor3`, never transparency, so panel fades own that); shared Heartbeat loop, pauses while `Holder` is hidden |
-| `Glint(Target, Prop, A, B, Holder?)` | a colour breathes between A and B (5 s); starts at A |
-| `Rise(Items, Step?)` | sections hide at once, then fade up in turn (`Kit.FadeIn`, 0.4 s, 0.15 s apart) |
+| `Candle(Flame, Holder?)` | a flame flickers in size and brightness (`ImageColor3`, never transparency, so panel fades own that); shared Heartbeat loop, pauses while `Holder` is hidden; under Reduce Motion it stays registered and rests at its built size and colour |
+| `Glint(Target, Prop, A, B, Holder?)` | a colour breathes between A and B (5 s): it rests at A on register, then breathes from a random phase; honours Reduce Motion live (rests at A while it is on) |
+| `Rise(Items, Step?)` | sections hide at once, then fade up in turn (`Kit.FadeIn`, 0.4 s, 0.15 s apart); inside a panel being opened, `Open`'s own fade leaves the waiting sections hidden, and a `Close` drops the fade-ins still pending (as it does `SmokeIn`'s) |
 | `Fill(Bar, Delay?)` | a `Kit.Bar` fills from 0 (1.1 s); the built size is cached, so a second call mid-fill restarts cleanly |
 | `Pips(Pips, Count, On, Off, Delay?)` | rank pips light one at a time (0.15 s apart) and settle on the exact `On` colour |
-| `Open(Panel)` / `Close(Panel)` | a panel scales from 0.985, rises 10 px and fades in (0.3 s, the fade starts one Heartbeat after the hide) / reverses out (0.2 s); opening again before a close ends keeps it open |
+| `Open(Panel)` / `Close(Panel)` | a panel scales from 0.985, rises 10 px and fades in (0.3 s, the fade starts one Heartbeat after the hide) / the reverse: scales to 0.985, drops 10 px and fades out (0.2 s), then hides; opening again before a close ends keeps it open |
 
 One tween per instance at a time (a new one replaces the old). `ActiveCount()` and `Stop(Inst)` are for checks and
 clean-up.

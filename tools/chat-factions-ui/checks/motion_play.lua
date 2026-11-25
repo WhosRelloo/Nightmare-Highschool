@@ -49,6 +49,29 @@ Flame.ImageTransparency = 0.7
 task.wait(0.2)
 Ok(math.abs(Flame.ImageTransparency - 0.7) < 0.001, "the candle loop still writes ImageTransparency (" .. Flame.ImageTransparency .. ")")
 
+-- Reduce Motion turned on after registration (the saved setting lands after OnStart): the flame rests at how it was
+-- built and the glint at A, for as long as it is on; turned off, the flicker carries on.
+Motion.ForceReduced = true
+task.wait(0.05)
+local Still = true
+for _ = 1, 10 do
+	if Flame.Size ~= UDim2.fromOffset(12, 14) or Flame.ImageColor3 ~= Color3.new(1, 1, 1) or S.Color ~= Color3.new(1, 0, 0) then
+		Still = false
+	end
+	task.wait(0.05)
+end
+Ok(Still, ("Reduce Motion on after registration: flame %s %s, glint %s"):format(tostring(Flame.Size), tostring(Flame.ImageColor3), tostring(S.Color)))
+Ok(Motion.ActiveCount() == Base + 2, "Reduce Motion dropped loop entries")
+Motion.ForceReduced = false
+local Moved = {}
+for _ = 1, 10 do
+	task.wait(0.05)
+	Moved[Flame.Size.X.Offset .. "/" .. math.round(Flame.ImageColor3.R * 100)] = true
+end
+local NM = 0
+for _ in Moved do NM += 1 end
+Ok(NM >= 3, "the candle didn't resume after Reduce Motion was turned off (" .. NM .. ")")
+
 local Bar = Instance.new("Frame")
 local Fill = Instance.new("Frame")
 Fill.Name = "Fill"
@@ -105,8 +128,51 @@ for I = 1, 2 do
 end
 Motion.Open(P2)
 Motion.Rise(Secs, 0.15)
-task.wait(1.2)
+task.wait(0.15)
+-- the stagger survives Open's own fade: the second section (due at 0.2 s) is still hidden
+Ok(Labs[2].TextTransparency > 0.5, ("Rise stagger lost: the second section is at %.2f 0.15 s after Open"):format(Labs[2].TextTransparency))
+task.wait(1.05)
 Ok(math.abs(Labs[1].TextTransparency - 0.1) < 0.01 and math.abs(Labs[2].TextTransparency - 0.1) < 0.01, ("Open + Rise left labels at %.2f / %.2f"):format(Labs[1].TextTransparency, Labs[2].TextTransparency))
+
+-- Open + Rise + a delayed SmokeIn, Close 0.1 s later: nothing fades back in once the panel has gone.
+local P6 = Instance.new("Frame")
+P6.Visible = false
+P6.Parent = G
+local Secs6, Labs6 = {}, {}
+for I = 1, 2 do
+	local Sec = Instance.new("Frame")
+	Sec.BackgroundTransparency = 1
+	Sec.Parent = P6
+	local Lab = Instance.new("TextLabel")
+	Lab.TextTransparency = 0.1
+	Lab.Parent = Sec
+	Secs6[I], Labs6[I] = Sec, Lab
+end
+local Smoke6 = Instance.new("TextLabel")
+Smoke6.TextTransparency = 0.1
+Smoke6.Parent = P6
+Motion.Open(P6)
+Motion.Rise(Secs6, 0.15)
+Motion.SmokeIn(Smoke6, 0.3)
+task.wait(0.1)
+Motion.Close(P6)
+task.wait(0.7)
+Ok(not P6.Visible, "Open/Close: the panel is still showing")
+Ok(Labs6[1].TextTransparency > 0.99 and Labs6[2].TextTransparency > 0.99 and Smoke6.TextTransparency > 0.99,
+	("a fade-in came back after Close (rise %.2f / %.2f, smoke %.2f)"):format(Labs6[1].TextTransparency, Labs6[2].TextTransparency, Smoke6.TextTransparency))
+
+-- Close is the true reverse: half way it is scaled down and dropped; once hidden it is back at its open place.
+local P7 = Instance.new("Frame")
+P7.Visible = false
+P7.Position = UDim2.fromOffset(100, 100)
+P7.Parent = G
+Motion.Open(P7)
+task.wait(0.5)
+Motion.Close(P7)
+task.wait(0.1)
+Ok(P7.NHOpenScale.Scale < 0.999 and P7.Position.Y.Offset > 100, ("Close half way: scale %.4f, y %d"):format(P7.NHOpenScale.Scale, P7.Position.Y.Offset))
+task.wait(0.3)
+Ok(not P7.Visible and P7.Position == UDim2.fromOffset(100, 100), "Close end " .. tostring(P7.Position))
 
 -- Open, Close 0.1 s later, Open again: the panel is back at how it was built, not dimmed.
 local P3 = Instance.new("Frame")

@@ -3,7 +3,10 @@
 	(Controllers.Gui.Chat, Controllers.Gui.FactionsPanel). Spec: docs/superpowers/specs/2026-11-25-chat-factions-ui-design.md.
 
 	- Every helper honours Settings > Reduce Motion (player attribute NHReducedMotion): the end state at once, and no
-	  flicker or glint. Motion.ForceReduced (true / false) overrides the setting for checks; nil follows it.
+	  flicker or glint. Motion.ForceReduced (true / false) overrides the setting for checks; nil follows it. The loop
+	  reads it every step (the saved setting lands after OnStart): a registered candle rests at how it was built and a
+	  glint at A while it is on, and they carry on when it is turned off.
+	- Delayed fade-ins (Rise, SmokeIn) inside a panel shown by Motion.Open are dropped if the panel is closed first.
 	- One tween per instance at a time: a new one cancels the old (never stacked).
 	- Candles and glints share one Heartbeat connection, connected only while something is registered. An entry leaves
 	  when its instance leaves the DataModel; it pauses while its Holder is hidden.
@@ -19,10 +22,13 @@ local Motion = {}
 Motion.ForceReduced = nil :: boolean?
 
 local Running = setmetatable({}, { __mode = "k" }) :: { [Instance]: Tween }
-local Candles = {} :: { [ImageLabel]: { Size: UDim2, T: number, Phase: number, Holder: GuiObject? } }
+local Candles = {} :: { [ImageLabel]: { Size: UDim2, Color: Color3, Phase: number, Holder: GuiObject? } }
 local Glints = {} :: { [Instance]: { Prop: string, A: Color3, B: Color3, Phase: number, Holder: GuiObject? } }
 local Opening = setmetatable({}, { __mode = "k" }) :: { [GuiObject]: number }
+local Shut = setmetatable({}, { __mode = "k" }) :: { [GuiObject]: boolean } -- panels Close has run on since their last Open
 local Tokens = setmetatable({}, { __mode = "k" }) :: { [Instance]: number } -- newest delayed call per Fill / SmokeIn
+local Rising = setmetatable({}, { __mode = "k" }) :: { [GuiObject]: number } -- Rise items whose fade-in is pending
+local Serial = 0
 local Beat: RBXScriptConnection? = nil
 
 function Motion.Reduced(): boolean
@@ -31,6 +37,23 @@ function Motion.Reduced(): boolean
 	end
 	local P = Players.LocalPlayer
 	return P ~= nil and P:GetAttribute("NHReducedMotion") == true
+end
+
+-- The panel (one Motion.Open / Close has run on) an instance sits in. A delayed fade-in inside it goes ahead only if
+-- the panel is open when it is due: after a Close (and no Open since) it is dropped, so nothing fades back in.
+local function gate(Inst: Instance): GuiObject?
+	local A: Instance? = Inst
+	while A do
+		if Opening[A :: any] ~= nil then
+			return A :: any
+		end
+		A = A.Parent
+	end
+	return nil
+end
+
+local function stillOpen(Panel: GuiObject?): boolean
+	return Panel == nil or not Shut[Panel]
 end
 
 function Motion.Play(Inst: Instance, Time: number, Goal: { [string]: any }, Style: Enum.EasingStyle?): Tween
@@ -77,9 +100,10 @@ function Motion.SmokeIn(Label: TextLabel, Delay: number?)
 	local T0, S0, P0 = Label:GetAttribute("NHSmokeT") :: number, Label:GetAttribute("NHSmokeS") :: number, Label:GetAttribute("NHSmokePos") :: UDim2
 	local Mine = (Tokens[Label] or 0) + 1
 	Tokens[Label] = Mine
+	local Panel = gate(Label)
 	settle(Label, { TextTransparency = 1, TextStrokeTransparency = 1, Position = P0 + UDim2.fromOffset(-8, 0) })
 	local function go()
-		if Label.Parent and Tokens[Label] == Mine then
+		if Label.Parent and Tokens[Label] == Mine and stillOpen(Panel) then
 			Motion.Play(Label, 0.35, { TextTransparency = T0, TextStrokeTransparency = S0, Position = P0 })
 		end
 	end
@@ -115,9 +139,13 @@ end
 
 local function step()
 	local Now = os.clock()
+	local Reduced = Motion.Reduced() -- read every step: the saved setting lands after the screens register
 	for Flame, E in Candles do
 		if not Flame:IsDescendantOf(game) then
 			Candles[Flame] = nil
+		elseif Reduced then
+			Flame.Size = E.Size -- still, at how it was built; the entry stays so it resumes when the setting is off
+			Flame.ImageColor3 = E.Color
 		elseif shown(E.Holder) then
 			local W = 1 + 0.06 * math.sin(Now * 3.7 + E.Phase) + 0.03 * math.sin(Now * 11.3 + E.Phase * 2)
 			local H = 1 + 0.09 * math.sin(Now * 3.7 + E.Phase + 0.6) + 0.04 * math.sin(Now * 9.1 + E.Phase)
@@ -129,6 +157,9 @@ local function step()
 	for Inst, E in Glints do
 		if not Inst:IsDescendantOf(game) then
 			Glints[Inst] = nil
+		elseif Reduced then
+			local Any: any = Inst
+			Any[E.Prop] = E.A
 		elseif shown(E.Holder) then
 			local K = 0.5 + 0.5 * math.sin(Now * (2 * math.pi / 5) + E.Phase)
 			local Any: any = Inst
@@ -148,10 +179,8 @@ local function ensureBeat()
 end
 
 -- A candle flame flickers (size and brightness through its colour, about 1.7 s a cycle) around how it was built.
+-- Under Reduce Motion it stays registered but still (see step).
 function Motion.Candle(Flame: ImageLabel, Holder: GuiObject?)
-	if Motion.Reduced() then
-		return
-	end
 	Candles[Flame] = { Size = Flame.Size, Color = Flame.ImageColor3, Phase = math.random() * 6.28, Holder = Holder }
 	ensureBeat()
 end
@@ -159,10 +188,7 @@ end
 -- An edge breathes between A and B (about 5 s a cycle). Prop is the colour property ("ImageColor3", "Color").
 function Motion.Glint(Target: Instance, Prop: string, A: Color3, B: Color3, Holder: GuiObject?)
 	local Any: any = Target
-	Any[Prop] = A
-	if Motion.Reduced() then
-		return
-	end
+	Any[Prop] = A -- rests at A on register, then breathes from a random phase (still at A under Reduce Motion)
 	Glints[Target] = { Prop = Prop, A = A, B = B, Phase = math.random() * 6.28, Holder = Holder }
 	ensureBeat()
 end
@@ -239,15 +265,24 @@ local function hide(Root: GuiObject)
 	end
 end
 
--- Sections fade up one after another (Step apart). They sit in list layouts, so they don't move.
+-- Sections fade up one after another (Step apart). They sit in list layouts, so they don't move. While an item waits,
+-- it is in Rising: Open's fade (one Heartbeat after Open) hides it again, so the stagger isn't lost; a Close drops it.
 function Motion.Rise(Items: { GuiObject }, Step: number?)
 	if Motion.Reduced() then
 		return
 	end
 	for I, Item in Items do
 		hide(Item)
+		Serial += 1
+		local Mine = Serial
+		Rising[Item] = Mine
+		local Panel = gate(Item)
 		task.delay(0.05 + (I - 1) * (Step or 0.15), function()
-			if Item.Parent then
+			if Rising[Item] ~= Mine then
+				return -- a newer Rise owns it
+			end
+			Rising[Item] = nil
+			if Item.Parent and stillOpen(Panel) then
 				Kit.FadeIn(Item, 0.4)
 			end
 		end)
@@ -313,6 +348,7 @@ end
 -- Shows a panel: it scales up from 0.985 and rises 10 px while it fades in (0.3 s).
 function Motion.Open(Panel: GuiObject)
 	Opening[Panel] = (Opening[Panel] or 0) + 1
+	Shut[Panel] = nil
 	Panel.Visible = true
 	local S = scaler(Panel)
 	if Panel:GetAttribute("NHOpenPos") == nil then
@@ -337,24 +373,39 @@ function Motion.Open(Panel: GuiObject)
 	RunService.Heartbeat:Once(function()
 		if Opening[Panel] == Mine and Panel.Parent then
 			Kit.FadeIn(Panel, 0.3)
+			-- that fade covers every descendant; Rise items still waiting go back to hidden for their own turn
+			for Item in Rising do
+				if Item:IsDescendantOf(Panel) then
+					hide(Item)
+				end
+			end
 		end
 	end)
 end
 
--- Hides a panel: the reverse over 0.2 s. Opening it again before that keeps it open.
+-- Hides a panel: the reverse over 0.2 s (scales to 0.985 and drops 10 px while it fades), then hides it. Opening it
+-- again before that keeps it open. Pending Rise / SmokeIn fade-ins inside it are dropped (see gate).
 function Motion.Close(Panel: GuiObject)
 	Opening[Panel] = (Opening[Panel] or 0) + 1
+	Shut[Panel] = true
 	local Mine = Opening[Panel]
 	if Motion.Reduced() or not Panel.Visible then
 		Panel.Visible = false
 		return
 	end
+	if Panel:GetAttribute("NHOpenPos") == nil then
+		Panel:SetAttribute("NHOpenPos", Panel.Position)
+	end
+	local Base = Panel:GetAttribute("NHOpenPos") :: UDim2
 	remember(Panel)
 	Motion.Play(scaler(Panel), 0.2, { Scale = 0.985 })
+	Motion.Play(Panel, 0.2, { Position = Base + UDim2.fromOffset(0, 10) })
 	Kit.FadeOut(Panel, 0.2)
 	task.delay(0.22, function()
 		if Opening[Panel] == Mine then
 			Panel.Visible = false
+			settle(Panel, { Position = Base })
+			settle(scaler(Panel), { Scale = 1 })
 		end
 	end)
 end

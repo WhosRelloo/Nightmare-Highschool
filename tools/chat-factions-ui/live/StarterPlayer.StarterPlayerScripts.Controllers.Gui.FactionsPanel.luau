@@ -385,7 +385,7 @@ function Local.Render(Animate: boolean?)
 	Rumours.Name = `Rumours`
 	Local.Label(Rumours, { Order = 0; Text = `<b>Rumours</b>`; TextSize = 16 })
 	for I, Planned in FactionConfig.Planned or {} do
-		table.insert(Smokes, Local.Label(Rumours, { Order = I; TextSize = 13; Color = DIM; Text = `<b>{Planned.Name}</b>: {Planned.Text}` }))
+		table.insert(Smokes, Local.Label(Rumours, { Order = I; TextSize = 13; Color = DIM; Text = `<i><b>{Planned.Name}</b>: {Planned.Text}</i>` })) -- italic and dim (spec)
 	end
 
 	if Animate then

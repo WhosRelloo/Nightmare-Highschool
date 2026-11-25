@@ -16,6 +16,14 @@ local function checkBody(Body: Instance, Label: string)
 	for _, N in { "Reputation", "Vigil", "CrimsonCourt", "Titles", "Rumours" } do
 		Ok(Body:FindFirstChild(N, true) ~= nil, Label .. ": missing " .. N)
 	end
+	local Rumours = Body:FindFirstChild("Rumours", true)
+	if Rumours then
+		for _, L in Rumours:GetChildren() do
+			if L:IsA("TextLabel") and L.LayoutOrder > 0 then
+				Ok(L.RichText and L.Text:sub(1, 3) == "<i>" and L.Text:sub(-4) == "</i>", Label .. ": a rumour isn't italic: " .. L.Text)
+			end
+		end
+	end
 	for _, D in Body:GetDescendants() do
 		if D.Name == "Bar" and D:GetAttribute("Value") ~= nil and D:FindFirstChild("Fill") then
 			local Want = math.clamp(D:GetAttribute("Value"), 0, 1)
@@ -57,9 +65,13 @@ local Got = nil
 local Hooked, Old = pcall(function() return Packets.SocialAction.Fire end)
 if Hooked and pcall(function() Packets.SocialAction.Fire = function(_, D) Got = D end end) then
 	T.Equip("Night Owl", false)
+	local Sent = Got
+	Got = nil
+	T.Equip("Night Owl", true) -- unequip, caught too: the player's real title is never changed
+	local Unsent = Got
 	Packets.SocialAction.Fire = Old
-	Ok(Got and Got.Action == "EquipTitle" and Got.Title == "Night Owl", "Equip didn't send EquipTitle")
-	T.Equip("Night Owl", true)
+	Ok(Sent and Sent.Action == "EquipTitle" and Sent.Title == "Night Owl", "Equip didn't send EquipTitle")
+	Ok(Unsent and Unsent.Action == "EquipTitle" and Unsent.Title == "", "unequip didn't send EquipTitle \"\"")
 else
 	table.insert(Notes, "Equip not checked: Packets.SocialAction can't be hooked")
 end

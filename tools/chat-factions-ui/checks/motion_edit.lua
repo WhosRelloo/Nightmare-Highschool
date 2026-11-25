@@ -1,5 +1,5 @@
 -- motion_edit (chat-factions-ui, Edit): UI.Motion has every helper, and with reduced motion every helper leaves the end
--- state at once (no tween, no loop). The animated paths are checked in Play (motion_play.lua).
+-- state at once (no tween; candles and glints register but rest). The animated paths are checked in Play (motion_play.lua).
 local M = game.ReplicatedStorage.UI:FindFirstChild("Motion")
 if not M then return "FAIL no UI.Motion" end
 local C = M:Clone()
@@ -33,13 +33,19 @@ Motion.Wake(Items, true)
 Ok(F.BackgroundTransparency == 0, "Wake awake (reduced) " .. F.BackgroundTransparency)
 local Base = Motion.ActiveCount()
 local Flame = Instance.new("ImageLabel")
+Flame.Size = UDim2.fromOffset(12, 14)
 Flame.Parent = G
 Motion.Candle(Flame, nil)
 local S = Instance.new("UIStroke")
 S.Parent = F
 Motion.Glint(S, "Color", Color3.new(1, 0, 0), Color3.new(0, 0, 1), nil)
 Ok(S.Color == Color3.new(1, 0, 0), "Glint (reduced) didn't set A")
-Ok(Motion.ActiveCount() == Base, "Candle or Glint joined the loop under reduced motion")
+-- they join the loop even under reduced motion (it is read every step, so they rest now and resume if it turns off)
+Ok(Motion.ActiveCount() == Base + 2, ("Candle and Glint should register under reduced motion: %d entries, want %d"):format(Motion.ActiveCount(), Base + 2))
+Ok(Flame.Size == UDim2.fromOffset(12, 14) and Flame.ImageColor3 == Color3.new(1, 1, 1), "Candle (reduced) changed the flame")
+Motion.Stop(Flame)
+Motion.Stop(S)
+Ok(Motion.ActiveCount() == Base, "Stop left entries in the loop")
 local Bar = Instance.new("Frame")
 local Fill = Instance.new("Frame")
 Fill.Name = "Fill"

@@ -11,9 +11,12 @@ Record: `tools/chat-factions-ui/REPORT.md`. Backup: `ServerStorage.NH_Backup.Cha
   stays faint on touch), and a soft dark patch sits behind the lines. /, the mouse or a new message brings the frame
   back. New lines smoke in, the header has a flickering candle, and the iron edge glints.
 - **The Factions panel** has a candle by its title, faction cards washed in their colour with a breathing edge, and
-  rank pips. On open it rises in, the sections fade up in turn, the bars fill, the pips light and the rumours smoke in.
+  rank pips. On open it rises in, the sections fade up in turn, the bars fill, the pips light and the rumours (italic
+  and dim) smoke in.
   Profile updates redraw it without replaying the animation.
-- **`UI.Motion`:** the shared animations. Everything honours Reduce Motion.
+- **`UI.Motion`:** the shared animations. Everything honours Reduce Motion, and the candles and glints follow it live
+  (turned on after start-up, they still at once). Closing the panel mid-open cancels the fade-ins still to come, and
+  Close is the true reverse of Open (scales down, drops 10 px, fades).
 - **The left-edge Factions and Journal buttons are gone.** L and J, the Phone's apps and the gamepad quick menu open
   both panels.
 - Behaviour is otherwise unchanged: TextChatService, filtering, commands, `NHCanChat`, / and history, L for the panel,
