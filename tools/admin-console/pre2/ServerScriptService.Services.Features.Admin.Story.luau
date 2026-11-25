@@ -23,7 +23,17 @@ return function(H)
 				local Who = Tg or Admin
 				if Cn.IsWatching(Who) then return false, `{Who.Name} is in a cutscene already` end
 				local Replay = a.Replay ~= false
-				local Id = Cn.Play({ Who }, a.Id, { Replay = Replay; Skippable = true })
+				-- Cine.Play marks the cut Started (and Seen when it ends); a replay saves nothing, so put the old mark back at the end
+				local Q = if Replay then H.svc(`Quests.Quests`) else nil
+				local Prev = if Q then (Q.CineState(Who) or {})[a.Id] else nil
+				local Id = Cn.Play({ Who }, a.Id, { Replay = Replay; Skippable = true; OnFinish = if Q then function(Viewer)
+					local S = Q.CineState(Viewer)
+					if S then S[a.Id] = Prev pcall(Q.SyncForCine, Viewer) end
+				end else nil })
+				if Id and Q then
+					local S = Q.CineState(Who)
+					if S then S[a.Id] = Prev pcall(Q.SyncForCine, Who) end -- restored now too, so the mark never shows even if the cut is cut short
+				end
 				if not Id then return false, `Couldn't play it for {Who.Name} (in the menu, or no character)` end
 				return true, `Playing {cutName(a.Id)} for {Who.Name}{if Replay then ` (replay)` else ` (first viewing)`}`
 			end;

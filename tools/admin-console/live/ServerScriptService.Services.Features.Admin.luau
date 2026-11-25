@@ -388,7 +388,8 @@ C.Transform = { Target = true; Run = function(A, T)
 end }
 -- (console 2) the form's direction: the game's own Look path (Lineage.SetLook saves it, sets RaceLooks, RaceCosmetics re-dresses)
 C.FormDirection = { Target = true; Run = function(A, T, a)
-	if not profile(T) then return false, `Their profile isn't loaded` end
+	local Data = svc(`Player.Data`) -- (profile() is defined further down, so it isn't in scope here)
+	if not (Data and Data.GetProfile(T)) then return false, `Their profile isn't loaded` end
 	local Race = T:GetAttribute(`Race`)
 	local Forms = require(ReplicatedStorage.Config.Forms)
 	local R = Race and Forms.Races and Forms.Races[Race]

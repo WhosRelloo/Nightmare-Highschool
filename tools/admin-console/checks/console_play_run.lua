@@ -173,7 +173,9 @@ local function first(K) local I = L[K] and L[K][1] return I and (if typeof(I) ==
 -- (fix round 1) the quest: the first in the list that can start now. A dare is open only on its own day (Quests.DareFor),
 -- so first("Quests") alone is refused on most days ("not open to them yet").
 -- (final review fix 2) Lists.Clubs starts with "None" (take them out): the join uses the first real club
+-- (Task 8) slot 2 may already be in a club (the Soccer session's work): join another one, SetClub refuses "already on"
 local RealClub = L.Clubs[2] and L.Clubs[2].Id
+if RealClub and P:GetAttribute("Club") == RealClub then RealClub = L.Clubs[3] and L.Clubs[3].Id or RealClub end
 if first("Clubs") ~= "None" then table.insert(Fails, "Lists.Clubs doesn't start with None") end
 local QuestId = first("Quests")
 for _, It in L.Quests do if not string.find(It.Id, "^Rite") then QuestId = It.Id break end end
@@ -267,6 +269,9 @@ do
 	Seen.RemoveRecordEntry = true
 end
 for _, Id in { "Kick", "Ban", "Unban", "Shutdown" } do Seen[Id] = true end
+-- (Task 8) the 18 phase 2 cards are run by console2_play_run
+for _, Id in { "TimePreset", "SetSeason", "SetMoon", "SetSky", "SetHeat", "SetBells", "GiveSummons", "ClearNotoriety", "HallMonitors", "WhosWanted",
+	"PlayCutscene", "CutsceneSeen", "TutorialEnter", "TutorialJump", "TutorialLeave", "GiveClue", "ResetCase", "FormDirection" } do Seen[Id] = true end
 for _, D in Admin.Registry(3) do if not Seen[D.Id] then table.insert(Fails, D.Id .. " not run") end end
 end
 
