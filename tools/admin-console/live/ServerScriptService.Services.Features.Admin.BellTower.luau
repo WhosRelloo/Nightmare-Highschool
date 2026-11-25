@@ -5,16 +5,13 @@
 local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
 local Players = game:GetService(`Players`)
 local Cfg = require(ReplicatedStorage.Config.Notoriety)
-local THRESHOLDS = Cfg.Tiers -- the Bell 1-5 Heat thresholds, { 10, 25, 45, 70, 90 }
-local MISDEEDS = Cfg.Heat -- the Heat-per-misdeed rows, keyed by misdeed
+-- Heat for Bell 1-5: midpoints of each bell's band, so the first cooling tick doesn't drop a bell
+local BELL_HEAT = { 17.5, 35, 57.5, 80, 100 }
 
 return function(H)
 	local A = H.Meta
 	local T = `Test`
 	local function nt() return H.svc(`School.Notoriety`) end
-	local Types = {}
-	for K in MISDEEDS do table.insert(Types, K) end
-	table.sort(Types)
 	return {
 		SetHeat = {
 			Meta = { Side = T; Section = `School`; Title = `Set Heat`; Help = `Their notoriety Heat, 0 to 100 (the Bells follow)`; Icon = `Discipline`;
@@ -34,7 +31,7 @@ return function(H)
 			Run = function(Admin, Tg, a)
 				local N = nt() if not N then return false, `Notoriety is missing` end
 				local Old = N.Get(Tg).Tier
-				N.SetHeat(Tg, if a.Bells == 0 then 0 else THRESHOLDS[a.Bells])
+				N.SetHeat(Tg, if a.Bells == 0 then 0 else BELL_HEAT[a.Bells])
 				return true, `{Tg.Name}: Bell {Old} to {a.Bells}`
 			end;
 		};

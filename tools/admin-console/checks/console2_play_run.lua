@@ -42,7 +42,7 @@ local KEYS = { "Quests", "Discipline", "Lineage", "Progress" }
 local Saved = {} for _, K in KEYS do Saved[K] = deep(Prof[K]) end
 local WA = { "NHSeason", "NHSky", "NHMoonOverride", "NHMoonOverrideNight", "NHMonitorsOff" }
 local W0 = {} for _, K in WA do W0[K] = workspace:GetAttribute(K) end
-local PA = { "RaceLooks", "NHTutorial" }
+local PA = { "RaceLooks", "NHTutorial", "RaceHunger", "NHSummons", "NHBells", "NHBellState" }
 local P0 = {} for _, K in PA do P0[K] = P:GetAttribute(K) end
 local St0 = Clock.GetState()
 local Me = P.UserId
@@ -72,7 +72,10 @@ local function putBack()
 	pcall(Q.SyncForCine, P)
 	for _, K in PA do if P:GetAttribute(K) ~= P0[K] then P:SetAttribute(K, P0[K]) end end
 	for _, K in WA do workspace:SetAttribute(K, W0[K]) end
-	pcall(Clock.SetTime, string.format("%02d:%02d", St0.Hour, St0.Minute or 0), St0.Day)
+	-- Lineage mirrors RaceHunger from the profile (math.floor(l.Hunger or 0)); the profile is what was restored
+	P:SetAttribute("RaceHunger", math.floor((Prof.Lineage and Prof.Lineage.Hunger) or 0))
+	-- SchoolClock.GetState().MinuteOfDay is 0..1440 and fractional
+	pcall(Clock.SetTime, string.format("%02d:%02d", math.floor(St0.MinuteOfDay // 60), math.floor(St0.MinuteOfDay % 60)), St0.Day)
 end
 
 local Ok, Err = xpcall(function()
@@ -168,7 +171,12 @@ putBack()
 for _, K in KEYS do if json(Prof[K]) ~= json(Saved[K]) then table.insert(Fails, "slot 2 " .. K .. " not put back") end end
 for _, K in WA do if workspace:GetAttribute(K) ~= W0[K] then table.insert(Fails, "workspace " .. K .. " not put back") end end
 if P:GetAttribute("Race") ~= Race0 or P:GetAttribute("RaceTier") ~= Tier0 then table.insert(Fails, "race not put back: " .. tostring(P:GetAttribute("Race")) .. " tier " .. tostring(P:GetAttribute("RaceTier"))) end
-for _, K in PA do if P:GetAttribute(K) ~= P0[K] then table.insert(Fails, "player attribute " .. K .. " not put back") end end
+for _, K in PA do
+	local Cur, Old = P:GetAttribute(K), P0[K]
+	local Same = Cur == Old or (K == "RaceHunger" and typeof(Cur) == "number" and typeof(Old) == "number" and math.abs(Cur - Old) <= 2)
+	if not Same then table.insert(Fails, "player attribute " .. K .. " not put back") end
+end
+if Clock.GetState().Day ~= St0.Day then table.insert(Fails, "clock day not put back: " .. tostring(Clock.GetState().Day) .. " vs " .. tostring(St0.Day)) end
 if lookNow() ~= Look0 then table.insert(Fails, "FormDirection look not put back: " .. tostring(lookNow()) .. " vs " .. tostring(Look0)) end
 local Note = `\n(race {tostring(Race0)}; FormDirection look before {tostring(Look0)}, after direction 2 {tostring(LookAfterSet)}, after put-back {tostring(lookNow())})`
 if not Ok then return "FAIL error: " .. tostring(Err) .. Note end

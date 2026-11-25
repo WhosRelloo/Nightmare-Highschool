@@ -70,6 +70,14 @@ local function into(Prof, K, V)
 		Prof[K] = deep(V)
 	end
 end
+-- Inventory.Kit.*.Burn ticks in real time (a Warmer), so it is left out of the profile compare
+local function cmpJson(K, V)
+	if K == "Inventory" and typeof(V) == "table" and typeof(V.Kit) == "table" then
+		V = deep(V)
+		for _, Item in V.Kit do if typeof(Item) == "table" then Item.Burn = nil end end
+	end
+	return json(V)
+end
 local PutBackDone = false
 local function putBack()
 	if PutBackDone then return end
@@ -81,15 +89,22 @@ local function putBack()
 	-- the club: leaving clears the Club / ClubRank mirrors that a put-back profile alone would leave
 	pcall(function() if not (Saved.Sports and Saved.Sports.Club) then require(SSS.Sports.Clubs).Leave(P) end end)
 	for _, K in KEYS do
-		if json(Prof[K]) ~= json(Saved[K]) then
+		if cmpJson(K, Prof[K]) ~= cmpJson(K, Saved[K]) then
 			local U = UPDATE[K]
 			if U then pcall(Data.UpdateState, P, { type = U[1]; [U[2]] = deep(Saved[K]) }) end
-			if json(Prof[K]) ~= json(Saved[K]) then into(Prof, K, Saved[K]) table.insert(Direct, K) end
+			if cmpJson(K, Prof[K]) ~= cmpJson(K, Saved[K]) then into(Prof, K, Saved[K]) table.insert(Direct, K) end
 			table.insert(Undo, K)
 		end
 	end
 	pcall(function() require(SSS.Social.Reputation).Sync(P) end)
 	pcall(function() local I = require(SSS.Player.Identity) if I.Mirror then I.Mirror(P, I.Get(P)) end end)
+	-- a profile that was in a club: put its Club / ClubRank mirrors back from the snapshot
+	if Saved.Sports and Saved.Sports.Club then
+		P:SetAttribute("Club", Attr0.Club)
+		P:SetAttribute("ClubRank", Attr0.ClubRank)
+	end
+	-- Lineage mirrors RaceHunger from the profile (math.floor(l.Hunger or 0))
+	P:SetAttribute("RaceHunger", math.floor((Prof.Lineage and Prof.Lineage.Hunger) or 0))
 	pcall(function() require(SSS.Sports.Clubs).Notify(P) end)
 	pcall(function() require(SSS.Player.Height).Apply(P) end) -- height mirrors and body (a stopped run has no respawn)
 	pcall(function() local Pg = require(SSS.Player.Progression) Pg.Apply(P) Pg.Notify(P) end)
@@ -292,10 +307,13 @@ repeat task.wait(0.5)
 until (H and H.Health > 0) or os.clock() - t0 > 20
 task.wait(2)
 local Prof = Data.GetProfile(P)
-for _, K in KEYS do if json(Prof[K]) ~= json(Saved[K]) then table.insert(Fails, `profile {K} not put back`) end end
+for _, K in KEYS do if cmpJson(K, Prof[K]) ~= cmpJson(K, Saved[K]) then table.insert(Fails, `profile {K} not put back`) end end
 for _, K in { "Level", "SubRace", "RaceTier", "Race", "Title", "HeightText", "Slot", "Enrolled", "Club", "ClubRank", "NHTestLevel", "NHHallPass" } do
 	if P:GetAttribute(K) ~= Attr0[K] then table.insert(Fails, `attribute {K}: {tostring(P:GetAttribute(K))}, was {tostring(Attr0[K])}`) end
 end
+-- Hunger ticks in real time: within 2 counts as put back
+local H1, H0 = P:GetAttribute("RaceHunger"), Attr0.RaceHunger
+if H1 ~= H0 and not (typeof(H1) == "number" and typeof(H0) == "number" and math.abs(H1 - H0) <= 2) then table.insert(Fails, `attribute RaceHunger: {tostring(H1)}, was {tostring(H0)}`) end
 -- attributes allowed to differ after the run, each with its reason; any other drift fails
 local DRIFT_OK = {
 	DetentionsOwed = "Discipline: Owe/ClearDetention set it; restore.py puts the discipline record back after the run";
@@ -307,7 +325,7 @@ local DRIFT_OK = {
 }
 local Drift = {}
 local Now = P:GetAttributes()
-for K, V in Now do if Attr0[K] ~= V then
+for K, V in Now do if Attr0[K] ~= V and not (K == "RaceHunger" and typeof(V) == "number" and typeof(Attr0[K]) == "number" and math.abs(V - Attr0[K]) <= 2) then
 	if DRIFT_OK[K] then table.insert(Drift, `{K}={tostring(V)} (was {tostring(Attr0[K])}; allowed: {DRIFT_OK[K]})`)
 	else table.insert(Fails, `attribute drift {K}={tostring(V)} (was {tostring(Attr0[K])})`) end
 end end

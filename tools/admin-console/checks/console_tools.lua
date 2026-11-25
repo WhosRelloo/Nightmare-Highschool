@@ -43,7 +43,7 @@ if A2.NHMoonPhasePreview ~= "Crimson" then table.insert(Fails, "crimson") end
 if A2.NHMoonPreview ~= nil then table.insert(Fails, "not full") end
 if A2.NHSkyPreview ~= nil then table.insert(Fails, "sky off") end
 local A3 = T.PreviewAttrs({ Season = "Autumn" })
-if A3.NHSeasonPreview ~= nil then table.insert(Fails, "Autumn is the normal season: no preview") end
+if A3.NHSeasonPreview ~= "Autumn" then table.insert(Fails, "Autumn previews as Autumn") end
 if A3.NHMoonPhasePreview ~= nil then table.insert(Fails, "missing moon is off") end
 if #Fails > 0 then return "FAIL tools: " .. table.concat(Fails, "; ") end
 return "PASS tools"
