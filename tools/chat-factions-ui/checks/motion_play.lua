@@ -40,11 +40,14 @@ Ok(Motion.ActiveCount() == Base + 2, ("loop entries %d, want %d"):format(Motion.
 local Seen = {}
 for _ = 1, 12 do
 	task.wait(0.05)
-	Seen[Flame.Size.X.Offset .. "/" .. math.round(Flame.ImageTransparency * 100)] = true
+	Seen[Flame.Size.X.Offset .. "/" .. math.round(Flame.ImageColor3.R * 100)] = true
 end
 local N = 0
 for _ in Seen do N += 1 end
-Ok(N >= 3, "the candle doesn't flicker (" .. N .. " distinct size/transparency pairs)")
+Ok(N >= 3, "the candle doesn't flicker (" .. N .. " distinct size/colour pairs)")
+Flame.ImageTransparency = 0.7
+task.wait(0.2)
+Ok(Flame.ImageTransparency == 0.7, "the candle loop still writes ImageTransparency (" .. Flame.ImageTransparency .. ")")
 
 local Bar = Instance.new("Frame")
 local Fill = Instance.new("Frame")

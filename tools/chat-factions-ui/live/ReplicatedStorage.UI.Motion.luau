@@ -122,7 +122,8 @@ local function step()
 			local W = 1 + 0.06 * math.sin(Now * 3.7 + E.Phase) + 0.03 * math.sin(Now * 11.3 + E.Phase * 2)
 			local H = 1 + 0.09 * math.sin(Now * 3.7 + E.Phase + 0.6) + 0.04 * math.sin(Now * 9.1 + E.Phase)
 			Flame.Size = UDim2.new(E.Size.X.Scale * W, E.Size.X.Offset * W, E.Size.Y.Scale * H, E.Size.Y.Offset * H)
-			Flame.ImageTransparency = math.clamp(E.T + 0.12 * (0.5 + 0.5 * math.sin(Now * 5.3 + E.Phase)), 0, 1)
+			-- brightness flickers through the colour, never ImageTransparency: the panel's fades own that
+			Flame.ImageColor3 = E.Color:Lerp(Color3.new(0, 0, 0), 0.18 * (0.5 + 0.5 * math.sin(Now * 5.3 + E.Phase)))
 		end
 	end
 	for Inst, E in Glints do
@@ -146,12 +147,12 @@ local function ensureBeat()
 	end
 end
 
--- A candle flame flickers (size and transparency, about 1.7 s a cycle) around how it was built.
+-- A candle flame flickers (size and brightness through its colour, about 1.7 s a cycle) around how it was built.
 function Motion.Candle(Flame: ImageLabel, Holder: GuiObject?)
 	if Motion.Reduced() then
 		return
 	end
-	Candles[Flame] = { Size = Flame.Size, T = Flame.ImageTransparency, Phase = math.random() * 6.28, Holder = Holder }
+	Candles[Flame] = { Size = Flame.Size, Color = Flame.ImageColor3, Phase = math.random() * 6.28, Holder = Holder }
 	ensureBeat()
 end
 
@@ -172,7 +173,7 @@ function Motion.Stop(Inst: Instance)
 	if E then
 		local F = Inst :: ImageLabel
 		F.Size = E.Size
-		F.ImageTransparency = E.T
+		F.ImageColor3 = E.Color
 	end
 	Candles[Inst :: any] = nil
 	Glints[Inst] = nil
@@ -284,8 +285,15 @@ function Motion.Pips(Pips: { GuiObject }, Count: number, On: Color3, Off: Color3
 	end
 	for I = 1, math.min(Count, #Pips) do
 		task.delay((Delay or 0) + (I - 1) * 0.15, function()
-			if Pips[I].Parent then
-				Motion.Play(Pips[I], 0.3, { BackgroundColor3 = On })
+			local Pip = Pips[I]
+			if Pip.Parent then
+				local T = Motion.Play(Pip, 0.3, { BackgroundColor3 = On })
+				T.Completed:Once(function(State)
+					-- a tween ends a hair off its goal; land exactly (unless it was cancelled or the pip is gone)
+					if State == Enum.PlaybackState.Completed and Pip.Parent then
+						Pip.BackgroundColor3 = On
+					end
+				end)
 			end
 		end)
 	end

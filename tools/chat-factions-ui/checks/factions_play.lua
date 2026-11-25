@@ -33,7 +33,8 @@ local function checkBody(Body: Instance, Label: string)
 			for _, Q in Pips:GetChildren() do
 				if Q:IsA("Frame") then
 					All += 1
-					if Q.BackgroundColor3 == Cfg.Factions[Id].Color then Lit += 1 end
+					local A, B = Q.BackgroundColor3, Cfg.Factions[Id].Color
+						if math.abs(A.R - B.R) + math.abs(A.G - B.G) + math.abs(A.B - B.B) < 0.01 then Lit += 1 end
 				end
 			end
 		end
