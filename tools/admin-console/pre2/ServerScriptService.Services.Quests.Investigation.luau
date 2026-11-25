@@ -81,6 +81,17 @@ function Shared.Grant(Player: Player, CaseId: string, ClueId: string, Pos: Vecto
 	return true
 end
 
+-- (console 2) the staff console's Reset a case: clues, links (Insights), the deduction and its text for one case
+function Shared.ResetCase(Player: Player, CaseId: string): boolean
+	local C = Shared.Get(Player, CaseId)
+	if not C then return false end
+	C.Clues, C.Insights, C.Solved = {}, {}, false
+	C.SolvedText = nil
+	Hooks.Sync(Player)
+	Hooks.Changed(Player, CaseId, `Clues`)
+	return true
+end
+
 -- Found in the world. Only counts once the case is open (a quest has pointed you at it).
 function Shared.Find(Player: Player, CaseId: string, ClueId: string, Pos: Vector3?): boolean
 	if not Hooks.IsOpen(Player, CaseId) then return false end
