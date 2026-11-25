@@ -4,7 +4,7 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 ## [Unreleased]
 
-### `chat-factions-ui`: the chat and the Factions panel in iron and candle, quiet (not merged; installed in NH Combat Test, place not saved)
+### `chat-factions-ui`: the chat and the Factions panel in iron and candle, quiet (merged to main 2026-11-25; installed in NH Combat Test, place not saved)
 Spec: `docs/superpowers/specs/2026-11-25-chat-factions-ui-design.md`. Plan: `docs/superpowers/plans/2026-11-25-chat-factions-ui.md`.
 Record: `tools/chat-factions-ui/REPORT.md`. Backup: `ServerStorage.NH_Backup.ChatFactionsUI_pre_20261125`.
 - **The chat goes quiet to text only:** the panel, iron edge, header and bar fade out after 10 quiet seconds (the bar
