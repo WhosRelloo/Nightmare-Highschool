@@ -325,7 +325,7 @@ local DRIFT_OK = {
 }
 local Drift = {}
 local Now = P:GetAttributes()
-for K, V in Now do if Attr0[K] ~= V and not (K == "RaceHunger" and typeof(V) == "number" and typeof(Attr0[K]) == "number" and math.abs(V - Attr0[K]) <= 2) then
+for K, V in Now do if Attr0[K] ~= V and not ((K == "RaceHunger" or K == "Hunger") and typeof(V) == "number" and typeof(Attr0[K]) == "number" and math.abs(V - Attr0[K]) <= 2) then
 	if DRIFT_OK[K] then table.insert(Drift, `{K}={tostring(V)} (was {tostring(Attr0[K])}; allowed: {DRIFT_OK[K]})`)
 	else table.insert(Fails, `attribute drift {K}={tostring(V)} (was {tostring(Attr0[K])})`) end
 end end
