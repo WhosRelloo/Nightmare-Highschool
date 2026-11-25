@@ -77,7 +77,8 @@
 | `tools/chat-factions-ui/live/ReplicatedStorage.UI.Motion.luau` (create) | the shared animations |
 | `tools/chat-factions-ui/live/StarterPlayer.StarterPlayerScripts.Controllers.Gui.Chat.luau` (create from `pre/`, then modify) | the chat window |
 | `tools/chat-factions-ui/live/StarterPlayer.StarterPlayerScripts.Controllers.Gui.FactionsPanel.luau` (create from `pre/`, then modify) | the Factions panel |
-| `tools/chat-factions-ui/checks/motion_edit.lua`, `motion_play.lua`, `chat_play.lua`, `factions_play.lua` (create) | checks |
+| `tools/chat-factions-ui/live/StarterPlayer.StarterPlayerScripts.Controllers.Gui.QuestJournal.luau` (create from `pre/`, then modify) | the Journal: its left-edge button hidden |
+| `tools/chat-factions-ui/checks/motion_edit.lua`, `motion_play.lua`, `chat_play.lua`, `factions_play.lua`, `buttons_play.lua` (create) | checks |
 | `tools/chat-factions-ui/harness/make_motion.lua` (create) | creates the empty `UI.Motion` ModuleScript once |
 | `tools/chat-factions-ui/.gitignore` (create) | `_orig/` |
 | `tools/chat-factions-ui/REPORT.md`, `docs/UI-Kit.md`, `CHANGELOG.md` (modify) | the record |
@@ -1336,7 +1337,130 @@ Run `factions_play.lua` through `run_live.py ... 60 Client`. Before it, read the
 
 ---
 
-### Task 4: The final round, shots and the record
+### Task 4: Remove the left-edge Factions and Journal buttons
+
+The owner asked for both buttons to go (2026-11-25). They're hidden the way the Wardrobe's and Settings' buttons already
+are: `Toggle.Visible = false`, with the instance kept, because `Ui.Toggle` and the Moments stamp (`QuestJournal.Toggle`,
+which falls back to a fixed point when it's hidden) still look it up. Touch players reach both panels through the Phone's
+Journal and Factions apps, keyboard through J and L, and gamepad through the quick menu. None of those change.
+
+**Files:**
+- Modify: `tools/chat-factions-ui/live/StarterPlayer.StarterPlayerScripts.Controllers.Gui.FactionsPanel.luau` (from Task 3)
+- Create: `tools/chat-factions-ui/live/StarterPlayer.StarterPlayerScripts.Controllers.Gui.QuestJournal.luau`, copied from `pre/` (fetched 2026-11-25) and then modified as below
+- Create: `tools/chat-factions-ui/checks/buttons_play.lua`
+
+**Interfaces:**
+- Consumes: `FactionsPanel.Toggle(Open?)` (Task 3), `QuestJournal.Toggle(Open?)` (unchanged).
+- Produces: both ScreenGuis (`PlayerGui.FactionsPanel`, `PlayerGui.QuestJournal`) still have a child `Toggle`, and it's
+  always hidden.
+
+- [ ] **Step 1: Copy the Journal module**
+
+```
+cp tools/chat-factions-ui/pre/StarterPlayer.StarterPlayerScripts.Controllers.Gui.QuestJournal.luau tools/chat-factions-ui/live/
+```
+
+- [ ] **Step 2: Write the failing Play check**
+
+`tools/chat-factions-ui/checks/buttons_play.lua`:
+```lua
+-- buttons_play (chat-factions-ui, Client, Play): the left-edge Factions and Journal buttons are gone (hidden, the
+-- instances kept), and they stay hidden after each panel opens and closes.
+local P = game.Players.LocalPlayer
+local Gui = P.PlayerGui
+local Fails = {}
+local function Ok(Cond, What) if not Cond then table.insert(Fails, What) end end
+local Factions = require(P.PlayerScripts.Controllers.Gui.FactionsPanel)
+local Journal = require(P.PlayerScripts.Controllers.Gui.QuestJournal)
+local function hidden(Name: string): boolean
+	local G = Gui:FindFirstChild(Name)
+	local T = G and G:FindFirstChild("Toggle")
+	return T ~= nil and T:IsA("GuiObject") and not T.Visible
+end
+Ok(Gui:FindFirstChild("FactionsPanel") ~= nil, "no FactionsPanel gui")
+Ok(Gui:FindFirstChild("QuestJournal") ~= nil, "no QuestJournal gui")
+Ok(hidden("FactionsPanel"), "the Factions button shows")
+Ok(hidden("QuestJournal"), "the Journal button shows")
+Factions.Toggle(true)
+task.wait(0.5)
+Factions.Toggle(false)
+task.wait(0.5)
+Ok(hidden("FactionsPanel"), "the Factions button shows after open and close")
+Journal.Toggle(true)
+task.wait(0.5)
+Journal.Toggle(false)
+task.wait(0.5)
+Ok(hidden("QuestJournal"), "the Journal button shows after open and close")
+return if #Fails == 0 then "PASS buttons_play" else "FAIL " .. table.concat(Fails, "; ")
+```
+
+- [ ] **Step 3: Hide the Factions button**
+
+In the FactionsPanel live copy, change the header's first line,
+```lua
+	Factions panel (client). Toggle with P or the "Factions" button (left edge, for touch).
+```
+to:
+```lua
+	Factions panel (client). Toggle with L, the Phone's Factions app, or the gamepad quick menu (the left-edge button
+	is hidden since 2026-11-25, chat-factions-ui).
+```
+In `Local.Build`, directly after the `local Toggle = Kit.Button({ ... })` block (the one that ends
+`Size = UDim2.new(0, 132, 0, 44); Parent = Gui;` and then `})`), add:
+```lua
+	Toggle.Visible = false -- (chat-factions-ui, owner 2026-11-25) no left-edge button: L, the Phone or the quick menu
+```
+
+- [ ] **Step 4: Hide the Journal button**
+
+In the QuestJournal live copy, change the header's first line,
+```lua
+	Quest journal (client). Toggle with J, the "Journal" button (left edge, for touch), or the top bar.
+```
+to:
+```lua
+	Quest journal (client). Toggle with J, the Phone's Journal app, the gamepad quick menu, or the top bar (the
+	left-edge button is hidden since 2026-11-25, chat-factions-ui).
+```
+In `Local.Build`, directly after the `local Toggle = Components.Button({ ... })` block (the one that ends
+`Size = UDim2.fromOffset(150, 44); Parent = Gui;` and then `})`), add:
+```lua
+	Toggle.Visible = false -- (chat-factions-ui, owner 2026-11-25) no left-edge button: J, the Phone or the quick menu
+```
+Then replace this line in `Shared.Toggle`:
+```lua
+	Ui.Toggle.Visible = not Open -- (2.38) the left-edge button would sit on the left page
+```
+with:
+```lua
+	Ui.Toggle.Visible = false -- (chat-factions-ui) the left-edge button stays hidden, open or closed
+```
+
+- [ ] **Step 5: Install in Edit**
+
+Run `get_studio_state` (it must be Edit), then:
+```
+python -X utf8 -I tools/admin-console/fetch.py tools/chat-factions-ui/_orig StarterPlayer.StarterPlayerScripts.Controllers.Gui.FactionsPanel StarterPlayer.StarterPlayerScripts.Controllers.Gui.QuestJournal
+python -X utf8 -I tools/admin-console/install_inplace.py tools/chat-factions-ui/_orig tools/chat-factions-ui/live ChatFactionsUI_pre_20261125 StarterPlayer.StarterPlayerScripts.Controllers.Gui.FactionsPanel StarterPlayer.StarterPlayerScripts.Controllers.Gui.QuestJournal
+```
+Expected: one installer line for each module, with no `PARSE FAIL`, `MISSING` or `CHANGED SINCE`.
+
+- [ ] **Step 6: Commit**
+
+```
+git add tools/chat-factions-ui/live/StarterPlayer.StarterPlayerScripts.Controllers.Gui.FactionsPanel.luau tools/chat-factions-ui/live/StarterPlayer.StarterPlayerScripts.Controllers.Gui.QuestJournal.luau tools/chat-factions-ui/pre/StarterPlayer.StarterPlayerScripts.Controllers.Gui.QuestJournal.luau tools/chat-factions-ui/checks/buttons_play.lua
+git commit -m "Chat and Factions UI, Task 4: the left-edge Factions and Journal buttons are hidden (L / J, the Phone and the quick menu open them)
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
+- [ ] **Step 7 (controller): Play round**
+
+Run `buttons_play.lua` and `factions_play.lua` through `run_live.py ... 60 Client`. Expected: `PASS buttons_play`, `PASS factions_play`.
+
+---
+
+### Task 5: The final round, shots and the record
 
 **Files:**
 - Create: `tools/chat-factions-ui/REPORT.md`
@@ -1348,7 +1472,7 @@ Run `factions_play.lua` through `run_live.py ... 60 Client`. Before it, read the
 
 The checks run in this order:
 1. Cine.
-2. `motion_play`, `chat_play`, `factions_play`.
+2. `motion_play`, `chat_play`, `factions_play`, `buttons_play`.
 3. The screenshots, with `screen_capture`, copied from the tool's saved file into the mockups folder:
    - `chat-quiet.jpg`: idle for 12 s.
    - `chat-awake.jpg`: after `Chat.Focus()` through a `run_live` Client one-liner.
@@ -1406,15 +1530,17 @@ Record: `tools/chat-factions-ui/REPORT.md`. Backup: `ServerStorage.NH_Backup.Cha
   rank pips. On open it rises in, the sections fade up in turn, the bars fill, the pips light and the rumours smoke in.
   Profile updates redraw it without replaying the animation.
 - **`UI.Motion`:** the shared animations. Everything honours Reduce Motion.
-- Behaviour is unchanged: TextChatService, filtering, commands, `NHCanChat`, / and history, L for the panel, and
-  equipping titles.
+- **The left-edge Factions and Journal buttons are gone.** L and J, the Phone's apps and the gamepad quick menu open
+  both panels.
+- Behaviour is otherwise unchanged: TextChatService, filtering, commands, `NHCanChat`, / and history, L for the panel,
+  and equipping titles.
 ```
 
 - [ ] **Step 5: Commit**
 
 ```
 git add tools/chat-factions-ui/REPORT.md docs/superpowers/mockups/2026-11-25-chat-factions-ui docs/UI-Kit.md CHANGELOG.md
-git commit -m "Chat and Factions UI, Task 4: final round, screenshots, report, UI kit Motion section, changelog
+git commit -m "Chat and Factions UI, Task 5: final round, screenshots, report, UI kit Motion section, changelog
 
 Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
 ```

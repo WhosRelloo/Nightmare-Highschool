@@ -32,7 +32,12 @@ Chat (from the 2.1.0 header of `Gui.Chat`):
   marked.
 
 Factions panel:
-- L (`TOGGLE_KEY`) and the left-edge Factions button toggle it (touch placement is unchanged), and Close closes it.
+- L (`TOGGLE_KEY`), the Phone's Factions app and the gamepad quick menu toggle it, and Close closes it.
+- **The left-edge Factions and Journal buttons are removed** (owner, 2026-11-25). They're hidden the way the Wardrobe's
+  and Settings' buttons already are (`Toggle.Visible = false`, the instance kept so nothing that looks it up breaks).
+  Touch players open both from the Phone (its Journal and Factions apps); keyboard uses L and J; gamepad uses the quick
+  menu. The Journal no longer shows its button again when it closes. The Moments stamp already falls back to a fixed
+  point when the Journal button is hidden.
 - It reads only `PlayerData.Social`, through the same `StateController.ProfileUpdated` re-render.
 - It shows the same content in the same order: Reputation (the equipped title and the four category bars: Popularity, Intimidation, Trust, Academics), one card per faction in
   `Config.Factions.Factions` (name, tagline, rank, status, standing, the initiation, mission, activity and perk lines
