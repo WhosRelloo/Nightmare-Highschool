@@ -1,6 +1,22 @@
 local P = game.Players.LocalPlayer
 local B = P.PlayerGui:WaitForChild("NHQuietProbe", 10)
 if not B then return "FAIL no probe" end
+-- (fix round 3) own start state: a running cutscene is waited out, and the stored staff prefs (Side, Favs) are
+-- set to Moderate / none for the run, then put back (server-side PrefsGet / PrefsSet through the console's own remotes)
+local RS = game:GetService("ReplicatedStorage")
+local F = RS:FindFirstChild("NHAdmin")
+local T0 = os.clock()
+while workspace:GetAttribute("NHCinePlaying") and os.clock() - T0 < 100 do task.wait(0.5) end
+if workspace:GetAttribute("NHCinePlaying") then return "FAIL a cutscene (NHCinePlaying) was still playing after 100 s" end
+while not (F and F:GetAttribute("Ready") and F:FindFirstChild("Prefs") and F:FindFirstChild("SavePrefs")) and os.clock() - T0 < 30 do
+	task.wait(0.5) F = RS:FindFirstChild("NHAdmin")
+end
+if not (F and F:FindFirstChild("Prefs") and F:FindFirstChild("SavePrefs")) then return "FAIL no NHAdmin Prefs remotes" end
+local Orig = F.Prefs:InvokeServer()
+if typeof(Orig) ~= "table" or not Orig.Ok then return "FAIL could not read the stored prefs: " .. tostring(Orig and Orig.Error) end
+local OrigFavs, OrigSide = table.clone(Orig.Favs or {}), Orig.Side
+F.SavePrefs:InvokeServer({}, "Moderate")
+local function Body()
 local Fails = {}
 local function Eq(Got, Want, What) if Got ~= Want then table.insert(Fails, What .. ": got " .. tostring(Got) .. ", want " .. tostring(Want)) end end
 -- (2026-11-24) the card layout: every option sits inside its card and clear of Run, Run sits inside the card, and no
@@ -40,6 +56,7 @@ Eq(B:Invoke("Console", "Open"), true, "opens")
 task.wait(1)
 local G = P.PlayerGui:FindFirstChild("NHStaffConsole")
 Eq(G and G.Enabled, true, "gui on")
+if B:Invoke("Console", "Info").Side ~= "Moderate" then B:Invoke("Console", "Side", "Moderate") task.wait(0.3) end
 local I = B:Invoke("Console", "Info")
 Eq(I.Level, 3, "studio level") Eq(I.Side, "Moderate", "start side") Eq(I.Section, "Student", "start section")
 Eq(#I.Cards, 14, "student cards (13 + Stop spectating)")
@@ -79,3 +96,12 @@ for _, L in G:GetDescendants() do
 end
 if #Fails > 0 then return "FAIL " .. #Fails .. "\n" .. table.concat(Fails, "\n") end
 return "PASS console_play_client"
+end
+local Ok, Res = pcall(Body)
+-- put the prefs back (the console's own client state goes to the stored side first, then the stored record is written last)
+pcall(function()
+	if OrigSide then B:Invoke("Console", "Side", OrigSide) end
+	F.SavePrefs:InvokeServer(OrigFavs, OrigSide)
+end)
+if not Ok then return "FAIL error: " .. tostring(Res) end
+return Res

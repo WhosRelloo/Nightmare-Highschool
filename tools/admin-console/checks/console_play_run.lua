@@ -192,12 +192,18 @@ local function first(K) local I = L[K] and L[K][1] return I and (if typeof(I) ==
 local RealClub = L.Clubs[2] and L.Clubs[2].Id
 if RealClub and P:GetAttribute("Club") == RealClub then RealClub = L.Clubs[3] and L.Clubs[3].Id or RealClub end
 if first("Clubs") ~= "None" then table.insert(Fails, "Lists.Clubs doesn't start with None") end
-local QuestId = first("Quests")
-for _, It in L.Quests do if not string.find(It.Id, "^Rite") then QuestId = It.Id break end end
-pcall(function()
-	local Q = require(SSS.Quests.Quests)
-	for _, It in L.Quests do if not string.find(It.Id, "^Rite") and Q.CanStart(P, It.Id) == true then QuestId = It.Id break end end
-end)
+-- (fix round 3) picked again at the QuestStart row, on the clock the earlier rows left; none startable = a state refusal
+local QuestId
+local function pickQuest()
+	local Id
+	pcall(function()
+		local Q = require(SSS.Quests.Quests)
+		for _, It in Admin.Lists().Quests do
+			if not string.find(It.Id, "^Rite") and Q.CanStart(P, It.Id) == true then Id = It.Id break end
+		end
+	end)
+	return Id
+end
 local Runs = {
 	{ "Mute", { Minutes = 10; Reason = "console test" } }, { "Unmute" }, { "Freeze" }, { "Freeze" }, { "Jail" }, { "Spectate" }, { "Bring" }, { "Goto" },
 	{ "Note", { Text = "console test" } },
@@ -214,7 +220,7 @@ local Runs = {
 	{ "SetTime", { Time = "12:30" }, true }, { "ClockSpeed", { Value = 60 }, true }, { "SkipToPeriod", { Segment = first("Segments") }, true }, { "RingBell", nil, true },
 	{ "SetDisciplinePoints", { Value = 0 } }, { "ClearDiscipline" }, { "LiftSuspension" }, { "ExcuseToday" },
 	{ "OweDetention" }, { "ClearDetention" },
-	{ "QuestStart", { Id = QuestId } }, { "QuestAbandon", { Id = QuestId } }, { "QuestReset" },
+	{ "QuestStart", {} }, { "QuestAbandon", {} }, { "QuestReset" },
 	{ "FullMoon", nil, true }, { "GotoRegion", { Id = first("Regions") }, true }, { "GotoRegion", { Id = first("Regions"); Send = true } },
 	{ "SpawnDelinquents", nil, true }, { "SpawnDelinquent", { Role = "Brute" }, true }, { "SpawnWolves", nil, true },
 	{ "SpawnBeast", { Beast = first("Beasts") }, true }, { "SpawnSparring", { Tier = "Easy" }, true }, { "ClearEnemies", nil, true },
@@ -242,6 +248,12 @@ for _, R in Runs do
 		while P:GetAttribute("ClassInRoom") ~= true and os.clock() - t1 < 10 do task.wait(0.25) end
 		if P:GetAttribute("ClassInRoom") ~= true then table.insert(Fails, "StartLesson setup: ClassInRoom never true in Period 1") end
 	end
+	if Cmd == "QuestStart" then QuestId = pickQuest() end
+	if (Cmd == "QuestStart" or Cmd == "QuestAbandon") and not QuestId then
+		table.insert(StateSeen, `{Cmd}: no quest can start now (state refusal)`)
+		continue
+	end
+	if Cmd == "QuestStart" or Cmd == "QuestAbandon" then Args = { Id = QuestId } end
 	local A, B = go(Cmd, Args, if NoTarget then nil else Me)
 	Ran += 1
 	if A ~= true then
