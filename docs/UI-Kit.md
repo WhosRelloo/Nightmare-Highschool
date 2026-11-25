@@ -624,3 +624,22 @@ Reserved keys (in `Settings.ReservedKeys`) can't be rebound. **M** opens the men
 - The existing dialogue box, panels and HUD aren't switched over to the kit yet. That's for the session that owns those scripts.
 - "Last joined" needs saved data (a DataStore). The footer currently shows "Enrolled as <DisplayName>".
 - The credits list uses "Name" placeholders.
+
+## Motion (`ReplicatedStorage.UI.Motion`, 2026-11-25)
+
+Shared animations for the iron-and-candle screens (the chat window and the Factions panel). Every helper honours
+Settings > Reduce Motion (`NHReducedMotion`): the end state at once, and no flicker or glint.
+
+| Helper | Does |
+|---|---|
+| `SmokeIn(Label, Delay?)` | fades a line in from 8 px left (0.35 s); the built state is read once, so a second call mid-drift still lands on it |
+| `Wake(Items, On, Instant?)` | each `{ Inst, AwakeGoal, QuietGoal }` tweens up (0.25 s) or down (0.6 s) |
+| `Candle(Flame, Holder?)` | a flame flickers in size and brightness (`ImageColor3`, never transparency, so panel fades own that); shared Heartbeat loop, pauses while `Holder` is hidden |
+| `Glint(Target, Prop, A, B, Holder?)` | a colour breathes between A and B (5 s); starts at A |
+| `Rise(Items, Step?)` | sections hide at once, then fade up in turn (`Kit.FadeIn`, 0.4 s, 0.15 s apart) |
+| `Fill(Bar, Delay?)` | a `Kit.Bar` fills from 0 (1.1 s); the built size is cached, so a second call mid-fill restarts cleanly |
+| `Pips(Pips, Count, On, Off, Delay?)` | rank pips light one at a time (0.15 s apart) and settle on the exact `On` colour |
+| `Open(Panel)` / `Close(Panel)` | a panel scales from 0.985, rises 10 px and fades in (0.3 s, the fade starts one Heartbeat after the hide) / reverses out (0.2 s); opening again before a close ends keeps it open |
+
+One tween per instance at a time (a new one replaces the old). `ActiveCount()` and `Stop(Inst)` are for checks and
+clean-up.
