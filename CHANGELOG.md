@@ -4,9 +4,28 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 ## [Unreleased]
 
-Work on branches that aren't merged into `main` yet. Nothing here is in NH Combat Test unless it says so.
+Nothing yet.
 
-### `phase6-infirmary`: the Infirmary furnished, the ambient patient, the phone on walking calls (not merged; installed in NH Combat Test, place not saved)
+## [2.40.0] - 2026-11-24: The staff console (phases 1a, 1b, 2), Soccer 2.0, the Infirmary, the new pace
+
+The branches merged since 2.39.0. Installed in NH Combat Test; **the place is not saved**.
+
+### `admin-console-2`: the staff console, phase 2, test tools and flags (merged into `main` 2026-11-24, installed in NH Combat Test, place not saved)
+Docs: `docs/Admin-Panel.md`. Spec: `docs/superpowers/specs/2026-11-24-admin-console-2-design.md`. Plan:
+`docs/superpowers/plans/2026-11-24-admin-console-2.md`. Record: `tools/admin-console/REPORT.md`. Backup:
+`ServerStorage.NH_Backup.AdminConsole2_20261124`.
+- **19 new cards** (18 server, 1 client tool), 85 server commands in all: season, moon and sky (owner-only in live
+  servers), Preview just for me, Set Heat, Set Bells, hall monitors on/off, cutscene replay, tutorial enter, jump to and
+  leave, Give a clue, Reset a case, form direction, and the rest in the record.
+- **New row flags:** TRANSFORMED, WANTED, NEW and IN CUTSCENE, and new lines on the context card.
+- **Fixed:** removing a mute entry that is still on now lifts the mute (unless another mute on the record is still on),
+  and the log says so.
+- **Checked in Play:** `console_mute_remove`, `console2_play_run` (41 calls), `console2_play_client`, and the 1a/1b checks
+  (`console_play_run`, 104 calls; `console_play_client`) all pass.
+- **For the owner:** Heat cools fast, so a bell set from the console lasts only seconds unless a monitor sees the student
+  (the game's tuning).
+
+### `phase6-infirmary`: the Infirmary furnished, the ambient patient, the phone on walking calls (merged into `main` 2026-11-24, installed in NH Combat Test, place not saved)
 Record: `tools/phase6-infirmary/REPORT.md` (the open rows from `tools/phase6-strafes/REPORT.md`). Docs: `docs/Infirmary.md`.
 Backups: `ServerStorage.NH_Backup.phase6infirmary_pre` (and `_stage1`-`_stage3`, the in-between installs).
 - **The Infirmary is furnished** in the house style (`tools/phase6-infirmary/build/dress.luau`, re-runnable): a coffered
