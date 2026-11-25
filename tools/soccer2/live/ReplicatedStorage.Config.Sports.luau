@@ -169,31 +169,31 @@ Sports.RaceAura = {
 -- and puts each id here (tools/soccer2/PUBLISH_LIST.md). All R6. The owner lifted 1.1's "no movement clips except the
 -- slide" for soccer matches (2026-11-24). Spec: docs/superpowers/specs/2026-11-24-soccer-2-0-design.md §2.
 Sports.SoccerAnims = {
-	KickRun = { Clip = `Strike Foward Jog_R6` };          -- the running shot (6+ studs/s)
-	Kick = { Clip = `KickSoccerball_Right` };              -- the standing / charged shot (the right-foot mirror)
-	Pass = { Clip = `Soccer Pass_R6` };
-	Volley = { Clip = `Scissor Kick_R6` };
-	Dribble = { Clip = `Soccer Spin_R6` };
-	Feint = { Clip = `Soccer Spin_R6` };
-	Tackle = { Clip = `Soccer Tackle_R6`; Was = 98978935956373 };   -- was "SLIDING"
-	Tackled = { Clip = `Soccer Tackled_R6` };
-	Tackled2 = { Clip = `Soccer Tackled2_R6` };
-	Trip = { Clip = `Soccer Trip_R6` };                    -- broken ankles, or a tackle into a feint
-	Fallen = { Clip = `Fallen Idle_R6` };                  -- the rest of a stun after a fall
-	KeeperDiveLeft = { Clip = `Goalkeeper Diving SaveLeft_R6` };
-	KeeperDiveRight = { Clip = `Goalkeeper Diving SaveRigh_R6` };
-	KeeperCatch = { Clip = `Goalkeeper Catch_R6` };
-	KeeperCatchIdle = { Clip = `Goalkeeper CatchIdle_R6` };
-	KeeperIdle = { Clip = `Goalkeeper Idle_R6` };
-	KeeperStepLeft = { Clip = `Goalkeeper StepLeft_R6` };
-	KeeperStepRight = { Clip = `Goalkeeper StepRight_R6` };
-	Idle = { Clip = `Soccer Idle_R6` };                    -- the match idle (Controllers.Character.SoccerPack)
-	IdleBall = { Clip = `Offensive Idle_R6` };             -- with the ball
-	Jog = { Clip = `Jog Forward_R6` };                     -- the match walk
-	JogBack = { Clip = `Jog Backward_R6` };                -- the backpedal
-	Chip = { Clip = `Chip_R6` };                           -- 2.1
-	Stall = { Clip = `Stall Soccerball_R6` };              -- 2.1
-	Penalty = { Clip = `Soccer Penalty Kick_R6` };         -- 2.2
+	KickRun = { Id = 127776968887075; Clip = `Strike Foward Jog_R6` };          -- the running shot (6+ studs/s)
+	Kick = { Id = 111487104369955; Clip = `KickSoccerball_Right` };              -- the standing / charged shot (the right-foot mirror)
+	Pass = { Id = 108869988503354; Clip = `Soccer Pass_R6` };
+	Volley = { Id = 118437859533781; Clip = `Scissor Kick_R6` };
+	Dribble = { Id = 100066818118237; Clip = `Soccer Spin_R6` };
+	Feint = { Id = 100066818118237; Clip = `Soccer Spin_R6` };
+	Tackle = { Id = 112548881966991; Clip = `Soccer Tackle_R6`; Was = 98978935956373 };   -- was "SLIDING"
+	Tackled = { Id = 101086995398769; Clip = `Soccer Tackled_R6` };
+	Tackled2 = { Id = 125805047689814; Clip = `Soccer Tackled2_R6` };
+	Trip = { Id = 75245383513275; Clip = `Soccer Trip_R6` };                    -- broken ankles, or a tackle into a feint
+	Fallen = { Id = 119511707602186; Clip = `Fallen Idle_R6` };                  -- the rest of a stun after a fall
+	KeeperDiveLeft = { Id = 73016465813301; Clip = `Goalkeeper Diving SaveLeft_R6` };
+	KeeperDiveRight = { Id = 124629389554381; Clip = `Goalkeeper Diving SaveRigh_R6` };
+	KeeperCatch = { Id = 93014171839838; Clip = `Goalkeeper Catch_R6` };
+	KeeperCatchIdle = { Id = 120597650847337; Clip = `Goalkeeper CatchIdle_R6` };
+	KeeperIdle = { Id = 84503179475939; Clip = `Goalkeeper Idle_R6` };
+	KeeperStepLeft = { Id = 123090538146554; Clip = `Goalkeeper StepLeft_R6` };
+	KeeperStepRight = { Id = 76575525051501; Clip = `Goalkeeper StepRight_R6` };
+	Idle = { Id = 90594863139881; Clip = `Soccer Idle_R6` };                    -- the match idle (Controllers.Character.SoccerPack)
+	IdleBall = { Id = 128070517747066; Clip = `Offensive Idle_R6` };             -- with the ball
+	Jog = { Id = 114109009018181; Clip = `Jog Forward_R6` };                     -- the match walk
+	JogBack = { Id = 76180769467845; Clip = `Jog Backward_R6` };                -- the backpedal
+	Chip = { Id = 80515967577594; Clip = `Chip_R6` };                           -- 2.1
+	Stall = { Id = 137167051221866; Clip = `Stall Soccerball_R6` };              -- 2.1
+	Penalty = { Id = 96773325578033; Clip = `Soccer Penalty Kick_R6` };         -- 2.2
 	KeeperThrow = { Id = 126461164655749 };                -- "Activate" (0.5 s, both arms forward)
 	Celebrate = { Id = 73569467689521 };                   -- "Isagi Celebration" (cut after the goal pause)
 }
