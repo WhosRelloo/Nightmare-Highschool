@@ -1,5 +1,7 @@
 # Staff console 1a: report
 
+> **Saved:** the owner saved NH Combat Test on 2026-11-25, with this work installed. Any "place not saved" below was true when it was written.
+
 Plan: `docs/superpowers/plans/2026-11-23-admin-console-1a.md`. Spec: `docs/superpowers/specs/2026-11-23-admin-console-design.md`.
 Place: NH Combat Test (placeId 98950102230473), slot 2 only. The place is **not saved**: it needs the owner's word.
 

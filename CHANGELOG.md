@@ -4,7 +4,13 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 ## [Unreleased]
 
-### `chat-factions-ui`: the chat and the Factions panel in iron and candle, quiet (merged to main 2026-11-25; installed in NH Combat Test, place not saved)
+Nothing yet.
+
+## [2.41.0] - 2026-11-25: The chat and the Factions panel in iron and candle; the soccer clips published
+
+The branches merged since 2.40.0. Installed in NH Combat Test, and **the owner saved the place on 2026-11-25**.
+
+### `chat-factions-ui`: the chat and the Factions panel in iron and candle, quiet (merged into `main` 2026-11-25)
 Spec: `docs/superpowers/specs/2026-11-25-chat-factions-ui-design.md`. Plan: `docs/superpowers/plans/2026-11-25-chat-factions-ui.md`.
 Record: `tools/chat-factions-ui/REPORT.md`. Backup: `ServerStorage.NH_Backup.ChatFactionsUI_pre_20261125`.
 - **The chat goes quiet to text only:** the panel, iron edge, header and bar fade out after 10 quiet seconds (the bar
@@ -22,11 +28,18 @@ Record: `tools/chat-factions-ui/REPORT.md`. Backup: `ServerStorage.NH_Backup.Cha
 - Behaviour is otherwise unchanged: TextChatService, filtering, commands, `NHCanChat`, / and history, L for the panel,
   and equipping titles.
 
+### `soccer-2-polish`: the soccer clips published (merged into `main` 2026-11-25)
+Record: `tools/soccer2/REPORT.md` (Published ids). Backup: `ServerStorage.NH_Backup.SoccerAnimIds_pre_20261125`.
+- **The 23 FIER soccer clips are published** to the group (15981569), and each `Config.Sports.SoccerAnims` slot has its
+  `Id` beside its `Clip`, so a live server plays them (it used to fall back to the 1.1 clips or the procedural pose).
+- **Checked:** all 25 slot ids load, and every loop flag matches `tools/soccer2/PUBLISH_LIST.md`. The Play round passed
+  (`soccer_clips_resolve`, match start, pack, moves, keeper, polish, respawn, match end, pack after, cine before and after).
+
 ## [2.40.0] - 2026-11-24: The staff console (phases 1a, 1b, 2), Soccer 2.0, the Infirmary, the new pace
 
-The branches merged since 2.39.0. Installed in NH Combat Test; **the place is not saved**.
+The branches merged since 2.39.0. Installed in NH Combat Test; the owner saved the place on 2026-11-25.
 
-### `admin-console-2`: the staff console, phase 2, test tools and flags (merged into `main` 2026-11-24, installed in NH Combat Test, place not saved)
+### `admin-console-2`: the staff console, phase 2, test tools and flags (merged into `main` 2026-11-24, installed in NH Combat Test, saved 2026-11-25)
 Docs: `docs/Admin-Panel.md`. Spec: `docs/superpowers/specs/2026-11-24-admin-console-2-design.md`. Plan:
 `docs/superpowers/plans/2026-11-24-admin-console-2.md`. Record: `tools/admin-console/REPORT.md`. Backup:
 `ServerStorage.NH_Backup.AdminConsole2_20261124`.
@@ -41,7 +54,7 @@ Docs: `docs/Admin-Panel.md`. Spec: `docs/superpowers/specs/2026-11-24-admin-cons
 - **For the owner:** Heat cools fast, so a bell set from the console lasts only seconds unless a monitor sees the student
   (the game's tuning).
 
-### `phase6-infirmary`: the Infirmary furnished, the ambient patient, the phone on walking calls (merged into `main` 2026-11-24, installed in NH Combat Test, place not saved)
+### `phase6-infirmary`: the Infirmary furnished, the ambient patient, the phone on walking calls (merged into `main` 2026-11-24, installed in NH Combat Test, saved 2026-11-25)
 Record: `tools/phase6-infirmary/REPORT.md` (the open rows from `tools/phase6-strafes/REPORT.md`). Docs: `docs/Infirmary.md`.
 Backups: `ServerStorage.NH_Backup.phase6infirmary_pre` (and `_stage1`-`_stage3`, the in-between installs).
 - **The Infirmary is furnished** in the house style (`tools/phase6-infirmary/build/dress.luau`, re-runnable): a coffered
@@ -59,7 +72,7 @@ Backups: `ServerStorage.NH_Backup.phase6infirmary_pre` (and `_stage1`-`_stage3`,
 - Studio-only test probe `ServerStorage.NHInfirmaryProbe`; checks in `tools/phase6-infirmary/checks/`.
 - **Screenshots for the owner's eye checks** (V1-V6) in `docs/img/infirmary-*.jpg`, listed in the report.
 
-### `soccer-2`: Soccer 2.0, the FIER clips (merged into `main` 2026-11-24, installed in NH Combat Test, place not saved)
+### `soccer-2`: Soccer 2.0, the FIER clips (merged into `main` 2026-11-24, installed in NH Combat Test, saved 2026-11-25)
 - **24 FIER soccer clips** baked into `ReplicatedStorage.NHSoccerClips` (travel removed, Contact markers, a right-foot
   kick), with generated timing data in `Config.SoccerClips`.
 - **Kicks meet the ball** 0.05 s after the server's kick; a charged shot creeps through its wind-up.
@@ -70,7 +83,7 @@ Backups: `ServerStorage.NH_Backup.phase6infirmary_pre` (and `_stage1`-`_stage3`,
 - Studio plays the clips through temporary ids until the owner publishes them (`tools/soccer2/PUBLISH_LIST.md`).
 - **Polish (`soccer-2-polish`):** a remote dive's clip is released 0.3 s later (the mover's dash reaches other clients late); a body that streams out drops its connections and destroys its cached tracks; a clip that never loads warns once and runs the plain 1.1 dash; a replayed clip's older Seek is retired (per-track token); a failing pack Restore retries at 1 s, 2 s, 4 s; the unused `MARGIN` constant is gone.
 
-### `admin-console-1b`: the staff console, phase 1b (merged into `main` 2026-11-24, installed in NH Combat Test, place not saved)
+### `admin-console-1b`: the staff console, phase 1b (merged into `main` 2026-11-24, installed in NH Combat Test, saved 2026-11-25)
 Docs: `docs/Admin-Panel.md`. Spec: `docs/superpowers/specs/2026-11-23-admin-console-1b-design.md`. Plan:
 `docs/superpowers/plans/2026-11-23-admin-console-1b.md`. Record: `tools/admin-console/REPORT.md`. Backup:
 `ServerStorage.NH_Backup.AdminConsole1b_20261124`.
@@ -89,7 +102,7 @@ Docs: `docs/Admin-Panel.md`. Spec: `docs/superpowers/specs/2026-11-23-admin-cons
   transforms; wing motion, hanging chains and tatters (`Functions.FormDangles`, rope physics), the Bloodline preview.
   Import notes and checks: `docs/Forms-Import.md`. Werewolves keep the full wolf.
 
-### `admin-console`: the staff console, phase 1a (merged into `main` 2026-11-23, installed in NH Combat Test, place not saved)
+### `admin-console`: the staff console, phase 1a (merged into `main` 2026-11-23, installed in NH Combat Test, saved 2026-11-25)
 Docs: `docs/Admin-Panel.md`. Spec: `docs/superpowers/specs/2026-11-23-admin-console-design.md`. Mirror and checks:
 `tools/admin-console/` (`REPORT.md`). Backup: `ServerStorage.NH_Backup.AdminConsole1a_pre_20261123`. Art: 20 rendered
 console pieces and 49 icons (ids in `art/ui/hud/console/ICONS.md`).

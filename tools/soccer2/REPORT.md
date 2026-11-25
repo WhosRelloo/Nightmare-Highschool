@@ -1,5 +1,7 @@
 # Soccer 2.0: report
 
+> **Saved:** the owner saved NH Combat Test on 2026-11-25, with this work installed. Any "place not saved" below was true when it was written.
+
 Branch `soccer-2`. Plan `docs/superpowers/plans/2026-11-24-soccer-2-0.md`, spec
 `docs/superpowers/specs/2026-11-24-soccer-2-0-design.md`. Installed in NH Combat Test (Edit). **Place not saved.**
 

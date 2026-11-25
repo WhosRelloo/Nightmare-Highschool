@@ -1,5 +1,7 @@
 # locomotion-pace: report (2026-11-23)
 
+> **Saved:** the owner saved NH Combat Test on 2026-11-25, with this work installed. Any "place not saved" below was true when it was written.
+
 Owner: "fix the running speed and animation. It's too fast. Make sure NPC's follow the same animation rules as players too."
 Owner picks: sprint "22 then 30", walk "10 everywhere"; then (same day) "make the left and right strafe slower,
 as well as the run": sprint 20, fast sprint 27, strafe 7 (was 8.5), `Gaits.SprintMax` 23. The Play numbers below are
