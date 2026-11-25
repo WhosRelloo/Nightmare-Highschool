@@ -42,12 +42,14 @@ return {
 	
 	Owner = {
 		4283953723; --/ VanitasSano_o
+		37484441; --/ WhosRello (project lead: group rank 254 is only a moderator, so the console needs this for level 3)
 		1219061975; --/ zz
 		3585755651; --//
 	};
 	
 	Admin = {
 		4283953723; --/ VanitasSano_o
+		37484441; --/ WhosRello
 		1219061975; --/ zz
 		3585755651 --// zoac
 	};
