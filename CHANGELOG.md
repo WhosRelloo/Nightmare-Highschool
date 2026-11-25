@@ -4,7 +4,23 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 ## [Unreleased]
 
-Nothing yet.
+### `chat-factions-ui`: the chat and the Factions panel in iron and candle, quiet (not merged; installed in NH Combat Test, place not saved)
+Spec: `docs/superpowers/specs/2026-11-25-chat-factions-ui-design.md`. Plan: `docs/superpowers/plans/2026-11-25-chat-factions-ui.md`.
+Record: `tools/chat-factions-ui/REPORT.md`. Backup: `ServerStorage.NH_Backup.ChatFactionsUI_pre_20261125`.
+- **The chat goes quiet to text only:** the panel, iron edge, header and bar fade out after 10 quiet seconds (the bar
+  stays faint on touch), and a soft dark patch sits behind the lines. /, the mouse or a new message brings the frame
+  back. New lines smoke in, the header has a flickering candle, and the iron edge glints.
+- **The Factions panel** has a candle by its title, faction cards washed in their colour with a breathing edge, and
+  rank pips. On open it rises in, the sections fade up in turn, the bars fill, the pips light and the rumours (italic
+  and dim) smoke in.
+  Profile updates redraw it without replaying the animation.
+- **`UI.Motion`:** the shared animations. Everything honours Reduce Motion, and the candles and glints follow it live
+  (turned on after start-up, they still at once). Closing the panel mid-open cancels the fade-ins still to come, and
+  Close is the true reverse of Open (scales down, drops 10 px, fades).
+- **The left-edge Factions and Journal buttons are gone.** L and J, the Phone's apps and the gamepad quick menu open
+  both panels.
+- Behaviour is otherwise unchanged: TextChatService, filtering, commands, `NHCanChat`, / and history, L for the panel,
+  and equipping titles.
 
 ## [2.40.0] - 2026-11-24: The staff console (phases 1a, 1b, 2), Soccer 2.0, the Infirmary, the new pace
 
