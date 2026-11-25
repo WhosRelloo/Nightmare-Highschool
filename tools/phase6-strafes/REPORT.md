@@ -45,7 +45,14 @@ Commits 5297baa..73fa065 on phase6-strafes. Installed in NH Combat Test (Edit); 
   legs crossing). The pray kneel shot was blocked by a crowded chapel: owner eye.
 - Slot 2: fresh snapshot, restored; Play stopped; nothing saved.
 
-## Open rows (updated)
+## Open rows (updated; closed 2026-11-24 except the owner eye, see the section below)
 1. Owner eye: the strafe look in motion, the pray kneel-in, the treatment gestures, the bleachers.
 2. The Infirmary room is bare (furniture, cabinets, curtains, a ceiling) and the bed seat height (2.1) is still a guess.
 3. Not built: the ambient patient on bed 1; the phone prop while walking.
+
+## 2026-11-24: open rows closed on `phase6-infirmary` (see tools/phase6-infirmary/REPORT.md)
+- Row 2: the Infirmary is furnished (ceiling, wainscot, bed curtains, medicine wall, desk, lights); the bed seat height
+  2.1 is checked in the viewport and stays.
+- Row 3: built: the ambient patient on bed 1 (AmbientNpcs, LayingIdle) and the phone on walking calls (Schedules).
+- Row 1: screenshots V1-V6 are in docs/img/infirmary-v*.jpg for the owner's eye check; the checks themselves stay the
+  owner's.

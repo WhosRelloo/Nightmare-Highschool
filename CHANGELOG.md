@@ -6,6 +6,24 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 Work on branches that aren't merged into `main` yet. Nothing here is in NH Combat Test unless it says so.
 
+### `phase6-infirmary`: the Infirmary furnished, the ambient patient, the phone on walking calls (not merged; installed in NH Combat Test, place not saved)
+Record: `tools/phase6-infirmary/REPORT.md` (the open rows from `tools/phase6-strafes/REPORT.md`). Docs: `docs/Infirmary.md`.
+Backups: `ServerStorage.NH_Backup.phase6infirmary_pre` (and `_stage1`-`_stage3`, the in-between installs).
+- **The Infirmary is furnished** in the house style (`tools/phase6-infirmary/build/dress.luau`, re-runnable): a coffered
+  plaster ceiling on oak beams, oak wainscot, dado and cornice, iron curtain rails with bone-linen bed curtains (drawn
+  back at each bed, closed between them), the medicine wall (apothecary drawers, a jar shelf, the first-aid case, the
+  glass cabinet), the Nurse's desk with lamp, microscope, hourglass and jars, a sink and mirror, nightstands with lamps,
+  a damask rug, two pendant lamps and sconces with warm lights, the anatomy skeleton, a clock and a portrait.
+- **The bed seat height stays 2.1 studs**, now checked in the viewport: a student sitting on the edge has the hips on
+  the blanket (torso bottom 3.24 against a bedding top of 3.20).
+- **An ambient patient lies on bed 1** (`Features.AmbientNpcs`, LayingIdle) while the Nurse is on duty and no student
+  has the bed; they come and go only with nobody within 30 studs. Sick students now take bed 2 and the standing spots
+  first, and bed 1 only when the patient isn't on it.
+- **Walking phone calls hold a phone** (`Features.Schedules`: StudentBrain's fidget phone, equipped for the call and
+  removed when the walk ends).
+- Studio-only test probe `ServerStorage.NHInfirmaryProbe`; checks in `tools/phase6-infirmary/checks/`.
+- **Screenshots for the owner's eye checks** (V1-V6) in `docs/img/infirmary-*.jpg`, listed in the report.
+
 ### `soccer-2`: Soccer 2.0, the FIER clips (merged into `main` 2026-11-24, installed in NH Combat Test, place not saved)
 - **24 FIER soccer clips** baked into `ReplicatedStorage.NHSoccerClips` (travel removed, Contact markers, a right-foot
   kick), with generated timing data in `Config.SoccerClips`.
