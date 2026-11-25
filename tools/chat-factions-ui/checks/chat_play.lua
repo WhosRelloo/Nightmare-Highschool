@@ -43,6 +43,12 @@ Ok(U.Border == nil or not U.Border:IsA("ImageLabel") or U.Border.ImageTransparen
 Ok(U.Bar.GroupTransparency > (if S.Touch then 0.55 else 0.99), "bar when quiet: " .. U.Bar.GroupTransparency)
 Ok(Got == nil or Got.TextTransparency < 0.05, "the line is hidden when quiet")
 Ok(U.Vignette.ImageTransparency < 0.5, "no vignette when quiet: " .. U.Vignette.ImageTransparency)
+do -- the vignette sits behind the lines, not the window
+	local Content = math.min(U.LogLayout.AbsoluteContentSize.Y, U.Log.AbsoluteSize.Y)
+	Ok(U.Vignette.AbsoluteSize.Y <= U.Log.AbsoluteSize.Y + 30, "vignette taller than the log: " .. U.Vignette.AbsoluteSize.Y)
+	local Mid = U.Vignette.AbsolutePosition.Y + U.Vignette.AbsoluteSize.Y / 2
+	Ok(Mid >= U.Log.AbsolutePosition.Y - 2 and Mid <= U.Log.AbsolutePosition.Y + Content + 2, "vignette centre off the lines: " .. Mid)
+end
 
 -- 3. Focus (what / does) wakes it and focuses the bar; leaving keeps the draft
 Chat.Focus()

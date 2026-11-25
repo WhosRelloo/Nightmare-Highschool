@@ -142,8 +142,8 @@ function Shared.Build(Gui: ScreenGui)
 		ImageColor3 = Color3.new(0, 0, 0),
 		ImageTransparency = 1,
 		ScaleType = Enum.ScaleType.Stretch,
-		Position = UDim2.fromOffset(-40, -10),
-		Size = UDim2.new(1, 60, 1, -BAR + 20),
+		Position = UDim2.fromOffset(-40, HEADER),
+		Size = UDim2.new(1, 60, 0, 0),
 		ZIndex = 1,
 		Parent = Window,
 	})
@@ -156,28 +156,29 @@ function Shared.Build(Gui: ScreenGui)
 		ZIndex = 8,
 		Parent = Content,
 	})
+	-- the candle art (Theme.SubGames) is two same-size squares: the flame's wick tip (128, 208 of 256) sits on the body's
+	-- wick tip (131.4, 80.4 of 256), so the flame is anchored at its wick and placed at the body's wick.
+	local CS = 22
 	local Candle = new("Frame", {
 		Name = "Candle",
 		BackgroundTransparency = 1,
-		AnchorPoint = Vector2.new(0, 0.5),
-		Position = UDim2.new(0, 2, 0.5, -1),
-		Size = UDim2.fromOffset(16, 24),
+		AnchorPoint = Vector2.new(0, 1),
+		Position = UDim2.new(0, 2, 1, 0),
+		Size = UDim2.fromOffset(CS, CS),
 		ZIndex = 9,
 		Parent = Header,
 	})
 	Kit.Image(Theme.SubGames.CandleBody, { -- (the candle art lives in Theme.SubGames, not Theme.Images)
 		Name = "Wax",
-		AnchorPoint = Vector2.new(0.5, 1),
-		Position = UDim2.new(0.5, 0, 1, 0),
-		Size = UDim2.fromOffset(8, 12),
+		Size = UDim2.fromScale(1, 1),
 		ZIndex = 9,
 		Parent = Candle,
 	})
 	local Flame = Kit.Image(Theme.SubGames.CandleFlame, {
 		Name = "Flame",
-		AnchorPoint = Vector2.new(0.5, 1),
-		Position = UDim2.new(0.5, 0, 1, -11),
-		Size = UDim2.fromOffset(12, 14),
+		AnchorPoint = Vector2.new(0.5, 208 / 256),
+		Position = UDim2.fromOffset(131.4 / 256 * CS, 80.4 / 256 * CS),
+		Size = UDim2.fromOffset(CS, CS),
 		ZIndex = 10,
 		Parent = Candle,
 	})
@@ -241,6 +242,7 @@ function Shared.Build(Gui: ScreenGui)
 		Parent = Log,
 	})
 	new("UIPadding", { PaddingRight = UDim.new(0, 6), PaddingBottom = UDim.new(0, 2), Parent = Log })
+	local LogLayout = Log:FindFirstChildOfClass("UIListLayout")
 
 	-- the bar
 	local Bar = new("CanvasGroup", {
@@ -321,6 +323,7 @@ function Shared.Build(Gui: ScreenGui)
 		Candle = Candle,
 		Flame = Flame,
 		Vignette = Vignette,
+		LogLayout = LogLayout,
 		Hint = Hint,
 		Log = Log,
 		Bar = Bar,
@@ -330,6 +333,11 @@ function Shared.Build(Gui: ScreenGui)
 		Send = Send,
 		SendFrame = SendFrame,
 	}
+	-- (chat-factions-ui) keep the vignette on the line block as the lines (or the log's size) change
+	for _, Sig in { LogLayout:GetPropertyChangedSignal("AbsoluteContentSize"), Log:GetPropertyChangedSignal("AbsoluteSize"), Log:GetPropertyChangedSignal("AbsolutePosition") } do
+		Sig:Connect(function() Local.FitVignette(U) end)
+	end
+	task.defer(Local.FitVignette, U)
 	return U
 end
 
@@ -426,6 +434,20 @@ function Local.UpdateHint(U)
 end
 
 -- a long note wraps; the bar grows (up to BAR_MAX) and the log gives way
+-- (chat-factions-ui) the quiet vignette sits behind the line block, not the window: top of the log, as tall as the lines
+function Local.FitVignette(U)
+	local Scale = U.Gui:FindFirstChildOfClass("UIScale")
+	local K = if Scale and Scale.Scale > 0 then Scale.Scale else 1
+	local Content = U.LogLayout.AbsoluteContentSize.Y / K
+	local H = 0
+	if Content > 0 then
+		H = math.min(Content + 28, U.Log.AbsoluteSize.Y / K + 20)
+	end
+	local Top = (U.Log.AbsolutePosition.Y - U.Window.AbsolutePosition.Y) / K
+	U.Vignette.Position = UDim2.fromOffset(-40, Top - 14)
+	U.Vignette.Size = UDim2.new(1, 60, 0, H)
+end
+
 function Local.Resize(U)
 	local Want = math.clamp(U.Box.TextBounds.Y / math.max(U.Gui:FindFirstChild("NHAutoScale") and U.Gui.NHAutoScale.Scale or 1, 0.01) + 18, BAR, BAR_MAX)
 	if U.Box.Text == "" then Want = BAR end
