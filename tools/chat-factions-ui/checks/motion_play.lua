@@ -40,11 +40,11 @@ Ok(Motion.ActiveCount() == Base + 2, ("loop entries %d, want %d"):format(Motion.
 local Seen = {}
 for _ = 1, 12 do
 	task.wait(0.05)
-	Seen[math.floor(Flame.Size.X.Offset * 100)] = true
+	Seen[Flame.Size.X.Offset .. "/" .. math.round(Flame.ImageTransparency * 100)] = true
 end
 local N = 0
 for _ in Seen do N += 1 end
-Ok(N >= 3, "the candle doesn't flicker (" .. N .. " sizes)")
+Ok(N >= 3, "the candle doesn't flicker (" .. N .. " distinct size/transparency pairs)")
 
 local Bar = Instance.new("Frame")
 local Fill = Instance.new("Frame")
@@ -143,6 +143,20 @@ task.wait(0.1)
 Motion.SmokeIn(L4)
 task.wait(0.6)
 Ok(math.abs(L4.TextTransparency - 0.1) < 0.01 and L4.Position == UDim2.fromOffset(15, 0), ("SmokeIn twice ended at %.2f"):format(L4.TextTransparency))
+
+-- The fade-in of Open is visible: two Heartbeats after Open the label is still mostly transparent, then it returns.
+local P5 = Instance.new("Frame")
+P5.Visible = false
+P5.Parent = G
+local L5 = Instance.new("TextLabel")
+L5.TextTransparency = 0.1
+L5.Parent = P5
+Motion.Open(P5)
+game:GetService("RunService").Heartbeat:Wait()
+game:GetService("RunService").Heartbeat:Wait()
+Ok(L5.TextTransparency > 0.5, ("Open's fade-in isn't visible (label at %.2f after two Heartbeats)"):format(L5.TextTransparency))
+task.wait(0.5)
+Ok(math.abs(L5.TextTransparency - 0.1) < 0.01, ("Open's fade-in didn't end at built (%.2f)"):format(L5.TextTransparency))
 
 G:Destroy()
 task.wait(0.2)

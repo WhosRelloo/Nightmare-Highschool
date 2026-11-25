@@ -205,7 +205,7 @@ local function remember(Root: GuiObject)
 end
 
 -- Drives every remembered transparency to 1 at once. A zero-length tween replaces any tween running on the property
--- (a plain assignment would be undone by it), so this also cancels an unfinished Kit.FadeIn.
+-- (a plain assignment would be undone by it), so this also cancels an unfinished Kit.FadeIn; the direct set shows it now.
 local function hide(Root: GuiObject)
 	remember(Root)
 	local Zero = TweenInfo.new(0)
@@ -226,6 +226,10 @@ local function hide(Root: GuiObject)
 		end
 		if next(Goal) then
 			TweenService:Create(D, Zero, Goal):Play()
+			local Any: any = D
+			for K, V in Goal do
+				Any[K] = V -- at once too: the tween only lands next step
+			end
 		end
 	end
 	one(Root)
@@ -320,7 +324,13 @@ function Motion.Open(Panel: GuiObject)
 	Panel.Position = Base + UDim2.fromOffset(0, 10)
 	Motion.Play(S, 0.3, { Scale = 1 })
 	Motion.Play(Panel, 0.3, { Position = Base })
-	Kit.FadeIn(Panel, 0.3)
+	-- One Heartbeat later, so the zero-length tweens of hide() have landed and FadeIn starts from invisible.
+	local Mine = Opening[Panel]
+	RunService.Heartbeat:Once(function()
+		if Opening[Panel] == Mine and Panel.Parent then
+			Kit.FadeIn(Panel, 0.3)
+		end
+	end)
 end
 
 -- Hides a panel: the reverse over 0.2 s. Opening it again before that keeps it open.
