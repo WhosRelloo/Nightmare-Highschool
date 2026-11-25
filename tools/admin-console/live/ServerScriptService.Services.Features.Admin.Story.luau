@@ -58,8 +58,10 @@ return function(H)
 				local Tu = tut() if not Tu then return false, `Tutorial is missing` end
 				local Cut, Seg = CHECKPOINTS[a.Checkpoint]:match(`^([%w_]+):([%w_]+)$`)
 				Tu.Checkpoint(Tg, Cut, Seg)
-				if Tg:GetAttribute(`NHTutorial`) == true then Tu.Resume(Tg) else Tu.Enter(Tg) end
-				return true, `{Tg.Name}: tutorial at the {string.lower(a.Checkpoint)}`
+				if Tg:GetAttribute(`NHTutorial`) ~= true then Tu.Enter(Tg) end
+				local Mark = Tu.Resume(Tg)
+				if not Mark then return false, `Couldn't place {Tg.Name} (no character or mark)` end
+				return true, `{Tg.Name}: tutorial at the {string.lower(a.Checkpoint)} (mark {Mark})`
 			end;
 		};
 		TutorialLeave = {
