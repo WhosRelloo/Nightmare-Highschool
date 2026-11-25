@@ -4,7 +4,30 @@ All notable changes to the NH Combat Test dev place. The newest entries come fir
 
 ## [Unreleased]
 
-Nothing yet.
+### `playtest-blockers`: four player-blocking bugs from the playtest, plus carry and grip (2026-11-25)
+Record: `tools/playtest-blockers/REPORT.md`. Backup: `ServerStorage.NH_Backup.PlaytestBlockers_20261125`.
+Installed in NH Combat Test (Edit); **the place is not saved**.
+- **Players can walk onto the soccer pitch and the practice field.** Their invisible ball-only walls (group
+  `SportBallWall`) were only switched off for `Default`, but characters run in `Entity` (and NPCs, ragdolls, walkers
+  and tutorial players in their own groups), so the walls stopped people as well as the ball. `Sports.Soccer` now
+  switches every group but `SportBall` off against them, at start and every 10 s. Matches still start and end.
+- **New Kid's "Read the note in locker 113" can be done.** Locker 113 carries the note's prompt, the class locker's
+  "Change Class", the next lockers' "Open" 2 studs away and students' "Talk", all on E, and only one shows at a time:
+  E went to a student. While a quest prompt you need is showing, `Gui.QuestTracker` switches off (for you only) other
+  prompts on its key that share its spot, and, while you stand at it, those around you. They come back once it's done
+  or you step away. Players already stuck on the step are fixed by this too.
+- **The Lost & Found box works.** The chest by the notice board was placed by the build kit without its
+  `NHLostFoundBox` tag, so it never got a prompt. `Features.LostFound` adopts the kit's `LostFoundBox` at start (not
+  the lost items, which share the kit attribute). Hand things in for Yen; used empty-handed it says how many things
+  are lost about the grounds.
+- **Carrying puts the body on your shoulder.** `CarryOffset` was tuned for the old left-shoulder clip, so with the
+  carry revamp's clips the body floated upside down above the carrier's head. It now lies across the right shoulder
+  (legs hanging in front), and the offset scales with the carrier.
+- **A grip holds its victim.** A normal grip set the victim down 3 studs ahead and left it free, so a downed player
+  could crawl out of the execution (a moving victim slid into the gripper). Every grip now welds the victim at the
+  grip offset for the clip, as racial grips already did.
+- **Left Alt** was checked and already only toggles shift lock (reserved in Settings, refused for every rebind, and
+  no other binding in code or at runtime). No change.
 
 ## [2.41.0] - 2026-11-25: The chat and the Factions panel in iron and candle; the soccer clips published
 
