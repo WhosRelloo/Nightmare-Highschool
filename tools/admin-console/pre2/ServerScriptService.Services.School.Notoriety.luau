@@ -347,6 +347,45 @@ function Shared.Get(P: Player)
 	}
 end
 
+-- (console 2) the staff console's Bell Tower cards
+function Shared.Clear(P: Player)
+	Local.Reset(P)
+	local D = Discipline.GetData(P)
+	if D then D.Summons = {} end
+	Local.Publish(P)
+	local S = Local.Get(P)
+	Shared.Changed:Fire(P, S.Tier, S.State)
+end
+
+function Shared.SetHeat(P: Player, Heat: number)
+	Heat = math.clamp(tonumber(Heat) or 0, 0, 100)
+	if Heat <= 0 then Shared.Clear(P) return end
+	local S = Local.Get(P)
+	local Old = S.Tier
+	S.Heat = Heat
+	S.Tier = F.Tier(Heat)
+	-- lowering re-arms the steps above the new bell, so raising again runs them again
+	if S.Tier < Config.HuntTier then S.Responded, S.RespondOk = false, nil end
+	if S.Tier < Config.ConvergeTier then S.Converged = false end
+	if S.Tier < Config.TollTier then S.Tolled = false end
+	S.LastSeenAt = S.T
+	local Root = Local.Root(P)
+	if Root then S.LastSeenPos = Root.Position end
+	if S.Tier > Old then Local.Escalate(P) end
+	if S.Tier > 0 and S.State == `` then S.State = `Lit` end
+	Local.Publish(P)
+	Shared.Changed:Fire(P, S.Tier, S.State)
+end
+
+function Shared.AddSummons(P: Player, Type: string): boolean
+	local D = Discipline.GetData(P)
+	if not D then return false end
+	if D.Summons and #D.Summons >= Config.SummonsLimit then return false end
+	Local.AddSummons(P, Type, `Staff`)
+	Local.Publish(P)
+	return true
+end
+
 ---| The probe (Studio only) |---
 
 function Local.Probe(Cmd: string, Name: string?, ...): any

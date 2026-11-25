@@ -42,6 +42,7 @@ local Settings = Config.HallMonitor
 local TICK = 0.2
 
 local Monitors = {} :: { any }
+local Off = false
 local Caught = {} :: { [Player]: { [string]: string } } -- per player: violation type -> period key already punished
 local LastFightReport = {} :: { [Player]: number }
 
@@ -615,6 +616,7 @@ end
 ---| Spawning |---
 
 function Local.Spawn(Slot: number)
+	if Off then return end
 	local School = Local.GetSchool()
 	local Spawn = School and School:FindFirstChild(`MonitorSpawn`) :: BasePart?
 	local AIFolder = ServerScriptService.Services.AI.AI
@@ -807,6 +809,26 @@ function Shared.GetMonitors(): { any }
 		})
 	end
 	return Result
+end
+
+-- (console 2) the staff console's Hall monitors card. Not saved: a new server starts with them on.
+function Shared.IsEnabled(): boolean return not Off end
+
+function Shared.SetEnabled(On: boolean)
+	if On == not Off then return end
+	Off = not On
+	workspace:SetAttribute(`NHMonitorsOff`, if Off then true else nil)
+	if Off then
+		for Slot, M in Monitors do
+			pcall(Local.EndChase, M)
+			Monitors[Slot] = nil -- before Destroy: the respawn watcher checks Monitors[Slot] == M
+			if M.Model and M.Model.Parent then M.Model:Destroy() end
+		end
+	else
+		for Slot = 1, Settings.Count do
+			if not Monitors[Slot] then task.spawn(Local.Spawn, Slot) end
+		end
+	end
 end
 
 function Shared.OnStart()
