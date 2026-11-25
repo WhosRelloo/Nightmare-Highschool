@@ -173,6 +173,58 @@ otherwise, and it was wrong.
 - The plan's decisions (its "Spec deltas") were approved by the owner on 2026-11-24.
 
 ### Open issues for the owner
-- Removing a mute entry doesn't lift the mute (spec §2). The player stays muted in this server until it ends or
-  Unmute runs, but the summary no longer mentions it, and a rejoin won't apply it again.
+- ~~Removing a mute entry doesn't lift the mute.~~ Fixed in phase 2 (2026-11-24, see below): removing a mute that is
+  still on lifts it, unless another mute on the record is still on.
 - graphify isn't installed, so `graphify update .` wasn't run.
+
+## Phase 2 (branch `claude/admin-console-2-895704`, plan `docs/superpowers/plans/2026-11-24-admin-console-2.md`)
+
+19 new cards (18 server, 1 client tool), so 85 server commands, plus the TRANSFORMED, WANTED, NEW and IN CUTSCENE flags
+and the new context-card lines. Spec: `docs/superpowers/specs/2026-11-24-admin-console-2-design.md`. Backup in Studio:
+`ServerStorage.NH_Backup.AdminConsole2_20261124`. The place is not saved; that needs the owner's word.
+
+### Edit checks (2026-11-24, after the final install)
+`PASS console_registry (85 commands)`, `PASS console_pure`, `PASS console_model`, `PASS console_play_server`,
+`PASS console_tools`, `PASS console2_lineage`.
+
+### Play round (slot 2, final)
+- `PASS console_mute_remove`: an active mute removed lifts it, two mutes with one removed still mutes, an ended mute
+  changes nothing, and a ban entry removed doesn't unban. The staff record is put back.
+- `PASS console2_play_run (41 calls)`: every phase 2 card through `Admin.Dispatch`, including:
+  - level 2 refused on Season, Moon and Sky in live-server mode;
+  - Set Bells 4 bringing the monitors;
+  - Hall monitors off, then on;
+  - a replay that writes nothing;
+  - a tutorial enter, then jumps to Garden, Fence and Bus, then leave;
+  - Give a clue, then Reset a case.
+- `PASS console2_play_client`: Preview just for me changes only your own sky, and the four flags draw.
+- `PASS console_play_run (104 calls)` and `PASS console_play_client`, the 1a/1b checks, still pass. Both are
+  order-dependent:
+  - `console_play_run` failed once on a dare that wasn't open at that clock time, and passed on the rerun.
+  - `console_play_client` needs a fresh Play with the staff prefs cleared and the Prologue finished. It failed in a
+    dirty session and passed fresh.
+- **Slot 2** is Human. Form direction was tested by making it a Vampire at Tier I for the check, then putting that back.
+  The saved FormDirection went from nil to "2", then "1", then back to nil.
+- **Slot 2 cine state:** `{Prologue=Seen}` before the round. Another session's Play had run the Prologue. It is empty
+  after the round, with Seen and Origin nil, as in 1b. The staff prefs are put back to `{Side=Test, Favs={}}`.
+- **Screenshots:** in `docs/superpowers/mockups/2026-11-23-admin-console/`: `play2-test-world.png`,
+  `play2-test-story.png`, `play2-test-school.png`, and `play2-row-flags.png` (WANTED).
+
+### Fixes found while running the plan
+- Moon tonight: a non-Full moon counts the next full moon from tomorrow. SetMoon refuses when there is no school clock.
+- Tutorial: jump to always resumes the student at the mark, and names the mark (or says it couldn't place them).
+- The NEW flag and the inspector no longer break the list when a service is missing.
+- Form direction called a helper before it was defined, so it now gets the profile directly. A replayed cutscene no
+  longer leaves a Started or Seen mark.
+- Final review:
+  - Set Heat 0 and Set Bells 0 keep owed summons, so only Clear notoriety drops them.
+  - Set Bells puts Heat at the middle of the bell (17.5, 35, 57.5, 80, 100), so the first cooling tick doesn't drop a bell.
+  - Preview just for me can show Autumn.
+  - The checks now put back the clock, the club, race hunger and the Bells attributes.
+- 1b open issue: removing a mute entry that is still on lifts the mute, and the log says so.
+
+### For the owner
+- Heat cools fast (about 1.5 a second while searched, 3 a second once quiet), so a bell set from the console lasts
+  only seconds unless a monitor sees the student. That's the game's tuning, not a console bug.
+- Hall monitors on/off is a whole-server change, but in live servers it is level 2 plus a hold. Only Season, Moon and
+  Sky are owner-only, as the spec says.
