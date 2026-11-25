@@ -950,9 +950,12 @@ function Shared.Inspect(Admin: Player, T: Player)
 	local sports = typeof(Prof.Sports) == `table` and Prof.Sports or {}
 	local arcade = typeof(Prof.Arcade) == `table` and Prof.Arcade.Best or {}
 	local Nt = svc(`School.Notoriety`)
-	local nt = Nt and Nt.Get(T) or {}
+	local nt = {}
+	if Nt then local Ok, R = pcall(Nt.Get, T) if Ok and typeof(R) == `table` then nt = R end end
 	local Tu = svc(`World.Tutorial`)
 	local Lin = typeof(Prof.Lineage) == `table` and Prof.Lineage or {}
+	local Checkpoint = nil
+	if Tu then local Ok, R = pcall(Tu.CheckpointOf, T) if Ok then Checkpoint = R end end
 	return {
 		Name = T.Name; UserId = T.UserId; Slot = T:GetAttribute(`Slot`); Race = T:GetAttribute(`SubRace`) or T:GetAttribute(`Race`);
 		Yen = Prof.Yen or 0; Level = P.Level; Exp = P.Exp; Points = P.Points; Stats = P.Stats;
@@ -962,7 +965,7 @@ function Shared.Inspect(Admin: Player, T: Player)
 		Arcade = arcade; Kills = Prof.Kills or 0; Note = latestNote(T.UserId);
 		Heat = nt.Heat; Bells = nt.Tier; BellState = nt.State; Summons = nt.Summons;
 		FormDirection = typeof(Lin.Looks) == `table` and Lin.Looks.FormDirection or nil;
-		Checkpoint = Tu and Tu.CheckpointOf(T) or nil;
+		Checkpoint = Checkpoint;
 	}
 end
 
@@ -1099,7 +1102,7 @@ local function playerList()
 			Transformed = C0 ~= nil and C0:GetAttribute(`Transformation`) ~= nil;
 			Bells = P:GetAttribute(`NHBells`); BellState = P:GetAttribute(`NHBellState`); Summons = P:GetAttribute(`NHSummons`);
 			InCutscene = P:GetAttribute(`NHTutorial`) == true or (Cn ~= nil and Cn.IsWatching(P) == true);
-			New = (function() local Ok, S = pcall(Q.CineState, P) return Ok and typeof(S) == `table` and S.Prologue ~= `Seen` end)();
+			New = Q ~= nil and (function() local Ok, S = pcall(Q.CineState, P) return Ok and typeof(S) == `table` and S.Prologue ~= `Seen` end)() or false;
 		})
 	end
 	return list
