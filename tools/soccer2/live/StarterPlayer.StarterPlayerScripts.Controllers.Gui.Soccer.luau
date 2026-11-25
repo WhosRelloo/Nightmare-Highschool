@@ -331,8 +331,6 @@ local function body(Char: Model)
 	local Done = false
 	local function clear()
 		if Done then return end   -- Destroying and AncestryChanged both fire
-		warn(`[Soccer diag] body clear {Char.Name}
-{debug.traceback()}`) -- DIAG (temporary)
 		Done = true
 		for _, C in Cs do C:Disconnect() end
 		Conns[Char] = nil
@@ -451,7 +449,6 @@ function Local.Move(Char: Model?, Kind: string, Slot: string, Side: number?, Me:
 	if not Char then return end
 	local C = Local.Data(Slot)
 	local Tr = Local.Pose(Char, Kind, Side, { Slot = Slot })
-	warn(`[Soccer diag] Move {Slot} me={Me} tr={Tr ~= nil} path={C ~= nil and C.Path ~= nil} root={Local.Root() ~= nil}`) -- DIAG (temporary)
 	if Tr and C and C.Path then
 		local Rate, DashTime, t0, t1 = Clips.Drive(Tr, C, Time, 2)
 		local W = Watch[Tr]

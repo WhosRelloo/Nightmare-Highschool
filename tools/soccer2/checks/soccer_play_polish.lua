@@ -66,9 +66,13 @@ local ok, Err = pcall(function()
 	if #Writes ~= 1 then table.insert(Fails, "(4) " .. #Writes .. " TimePosition writes from two Seeks (want 1)") end
 	if Writes[1] and Writes[1] < 2 then table.insert(Fails, string.format("(4) the surviving write is %.2f (want >= 2, the second Seek's)", Writes[1])) end
 
-	-- (3) a clip that never loads: DashPath falls back to the plain dash (the dribble's 1.1 distance)
+	-- (3) a clip that never loads: DashPath falls back to the plain dash (the dribble's 1.1 distance).
+	-- The bogus track is cached under the slot on the local body, so it is dropped and destroyed afterwards.
 	local Tracks = Soccer.TracksForTests(Char)
-	for K, Old in Tracks do if K:sub(1, 7) == "Dribble" then pcall(function() Old:Stop(0) Old:Destroy() end) Tracks[K] = nil end end
+	local function dropDribble()
+		for K, Old in Tracks do if K:sub(1, 7) == "Dribble" then pcall(function() Old:Stop(0) Old:Destroy() end) Tracks[K] = nil end end
+	end
+	dropDribble()
 	Clips.TestId("Dribble", "rbxassetid://1")
 	local Centre = workspace.Sports.Pitch:GetBoundingBox().Position
 	local D = flat(Centre - Root.Position)
@@ -81,8 +85,18 @@ local ok, Err = pcall(function()
 	local Want = T.Dribble.Dash * 0.5   -- the 1.1 dribble distance (Gui.Soccer S_Dribble)
 	local Got = flat(Root.Position - From).Magnitude
 	if Got < Want * 0.8 then table.insert(Fails, string.format("(3) the never-loaded dribble moved %.2f of %.2f studs (want >= 80%%)", Got, Want)) end
-	local Dr = Soccer.TracksForTests(Char)["Dribble"]
-	if Dr and Dr.IsPlaying then Dr:Stop(0) end
+	-- put everything back: the hook, and the bogus track the body cached
+	Clips.TestId("Dribble", nil)
+	dropDribble()
+	local Id = Clips.Id("Dribble")
+	if not Id or Id == "rbxassetid://1" then table.insert(Fails, "(3) after the restore Dribble resolves to " .. tostring(Id)) return end
+	local Fresh = Soccer.PlayForTests(Char, "Dribble")
+	if not Fresh then table.insert(Fails, "(3) no fresh Dribble track after the restore") return end
+	local L0 = os.clock()
+	while Fresh.Length <= 0 and os.clock() - L0 < 3 do RunService.Heartbeat:Wait() end
+	if Fresh.Length <= 0 then table.insert(Fails, "(3) the fresh Dribble track never reached Length > 0") end
+	Fresh:Stop(0)
+	dropDribble()
 end)
 cleanup()
 if not ok then return "FAIL soccer_play_polish: " .. tostring(Err) end
