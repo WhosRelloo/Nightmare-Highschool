@@ -1,0 +1,63 @@
+{
+ "prop": "AnatToolDriver",
+ "axes": "Blender (x right, y away from the student, z up), units = Blender m",
+ "pieces": {
+  "AnatToolDriver_Main": "Root"
+ },
+ "centres": {
+  "AnatToolDriver_Main": [
+   -0.15000000596046448,
+   -0.33459997177124023,
+   0.02871418371796608
+  ]
+ },
+ "sizes": {
+  "AnatToolDriver_Main": [
+   0.04142835736274719,
+   0.24480000138282776,
+   0.04142836481332779
+  ]
+ },
+ "mats": {
+  "AnatToolDriver_Main": "Rosewood"
+ },
+ "tris": {
+  "AnatToolDriver_Main": 5284
+ },
+ "textures": {
+  "AnatToolDriver_Main": {
+   "color": "props/textures/AnatToolDriver_Main_color.png",
+   "rough": "props/textures/AnatToolDriver_Main_rough.png",
+   "normal": "props/textures/AnatToolDriver_Main_normal.png",
+   "metal": "props/textures/AnatToolDriver_Main_metal.png"
+  }
+ },
+ "attach": {
+  "Grip": {
+   "bone": "Root",
+   "pos": [
+    -0.15000000596046448,
+    -0.3929999768733978,
+    0.02871418371796608
+   ]
+  },
+  "Tip": {
+   "bone": "Root",
+   "pos": [
+    -0.15000000596046448,
+    -0.21219998598098755,
+    0.02871418371796608
+   ]
+  }
+ },
+ "bones": {
+  "Root": {
+   "head": [
+    -0.15000000596046448,
+    -0.4569999873638153,
+    0.02871418371796608
+   ],
+   "parent": null
+  }
+ }
+}

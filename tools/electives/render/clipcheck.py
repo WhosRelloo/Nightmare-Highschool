@@ -18,6 +18,12 @@ ALLOW = [
     ("BellyPlate", "PlateRing"), ("BellyPlate", "PlateRivet"), ("PlateRing", "PlateRivet"),
     ("Heart", "HeartBand"), ("Heart", "HeartLug"), ("Heart", "HeartStub"),
     ("Candle", "CandleDish"), ("Candle", "Flame"),
+    ("FlagCog", "FlagCog_Hub"), ("Deck", "Cradle_*"),
+    # species_lib (Raven, Wyvern): "<Piece>__<part>"; parts of one piece may touch (allowed() below)
+    ("Body__*", "Mechanism__deck"), ("Body__*", "Mechanism__brace"), ("Body__*", "Head__*"), ("Body__*", "Limbs__*"),
+    ("Body__*", "SideKey__*"), ("Body__*", "Tail__*"), ("Body__hinge", "Plate__*"), ("Limbs__*", "WingPlate*__*"),
+    ("Mechanism__deck", "Lungs__*"), ("Mechanism__deck", "GearGut__*"), ("Mechanism__pipe*", "Lungs__*"),
+    ("FireGland__*", "FireGlandGlass__*"), ("FireGland__*", "FireGlandGlow__*"),
     ("Wax", "Tray"), ("Roll", "Slot"), ("Chalk", "Slot"), ("Chalk", "Chalk"),
 ]
 
@@ -28,6 +34,8 @@ def base(o):
 
 def allowed(a, b):
     x, y = base(a), base(b)
+    if "__" in x and "__" in y and x.split("__")[0] == y.split("__")[0]:
+        return True
     return any((fnmatch(x, p) and fnmatch(y, q)) or (fnmatch(x, q) and fnmatch(y, p)) for p, q in ALLOW)
 
 
@@ -82,3 +90,4 @@ def run(out_path):
         for n, a, b in sorted(hits, key=lambda h: -h[0]):
             f.write(f"{n:5d}  {desc(a)}  X  {desc(b)}\n")
     print("CLIPCHECK", len(hits), out_path)
+    return len(hits)

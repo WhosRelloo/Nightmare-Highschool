@@ -1,0 +1,63 @@
+{
+ "prop": "AnatToolTweezers",
+ "axes": "Blender (x right, y away from the student, z up), units = Blender m",
+ "pieces": {
+  "AnatToolTweezers_Main": "Root"
+ },
+ "centres": {
+  "AnatToolTweezers_Main": [
+   0.30000001192092896,
+   -0.3381999731063843,
+   0.014999999664723873
+  ]
+ },
+ "sizes": {
+  "AnatToolTweezers_Main": [
+   0.019360005855560303,
+   0.19839999079704285,
+   0.014000000432133675
+  ]
+ },
+ "mats": {
+  "AnatToolTweezers_Main": "Steel"
+ },
+ "tris": {
+  "AnatToolTweezers_Main": 4684
+ },
+ "textures": {
+  "AnatToolTweezers_Main": {
+   "color": "props/textures/AnatToolTweezers_Main_color.png",
+   "rough": "props/textures/AnatToolTweezers_Main_rough.png",
+   "normal": "props/textures/AnatToolTweezers_Main_normal.png",
+   "metal": "props/textures/AnatToolTweezers_Main_metal.png"
+  }
+ },
+ "attach": {
+  "Grip": {
+   "bone": "Root",
+   "pos": [
+    0.30000001192092896,
+    -0.3317999839782715,
+    0.015119998715817928
+   ]
+  },
+  "Tip": {
+   "bone": "Root",
+   "pos": [
+    0.30000001192092896,
+    -0.24187999963760376,
+    0.01111999899148941
+   ]
+  }
+ },
+ "bones": {
+  "Root": {
+   "head": [
+    0.30000001192092896,
+    -0.4309999942779541,
+    0.015119998715817928
+   ],
+   "parent": null
+  }
+ }
+}

@@ -189,8 +189,12 @@ def mainspring(centre, z, r0, r1, turns, mat):
     return o
 
 
-def build_frog(M, origin, plate_open_deg=110, heart_lifted=True, heart_z=None):
+def build_frog(M, origin, plate_open_deg=110, heart_lifted=True, heart_z=None, rest=False):
+    """rest=True: the game's rest pose (plate shut, a half-size heart-pump seated in a low cradle, a loose cog on
+    the deck); every part clear of every other (clipcheck)."""
     M_.update(M)
+    if rest:
+        plate_open_deg = 0
     ox, oy, oz = origin
     BR = Vector((0.088, 0.112, 0.036))
     BC = Vector((ox, oy, oz + BR.z + 0.0004))  # rests on the surface, 0.4 mm clear
@@ -250,14 +254,32 @@ def build_frog(M, origin, plate_open_deg=110, heart_lifted=True, heart_z=None):
 
     # the heart cradle: post, cup, ring, prongs, glow ring; copper pipes from the ring to the bellows boards
     HC = Vector((BC.x, BC.y, dtop + 0.02))
-    cyl("Cradle_Post", (HC.x, HC.y, (dtop + HC.z - 0.002) / 2), 0.004, HC.z - 0.002 - dtop, M["brass_dark"])
-    cyl("Cradle_Cup", (HC.x, HC.y, HC.z - 0.002), 0.0135, 0.002, M["brass_dark"])
-    torus("Cradle_Ring", HC, 0.014, 0.0022, M["brass"])
+    RR = 0.017 if rest else 0.014              # rest: a wider ring, so the seated pump's lobes clear it
+    if rest:   # a low cradle: the cup sits on the deck, three struts carry the ring, the seated heart drops between
+        cyl("Cradle_Cup", (HC.x, HC.y, dtop + 0.001), 0.0135, 0.002, M["brass_dark"])
+        for a in (0, 120, 240):
+            aa = math.radians(a + 90)
+            tube("Cradle_Strut", [(HC.x + math.cos(aa) * 0.0128, HC.y + math.sin(aa) * 0.0128, dtop + 0.0016),
+                                  (HC.x + math.cos(aa) * RR, HC.y + math.sin(aa) * RR, HC.z - 0.0016)], 0.0009, M["brass"])
+    else:
+        cyl("Cradle_Post", (HC.x, HC.y, (dtop + HC.z - 0.002) / 2), 0.004, HC.z - 0.002 - dtop, M["brass_dark"])
+        cyl("Cradle_Cup", (HC.x, HC.y, HC.z - 0.002), 0.0135, 0.002, M["brass_dark"])
+    torus("Cradle_Ring", HC, RR, 0.0022, M["brass"])
     for a in (45, 135, 225, 315):
         aa = math.radians(a)
-        tube("Cradle_Prong", [(HC.x + math.cos(aa) * 0.0155, HC.y + math.sin(aa) * 0.0155, HC.z),
-                              (HC.x + math.cos(aa) * 0.0175, HC.y + math.sin(aa) * 0.0175, HC.z + 0.008)], 0.0011, M["brass"])
-    torus("Cradle_Glow", (HC.x, HC.y, HC.z + 0.0045), 0.0105, 0.0006, M["glow"])
+        tube("Cradle_Prong", [(HC.x + math.cos(aa) * (RR + 0.0015), HC.y + math.sin(aa) * (RR + 0.0015), HC.z),
+                              (HC.x + math.cos(aa) * (RR + 0.0035), HC.y + math.sin(aa) * (RR + 0.0035), HC.z + 0.008)], 0.0011, M["brass"])
+    torus("Cradle_Glow", (HC.x, HC.y, (dtop + 0.0029) if rest else (HC.z + 0.0045)), 0.0105, 0.0006, M["glow"])
+    if rest:   # the loose cog (the Flag organ): lying flat on the deck, no axle
+        lo = len(bpy.data.objects)
+        gear((BC.x - 0.047, BC.y - 0.004, dtop + 0.0003 + 0.00125), 0.0075, 0.0025, 10, M["brass"], 0.2)
+        for o in list(bpy.data.objects):
+            if o.name.startswith("Gear_Axle") and o.name not in out.get("_seen", ()) and o.location.x < BC.x - 0.04:
+                bpy.data.objects.remove(o)
+        for o in list(bpy.data.objects):
+            b = o.name.split(".")[0]
+            if b in ("Gear", "Gear_Hub") and o.location.x < BC.x - 0.04:
+                o.name = "FlagCog" if b == "Gear" else "FlagCog_Hub"
     for sx, lc in zip((-1, 1), lungs):
         tube("Pipe_Lung", [(HC.x + sx * 0.0175, HC.y + 0.004, HC.z),
                            (HC.x + sx * 0.025, HC.y + 0.02, lc.z + 0.012),
@@ -303,6 +325,9 @@ def build_frog(M, origin, plate_open_deg=110, heart_lifted=True, heart_z=None):
 
     # --- the heart-pump: one fused mesh, a brass band, copper stubs and a lifting lug
     hz = heart_z if heart_z is not None else (HC.z + 0.1 if heart_lifted else HC.z + 0.008)
+    HS = 0.5 if rest else 1.0                  # rest: a half-size pump, its cone resting in the ring
+    if rest:
+        hz = dtop + 0.0023 + 0.04 * HS        # the cone's tip 0.3 mm over the cup
     H = Vector((HC.x, HC.y, hz))
     lobes = [sphere("Heart", (H.x - 0.011, H.y, H.z), 0.0175, M["heart"], 32), sphere("Lobe", (H.x + 0.011, H.y, H.z), 0.0175, M["heart"], 32)]
     bpy.ops.mesh.primitive_cone_add(radius1=0.026, depth=0.036, location=(H.x, H.y, H.z - 0.022), rotation=(math.pi, 0, 0), vertices=48)
@@ -323,7 +348,16 @@ def build_frog(M, origin, plate_open_deg=110, heart_lifted=True, heart_z=None):
     hl.data.energy = 1.2
     hl.data.color = (1.0, 0.22, 0.12)
     hl.data.shadow_soft_size = 0.02
+    hparts = [heart, band, lug] + [o for o in bpy.data.objects if o.name.startswith("HeartStub")]
+    if rest:
+        from mathutils import Matrix
+        K = Matrix.Translation(H) @ Matrix.Scale(HS, 4) @ Matrix.Translation(-H)
+        bpy.context.view_layer.update()
+        for o in hparts:
+            o.matrix_world = K @ o.matrix_world
+        lc = H + (lc - H) * HS
     out["keep"] += [heart, band, lug]
+    out["heart_parts"] = hparts
     out["heart"] = H
     out["lug"] = lug
     out["lug_centre"] = lc

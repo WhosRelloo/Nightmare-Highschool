@@ -1,0 +1,63 @@
+{
+ "prop": "AnatToolKey",
+ "axes": "Blender (x right, y away from the student, z up), units = Blender m",
+ "pieces": {
+  "AnatToolKey_Main": "Root"
+ },
+ "centres": {
+  "AnatToolKey_Main": [
+   -0.30000001192092896,
+   -0.34803998470306396,
+   0.01679999940097332
+  ]
+ },
+ "sizes": {
+  "AnatToolKey_Main": [
+   0.07047182321548462,
+   0.15808001160621643,
+   0.01759999990463257
+  ]
+ },
+ "mats": {
+  "AnatToolKey_Main": "Brass"
+ },
+ "tris": {
+  "AnatToolKey_Main": 18430
+ },
+ "textures": {
+  "AnatToolKey_Main": {
+   "color": "props/textures/AnatToolKey_Main_color.png",
+   "rough": "props/textures/AnatToolKey_Main_rough.png",
+   "normal": "props/textures/AnatToolKey_Main_normal.png",
+   "metal": "props/textures/AnatToolKey_Main_metal.png"
+  }
+ },
+ "attach": {
+  "Grip": {
+   "bone": "Root",
+   "pos": [
+    -0.30000001192092896,
+    -0.38499999046325684,
+    0.01679999940097332
+   ]
+  },
+  "Tip": {
+   "bone": "Root",
+   "pos": [
+    -0.30000001192092896,
+    -0.26980000734329224,
+    0.01679999940097332
+   ]
+  }
+ },
+ "bones": {
+  "Root": {
+   "head": [
+    -0.30000001192092896,
+    -0.38499999046325684,
+    0.01679999940097332
+   ],
+   "parent": null
+  }
+ }
+}

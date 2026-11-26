@@ -1,0 +1,489 @@
+{
+ "prop": "AnatFrog",
+ "axes": "Blender (x right, y away from the student, z up), units = Blender m",
+ "pieces": {
+  "AnatFrog_Body": "Body",
+  "AnatFrog_CradleGlow": "Body",
+  "AnatFrog_FlagCog": "FlagCog",
+  "AnatFrog_GearGut": "GearGut",
+  "AnatFrog_Head": "Body",
+  "AnatFrog_HeartPump": "HeartPump",
+  "AnatFrog_Legs": "Body",
+  "AnatFrog_Lungs": "Lungs",
+  "AnatFrog_Mechanism": "Body",
+  "AnatFrog_Plate": "PlateHinge",
+  "AnatFrog_SideKey": "SideKey"
+ },
+ "centres": {
+  "AnatFrog_Body": [
+   -2.60770320892334e-08,
+   0.059999965131282806,
+   0.06714999675750732
+  ],
+  "AnatFrog_CradleGlow": [
+   0.0,
+   0.05999999865889549,
+   0.05909999832510948
+  ],
+  "AnatFrog_FlagCog": [
+   -0.04699999839067459,
+   0.0559999980032444,
+   0.057749997824430466
+  ],
+  "AnatFrog_GearGut": [
+   -0.003497011959552765,
+   0.013186214491724968,
+   0.058262504637241364
+  ],
+  "AnatFrog_Head": [
+   7.450580596923828e-09,
+   0.19231468439102173,
+   0.07648413628339767
+  ],
+  "AnatFrog_HeartPump": [
+   4.656612873077393e-10,
+   0.05999999865889549,
+   0.07604999840259552
+  ],
+  "AnatFrog_Legs": [
+   7.450580596923828e-09,
+   0.05500000715255737,
+   0.07500000298023224
+  ],
+  "AnatFrog_Lungs": [
+   0.0,
+   0.0955599993467331,
+   0.06520000100135803
+  ],
+  "AnatFrog_Mechanism": [
+   7.450580596923828e-09,
+   0.06000000983476639,
+   0.07049872726202011
+  ],
+  "AnatFrog_Plate": [
+   0.0009999815374612808,
+   0.059999980032444,
+   0.10790000110864639
+  ],
+  "AnatFrog_SideKey": [
+   0.11700000613927841,
+   0.05000000074505806,
+   0.07800000160932541
+  ]
+ },
+ "sizes": {
+  "AnatFrog_Body": [
+   0.17600011825561523,
+   0.22400008141994476,
+   0.06549999862909317
+  ],
+  "AnatFrog_CradleGlow": [
+   0.022199999541044235,
+   0.022199995815753937,
+   0.0011999979615211487
+  ],
+  "AnatFrog_FlagCog": [
+   0.014798276126384735,
+   0.014920331537723541,
+   0.0037499964237213135
+  ],
+  "AnatFrog_GearGut": [
+   0.0707300454378128,
+   0.059351641684770584,
+   0.021125007420778275
+  ],
+  "AnatFrog_Head": [
+   0.12799997627735138,
+   0.09537063539028168,
+   0.08396826684474945
+  ],
+  "AnatFrog_HeartPump": [
+   0.028499998152256012,
+   0.026000000536441803,
+   0.03509999439120293
+  ],
+  "AnatFrog_Legs": [
+   0.4479999542236328,
+   0.38999998569488525,
+   0.07999999821186066
+  ],
+  "AnatFrog_Lungs": [
+   0.09200000762939453,
+   0.03911999613046646,
+   0.01799999549984932
+  ],
+  "AnatFrog_Mechanism": [
+   0.1398528516292572,
+   0.1811998039484024,
+   0.03579745814204216
+  ],
+  "AnatFrog_Plate": [
+   0.12400008738040924,
+   0.1600000411272049,
+   0.02199999988079071
+  ],
+  "AnatFrog_SideKey": [
+   0.07400001585483551,
+   0.03600000590085983,
+   0.035999998450279236
+  ]
+ },
+ "mats": {
+  "AnatFrog_Body": "Brass",
+  "AnatFrog_CradleGlow": "Glow",
+  "AnatFrog_FlagCog": "Brass",
+  "AnatFrog_GearGut": "Brass",
+  "AnatFrog_Head": "Brass",
+  "AnatFrog_HeartPump": "Heart",
+  "AnatFrog_Legs": "Brass",
+  "AnatFrog_Lungs": "LeatherDk",
+  "AnatFrog_Mechanism": "BrassDark",
+  "AnatFrog_Plate": "Porcelain",
+  "AnatFrog_SideKey": "Brass"
+ },
+ "tris": {
+  "AnatFrog_Body": 18430,
+  "AnatFrog_CradleGlow": 2048,
+  "AnatFrog_FlagCog": 3196,
+  "AnatFrog_GearGut": 12094,
+  "AnatFrog_Head": 9250,
+  "AnatFrog_HeartPump": 5578,
+  "AnatFrog_Legs": 13758,
+  "AnatFrog_Lungs": 3088,
+  "AnatFrog_Mechanism": 18430,
+  "AnatFrog_Plate": 12512,
+  "AnatFrog_SideKey": 2268
+ },
+ "textures": {
+  "AnatFrog_Body": {
+   "color": "props/textures/AnatFrog_Body_color.png",
+   "rough": "props/textures/AnatFrog_Body_rough.png",
+   "normal": "props/textures/AnatFrog_Body_normal.png",
+   "metal": "props/textures/AnatFrog_Body_metal.png"
+  },
+  "AnatFrog_FlagCog": {
+   "color": "props/textures/AnatFrog_FlagCog_color.png",
+   "rough": "props/textures/AnatFrog_FlagCog_rough.png",
+   "normal": "props/textures/AnatFrog_FlagCog_normal.png",
+   "metal": "props/textures/AnatFrog_FlagCog_metal.png"
+  },
+  "AnatFrog_GearGut": {
+   "color": "props/textures/AnatFrog_GearGut_color.png",
+   "rough": "props/textures/AnatFrog_GearGut_rough.png",
+   "normal": "props/textures/AnatFrog_GearGut_normal.png",
+   "metal": "props/textures/AnatFrog_GearGut_metal.png"
+  },
+  "AnatFrog_Head": {
+   "color": "props/textures/AnatFrog_Head_color.png",
+   "rough": "props/textures/AnatFrog_Head_rough.png",
+   "normal": "props/textures/AnatFrog_Head_normal.png",
+   "metal": "props/textures/AnatFrog_Head_metal.png"
+  },
+  "AnatFrog_HeartPump": {
+   "color": "props/textures/AnatFrog_HeartPump_color.png",
+   "rough": "props/textures/AnatFrog_HeartPump_rough.png",
+   "normal": "props/textures/AnatFrog_HeartPump_normal.png",
+   "metal": "props/textures/AnatFrog_HeartPump_metal.png"
+  },
+  "AnatFrog_Legs": {
+   "color": "props/textures/AnatFrog_Legs_color.png",
+   "rough": "props/textures/AnatFrog_Legs_rough.png",
+   "normal": "props/textures/AnatFrog_Legs_normal.png",
+   "metal": "props/textures/AnatFrog_Legs_metal.png"
+  },
+  "AnatFrog_Lungs": {
+   "color": "props/textures/AnatFrog_Lungs_color.png",
+   "rough": "props/textures/AnatFrog_Lungs_rough.png",
+   "normal": "props/textures/AnatFrog_Lungs_normal.png",
+   "metal": "props/textures/AnatFrog_Lungs_metal.png"
+  },
+  "AnatFrog_Mechanism": {
+   "color": "props/textures/AnatFrog_Mechanism_color.png",
+   "rough": "props/textures/AnatFrog_Mechanism_rough.png",
+   "normal": "props/textures/AnatFrog_Mechanism_normal.png",
+   "metal": "props/textures/AnatFrog_Mechanism_metal.png"
+  },
+  "AnatFrog_Plate": {
+   "color": "props/textures/AnatFrog_Plate_color.png",
+   "rough": "props/textures/AnatFrog_Plate_rough.png",
+   "normal": "props/textures/AnatFrog_Plate_normal.png",
+   "metal": "props/textures/AnatFrog_Plate_metal.png"
+  },
+  "AnatFrog_SideKey": {
+   "color": "props/textures/AnatFrog_SideKey_color.png",
+   "rough": "props/textures/AnatFrog_SideKey_rough.png",
+   "normal": "props/textures/AnatFrog_SideKey_normal.png",
+   "metal": "props/textures/AnatFrog_SideKey_metal.png"
+  }
+ },
+ "attach": {
+  "Seam01": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.0630000252276659,
+    0.059999980032444,
+    0.10790000110864639
+   ]
+  },
+  "Seam02": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.06088742496888051,
+    0.0807055089628976,
+    0.10790000110864639
+   ]
+  },
+  "Seam03": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.05469359440892358,
+    0.09999999031424522,
+    0.10790000110864639
+   ]
+  },
+  "Seam04": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.04484063286466719,
+    0.11656853706803054,
+    0.10790000110864639
+   ]
+  },
+  "Seam05": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.0320000033825636,
+    0.12928203014380119,
+    0.10790000110864639
+   ]
+  },
+  "Seam06": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.017046773641674607,
+    0.13727406599848416,
+    0.10790000110864639
+   ]
+  },
+  "Seam07": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.0009999815374612847,
+    0.14000000059604645,
+    0.10790000110864639
+   ]
+  },
+  "Seam08": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.015046810566752038,
+    0.13727406599848416,
+    0.10790000110864639
+   ]
+  },
+  "Seam09": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.030000040307641015,
+    0.1292820301438012,
+    0.10790000110864639
+   ]
+  },
+  "Seam10": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.04284066978974462,
+    0.11656853706803054,
+    0.10790000110864639
+   ]
+  },
+  "Seam11": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.05269363133400102,
+    0.09999999031424522,
+    0.10790000110864639
+   ]
+  },
+  "Seam12": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.058887461893957944,
+    0.08070550896289763,
+    0.10790000110864639
+   ]
+  },
+  "Seam13": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.06100006215274334,
+    0.05999998003244401,
+    0.10790000110864639
+   ]
+  },
+  "Seam14": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.05888746189395795,
+    0.03929445110199038,
+    0.10790000110864639
+   ]
+  },
+  "Seam15": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.052693631334001026,
+    0.019999969750642797,
+    0.10790000110864639
+   ]
+  },
+  "Seam16": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.04284066978974465,
+    0.003431422996857496,
+    0.10790000110864639
+   ]
+  },
+  "Seam17": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.030000040307641057,
+    -0.009282070078913185,
+    0.10790000110864639
+   ]
+  },
+  "Seam18": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.015046810566752038,
+    -0.017274105933596157,
+    0.10790000110864639
+   ]
+  },
+  "Seam19": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.0009999815374612693,
+    -0.020000040531158447,
+    0.10790000110864639
+   ]
+  },
+  "Seam20": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.01704677364167458,
+    -0.017274105933596157,
+    0.10790000110864639
+   ]
+  },
+  "Seam21": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.0320000033825636,
+    -0.009282070078913199,
+    0.10790000110864639
+   ]
+  },
+  "Seam22": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.044840632864667176,
+    0.0034314229968574472,
+    0.10790000110864639
+   ]
+  },
+  "Seam23": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.05469359440892356,
+    0.019999969750642742,
+    0.10790000110864639
+   ]
+  },
+  "Seam24": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.0608874249688805,
+    0.03929445110199033,
+    0.10790000110864639
+   ]
+  }
+ },
+ "bones": {
+  "Root": {
+   "head": [
+    0,
+    0,
+    0
+   ],
+   "parent": null
+  },
+  "Body": {
+   "head": [
+    0.0,
+    0.05999999865889549,
+    0.07039999961853027
+   ],
+   "parent": "Root"
+  },
+  "PlateHinge": {
+   "head": [
+    -0.05900000035762787,
+    0.05999999865889549,
+    0.09640000015497208
+   ],
+   "parent": "Body",
+   "axis": [
+    0,
+    -1,
+    0
+   ]
+  },
+  "HeartPump": {
+   "head": [
+    0.0,
+    0.05999999865889549,
+    0.07850000262260437
+   ],
+   "parent": "Body"
+  },
+  "Lungs": {
+   "head": [
+    -1.862645149230957e-09,
+    0.09399999678134918,
+    0.06520000100135803
+   ],
+   "parent": "Body"
+  },
+  "GearGut": {
+   "head": [
+    0.000509473611600697,
+    0.009966324083507061,
+    0.06270000338554382
+   ],
+   "parent": "Body"
+  },
+  "FlagCog": {
+   "head": [
+    -0.04699999839067459,
+    0.0559999980032444,
+    0.057749997824430466
+   ],
+   "parent": "Body"
+  },
+  "SideKey": {
+   "head": [
+    0.11500000208616257,
+    0.05000000074505806,
+    0.06400000303983688
+   ],
+   "parent": "Body",
+   "axis": [
+    1,
+    0,
+    0
+   ]
+  }
+ }
+}

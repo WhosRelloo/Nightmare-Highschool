@@ -1,0 +1,246 @@
+{
+ "prop": "AnatBenchSet",
+ "axes": "Blender (x right, y away from the student, z up), units = Blender m",
+ "pieces": {
+  "AnatBenchSet_Candle": "Root",
+  "AnatBenchSet_Chalk1Glow": "Root",
+  "AnatBenchSet_Chalk2Glow": "Root",
+  "AnatBenchSet_Chalk3Glow": "Root",
+  "AnatBenchSet_Chalk4Glow": "Root",
+  "AnatBenchSet_Chalk5Glow": "Root",
+  "AnatBenchSet_Desk": "Root",
+  "AnatBenchSet_FlameGlow": "Root",
+  "AnatBenchSet_Roll": "Root",
+  "AnatBenchSet_Tray": "Root",
+  "AnatBenchSet_Wax": "Root"
+ },
+ "centres": {
+  "AnatBenchSet_Candle": [
+   -0.6200000047683716,
+   0.36000001430511475,
+   0.0641000047326088
+  ],
+  "AnatBenchSet_Chalk1Glow": [
+   -0.29999998211860657,
+   -0.3349999785423279,
+   0.008200000040233135
+  ],
+  "AnatBenchSet_Chalk2Glow": [
+   -0.15000000596046448,
+   -0.3349999785423279,
+   0.008200000040233135
+  ],
+  "AnatBenchSet_Chalk3Glow": [
+   0.0,
+   -0.3349999785423279,
+   0.008200000040233135
+  ],
+  "AnatBenchSet_Chalk4Glow": [
+   0.15000000596046448,
+   -0.3349999785423279,
+   0.008200000040233135
+  ],
+  "AnatBenchSet_Chalk5Glow": [
+   0.29999998211860657,
+   -0.3349999785423279,
+   0.008200000040233135
+  ],
+  "AnatBenchSet_Desk": [
+   0.0,
+   0.050000011920928955,
+   0.0
+  ],
+  "AnatBenchSet_FlameGlow": [
+   -0.6200000047683716,
+   0.36000001430511475,
+   0.14800000190734863
+  ],
+  "AnatBenchSet_Roll": [
+   0.0,
+   -0.33500000834465027,
+   0.003949999809265137
+  ],
+  "AnatBenchSet_Tray": [
+   0.0,
+   0.05000000447034836,
+   0.016200000420212746
+  ],
+  "AnatBenchSet_Wax": [
+   0.0,
+   0.04999999701976776,
+   0.029999999329447746
+  ]
+ },
+ "sizes": {
+  "AnatBenchSet_Candle": [
+   0.12000000476837158,
+   0.12000000476837158,
+   0.12780000269412994
+  ],
+  "AnatBenchSet_Chalk1Glow": [
+   0.10199998319149017,
+   0.25200000405311584,
+   0.0010000001639127731
+  ],
+  "AnatBenchSet_Chalk2Glow": [
+   0.10200000554323196,
+   0.25200000405311584,
+   0.0010000001639127731
+  ],
+  "AnatBenchSet_Chalk3Glow": [
+   0.10199999809265137,
+   0.25200000405311584,
+   0.0010000001639127731
+  ],
+  "AnatBenchSet_Chalk4Glow": [
+   0.10200000554323196,
+   0.25200000405311584,
+   0.0010000001639127731
+  ],
+  "AnatBenchSet_Chalk5Glow": [
+   0.10199998319149017,
+   0.25200000405311584,
+   0.0010000001639127731
+  ],
+  "AnatBenchSet_Desk": [
+   2.4000000953674316,
+   1.7999999523162842,
+   0.0
+  ],
+  "AnatBenchSet_FlameGlow": [
+   0.018000006675720215,
+   0.018000006675720215,
+   0.04399999976158142
+  ],
+  "AnatBenchSet_Roll": [
+   0.8600000143051147,
+   0.30000001192092896,
+   0.007500000298023224
+  ],
+  "AnatBenchSet_Tray": [
+   0.6000000238418579,
+   0.4399999976158142,
+   0.03200000151991844
+  ],
+  "AnatBenchSet_Wax": [
+   0.550000011920929,
+   0.38999998569488525,
+   0.006000000983476639
+  ]
+ },
+ "mats": {
+  "AnatBenchSet_Candle": "Candle",
+  "AnatBenchSet_Chalk1Glow": "Chalk",
+  "AnatBenchSet_Chalk2Glow": "Chalk",
+  "AnatBenchSet_Chalk3Glow": "Chalk",
+  "AnatBenchSet_Chalk4Glow": "Chalk",
+  "AnatBenchSet_Chalk5Glow": "Chalk",
+  "AnatBenchSet_Desk": "Desk",
+  "AnatBenchSet_FlameGlow": "Flame",
+  "AnatBenchSet_Roll": "Leather",
+  "AnatBenchSet_Tray": "Iron",
+  "AnatBenchSet_Wax": "Wax"
+ },
+ "tris": {
+  "AnatBenchSet_Candle": 312,
+  "AnatBenchSet_Chalk1Glow": 48,
+  "AnatBenchSet_Chalk2Glow": 48,
+  "AnatBenchSet_Chalk3Glow": 48,
+  "AnatBenchSet_Chalk4Glow": 48,
+  "AnatBenchSet_Chalk5Glow": 48,
+  "AnatBenchSet_Desk": 2,
+  "AnatBenchSet_FlameGlow": 528,
+  "AnatBenchSet_Roll": 248,
+  "AnatBenchSet_Tray": 188,
+  "AnatBenchSet_Wax": 188
+ },
+ "textures": {
+  "AnatBenchSet_Candle": {
+   "color": "props/textures/AnatBenchSet_Candle_color.png",
+   "rough": "props/textures/AnatBenchSet_Candle_rough.png",
+   "normal": "props/textures/AnatBenchSet_Candle_normal.png",
+   "metal": "props/textures/AnatBenchSet_Candle_metal.png"
+  },
+  "AnatBenchSet_Desk": {
+   "color": "props/textures/AnatBenchSet_Desk_color.png",
+   "rough": "props/textures/AnatBenchSet_Desk_rough.png",
+   "normal": "props/textures/AnatBenchSet_Desk_normal.png",
+   "metal": "props/textures/AnatBenchSet_Desk_metal.png"
+  },
+  "AnatBenchSet_Roll": {
+   "color": "props/textures/AnatBenchSet_Roll_color.png",
+   "rough": "props/textures/AnatBenchSet_Roll_rough.png",
+   "normal": "props/textures/AnatBenchSet_Roll_normal.png",
+   "metal": "props/textures/AnatBenchSet_Roll_metal.png"
+  },
+  "AnatBenchSet_Tray": {
+   "color": "props/textures/AnatBenchSet_Tray_color.png",
+   "rough": "props/textures/AnatBenchSet_Tray_rough.png",
+   "normal": "props/textures/AnatBenchSet_Tray_normal.png",
+   "metal": "props/textures/AnatBenchSet_Tray_metal.png"
+  },
+  "AnatBenchSet_Wax": {
+   "color": "props/textures/AnatBenchSet_Wax_color.png",
+   "rough": "props/textures/AnatBenchSet_Wax_rough.png",
+   "normal": "props/textures/AnatBenchSet_Wax_normal.png",
+   "metal": "props/textures/AnatBenchSet_Wax_metal.png"
+  }
+ },
+ "attach": {
+  "Slot1": {
+   "bone": "Root",
+   "pos": [
+    -0.30000001192092896,
+    -0.38499999046325684,
+    0.01679999940097332
+   ],
+   "tool": "Key"
+  },
+  "Slot2": {
+   "bone": "Root",
+   "pos": [
+    -0.15000000596046448,
+    -0.4569999873638153,
+    0.02871418371796608
+   ],
+   "tool": "Driver"
+  },
+  "Slot3": {
+   "bone": "Root",
+   "pos": [
+    0.0,
+    -0.4399999976158142,
+    0.018880000337958336
+   ],
+   "tool": "Loupe"
+  },
+  "Slot4": {
+   "bone": "Root",
+   "pos": [
+    0.15000000596046448,
+    -0.46000000834465027,
+    0.01312000211328268
+   ],
+   "tool": "Scalpel"
+  },
+  "Slot5": {
+   "bone": "Root",
+   "pos": [
+    0.30000001192092896,
+    -0.4309999942779541,
+    0.015119998715817928
+   ],
+   "tool": "Tweezers"
+  }
+ },
+ "bones": {
+  "Root": {
+   "head": [
+    0,
+    0,
+    0
+   ],
+   "parent": null
+  }
+ }
+}

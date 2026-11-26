@@ -12,6 +12,8 @@ from mathutils import Vector
 argv = sys.argv[sys.argv.index("--") + 1:]
 MAPS, OUT = argv[0], argv[1]
 SAMPLES = int(argv[2]) if len(argv) > 2 else 96
+MODE = argv[3] if len(argv) > 3 else ""
+REST = MODE in ("export", "restcheck")   # the game's rest pose: plate shut, organs seated, every tool in its slot
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
 scene = bpy.context.scene
@@ -110,30 +112,38 @@ TZ = 0.034  # rest height on the wax (1 mm clear)
 import frog_lib  # noqa: E402
 FY = 0.06
 HZ = TZ + 0.17
-FROG = frog_lib.build_frog(M, (0, FY, TZ), plate_open_deg=95, heart_lifted=True, heart_z=HZ)
+SPECIES = argv[4] if len(argv) > 4 else "Frog"
+if SPECIES == "Frog":
+    FROG = frog_lib.build_frog(M, (0, FY, TZ), plate_open_deg=95, heart_lifted=True, heart_z=HZ, rest=REST)
 
-# legs (brass tubes with joints), splayed and pinned; they start inside the shell and are carved flush
-LEGS = [
-    [(0.06, FY + 0.07, TZ + 0.03), (0.13, FY + 0.12, TZ + 0.02), (0.17, FY + 0.17, TZ + 0.012)],
-    [(0.065, FY - 0.07, TZ + 0.03), (0.15, FY - 0.09, TZ + 0.02), (0.12, FY - 0.15, TZ + 0.016), (0.2, FY - 0.18, TZ + 0.012)],
-]
-for sx in (-1, 1):
-    for leg in LEGS:
-        pts = [(sx * p[0], p[1], p[2]) for p in leg]
-        tube(pts, 0.011, M["brass"]).name = "Leg"
-        for p in pts[1:-1]:
-            sphere(p, (0.015,) * 3, M["brass_dark"], 24).name = "LegJoint"
-        fx, fy, fz = pts[-1]
-        sphere((fx, fy, fz), (0.024, 0.02, 0.006), M["brass"], 32).name = "Foot"
-        cyl((fx, fy, fz + 0.03), 0.0018, 0.06, M["steel"]).name = "Pin"
-        sphere((fx, fy, fz + 0.062), (0.007,) * 3, M["porcelain"], 24).name = "PinHead"
+    # legs (brass tubes with joints), splayed and pinned; they start inside the shell and are carved flush
+    LEGS = [
+        [(0.06, FY + 0.07, TZ + 0.03), (0.13, FY + 0.12, TZ + 0.02), (0.17, FY + 0.17, TZ + 0.012)],
+        [(0.065, FY - 0.07, TZ + 0.03), (0.15, FY - 0.09, TZ + 0.02), (0.12, FY - 0.15, TZ + 0.016), (0.2, FY - 0.18, TZ + 0.012)],
+    ]
+    for sx in (-1, 1):
+        for leg in LEGS:
+            pts = [(sx * p[0], p[1], p[2]) for p in leg]
+            tube(pts, 0.011, M["brass"]).name = "Leg"
+            for p in pts[1:-1]:
+                sphere(p, (0.015,) * 3, M["brass_dark"], 24).name = "LegJoint"
+            fx, fy, fz = pts[-1]
+            sphere((fx, fy, fz), (0.024, 0.02, 0.006), M["brass"], 32).name = "Foot"
+            cyl((fx, fy, fz + 0.03), 0.0018, 0.06, M["steel"]).name = "Pin"
+            sphere((fx, fy, fz + 0.062), (0.007,) * 3, M["porcelain"], 24).name = "PinHead"
 
-# the key in its side, unwound: shaft through the wall, bow ring on its end
-cyl((0.115, FY - 0.01, TZ + 0.03), 0.004, 0.07, M["brass"], rot=(0, math.radians(90), 0)).name = "KeyShaft"
-torus((0.15, FY - 0.01, TZ + 0.03 + 0.014), 0.014, 0.004, M["brass"], rot=(0, math.radians(90), 0)).name = "KeyBow"
+    # the key in its side, unwound: shaft through the wall, bow ring on its end
+    cyl((0.115, FY - 0.01, TZ + 0.03), 0.004, 0.07, M["brass"], rot=(0, math.radians(90), 0)).name = "KeyShaft"
+    torus((0.15, FY - 0.01, TZ + 0.03 + 0.014), 0.014, 0.004, M["brass"], rot=(0, math.radians(90), 0)).name = "KeyBow"
 
-carved = frog_lib.carve(FROG, list(bpy.data.objects))
-print("CARVED", carved)
+    carved = frog_lib.carve(FROG, list(bpy.data.objects))
+    print("CARVED", carved)
+else:   # the Raven or the Wyvern (species_lib), rest pose; opened for the close-up render
+    import species_lib  # noqa: E402
+    FROG = getattr(species_lib, "build_" + SPECIES.lower())(M, (0, FY, TZ))
+    if not REST:
+        bpy.data.objects["PlatePivot"].rotation_euler = (0, -math.radians(95), 0)
+    print("CARVED", FROG["carved"])
 
 
 def rest_on(rootobj, z):
@@ -161,31 +171,39 @@ for k, x in enumerate((-0.3, -0.15, 0.0, 0.15, 0.3)):
     box((x, RY, 0.0067), (0.12, 0.27, 0.002), M["leather_dk"]).name = "Slot"
 SLOT_TOP = 0.0077
 # empty slots for the screwdriver (put down on the table) and the tweezers (in hand): chalk outlines
-for x in (-0.15, 0.3):
+for x in ((-0.3, -0.15, 0.0, 0.15, 0.3) if (REST or SPECIES != "Frog") else (-0.15, 0.3)):
     for dx, dy, w, h in ((0, 0.125, 0.1, 0.002), (0, -0.125, 0.1, 0.002), (0.05, 0, 0.002, 0.25), (-0.05, 0, 0.002, 0.25)):
         box((x + dx, RY + dy, SLOT_TOP + 0.0005), (w, h, 0.001), M["chalk"]).name = "Chalk"
 
 rest_on(T.build_pinkey(M, (-0.3, RY - 0.05, 0.05), (0, 0, 0)), SLOT_TOP + 0.0003)
 rest_on(T.build_loupe(M, (0.0, RY - 0.105, 0.05), (0, 0, 0)), SLOT_TOP + 0.0003)
 rest_on(T.build_scalpel(M, (0.15, RY - 0.125, 0.05), (0, 0, 0)), SLOT_TOP + 0.0003)
+if REST or SPECIES != "Frog":   # the screwdriver and the tweezers in slots 2 and 5 (hotkey order: Key, Driver, Loupe, Scalpel, Tweezers)
+    rest_on(T.build_screwdriver(M, (-0.15, RY - 0.122, 0.05), (0, 0, 0)), SLOT_TOP + 0.0003)
+    rest_on(T.build_tweezers(M, (0.3, RY - 0.096, 0.05), (0, 0, 0), gap=0.006), SLOT_TOP + 0.0003)
 # the screwdriver, put down on the desk beside the tray
-rest_on(T.build_screwdriver(M, (0.36, -0.12, 0.05), (0, 0, math.radians(-32))), 0.0003)
+if not (REST or SPECIES != "Frog"):
+  rest_on(T.build_screwdriver(M, (0.36, -0.12, 0.05), (0, 0, math.radians(-32))), 0.0003)
 
 # the tweezers in hand: heel toward camera-right, tips pinching the heart-pump's lug from either side
-lug, lc = FROG["lug"], FROG["lug_centre"]
-P = lc + Vector((0, 0, frog_lib.LUG_R))           # the top of the lug ring (its centreline)
-dirv = -Vector((0.2, -0.07, 0.08)).normalized()  # from the heel down to the tips
-q = dirv.to_track_quat("Y", "Z")
-ax = q @ Vector((1, 0, 0))                       # the axis the arms close along
-lug.rotation_mode = "QUATERNION"
-lug.rotation_quaternion = ax.to_track_quat("Z", "Y")   # the lug ring lies between the arms
-TIP = Vector((0, 0.1182, -0.0025))               # tweezers-local pinch point (u = 0.985)
-INNER = frog_lib.LUG_r + 0.0003                  # each arm's inner face this far from the ring's plane
-gap = (INNER / T.SCALE - 0.001727) / 0.4903
-tw = T.build_tweezers(M, (0, 0, 0), (0, 0, 0), gap=gap)
-tw.rotation_mode = "QUATERNION"
-tw.rotation_quaternion = q
-tw.location = P - q @ (TIP * T.SCALE)
+def _in_hand():
+  lug, lc = FROG["lug"], FROG["lug_centre"]
+  P = lc + Vector((0, 0, frog_lib.LUG_R))           # the top of the lug ring (its centreline)
+  dirv = -Vector((0.2, -0.07, 0.08)).normalized()  # from the heel down to the tips
+  q = dirv.to_track_quat("Y", "Z")
+  ax = q @ Vector((1, 0, 0))                       # the axis the arms close along
+  lug.rotation_mode = "QUATERNION"
+  lug.rotation_quaternion = ax.to_track_quat("Z", "Y")   # the lug ring lies between the arms
+  TIP = Vector((0, 0.1182, -0.0025))               # tweezers-local pinch point (u = 0.985)
+  INNER = frog_lib.LUG_r + 0.0003                  # each arm's inner face this far from the ring's plane
+  gap = (INNER / T.SCALE - 0.001727) / 0.4903
+  tw = T.build_tweezers(M, (0, 0, 0), (0, 0, 0), gap=gap)
+  tw.rotation_mode = "QUATERNION"
+  tw.rotation_quaternion = q
+  tw.location = P - q @ (TIP * T.SCALE)
+
+if not (REST or SPECIES != "Frog"):
+    _in_hand()
 
 # a candle at the desk corner
 cyl((-0.62, 0.36, 0.0042), 0.06, 0.008, M["brass"], verts=48).name = "CandleDish"
@@ -242,6 +260,15 @@ if len(argv) > 3 and argv[3] == "close":
     cam.data.dof.focus_distance = (BCv - cam.location).length
     cam.data.dof.aperture_fstop = 9.0
 
+if MODE in ("export", "restcheck"):
+    import clipcheck
+    n = clipcheck.run(OUT if MODE == "restcheck" else os.path.join(os.path.dirname(os.path.abspath(__file__)), "clip_report_rest.txt"))
+    if MODE == "export":
+        if n:
+            raise SystemExit(3)
+        import export_bench
+        export_bench.run(FROG, OUT, MAPS)
+    raise SystemExit(0)
 if len(argv) > 3 and argv[3] == "check":
     import clipcheck
     clipcheck.run(OUT)

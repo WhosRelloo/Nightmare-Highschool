@@ -1,0 +1,299 @@
+{
+ "name": "AnatTrace",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action",
+ "easing": {
+  "style": "CubicV2",
+  "direction": "InOut"
+ },
+ "keyframes": [
+  {
+   "time": 0,
+   "joints": {
+    "Root": {
+     "rotation": [
+      -12,
+      0,
+      0
+     ]
+    },
+    "Neck": {
+     "rotation": [
+      -10,
+      0,
+      0
+     ]
+    },
+    "LeftShoulder": {
+     "aim": [
+      -0.25,
+      -0.62,
+      0.8
+     ]
+    },
+    "RightShoulder": {
+     "aim": [
+      0.25,
+      -0.62,
+      0.8
+     ]
+    },
+    "LeftHip": {
+     "aim": [
+      -0.12,
+      -0.12,
+      1
+     ]
+    },
+    "RightHip": {
+     "aim": [
+      0.12,
+      -0.12,
+      1
+     ]
+    }
+   }
+  },
+  {
+   "time": 0.2,
+   "joints": {
+    "Root": {
+     "rotation": [
+      -15,
+      4,
+      0
+     ]
+    },
+    "Neck": {
+     "rotation": [
+      -16,
+      0,
+      0
+     ]
+    },
+    "LeftShoulder": {
+     "aim": [
+      -0.25,
+      -0.62,
+      0.8
+     ]
+    },
+    "RightShoulder": {
+     "aim": [
+      -0.05,
+      -0.5,
+      0.85
+     ]
+    },
+    "LeftHip": {
+     "aim": [
+      -0.12,
+      -0.12,
+      1
+     ]
+    },
+    "RightHip": {
+     "aim": [
+      0.12,
+      -0.12,
+      1
+     ]
+    }
+   }
+  },
+  {
+   "time": 0.35,
+   "joints": {
+    "Root": {
+     "rotation": [
+      -18,
+      3,
+      0
+     ]
+    },
+    "Neck": {
+     "rotation": [
+      -18,
+      0,
+      0
+     ]
+    },
+    "LeftShoulder": {
+     "aim": [
+      -0.25,
+      -0.62,
+      0.8
+     ]
+    },
+    "RightShoulder": {
+     "aim": [
+      0.0,
+      -0.66,
+      0.9
+     ]
+    },
+    "LeftHip": {
+     "aim": [
+      -0.12,
+      -0.12,
+      1
+     ]
+    },
+    "RightHip": {
+     "aim": [
+      0.12,
+      -0.12,
+      1
+     ]
+    }
+   },
+   "markers": [
+    {
+     "name": "Contact"
+    }
+   ]
+  },
+  {
+   "time": 0.9,
+   "joints": {
+    "Root": {
+     "rotation": [
+      -19,
+      -4,
+      0
+     ]
+    },
+    "Neck": {
+     "rotation": [
+      -19,
+      0,
+      0
+     ]
+    },
+    "LeftShoulder": {
+     "aim": [
+      -0.25,
+      -0.62,
+      0.8
+     ]
+    },
+    "RightShoulder": {
+     "aim": [
+      0.32,
+      -0.68,
+      0.86
+     ]
+    },
+    "LeftHip": {
+     "aim": [
+      -0.12,
+      -0.12,
+      1
+     ]
+    },
+    "RightHip": {
+     "aim": [
+      0.12,
+      -0.12,
+      1
+     ]
+    }
+   }
+  },
+  {
+   "time": 1.3,
+   "joints": {
+    "Root": {
+     "rotation": [
+      -18,
+      -1,
+      0
+     ]
+    },
+    "Neck": {
+     "rotation": [
+      -17,
+      0,
+      0
+     ]
+    },
+    "LeftShoulder": {
+     "aim": [
+      -0.25,
+      -0.62,
+      0.8
+     ]
+    },
+    "RightShoulder": {
+     "aim": [
+      0.12,
+      -0.72,
+      0.8
+     ]
+    },
+    "LeftHip": {
+     "aim": [
+      -0.12,
+      -0.12,
+      1
+     ]
+    },
+    "RightHip": {
+     "aim": [
+      0.12,
+      -0.12,
+      1
+     ]
+    }
+   }
+  },
+  {
+   "time": 1.6,
+   "joints": {
+    "Root": {
+     "rotation": [
+      -12,
+      0,
+      0
+     ]
+    },
+    "Neck": {
+     "rotation": [
+      -10,
+      0,
+      0
+     ]
+    },
+    "LeftShoulder": {
+     "aim": [
+      -0.25,
+      -0.62,
+      0.8
+     ]
+    },
+    "RightShoulder": {
+     "aim": [
+      0.25,
+      -0.62,
+      0.8
+     ]
+    },
+    "LeftHip": {
+     "aim": [
+      -0.12,
+      -0.12,
+      1
+     ]
+    },
+    "RightHip": {
+     "aim": [
+      0.12,
+      -0.12,
+      1
+     ]
+    }
+   }
+  }
+ ]
+}

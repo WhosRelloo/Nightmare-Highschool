@@ -1,0 +1,99 @@
+{
+ "ok": true,
+ "name": "AnatRecoil",
+ "rig": "R6",
+ "loop": false,
+ "priority": "Action",
+ "authoredDuration": 0.8,
+ "bakedDuration": 0.833,
+ "passes": {
+  "spline": true,
+  "overlapFrames30": {
+   "Head": 1
+  },
+  "settle": "off",
+  "life": 0.6,
+  "breathe": null,
+  "fps": 30,
+  "overlapExcluded": []
+ },
+ "bakedKeys": 22,
+ "poseKeys": 49,
+ "markers": 1,
+ "failing": [],
+ "checks": [
+  {
+   "id": "jointLimits",
+   "status": "pass",
+   "detail": "every joint stays within its range"
+  },
+  {
+   "id": "velocity",
+   "status": "pass",
+   "detail": "fastest for its limit: RightShoulder at 663°/s around 0.07 s; limit 2500°/s"
+  },
+  {
+   "id": "rootDrift",
+   "status": "pass",
+   "detail": "the body stays within 0.24 studs of the HumanoidRootPart and returns within 0.1"
+  },
+  {
+   "id": "loopContinuity",
+   "status": "skipped",
+   "detail": "the animation does not loop"
+  },
+  {
+   "id": "groundContact",
+   "status": "skipped",
+   "detail": "only for locomotion or grounded"
+  },
+  {
+   "id": "footSliding",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  },
+  {
+   "id": "gaitSymmetry",
+   "status": "skipped",
+   "detail": "only for locomotion"
+  }
+ ],
+ "lint": [
+  {
+   "consider": "straightPath",
+   "message": "Right Leg moves in a straight line from 0.00 to 0.10 s (bows 2% of its 1.0-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "straightPath",
+   "message": "Left Leg moves in a straight line from 0.00 to 0.10 s (bows 3% of its 0.8-stud path). Organic moves curve: measured arm raises bow 22% of their travel, slashes 36%, even punches 6-12%. Add a breakdown key off the straight line (usually higher, or swinging out)."
+  },
+  {
+   "consider": "noAnticipation",
+   "message": "The Right Arm launches from a dead start on the first frames of the clip: no pull-back, no hip load, no dip in the 0.6 s before it. Real punches don't pull the hand back; they load the hips (pelvis turn peaks ~50 ms before the hand, shoulders ~35 ms before). Slashes raise first for 0.7-1.4 s. Game telegraphs: player light attacks 0.07-0.1 s, heavies 0.17-0.2 s, NPC attacks the player must read >= 0.34 s (Dark Souls 3)."
+  }
+ ],
+ "measured": {
+  "lags": {},
+  "spacingPeakOverMean": 1.7836192127146806,
+  "peakAt": 0.5,
+  "action": {
+   "effector": "Right Arm",
+   "peakSpeed": 17.69706467827113,
+   "onset": 0,
+   "peak": 0.06666666666666667,
+   "stop": 0.23333333333333334,
+   "strike_s": 0.23333333333333334,
+   "followThrough_s": 0,
+   "hold_s": 0.03333333333333333,
+   "recovery_s": 0.4666666666666667,
+   "windupBack": 0,
+   "rootDrop": 0,
+   "rootShift": 0.3391995104920275,
+   "torsoPeak_ms": 0
+  }
+ },
+ "sheet": "sheets/Recoil.png",
+ "trails": "sheets/Recoil_t.png",
+ "luau": "lua/Recoil.lua",
+ "luauBytes": 4175
+}

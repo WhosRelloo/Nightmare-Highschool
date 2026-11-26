@@ -1,0 +1,675 @@
+{
+ "prop": "AnatRaven",
+ "axes": "Blender (x right, y away from the student, z up), units = Blender m",
+ "pieces": {
+  "AnatRaven_Body": "Body",
+  "AnatRaven_CradleGlow": "Body",
+  "AnatRaven_FlagCog": "FlagCog",
+  "AnatRaven_Head": "Body",
+  "AnatRaven_HeartPump": "HeartPump",
+  "AnatRaven_Limbs": "Body",
+  "AnatRaven_Lungs": "Lungs",
+  "AnatRaven_Mechanism": "Body",
+  "AnatRaven_Plate": "PlateHinge",
+  "AnatRaven_SideKey": "SideKey",
+  "AnatRaven_Tail": "Body",
+  "AnatRaven_VoiceBox": "VoiceBox",
+  "AnatRaven_WingPlate1": "WingPlate1",
+  "AnatRaven_WingPlate2": "WingPlate2",
+  "AnatRaven_WingPlate3": "WingPlate3",
+  "AnatRaven_WingPlate4": "WingPlate4",
+  "AnatRaven_WingSpring": "WingSpring"
+ },
+ "centres": {
+  "AnatRaven_Body": [
+   -2.2351741790771484e-08,
+   0.059999965131282806,
+   0.07064981758594513
+  ],
+  "AnatRaven_CradleGlow": [
+   0.0,
+   0.06599999964237213,
+   0.06310000270605087
+  ],
+  "AnatRaven_FlagCog": [
+   -0.041999999433755875,
+   0.04800000041723251,
+   0.06175000220537186
+  ],
+  "AnatRaven_Head": [
+   0.0,
+   0.2364332675933838,
+   0.07153414189815521
+  ],
+  "AnatRaven_HeartPump": [
+   4.656612873077393e-10,
+   0.06599999964237213,
+   0.08005000650882721
+  ],
+  "AnatRaven_Limbs": [
+   0.0,
+   0.08000001311302185,
+   0.08658156543970108
+  ],
+  "AnatRaven_Lungs": [
+   0.0,
+   0.1087999939918518,
+   0.0681999996304512
+  ],
+  "AnatRaven_Mechanism": [
+   5.587935447692871e-09,
+   0.06000000983476639,
+   0.07253339886665344
+  ],
+  "AnatRaven_Plate": [
+   0.00099998340010643,
+   0.0599999725818634,
+   0.11489962786436081
+  ],
+  "AnatRaven_SideKey": [
+   0.0,
+   -0.08314696699380875,
+   0.10440000146627426
+  ],
+  "AnatRaven_Tail": [
+   3.725290298461914e-09,
+   -0.09499998390674591,
+   0.03750000149011612
+  ],
+  "AnatRaven_VoiceBox": [
+   0.0,
+   0.14299999177455902,
+   0.07349999994039536
+  ],
+  "AnatRaven_WingPlate1": [
+   -0.089373879134655,
+   0.03999999910593033,
+   0.07639999687671661
+  ],
+  "AnatRaven_WingPlate2": [
+   -0.08981271088123322,
+   0.10999999940395355,
+   0.07639999687671661
+  ],
+  "AnatRaven_WingPlate3": [
+   0.089373879134655,
+   0.03999999910593033,
+   0.07639999687671661
+  ],
+  "AnatRaven_WingPlate4": [
+   0.08981271088123322,
+   0.10999999940395355,
+   0.07639999687671661
+  ],
+  "AnatRaven_WingSpring": [
+   0.0,
+   0.007999963127076626,
+   0.0686996579170227
+  ]
+ },
+ "sizes": {
+  "AnatRaven_Body": [
+   0.15000011026859283,
+   0.2600000500679016,
+   0.07249962538480759
+  ],
+  "AnatRaven_CradleGlow": [
+   0.022199999541044235,
+   0.022200003266334534,
+   0.0012000054121017456
+  ],
+  "AnatRaven_FlagCog": [
+   0.014798276126384735,
+   0.014920331537723541,
+   0.003750000149011612
+  ],
+  "AnatRaven_Head": [
+   0.07199999690055847,
+   0.12913347780704498,
+   0.0738682672381401
+  ],
+  "AnatRaven_HeartPump": [
+   0.028499998152256012,
+   0.025999996811151505,
+   0.03510000556707382
+  ],
+  "AnatRaven_Limbs": [
+   0.15650811791419983,
+   0.18999996781349182,
+   0.057445451617240906
+  ],
+  "AnatRaven_Lungs": [
+   0.085999995470047,
+   0.03359999507665634,
+   0.01599999889731407
+  ],
+  "AnatRaven_Mechanism": [
+   0.12186691164970398,
+   0.22006095945835114,
+   0.03186679258942604
+  ],
+  "AnatRaven_Plate": [
+   0.10330365598201752,
+   0.16528579592704773,
+   0.02199999988079071
+  ],
+  "AnatRaven_SideKey": [
+   0.036000002175569534,
+   0.07400000095367432,
+   0.035999998450279236
+  ],
+  "AnatRaven_Tail": [
+   0.08201294392347336,
+   0.09999996423721313,
+   0.00599999725818634
+  ],
+  "AnatRaven_VoiceBox": [
+   0.03200000151991844,
+   0.013999998569488525,
+   0.0260000042617321
+  ],
+  "AnatRaven_WingPlate1": [
+   0.004500001668930054,
+   0.030000001192092896,
+   0.019999995827674866
+  ],
+  "AnatRaven_WingPlate2": [
+   0.004500001668930054,
+   0.030000001192092896,
+   0.019999995827674866
+  ],
+  "AnatRaven_WingPlate3": [
+   0.004500001668930054,
+   0.030000001192092896,
+   0.019999995827674866
+  ],
+  "AnatRaven_WingPlate4": [
+   0.004500001668930054,
+   0.030000001192092896,
+   0.019999995827674866
+  ],
+  "AnatRaven_WingSpring": [
+   0.054999999701976776,
+   0.014599611982703209,
+   0.016599304974079132
+  ]
+ },
+ "mats": {
+  "AnatRaven_Body": "Brass",
+  "AnatRaven_CradleGlow": "Glow",
+  "AnatRaven_FlagCog": "Brass",
+  "AnatRaven_Head": "Brass",
+  "AnatRaven_HeartPump": "Heart",
+  "AnatRaven_Limbs": "BrassDark",
+  "AnatRaven_Lungs": "LeatherDk",
+  "AnatRaven_Mechanism": "BrassDark",
+  "AnatRaven_Plate": "Porcelain",
+  "AnatRaven_SideKey": "Brass",
+  "AnatRaven_Tail": "BrassDark",
+  "AnatRaven_VoiceBox": "BrassDark",
+  "AnatRaven_WingPlate1": "Brass",
+  "AnatRaven_WingPlate2": "Brass",
+  "AnatRaven_WingPlate3": "Brass",
+  "AnatRaven_WingPlate4": "Brass",
+  "AnatRaven_WingSpring": "Steel"
+ },
+ "tris": {
+  "AnatRaven_Body": 18430,
+  "AnatRaven_CradleGlow": 2048,
+  "AnatRaven_FlagCog": 3196,
+  "AnatRaven_Head": 9342,
+  "AnatRaven_HeartPump": 6402,
+  "AnatRaven_Limbs": 8490,
+  "AnatRaven_Lungs": 2872,
+  "AnatRaven_Mechanism": 17972,
+  "AnatRaven_Plate": 12512,
+  "AnatRaven_SideKey": 2530,
+  "AnatRaven_Tail": 2880,
+  "AnatRaven_VoiceBox": 2228,
+  "AnatRaven_WingPlate1": 500,
+  "AnatRaven_WingPlate2": 500,
+  "AnatRaven_WingPlate3": 500,
+  "AnatRaven_WingPlate4": 500,
+  "AnatRaven_WingSpring": 3096
+ },
+ "textures": {
+  "AnatRaven_Body": {
+   "color": "props/textures/AnatRaven_Body_color.png",
+   "rough": "props/textures/AnatRaven_Body_rough.png",
+   "normal": "props/textures/AnatRaven_Body_normal.png",
+   "metal": "props/textures/AnatRaven_Body_metal.png"
+  },
+  "AnatRaven_FlagCog": {
+   "color": "props/textures/AnatRaven_FlagCog_color.png",
+   "rough": "props/textures/AnatRaven_FlagCog_rough.png",
+   "normal": "props/textures/AnatRaven_FlagCog_normal.png",
+   "metal": "props/textures/AnatRaven_FlagCog_metal.png"
+  },
+  "AnatRaven_Head": {
+   "color": "props/textures/AnatRaven_Head_color.png",
+   "rough": "props/textures/AnatRaven_Head_rough.png",
+   "normal": "props/textures/AnatRaven_Head_normal.png",
+   "metal": "props/textures/AnatRaven_Head_metal.png"
+  },
+  "AnatRaven_HeartPump": {
+   "color": "props/textures/AnatRaven_HeartPump_color.png",
+   "rough": "props/textures/AnatRaven_HeartPump_rough.png",
+   "normal": "props/textures/AnatRaven_HeartPump_normal.png",
+   "metal": "props/textures/AnatRaven_HeartPump_metal.png"
+  },
+  "AnatRaven_Limbs": {
+   "color": "props/textures/AnatRaven_Limbs_color.png",
+   "rough": "props/textures/AnatRaven_Limbs_rough.png",
+   "normal": "props/textures/AnatRaven_Limbs_normal.png",
+   "metal": "props/textures/AnatRaven_Limbs_metal.png"
+  },
+  "AnatRaven_Lungs": {
+   "color": "props/textures/AnatRaven_Lungs_color.png",
+   "rough": "props/textures/AnatRaven_Lungs_rough.png",
+   "normal": "props/textures/AnatRaven_Lungs_normal.png",
+   "metal": "props/textures/AnatRaven_Lungs_metal.png"
+  },
+  "AnatRaven_Mechanism": {
+   "color": "props/textures/AnatRaven_Mechanism_color.png",
+   "rough": "props/textures/AnatRaven_Mechanism_rough.png",
+   "normal": "props/textures/AnatRaven_Mechanism_normal.png",
+   "metal": "props/textures/AnatRaven_Mechanism_metal.png"
+  },
+  "AnatRaven_Plate": {
+   "color": "props/textures/AnatRaven_Plate_color.png",
+   "rough": "props/textures/AnatRaven_Plate_rough.png",
+   "normal": "props/textures/AnatRaven_Plate_normal.png",
+   "metal": "props/textures/AnatRaven_Plate_metal.png"
+  },
+  "AnatRaven_SideKey": {
+   "color": "props/textures/AnatRaven_SideKey_color.png",
+   "rough": "props/textures/AnatRaven_SideKey_rough.png",
+   "normal": "props/textures/AnatRaven_SideKey_normal.png",
+   "metal": "props/textures/AnatRaven_SideKey_metal.png"
+  },
+  "AnatRaven_Tail": {
+   "color": "props/textures/AnatRaven_Tail_color.png",
+   "rough": "props/textures/AnatRaven_Tail_rough.png",
+   "normal": "props/textures/AnatRaven_Tail_normal.png",
+   "metal": "props/textures/AnatRaven_Tail_metal.png"
+  },
+  "AnatRaven_VoiceBox": {
+   "color": "props/textures/AnatRaven_VoiceBox_color.png",
+   "rough": "props/textures/AnatRaven_VoiceBox_rough.png",
+   "normal": "props/textures/AnatRaven_VoiceBox_normal.png",
+   "metal": "props/textures/AnatRaven_VoiceBox_metal.png"
+  },
+  "AnatRaven_WingPlate1": {
+   "color": "props/textures/AnatRaven_WingPlate1_color.png",
+   "rough": "props/textures/AnatRaven_WingPlate1_rough.png",
+   "normal": "props/textures/AnatRaven_WingPlate1_normal.png",
+   "metal": "props/textures/AnatRaven_WingPlate1_metal.png"
+  },
+  "AnatRaven_WingPlate2": {
+   "color": "props/textures/AnatRaven_WingPlate2_color.png",
+   "rough": "props/textures/AnatRaven_WingPlate2_rough.png",
+   "normal": "props/textures/AnatRaven_WingPlate2_normal.png",
+   "metal": "props/textures/AnatRaven_WingPlate2_metal.png"
+  },
+  "AnatRaven_WingPlate3": {
+   "color": "props/textures/AnatRaven_WingPlate3_color.png",
+   "rough": "props/textures/AnatRaven_WingPlate3_rough.png",
+   "normal": "props/textures/AnatRaven_WingPlate3_normal.png",
+   "metal": "props/textures/AnatRaven_WingPlate3_metal.png"
+  },
+  "AnatRaven_WingPlate4": {
+   "color": "props/textures/AnatRaven_WingPlate4_color.png",
+   "rough": "props/textures/AnatRaven_WingPlate4_rough.png",
+   "normal": "props/textures/AnatRaven_WingPlate4_normal.png",
+   "metal": "props/textures/AnatRaven_WingPlate4_metal.png"
+  },
+  "AnatRaven_WingSpring": {
+   "color": "props/textures/AnatRaven_WingSpring_color.png",
+   "rough": "props/textures/AnatRaven_WingSpring_rough.png",
+   "normal": "props/textures/AnatRaven_WingSpring_normal.png",
+   "metal": "props/textures/AnatRaven_WingSpring_metal.png"
+  }
+ },
+ "attach": {
+  "WingPlate1": {
+   "bone": "WingPlate1",
+   "pos": [
+    -0.09132388315738739,
+    0.039999998658895496,
+    0.07640000027418137
+   ]
+  },
+  "WingPlate2": {
+   "bone": "WingPlate2",
+   "pos": [
+    -0.09176271045190905,
+    0.1099999986588955,
+    0.07640000027418137
+   ]
+  },
+  "WingPlate3": {
+   "bone": "WingPlate3",
+   "pos": [
+    0.09132388315738739,
+    0.039999998658895496,
+    0.07640000027418137
+   ]
+  },
+  "WingPlate4": {
+   "bone": "WingPlate4",
+   "pos": [
+    0.09176271045190905,
+    0.1099999986588955,
+    0.07640000027418137
+   ]
+  },
+  "Seam01": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.05265181139111519,
+    0.0599999725818634,
+    0.11489962786436081
+   ]
+  },
+  "Seam02": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.05089181803166239,
+    0.0813895285172877,
+    0.11489962786436081
+   ]
+  },
+  "Seam03": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.045731778592224166,
+    0.10132142156362534,
+    0.11489962786436081
+   ]
+  },
+  "Seam04": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.037523341233229854,
+    0.11843732614877905,
+    0.11489962786436081
+   ]
+  },
+  "Seam05": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.026825897395610816,
+    0.13157082166064032,
+    0.11489962786436081
+   ]
+  },
+  "Seam06": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.01436846019853897,
+    0.13982688208420335,
+    0.11489962786436081
+   ]
+  },
+  "Seam07": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.0009999834001064333,
+    0.14264287054538727,
+    0.11489962786436081
+   ]
+  },
+  "Seam08": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.012368493398326103,
+    0.13982688208420335,
+    0.11489962786436081
+   ]
+  },
+  "Seam09": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.02482593059539794,
+    0.13157082166064032,
+    0.11489962786436081
+   ]
+  },
+  "Seam10": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.03552337443301699,
+    0.11843732614877905,
+    0.11489962786436081
+   ]
+  },
+  "Seam11": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.043731811792011306,
+    0.10132142156362534,
+    0.11489962786436081
+   ]
+  },
+  "Seam12": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.048891851231449526,
+    0.08138952851728773,
+    0.11489962786436081
+   ]
+  },
+  "Seam13": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.05065184459090233,
+    0.05999997258186341,
+    0.11489962786436081
+   ]
+  },
+  "Seam14": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.04889185123144953,
+    0.03861041664643909,
+    0.11489962786436081
+   ]
+  },
+  "Seam15": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.043731811792011306,
+    0.018678523600101492,
+    0.11489962786436081
+   ]
+  },
+  "Seam16": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.03552337443301701,
+    0.0015626190149477942,
+    0.11489962786436081
+   ]
+  },
+  "Seam17": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.024825930595397974,
+    -0.011570876496913504,
+    0.11489962786436081
+   ]
+  },
+  "Seam18": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.012368493398326103,
+    -0.019826936920476546,
+    0.11489962786436081
+   ]
+  },
+  "Seam19": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.0009999834001064205,
+    -0.02264292538166046,
+    0.11489962786436081
+   ]
+  },
+  "Seam20": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.014368460198538947,
+    -0.01982693692047656,
+    0.11489962786436081
+   ]
+  },
+  "Seam21": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.026825897395610816,
+    -0.011570876496913504,
+    0.11489962786436081
+   ]
+  },
+  "Seam22": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.03752334123322984,
+    0.0015626190149477456,
+    0.11489962786436081
+   ]
+  },
+  "Seam23": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.045731778592224145,
+    0.018678523600101436,
+    0.11489962786436081
+   ]
+  },
+  "Seam24": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.05089181803166238,
+    0.038610416646439036,
+    0.11489962786436081
+   ]
+  }
+ },
+ "bones": {
+  "Root": {
+   "head": [
+    0,
+    0,
+    0
+   ],
+   "parent": null
+  },
+  "Body": {
+   "head": [
+    0.0,
+    0.05999999865889549,
+    0.07440000027418137
+   ],
+   "parent": "Root"
+  },
+  "PlateHinge": {
+   "head": [
+    -0.0486517958343029,
+    0.05999999865889549,
+    0.10339962691068649
+   ],
+   "parent": "Body",
+   "axis": [
+    0,
+    -1,
+    0
+   ]
+  },
+  "HeartPump": {
+   "head": [
+    0.0,
+    0.06639999896287918,
+    0.08682500571012497
+   ],
+   "parent": "Body"
+  },
+  "Lungs": {
+   "head": [
+    1.862645149230957e-09,
+    0.10873332619667053,
+    0.06852222979068756
+   ],
+   "parent": "Body"
+  },
+  "VoiceBox": {
+   "head": [
+    0.0,
+    0.1421363651752472,
+    0.07440909743309021
+   ],
+   "parent": "Body"
+  },
+  "WingSpring": {
+   "head": [
+    -3.592421762732556e-06,
+    0.007999986410140991,
+    0.06756655871868134
+   ],
+   "parent": "Body"
+  },
+  "FlagCog": {
+   "head": [
+    -0.041999999433755875,
+    0.04800000041723251,
+    0.06174999848008156
+   ],
+   "parent": "Body"
+  },
+  "WingPlate1": {
+   "head": [
+    -0.09015721082687378,
+    0.03999999910593033,
+    0.07639999687671661
+   ],
+   "parent": "Body"
+  },
+  "WingPlate2": {
+   "head": [
+    -0.090596042573452,
+    0.11000000685453415,
+    0.07639999687671661
+   ],
+   "parent": "Body"
+  },
+  "WingPlate3": {
+   "head": [
+    0.09015722572803497,
+    0.03999999910593033,
+    0.07639999687671661
+   ],
+   "parent": "Body"
+  },
+  "WingPlate4": {
+   "head": [
+    0.090596042573452,
+    0.11000000685453415,
+    0.07639999687671661
+   ],
+   "parent": "Body"
+  },
+  "SideKey": {
+   "head": [
+    -1.7462298274040222e-10,
+    -0.09864696860313416,
+    0.09740000218153
+   ],
+   "parent": "Body",
+   "axis": [
+    0,
+    -1,
+    0
+   ]
+  }
+ }
+}

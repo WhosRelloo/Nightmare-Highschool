@@ -1,0 +1,63 @@
+{
+ "prop": "AnatToolScalpel",
+ "axes": "Blender (x right, y away from the student, z up), units = Blender m",
+ "pieces": {
+  "AnatToolScalpel_Main": "Root"
+ },
+ "centres": {
+  "AnatToolScalpel_Main": [
+   0.15000000596046448,
+   -0.3343999981880188,
+   0.018010010942816734
+  ]
+ },
+ "sizes": {
+  "AnatToolScalpel_Main": [
+   0.01600000262260437,
+   0.25120002031326294,
+   0.0200200155377388
+  ]
+ },
+ "mats": {
+  "AnatToolScalpel_Main": "Steel"
+ },
+ "tris": {
+  "AnatToolScalpel_Main": 1684
+ },
+ "textures": {
+  "AnatToolScalpel_Main": {
+   "color": "props/textures/AnatToolScalpel_Main_color.png",
+   "rough": "props/textures/AnatToolScalpel_Main_rough.png",
+   "normal": "props/textures/AnatToolScalpel_Main_normal.png",
+   "metal": "props/textures/AnatToolScalpel_Main_metal.png"
+  }
+ },
+ "attach": {
+  "Grip": {
+   "bone": "Root",
+   "pos": [
+    0.15000000596046448,
+    -0.3880000114440918,
+    0.01312000211328268
+   ]
+  },
+  "Tip": {
+   "bone": "Root",
+   "pos": [
+    0.15000000596046448,
+    -0.20879998803138733,
+    0.009920001961290836
+   ]
+  }
+ },
+ "bones": {
+  "Root": {
+   "head": [
+    0.15000000596046448,
+    -0.46000000834465027,
+    0.01312000211328268
+   ],
+   "parent": null
+  }
+ }
+}

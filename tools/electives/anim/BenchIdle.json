@@ -1,0 +1,205 @@
+{
+ "name": "AnatBenchIdle",
+ "rig": "R6",
+ "loop": true,
+ "priority": "Idle",
+ "easing": {
+  "style": "CubicV2",
+  "direction": "InOut"
+ },
+ "keyframes": [
+  {
+   "time": 0,
+   "joints": {
+    "Root": {
+     "rotation": [
+      -12,
+      0,
+      0
+     ]
+    },
+    "Neck": {
+     "rotation": [
+      -10,
+      0,
+      0
+     ]
+    },
+    "LeftShoulder": {
+     "aim": [
+      -0.25,
+      -0.62,
+      0.8
+     ]
+    },
+    "RightShoulder": {
+     "aim": [
+      0.25,
+      -0.62,
+      0.8
+     ]
+    },
+    "LeftHip": {
+     "aim": [
+      -0.12,
+      -0.12,
+      1
+     ]
+    },
+    "RightHip": {
+     "aim": [
+      0.12,
+      -0.12,
+      1
+     ]
+    }
+   }
+  },
+  {
+   "time": 1.7,
+   "joints": {
+    "Root": {
+     "rotation": [
+      -13.5,
+      1.5,
+      0
+     ]
+    },
+    "Neck": {
+     "rotation": [
+      -11,
+      0,
+      0
+     ]
+    },
+    "LeftShoulder": {
+     "aim": [
+      -0.25,
+      -0.62,
+      0.8
+     ]
+    },
+    "RightShoulder": {
+     "aim": [
+      0.27,
+      -0.6,
+      0.82
+     ]
+    },
+    "LeftHip": {
+     "aim": [
+      -0.12,
+      -0.12,
+      1
+     ]
+    },
+    "RightHip": {
+     "aim": [
+      0.12,
+      -0.12,
+      1
+     ]
+    }
+   },
+   "markers": [
+    {
+     "name": "Contact"
+    }
+   ]
+  },
+  {
+   "time": 2.6,
+   "joints": {
+    "Root": {
+     "rotation": [
+      -12.5,
+      -1,
+      0
+     ]
+    },
+    "Neck": {
+     "rotation": [
+      -9,
+      0,
+      0
+     ]
+    },
+    "LeftShoulder": {
+     "aim": [
+      -0.23,
+      -0.64,
+      0.79
+     ]
+    },
+    "RightShoulder": {
+     "aim": [
+      0.25,
+      -0.62,
+      0.8
+     ]
+    },
+    "LeftHip": {
+     "aim": [
+      -0.12,
+      -0.12,
+      1
+     ]
+    },
+    "RightHip": {
+     "aim": [
+      0.12,
+      -0.12,
+      1
+     ]
+    }
+   }
+  },
+  {
+   "time": 4.0,
+   "joints": {
+    "Root": {
+     "rotation": [
+      -12,
+      0,
+      0
+     ]
+    },
+    "Neck": {
+     "rotation": [
+      -10,
+      0,
+      0
+     ]
+    },
+    "LeftShoulder": {
+     "aim": [
+      -0.25,
+      -0.62,
+      0.8
+     ]
+    },
+    "RightShoulder": {
+     "aim": [
+      0.25,
+      -0.62,
+      0.8
+     ]
+    },
+    "LeftHip": {
+     "aim": [
+      -0.12,
+      -0.12,
+      1
+     ]
+    },
+    "RightHip": {
+     "aim": [
+      0.12,
+      -0.12,
+      1
+     ]
+    }
+   }
+  }
+ ]
+}

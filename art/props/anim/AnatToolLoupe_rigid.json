@@ -1,0 +1,76 @@
+{
+ "prop": "AnatToolLoupe",
+ "axes": "Blender (x right, y away from the student, z up), units = Blender m",
+ "pieces": {
+  "AnatToolLoupe_LensGlass": "Root",
+  "AnatToolLoupe_Main": "Root"
+ },
+ "centres": {
+  "AnatToolLoupe_LensGlass": [
+   0.0,
+   -0.2879999876022339,
+   0.018902331590652466
+  ],
+  "AnatToolLoupe_Main": [
+   0.0,
+   -0.34223997592926025,
+   0.018880000337958336
+  ]
+ },
+ "sizes": {
+  "AnatToolLoupe_LensGlass": [
+   0.07200000435113907,
+   0.07200002670288086,
+   0.015315340831875801
+  ],
+  "AnatToolLoupe_Main": [
+   0.08620254695415497,
+   0.19552001357078552,
+   0.0217599980533123
+  ]
+ },
+ "mats": {
+  "AnatToolLoupe_LensGlass": "Glass",
+  "AnatToolLoupe_Main": "Brass"
+ },
+ "tris": {
+  "AnatToolLoupe_LensGlass": 4992,
+  "AnatToolLoupe_Main": 4636
+ },
+ "textures": {
+  "AnatToolLoupe_Main": {
+   "color": "props/textures/AnatToolLoupe_Main_color.png",
+   "rough": "props/textures/AnatToolLoupe_Main_rough.png",
+   "normal": "props/textures/AnatToolLoupe_Main_normal.png",
+   "metal": "props/textures/AnatToolLoupe_Main_metal.png"
+  }
+ },
+ "attach": {
+  "Grip": {
+   "bone": "Root",
+   "pos": [
+    0.0,
+    -0.4000000059604645,
+    0.018880000337958336
+   ]
+  },
+  "Tip": {
+   "bone": "Root",
+   "pos": [
+    0.0,
+    -0.2879999876022339,
+    0.018880000337958336
+   ]
+  }
+ },
+ "bones": {
+  "Root": {
+   "head": [
+    0.0,
+    -0.4399999976158142,
+    0.018880000337958336
+   ],
+   "parent": null
+  }
+ }
+}

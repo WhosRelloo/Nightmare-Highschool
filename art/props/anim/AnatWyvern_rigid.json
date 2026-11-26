@@ -1,0 +1,596 @@
+{
+ "prop": "AnatWyvern",
+ "axes": "Blender (x right, y away from the student, z up), units = Blender m",
+ "pieces": {
+  "AnatWyvern_Body": "Body",
+  "AnatWyvern_CradleGlow": "Body",
+  "AnatWyvern_FireGland": "FireGland",
+  "AnatWyvern_FireGlandGlass": "FireGland",
+  "AnatWyvern_FireGlandGlow": "FireGland",
+  "AnatWyvern_FlagCog": "FlagCog",
+  "AnatWyvern_GearGut": "GearGut",
+  "AnatWyvern_Head": "Body",
+  "AnatWyvern_HeartA": "HeartA",
+  "AnatWyvern_HeartB": "HeartB",
+  "AnatWyvern_Limbs": "Body",
+  "AnatWyvern_Lungs": "Lungs",
+  "AnatWyvern_Mechanism": "Body",
+  "AnatWyvern_Plate": "PlateHinge",
+  "AnatWyvern_SideKey": "SideKey",
+  "AnatWyvern_Tail": "Body"
+ },
+ "centres": {
+  "AnatWyvern_Body": [
+   -2.2351741790771484e-08,
+   0.05999995023012161,
+   0.07205374538898468
+  ],
+  "AnatWyvern_CradleGlow": [
+   0.0,
+   0.07500000298023224,
+   0.06509999930858612
+  ],
+  "AnatWyvern_FireGland": [
+   0.0,
+   0.1679999977350235,
+   0.07909999787807465
+  ],
+  "AnatWyvern_FireGlandGlass": [
+   -4.6566128730773926e-09,
+   0.1679999977350235,
+   0.08069999516010284
+  ],
+  "AnatWyvern_FireGlandGlow": [
+   0.0,
+   0.1679999977350235,
+   0.08069999516010284
+  ],
+  "AnatWyvern_FlagCog": [
+   -0.04600000008940697,
+   0.017999999225139618,
+   0.0637499988079071
+  ],
+  "AnatWyvern_GearGut": [
+   -0.003497011959552765,
+   -0.028813786804676056,
+   0.0642625018954277
+  ],
+  "AnatWyvern_Head": [
+   3.725290298461914e-09,
+   0.27065420150756836,
+   0.06800000369548798
+  ],
+  "AnatWyvern_HeartA": [
+   4.656612873077393e-10,
+   0.10999999940395355,
+   0.08204999566078186
+  ],
+  "AnatWyvern_HeartB": [
+   4.656612873077393e-10,
+   0.03999999910593033,
+   0.08204999566078186
+  ],
+  "AnatWyvern_Limbs": [
+   0.0,
+   0.12000000476837158,
+   0.07939999550580978
+  ],
+  "AnatWyvern_Lungs": [
+   0.0,
+   0.07679999619722366,
+   0.07019999623298645
+  ],
+  "AnatWyvern_Mechanism": [
+   7.450580596923828e-09,
+   0.060000017285346985,
+   0.07453339546918869
+  ],
+  "AnatWyvern_Plate": [
+   0.0009999852627515793,
+   0.0599999725818634,
+   0.1177074983716011
+  ],
+  "AnatWyvern_SideKey": [
+   0.09667932242155075,
+   -0.010000001639127731,
+   0.10039999336004257
+  ],
+  "AnatWyvern_Tail": [
+   0.04213893786072731,
+   -0.15003284811973572,
+   0.0511532723903656
+  ]
+ },
+ "sizes": {
+  "AnatWyvern_Body": [
+   0.15600010752677917,
+   0.34000009298324585,
+   0.07530750334262848
+  ],
+  "AnatWyvern_CradleGlow": [
+   0.022199999541044235,
+   0.09220000356435776,
+   0.0012000054121017456
+  ],
+  "AnatWyvern_FireGland": [
+   0.022199999541044235,
+   0.02219998836517334,
+   0.032600000500679016
+  ],
+  "AnatWyvern_FireGlandGlass": [
+   0.025000018998980522,
+   0.025000005960464478,
+   0.025000005960464478
+  ],
+  "AnatWyvern_FireGlandGlow": [
+   0.012399999424815178,
+   0.012400001287460327,
+   0.012400001287460327
+  ],
+  "AnatWyvern_FlagCog": [
+   0.014798276126384735,
+   0.014920331537723541,
+   0.0037499964237213135
+  ],
+  "AnatWyvern_GearGut": [
+   0.0707300454378128,
+   0.059351637959480286,
+   0.021125007420778275
+  ],
+  "AnatWyvern_Head": [
+   0.07199998199939728,
+   0.12469157576560974,
+   0.0559999980032444
+  ],
+  "AnatWyvern_HeartA": [
+   0.028499998152256012,
+   0.025999993085861206,
+   0.03509999066591263
+  ],
+  "AnatWyvern_HeartB": [
+   0.028499998152256012,
+   0.026000000536441803,
+   0.03509999066591263
+  ],
+  "AnatWyvern_Limbs": [
+   0.17580854892730713,
+   0.16999998688697815,
+   0.056000005453825
+  ],
+  "AnatWyvern_Lungs": [
+   0.09600000083446503,
+   0.03360000252723694,
+   0.01600000262260437
+  ],
+  "AnatWyvern_Mechanism": [
+   0.12894809246063232,
+   0.295359343290329,
+   0.03186679258942604
+  ],
+  "AnatWyvern_Plate": [
+   0.10999931395053864,
+   0.19799870252609253,
+   0.02199999988079071
+  ],
+  "AnatWyvern_SideKey": [
+   0.07186467945575714,
+   0.036000002175569534,
+   0.035999998450279236
+  ],
+  "AnatWyvern_Tail": [
+   0.09958361834287643,
+   0.12563514709472656,
+   0.03473200276494026
+  ]
+ },
+ "mats": {
+  "AnatWyvern_Body": "Brass",
+  "AnatWyvern_CradleGlow": "Glow",
+  "AnatWyvern_FireGland": "BrassDark",
+  "AnatWyvern_FireGlandGlass": "Glass",
+  "AnatWyvern_FireGlandGlow": "Flame",
+  "AnatWyvern_FlagCog": "Brass",
+  "AnatWyvern_GearGut": "Brass",
+  "AnatWyvern_Head": "Brass",
+  "AnatWyvern_HeartA": "Heart",
+  "AnatWyvern_HeartB": "Heart",
+  "AnatWyvern_Limbs": "LeatherDk",
+  "AnatWyvern_Lungs": "LeatherDk",
+  "AnatWyvern_Mechanism": "BrassDark",
+  "AnatWyvern_Plate": "Porcelain",
+  "AnatWyvern_SideKey": "Brass",
+  "AnatWyvern_Tail": "BrassDark"
+ },
+ "tris": {
+  "AnatWyvern_Body": 18430,
+  "AnatWyvern_CradleGlow": 4096,
+  "AnatWyvern_FireGland": 3764,
+  "AnatWyvern_FireGlandGlass": 2208,
+  "AnatWyvern_FireGlandGlow": 528,
+  "AnatWyvern_FlagCog": 3196,
+  "AnatWyvern_GearGut": 12094,
+  "AnatWyvern_Head": 8360,
+  "AnatWyvern_HeartA": 6402,
+  "AnatWyvern_HeartB": 6402,
+  "AnatWyvern_Limbs": 12904,
+  "AnatWyvern_Lungs": 2872,
+  "AnatWyvern_Mechanism": 18430,
+  "AnatWyvern_Plate": 12512,
+  "AnatWyvern_SideKey": 2450,
+  "AnatWyvern_Tail": 8898
+ },
+ "textures": {
+  "AnatWyvern_Body": {
+   "color": "props/textures/AnatWyvern_Body_color.png",
+   "rough": "props/textures/AnatWyvern_Body_rough.png",
+   "normal": "props/textures/AnatWyvern_Body_normal.png",
+   "metal": "props/textures/AnatWyvern_Body_metal.png"
+  },
+  "AnatWyvern_FireGland": {
+   "color": "props/textures/AnatWyvern_FireGland_color.png",
+   "rough": "props/textures/AnatWyvern_FireGland_rough.png",
+   "normal": "props/textures/AnatWyvern_FireGland_normal.png",
+   "metal": "props/textures/AnatWyvern_FireGland_metal.png"
+  },
+  "AnatWyvern_FlagCog": {
+   "color": "props/textures/AnatWyvern_FlagCog_color.png",
+   "rough": "props/textures/AnatWyvern_FlagCog_rough.png",
+   "normal": "props/textures/AnatWyvern_FlagCog_normal.png",
+   "metal": "props/textures/AnatWyvern_FlagCog_metal.png"
+  },
+  "AnatWyvern_GearGut": {
+   "color": "props/textures/AnatWyvern_GearGut_color.png",
+   "rough": "props/textures/AnatWyvern_GearGut_rough.png",
+   "normal": "props/textures/AnatWyvern_GearGut_normal.png",
+   "metal": "props/textures/AnatWyvern_GearGut_metal.png"
+  },
+  "AnatWyvern_Head": {
+   "color": "props/textures/AnatWyvern_Head_color.png",
+   "rough": "props/textures/AnatWyvern_Head_rough.png",
+   "normal": "props/textures/AnatWyvern_Head_normal.png",
+   "metal": "props/textures/AnatWyvern_Head_metal.png"
+  },
+  "AnatWyvern_HeartA": {
+   "color": "props/textures/AnatWyvern_HeartA_color.png",
+   "rough": "props/textures/AnatWyvern_HeartA_rough.png",
+   "normal": "props/textures/AnatWyvern_HeartA_normal.png",
+   "metal": "props/textures/AnatWyvern_HeartA_metal.png"
+  },
+  "AnatWyvern_HeartB": {
+   "color": "props/textures/AnatWyvern_HeartB_color.png",
+   "rough": "props/textures/AnatWyvern_HeartB_rough.png",
+   "normal": "props/textures/AnatWyvern_HeartB_normal.png",
+   "metal": "props/textures/AnatWyvern_HeartB_metal.png"
+  },
+  "AnatWyvern_Limbs": {
+   "color": "props/textures/AnatWyvern_Limbs_color.png",
+   "rough": "props/textures/AnatWyvern_Limbs_rough.png",
+   "normal": "props/textures/AnatWyvern_Limbs_normal.png",
+   "metal": "props/textures/AnatWyvern_Limbs_metal.png"
+  },
+  "AnatWyvern_Lungs": {
+   "color": "props/textures/AnatWyvern_Lungs_color.png",
+   "rough": "props/textures/AnatWyvern_Lungs_rough.png",
+   "normal": "props/textures/AnatWyvern_Lungs_normal.png",
+   "metal": "props/textures/AnatWyvern_Lungs_metal.png"
+  },
+  "AnatWyvern_Mechanism": {
+   "color": "props/textures/AnatWyvern_Mechanism_color.png",
+   "rough": "props/textures/AnatWyvern_Mechanism_rough.png",
+   "normal": "props/textures/AnatWyvern_Mechanism_normal.png",
+   "metal": "props/textures/AnatWyvern_Mechanism_metal.png"
+  },
+  "AnatWyvern_Plate": {
+   "color": "props/textures/AnatWyvern_Plate_color.png",
+   "rough": "props/textures/AnatWyvern_Plate_rough.png",
+   "normal": "props/textures/AnatWyvern_Plate_normal.png",
+   "metal": "props/textures/AnatWyvern_Plate_metal.png"
+  },
+  "AnatWyvern_SideKey": {
+   "color": "props/textures/AnatWyvern_SideKey_color.png",
+   "rough": "props/textures/AnatWyvern_SideKey_rough.png",
+   "normal": "props/textures/AnatWyvern_SideKey_normal.png",
+   "metal": "props/textures/AnatWyvern_SideKey_metal.png"
+  },
+  "AnatWyvern_Tail": {
+   "color": "props/textures/AnatWyvern_Tail_color.png",
+   "rough": "props/textures/AnatWyvern_Tail_rough.png",
+   "normal": "props/textures/AnatWyvern_Tail_normal.png",
+   "metal": "props/textures/AnatWyvern_Tail_metal.png"
+  }
+ },
+ "attach": {
+  "HiddenSeam": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.05049966085914941,
+    0.05999999865889549,
+    0.11770749741792678
+   ]
+  },
+  "Seam01": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.0559996422380209,
+    0.0599999725818634,
+    0.1177074983716011
+   ]
+  },
+  "Seam02": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.054125574372203916,
+    0.08562289014153407,
+    0.1177074983716011
+   ]
+  },
+  "Seam03": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.04863108540276481,
+    0.10949964821338654,
+    0.1177074983716011
+   ]
+  },
+  "Seam04": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.03989061567289852,
+    0.1300030851930324,
+    0.1177074983716011
+   ]
+  },
+  "Seam05": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.028499813750386245,
+    0.14573592573384053,
+    0.1177074983716011
+   ]
+  },
+  "Seam06": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.015234943962056978,
+    0.15562600275270308,
+    0.1177074983716011
+   ]
+  },
+  "Seam07": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.0009999852627515828,
+    0.15899932384490967,
+    0.1177074983716011
+   ]
+  },
+  "Seam08": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.013234973436553813,
+    0.15562600275270308,
+    0.1177074983716011
+   ]
+  },
+  "Seam09": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.026499843224883066,
+    0.14573592573384053,
+    0.1177074983716011
+   ]
+  },
+  "Seam10": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.03789064514739535,
+    0.1300030851930324,
+    0.1177074983716011
+   ]
+  },
+  "Seam11": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.046631114877261653,
+    0.10949964821338654,
+    0.1177074983716011
+   ]
+  },
+  "Seam12": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.05212560384670075,
+    0.0856228901415341,
+    0.1177074983716011
+   ]
+  },
+  "Seam13": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.05399967171251774,
+    0.05999997258186342,
+    0.1177074983716011
+   ]
+  },
+  "Seam14": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.05212560384670076,
+    0.03437705502219274,
+    0.1177074983716011
+   ]
+  },
+  "Seam15": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.04663111487726166,
+    0.010500296950340299,
+    0.1177074983716011
+   ]
+  },
+  "Seam16": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.037890645147395374,
+    -0.010003140029305566,
+    0.1177074983716011
+   ]
+  },
+  "Seam17": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.026499843224883104,
+    -0.025735980570113698,
+    0.1177074983716011
+   ]
+  },
+  "Seam18": {
+   "bone": "PlateHinge",
+   "pos": [
+    -0.013234973436553813,
+    -0.03562605758897627,
+    0.1177074983716011
+   ]
+  },
+  "Seam19": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.000999985262751569,
+    -0.03899937868118286,
+    0.1177074983716011
+   ]
+  },
+  "Seam20": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.015234943962056954,
+    -0.03562605758897629,
+    0.1177074983716011
+   ]
+  },
+  "Seam21": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.028499813750386245,
+    -0.025735980570113712,
+    0.1177074983716011
+   ]
+  },
+  "Seam22": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.039890615672898505,
+    -0.010003140029305621,
+    0.1177074983716011
+   ]
+  },
+  "Seam23": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.04863108540276479,
+    0.01050029695034023,
+    0.1177074983716011
+   ]
+  },
+  "Seam24": {
+   "bone": "PlateHinge",
+   "pos": [
+    0.0541255743722039,
+    0.034377055022192654,
+    0.1177074983716011
+   ]
+  }
+ },
+ "bones": {
+  "Root": {
+   "head": [
+    0,
+    0,
+    0
+   ],
+   "parent": null
+  },
+  "Body": {
+   "head": [
+    0.0,
+    0.05999999865889549,
+    0.07639999687671661
+   ],
+   "parent": "Root"
+  },
+  "PlateHinge": {
+   "head": [
+    -0.05199962109327316,
+    0.05999999865889549,
+    0.10620749741792679
+   ],
+   "parent": "Body",
+   "axis": [
+    0,
+    -1,
+    0
+   ]
+  },
+  "FireGland": {
+   "head": [
+    5.820766091346741e-11,
+    0.1679999977350235,
+    0.07464999705553055
+   ],
+   "parent": "Body"
+  },
+  "HeartA": {
+   "head": [
+    0.0,
+    0.1103999987244606,
+    0.08882500231266022
+   ],
+   "parent": "Body"
+  },
+  "HeartB": {
+   "head": [
+    0.0,
+    0.04039999842643738,
+    0.08882500231266022
+   ],
+   "parent": "Body"
+  },
+  "Lungs": {
+   "head": [
+    1.6556845894299954e-09,
+    0.07673333585262299,
+    0.07052221149206161
+   ],
+   "parent": "Body"
+  },
+  "GearGut": {
+   "head": [
+    0.0005031580221839249,
+    -0.03201122581958771,
+    0.06711666285991669
+   ],
+   "parent": "Body"
+  },
+  "FlagCog": {
+   "head": [
+    -0.04600000008940697,
+    0.017999999225139618,
+    0.0637499988079071
+   ],
+   "parent": "Body"
+  },
+  "SideKey": {
+   "head": [
+    0.11164548248052597,
+    -0.010000001639127731,
+    0.09339999407529831
+   ],
+   "parent": "Body",
+   "axis": [
+    1,
+    0,
+    0
+   ]
+  }
+ }
+}
