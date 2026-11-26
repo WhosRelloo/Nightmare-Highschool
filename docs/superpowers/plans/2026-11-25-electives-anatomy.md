@@ -766,8 +766,8 @@ R = B.Handle(S, "Use", { Target = "Organ", Organ = "HeartA" }, 5)
 Eq(R.Slip, true, "heart before fire-gland slips")
 R = B.Handle(S, "Use", { Target = "Organ", Organ = "FireGland" }, 6) Eq(R.Holding, "FireGland", "fire-gland first is fine")
 -- 7) Crane's Inspection doubles the slip cost
-local A1 = {} B.Start(A1, 1, 0) A1.Slips = 2
-local A2 = { Sub = { Twist = "Specimen"; Sub = { Name = "Mr. Thaddeus Crane" } } } B.Start(A2, 1, 0) A2.Slips = 2
+local A1 = {} B.Start(A1, 1, 0) A1.Slips = 2 A1.TraceAccuracy = 1 A1.PlacedCount = A1.Need
+local A2 = { Sub = { Twist = "Specimen"; Sub = { Name = "Mr. Thaddeus Crane" } } } B.Start(A2, 1, 0) A2.Slips = 2 A2.TraceAccuracy = 1 A2.PlacedCount = A2.Need
 if not (B.Breakdown(A2).Accuracy < B.Breakdown(A1).Accuracy) then table.insert(Fails, "inspection should cost more") end
 -- 8) Moth's loose specimen hides the slots until the Loupe is used on the card
 S = { Sub = { Twist = "Specimen"; Sub = { Name = "Miss Delphine Moth" } } }
