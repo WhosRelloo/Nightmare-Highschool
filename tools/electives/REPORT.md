@@ -193,9 +193,12 @@ in `Gui.Activities.AnatomyBench` and installed:
   lobes sit either side of it, so their centre falls under it). The In hand label names what was taken, and placing it
   on its own outline costs nothing, but the cause isn't found. Lower down (tools, side key, seam) the pointer and the
   ray agree.
-- **First frames:** the specimen shows up about 4 s after the lesson opens, untextured (white) for about 5 s more,
-  while its meshes and 196 maps load. The models should be preloaded (`ContentProvider:PreloadAsync`) before the
-  bench is shown.
+- **First frames:** the specimen showed up about 4 s after the lesson opened, then stayed white for about 5 s more while
+  its meshes and 196 maps loaded. **Fixed in Edit (not yet seen in Play):** `Bench.Preload()` warms every model in
+  `ReplicatedStorage.Anatomy.Models`. The Activities controller calls it 15 s after joining, and the bench calls it
+  again when it is first required. `Bench:CoverUntilLoaded()` covers the bench in a dark cloth reading "Laying out
+  the specimen..." (under the panels) until this lesson's props have their meshes and colour maps, for 10 s at most.
+  If they're already cached, there's no cover. Backup: NH_Backup.Electives_Preload_20261126.
 - The Raven's and Wyvern's dial plates read cream white. That looks like the baked enamel, not a missing map.
 - In hook runs the tool in hand waits above the tail during the Key, trace and unscrew steps. That's expected: the
   hooks have no pointer.

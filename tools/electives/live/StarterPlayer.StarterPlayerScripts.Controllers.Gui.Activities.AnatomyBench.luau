@@ -64,6 +64,30 @@ local TWIST_TEXT = { Inspection = `Inspection: slips cost double`; Loose = `Loos
 local Bench = {}
 Bench.__index = Bench
 
+----------------------------------------------------------------------------------------------------- preload
+-- The bench clones its props from ReplicatedStorage.Anatomy.Models. Unloaded meshes show up seconds late and
+-- unloaded SurfaceAppearances show white, so the assets are fetched ahead: Bench.Preload() warms every model (it runs
+-- once, when this module is first required), and Bench.new covers the specimen until its own props are in.
+local ContentProvider = game:GetService(`ContentProvider`)
+local PRELOAD_WAIT = 10 -- the longest a lesson waits on its props before showing them anyway
+local Warmed = false
+local function assetsOf(Root: Instance): { Instance }
+	local List = {}
+	for _, D in Root:GetDescendants() do
+		if D:IsA(`MeshPart`) or D:IsA(`SurfaceAppearance`) or D:IsA(`Decal`) or D:IsA(`Texture`) then table.insert(List, D) end
+	end
+	return List
+end
+function Bench.Preload()
+	if Warmed then return end
+	Warmed = true
+	task.spawn(function()
+		local Models = ReplicatedStorage:WaitForChild(`Anatomy`):WaitForChild(`Models`, 30)
+		if Models then pcall(ContentProvider.PreloadAsync, ContentProvider, assetsOf(Models)) end
+	end)
+end
+Bench.Preload()
+
 ----------------------------------------------------------------------------------------------------- small helpers
 local function new(Class: string, Props: { [string]: any }?, Parent: Instance?)
 	local I = Instance.new(Class)
@@ -269,8 +293,43 @@ function Bench.new(Content: Frame, Payload, Api)
 	self:RefreshSteps()
 	self:RefreshTools()
 	self:RefreshCard()
+	self:CoverUntilLoaded()
 	if RunService:IsStudio() then _G.NHAnatomyBench = self end
 	return self
+end
+
+-- A dark cloth over the bench (under the panels) until this lesson's props have their meshes and maps, so the
+-- specimen never pops in late or white. Gives up after PRELOAD_WAIT and shows what there is.
+function Bench:CoverUntilLoaded()
+	local List = {}
+	for _, Prop in { self.Set, self.Specimen } do for _, X in assetsOf(Prop.Model) do table.insert(List, X) end end
+	for _, T in self.Tools do for _, X in assetsOf(T.Model) do table.insert(List, X) end end
+	local Pending = 0
+	for _, X in List do
+		local Id = if X:IsA(`MeshPart`) then X.MeshId elseif X:IsA(`SurfaceAppearance`) then X.ColorMap else nil
+		if Id and Id ~= `` and ContentProvider:GetAssetFetchStatus(Id) ~= Enum.AssetFetchStatus.Success then Pending += 1 end
+	end
+	self.Loaded = Pending == 0
+	if self.Loaded then return end
+	local Cover = new(`Frame`, { Name = `Cover`; Size = UDim2.fromScale(1, 1); BackgroundColor3 = Color3.fromRGB(12, 10, 12); BorderSizePixel = 0; ZIndex = 3 }, self.Content)
+	local Label = text(Cover, `Laying out the specimen...`, { AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.42);
+		Size = UDim2.fromScale(0.4, 0.05); TextXAlignment = Enum.TextXAlignment.Center; TextColor3 = DIM })
+	self.Cover = Cover
+	local Started = os.clock()
+	local Done = false
+	task.spawn(function()
+		pcall(ContentProvider.PreloadAsync, ContentProvider, List)
+		Done = true
+	end)
+	task.spawn(function()
+		while not Done and os.clock() - Started < PRELOAD_WAIT and not self.Destroyed do task.wait(0.1) end
+		self.Loaded = true
+		if self.Destroyed or not Cover.Parent then return end
+		local Info = TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		TweenService:Create(Cover, Info, { BackgroundTransparency = 1 }):Play()
+		TweenService:Create(Label, Info, { TextTransparency = 1 }):Play()
+		task.delay(0.4, function() Cover:Destroy() end)
+	end)
 end
 
 function Bench:BuildViewport()
@@ -1057,6 +1116,7 @@ function Bench:Destroy()
 	if _G.NHAnatomyBench == self then _G.NHAnatomyBench = nil end
 	if self.VF then self.VF:Destroy() end
 	if self.UI then self.UI:Destroy() end
+	if self.Cover then self.Cover:Destroy() end
 end
 
 ----------------------------------------------------------------------------------------------------- Studio test hooks

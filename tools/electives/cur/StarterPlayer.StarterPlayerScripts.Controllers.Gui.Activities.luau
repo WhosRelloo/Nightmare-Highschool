@@ -907,6 +907,11 @@ function Shared.OnStart()
 		for _, Id in Kit.Theme.SubGames or {} do table.insert(List, if typeof(Id) == `number` then `rbxassetid://{Id}` else tostring(Id)) end
 		pcall(function() game:GetService(`ContentProvider`):PreloadAsync(List) end)
 	end)
+	-- (Anatomy) warm the bench's models a little after joining, so a first lesson does not wait on its meshes and maps
+	task.delay(15, function()
+		local Bench = script:FindFirstChild(`AnatomyBench`)
+		if Bench then pcall(function() require(Bench).Preload() end) end
+	end)
 	local function OnEvent(Message)
 		if typeof(Message) ~= `table` then return end
 
