@@ -1,4 +1,4 @@
--- tools/electives/stage/anatomy_import.lua (Edit, after the owner imports the Anatomy FBX files; not run yet).
+-- tools/electives/stage/anatomy_import.lua (Edit, after the owner imports the Anatomy FBX files).
 -- Import each art/props/fbx/Anat<Prop>.fbx with "Import as rig" OFF into Workspace (it arrives as a Model named
 -- Anat<Prop> holding MeshParts Anat<Prop>_<Piece>). This script then, per prop in ReplicatedStorage.Anatomy.Layout:
 --   * renames each MeshPart to its piece name and sets its Size and CFrame from the layout (bench space, studs), so
@@ -26,10 +26,20 @@ for prop, P in L.Props do
 		if not (part and part:IsA("MeshPart")) then table.insert(missing, piece) continue end
 		local tex = TEXTURES["Anat" .. prop .. "_" .. piece]
 		part.Name = piece
-		part.Size = pc.Size
-		part.CFrame = CFrame.new(pc.Centre)
+		-- uniform scale by the median axis ratio: the Layout clamps thin axes to 0.05 studs, so setting Size = pc.Size
+		-- would fatten glows, the desk and the wing plates (first real import, 2026-11-25: every piece came in at 10x)
+		local r = part.Size / pc.Size
+		local k = ({ r.X, r.Y, r.Z })
+		table.sort(k)
+		part.Size = part.Size / k[2]
+		-- the 3D Importer turns every mesh 180 degrees about Y (Blender -Y forward); keep that turn, or tools lie
+		-- backwards in their slots (Driver handle at the tip end, Loupe ring away from its glass)
+		part.CFrame = CFrame.new(pc.Centre) * CFrame.Angles(0, math.pi, 0)
 		part.Anchored = true
 		part.CanCollide, part.CanTouch, part.CanQuery = false, false, true
+		-- until the PBR maps are uploaded (TEXTURES), the piece wears its proxy colour and material from the Layout
+		part.Color = pc.Color
+		pcall(function() part.Material = Enum.Material[pc.Material] end)
 		if pc.Glow then part.Material = Enum.Material.Neon part.Color = pc.Color end
 		if pc.Glass then part.Material = Enum.Material.Glass part.Transparency = 0.6 part.Color = pc.Color end
 		if tex then

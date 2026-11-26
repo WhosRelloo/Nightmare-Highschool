@@ -73,6 +73,20 @@ Close-up renders (the Journal plates once uploaded): `render/out/{Frog,Raven,Wyv
    off when making the plate images.
 5. **The report card says "practice"** because slot 2 had already passed this period. That is expected.
 
+## Owner import (2026-11-25, later)
+
+The owner imported the 9 FBX files and published the 9 clips to the group. `stage/anatomy_import.lua` ran in Edit, and
+all 61 pieces went to `ReplicatedStorage.Anatomy.Models`. `anatomy_models_edit` now reports 9 imported models.
+Two fixes to the script came out of the first real run:
+- **Uniform scale.** Every piece came in at 10x. The script now divides by the median axis ratio, because the
+  Layout's 0.05-stud minimum would have fattened the glows, the desk and the wing plates.
+- **180-degree turn kept.** The importer turns every mesh 180 degrees about Y, and `CFrame.new(Centre)` dropped that.
+  The Driver lay handle-first and the Loupe's ring was away from its glass.
+
+Until the PBR textures are uploaded, the pieces wear the Layout's proxy colours and materials (brass, wood, leather,
+wax, steel). The animation ids aren't in the `Clips` map yet, so the clips still play through
+`RegisterKeyframeSequence`, which works in Studio only.
+
 ## Follow-ups for the owner
 
 - **Healer perk has no consumer.** `Config.Anatomy.HealMult(Level)` (+10% per level) and `ReviveMult(Level)` (-8% time
