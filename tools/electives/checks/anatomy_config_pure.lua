@@ -16,5 +16,8 @@ for _, Id in { "Frog", "Raven", "Wyvern" } do
 	Eq(S.Steps[#S.Steps].Id, "Lift", Id .. " ends with Lift")
 end
 local NF = 0 for _, O in A.Species.Frog.Organs do if not O.Flag then NF += 1 end end Eq(NF, 3, "frog organs (not counting the flag)")
+local function Near(G, W, What) if math.abs(G - W) > 1e-6 then table.insert(Fails, What .. ": got " .. tostring(G) .. " want " .. tostring(W)) end end
+Eq(A.HealMult(1), 1, "heal lvl 1") Near(A.HealMult(5), 1.4, "heal lvl 5") Near(A.HealMult(9), 1.4, "heal clamps")
+Eq(A.ReviveMult(1), 1, "revive lvl 1") Near(A.ReviveMult(5), 0.68, "revive lvl 5")
 if #Fails > 0 then return "FAIL\n" .. table.concat(Fails, "\n") end
 return "PASS anatomy_config_pure"

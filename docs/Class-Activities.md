@@ -156,6 +156,23 @@ Some checks used real key presses or mouse clicks; others used a test script.
 ![The grade sheet](img/sub-grade-sheet.jpg)
 ![The art](img/sub-games-art.png)
 
+## Electives and Anatomy (2026-11-25)
+
+Design: `docs/superpowers/specs/2026-11-25-electives-anatomy-design.md`. Plan: `docs/superpowers/plans/2026-11-25-electives-anatomy.md`. Record: `tools/electives/REPORT.md`.
+
+- **The Registrar:** a desk tagged `NHRegistrarDesk`, where you pick one elective per term (`Services.School.Electives`, `Config.Electives`, `Gui.Registrar`). The pick is the `ElectivePick` attribute.
+- **When:** electives meet on weekdays 1 and 3 (Tuesday and Thursday) in period 3. One desk can host both a regular period and an elective (`Activities.SlotFor`).
+- **Anatomy (R103, `Bench` mode):** you take a clockwork specimen apart with five physical tools on a leather roll: 1 Key, 2 Driver, 3 Loupe, 4 Scalpel, 5 Tweezers. Pick a tool up (click, tap or 1–5), use it, and put it down on the roll or the desk (right click or Q).
+  - **The steps:** wind the side key down, trace the seam, pry the plate, then lift each organ onto its outline on the Specimen card.
+  - **The species:** Clockwork Frog (level 1), Clockwork Raven (level 3) and Clockwork Wyvern (level 5, or a substitute's crate). The species list is data in `Config.Anatomy`.
+  - **Grading:** Accuracy 60%, Process 25%, Time 15%, with a time limit per specimen. Slips (the wrong tool, the wrong target, a step out of order) recoil the arm and cost points.
+  - **The judge:** the server (`ServerStorage.Activities.AnatomyBench`) judges every Pick, Put, Use and Place. Trace points are checked against the seam ellipse.
+- **The renderer:** `Controllers.Gui.Activities.AnatomyBench`. A ViewportFrame scene with your own R6 at the bench playing the nine seated `Anat*` clips. The props come from `ReplicatedStorage.Anatomy.Layout`, and stand-in parts are drawn until the owner imports the meshes (`tools/electives/PUBLISH_LIST.md`).
+- **The Specimen Journal:** each species' best grade, kept in `Classes.Anatomy.Journal`. It's a parchment in the phone's Report Card app.
+- **Mastery:** all three species at A or better grants the title **Anatomist** (`Reputation.AwardTitle`) and the **Brass Loupe Monocle** (`Accessories.Grant`). It runs through `Activities.JournalHandler` = `Electives.CheckMastery`. The monocle isn't modelled yet; it backfills once it is in `Config.Accessories`.
+- **The Healer perk:** `Config.Anatomy.HealMult(Level)` (+10% healing per level) and `ReviveMult(Level)` (8% faster revives per level). **No system reads them yet:** the game has no item heal and no player-to-player revive (downed players get up on a timer).
+- **Checks:** `tools/electives/checks/`. Pure: `classes_pure`, `anatomy_config_pure`, `anatomy_bench_pure`. Edit: `registrar_desk_edit`, `slots_edit`, `anatomy_models_edit`, `anatomy_clips_edit`. Play: `electives_play`, `anatomy_play`, `anatomy_client`, `anatomy_rewards_play`.
+
 ## Ideas for later
 
 - Teacher NPCs at the desks, using the same `ReportIncident` to report fights in class.

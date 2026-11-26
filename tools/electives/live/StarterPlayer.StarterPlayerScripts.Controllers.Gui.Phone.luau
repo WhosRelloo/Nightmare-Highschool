@@ -888,6 +888,51 @@ function Local.Report()
 	Local.Label(Row, `THIS WEEK SO FAR`, 14, { Font = Fonts.Title; TextColor3 = SECTION; Position = UDim2.fromOffset(50, 8); Size = UDim2.new(1, -60, 0, 18) })
 	Local.Label(Row, if (So.Total or 0) > 0 then `{So.Attended} of {So.Total} classes{if So.Average then `, {So.Average} average` else ``}. The next card comes Monday.` else `No classes yet this week. The next card comes Monday.`, 15,
 		{ FontFace = BOLD; TextColor3 = HINT; TextWrapped = true; TextYAlignment = Enum.TextYAlignment.Top; Position = UDim2.fromOffset(50, 28); Size = UDim2.new(1, -60, 0, 38) })
+	-- (Electives, Task 12) the Specimen Journal: one plate per species, its Latin name, and the best grade under the wax seal.
+	-- A species never dissected shows a pencil outline. Plate art comes from Config.Anatomy.Species[Id].Plate (an image id)
+	-- once the close-up renders are uploaded; until then the plate is a ruled sketch frame with the specimen's name.
+	if type(R.Journal) == `table` then
+		local AnatOk, Anat = pcall(require, game:GetService(`ReplicatedStorage`).Config.Anatomy)
+		if AnatOk and type(Anat) == `table` then
+			local _, In = parchment()
+			In.Parent.Name = `SpecimenJournal`
+			heading(In, `THE SPECIMEN JOURNAL`, 1)
+			ink(In, if R.Journal.Mastered then `Every specimen at A or better. Signed: Anatomist.` else `Your best dissection of each specimen. All three at A or better earns the title Anatomist and the Brass Loupe Monocle.`,
+				14, 2, { TextColor3 = INK_SOFT })
+			for I, Id in Anat.Mastery.Species do
+				local Sp = Anat.Species[Id]
+				local G = R.Journal.Grades and R.Journal.Grades[Id]
+				rule(In, 2 + I * 2 - 1)
+				local Page = new(`Frame`, { Name = Id; BackgroundTransparency = 1; Size = UDim2.new(1, 0, 0, 92); LayoutOrder = 2 + I * 2 }, In)
+				-- the plate
+				local Plate = new(`Frame`, { Name = `Plate`; BackgroundColor3 = Color3.fromRGB(232, 220, 190); BackgroundTransparency = if G then 0.2 else 1; BorderSizePixel = 0;
+					Size = UDim2.fromOffset(86, 86); Position = UDim2.fromOffset(0, 3); ZIndex = 7 }, Page)
+				new(`UICorner`, { CornerRadius = UDim.new(0, 4) }, Plate)
+				new(`UIStroke`, { Color = if G then Color3.fromRGB(110, 78, 46) else Color3.fromRGB(120, 112, 100); Thickness = if G then 2 else 1; Transparency = if G then 0.2 else 0.35;
+					LineJoinMode = Enum.LineJoinMode.Round }, Plate)
+				if G and Sp.Plate then
+					new(`ImageLabel`, { Name = `Art`; BackgroundTransparency = 1; Image = `rbxassetid://{Sp.Plate}`; Size = UDim2.new(1, -6, 1, -6); Position = UDim2.fromOffset(3, 3);
+						ScaleType = Enum.ScaleType.Crop; ZIndex = 8 }, Plate)
+				else
+					Local.Label(Plate, Sp.Name, 13, { FontFace = BOLD; TextColor3 = if G then INK else Color3.fromRGB(120, 112, 100); TextWrapped = true;
+						TextXAlignment = Enum.TextXAlignment.Center; Size = UDim2.new(1, -8, 1, -8); Position = UDim2.fromOffset(4, 4); ZIndex = 8 })
+				end
+				-- the name, the Latin, the line under it
+				Local.Label(Page, Sp.Name, 19, { Font = Fonts.Title; TextColor3 = if G then INK else INK_SOFT; Position = UDim2.fromOffset(98, 8); Size = UDim2.new(1, -176, 0, 22); ZIndex = 7 })
+				Local.Label(Page, `<i>{Sp.Latin}</i>`, 15, { FontFace = BOLD; RichText = true; TextColor3 = INK_SOFT; Position = UDim2.fromOffset(98, 32); Size = UDim2.new(1, -176, 0, 18); ZIndex = 7 })
+				Local.Label(Page, if G then `Best dissection: {G}` else `Not yet dissected`, 14, { FontFace = BOLD; TextColor3 = if G then (GRADE_INK[G] or INK) else Color3.fromRGB(120, 112, 100);
+					Position = UDim2.fromOffset(98, 56); Size = UDim2.new(1, -176, 0, 18); ZIndex = 7 })
+				-- the seal: wax with the grade, or an empty pencil ring
+				if G then
+					seal(Page, 64, G, UDim2.new(1, 0, 0.5, 0), Vector2.new(1, 0.5), 8)
+				else
+					local Ring = new(`Frame`, { Name = `Pencil`; BackgroundTransparency = 1; AnchorPoint = Vector2.new(1, 0.5); Position = UDim2.new(1, -4, 0.5, 0); Size = UDim2.fromOffset(56, 56); ZIndex = 8 }, Page)
+					new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Ring)
+					new(`UIStroke`, { Color = Color3.fromRGB(120, 112, 100); Thickness = 1.5; Transparency = 0.3 }, Ring)
+				end
+			end
+		end
+	end
 end
 
 function Local.Gazette()

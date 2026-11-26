@@ -111,7 +111,33 @@ function Local.Prompt(Inst: Instance)
 	Pr.Parent = Host
 end
 
+-- (Task 12) Anatomy mastery: every species in Config.Anatomy.Mastery at MinGrade or better grants the title
+-- (Social.Reputation.AwardTitle) and the accessory (Features.Accessories.Grant). Both calls are idempotent, so this runs
+-- after every Journal write: the title lands once, and the accessory backfills on the next lesson once it is in
+-- Config.Accessories (BrassLoupeMonocle is not modelled yet). Returns { Title = bool, Accessory = bool } (newly granted).
+local GRADE_RANK = { [`A+`] = 6; A = 5; B = 4; C = 3; D = 2; F = 1 }
+function Shared.CheckMastery(Player: Player, Subject: string, ClassData): { Title: boolean, Accessory: boolean }?
+	if Subject ~= `Anatomy` or typeof(ClassData) ~= `table` or typeof(ClassData.Journal) ~= `table` then return nil end
+	local M = require(ReplicatedStorage.Config.Anatomy).Mastery
+	for _, Id in M.Species do
+		if (GRADE_RANK[ClassData.Journal[Id]] or 0) < GRADE_RANK[M.MinGrade] then return nil end
+	end
+	local Got = { Title = false; Accessory = false }
+	local Svc = ServerScriptService.Services
+	pcall(function() Got.Title = require(Svc.Social.Reputation).AwardTitle(Player, M.Title) == true end)
+	pcall(function() Got.Accessory = require(Svc.Features.Accessories).Grant(Player, M.Accessory) == true end)
+	if not ClassData.Mastered then
+		ClassData.Mastered = true
+		Local.Notify(Player, `Specimen Journal complete`, `Every specimen at {M.MinGrade} or better. You are an {M.Title}.`, `Good`)
+	end
+	if Got.Accessory then Local.Notify(Player, `New in your wardrobe`, `The Brass Loupe Monocle: wear it at a wardrobe station.`, `Info`) end
+	return Got
+end
+
 function Shared.OnStart()
+	pcall(function()
+		require(ServerScriptService.Services.School.Activities).JournalHandler = Shared.CheckMastery
+	end)
 	Players.PlayerAdded:Connect(Local.OnJoin)
 	for _, P in Players:GetPlayers() do task.spawn(Local.OnJoin, P) end
 	Packets.ElectiveEnrol.OnServerEvent:Connect(function(Player, Msg)

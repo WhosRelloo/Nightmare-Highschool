@@ -79,4 +79,12 @@ function Anatomy.SpeciesFor(Level: number, Override: string?)
 	return Best
 end
 
+-- Healer perk (Task 12). HealMult scales what a heal restores; ReviveMult scales how long a revive takes.
+-- No game system reads them yet: there is no item heal and no player-to-player revive (see tools/electives/REPORT.md).
+function Anatomy.HealMult(Level: number): number return 1 + 0.10 * (math.clamp(Level, 1, 5) - 1) end
+function Anatomy.ReviveMult(Level: number): number return 1 - 0.08 * (math.clamp(Level, 1, 5) - 1) end
+
+-- Mastery: every species at A or better grants the title and the accessory once.
+Anatomy.Mastery = { Species = { `Frog`, `Raven`, `Wyvern` }; MinGrade = `A`; Title = `Anatomist`; Accessory = `BrassLoupeMonocle` }
+
 return Anatomy
