@@ -79,8 +79,8 @@ Close-up renders (the Journal plates once uploaded): `render/out/{Frog,Raven,Wyv
   per level) exist and are tested, but nothing reads them. The game has no item heal and no player-to-player revive:
   downed players get up on a timer (`Features.Downed`, `Config.DownedDuration`). The Registrar card already promises
   "First-aid pouch heals +10% per level" and "Revive downed friends faster". Building a friend revive (hold E on a
-  downed player) and a first-aid item is a new gameplay system, so it's the owner's call. The parent session has
-  passed the question on.
+  downed player) and a first-aid pouch is a new gameplay system. **The owner said "Later, log it" (2026-11-25):**
+  neither is built. When they are, they should read `HealMult` / `ReviveMult` from the student's Anatomy level.
 - **BrassLoupeMonocle** is not modelled and not in `Config.Accessories`. Mastery calls `Accessories.Grant` on every
   lesson, so it backfills once the accessory is added.
 - **Import and publish:** see `PUBLISH_LIST.md` (9 FBX files, 200 textures, 9 clips, 3 plates).
