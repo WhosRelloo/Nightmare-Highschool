@@ -55,7 +55,7 @@ Close-up renders (the Journal plates once uploaded): `render/out/{Frog,Raven,Wyv
   `KeyframeSequenceProvider:RegisterKeyframeSequence`. `stage/anatomy_import.lua` is written but has not been run
   against real imports.
 - **No IK on the arms.** The tool in hand follows the pointer; the R6 plays the clips.
-- **Journal plates** show a name card until `Config.Anatomy.Species[Id].Plate` is set to an uploaded image id.
+- **Journal plates** are uploaded and wired (see below). A species with no grade still shows the pencil ring.
 - **graphify** is not installed on this machine (`graphify` is not on PATH), so `graphify update .` was not run.
 
 ## Known issues seen in the screenshots (for the next pass)
@@ -124,6 +124,18 @@ The five issues above were fixed, and the Play round passed again: `anatomy_clie
    the roll. The test hooks aim each tool at its target, and the test's desk spot is now in view.
 4. **R6 clone:** no accessories, no face, and the head is hidden, so the hair and crown no longer cross the view.
    The sleeves show at the bottom corners as the arms reach in.
+
+### Journal plates (2026-11-26)
+
+The three close-ups were cropped to 512 px squares (`render/out/plates/AnatPlate_*.png`). The Raven and Wyvern crops
+leave out the blurred piece in the top-left corner. They were uploaded through Studio and their ids are in
+`Config.Anatomy.Species.*.Plate`: Frog 99000128465951, Raven 124681137363813, Wyvern 100444371073403. Installed in Edit
+(backup `Electives_Plates_20261126`); `anatomy_config_pure` PASS.
+- The upload went to the owner's user account (37484441), not the group: Studio's uploader has no group option. Images
+  are not permission-locked like animations, so they load in the group's place. If the owner wants them group-owned,
+  re-upload the three PNGs as the group and swap the ids.
+- The Wyvern image was still in moderation review when it was wired.
+- Not yet seen in the phone in Play.
 
 ## Follow-ups for the owner
 

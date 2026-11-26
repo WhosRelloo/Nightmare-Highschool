@@ -52,9 +52,8 @@ Shot list and timings: `tools/electives/anim/clips.md`.
 
 ## 4. Journal plates (3 images)
 
-`tools/electives/render/out/{Frog,Raven,Wyvern}_close.png` (the Frog one is the approved close-up). Upload them, then
-set `Plate = <id>` on each species in `Config.Anatomy`. The Specimen Journal in the phone's Report Card app shows the
-plate once a species has a grade.
+**Done (2026-11-26).** The 512 px crops in `tools/electives/render/out/plates/` are uploaded and the ids are set on each
+species in `Config.Anatomy`. They are owned by the owner's account, not the group (see `REPORT.md`).
 
 ## 5. Not built yet
 

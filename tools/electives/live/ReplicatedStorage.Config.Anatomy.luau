@@ -16,7 +16,7 @@ Anatomy.UseInterval = 0.12     -- min seconds between counted Key/Driver turns
 
 Anatomy.Species = {
 	Frog = {
-		Id = `Frog`; Name = `Clockwork Frog`; Latin = `Rana Horologica`; Level = 1; TimeLimit = 120; Par = 60;
+		Id = `Frog`; Name = `Clockwork Frog`; Latin = `Rana Horologica`; Level = 1; TimeLimit = 120; Par = 60; Plate = 99000128465951;
 		FlagFrom = 4; Seam = { Rx = 1; Ry = 1.3 };
 		Steps = {
 			{ Id = `Unwind`; Tool = `Key`; Target = `SideKey`; Count = 8 };
@@ -32,7 +32,7 @@ Anatomy.Species = {
 		};
 	};
 	Raven = {
-		Id = `Raven`; Name = `Clockwork Raven`; Latin = `Corvus Mechanicus`; Level = 3; TimeLimit = 150; Par = 80;
+		Id = `Raven`; Name = `Clockwork Raven`; Latin = `Corvus Mechanicus`; Level = 3; TimeLimit = 150; Par = 80; Plate = 124681137363813;
 		FlagFrom = 4; Seam = { Rx = 1; Ry = 1.6 };
 		Steps = {
 			{ Id = `Unwind`; Tool = `Key`; Target = `SideKey`; Count = 8 };
@@ -50,7 +50,7 @@ Anatomy.Species = {
 		};
 	};
 	Wyvern = {
-		Id = `Wyvern`; Name = `Clockwork Wyvern`; Latin = `Draco Horologicus`; Level = 5; TimeLimit = 180; Par = 100;
+		Id = `Wyvern`; Name = `Clockwork Wyvern`; Latin = `Draco Horologicus`; Level = 5; TimeLimit = 180; Par = 100; Plate = 100444371073403;
 		FlagFrom = 4; Seam = { Rx = 1; Ry = 1.8 };
 		Steps = {
 			{ Id = `Unwind`; Tool = `Key`; Target = `SideKey`; Count = 12 };
