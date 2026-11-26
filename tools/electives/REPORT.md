@@ -250,9 +250,13 @@ The sheet slides up and settles from a tilt. Reduced motion gets it at once. It 
 `shots/report_card_new.jpg`.
 
 **Still open:**
-- ~~The arm clone reads as blocky avatar parts.~~ **Fixed in Edit (seen in an Edit preview, not yet in Play):** the
-  clone's boxes are hidden, and each arm is dressed in welded pieces: a rounded wool sleeve, a linen cuff with a brass
-  button, and a leather glove with fingers and a thumb (`Bench:DressArms`). The clips still drive the arms.
+- **The arms follow the work (Edit, not yet seen in Play).** The owner kept the blocky R6 arms and asked that they
+  move with what the player does. After the Animator poses them each frame (`PreSimulation`), `Bench:AimArms` turns
+  each shoulder's `Motor6D.Transform` toward a target, blended by an eased weight. The right arm takes the tool in hand
+  (full), or the pointer over the bench when the hand is empty (0.45). The left arm braces beside the specimen while
+  tracing, turning a key or driver, or lifting a part (0.9), and rests lightly toward the tray while a tool is up
+  (0.35). Only the shoulder turns, so the limbs stay rigid and on their sockets. The aim was checked on a stand-in R6:
+  the arm's down axis lies on the shoulder-to-target line (dot 1.0000 on both sides).
 - `Config.Anatomy.UI` now holds the 6 imported chrome ids (AnatPlate 121213116627792, AnatProcedure 101550617900095,
   AnatSpecimen 89646077609423, AnatSeal 96567098133942, AnatHold 101401000383834, AnatTag 80741161853877). Installed in
   Edit, not yet seen in Play.

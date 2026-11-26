@@ -44,6 +44,7 @@ local CAMERA_CF = CFrame.lookAt(Vector3.new(0, 9, 9.75), Vector3.new(0, 0, 1.3))
 local HOVER = Vector3.new(0, 0.9, 1.8) -- where a tool in hand waits while the pointer is over the panels
 local CAMERA_FOV = 38
 local STAGE = Vector3.new(0, 2600, 0) -- where the bench is staged in the world (client-only parts, high over the map)
+local WIDE_FOCUS_ARMS = Vector3.new(0, 0, 1.3)
 local ARM_SCALE = 3.25         -- the R6 clone scaled so an arm is ~0.65 m at the layout's 10 studs per metre
 local SEAT_CF = CFrame.new(0, 2.65, 10.2)
 local OPEN_DEG = 95
@@ -434,7 +435,6 @@ function Bench:BuildArms()
 	Rig.Parent = self.World
 	pcall(function() Rig:ScaleTo(ARM_SCALE) end)
 	Rig:PivotTo(SEAT_CF + STAGE)
-	self:DressArms(Rig)
 	local Animator = Hum:FindFirstChildOfClass(`Animator`) or new(`Animator`, {}, Hum)
 	self.Rig, self.Animator = Rig, Animator
 	local Folder = ReplicatedStorage:FindFirstChild(`AnatomyClips`)
@@ -461,44 +461,59 @@ function Bench:BuildArms()
 	end
 	local Idle = self.Tracks.AnatBenchIdle
 	if Idle then Idle.Looped = true Idle.Priority = Enum.AnimationPriority.Idle Idle:Play(0.2) end
+	-- after the Animator has posed the arms each frame, bend the shoulders toward what the student is doing
+	table.insert(self.Conns, RunService.PreSimulation:Connect(function(Dt) self:AimArms(Dt) end))
 end
 
--- the bare R6 boxes read as blocks under the stage lights: hide them and dress each arm in a rounded wool sleeve,
--- a turned-back linen cuff with a brass button, and a leather dissecting glove. The pieces are welded to the arm, so
--- the clips still drive them.
-local SLEEVE = Color3.fromRGB(38, 34, 38)
-local LINEN = Color3.fromRGB(206, 196, 176)
-local GLOVE = Color3.fromRGB(46, 30, 26)
-local BUTTON = Color3.fromRGB(196, 150, 72)
-
-function Bench:DressArms(Rig: Model)
-	for _, P in Rig:GetChildren() do
-		if P:IsA(`BasePart`) and P.Name ~= `HumanoidRootPart` then P.Transparency = 1 end
+-- The arms follow the work. The clips pose them; on top of that each shoulder turns its arm toward a target, blended
+-- by a weight that eases in and out:
+--   right arm: the tool in hand (full), or the pointer over the bench when the hand is empty (a light reach)
+--   left arm:  the specimen, steadying it while tracing, turning a key/driver or lifting a part; resting otherwise
+-- The R6 stays rigid: only the shoulder Motor6D's Transform turns, so the limb stays on its socket.
+local AIM_RATE = 10 -- how fast a target and a weight ease (per second)
+function Bench:AimArms(Dt: number)
+	if self.Destroyed or not self.Rig then return end
+	local Torso = self.Rig:FindFirstChild(`Torso`)
+	if not Torso then return end
+	Dt = math.min(Dt, 1 / 20)
+	local k = 1 - math.exp(-AIM_RATE * Dt)
+	self.Aim = self.Aim or {}
+	local Busy = self.Tracing or self.Holding_ or self.Holding
+	local Specimen = (self.SeamCentre or WIDE_FOCUS_ARMS) + Vector3.new(0, 0.1, 0)
+	-- right: the tool's grip, else the pointer
+	local RGoal, RW
+	if self.Hand and self.Tools[self.Hand] then
+		RGoal, RW = self.Tools[self.Hand].CF.Position, 1
+	elseif not self:OverChrome() and self:Hit() then
+		RGoal, RW = self:Hit().Position, 0.45
+	else
+		RGoal, RW = Specimen + Vector3.new(2.5, 0, 2.5), 0
 	end
-	for _, Side in { `Right Arm`; `Left Arm` } do
-		local Arm = Rig:FindFirstChild(Side)
-		if not (Arm and Arm:IsA(`BasePart`)) then continue end
-		local S = Arm.Size
-		local In = if Side == `Right Arm` then -1 else 1 -- the inner side of the hand, toward the body's centre
-		local function piece(Name, Shape, Size, At, Material, Color, Mesh)
-			local P = new(`Part`, { Name = Name; Shape = Shape; Size = Size; Material = Material; Color = Color; CFrame = Arm.CFrame * At;
-				CanCollide = false; CanQuery = false; CanTouch = false; Massless = true; Anchored = false; CastShadow = true;
-				TopSurface = Enum.SurfaceType.Smooth; BottomSurface = Enum.SurfaceType.Smooth }, Arm)
-			if Mesh then new(`SpecialMesh`, { MeshType = Enum.MeshType.Sphere }, P) end
-			new(`WeldConstraint`, { Part0 = Arm; Part1 = P }, P)
-			return P
+	-- left: brace the specimen beside the work while busy, a light rest toward the tray when a tool is up
+	local LGoal, LW
+	if Busy then
+		LGoal, LW = Specimen + Vector3.new(-1.1, 0, 0.6), 0.9
+	elseif self.Hand then
+		LGoal, LW = Specimen + Vector3.new(-2.6, -0.2, 2.2), 0.35
+	else
+		LGoal, LW = Specimen + Vector3.new(-2.6, 0, 2.5), 0
+	end
+	for Side, Goal in { Right = RGoal; Left = LGoal } do
+		local W = if Side == `Right` then RW else LW
+		local A = self.Aim[Side]
+		if not A then A = { P = Goal; W = 0 } self.Aim[Side] = A end
+		A.P = A.P:Lerp(Goal, k)
+		A.W += (W - A.W) * k
+		local M = Torso:FindFirstChild(Side .. ` Shoulder`)
+		if M and M:IsA(`Motor6D`) and A.W > 0.001 then
+			local J = Torso.CFrame * M.C0
+			local To = J:VectorToObjectSpace((A.P + STAGE) - J.Position)
+			if To.Magnitude > 1e-3 then
+				-- the arm hangs down the joint's -Y; turn that onto the target, keeping the clip's own twist on top
+				local Aim = CFrame.fromRotationBetweenVectors(Vector3.new(0, -1, 0), To.Unit)
+				M.Transform = M.Transform:Lerp(Aim, A.W)
+			end
 		end
-		local Along = CFrame.Angles(0, 0, math.pi / 2) -- a cylinder's axis is X: turn it down the arm
-		piece(`Sleeve`, Enum.PartType.Cylinder, Vector3.new(S.Y * 0.74, S.X * 0.84, S.X * 0.84), CFrame.new(0, S.Y * 0.13, 0) * Along, Enum.Material.Fabric, SLEEVE)
-		piece(`Shoulder`, Enum.PartType.Ball, Vector3.one * S.X * 0.84, CFrame.new(0, S.Y * 0.5, 0), Enum.Material.Fabric, SLEEVE)
-		piece(`Cuff`, Enum.PartType.Cylinder, Vector3.new(S.Y * 0.09, S.X * 0.9, S.X * 0.9), CFrame.new(0, -S.Y * 0.25, 0) * Along, Enum.Material.Fabric, LINEN)
-		piece(`Button`, Enum.PartType.Ball, Vector3.one * S.X * 0.12, CFrame.new(0, -S.Y * 0.25, -S.X * 0.45), Enum.Material.Metal, BUTTON)
-		piece(`Wrist`, Enum.PartType.Cylinder, Vector3.new(S.Y * 0.1, S.X * 0.62, S.X * 0.62), CFrame.new(0, -S.Y * 0.32, 0) * Along, Enum.Material.Leather, GLOVE)
-		piece(`Hand`, Enum.PartType.Block, Vector3.new(S.X * 0.74, S.Y * 0.3, S.X * 0.56), CFrame.new(0, -S.Y * 0.44, 0), Enum.Material.Leather, GLOVE, true)
-		piece(`Fingers`, Enum.PartType.Block, Vector3.new(S.X * 0.66, S.Y * 0.16, S.X * 0.46), CFrame.new(0, -S.Y * 0.56, -S.X * 0.04) * CFrame.Angles(math.rad(-12), 0, 0),
-			Enum.Material.Leather, GLOVE, true)
-		piece(`Thumb`, Enum.PartType.Block, Vector3.new(S.X * 0.22, S.Y * 0.17, S.X * 0.22), CFrame.new(In * S.X * 0.36, -S.Y * 0.47, -S.X * 0.12) * CFrame.Angles(0, 0, In * math.rad(-25)),
-			Enum.Material.Leather, GLOVE, true)
 	end
 end
 
