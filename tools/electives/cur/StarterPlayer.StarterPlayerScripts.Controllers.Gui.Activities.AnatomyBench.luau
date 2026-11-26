@@ -38,7 +38,9 @@ local DIM = C.TextDim or Color3.fromRGB(170, 160, 146)
 
 local TURN_EVERY = 0.25        -- seconds of holding per Key/Driver turn
 local TRACE_HZ = 30
-local CAMERA_CF = CFrame.lookAt(Vector3.new(0, 7.2, 7.6), Vector3.new(0, 0, 0.4))
+-- framed so the frog's head sits ~11% from the top and the roll's near edge ~86% down, clear of the tool-button bar
+local CAMERA_CF = CFrame.lookAt(Vector3.new(0, 9, 9.75), Vector3.new(0, 0, 1.3))
+local HOVER = Vector3.new(0, 0.9, 1.8) -- where a tool in hand waits while the pointer is over the panels
 local CAMERA_FOV = 38
 local ARM_SCALE = 3.25         -- the R6 clone scaled so an arm is ~0.65 m at the layout's 10 studs per metre
 local SEAT_CF = CFrame.new(0, 2.65, 10.2)
@@ -272,8 +274,10 @@ end
 
 function Bench:BuildViewport()
 	local VF = new(`ViewportFrame`, { Name = `Bench`; Size = UDim2.fromScale(1, 1); BackgroundColor3 = Color3.fromRGB(12, 10, 12);
-		BorderSizePixel = 0; Ambient = Color3.fromRGB(40, 34, 30); LightColor = Color3.fromRGB(255, 214, 168);
-		LightDirection = Vector3.new(0.24, -0.95, -0.17); ZIndex = 1 }, self.Content)
+		-- a ViewportFrame has no sky or environment for the PBR maps: a near-neutral key from over the student's left
+		-- shoulder and a strong ambient keep brass reading as brass instead of flat orange
+		BorderSizePixel = 0; Ambient = Color3.fromRGB(150, 142, 132); LightColor = Color3.fromRGB(255, 244, 228);
+		LightDirection = Vector3.new(0.35, -0.85, -0.4); ZIndex = 1 }, self.Content)
 	local WM = new(`WorldModel`, {}, VF)
 	local Cam = new(`Camera`, { FieldOfView = CAMERA_FOV; CFrame = CAMERA_CF }, VF)
 	VF.CurrentCamera = Cam
@@ -326,8 +330,12 @@ function Bench:BuildArms()
 	Char.Archivable = Was
 	if not ok or not Rig then return end
 	for _, X in Rig:GetDescendants() do
-		if X:IsA(`Script`) or X:IsA(`LocalScript`) or X:IsA(`ForceField`) or X:IsA(`Tool`) or X:IsA(`Sound`) or X:IsA(`ParticleEmitter`) then X:Destroy() end
+		if X:IsA(`Script`) or X:IsA(`LocalScript`) or X:IsA(`ForceField`) or X:IsA(`Tool`) or X:IsA(`Sound`) or X:IsA(`ParticleEmitter`)
+			or X:IsA(`Accoutrement`) or X:IsA(`Decal`) then X:Destroy() end
 	end
+	-- the head sits at the camera at this scale: hide it (hair, hats and the face are gone above), keep torso and arms
+	local RigHead = Rig:FindFirstChild(`Head`)
+	if RigHead and RigHead:IsA(`BasePart`) then RigHead.Transparency = 1 end
 	local Hum = Rig:FindFirstChildOfClass(`Humanoid`)
 	local Root = Rig:FindFirstChild(`HumanoidRootPart`)
 	if not Hum or not Root then Rig:Destroy() return end
@@ -530,6 +538,22 @@ function Bench:PointerRay(Screen: Vector2?)
 	local Aspect = Size.X / Size.Y
 	local Dir = self.Camera.CFrame:VectorToWorldSpace(Vector3.new((2 * u - 1) * tanY * Aspect, (1 - 2 * v) * tanY, -1)).Unit
 	return self.Camera.CFrame.Position, Dir, u, v
+end
+
+-- true while the pointer is outside the viewport or over one of the chrome panels drawn on top of it
+function Bench:OverChrome(): boolean
+	local Pos = UserInputService:GetMouseLocation()
+	local VF = self.VF
+	local Rel = Pos - VF.AbsolutePosition
+	if Rel.X < 0 or Rel.Y < 0 or Rel.X > VF.AbsoluteSize.X or Rel.Y > VF.AbsoluteSize.Y then return true end
+	for _, F in self.UI:GetDescendants() do
+		if F:IsA(`GuiObject`) and F.Visible and F ~= VF and not F:IsDescendantOf(VF) and F.Name ~= `Vignette`
+			and F.BackgroundTransparency < 0.95 then
+			local A, S = F.AbsolutePosition, F.AbsoluteSize
+			if Pos.X >= A.X and Pos.Y >= A.Y and Pos.X <= A.X + S.X and Pos.Y <= A.Y + S.Y then return true end
+		end
+	end
+	return false
 end
 
 function Bench:Hit(Screen: Vector2?)
@@ -739,8 +763,10 @@ function Bench:Step(Dt: number)
 	if self.Hand then
 		local T = self.Tools[self.Hand]
 		local R = self:Hit()
-		local P = if R then R.Position else nil
+		local P = if R and not self:OverChrome() then R.Position else nil
 		if self.TestPoint then P = self.TestPoint end
+		-- off the bench (over a panel, or outside the view) the tool waits where it was, or above the specimen
+		if P then self.LastPoint = P else P = self.LastPoint or HOVER R = nil end
 		if P then
 			local Over = R and self:Classify(R.Instance)
 			local Lift = if self.Holding_ or self.Tracing then 0.02 else (if Over and (Over.Kind == `Desk` or Over.Kind == `Roll` or Over.Kind == `Set`) then 0.45 else 0.18)
@@ -977,9 +1003,15 @@ end
 
 ----------------------------------------------------------------------------------------------------- Studio test hooks
 if RunService:IsStudio() then
-	function Bench:_TestKey(n: number) self:Key(n) end
+	function Bench:_TestKey(n: number) self.TestPoint = HOVER self:Key(n) end
 	function Bench:_TestUse(Target: string, Organ: string?)
 		self.LastUse = Target
+		-- the tool in hand goes to what it is used on (hook runs have no real pointer)
+		local Sp = self.Specimen
+		if Target == `SideKey` and Sp.Bones.SideKey then self.TestPoint = Sp.Bones.SideKey.Head
+		elseif Target == `Plate` then self.TestPoint = self.SeamCentre
+		elseif Target == `Organ` and Organ and Sp.Bones[self:BoneOf(Organ)] then self.TestPoint = Sp.Bones[self:BoneOf(Organ)].Head + Vector3.new(0, 0.35, 0)
+		end
 		self.Api.Send(`Use`, { Target = Target; Organ = Organ })
 	end
 	function Bench:_TestTrace(Points, Delay: number?)
