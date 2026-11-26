@@ -21,7 +21,7 @@ W(1.5)
 table.insert(Log, "trace pts " .. n .. " step " .. B:_TestState().Step)
 B:_TestKey(2) W()
 B:_TestUse("Plate") W(1.4)
-B:_TestPut("Desk", Vector3.new(6.5, 0, -1)) W(1.2)
+B:_TestPut("Desk", Vector3.new(4.4, 0, 2.6)) W(1.2) -- a desk spot in view, right of the roll
 shot("desk", 3)
 table.insert(Log, "driver " .. tostring(B:_TestState().Tools.Driver) .. " plate " .. tostring(B:_TestState().PlateOpen))
 B:_TestKey(5) W()

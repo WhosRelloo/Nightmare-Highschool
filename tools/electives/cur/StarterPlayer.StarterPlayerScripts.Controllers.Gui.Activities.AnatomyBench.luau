@@ -276,7 +276,7 @@ function Bench:BuildViewport()
 	local VF = new(`ViewportFrame`, { Name = `Bench`; Size = UDim2.fromScale(1, 1); BackgroundColor3 = Color3.fromRGB(12, 10, 12);
 		-- a ViewportFrame has no sky or environment for the PBR maps: a near-neutral key from over the student's left
 		-- shoulder and a strong ambient keep brass reading as brass instead of flat orange
-		BorderSizePixel = 0; Ambient = Color3.fromRGB(150, 142, 132); LightColor = Color3.fromRGB(255, 244, 228);
+		BorderSizePixel = 0; Ambient = Color3.fromRGB(112, 104, 96); LightColor = Color3.fromRGB(255, 240, 220);
 		LightDirection = Vector3.new(0.35, -0.85, -0.4); ZIndex = 1 }, self.Content)
 	local WM = new(`WorldModel`, {}, VF)
 	local Cam = new(`Camera`, { FieldOfView = CAMERA_FOV; CFrame = CAMERA_CF }, VF)
@@ -679,7 +679,8 @@ function Bench:PutHere()
 	if not self.Hand then return end
 	local R = self:Hit()
 	local What = R and self:Classify(R.Instance)
-	if What and What.Kind == `Desk` then
+	-- a desk spot hidden behind a panel would lose the tool: over a panel it goes back to the roll
+	if What and What.Kind == `Desk` and not self:OverChrome() then
 		self.PutPoint = R.Position
 		self:Put(`Desk`)
 	else

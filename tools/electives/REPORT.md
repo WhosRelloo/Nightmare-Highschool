@@ -111,6 +111,20 @@ What it showed:
      with a real mouse.
   5. Lifted organs sit beside the frog's head instead of on the card's outline spot.
 
+### Bench visual fixes (2026-11-26)
+
+The five issues above were fixed, and the Play round passed again: `anatomy_client` PASS (real true, 9 tracks, a
+140-point trace, recoil, grade A). Shots: `shots/fix_{start,key,open}.jpg`.
+1. **Lighting:** neutral key light and a stronger ambient, instead of the dim orange light. The first try washed the
+   brass out, so the ambient was lowered to (112, 104, 96). That second value has not been seen in Play yet.
+2. **Framing:** the camera is at (0, 9, 9.75) looking at (0, 0, 1.3). The frog's head is about 11% from the top and
+   the whole roll sits above the button bar.
+3. and 5. **Held tool and organ:** over a panel or outside the view, the tool in hand waits at its last point (or
+   above the specimen), so it and the organ on the tweezers stay in frame. A desk put-down over a panel goes back to
+   the roll. The test hooks aim each tool at its target, and the test's desk spot is now in view.
+4. **R6 clone:** no accessories, no face, and the head is hidden, so the hair and crown no longer cross the view.
+   The sleeves show at the bottom corners as the arms reach in.
+
 ## Follow-ups for the owner
 
 - **Healer perk has no consumer.** `Config.Anatomy.HealMult(Level)` (+10% per level) and `ReviveMult(Level)` (-8% time
