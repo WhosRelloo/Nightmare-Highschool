@@ -93,6 +93,24 @@ built-in browser):
 - Note: `ContentProvider:PreloadAsync` reports Failure through `execute_luau` even for textures the game already uses.
   Judge by a screenshot taken a few seconds after the maps are applied.
 
+### Play round with the real models (2026-11-26)
+
+`anatomy_client` PASS with the real models (`real true`): 9 tracks, a 143-point trace, the Driver on the desk, the
+plate open, AnatRecoil on the wrong outline, grade A. `anatomy_client_after` PASS (frog A+). Slot 2 restored, cine
+passed before and after, place not saved. Shots: `shots/real_{start,trace,open}.jpg`.
+
+What it showed:
+- The frog, its eyes, studs, dial plate and legs, and all five tools render in the bench. The open plate shows the
+  hollow body with the cradle inside.
+- **Still to fix:**
+  1. In the ViewportFrame the brass reads flat and orange: the viewport has no environment lighting for the PBR
+     maps. Try `ViewportFrame.Ambient` / `LightColor` / `LightDirection`, or a WorldModel lit from the camera side.
+  2. The tool-button bar covers the lower half of the tools on the roll. Raise the camera target or shrink the bar.
+  3. The tool in hand is still out of frame in the hook-driven run (see known issue 2 above).
+  4. A dark diagonal shape crosses the upper left during the trace. It may be the R6 arm at 3.25x scale. Check
+     with a real mouse.
+  5. Lifted organs sit beside the frog's head instead of on the card's outline spot.
+
 ## Follow-ups for the owner
 
 - **Healer perk has no consumer.** `Config.Anatomy.HealMult(Level)` (+10% per level) and `ReviveMult(Level)` (-8% time
