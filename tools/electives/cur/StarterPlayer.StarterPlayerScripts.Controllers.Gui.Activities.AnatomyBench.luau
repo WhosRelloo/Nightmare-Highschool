@@ -434,6 +434,7 @@ function Bench:BuildArms()
 	Rig.Parent = self.World
 	pcall(function() Rig:ScaleTo(ARM_SCALE) end)
 	Rig:PivotTo(SEAT_CF + STAGE)
+	self:DressArms(Rig)
 	local Animator = Hum:FindFirstChildOfClass(`Animator`) or new(`Animator`, {}, Hum)
 	self.Rig, self.Animator = Rig, Animator
 	local Folder = ReplicatedStorage:FindFirstChild(`AnatomyClips`)
@@ -460,6 +461,45 @@ function Bench:BuildArms()
 	end
 	local Idle = self.Tracks.AnatBenchIdle
 	if Idle then Idle.Looped = true Idle.Priority = Enum.AnimationPriority.Idle Idle:Play(0.2) end
+end
+
+-- the bare R6 boxes read as blocks under the stage lights: hide them and dress each arm in a rounded wool sleeve,
+-- a turned-back linen cuff with a brass button, and a leather dissecting glove. The pieces are welded to the arm, so
+-- the clips still drive them.
+local SLEEVE = Color3.fromRGB(38, 34, 38)
+local LINEN = Color3.fromRGB(206, 196, 176)
+local GLOVE = Color3.fromRGB(46, 30, 26)
+local BUTTON = Color3.fromRGB(196, 150, 72)
+
+function Bench:DressArms(Rig: Model)
+	for _, P in Rig:GetChildren() do
+		if P:IsA(`BasePart`) and P.Name ~= `HumanoidRootPart` then P.Transparency = 1 end
+	end
+	for _, Side in { `Right Arm`; `Left Arm` } do
+		local Arm = Rig:FindFirstChild(Side)
+		if not (Arm and Arm:IsA(`BasePart`)) then continue end
+		local S = Arm.Size
+		local In = if Side == `Right Arm` then -1 else 1 -- the inner side of the hand, toward the body's centre
+		local function piece(Name, Shape, Size, At, Material, Color, Mesh)
+			local P = new(`Part`, { Name = Name; Shape = Shape; Size = Size; Material = Material; Color = Color; CFrame = Arm.CFrame * At;
+				CanCollide = false; CanQuery = false; CanTouch = false; Massless = true; Anchored = false; CastShadow = true;
+				TopSurface = Enum.SurfaceType.Smooth; BottomSurface = Enum.SurfaceType.Smooth }, Arm)
+			if Mesh then new(`SpecialMesh`, { MeshType = Enum.MeshType.Sphere }, P) end
+			new(`WeldConstraint`, { Part0 = Arm; Part1 = P }, P)
+			return P
+		end
+		local Along = CFrame.Angles(0, 0, math.pi / 2) -- a cylinder's axis is X: turn it down the arm
+		piece(`Sleeve`, Enum.PartType.Cylinder, Vector3.new(S.Y * 0.74, S.X * 0.84, S.X * 0.84), CFrame.new(0, S.Y * 0.13, 0) * Along, Enum.Material.Fabric, SLEEVE)
+		piece(`Shoulder`, Enum.PartType.Ball, Vector3.one * S.X * 0.84, CFrame.new(0, S.Y * 0.5, 0), Enum.Material.Fabric, SLEEVE)
+		piece(`Cuff`, Enum.PartType.Cylinder, Vector3.new(S.Y * 0.09, S.X * 0.9, S.X * 0.9), CFrame.new(0, -S.Y * 0.25, 0) * Along, Enum.Material.Fabric, LINEN)
+		piece(`Button`, Enum.PartType.Ball, Vector3.one * S.X * 0.12, CFrame.new(0, -S.Y * 0.25, -S.X * 0.45), Enum.Material.Metal, BUTTON)
+		piece(`Wrist`, Enum.PartType.Cylinder, Vector3.new(S.Y * 0.1, S.X * 0.62, S.X * 0.62), CFrame.new(0, -S.Y * 0.32, 0) * Along, Enum.Material.Leather, GLOVE)
+		piece(`Hand`, Enum.PartType.Block, Vector3.new(S.X * 0.74, S.Y * 0.3, S.X * 0.56), CFrame.new(0, -S.Y * 0.44, 0), Enum.Material.Leather, GLOVE, true)
+		piece(`Fingers`, Enum.PartType.Block, Vector3.new(S.X * 0.66, S.Y * 0.16, S.X * 0.46), CFrame.new(0, -S.Y * 0.56, -S.X * 0.04) * CFrame.Angles(math.rad(-12), 0, 0),
+			Enum.Material.Leather, GLOVE, true)
+		piece(`Thumb`, Enum.PartType.Block, Vector3.new(S.X * 0.22, S.Y * 0.17, S.X * 0.22), CFrame.new(In * S.X * 0.36, -S.Y * 0.47, -S.X * 0.12) * CFrame.Angles(0, 0, In * math.rad(-25)),
+			Enum.Material.Leather, GLOVE, true)
+	end
 end
 
 function Bench:Clip(Key: string, Reverse: boolean?)

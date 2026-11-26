@@ -250,8 +250,12 @@ The sheet slides up and settles from a tilt. Reduced motion gets it at once. It 
 `shots/report_card_new.jpg`.
 
 **Still open:**
-- The arm clone (the student's arms) now reads as blocky avatar parts at the bottom corners under real light, and it
-  doesn't follow the close shots. Hide it outside the wide shot, or rebuild it as gloved hands.
+- ~~The arm clone reads as blocky avatar parts.~~ **Fixed in Edit (seen in an Edit preview, not yet in Play):** the
+  clone's boxes are hidden, and each arm is dressed in welded pieces: a rounded wool sleeve, a linen cuff with a brass
+  button, and a leather glove with fingers and a thumb (`Bench:DressArms`). The clips still drive the arms.
+- `Config.Anatomy.UI` now holds the 6 imported chrome ids (AnatPlate 121213116627792, AnatProcedure 101550617900095,
+  AnatSpecimen 89646077609423, AnatSeal 96567098133942, AnatHold 101401000383834, AnatTag 80741161853877). Installed in
+  Edit, not yet seen in Play.
 - The frog's white dial plate is still the brightest thing in the shot. The key light is turned down, but the enamel
   map itself could be warmed.
 - Only the Frog was seen on the stage. The Raven and the Wyvern use the same code path.
