@@ -236,7 +236,7 @@ function Local.Begin(Player: Player, Subject: string, Context)
 		return
 	end
 
-	local TimeLimit = Game.TimeLimit(PlayLevel) * (Rule.TimeMult or 1)
+	local TimeLimit = (if Game.TimeLimitFor then Game.TimeLimitFor(S) else Game.TimeLimit(PlayLevel)) * (Rule.TimeMult or 1)
 	if typeof(Payload) == `table` and Payload.TimeLimit then Payload.TimeLimit = TimeLimit end
 	S.EndsAt = StartAt + TimeLimit
 	S.Freeze = StateManager.CreateState(Character, `InActivity`)
@@ -249,6 +249,7 @@ function Local.Begin(Player: Player, Subject: string, Context)
 		Title = Def.Title;
 		Tagline = if Sub then `{Sub.Sub.Name}: {Sub.RuleName}. {Def.Tagline}` else Def.Tagline;
 		Activity = Def.Type;
+		Bench = Def.Bench == true; -- (Anatomy) full-screen bench games
 		Level = PlayLevel;
 		Practice = S.Practice;
 		Study = S.Study;
@@ -286,6 +287,12 @@ function Local.Finish(S, Reason: string?)
 		Percent = Percent; Grade = Grade; Passed = Passed; Practice = S.Practice; Reason = Reason;
 		Yen = 0; LevelUp = false; Level = S.Level;
 	}
+	-- (Anatomy) bench games report how the grade splits (accuracy / process / time) and which specimen it was
+	if S.Game.Breakdown then
+		local OkB, B = pcall(S.Game.Breakdown, S)
+		if OkB then Result.Breakdown = B end
+	end
+	if S.Species then Result.Species = S.Species.Id end
 
 	-- Night Study: no class rewards; the faction handler pays out instead.
 	if S.Study then
@@ -300,6 +307,11 @@ function Local.Finish(S, Reason: string?)
 	end
 
 	local ClassData, Profile = Local.GetClassData(Player, S.Subject)
+	if ClassData and S.Species then -- (Anatomy) the Specimen Journal keeps each species' best grade, practice included
+		if typeof(ClassData.Journal) ~= `table` then ClassData.Journal = {} end
+		if Local.GradeRank(Grade) > Local.GradeRank(ClassData.Journal[S.Species.Id]) then ClassData.Journal[S.Species.Id] = Grade end
+		if Shared.JournalHandler then pcall(Shared.JournalHandler, Player, S.Subject, ClassData) end
+	end
 	if ClassData and not S.Practice then
 		if Local.GradeRank(Grade) > Local.GradeRank(ClassData.BestGrade) then
 			ClassData.BestGrade = Grade
