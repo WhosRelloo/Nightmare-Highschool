@@ -161,6 +161,45 @@ The piece is one Head MeshPart, `LoupeMonocle` (10,180 tris), with a 2048 baked 
   - Mastery's `Grant` adds it to a master's owned list now (it doesn't check for the template).
   - `Accessories.Ready` keeps it out of the Wardrobe until the template is in `NHAccessories`.
 
+### Raven, Wyvern and a real mouse (2026-11-26, six short Play rounds)
+
+Slot 2 was restored after every round, and the cine check passed before and after each one. The place was not saved.
+The new checks are `anatomy_species_setup` (the runner sets `LEVEL`: 3 for the Raven, 5 for the Wyvern),
+`anatomy_species_client` (it follows each species' own Steps) and `anatomy_species_after`. While they run, the tester's
+Journal is blanked so mastery can't fire. Afterwards the class record, the pick and the hall pass are put back (level 3,
+Journal Frog A+).
+- **Raven** PASS: real models, 9 tracks. Unwind 8, the 4 wing plates unscrewed, a 139-point trace, plate open, 4 organs
+  placed, grade A+.
+- **Wyvern** PASS: real models. Unwind 12, the Loupe found the hidden seam, a 143-point trace, plate open. The
+  Fire-gland came out first, then the 2 hearts, the lungs and the gut. Grade A+.
+- Shots: `shots/raven_*.jpg` and `shots/wyvern_*.jpg`.
+
+**Real mouse** (`user_mouse_input` in the Client): a whole Frog lesson finished with real clicks and drags. The Key
+held on the side key (the ring filled and the count rose), the seam was drawn by hand, the plate was pried open, and
+organs were lifted and placed on the card. Grade A+. Shots: `shots/mouse_*.jpg`. Three bugs came out of it, all fixed
+in `Gui.Activities.AnatomyBench` and installed:
+1. **The pointer was 58 px off.** GUI positions are measured from below the top bar, even in an IgnoreGuiInset
+   ScreenGui: the bench's ViewportFrame sits at y -58. Presses (`InputObject.Position`) were right. The held tool,
+   `OverChrome`, the hold ring and right-click put-downs used `GetMouseLocation`, which counts the bar. All of them
+   now go through `Bench:Pointer()`. The tool in hand now sits at the pointer.
+2. **Organs were hard to click.** With the plate open, a ray that lands on the specimen's body (the hollow shell and
+   cradle, whose collision hulls aren't hollow) goes on through it to an organ behind.
+3. **A forgiving pick.** A Tweezers press that doesn't hit an organ takes the nearest unplaced organ drawn within
+   40 px (`NearestOrgan`, measured to the organ's pieces).
+
+**Still open:**
+- Near the top of the bench view, things are drawn about 14 px higher than the ray math puts them. The frog's heart is
+  drawn at GUI y ~125 but its part projects to 128..145. A click on the heart's upper half lifts the lungs (their
+  lobes sit either side of it, so their centre falls under it). The In hand label names what was taken, and placing it
+  on its own outline costs nothing, but the cause isn't found. Lower down (tools, side key, seam) the pointer and the
+  ray agree.
+- **First frames:** the specimen shows up about 4 s after the lesson opens, untextured (white) for about 5 s more,
+  while its meshes and 196 maps load. The models should be preloaded (`ContentProvider:PreloadAsync`) before the
+  bench is shown.
+- The Raven's and Wyvern's dial plates read cream white. That looks like the baked enamel, not a missing map.
+- In hook runs the tool in hand waits above the tail during the Key, trace and unscrew steps. That's expected: the
+  hooks have no pointer.
+
 ## Follow-ups for the owner
 
 - **Healer perk has no consumer.** `Config.Anatomy.HealMult(Level)` (+10% per level) and `ReviveMult(Level)` (-8% time

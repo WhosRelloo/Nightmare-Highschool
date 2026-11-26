@@ -21,6 +21,7 @@ local ReplicatedStorage = game:GetService(`ReplicatedStorage`)
 local RunService = game:GetService(`RunService`)
 local TweenService = game:GetService(`TweenService`)
 local UserInputService = game:GetService(`UserInputService`)
+local GuiService = game:GetService(`GuiService`)
 
 local Kit = require(ReplicatedStorage:WaitForChild(`UI`):WaitForChild(`Components`))
 local Layout = require(ReplicatedStorage:WaitForChild(`Anatomy`):WaitForChild(`Layout`))
@@ -527,9 +528,16 @@ function Bench:RefreshCard()
 end
 
 ----------------------------------------------------------------------------------------------------- pointer and input
+-- the pointer in GUI space (AbsolutePosition's): GUI positions are measured from below the top bar even in an
+-- IgnoreGuiInset ScreenGui (the bench's ViewportFrame sits at y -58), like InputObject.Position. GetMouseLocation
+-- counts the bar, so take it off. (2026-11-26: a real mouse saw the tool in hand drawn 58 px below the pointer.)
+function Bench:Pointer(): Vector2
+	return UserInputService:GetMouseLocation() - GuiService:GetGuiInset()
+end
+
 function Bench:PointerRay(Screen: Vector2?)
 	local VF = self.VF
-	local Pos = Screen or (UserInputService:GetMouseLocation() - Vector2.new(0, 0))
+	local Pos = Screen or self:Pointer()
 	local Rel = Pos - VF.AbsolutePosition
 	local Size = VF.AbsoluteSize
 	if Size.X <= 0 or Size.Y <= 0 then return nil end
@@ -540,9 +548,38 @@ function Bench:PointerRay(Screen: Vector2?)
 	return self.Camera.CFrame.Position, Dir, u, v
 end
 
+-- a world point to GUI space (PointerRay's inverse)
+function Bench:ToScreen(W: Vector3): Vector2?
+	local VF, Cam = self.VF, self.Camera
+	local Size = VF.AbsoluteSize
+	local p = Cam.CFrame:PointToObjectSpace(W)
+	if p.Z >= 0 or Size.Y <= 0 then return nil end
+	local tanY = math.tan(math.rad(Cam.FieldOfView) / 2)
+	local x, y = p.X / -p.Z / (tanY * Size.X / Size.Y), p.Y / -p.Z / tanY
+	return VF.AbsolutePosition + Vector2.new((x + 1) / 2 * Size.X, (1 - y) / 2 * Size.Y)
+end
+
+-- the unplaced organ drawn nearest a press, within PICK_RADIUS px: organs are small, and the cradle round them is
+-- hollow (2026-11-26: real clicks on the frog's heart landed on the Mechanism's hull)
+local PICK_RADIUS = 40
+function Bench:NearestOrgan(Screen: Vector2): string?
+	local Best, BestD = nil, PICK_RADIUS
+	for _, O in self.Payload.Organs or {} do
+		-- measured to the organ's drawn pieces (their centre), not its bone's pivot, which can sit off the part
+		local B = not self.Placed[O.Id] and self.Specimen.Bones[self:BoneOf(O.Id)]
+		local Sum, N = Vector3.zero, 0
+		for _, Piece in (B and B.Pieces) or {} do
+			for _, E in (self.Specimen.Pieces[Piece] or { Parts = {} }).Parts do Sum += E.Part.Position N += 1 end
+		end
+		local At = N > 0 and self:ToScreen(Sum / N) or nil
+		if At and (At - Screen).Magnitude < BestD then Best, BestD = O.Id, (At - Screen).Magnitude end
+	end
+	return Best
+end
+
 -- true while the pointer is outside the viewport or over one of the chrome panels drawn on top of it
 function Bench:OverChrome(): boolean
-	local Pos = UserInputService:GetMouseLocation()
+	local Pos = self:Pointer()
 	local VF = self.VF
 	local Rel = Pos - VF.AbsolutePosition
 	if Rel.X < 0 or Rel.Y < 0 or Rel.X > VF.AbsoluteSize.X or Rel.Y > VF.AbsoluteSize.Y then return true end
@@ -571,6 +608,22 @@ function Bench:Hit(Screen: Vector2?)
 	end
 	Params.FilterDescendantsInstances = Ex
 	local R = self.World:Raycast(O, D * 60, Params)
+	-- with the plate open, the shell and the cradle are hollow but their collision hulls aren't: a ray that lands on the
+	-- specimen's body goes on through it to an organ behind, if there is one (2026-11-26: a real click on the frog's
+	-- heart hit the Mechanism's hull over most of it)
+	if R and self.PlateOpen then
+		local First, Tries = R, 0
+		while R and Tries < 6 do
+			local W = self:Classify(R.Instance)
+			if not W or W.Kind ~= `Body` then break end
+			table.insert(Ex, R.Instance)
+			Params.FilterDescendantsInstances = Ex
+			R = self.World:Raycast(O, D * 60, Params)
+			Tries += 1
+		end
+		local W = R and self:Classify(R.Instance)
+		if not (W and W.Kind == `Organ`) then R = First end
+	end
 	return R, O, D
 end
 
@@ -607,7 +660,7 @@ function Bench:BindInput()
 		local T = Input.UserInputType
 		if T == Enum.UserInputType.MouseButton1 or T == Enum.UserInputType.Touch then
 			if Processed then return end
-			self:PressAt(Vector2.new(Input.Position.X, Input.Position.Y + (if T == Enum.UserInputType.Touch then 0 else 0)))
+			self:PressAt(Vector2.new(Input.Position.X, Input.Position.Y))
 		elseif T == Enum.UserInputType.MouseButton2 then
 			self:PutHere()
 		elseif T == Enum.UserInputType.Keyboard then
@@ -640,6 +693,10 @@ function Bench:PressAt(Screen: Vector2)
 	local R = self:Hit(Screen)
 	local What = R and self:Classify(R.Instance)
 	self.PressScreen = Screen
+	if self.Hand == `Tweezers` and self.PlateOpen and not self.Holding and not (What and (What.Kind == `Organ` or What.Kind == `Tool`)) then
+		local Near = self:NearestOrgan(Screen)
+		if Near then What = { Kind = `Organ`; Organ = Near } end
+	end
 	if not self.Hand then
 		if What and What.Kind == `Tool` then self:Key(table.find(Config.Tools, What.Tool) or 0) end
 		return
@@ -798,7 +855,7 @@ function Bench:Step(Dt: number)
 	-- Key/Driver: a hold ring fills; each fill sends one turn
 	local H = self.Holding_
 	if H then
-		local Pos = UserInputService:GetMouseLocation()
+		local Pos = self:Pointer()
 		self.Ring.Visible = true
 		self.Ring.Position = UDim2.fromOffset(Pos.X - self.UI.AbsolutePosition.X, Pos.Y - self.UI.AbsolutePosition.Y)
 		local k = math.clamp((Now - H.Since) / TURN_EVERY, 0, 1)
