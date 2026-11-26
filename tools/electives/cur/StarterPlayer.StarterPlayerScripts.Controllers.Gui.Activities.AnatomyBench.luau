@@ -114,6 +114,16 @@ local function text(Parent: Instance, Str: string, Props)
 	return T
 end
 
+-- a flat line on the bench from A to B (layout space): a thin strip lifted a hair off the surface, overlapping the next
+local function stroke(A: Vector3, B: Vector3, Width: number, Color: Color3, Material: Enum.Material, Lift: number, Parent: Instance): BasePart
+	local L = math.max((B - A).Magnitude, 0.001)
+	local Mid = (A + B) / 2 + Vector3.new(0, Lift, 0)
+	local CF = if L > 0.002 then CFrame.lookAt(Mid, Mid + (B - A)) * CFrame.Angles(0, math.pi / 2, 0) else CFrame.new(Mid)
+	return new(`Part`, { Name = `Stroke`; Anchored = true; CanCollide = false; CanQuery = false; CanTouch = false; CastShadow = false;
+		Material = Material; Color = Color; Size = Vector3.new(L + Width * 0.5, 0.012, Width);
+		CFrame = CFrame.new(STAGE) * CF }, Parent)
+end
+
 local function ease(t: number): number -- smooth in/out
 	t = math.clamp(t, 0, 1)
 	return t * t * (3 - 2 * t)
@@ -402,10 +412,12 @@ function Bench:BuildStage()
 	self.SeamR = (Seam[1] - self.SeamCentre).Magnitude
 	self.SeamDots = {}
 	for i, P in Seam do
-		local D = new(`Part`, { Name = `SeamDot`; Anchored = true; CanCollide = false; CanQuery = false; Shape = Enum.PartType.Ball;
-			Size = Vector3.one * 0.06; Material = Enum.Material.Neon; Color = GOLD; Transparency = 1; CFrame = CFrame.new(STAGE + P + Vector3.new(0, 0.03, 0)) }, WM)
-		self.SeamDots[i] = D
+		local Q = Seam[i % #Seam + 1]
+		local A, B = P:Lerp(Q, 0.18), P:Lerp(Q, 0.82)
+		table.insert(self.SeamDots, stroke(A, B, 0.1, Color3.fromRGB(26, 14, 10), Enum.Material.SmoothPlastic, 0.02, WM))
+		table.insert(self.SeamDots, stroke(A, B, 0.05, Color3.fromRGB(255, 240, 205), Enum.Material.Neon, 0.035, WM))
 	end
+	for _, D in self.SeamDots do D.Transparency = 1 end
 	self.Trail = new(`Folder`, { Name = `Trail` }, WM)
 	Stage.Parent = workspace
 end
@@ -467,7 +479,8 @@ end
 
 -- The arms follow the work. The clips pose them; on top of that each shoulder turns its arm toward a target, blended
 -- by a weight that eases in and out:
---   right arm: the tool in hand (full), or the pointer over the bench when the hand is empty (a light reach)
+--   right arm: the tool in hand (0.4), or the pointer over the bench when the hand is empty (0.2); kept partial so the
+--              near arm stays at the frame's edge and never covers the tool roll or the card
 --   left arm:  the specimen, steadying it while tracing, turning a key/driver or lifting a part; resting otherwise
 -- The R6 stays rigid: only the shoulder Motor6D's Transform turns, so the limb stays on its socket.
 local AIM_RATE = 10 -- how fast a target and a weight ease (per second)
@@ -483,18 +496,18 @@ function Bench:AimArms(Dt: number)
 	-- right: the tool's grip, else the pointer
 	local RGoal, RW
 	if self.Hand and self.Tools[self.Hand] then
-		RGoal, RW = self.Tools[self.Hand].CF.Position, 1
+		RGoal, RW = self.Tools[self.Hand].CF.Position, 0.4
 	elseif not self:OverChrome() and self:Hit() then
-		RGoal, RW = self:Hit().Position, 0.45
+		RGoal, RW = self:Hit().Position, 0.2
 	else
 		RGoal, RW = Specimen + Vector3.new(2.5, 0, 2.5), 0
 	end
 	-- left: brace the specimen beside the work while busy, a light rest toward the tray when a tool is up
 	local LGoal, LW
 	if Busy then
-		LGoal, LW = Specimen + Vector3.new(-1.1, 0, 0.6), 0.9
+		LGoal, LW = Specimen + Vector3.new(-1.1, 0, 0.6), 0.5
 	elseif self.Hand then
-		LGoal, LW = Specimen + Vector3.new(-2.6, -0.2, 2.2), 0.35
+		LGoal, LW = Specimen + Vector3.new(-2.6, -0.2, 2.2), 0.2
 	else
 		LGoal, LW = Specimen + Vector3.new(-2.6, 0, 2.5), 0
 	end
@@ -616,12 +629,38 @@ local PAPER_RED = Color3.fromRGB(140, 28, 34)
 local PAPER_PAL = { Done = Color3.fromRGB(128, 112, 96); Now = PAPER_RED; Next = PAPER_INK; ToolHex = `#7d6a58`; Title = PAPER_RED; Sub = Color3.fromRGB(96, 80, 66);
 	Slot = Color3.fromRGB(235, 228, 214); SlotDone = Color3.fromRGB(214, 176, 92); SlotText = PAPER_INK; SlotDoneText = PAPER_INK; SlotStroke = Color3.fromRGB(120, 96, 70) }
 
-local function skinFrame(F: GuiObject, Id: number, Slice: Rect?, Scale: number?)
+-- Slice borders scale with the panel's height (Scale is right at RefH px tall), so the drawn rules and edges sit at
+-- the same fraction of the panel at every screen size and the text laid out in fractions stays clear of them.
+local function skinFrame(F: GuiObject, Id: number, Slice: Rect?, Scale: number?, RefH: number?)
 	F.BackgroundTransparency = 1
 	for _, X in F:GetChildren() do if X:IsA(`UIStroke`) or X:IsA(`UIGradient`) then X:Destroy() end end
 	local I = new(`ImageLabel`, { Name = `Skin`; BackgroundTransparency = 1; Image = `rbxassetid://{Id}`; Size = UDim2.fromScale(1, 1); ZIndex = 0 }, F)
-	if Slice then I.ScaleType = Enum.ScaleType.Slice I.SliceCenter = Slice I.SliceScale = Scale or 1 end
+	if Slice then
+		I.ScaleType = Enum.ScaleType.Slice I.SliceCenter = Slice
+		local function fit() I.SliceScale = math.max((Scale or 1) * F.AbsoluteSize.Y / (RefH or F.AbsoluteSize.Y), 0.05) end
+		fit()
+		if RefH then F:GetPropertyChangedSignal(`AbsoluteSize`):Connect(fit) end
+	end
 	return I
+end
+
+-- one text size for a row of labels: the largest that fits every label, so no tag reads smaller than its neighbours
+local TextService = game:GetService(`TextService`)
+local function uniformText(Labels: { TextLabel })
+	local function fit()
+		local Best = math.huge
+		for _, L in Labels do
+			local W, H = L.AbsoluteSize.X, L.AbsoluteSize.Y
+			if W < 4 or H < 4 then return end
+			local Size = math.floor(H)
+			while Size > 6 and TextService:GetTextSize(L.ContentText, Size, L.Font, Vector2.new(10000, 10000)).X > W do Size -= 1 end
+			Best = math.min(Best, Size)
+		end
+		for _, L in Labels do L.TextScaled = false L.TextWrapped = false L.TextSize = Best end
+	end
+	for _, L in Labels do L:GetPropertyChangedSignal(`AbsoluteSize`):Connect(fit) end
+	fit()
+	task.defer(fit)
 end
 
 function Bench:ApplySkin()
@@ -634,21 +673,54 @@ function Bench:ApplySkin()
 		local Plate = UI:FindFirstChild(`Plate`)
 		skinFrame(Plate, Ids.Plate)
 		-- clear the loupe roundel on the left
-		for _, X in Plate:GetChildren() do if X:IsA(`TextLabel`) and X.Position.X.Scale < 0.5 then X.Position = UDim2.fromScale(0.15, X.Position.Y.Scale) X.Size = UDim2.fromScale(0.56, X.Size.Y.Scale) end end
+		-- rows: name, Latin, room line, all inside the frame's inner edge (it eats ~15% top and bottom)
+		local Rows = { { 0.08, 0.13, 0.32 }; { 0.48, 0.46, 0.17 }; { 0.72, 0.64, 0.16 } }
+		for _, X in Plate:GetChildren() do
+			if X:IsA(`TextLabel`) and X.Position.X.Scale < 0.5 then
+				local R
+				for _, Row in Rows do if math.abs(X.Position.Y.Scale - Row[1]) < 0.01 then R = Row end end
+				X.Position = UDim2.fromScale(0.15, if R then R[2] else X.Position.Y.Scale)
+				X.Size = UDim2.fromScale(0.55, if R then R[3] else X.Size.Y.Scale)
+			elseif X:IsA(`TextLabel`) then
+				X.Position = UDim2.fromScale(0.71, 0.2) X.Size = UDim2.fromScale(0.25, 0.56) -- the timer
+			end
+		end
 	end
 	if has(`Procedure`) then
 		local Proc = UI:FindFirstChild(`Procedure`)
-		skinFrame(Proc, Ids.Procedure, Rect.new(30, 120, 370, 540), 0.5)
+		local n = #self.Steps
+		Proc.Size = UDim2.fromScale(Proc.Size.X.Scale, 0.1 + 0.055 * n)
+		local H = 0.1 + 0.055 * n
+		-- the card's red rule sits ~60 px down at slice scale 0.5 on a 190 px card: keep that ratio at every size
+		skinFrame(Proc, Ids.Procedure, Rect.new(30, 120, 370, 540), 0.5, 190 * H / 0.28)
+		-- the rule is ~6.7% of the screen's height below the card's top, so as a fraction of the card: 0.067 / H
+		local Top, Bottom = 0.067 / H + 0.04, 0.93
 		for _, X in Proc:GetChildren() do
-			if X:IsA(`TextLabel`) then X.Position = UDim2.new(0.09, 0, X.Position.Y.Scale, X.Position.Y.Offset + 6) X.Size = UDim2.new(0.84, 0, X.Size.Y.Scale, X.Size.Y.Offset) end
-			if X:IsA(`TextLabel`) and X.Text == `PROCEDURE` then X.TextColor3 = PAPER_RED end
+			if X:IsA(`TextLabel`) and X.Text == `PROCEDURE` then
+				X.TextColor3 = PAPER_RED
+				X.Position = UDim2.fromScale(0.09, 0.06) X.Size = UDim2.fromScale(0.82, math.min(0.16, Top - 0.1))
+			end
+		end
+		local Pitch = (Bottom - Top) / n
+		for i, L in self.StepLines do
+			L.Position = UDim2.fromScale(0.09, Top + (i - 1) * Pitch + Pitch * 0.1)
+			L.Size = UDim2.fromScale(0.82, Pitch * 0.8)
 		end
 	end
 	if has(`Specimen`) then
 		local Card = self.Card
-		skinFrame(Card, Ids.Specimen, Rect.new(40, 110, 360, 540), 0.6)
+		skinFrame(Card, Ids.Specimen, Rect.new(40, 110, 360, 540), 0.6, 341)
 		for _, X in Card:GetChildren() do
-			if X:IsA(`TextLabel`) then X.TextColor3 = if X.Text == `SPECIMEN CARD` then PAPER_RED else PAPER_PAL.Sub end
+			if X:IsA(`TextLabel`) and X.Text == `SPECIMEN CARD` then
+				X.TextColor3 = PAPER_RED X.Position = UDim2.fromScale(0.1, 0.06) X.Size = UDim2.fromScale(0.8, 0.06)
+			elseif X:IsA(`TextLabel`) and X ~= self.CardNote then
+				X.TextColor3 = PAPER_PAL.Sub X.Position = UDim2.fromScale(0.1, 0.125) X.Size = UDim2.fromScale(0.8, 0.04)
+			end
+		end
+		local n = math.max(#self.SlotButtons, 1)
+		for i, S in self.SlotButtons do
+			S.Button.Position = UDim2.fromScale(0.09, 0.22 + (i - 1) * 0.72 / n)
+			S.Button.Size = UDim2.fromScale(0.82, 0.72 / n - 0.03)
 		end
 		self.CardPal = PAPER_PAL
 		for _, S in self.SlotButtons do S.Button.BackgroundTransparency = 0.35 S.Stroke.Color = PAPER_PAL.SlotStroke end
@@ -657,8 +729,11 @@ function Bench:ApplySkin()
 		for _, T in self.Tags do
 			T.Skin = skinFrame(T.Button, Ids.Tag)
 			T.Stroke = new(`UIStroke`, { Color = GOLD; Thickness = 1.5; Transparency = 1; ApplyStrokeMode = Enum.ApplyStrokeMode.Border }, T.Button)
-			for _, X in T.Button:GetChildren() do if X:IsA(`TextLabel`) then X.TextColor3 = PAPER_INK X.Position = UDim2.fromScale(0.16, 0.2) X.Size = UDim2.fromScale(0.8, 0.6) end end
+			for _, X in T.Button:GetChildren() do if X:IsA(`TextLabel`) then X.TextColor3 = PAPER_INK X.Position = UDim2.fromScale(0.25, 0.2) X.Size = UDim2.fromScale(0.71, 0.6) end end
 		end
+		local Labels = {}
+		for _, T in self.Tags do for _, X in T.Button:GetChildren() do if X:IsA(`TextLabel`) then table.insert(Labels, X) end end end
+		uniformText(Labels)
 	end
 	if has(`Hold`) then
 		new(`ImageLabel`, { Name = `Socket`; BackgroundTransparency = 1; Image = `rbxassetid://{Ids.Hold}`; AnchorPoint = Vector2.new(0.5, 0.5);
@@ -1006,8 +1081,10 @@ function Bench:SampleTrace(P: Vector3)
 	local x = (P.X - self.SeamCentre.X) / self.SeamR
 	local y = -(P.Z - self.SeamCentre.Z) / self.SeamR
 	table.insert(Tr.Points, { math.floor(x * 1000) / 1000, math.floor(y * 1000) / 1000 })
-	new(`Part`, { Name = `Cut`; Anchored = true; CanCollide = false; CanQuery = false; Shape = Enum.PartType.Ball; Material = Enum.Material.Neon;
-		Color = Color3.fromRGB(255, 92, 60); Size = Vector3.one * 0.05; CFrame = CFrame.new(STAGE + P + Vector3.new(0, 0.04, 0)) }, self.Trail)
+	local From = Tr.LastP or P
+	Tr.LastP = P
+	stroke(From, P, 0.13, Color3.fromRGB(30, 6, 4), Enum.Material.SmoothPlastic, 0.045, self.Trail).Name = `CutEdge`
+	stroke(From, P, 0.07, Color3.fromRGB(255, 70, 40), Enum.Material.Neon, 0.06, self.Trail).Name = `Cut`
 end
 
 function Bench:EndTrace()
@@ -1335,7 +1412,7 @@ function Bench:Update(Reply)
 		self.Ring.Visible = false
 		if Done then
 			if Done.Id == `Pry` then self:OpenPlate() self:Clip(`Pry`) end
-			if Done.Id == `Trace` then self:Clip(`Trace`) for _, P in self.Trail:GetChildren() do P.Color = Color3.fromRGB(70, 20, 16) end end
+			if Done.Id == `Trace` then self:Clip(`Trace`) for _, P in self.Trail:GetChildren() do if P.Name == `Cut` then P.Color = Color3.fromRGB(150, 26, 20) P.Material = Enum.Material.SmoothPlastic end end end
 			if Done.Id == `Inspect` then self:Clip(`Inspect`) end
 			if Api.Sound then Api.Sound(`Good`) end
 		end
