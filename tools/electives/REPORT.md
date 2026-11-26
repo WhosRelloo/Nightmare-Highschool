@@ -83,9 +83,15 @@ Two fixes to the script came out of the first real run:
 - **180-degree turn kept.** The importer turns every mesh 180 degrees about Y, and `CFrame.new(Centre)` dropped that.
   The Driver lay handle-first and the Loupe's ring was away from its glass.
 
-Until the PBR textures are uploaded, the pieces wear the Layout's proxy colours and materials (brass, wood, leather,
-wax, steel). The animation ids aren't in the `Clips` map yet, so the clips still play through
-`RegisterKeyframeSequence`, which works in Studio only.
+The ids were read from the group's creations (`itemconfiguration.roblox.com/v1/creations/get-assets`, through the
+built-in browser):
+- **Textures:** 196 maps for 49 pieces, all moderation Green. `stage/anatomy_image_ids.txt` holds the ids, and
+  `stage/anatomy_textures.lua` (generated from it) puts a SurfaceAppearance on each piece. The 12 Glow and Glass pieces
+  have no bake and keep Neon or Glass. Screenshot: `shots/import_textured.jpg`.
+- **Clips:** the 9 published ids are in `AnatomyClips.Clips.Ids`. The renderer loads them first and only falls back to
+  `RegisterKeyframeSequence` for a clip with no id.
+- Note: `ContentProvider:PreloadAsync` reports Failure through `execute_luau` even for textures the game already uses.
+  Judge by a screenshot taken a few seconds after the maps are applied.
 
 ## Follow-ups for the owner
 

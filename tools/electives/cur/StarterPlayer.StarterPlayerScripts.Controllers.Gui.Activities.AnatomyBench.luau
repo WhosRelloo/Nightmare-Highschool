@@ -5,7 +5,7 @@
 	the owner has imported them (tools/electives/stage/anatomy_import.lua); until then each piece is a stand-in built
 	from its layout box (bowl body, dome plate, ellipsoid organs), so the lesson plays the same either way.
 	The student's arms (an R6 clone of the player, scaled to the bench) reach in from below and play the seated clips in
-	ReplicatedStorage.AnatomyClips (registered at runtime with KeyframeSequenceProvider until they are published).
+	ReplicatedStorage.AnatomyClips (published ids in Clips.Ids; KeyframeSequenceProvider only for a clip with no id).
 
 	Input: click a tool on the roll (or its tag, or keys 1-5) to pick it up: it follows the pointer, tip first. Click a
 	target to use it: the Key and the Driver turn while held (a hold ring fills every 0.25 s); the Scalpel traces the seam
@@ -341,10 +341,17 @@ function Bench:BuildArms()
 	self.Rig, self.Animator = Rig, Animator
 	local Folder = ReplicatedStorage:FindFirstChild(`AnatomyClips`)
 	self.ClipMap = Folder and Folder:FindFirstChild(`Clips`) and require(Folder.Clips) or {}
+	-- published clips first (Clips.Ids: clip name -> group asset id); KSP registration only covers a clip with no id
+	-- (it works in Studio only)
+	for Name, AssetId in (type(self.ClipMap.Ids) == `table` and self.ClipMap.Ids) or {} do
+		local A = new(`Animation`, { AnimationId = `rbxassetid://{AssetId}`; Name = Name })
+		local okT, Track = pcall(function() return Animator:LoadAnimation(A) end)
+		if okT and Track then self.Tracks[Name] = Track end
+	end
 	if Folder and Folder:FindFirstChild(`Animations`) then
 		local KSP = game:GetService(`KeyframeSequenceProvider`)
 		for _, Seq in Folder.Animations:GetChildren() do
-			if Seq:IsA(`KeyframeSequence`) then
+			if Seq:IsA(`KeyframeSequence`) and not self.Tracks[Seq.Name] then
 				local okId, Id = pcall(function() return KSP:RegisterKeyframeSequence(Seq) end)
 				if okId then
 					local A = new(`Animation`, { AnimationId = Id; Name = Seq.Name })
