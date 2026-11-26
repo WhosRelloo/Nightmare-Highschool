@@ -6,6 +6,9 @@
 local Anatomy = {}
 
 Anatomy.Tools = { `Key`, `Driver`, `Loupe`, `Scalpel`, `Tweezers` }
+-- The bench's PBR chrome (art/ui/hud/out/anatomy, made by art/ui/hud/make_anatomy_ui.py): group image ids, 0 until the
+-- owner imports them. A panel with an id draws the image; one at 0 keeps the plain iron panel.
+Anatomy.UI = { Plate = 0; Procedure = 0; Specimen = 0; Seal = 0; Hold = 0; Tag = 0 }
 Anatomy.Weights = { Accuracy = 0.6; Process = 0.25; Time = 0.15 }
 Anatomy.SlipCost = 0.08        -- accuracy lost per slip (x2 under Crane's Inspection)
 Anatomy.WrongToolCost = 0.15   -- process lost per use with the wrong tool or out of order

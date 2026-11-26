@@ -43,6 +43,7 @@ local TRACE_HZ = 30
 local CAMERA_CF = CFrame.lookAt(Vector3.new(0, 9, 9.75), Vector3.new(0, 0, 1.3))
 local HOVER = Vector3.new(0, 0.9, 1.8) -- where a tool in hand waits while the pointer is over the panels
 local CAMERA_FOV = 38
+local STAGE = Vector3.new(0, 2600, 0) -- where the bench is staged in the world (client-only parts, high over the map)
 local ARM_SCALE = 3.25         -- the R6 clone scaled so an arm is ~0.65 m at the layout's 10 studs per metre
 local SEAT_CF = CFrame.new(0, 2.65, 10.2)
 local OPEN_DEG = 95
@@ -230,6 +231,7 @@ local function buildProp(Name: string, Parent: Instance)
 			P:SetAttribute(`Bone`, pc.Bone)
 			if not P.Parent or P.Parent == nil then P.Parent = Model end
 			table.insert(Entry.Parts, { Part = P; Rest = P.CFrame; Transparency = P.Transparency })
+			P.CFrame = P.CFrame + STAGE
 		end
 		Prop.Pieces[Piece] = Entry
 		if Prop.Bones[pc.Bone] then table.insert(Prop.Bones[pc.Bone].Pieces, Piece) end
@@ -243,7 +245,7 @@ local function setBone(Prop, Bone: string, CF: CFrame)
 	if not B then return end
 	B.CF = CF
 	for _, Piece in B.Pieces do
-		for _, E in Prop.Pieces[Piece].Parts do E.Part.CFrame = CF * E.Rest end
+		for _, E in Prop.Pieces[Piece].Parts do E.Part.CFrame = (CF * E.Rest) + STAGE end
 	end
 end
 
@@ -286,8 +288,9 @@ function Bench.new(Content: Frame, Payload, Api)
 	self.Busy = false
 	for _, O in Payload.Organs or {} do if O.Slot then self.Revealed[O.Id] = O.Slot end end
 
-	self:BuildViewport()
+	self:BuildStage()
 	self:BuildChrome()
+	self:ApplySkin()
 	self:BuildArms()
 	self:BindInput()
 	self:RefreshSteps()
@@ -299,18 +302,14 @@ function Bench.new(Content: Frame, Payload, Api)
 end
 
 -- A dark cloth over the bench (under the panels) until this lesson's props have their meshes and maps, so the
--- specimen never pops in late or white. Gives up after PRELOAD_WAIT and shows what there is.
+-- specimen never pops in late or white. Gives up after PRELOAD_WAIT and shows what there is. (Game scripts can't
+-- read a SurfaceAppearance's map ids, so it doesn't ask what is cached: PreloadAsync returns at once when all of it
+-- is, and the cloth then goes without a fade.)
 function Bench:CoverUntilLoaded()
 	local List = {}
 	for _, Prop in { self.Set, self.Specimen } do for _, X in assetsOf(Prop.Model) do table.insert(List, X) end end
 	for _, T in self.Tools do for _, X in assetsOf(T.Model) do table.insert(List, X) end end
-	local Pending = 0
-	for _, X in List do
-		local Id = if X:IsA(`MeshPart`) then X.MeshId elseif X:IsA(`SurfaceAppearance`) then X.ColorMap else nil
-		if Id and Id ~= `` and ContentProvider:GetAssetFetchStatus(Id) ~= Enum.AssetFetchStatus.Success then Pending += 1 end
-	end
-	self.Loaded = Pending == 0
-	if self.Loaded then return end
+	self.Loaded = false
 	local Cover = new(`Frame`, { Name = `Cover`; Size = UDim2.fromScale(1, 1); BackgroundColor3 = Color3.fromRGB(12, 10, 12); BorderSizePixel = 0; ZIndex = 3 }, self.Content)
 	local Label = text(Cover, `Laying out the specimen...`, { AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.42);
 		Size = UDim2.fromScale(0.4, 0.05); TextXAlignment = Enum.TextXAlignment.Center; TextColor3 = DIM })
@@ -324,7 +323,9 @@ function Bench:CoverUntilLoaded()
 	task.spawn(function()
 		while not Done and os.clock() - Started < PRELOAD_WAIT and not self.Destroyed do task.wait(0.1) end
 		self.Loaded = true
+		self.LoadTime = os.clock() - Started
 		if self.Destroyed or not Cover.Parent then return end
+		if self.LoadTime < 0.2 then Cover:Destroy() return end -- all cached: no fade
 		local Info = TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 		TweenService:Create(Cover, Info, { BackgroundTransparency = 1 }):Play()
 		TweenService:Create(Label, Info, { TextTransparency = 1 }):Play()
@@ -332,21 +333,48 @@ function Bench:CoverUntilLoaded()
 	end)
 end
 
-function Bench:BuildViewport()
-	local VF = new(`ViewportFrame`, { Name = `Bench`; Size = UDim2.fromScale(1, 1); BackgroundColor3 = Color3.fromRGB(12, 10, 12);
-		-- a ViewportFrame has no sky or environment for the PBR maps: a near-neutral key from over the student's left
-		-- shoulder and a strong ambient keep brass reading as brass instead of flat orange
-		BorderSizePixel = 0; Ambient = Color3.fromRGB(112, 104, 96); LightColor = Color3.fromRGB(255, 240, 220);
-		LightDirection = Vector3.new(0.35, -0.85, -0.4); ZIndex = 1 }, self.Content)
-	local WM = new(`WorldModel`, {}, VF)
-	local Cam = new(`Camera`, { FieldOfView = CAMERA_FOV; CFrame = CAMERA_CF }, VF)
-	VF.CurrentCamera = Cam
-	self.VF, self.World, self.Camera = VF, WM, Cam
+-- (2026-11-26) The bench is staged in the real world, not a ViewportFrame: a ViewportFrame has no environment, so its
+-- brass read flat. The props are drawn at STAGE (high over the map, client-only parts) inside a dark room with their
+-- own candle, key and rim lights, and the bench drives the real camera while the lesson is open. All the bench's
+-- maths stays in layout space: parts sit at STAGE + their layout pose, rays and screen points are moved by STAGE.
+function Bench:BuildStage()
+	local Stage = new(`Model`, { Name = `NHAnatomyStage` })
+	self.Stage = Stage
+	local function wall(Size: Vector3, Pos: Vector3)
+		new(`Part`, { Anchored = true; CanCollide = false; CanQuery = false; CastShadow = false; Size = Size; CFrame = CFrame.new(STAGE + Pos);
+			Color = Color3.fromRGB(14, 11, 10); Material = Enum.Material.SmoothPlastic }, Stage)
+	end
+	-- a closed dark room: no sun, no sky, whatever the school clock says
+	wall(Vector3.new(64, 2, 54), Vector3.new(0, -4, 0)) wall(Vector3.new(64, 2, 54), Vector3.new(0, 24, 0))
+	wall(Vector3.new(2, 30, 54), Vector3.new(-32, 10, 0)) wall(Vector3.new(2, 30, 54), Vector3.new(32, 10, 0))
+	wall(Vector3.new(64, 30, 2), Vector3.new(0, 10, -27)) wall(Vector3.new(64, 30, 2), Vector3.new(0, 10, 27))
+	local function lamp(CF: CFrame, Class: string, Props)
+		local A = new(`Part`, { Name = `Lamp`; Anchored = true; CanCollide = false; CanQuery = false; Transparency = 1; Size = Vector3.one * 0.2; CFrame = CF + STAGE }, Stage)
+		return new(Class, Props, A)
+	end
+	-- the candle's pool, a warm key over the student's left shoulder, a cool rim from behind the specimen
+	self.CandleLight = lamp(CFrame.new(-6.2, 2.1, -3.6), `PointLight`, { Color = Color3.fromRGB(255, 160, 80); Brightness = 2.4; Range = 22; Shadows = true })
+	lamp(CFrame.lookAt(Vector3.new(-6, 14, 9), Vector3.zero), `SpotLight`, { Color = Color3.fromRGB(255, 220, 180); Brightness = 0.8; Range = 32; Angle = 45; Shadows = true; Face = Enum.NormalId.Front })
+	lamp(CFrame.lookAt(Vector3.new(5, 8, -9), Vector3.new(0, 0.5, 0)), `SpotLight`, { Color = Color3.fromRGB(150, 175, 255); Brightness = 0.9; Range = 25; Angle = 45; Face = Enum.NormalId.Front })
+	local WM = Stage
+	self.World = Stage
+	self.Camera = workspace.CurrentCamera
 	self.CamBase = CAMERA_CF
-	-- a vignette over the viewport, warm at the candle's corner
+	-- the real camera is the bench's while the lesson is open (put back in Destroy)
+	local Cam = workspace.CurrentCamera
+	self.CamWas = { Type = Cam.CameraType; FOV = Cam.FieldOfView; Subject = Cam.CameraSubject }
+	Cam.CameraType = Enum.CameraType.Scriptable
+	-- the rest of the HUD steps aside (the lesson's own screen stays); put back in Destroy
+	self.HiddenGuis = {}
+	local Mine = self.Content:FindFirstAncestorWhichIsA(`ScreenGui`)
+	for _, G in Players.LocalPlayer.PlayerGui:GetChildren() do
+		if G:IsA(`ScreenGui`) and G.Enabled and G ~= Mine then G.Enabled = false table.insert(self.HiddenGuis, G) end
+	end
+	-- a vignette over the view
 	local Vig = new(`Frame`, { Name = `Vignette`; Size = UDim2.fromScale(1, 1); BackgroundTransparency = 0; BackgroundColor3 = Color3.new(0, 0, 0); ZIndex = 2 }, self.Content)
 	new(`UIGradient`, { Transparency = NumberSequence.new({ NumberSequenceKeypoint.new(0, 0.35), NumberSequenceKeypoint.new(0.18, 1), NumberSequenceKeypoint.new(0.82, 1), NumberSequenceKeypoint.new(1, 0.35) }) }, Vig)
 	Vig.Active = false
+	self.Vignette = Vig
 
 	self.Set = buildProp(`BenchSet`, WM)
 	self.Specimen = buildProp(self.Species, WM)
@@ -360,7 +388,7 @@ function Bench:BuildViewport()
 		local A = T.Layout.Attach
 		T.Tip, T.Grip = A.Tip.Pos, A.Grip.Pos
 		local lo = math.huge
-		for _, E in T.Pieces do for _, X in E.Parts do lo = math.min(lo, X.Part.Position.Y - X.Part.Size.Y / 2) end end
+		for _, E in T.Pieces do for _, X in E.Parts do lo = math.min(lo, X.Rest.Position.Y - X.Part.Size.Y / 2) end end
 		T.Bottom = lo
 		self.Tools[Id] = T
 	end
@@ -374,10 +402,11 @@ function Bench:BuildViewport()
 	self.SeamDots = {}
 	for i, P in Seam do
 		local D = new(`Part`, { Name = `SeamDot`; Anchored = true; CanCollide = false; CanQuery = false; Shape = Enum.PartType.Ball;
-			Size = Vector3.one * 0.06; Material = Enum.Material.Neon; Color = GOLD; Transparency = 1; CFrame = CFrame.new(P + Vector3.new(0, 0.03, 0)) }, WM)
+			Size = Vector3.one * 0.06; Material = Enum.Material.Neon; Color = GOLD; Transparency = 1; CFrame = CFrame.new(STAGE + P + Vector3.new(0, 0.03, 0)) }, WM)
 		self.SeamDots[i] = D
 	end
 	self.Trail = new(`Folder`, { Name = `Trail` }, WM)
+	Stage.Parent = workspace
 end
 
 function Bench:BuildArms()
@@ -404,7 +433,7 @@ function Bench:BuildArms()
 	Root.Anchored = true
 	Rig.Parent = self.World
 	pcall(function() Rig:ScaleTo(ARM_SCALE) end)
-	Rig:PivotTo(SEAT_CF)
+	Rig:PivotTo(SEAT_CF + STAGE)
 	local Animator = Hum:FindFirstChildOfClass(`Animator`) or new(`Animator`, {}, Hum)
 	self.Rig, self.Animator = Rig, Animator
 	local Folder = ReplicatedStorage:FindFirstChild(`AnatomyClips`)
@@ -523,6 +552,67 @@ function Bench:BuildChrome()
 	self.Ring = Ring
 end
 
+-- The PBR chrome images (Config.UI ids) over the plain panels: each panel with an id swaps its iron fill for the
+-- image, and the paper cards take dark ink. Panels whose id is 0 stay as built.
+local IRON_PAL = { Done = DIM; Now = GOLD; Next = INK; ToolHex = `#9a8f80`; Title = GOLD; Sub = DIM;
+	Slot = Color3.fromRGB(30, 24, 22); SlotDone = Color3.fromRGB(92, 70, 28); SlotText = INK; SlotDoneText = INK; SlotStroke = GOLD }
+local PAPER_INK = Color3.fromRGB(46, 34, 28)
+local PAPER_RED = Color3.fromRGB(140, 28, 34)
+local PAPER_PAL = { Done = Color3.fromRGB(128, 112, 96); Now = PAPER_RED; Next = PAPER_INK; ToolHex = `#7d6a58`; Title = PAPER_RED; Sub = Color3.fromRGB(96, 80, 66);
+	Slot = Color3.fromRGB(235, 228, 214); SlotDone = Color3.fromRGB(214, 176, 92); SlotText = PAPER_INK; SlotDoneText = PAPER_INK; SlotStroke = Color3.fromRGB(120, 96, 70) }
+
+local function skinFrame(F: GuiObject, Id: number, Slice: Rect?, Scale: number?)
+	F.BackgroundTransparency = 1
+	for _, X in F:GetChildren() do if X:IsA(`UIStroke`) or X:IsA(`UIGradient`) then X:Destroy() end end
+	local I = new(`ImageLabel`, { Name = `Skin`; BackgroundTransparency = 1; Image = `rbxassetid://{Id}`; Size = UDim2.fromScale(1, 1); ZIndex = 0 }, F)
+	if Slice then I.ScaleType = Enum.ScaleType.Slice I.SliceCenter = Slice I.SliceScale = Scale or 1 end
+	return I
+end
+
+function Bench:ApplySkin()
+	local Ids = Config.UI or {}
+	local function has(K) return typeof(Ids[K]) == `number` and Ids[K] > 0 end
+	self.StepPal = if has(`Procedure`) then PAPER_PAL else IRON_PAL
+	self.CardPal = IRON_PAL
+	local UI = self.UI
+	if has(`Plate`) then
+		local Plate = UI:FindFirstChild(`Plate`)
+		skinFrame(Plate, Ids.Plate)
+		-- clear the loupe roundel on the left
+		for _, X in Plate:GetChildren() do if X:IsA(`TextLabel`) and X.Position.X.Scale < 0.5 then X.Position = UDim2.fromScale(0.15, X.Position.Y.Scale) X.Size = UDim2.fromScale(0.56, X.Size.Y.Scale) end end
+	end
+	if has(`Procedure`) then
+		local Proc = UI:FindFirstChild(`Procedure`)
+		skinFrame(Proc, Ids.Procedure, Rect.new(30, 120, 370, 540), 0.5)
+		for _, X in Proc:GetChildren() do
+			if X:IsA(`TextLabel`) then X.Position = UDim2.new(0.09, 0, X.Position.Y.Scale, X.Position.Y.Offset + 6) X.Size = UDim2.new(0.84, 0, X.Size.Y.Scale, X.Size.Y.Offset) end
+			if X:IsA(`TextLabel`) and X.Text == `PROCEDURE` then X.TextColor3 = PAPER_RED end
+		end
+	end
+	if has(`Specimen`) then
+		local Card = self.Card
+		skinFrame(Card, Ids.Specimen, Rect.new(40, 110, 360, 540), 0.6)
+		for _, X in Card:GetChildren() do
+			if X:IsA(`TextLabel`) then X.TextColor3 = if X.Text == `SPECIMEN CARD` then PAPER_RED else PAPER_PAL.Sub end
+		end
+		self.CardPal = PAPER_PAL
+		for _, S in self.SlotButtons do S.Button.BackgroundTransparency = 0.35 S.Stroke.Color = PAPER_PAL.SlotStroke end
+	end
+	if has(`Tag`) then
+		for _, T in self.Tags do
+			T.Skin = skinFrame(T.Button, Ids.Tag)
+			T.Stroke = new(`UIStroke`, { Color = GOLD; Thickness = 1.5; Transparency = 1; ApplyStrokeMode = Enum.ApplyStrokeMode.Border }, T.Button)
+			for _, X in T.Button:GetChildren() do if X:IsA(`TextLabel`) then X.TextColor3 = PAPER_INK X.Position = UDim2.fromScale(0.16, 0.2) X.Size = UDim2.fromScale(0.8, 0.6) end end
+		end
+	end
+	if has(`Hold`) then
+		new(`ImageLabel`, { Name = `Socket`; BackgroundTransparency = 1; Image = `rbxassetid://{Ids.Hold}`; AnchorPoint = Vector2.new(0.5, 0.5);
+			Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromScale(1.5, 1.5); ZIndex = 7 }, self.Ring)
+	end
+	self:RefreshSteps()
+	self:RefreshCard()
+end
+
 function Bench:SetHint(Str: string, Bad: boolean?)
 	self.Hint.Text = Str
 	self.Hint.TextColor3 = if Bad then Color3.fromRGB(255, 120, 110) else INK
@@ -531,17 +621,18 @@ end
 function Bench:RefreshSteps()
 	for i, St in self.Steps do
 		local T = STEP_TEXT[St.Id] or { St.Id, `` }
-		local Label = `{i}. {T[1]}  <font color="#9a8f80">({St.Tool})</font>`
+		local Pal = self.StepPal or IRON_PAL
+		local Label = `{i}. {T[1]}  <font color="{Pal.ToolHex}">({St.Tool})</font>`
 		local L = self.StepLines[i]
 		if i < self.StepIndex then
 			L.Text = `<s>{i}. {T[1]}</s>`
-			L.TextColor3 = DIM
+			L.TextColor3 = Pal.Done
 		elseif i == self.StepIndex then
-			L.Text = Label
-			L.TextColor3 = GOLD
+			L.Text = `<b>{Label}</b>`
+			L.TextColor3 = Pal.Now
 		else
 			L.Text = Label
-			L.TextColor3 = INK
+			L.TextColor3 = Pal.Next
 		end
 	end
 	local St = self.Steps[self.StepIndex]
@@ -560,7 +651,12 @@ function Bench:RefreshTools()
 		local Tag = self.Tags[Id]
 		Tag.Stroke.Transparency = if InHand then 0 else 0.45
 		Tag.Stroke.Thickness = if InHand then 3 else 1.5
-		Tag.Button.BackgroundTransparency = if OnRoll or InHand then 0.1 else 0.55
+		if Tag.Skin then
+			Tag.Skin.ImageTransparency = if OnRoll or InHand then 0 else 0.45
+			Tag.Skin.ImageColor3 = if InHand then Color3.fromRGB(255, 236, 190) else Color3.new(1, 1, 1)
+		else
+			Tag.Button.BackgroundTransparency = if OnRoll or InHand then 0.1 else 0.55
+		end
 		pieceVisible(self.Set, `Chalk{i}Glow`, not OnRoll)
 	end
 	local Holding = ``
@@ -578,7 +674,9 @@ function Bench:RefreshCard()
 		S.Button.Visible = Slot ~= nil
 		if not Slot then AnyHidden = true end
 		S.Label.Text = if Done then `<b>{SLOT_TEXT[Slot] or Slot}</b>  \u{2713}` else (SLOT_TEXT[Slot or ``] or Slot or ``)
-		S.Button.BackgroundColor3 = if Done then Color3.fromRGB(92, 70, 28) else Color3.fromRGB(30, 24, 22)
+		local Pal = self.CardPal or IRON_PAL
+		S.Button.BackgroundColor3 = if Done then Pal.SlotDone else Pal.Slot
+		S.Label.TextColor3 = if Done then Pal.SlotDoneText else Pal.SlotText
 		S.Stroke.Transparency = if Done then 0 else 0.2
 	end
 	self.CardNote.Visible = AnyHidden
@@ -594,28 +692,18 @@ function Bench:Pointer(): Vector2
 	return UserInputService:GetMouseLocation() - GuiService:GetGuiInset()
 end
 
+-- the pointer's ray in layout space (the real camera's ray, moved back from STAGE)
 function Bench:PointerRay(Screen: Vector2?)
-	local VF = self.VF
 	local Pos = Screen or self:Pointer()
-	local Rel = Pos - VF.AbsolutePosition
-	local Size = VF.AbsoluteSize
-	if Size.X <= 0 or Size.Y <= 0 then return nil end
-	local u, v = Rel.X / Size.X, Rel.Y / Size.Y
-	local tanY = math.tan(math.rad(self.Camera.FieldOfView) / 2)
-	local Aspect = Size.X / Size.Y
-	local Dir = self.Camera.CFrame:VectorToWorldSpace(Vector3.new((2 * u - 1) * tanY * Aspect, (1 - 2 * v) * tanY, -1)).Unit
-	return self.Camera.CFrame.Position, Dir, u, v
+	local R = workspace.CurrentCamera:ScreenPointToRay(Pos.X, Pos.Y)
+	return R.Origin - STAGE, R.Direction.Unit
 end
 
--- a world point to GUI space (PointerRay's inverse)
+-- a layout-space point to GUI space (PointerRay's inverse)
 function Bench:ToScreen(W: Vector3): Vector2?
-	local VF, Cam = self.VF, self.Camera
-	local Size = VF.AbsoluteSize
-	local p = Cam.CFrame:PointToObjectSpace(W)
-	if p.Z >= 0 or Size.Y <= 0 then return nil end
-	local tanY = math.tan(math.rad(Cam.FieldOfView) / 2)
-	local x, y = p.X / -p.Z / (tanY * Size.X / Size.Y), p.Y / -p.Z / tanY
-	return VF.AbsolutePosition + Vector2.new((x + 1) / 2 * Size.X, (1 - y) / 2 * Size.Y)
+	local p = workspace.CurrentCamera:WorldToScreenPoint(W + STAGE)
+	if p.Z <= 0 then return nil end
+	return Vector2.new(p.X, p.Y)
 end
 
 -- the unplaced organ drawn nearest a press, within PICK_RADIUS px: organs are small, and the cradle round them is
@@ -630,26 +718,32 @@ function Bench:NearestOrgan(Screen: Vector2): string?
 		for _, Piece in (B and B.Pieces) or {} do
 			for _, E in (self.Specimen.Pieces[Piece] or { Parts = {} }).Parts do Sum += E.Part.Position N += 1 end
 		end
-		local At = N > 0 and self:ToScreen(Sum / N) or nil
+		local At = N > 0 and self:ToScreen(Sum / N - STAGE) or nil
 		if At and (At - Screen).Magnitude < BestD then Best, BestD = O.Id, (At - Screen).Magnitude end
 	end
 	return Best
 end
 
--- true while the pointer is outside the viewport or over one of the chrome panels drawn on top of it
+-- true while the pointer is outside the bench's screen or over one of the chrome panels drawn on top of it
 function Bench:OverChrome(): boolean
 	local Pos = self:Pointer()
-	local VF = self.VF
-	local Rel = Pos - VF.AbsolutePosition
-	if Rel.X < 0 or Rel.Y < 0 or Rel.X > VF.AbsoluteSize.X or Rel.Y > VF.AbsoluteSize.Y then return true end
+	local C = self.Content
+	local Rel = Pos - C.AbsolutePosition
+	if Rel.X < 0 or Rel.Y < 0 or Rel.X > C.AbsoluteSize.X or Rel.Y > C.AbsoluteSize.Y then return true end
 	for _, F in self.UI:GetDescendants() do
-		if F:IsA(`GuiObject`) and F.Visible and F ~= VF and not F:IsDescendantOf(VF) and F.Name ~= `Vignette`
-			and F.BackgroundTransparency < 0.95 then
+		if F:IsA(`GuiObject`) and F.Visible and F.Name ~= `Vignette` and F.BackgroundTransparency < 0.95 then
 			local A, S = F.AbsolutePosition, F.AbsoluteSize
 			if Pos.X >= A.X and Pos.Y >= A.Y and Pos.X <= A.X + S.X and Pos.Y <= A.Y + S.Y then return true end
 		end
 	end
 	return false
+end
+
+-- a ray in layout space against the stage; the result's Position is in layout space too
+local function stageCast(O: Vector3, D: Vector3, Params: RaycastParams)
+	local R = workspace:Raycast(O + STAGE, D, Params)
+	if not R then return nil end
+	return { Instance = R.Instance; Position = R.Position - STAGE; Normal = R.Normal }
 end
 
 function Bench:Hit(Screen: Vector2?)
@@ -666,7 +760,7 @@ function Bench:Hit(Screen: Vector2?)
 		end
 	end
 	Params.FilterDescendantsInstances = Ex
-	local R = self.World:Raycast(O, D * 60, Params)
+	local R = stageCast(O, D * 60, Params)
 	-- with the plate open, the shell and the cradle are hollow but their collision hulls aren't: a ray that lands on the
 	-- specimen's body goes on through it to an organ behind, if there is one (2026-11-26: a real click on the frog's
 	-- heart hit the Mechanism's hull over most of it)
@@ -677,7 +771,7 @@ function Bench:Hit(Screen: Vector2?)
 			if not W or W.Kind ~= `Body` then break end
 			table.insert(Ex, R.Instance)
 			Params.FilterDescendantsInstances = Ex
-			R = self.World:Raycast(O, D * 60, Params)
+			R = stageCast(O, D * 60, Params)
 			Tries += 1
 		end
 		local W = R and self:Classify(R.Instance)
@@ -735,7 +829,11 @@ function Bench:BindInput()
 		local T = Input.UserInputType
 		if T == Enum.UserInputType.MouseButton1 or T == Enum.UserInputType.Touch then self:Release() end
 	end)
-	Conn(RunService.RenderStepped, function(Dt) self:Step(Dt) end)
+	-- after the game's own camera each frame, so the bench's shot wins
+	local Bind = `NHAnatomyBench`
+	pcall(function() RunService:UnbindFromRenderStep(Bind) end)
+	RunService:BindToRenderStep(Bind, Enum.RenderPriority.Camera.Value + 1, function(Dt) self:Step(Dt) end)
+	self.Bound = Bind
 end
 
 function Bench:Key(N: number)
@@ -854,7 +952,7 @@ function Bench:SampleTrace(P: Vector3)
 	local y = -(P.Z - self.SeamCentre.Z) / self.SeamR
 	table.insert(Tr.Points, { math.floor(x * 1000) / 1000, math.floor(y * 1000) / 1000 })
 	new(`Part`, { Name = `Cut`; Anchored = true; CanCollide = false; CanQuery = false; Shape = Enum.PartType.Ball; Material = Enum.Material.Neon;
-		Color = Color3.fromRGB(255, 92, 60); Size = Vector3.one * 0.05; CFrame = CFrame.new(P + Vector3.new(0, 0.04, 0)) }, self.Trail)
+		Color = Color3.fromRGB(255, 92, 60); Size = Vector3.one * 0.05; CFrame = CFrame.new(STAGE + P + Vector3.new(0, 0.04, 0)) }, self.Trail)
 end
 
 function Bench:EndTrace()
@@ -936,14 +1034,98 @@ function Bench:Step(Dt: number)
 			end
 		end
 	end
-	-- a slip shakes the view
-	if self.ShakeUntil and Now < self.ShakeUntil then
-		local a = (self.ShakeUntil - Now) / 0.15
-		self.Camera.CFrame = self.CamBase * CFrame.new((math.random() - 0.5) * 0.08 * a, (math.random() - 0.5) * 0.08 * a, 0)
-	elseif self.ShakeUntil then
-		self.ShakeUntil = nil
-		self.Camera.CFrame = self.CamBase
+	self:StepCamera(Dt, Now)
+end
+
+----------------------------------------------------------------------------------------------------- the camera
+-- The view is a shot: a focus point, a distance along the wide shot's line of sight, a lens (FOV) and a yaw round the
+-- focus. Each frame the camera springs toward the shot the bench is in (critically damped: quick to start, slow to
+-- land). Close shots come only while the step's own tool is in hand, so the roll is back in view whenever a tool is
+-- being chosen. Kicks (a quick lens punch) and shakes land on the moments: the plate giving, a lift, a place, a slip.
+-- The pointer ray and ToScreen read the live camera, so clicks stay true while it moves.
+local WIDE_FOCUS = Vector3.new(0, 0, 1.3)
+local WIDE_OFFSET = CAMERA_CF.Position - WIDE_FOCUS
+local WIDE_DIST = WIDE_OFFSET.Magnitude
+local WIDE_DIR = WIDE_OFFSET.Unit
+
+function Bench:ShotFor(): (Vector3, number, number, number, number)
+	-- returns Focus, Dist, FOV, Yaw (degrees), spring rate
+	local Sp = self.Specimen
+	if self.Finished then
+		-- the reveal: back off and swing round the finished specimen
+		local t = os.clock() - self.Finished
+		return WIDE_FOCUS:Lerp(self.SeamCentre, 0.5), WIDE_DIST * 0.9, 34, math.clamp(t * 4, 0, 14), 2.2
 	end
+	if not self.Loaded then return WIDE_FOCUS + Vector3.new(0, 0.6, 0), WIDE_DIST * 1.3, 46, -6, 3 end
+	local St = self.Steps[self.StepIndex]
+	local Id, Hand = St and St.Id, self.Hand
+	local Near = function(P: Vector3, k: number) return WIDE_FOCUS:Lerp(P, k) end
+	if Id == `Unwind` and Hand == `Key` and Sp.Bones.SideKey then
+		return Near(Sp.Bones.SideKey.Head, 0.6), WIDE_DIST * 0.82, 30, -7, 4.5
+	elseif Id == `Unscrew` and Hand == `Driver` then
+		local B = Sp.Bones[`WingPlate{math.min((self.Progress or 0) + 1, 4)}`]
+		local P = if B then B.Head else self.SeamCentre
+		return Near(P, 0.6), WIDE_DIST * 0.82, 30, if P.X >= 0 then 6 else -6, 4
+	elseif Id == `Inspect` and Hand == `Loupe` then
+		return Near(self.SeamCentre, 0.85), WIDE_DIST * 0.72, 22, 3, 3.2 -- the loupe's look: slow, tight
+	elseif Id == `Trace` and Hand == `Scalpel` then
+		return Near(self.SeamCentre, 0.8), WIDE_DIST * 0.8, 28, 0, 4
+	elseif Id == `Pry` and Hand == `Driver` then
+		return Near(self.SeamCentre, 0.75), WIDE_DIST * 0.8, 29, 4, 4
+	elseif Id == `Lift` and Hand == `Tweezers` and self.PlateOpen then
+		if self.Holding then
+			-- a part in the tweezers: ease back and lean toward the specimen card
+			return Near(self.SeamCentre, 0.55) + Vector3.new(0.5, 0, 0), WIDE_DIST * 0.88, 32, 5, 3.5
+		end
+		return Near(self.SeamCentre, 0.85), WIDE_DIST * 0.74, 25, -3, 4
+	end
+	return WIDE_FOCUS, WIDE_DIST, CAMERA_FOV, 0, 3
+end
+
+function Bench:Kick(Fov: number, Shake: number?)
+	-- a lens punch (degrees narrower, springs back) and an optional shake (studs)
+	local C = self.Cam
+	if not C then return end
+	C.FovV -= Fov * 14
+	if Shake then self.ShakeUntil = os.clock() + 0.18 self.ShakeAmp = Shake end
+end
+
+function Bench:StepCamera(Dt: number, Now: number)
+	local Focus, Dist, Fov, Yaw, Rate = self:ShotFor()
+	local C = self.Cam
+	if not C then
+		-- the first frame: start wide and high so the bench opens on a slow push-in
+		C = { Focus = Focus; FocusV = Vector3.zero; Dist = Dist; DistV = 0; Fov = Fov; FovV = 0; Yaw = Yaw; YawV = 0 }
+		self.Cam = C
+	end
+	Dt = math.min(Dt, 1 / 30)
+	local w = Rate
+	local function spring(x, v, goal)
+		local a = (goal - x) * w * w - v * 2 * w
+		v += a * Dt
+		return x + v * Dt, v
+	end
+	C.Focus, C.FocusV = spring(C.Focus, C.FocusV, Focus)
+	C.Dist, C.DistV = spring(C.Dist, C.DistV, Dist)
+	C.Fov, C.FovV = spring(C.Fov, C.FovV, Fov)
+	C.Yaw, C.YawV = spring(C.Yaw, C.YawV, Yaw)
+	-- alive: a slow breath of drift, stilled while drawing or holding a turn so the hand stays steady
+	local Still = self.Tracing or self.Holding_
+	self.Drift = (self.Drift or 0) + (if Still then -Dt else Dt) * 2
+	self.Drift = math.clamp(self.Drift, 0, 1)
+	local d = self.Drift
+	local Sway = Vector3.new(math.sin(Now * 0.37) * 0.05, math.sin(Now * 0.53) * 0.03, 0) * d
+	local Dir = CFrame.Angles(0, math.rad(C.Yaw + math.sin(Now * 0.23) * 0.5 * d), 0):VectorToWorldSpace(WIDE_DIR)
+	local CF = CFrame.lookAt(C.Focus + Dir * C.Dist, C.Focus) * CFrame.new(Sway)
+	if self.ShakeUntil and Now < self.ShakeUntil then
+		local a = (self.ShakeUntil - Now) / 0.18 * (self.ShakeAmp or 0.08)
+		CF *= CFrame.new((math.random() - 0.5) * a, (math.random() - 0.5) * a, 0) * CFrame.Angles(0, 0, (math.random() - 0.5) * a * 0.15)
+	end
+	local Cam = workspace.CurrentCamera
+	Cam.CameraType = Enum.CameraType.Scriptable
+	Cam.CFrame = CF + STAGE
+	Cam.FieldOfView = math.clamp(C.Fov, 12, 60)
+	self.CamBase = CF
 end
 
 ----------------------------------------------------------------------------------------------------- server replies
@@ -952,6 +1134,7 @@ function Bench:OpenPlate()
 	local B = Sp.Bones.PlateHinge
 	if not B or self.PlateOpen then return end
 	self.PlateOpen = true
+	self:Kick(5, 0.12) -- the plate gives
 	local Axis = B.Axis or Vector3.new(0, 0, 1)
 	local V = new(`NumberValue`, { Value = 0 })
 	V.Changed:Connect(function(a)
@@ -968,6 +1151,7 @@ function Bench:TurnKey()
 	local B = Sp.Bones.SideKey
 	if not B then return end
 	self.KeyAngle = (self.KeyAngle or 0) + 45
+	self:Kick(0.6)
 	local Axis = B.Axis or Vector3.new(1, 0, 0)
 	local From = (self.KeyAngle - 45)
 	local V = new(`NumberValue`, { Value = From })
@@ -982,6 +1166,7 @@ function Bench:PopWingPlate(k: number)
 	local B = Sp.Bones[Bone]
 	if not B then return end
 	local Out = Vector3.new(if B.Head.X >= 0 then 1 else -1, 0.6, 0) * 0.6
+	self:Kick(1.5, 0.05)
 	local V = new(`NumberValue`, { Value = 0 })
 	V.Changed:Connect(function(t) setBone(Sp, Bone, CFrame.new(Out * t) * CFrame.new(B.Head) * CFrame.Angles(0, 0, t * 0.8) * CFrame.new(-B.Head)) end)
 	TweenService:Create(V, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Value = 1 }):Play()
@@ -1037,7 +1222,7 @@ function Bench:Update(Reply)
 		self.Holding_ = nil
 		self.Ring.Visible = false
 		self:Clip(`Recoil`)
-		self.ShakeUntil = os.clock() + 0.15
+		self:Kick(-1, 0.1)
 		if Api.Sound then Api.Sound(`Wrong`) end
 		local Why = ({ Flag = `That cog is loose: it isn't part of the specimen`; FirstOrgan = `The fire-gland comes out first`;
 			WrongSlot = `Not that outline`; NotYet = `Not yet: follow the procedure` })[Reply.Why] or `Slipped!`
@@ -1063,6 +1248,7 @@ function Bench:Update(Reply)
 	if Reply.Holding then
 		self.Holding = Reply.Holding
 		self:Clip(`Lift`)
+		self:Kick(2)
 		if Api.Sound then Api.Sound(`Good`) end
 	end
 	if Reply.Placed then
@@ -1072,11 +1258,12 @@ function Bench:Update(Reply)
 		fadeBone(self.Specimen, Id, 1, 0.35)
 		if Id == `FireGland` then fadeBone(self.Specimen, `FireGland`, 1, 0.35) end
 		self:Clip(`Place`)
+		self:Kick(-1.5)
 		if Api.Sound then Api.Sound(`Correct`, self:PlacedCount()) end
 		local S = self.SlotButtons[self.PendingPlace or 0]
 		if S and Api.Burst then Api.Burst(S.Button, true) end
 		self:RefreshCard()
-		if Reply.Done then self:Clip(`Done`) self:SetHint(`Specimen complete`) end
+		if Reply.Done then self:Clip(`Done`) self:SetHint(`Specimen complete`) self.Finished = os.clock() end
 	end
 	-- progress and steps
 	if Reply.Progress then
@@ -1114,7 +1301,19 @@ function Bench:Destroy()
 	for _, C_ in self.Conns do C_:Disconnect() end
 	for _, T in self.Tracks do pcall(function() T:Stop(0) end) end
 	if _G.NHAnatomyBench == self then _G.NHAnatomyBench = nil end
-	if self.VF then self.VF:Destroy() end
+	if self.Bound then pcall(function() RunService:UnbindFromRenderStep(self.Bound) end) end
+	if self.Stage then self.Stage:Destroy() end
+	if self.Vignette then self.Vignette:Destroy() end
+	-- the camera and the HUD go back as they were
+	local Cam = workspace.CurrentCamera
+	local W = self.CamWas
+	if W then
+		Cam.CameraType = if W.Type == Enum.CameraType.Scriptable then Enum.CameraType.Custom else W.Type
+		Cam.FieldOfView = W.FOV
+		local Hum = Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChildOfClass(`Humanoid`)
+		Cam.CameraSubject = Hum or W.Subject
+	end
+	for _, G in self.HiddenGuis or {} do if G.Parent then G.Enabled = true end end
 	if self.UI then self.UI:Destroy() end
 	if self.Cover then self.Cover:Destroy() end
 end

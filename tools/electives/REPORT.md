@@ -188,7 +188,7 @@ in `Gui.Activities.AnatomyBench` and installed:
    40 px (`NearestOrgan`, measured to the organ's pieces).
 
 **Still open:**
-- Near the top of the bench view, things are drawn about 14 px higher than the ray math puts them. The frog's heart is
+- (Resolved later the same day: an aiming error, see below.) Near the top of the bench view, things seemed to be drawn about 14 px higher than the ray math puts them. The frog's heart is
   drawn at GUI y ~125 but its part projects to 128..145. A click on the heart's upper half lifts the lungs (their
   lobes sit either side of it, so their centre falls under it). The In hand label names what was taken, and placing it
   on its own outline costs nothing, but the cause isn't found. Lower down (tools, side key, seam) the pointer and the
@@ -202,6 +202,60 @@ in `Gui.Activities.AnatomyBench` and installed:
 - The Raven's and Wyvern's dial plates read cream white. That looks like the baked enamel, not a missing map.
 - In hook runs the tool in hand waits above the tail during the Key, trace and unscrew steps. That's expected: the
   hooks have no pointer.
+
+### Camera, a real-world stage, the UI chrome and a new report card (2026-11-26, five short Play rounds)
+
+**The top-of-view clicks were never off.** A 5x5 grid of neon markers lands exactly where `ToScreen` puts it, top row
+included, and a real mouse at input (828, 67) reads `Pointer()` (828, 67). The "14 px" was my own aiming: screenshot y
+is GUI y + 58 (the top bar), not + 68-70. With that, a real click on the heart's top half lifts the Heart-pump and one
+on a lung lobe lifts the lungs. A whole Frog lesson by real mouse: A+.
+
+**First load.** `Bench.Preload()` warms every model 15 s after joining (Activities controller) and again on first
+require. `CoverUntilLoaded` lays a dark cloth over the bench until this lesson's props are in, for 10 s at most, and
+drops it at once when they're cached. (Game scripts can't read a SurfaceAppearance's map ids, so it doesn't ask; the
+first version did and broke the bench.) Seen in Play: loaded in 0.39 s.
+
+**The stage (texture quality).** The bench no longer draws in a ViewportFrame. A ViewportFrame has no environment,
+so its brass read flat cream-gold. The props are now client-only parts at `STAGE` (0, 2600, 0) inside a closed dark
+room with their own lights: the candle's pool, a warm key over the left shoulder, a cool rim. The bench drives the
+real camera (Scriptable, bound after the game's camera) and hides the other HUD screens, and puts both back on
+Destroy. The game's maths stays in layout space: parts sit at STAGE + their layout pose, and rays and screen points
+go through the real camera (`ScreenPointToRay` / `WorldToScreenPoint`) moved by STAGE. Shots:
+`shots/stage_wide.jpg`, `shots/stage_trace_shot.jpg`, `shots/stage_lighting_test.jpg`.
+
+**The camera.** The view is a shot (focus, distance, lens, yaw) that a critically damped spring chases:
+- the bench opens high and wide and pushes in;
+- a close shot comes for each step's own tool (the side key for the Key, the next wing plate for the Driver, a tight
+  loupe look for Inspect, over the plate for the Scalpel and the pry, into the cavity for the Tweezers);
+- the camera eases back and leans toward the card while a part is in the tweezers;
+- an orbit reveal plays when the specimen is done;
+- kicks land on the moments: the plate giving (lens punch and shake), each lift, each place, each key turn and wing
+  plate, and a slip.
+A slow drift keeps the camera alive. It goes still while you trace or hold a turn, so the hand stays steady. Close
+shots only come while the right tool is in hand, so the roll is back in view whenever a tool is being chosen.
+
+**The UI chrome.** The six PBR pieces from the design spec (`make_anatomy_ui.py`) were never on the import list.
+They're staged now (PUBLISH_LIST section 6). `Config.Anatomy.UI` holds their ids, all 0 for now. `ApplySkin` swaps
+each panel to its image as its id arrives, with dark ink on the paper cards. Tested with a stand-in image:
+`shots/stage_skin_standin.jpg`.
+
+**The report card (every class).** It's now a standalone ivory sheet on a dimmed screen, not a card inside the chalk
+board:
+- a crimson crest band (school, subject, lesson, level, PRACTICE / GRADED);
+- the grade pressed into a wax seal tinted by the grade;
+- the score counting up with its bar;
+- the game's breakdown as bars, when it sends one (Anatomy: accuracy, process, time);
+- the outcome lines in paper-safe ink, and the remark in hand.
+The sheet slides up and settles from a tilt. Reduced motion gets it at once. It closes after 10 s. Shot:
+`shots/report_card_new.jpg`.
+
+**Still open:**
+- The arm clone (the student's arms) now reads as blocky avatar parts at the bottom corners under real light, and it
+  doesn't follow the close shots. Hide it outside the wide shot, or rebuild it as gloved hands.
+- The frog's white dial plate is still the brightest thing in the shot. The key light is turned down, but the enamel
+  map itself could be warmed.
+- Only the Frog was seen on the stage. The Raven and the Wyvern use the same code path.
+- graphify isn't installed, so `graphify update .` wasn't run.
 
 ## Follow-ups for the owner
 

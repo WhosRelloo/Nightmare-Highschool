@@ -65,3 +65,21 @@ Built, baked and staged in `art/group-upload-accessories/anatomy-monocle/`: `NHA
 4. Run that script in Edit. It builds `ReplicatedStorage.NHAccessories.LoupeMonocle`.
 
 The catalog entry (`anatomy-loupe-monocle`) is already installed.
+
+## 6. The bench UI chrome (6 images)
+
+Staged in `E:\Nightmare-Highschool\.claude\worktrees\electives-22bb10\art\group-upload-anatomy-ui\` (made by
+`art/ui/hud/make_anatomy_ui.py`):
+
+| File | What it is |
+| --- | --- |
+| AnatPlate.png | the iron title plate with the loupe roundel (species, room, timer) |
+| AnatProcedure.png | the parchment procedure card on a brass tack |
+| AnatSpecimen.png | the porcelain specimen card in a riveted brass frame |
+| AnatSeal.png | the oxblood wax seal (kept for the grade stamp) |
+| AnatHold.png | the brass socket behind the Key/Driver hold ring |
+| AnatTag.png | the brass tool tag (the 1-5 labels) |
+
+1. Bulk-import the 6 PNGs as group images (15981569).
+2. Put their ids in `Config.Anatomy.UI` (`Plate`, `Procedure`, `Specimen`, `Seal`, `Hold`, `Tag`), or send them and the
+   session fills them in. A panel whose id is still 0 keeps the plain iron look, so they can come in any order.
