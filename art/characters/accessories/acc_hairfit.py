@@ -21,7 +21,8 @@ ROOT = argv[argv.index("--root") + 1] if "--root" in argv else "E:/NH-Work/acc"
 ONLY = argv[argv.index("--items") + 1].split(",") if "--items" in argv else None
 SEAT = 1.93
 MASKS = {"LaceMask", "LaceMaskTrim", "BoneMask", "GiltMask",   # Kit A
-         "KintsugiMask", "WatchMask", "FoxMask", "WolfMask", "GrilleMask", "WaxMask", "MothMask", "DominoMask"}   # Kit C
+         "KintsugiMask", "WatchMask", "FoxMask", "WolfMask", "GrilleMask", "WaxMask", "MothMask", "DominoMask",   # Kit C
+         "LoupeMonocle"}   # the Anatomy mastery monocle (sits on the face like a mask)
 
 
 def tris_of(ob):

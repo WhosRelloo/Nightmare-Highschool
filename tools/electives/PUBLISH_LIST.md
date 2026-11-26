@@ -55,7 +55,13 @@ Shot list and timings: `tools/electives/anim/clips.md`.
 **Done (2026-11-26).** The 512 px crops in `tools/electives/render/out/plates/` are uploaded and the ids are set on each
 species in `Config.Anatomy`. They are owned by the owner's account, not the group (see `REPORT.md`).
 
-## 5. Not built yet
+## 5. The Brass Loupe Monocle (the mastery accessory)
 
-- **BrassLoupeMonocle**, the mastery accessory. It isn't modelled and isn't in `Config.Accessories`. Mastery already
-  tries to grant it on every lesson and will backfill it once it's in the catalog.
+Built, baked and staged in `art/group-upload-accessories/anatomy-monocle/`: `NHAcc_LoupeMonocle.fbx` and 4 maps
+(colour, normal, roughness, metalness, at 1024).
+1. Import the FBX through the 3D Importer, as the group.
+2. Bulk-import the 4 PNGs as group images.
+3. Ask me to read the ids and fill `tools/accessories/assemble_anatomy_monocle.luau`.
+4. Run that script in Edit. It builds `ReplicatedStorage.NHAccessories.LoupeMonocle`.
+
+The catalog entry (`anatomy-loupe-monocle`) is already installed.

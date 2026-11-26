@@ -1,6 +1,6 @@
 -- anatomy_rewards_play (Task 12, Server VM): the Healer perk numbers at level 5, then mastery: with every species at A in
 -- the Journal, one more lesson grants the title Anatomist once (a second pass grants nothing), and the monocle is tried
--- (it stays ungranted until BrassLoupeMonocle is in Config.Accessories). Everything it touches is put back at the end.
+-- (anatomy-loupe-monocle: Grant owns it at once; the Wardrobe shows it once its template is in NHAccessories). Everything it touches is put back at the end.
 local SSS = game:GetService("ServerScriptService")
 local RS = game:GetService("ReplicatedStorage")
 local Act = require(SSS.Services.School.Activities)

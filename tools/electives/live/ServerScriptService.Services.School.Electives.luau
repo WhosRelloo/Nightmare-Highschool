@@ -114,7 +114,7 @@ end
 -- (Task 12) Anatomy mastery: every species in Config.Anatomy.Mastery at MinGrade or better grants the title
 -- (Social.Reputation.AwardTitle) and the accessory (Features.Accessories.Grant). Both calls are idempotent, so this runs
 -- after every Journal write: the title lands once, and the accessory backfills on the next lesson once it is in
--- Config.Accessories (BrassLoupeMonocle is not modelled yet). Returns { Title = bool, Accessory = bool } (newly granted).
+-- Config.Accessories (anatomy-loupe-monocle; owned at once, shown once its template is in NHAccessories). Returns { Title = bool, Accessory = bool } (newly granted).
 local GRADE_RANK = { [`A+`] = 6; A = 5; B = 4; C = 3; D = 2; F = 1 }
 function Shared.CheckMastery(Player: Player, Subject: string, ClassData): { Title: boolean, Accessory: boolean }?
 	if Subject ~= `Anatomy` or typeof(ClassData) ~= `table` or typeof(ClassData.Journal) ~= `table` then return nil end

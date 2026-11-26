@@ -85,6 +85,6 @@ function Anatomy.HealMult(Level: number): number return 1 + 0.10 * (math.clamp(L
 function Anatomy.ReviveMult(Level: number): number return 1 - 0.08 * (math.clamp(Level, 1, 5) - 1) end
 
 -- Mastery: every species at A or better grants the title and the accessory once.
-Anatomy.Mastery = { Species = { `Frog`, `Raven`, `Wyvern` }; MinGrade = `A`; Title = `Anatomist`; Accessory = `BrassLoupeMonocle` }
+Anatomy.Mastery = { Species = { `Frog`, `Raven`, `Wyvern` }; MinGrade = `A`; Title = `Anatomist`; Accessory = `anatomy-loupe-monocle` }
 
 return Anatomy

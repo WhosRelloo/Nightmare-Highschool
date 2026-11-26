@@ -137,6 +137,30 @@ leave out the blurred piece in the top-left corner. They were uploaded through S
 - The Wyvern image was still in moderation review when it was wired.
 - Not yet seen in the phone in Play.
 
+### Brass Loupe Monocle (2026-11-26)
+
+Built at the accessory standard (`art/characters/accessories/nh_kitc_monocle.py`). It's a jeweller's loupe over the
+right painted eye (x -0.205, z 1.49), with these parts:
+- a knurled gold eye ring sitting 0.012 off the face;
+- a flared brass barrel with two turned bands;
+- a bezel with three steel screws and a dark glass lens;
+- a hinge lug, and a fine gold chain down the cheek to a teardrop fob at the jaw.
+
+The piece is one Head MeshPart, `LoupeMonocle` (10,180 tris), with a 2048 baked atlas.
+- **Catalog:** `anatomy-loupe-monocle` in `Config.Accessories`, Slot `Face`, `Earned = true` with an `Earn` line (the
+  Standing Path pattern: never sold). `Config.Anatomy.Mastery.Accessory` now names that id. Both are installed in Edit
+  (backup `Electives_Monocle_20261126`).
+  - There is no Eyes slot yet (Kit C's C4 isn't built), so the monocle takes the Mask slot and isn't worn with a mask.
+- **Checks:**
+  - `acc_check.py` passes, 0 fails: no clipping on any of the 12 bodies, gap 0.012.
+  - `acc_hairfit.py`: 18 of 35 hairs fit (a radial scale k 1.02..1.13; it's in `MASKS`, worn like a mask). The other
+    17 still wear it, untucked (the 1.88 rule).
+- **Renders:** `shots/monocle_{close,close_f,front34}.jpg`.
+- **Owner import:** `art/group-upload-accessories/anatomy-monocle/` holds the FBX and 4 maps. After the import, run
+  `tools/accessories/assemble_anatomy_monocle.luau` with the map ids filled in.
+  - Mastery's `Grant` adds it to a master's owned list now (it doesn't check for the template).
+  - `Accessories.Ready` keeps it out of the Wardrobe until the template is in `NHAccessories`.
+
 ## Follow-ups for the owner
 
 - **Healer perk has no consumer.** `Config.Anatomy.HealMult(Level)` (+10% per level) and `ReviveMult(Level)` (-8% time
@@ -145,7 +169,6 @@ leave out the blurred piece in the top-left corner. They were uploaded through S
   "First-aid pouch heals +10% per level" and "Revive downed friends faster". Building a friend revive (hold E on a
   downed player) and a first-aid pouch is a new gameplay system. **The owner said "Later, log it" (2026-11-25):**
   neither is built. When they are, they should read `HealMult` / `ReviveMult` from the student's Anatomy level.
-- **BrassLoupeMonocle** is not modelled and not in `Config.Accessories`. Mastery calls `Accessories.Grant` on every
-  lesson, so it backfills once the accessory is added.
+- **The monocle template** waits for the owner's import (see "Brass Loupe Monocle" above and `PUBLISH_LIST.md`).
 - **Import and publish:** see `PUBLISH_LIST.md` (9 FBX files, 200 textures, 9 clips, 3 plates).
 - **The Specimens, Poses and Flow canvas boards** from the design stage are unpublished drafts.
