@@ -414,7 +414,7 @@ function Bench:BuildStage()
 	for i, P in Seam do
 		local Q = Seam[i % #Seam + 1]
 		local A, B = P:Lerp(Q, 0.18), P:Lerp(Q, 0.82)
-		table.insert(self.SeamDots, stroke(A, B, 0.1, Color3.fromRGB(26, 14, 10), Enum.Material.SmoothPlastic, 0.02, WM))
+		table.insert(self.SeamDots, stroke(A, B, 0.13, Color3.fromRGB(26, 14, 10), Enum.Material.SmoothPlastic, 0.02, WM))
 		table.insert(self.SeamDots, stroke(A, B, 0.05, Color3.fromRGB(255, 240, 205), Enum.Material.Neon, 0.035, WM))
 	end
 	for _, D in self.SeamDots do D.Transparency = 1 end
@@ -644,7 +644,7 @@ local function skinFrame(F: GuiObject, Id: number, Slice: Rect?, Scale: number?,
 	return I
 end
 
--- one text size for a row of labels: the largest that fits every label, so no tag reads smaller than its neighbours
+-- one text size for a row of labels: the largest that fits every label, so no tag reads larger than its neighbours
 local TextService = game:GetService(`TextService`)
 local function uniformText(Labels: { TextLabel })
 	local function fit()
@@ -656,7 +656,12 @@ local function uniformText(Labels: { TextLabel })
 			while Size > 6 and TextService:GetTextSize(L.ContentText, Size, L.Font, Vector2.new(10000, 10000)).X > W do Size -= 1 end
 			Best = math.min(Best, Size)
 		end
-		for _, L in Labels do L.TextScaled = false L.TextWrapped = false L.TextSize = Best end
+		-- still TextScaled (so a label can always shrink to fit), capped at the shared size so the row matches
+		for _, L in Labels do
+			L.TextScaled = true L.TextWrapped = false
+			local C = L:FindFirstChildOfClass(`UITextSizeConstraint`) or new(`UITextSizeConstraint`, {}, L)
+			C.MaxTextSize = math.max(Best, 1)
+		end
 	end
 	for _, L in Labels do L:GetPropertyChangedSignal(`AbsoluteSize`):Connect(fit) end
 	fit()
@@ -679,8 +684,8 @@ function Bench:ApplySkin()
 			if X:IsA(`TextLabel`) and X.Position.X.Scale < 0.5 then
 				local R
 				for _, Row in Rows do if math.abs(X.Position.Y.Scale - Row[1]) < 0.01 then R = Row end end
-				X.Position = UDim2.fromScale(0.15, if R then R[2] else X.Position.Y.Scale)
-				X.Size = UDim2.fromScale(0.55, if R then R[3] else X.Size.Y.Scale)
+				X.Position = UDim2.fromScale(0.2, if R then R[2] else X.Position.Y.Scale)
+				X.Size = UDim2.fromScale(0.5, if R then R[3] else X.Size.Y.Scale)
 			elseif X:IsA(`TextLabel`) then
 				X.Position = UDim2.fromScale(0.71, 0.2) X.Size = UDim2.fromScale(0.25, 0.56) -- the timer
 			end
@@ -1081,7 +1086,8 @@ function Bench:SampleTrace(P: Vector3)
 	local x = (P.X - self.SeamCentre.X) / self.SeamR
 	local y = -(P.Z - self.SeamCentre.Z) / self.SeamR
 	table.insert(Tr.Points, { math.floor(x * 1000) / 1000, math.floor(y * 1000) / 1000 })
-	local From = Tr.LastP or P
+	-- join to the last sample unless the pointer jumped (left the plate and came back): then start a fresh run
+	local From = if Tr.LastP and (P - Tr.LastP).Magnitude < self.SeamR * 0.35 then Tr.LastP else P
 	Tr.LastP = P
 	stroke(From, P, 0.13, Color3.fromRGB(30, 6, 4), Enum.Material.SmoothPlastic, 0.045, self.Trail).Name = `CutEdge`
 	stroke(From, P, 0.07, Color3.fromRGB(255, 70, 40), Enum.Material.Neon, 0.06, self.Trail).Name = `Cut`
