@@ -288,7 +288,8 @@ candle that burns down past 3-2-1 (`Bench.Docket`, called from Activities). "Lea
 - All docket text uses explicit fitted sizes (`fitDocket`), never TextScaled, which drops to 8 in Play.
 - The room header carries `NHContrastOk`: FitCheck reads the white base under the dark gradient (real contrast about 13:1).
 - Leave tag: a TextButton's padding also shrinks its children, so the tag art is sized from the padding to fill the button.
-  The hole sits 16-19% across the art and the text starts at 26%. This last fix is installed in Edit, not yet seen in Play.
+  The hole sits 16-19% across the art and the text starts at 26%. Seen in Play, and a real Level 1 lesson hands off from
+  the docket to the bench cleanly, with the tag staying bottom-left.
 
 ## Follow-ups for the owner
 
