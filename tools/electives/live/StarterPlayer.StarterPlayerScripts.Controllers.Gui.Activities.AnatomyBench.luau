@@ -1647,7 +1647,7 @@ function Bench.Docket(Screen, Message)
 	rule(Card, 0.69, 1, DOCKET_RED)
 	-- the task, in hand: wrapped inside the lower panel, left of the seal
 	local Task = docketText(Card, `<i>{Message.Tagline or ``}</i>`, { Name = `Task`; TextWrapped = true; TextXAlignment = Enum.TextXAlignment.Left; TextYAlignment = Enum.TextYAlignment.Top;
-		Position = UDim2.fromScale(0.14, 0.715); Size = UDim2.fromScale(0.5, 0.2) })
+		Position = UDim2.fromScale(0.14, 0.71); Size = UDim2.fromScale(0.46, 0.21) }) -- ends at 0.60: a clear gap before the seal (its edge is at ~0.64)
 	one(Task, 28)
 	-- the wax seal: the mode, stamped
 	local SealHolder = new(`Frame`, { Name = `Seal`; BackgroundTransparency = 1; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.77, 0.8);
