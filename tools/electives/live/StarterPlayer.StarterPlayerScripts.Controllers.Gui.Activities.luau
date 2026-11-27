@@ -574,6 +574,31 @@ function Local.Open(Message)
 		Api.Send(`Quit`, nil)
 	end)
 
+	-- (Electives) Bench lessons open on the renderer's own intro (Anatomy: a specimen docket and a candle count) in place
+	-- of the chalkboard; Leave lesson moves to the bottom-left at once and takes the renderer's skin
+	local Docket = nil
+	if Lesson.Bench then
+		local okM, Mod = pcall(require, RendererModule)
+		if okM and type(Mod) == `table` and Mod.Docket then
+			local okD, Dk = pcall(Mod.Docket, Screen, Message)
+			if okD and Dk then
+				Docket = Dk
+				Screen.Board.Visible = false
+				local Dim0 = Screen.Gui:FindFirstChild(`Dim`)
+				if Dim0 then Dim0.Visible = false end
+				Screen.QuitHome = { Parent = Screen.Quit.Parent; Position = Screen.Quit.Position; AnchorPoint = Screen.Quit.AnchorPoint; Size = Screen.Quit.Size }
+				Screen.Quit.AnchorPoint = Vector2.new(0, 1)
+				Screen.Quit.Position = UDim2.new(0, 18, 1, -14)
+				Screen.Quit.Size = UDim2.fromOffset(170, 44)
+				Screen.Quit.ZIndex = 20
+				Screen.Quit.Parent = Screen.Gui
+				if Mod.SkinQuit then pcall(Mod.SkinQuit, Screen.Quit) end
+			else
+				warn(`[Activities] {Message.Activity} docket failed: {Dk}`)
+			end
+		end
+	end
+
 	-- Intro: the tagline, then 3-2-1 stamped into the HUD's gold orb (with a tick each second)
 	local Intro = Shared.Label(Screen.Content, {
 		Font = Theme.HandFont; TextColor3 = Theme.Chalk; Size = UDim2.fromScale(0.8, 0.13); Position = UDim2.fromScale(0.1, 0.1);
@@ -628,6 +653,13 @@ function Local.Open(Message)
 		Position = UDim2.fromScale(0.5, 0.52); Size = UDim2.fromScale(0.55, 0.55); ZIndex = 3;
 	})
 
+	if Docket then -- the docket carries the tagline and the count
+		Intro.Visible = false
+		Orb.Visible = false
+		if Lesson.Icon then Lesson.Icon.Visible = false end
+		Lesson.Docket = Docket
+	end
+
 	local Started = os.clock()
 	task.spawn(function()
 		local Intro_ = Message.Intro or 3
@@ -636,7 +668,9 @@ function Local.Open(Message)
 			if Count.Text ~= tostring(Left) then
 				Count.Text = tostring(Left)
 				Kit.PlaySound(`Tick`, 0.5, 1.1)
-				if not Kit.ReducedMotion() then Shared.Pop(Orb, 1.25) end
+				if Docket then
+					pcall(function() Docket:Count(math.clamp(Left, 1, 3)) end)
+				elseif not Kit.ReducedMotion() then Shared.Pop(Orb, 1.25) end
 			end
 			task.wait()
 		end
@@ -644,6 +678,7 @@ function Local.Open(Message)
 		Intro:Destroy()
 		Orb:Destroy()
 		if Lesson.Icon then Lesson.Icon:Destroy() Lesson.Icon = nil end
+		if Docket then pcall(function() Docket:Leave() end) Lesson.Docket = nil end
 
 		-- (Electives) Bench mode: the renderer gets the whole screen; the chalk board steps aside and
 		-- only Quit stays, bottom-left. ShowResult brings the board back for the report card.
@@ -659,12 +694,14 @@ function Local.Open(Message)
 			Screen.Board.Visible = false
 			local Dim = Screen.Gui:FindFirstChild(`Dim`)
 			if Dim then Dim.Visible = false end
-			Screen.QuitHome = { Parent = Screen.Quit.Parent; Position = Screen.Quit.Position; AnchorPoint = Screen.Quit.AnchorPoint; Size = Screen.Quit.Size }
-			Screen.Quit.AnchorPoint = Vector2.new(0, 1)
-			Screen.Quit.Position = UDim2.new(0, 18, 1, -14)
-			Screen.Quit.Size = UDim2.fromOffset(150, 34)
-			Screen.Quit.ZIndex = 20
-			Screen.Quit.Parent = Screen.Gui
+			if not Screen.QuitHome then -- (the docket intro moved it already)
+				Screen.QuitHome = { Parent = Screen.Quit.Parent; Position = Screen.Quit.Position; AnchorPoint = Screen.Quit.AnchorPoint; Size = Screen.Quit.Size }
+				Screen.Quit.AnchorPoint = Vector2.new(0, 1)
+				Screen.Quit.Position = UDim2.new(0, 18, 1, -14)
+				Screen.Quit.Size = UDim2.fromOffset(150, 34)
+				Screen.Quit.ZIndex = 20
+				Screen.Quit.Parent = Screen.Gui
+			end
 			Target = BenchContent
 		end
 
@@ -732,6 +769,13 @@ function Local.ShowResult(Message)
 	local Content = Lesson.Screen.Content
 	for _, Child in Content:GetChildren() do Child:Destroy() end
 	Lesson.Screen.Quit.Visible = false
+	if Lesson.Docket then -- (Electives) ended on the docket intro: the board comes back for the message
+		pcall(function() Lesson.Docket:Destroy() end)
+		Lesson.Docket = nil
+		Lesson.Screen.Board.Visible = true
+		local Dim0 = Lesson.Screen.Gui:FindFirstChild(`Dim`)
+		if Dim0 then Dim0.Visible = true end
+	end
 	if Lesson.Screen.BenchContent then -- (Electives) back from the full-screen bench to the board for the report card
 		Lesson.Screen.BenchContent:Destroy()
 		Lesson.Screen.BenchContent = nil

@@ -1525,4 +1525,227 @@ if RunService:IsStudio() then
 	end
 end
 
+----------------------------------------------------------------------------------------------------- the intro docket
+-- The lesson intro for bench lessons, in place of the chalkboard and the gold 3-2-1 orb: a specimen docket hangs on a
+-- red string over a dark, candle-warm room (species, Latin, level, teacher, time, twist, the task in hand, a wax seal
+-- for the mode) and a candle burns down past three marks for the count. The Activities controller calls
+-- Bench.Docket(Screen, Message) when the lesson opens, :Count(n) each second, and :Leave() when the bench takes over.
+-- Every text sits in fractions of the docket, clear of its frame art; one size cap per role keeps the rows even.
+local DOCKET_INK = Color3.fromRGB(46, 34, 28)
+local DOCKET_RED = Color3.fromRGB(140, 28, 34)
+local DOCKET_DIM = Color3.fromRGB(110, 92, 76)
+local DOCKET_LINE = Color3.fromRGB(170, 150, 124)
+local WAX = Color3.fromRGB(236, 226, 200)
+
+local function docketText(Parent: Instance, Str: string, Props): TextLabel
+	local T = new(`TextLabel`, { BackgroundTransparency = 1; Text = Str; TextColor3 = DOCKET_INK; Font = Enum.Font.Merriweather; TextScaled = true;
+		RichText = true; TextWrapped = false; TextXAlignment = Enum.TextXAlignment.Center; TextYAlignment = Enum.TextYAlignment.Center; ZIndex = 3 }, Parent)
+	for K, V in Props or {} do (T :: any)[K] = V end
+	return T
+end
+
+local function rule(Parent: Instance, Y: number, Thick: number, Color: Color3, X0: number?, X1: number?)
+	return new(`Frame`, { BackgroundColor3 = Color; BorderSizePixel = 0; ZIndex = 3; Position = UDim2.fromScale(X0 or 0.11, Y);
+		Size = UDim2.new((X1 or 0.89) - (X0 or 0.11), 0, 0, Thick) }, Parent)
+end
+
+function Bench.Docket(Screen, Message)
+	local Gui: ScreenGui = Screen.Gui
+	local P = Message.Payload or {}
+	local E = Electives.Get and Electives.Get(`Anatomy`) or {}
+	local Ids = Config.UI or {}
+	local Calm = Kit.ReducedMotion and Kit.ReducedMotion()
+	local D = {}
+
+	-- the room: near-black with a warm pool where the candle stands
+	local Room = new(`Frame`, { Name = `DocketRoom`; Size = UDim2.fromScale(1, 1); BackgroundColor3 = Color3.new(1, 1, 1); BorderSizePixel = 0; ZIndex = 1 }, Gui)
+	Room:SetAttribute(`NHNotPanel`, true)
+	new(`UIGradient`, { Rotation = 0; Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(10, 7, 6)), ColorSequenceKeypoint.new(0.6, Color3.fromRGB(12, 8, 7)),
+		ColorSequenceKeypoint.new(0.76, Color3.fromRGB(52, 31, 15)), ColorSequenceKeypoint.new(0.92, Color3.fromRGB(14, 9, 7)), ColorSequenceKeypoint.new(1, Color3.fromRGB(8, 6, 5)) }) }, Room)
+	text(Room, `NIGHTMARE HIGHSCHOOL  \u{00B7}  ELECTIVE  \u{00B7}  {string.upper(E.Name or `Anatomy`)}`, { Font = Enum.Font.Merriweather; TextColor3 = Color3.fromRGB(170, 150, 120);
+		Position = UDim2.fromScale(0.025, 0.03); Size = UDim2.fromScale(0.5, 0.03); ZIndex = 2 })
+
+	-- the docket: a CanvasGroup so it swings and fades as one piece
+	local Group = new(`CanvasGroup`, { Name = `Docket`; BackgroundTransparency = 1; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.42, 0.53);
+		Size = UDim2.fromScale(0.8, 0.86); ZIndex = 4; Rotation = -3 }, Gui)
+	new(`UIAspectRatioConstraint`, { AspectRatio = 0.8; DominantAxis = Enum.DominantAxis.Height }, Group)
+	local Card = new(`Frame`, { Name = `Card`; BackgroundTransparency = 1; Size = UDim2.fromScale(1, 1); ZIndex = 2 }, Group)
+	if typeof(Ids.Specimen) == `number` and Ids.Specimen > 0 then
+		new(`ImageLabel`, { Name = `Skin`; BackgroundTransparency = 1; Image = `rbxassetid://{Ids.Specimen}`; Size = UDim2.fromScale(1, 1); ZIndex = 2 }, Card)
+	else
+		Card.BackgroundTransparency = 0 Card.BackgroundColor3 = Color3.fromRGB(240, 232, 214)
+		new(`UIStroke`, { Color = GOLD; Thickness = 3 }, Card)
+	end
+	-- the eyelet the string runs through
+	local Eye = new(`Frame`, { Name = `Eyelet`; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.075); Size = UDim2.fromScale(0.05, 0.04);
+		BackgroundColor3 = Color3.fromRGB(30, 22, 18); ZIndex = 3 }, Card)
+	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Eye)
+	new(`UIStroke`, { Color = Color3.fromRGB(150, 118, 62); Thickness = 3 }, Eye)
+
+	docketText(Card, `SPECIMEN  DOCKET`, { Font = Fonts.Title or Enum.Font.Fantasy; TextColor3 = DOCKET_RED; Position = UDim2.fromScale(0.15, 0.11); Size = UDim2.fromScale(0.7, 0.045) })
+	docketText(Card, `{E.Name or `Anatomy`}  \u{00B7}  Room {E.Room or `R103`}  \u{00B7}  Level {P.Level or Message.Level or 1}`,
+		{ TextColor3 = DOCKET_DIM; Position = UDim2.fromScale(0.15, 0.163); Size = UDim2.fromScale(0.7, 0.028) })
+	rule(Card, 0.205, 2, DOCKET_RED) rule(Card, 0.212, 1, DOCKET_RED)
+	docketText(Card, string.upper(P.Name or `Specimen`), { Font = Fonts.Title or Enum.Font.Fantasy; Position = UDim2.fromScale(0.1, 0.235); Size = UDim2.fromScale(0.8, 0.07) })
+	docketText(Card, `<i>{P.Latin or ``}</i>`, { TextColor3 = DOCKET_DIM; Position = UDim2.fromScale(0.15, 0.315); Size = UDim2.fromScale(0.7, 0.04) })
+
+	-- the fields: a small-caps key and a value on a ruled line
+	local Mode = if Message.Study then `Night Study` elseif Message.Practice then `Practice` else `Graded`
+	local Limit = tonumber(Message.TimeLimit or P.TimeLimit) or 60
+	local Fields = {
+		{ `LEVEL`; `{P.Level or Message.Level or 1}  \u{2014}  {Mode}` };
+		{ `TEACHER`; if Message.Substitute then `{Message.Substitute.Name} (substitute)` else (E.Teacher or ``) };
+		{ `TIME`; string.format(`%d:%02d`, Limit // 60, Limit % 60) };
+		{ `TWIST`; TWIST_TEXT[P.Twist] or `None tonight` };
+	}
+	local KeyLabels, ValueLabels = {}, {}
+	for i, Fd in Fields do
+		local Y = 0.385 + (i - 1) * 0.072
+		table.insert(KeyLabels, docketText(Card, `<b>{Fd[1]}</b>`, { TextColor3 = DOCKET_DIM; TextXAlignment = Enum.TextXAlignment.Left; Position = UDim2.fromScale(0.14, Y + 0.012); Size = UDim2.fromScale(0.22, 0.026) }))
+		table.insert(ValueLabels, docketText(Card, Fd[2], { TextXAlignment = Enum.TextXAlignment.Left; Position = UDim2.fromScale(0.38, Y); Size = UDim2.fromScale(0.48, 0.04) }))
+		rule(Card, Y + 0.047, 1, DOCKET_LINE, 0.38, 0.86)
+	end
+	rule(Card, 0.69, 1, DOCKET_RED)
+	-- the task, in hand: wrapped inside the lower panel, left of the seal
+	local Task = docketText(Card, `<i>{Message.Tagline or ``}</i>`, { TextWrapped = true; TextXAlignment = Enum.TextXAlignment.Left; TextYAlignment = Enum.TextYAlignment.Top;
+		Position = UDim2.fromScale(0.14, 0.715); Size = UDim2.fromScale(0.5, 0.2) })
+	new(`UITextSizeConstraint`, { MaxTextSize = 28 }, Task)
+	-- the wax seal: the mode, stamped
+	local SealHolder = new(`Frame`, { Name = `Seal`; BackgroundTransparency = 1; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.77, 0.8);
+		Size = UDim2.fromScale(0.26, 0.26); ZIndex = 4 }, Card)
+	new(`UIAspectRatioConstraint`, {}, SealHolder)
+	if typeof(Ids.Seal) == `number` and Ids.Seal > 0 then
+		new(`ImageLabel`, { BackgroundTransparency = 1; Image = `rbxassetid://{Ids.Seal}`; Size = UDim2.fromScale(1, 1); ZIndex = 4 }, SealHolder)
+	else
+		SealHolder.BackgroundColor3 = Color3.fromRGB(120, 24, 30) SealHolder.BackgroundTransparency = 0
+		new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, SealHolder)
+	end
+	docketText(SealHolder, string.upper(Mode), { TextColor3 = Color3.fromRGB(250, 226, 200); Font = Fonts.Title or Enum.Font.Fantasy;
+		AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromScale(0.6, 0.16); ZIndex = 5 })
+
+	-- the string, from the top of the screen to the eyelet (outside the group, so it isn't clipped)
+	local String = new(`Frame`, { Name = `DocketString`; BackgroundColor3 = Color3.fromRGB(150, 30, 30); BorderSizePixel = 0; AnchorPoint = Vector2.new(0.5, 0);
+		Position = UDim2.fromScale(0.42, 0); Size = UDim2.new(0, 3, 0.15, 0); ZIndex = 3 }, Gui)
+
+	-- the candle: a cream stick in a brass dish, three burn marks with their numerals, a flame with a warm glow
+	local Stand = new(`Frame`, { Name = `CountCandle`; BackgroundTransparency = 1; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.76, 0.52);
+		Size = UDim2.fromScale(0.3, 0.62); ZIndex = 4 }, Gui)
+	new(`UIAspectRatioConstraint`, { AspectRatio = 0.5; DominantAxis = Enum.DominantAxis.Height }, Stand)
+	local Glow = new(`Frame`, { Name = `Glow`; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.42, 0.2); Size = UDim2.fromScale(1.2, 0.6);
+		BackgroundColor3 = Color3.fromRGB(255, 170, 70); BackgroundTransparency = 0.82; ZIndex = 3 }, Stand)
+	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Glow)
+	local Dish = new(`Frame`, { Name = `Dish`; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.42, 0.9); Size = UDim2.fromScale(0.8, 0.09);
+		BackgroundColor3 = Color3.fromRGB(150, 118, 62); ZIndex = 4 }, Stand)
+	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Dish)
+	new(`UIStroke`, { Color = Color3.fromRGB(70, 52, 30); Thickness = 4 }, Dish)
+	local TOP, BASE = 0.3, 0.88 -- the stick's top (full height) and its foot, as fractions of the stand
+	local Stick = new(`Frame`, { Name = `Stick`; AnchorPoint = Vector2.new(0.5, 1); Position = UDim2.fromScale(0.42, BASE); Size = UDim2.fromScale(0.3, BASE - TOP);
+		BackgroundColor3 = Color3.new(1, 1, 1); ZIndex = 5 }, Stand)
+	new(`UICorner`, { CornerRadius = UDim.new(0.12, 0) }, Stick)
+	new(`UIGradient`, { Color = ColorSequence.new(Color3.fromRGB(255, 250, 236), WAX:Lerp(Color3.fromRGB(180, 160, 120), 0.4)) }, Stick)
+	local Wick = new(`Frame`, { Name = `Wick`; AnchorPoint = Vector2.new(0.5, 1); Position = UDim2.fromScale(0.42, TOP); Size = UDim2.fromScale(0.025, 0.04);
+		BackgroundColor3 = Color3.fromRGB(30, 20, 14); BorderSizePixel = 0; ZIndex = 6 }, Stand)
+	local Flame = new(`Frame`, { Name = `Flame`; AnchorPoint = Vector2.new(0.5, 1); Position = UDim2.fromScale(0.42, TOP - 0.03); Size = UDim2.fromScale(0.14, 0.12);
+		BackgroundColor3 = Color3.fromRGB(255, 190, 80); ZIndex = 7 }, Stand)
+	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Flame)
+	local Core = new(`Frame`, { Name = `Core`; AnchorPoint = Vector2.new(0.5, 1); Position = UDim2.fromScale(0.5, 0.95); Size = UDim2.fromScale(0.5, 0.55);
+		BackgroundColor3 = Color3.fromRGB(255, 244, 200); ZIndex = 8 }, Flame)
+	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Core)
+	local Marks = {}
+	for i = 1, 3 do
+		local Y = TOP + (BASE - TOP) * (i - 0.35) / 3.2
+		new(`Frame`, { Name = `Mark{i}`; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.42, Y); Size = UDim2.fromScale(0.3, 0.006);
+			BackgroundColor3 = Color3.fromRGB(150, 120, 90); BorderSizePixel = 0; ZIndex = 6 }, Stand)
+		Marks[4 - i] = { Y = Y; Label = text(Stand, tostring(4 - i), { Font = Fonts.Title or Enum.Font.Fantasy; TextColor3 = Color3.fromRGB(150, 132, 110);
+			TextXAlignment = Enum.TextXAlignment.Left; AnchorPoint = Vector2.new(0, 0.5); Position = UDim2.fromScale(0.63, Y); Size = UDim2.fromScale(0.3, 0.07); ZIndex = 6 }) }
+	end
+	text(Stand, `THE COUNT BURNS DOWN`, { Font = Enum.Font.Merriweather; TextColor3 = Color3.fromRGB(190, 166, 130); TextXAlignment = Enum.TextXAlignment.Center;
+		AnchorPoint = Vector2.new(0.5, 0); Position = UDim2.fromScale(0.42, 0.965); Size = UDim2.fromScale(1.1, 0.035); ZIndex = 4 })
+
+	-- the flame flickers while the docket is up
+	local Alive = true
+	task.spawn(function()
+		while Alive and Flame.Parent do
+			local s = 1 + math.sin(os.clock() * 13) * 0.06 + math.sin(os.clock() * 7.3) * 0.05
+			Flame.Size = UDim2.fromScale(0.14 * (2 - s), 0.12 * s)
+			Glow.BackgroundTransparency = 0.82 + math.sin(os.clock() * 5.1) * 0.03
+			task.wait()
+		end
+	end)
+
+	-- arrival: the docket drops on its string and swings to rest
+	if not Calm then
+		Group.Position = UDim2.fromScale(0.42, -0.5) Group.Rotation = -12 Group.GroupTransparency = 0.2
+		String.Size = UDim2.new(0, 3, 0, 0)
+		TweenService:Create(Group, TweenInfo.new(0.7, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Position = UDim2.fromScale(0.42, 0.53); GroupTransparency = 0 }):Play()
+		TweenService:Create(Group, TweenInfo.new(1.4, Enum.EasingStyle.Elastic, Enum.EasingDirection.Out), { Rotation = -3 }):Play()
+		TweenService:Create(String, TweenInfo.new(0.7, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Size = UDim2.new(0, 3, 0.15, 0) }):Play()
+		Stand.Position = UDim2.fromScale(0.82, 0.52)
+		TweenService:Create(Stand, TweenInfo.new(0.6, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Position = UDim2.fromScale(0.76, 0.52) }):Play()
+	end
+
+	-- the count: the stick burns down to the mark, the mark's numeral lights, the spent ones go dim
+	function D:Count(n: number)
+		local M = Marks[n]
+		if not M then return end
+		for k, X in Marks do
+			X.Label.TextColor3 = if k == n then Color3.fromRGB(250, 210, 150) elseif k > n then Color3.fromRGB(96, 84, 70) else Color3.fromRGB(150, 132, 110)
+		end
+		local Top = if n == 3 then TOP else Marks[n + 1].Y
+		local Info = TweenInfo.new(if Calm then 0 else 0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+		TweenService:Create(Stick, Info, { Size = UDim2.fromScale(0.3, BASE - Top) }):Play()
+		TweenService:Create(Wick, Info, { Position = UDim2.fromScale(0.42, Top) }):Play()
+		TweenService:Create(Flame, Info, { Position = UDim2.fromScale(0.42, Top - 0.03) }):Play()
+		TweenService:Create(Glow, Info, { Position = UDim2.fromScale(0.42, Top - 0.1) }):Play()
+		if not Calm then
+			local Sc = M.Label:FindFirstChildOfClass(`UIScale`) or new(`UIScale`, {}, M.Label)
+			Sc.Scale = 1.35
+			TweenService:Create(Sc, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), { Scale = 1 }):Play()
+		end
+	end
+
+	-- departure: the docket lifts away on its string, the candle and the room fade; the bench's own cover takes over
+	function D:Leave()
+		Alive = false
+		local T = if Calm then 0 else 0.45
+		local Info = TweenInfo.new(T, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+		TweenService:Create(Group, Info, { Position = UDim2.fromScale(0.42, -0.6); Rotation = -8; GroupTransparency = 1 }):Play()
+		TweenService:Create(String, Info, { Size = UDim2.new(0, 3, 0, 0) }):Play()
+		for _, X in Stand:GetDescendants() do
+			if X:IsA(`GuiObject`) then
+				local Goal: { [string]: any } = { BackgroundTransparency = 1 }
+				if X:IsA(`TextLabel`) then Goal.TextTransparency = 1 end
+				TweenService:Create(X, Info, Goal):Play()
+			end
+		end
+		task.delay(T + 0.05, function()
+			for _, X in { Group, String, Stand } do if X.Parent then X:Destroy() end end
+			for _, X in Room:GetChildren() do if X:IsA(`TextLabel`) then X:Destroy() end end
+			TweenService:Create(Room, TweenInfo.new(if Calm then 0 else 0.35), { BackgroundTransparency = 1 }):Play()
+			task.delay(0.4, function() if Room.Parent then Room:Destroy() end end)
+		end)
+	end
+	function D:Destroy()
+		Alive = false
+		for _, X in { Group, String, Stand, Room } do if X.Parent then X:Destroy() end end
+	end
+	D.Gui = Gui
+	return D
+end
+
+-- the Leave lesson button as a brass tag (bench lessons): the Anatomy tag art behind ink text, clear of its hole
+function Bench.SkinQuit(Quit: TextButton)
+	local Ids = Config.UI or {}
+	if not (typeof(Ids.Tag) == `number` and Ids.Tag > 0) then return end
+	Quit.BackgroundTransparency = 1
+	for _, X in Quit:GetChildren() do if X:IsA(`ImageLabel`) or X:IsA(`UIGradient`) or X:IsA(`UIStroke`) then X:Destroy() end end
+	new(`ImageLabel`, { Name = `TagSkin`; BackgroundTransparency = 1; Image = `rbxassetid://{Ids.Tag}`; ZIndex = math.max(Quit.ZIndex - 1, 1);
+		-- the button's padding (6% / 12%) is undone so the art fills the whole button
+		Size = UDim2.fromScale(1 / 0.88, 1 / 0.76); Position = UDim2.fromScale(-0.06 / 0.88, -0.12 / 0.76) }, Quit)
+	local Pad = Quit:FindFirstChildOfClass(`UIPadding`)
+	if Pad then Pad.PaddingLeft = UDim.new(0.24, 0) Pad.PaddingRight = UDim.new(0.06, 0) end
+	Quit.TextColor3 = DOCKET_INK
+	Quit.Font = Enum.Font.Merriweather
+end
+
 return Bench
