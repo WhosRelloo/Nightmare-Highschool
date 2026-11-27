@@ -1538,10 +1538,44 @@ local DOCKET_LINE = Color3.fromRGB(170, 150, 124)
 local WAX = Color3.fromRGB(236, 226, 200)
 
 local function docketText(Parent: Instance, Str: string, Props): TextLabel
-	local T = new(`TextLabel`, { BackgroundTransparency = 1; Text = Str; TextColor3 = DOCKET_INK; Font = Enum.Font.Merriweather; TextScaled = true;
+	-- an explicit size, fitted by fitDocket (TextScaled does not hold on these labels in Play: see uniformText)
+	local T = new(`TextLabel`, { BackgroundTransparency = 1; Text = Str; TextColor3 = DOCKET_INK; Font = Enum.Font.Merriweather; TextScaled = false; TextSize = 14;
 		RichText = true; TextWrapped = false; TextXAlignment = Enum.TextXAlignment.Center; TextYAlignment = Enum.TextYAlignment.Center; ZIndex = 3 }, Parent)
 	for K, V in Props or {} do (T :: any)[K] = V end
 	return T
+end
+
+-- the largest size that fits a label's box (wrapped labels: every line inside the height), in the GUI's own units.
+-- The label's own UIScale (the numeral pop) is left out so the pop still reads; rich-text tags get a 6% width margin.
+local function fitSize(L: TextLabel, Max: number?): number?
+	local k = scaleAbove(L.Parent :: Instance)
+	local W, H = L.AbsoluteSize.X / k, L.AbsoluteSize.Y / k
+	if W < 4 or H < 4 then return nil end
+	local Size = math.min(math.floor(H), Max or 200)
+	while Size > 8 do
+		local B = TextService:GetTextSize(L.ContentText, Size, L.Font, Vector2.new(if L.TextWrapped then W else 10000, 10000))
+		if B.X * 1.06 <= W and B.Y <= H then break end
+		Size -= 1
+	end
+	return Size
+end
+-- Groups share one size (the smallest fit); a lone label is its own group. Max caps a group.
+local function fitDocket(Groups: { { Labels: { TextLabel }, Max: number? } })
+	for _, G in Groups do
+		local Best
+		for _, L in G.Labels do
+			if L.Parent then
+				local S = fitSize(L, G.Max)
+				if S then Best = math.min(Best or S, S) end
+			end
+		end
+		if Best then
+			for _, L in G.Labels do
+				if L.TextScaled then L.TextScaled = false end
+				if L.TextSize ~= Best then L.TextSize = Best end
+			end
+		end
+	end
 end
 
 local function rule(Parent: Instance, Y: number, Thick: number, Color: Color3, X0: number?, X1: number?)
@@ -1562,8 +1596,10 @@ function Bench.Docket(Screen, Message)
 	Room:SetAttribute(`NHNotPanel`, true)
 	new(`UIGradient`, { Rotation = 0; Color = ColorSequence.new({ ColorSequenceKeypoint.new(0, Color3.fromRGB(10, 7, 6)), ColorSequenceKeypoint.new(0.6, Color3.fromRGB(12, 8, 7)),
 		ColorSequenceKeypoint.new(0.76, Color3.fromRGB(52, 31, 15)), ColorSequenceKeypoint.new(0.92, Color3.fromRGB(14, 9, 7)), ColorSequenceKeypoint.new(1, Color3.fromRGB(8, 6, 5)) }) }, Room)
-	text(Room, `NIGHTMARE HIGHSCHOOL  \u{00B7}  ELECTIVE  \u{00B7}  {string.upper(E.Name or `Anatomy`)}`, { Font = Enum.Font.Merriweather; TextColor3 = Color3.fromRGB(170, 150, 120);
-		Position = UDim2.fromScale(0.025, 0.03); Size = UDim2.fromScale(0.5, 0.03); ZIndex = 2 })
+	local Fit = {}
+	local function one(L: TextLabel, Max: number?) L.TextScaled = false L.TextWrapped = L.TextWrapped and L.Name == `Task` table.insert(Fit, { Labels = { L }; Max = Max }) return L end
+	one(text(Room, `NIGHTMARE HIGHSCHOOL  \u{00B7}  ELECTIVE  \u{00B7}  {string.upper(E.Name or `Anatomy`)}`, { Font = Enum.Font.Merriweather; TextColor3 = Color3.fromRGB(222, 204, 170);
+		Position = UDim2.fromScale(0.025, 0.03); Size = UDim2.fromScale(0.5, 0.03); ZIndex = 2 }))
 
 	-- the docket: a CanvasGroup so it swings and fades as one piece
 	local Group = new(`CanvasGroup`, { Name = `Docket`; BackgroundTransparency = 1; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.42, 0.53);
@@ -1582,12 +1618,12 @@ function Bench.Docket(Screen, Message)
 	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Eye)
 	new(`UIStroke`, { Color = Color3.fromRGB(150, 118, 62); Thickness = 3 }, Eye)
 
-	docketText(Card, `SPECIMEN  DOCKET`, { Font = Fonts.Title or Enum.Font.Fantasy; TextColor3 = DOCKET_RED; Position = UDim2.fromScale(0.15, 0.11); Size = UDim2.fromScale(0.7, 0.045) })
-	docketText(Card, `{E.Name or `Anatomy`}  \u{00B7}  Room {E.Room or `R103`}  \u{00B7}  Level {P.Level or Message.Level or 1}`,
-		{ TextColor3 = DOCKET_DIM; Position = UDim2.fromScale(0.15, 0.163); Size = UDim2.fromScale(0.7, 0.028) })
-	rule(Card, 0.205, 2, DOCKET_RED) rule(Card, 0.212, 1, DOCKET_RED)
-	docketText(Card, string.upper(P.Name or `Specimen`), { Font = Fonts.Title or Enum.Font.Fantasy; Position = UDim2.fromScale(0.1, 0.235); Size = UDim2.fromScale(0.8, 0.07) })
-	docketText(Card, `<i>{P.Latin or ``}</i>`, { TextColor3 = DOCKET_DIM; Position = UDim2.fromScale(0.15, 0.315); Size = UDim2.fromScale(0.7, 0.04) })
+	-- the card art carries its own double red rule at ~18% down: header and subline sit above it, the name below
+	one(docketText(Card, `SPECIMEN  DOCKET`, { Font = Fonts.Title or Enum.Font.Fantasy; TextColor3 = DOCKET_RED; Position = UDim2.fromScale(0.15, 0.098); Size = UDim2.fromScale(0.7, 0.04) }))
+	one(docketText(Card, `{E.Name or `Anatomy`}  \u{00B7}  Room {E.Room or `R103`}  \u{00B7}  Level {P.Level or Message.Level or 1}`,
+		{ TextColor3 = DOCKET_DIM; Position = UDim2.fromScale(0.15, 0.139); Size = UDim2.fromScale(0.7, 0.026) }))
+	one(docketText(Card, string.upper(P.Name or `Specimen`), { Font = Fonts.Title or Enum.Font.Fantasy; Position = UDim2.fromScale(0.1, 0.235); Size = UDim2.fromScale(0.8, 0.07) }))
+	one(docketText(Card, `<i>{P.Latin or ``}</i>`, { TextColor3 = DOCKET_DIM; Position = UDim2.fromScale(0.15, 0.315); Size = UDim2.fromScale(0.7, 0.04) }))
 
 	-- the fields: a small-caps key and a value on a ruled line
 	local Mode = if Message.Study then `Night Study` elseif Message.Practice then `Practice` else `Graded`
@@ -1605,11 +1641,12 @@ function Bench.Docket(Screen, Message)
 		table.insert(ValueLabels, docketText(Card, Fd[2], { TextXAlignment = Enum.TextXAlignment.Left; Position = UDim2.fromScale(0.38, Y); Size = UDim2.fromScale(0.48, 0.04) }))
 		rule(Card, Y + 0.047, 1, DOCKET_LINE, 0.38, 0.86)
 	end
+	table.insert(Fit, { Labels = KeyLabels }) table.insert(Fit, { Labels = ValueLabels })
 	rule(Card, 0.69, 1, DOCKET_RED)
 	-- the task, in hand: wrapped inside the lower panel, left of the seal
-	local Task = docketText(Card, `<i>{Message.Tagline or ``}</i>`, { TextWrapped = true; TextXAlignment = Enum.TextXAlignment.Left; TextYAlignment = Enum.TextYAlignment.Top;
+	local Task = docketText(Card, `<i>{Message.Tagline or ``}</i>`, { Name = `Task`; TextWrapped = true; TextXAlignment = Enum.TextXAlignment.Left; TextYAlignment = Enum.TextYAlignment.Top;
 		Position = UDim2.fromScale(0.14, 0.715); Size = UDim2.fromScale(0.5, 0.2) })
-	new(`UITextSizeConstraint`, { MaxTextSize = 28 }, Task)
+	one(Task, 28)
 	-- the wax seal: the mode, stamped
 	local SealHolder = new(`Frame`, { Name = `Seal`; BackgroundTransparency = 1; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.77, 0.8);
 		Size = UDim2.fromScale(0.26, 0.26); ZIndex = 4 }, Card)
@@ -1620,8 +1657,8 @@ function Bench.Docket(Screen, Message)
 		SealHolder.BackgroundColor3 = Color3.fromRGB(120, 24, 30) SealHolder.BackgroundTransparency = 0
 		new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, SealHolder)
 	end
-	docketText(SealHolder, string.upper(Mode), { TextColor3 = Color3.fromRGB(250, 226, 200); Font = Fonts.Title or Enum.Font.Fantasy;
-		AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromScale(0.6, 0.16); ZIndex = 5 })
+	one(docketText(SealHolder, string.upper(Mode), { TextColor3 = Color3.fromRGB(250, 226, 200); Font = Fonts.Title or Enum.Font.Fantasy;
+		AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromScale(0.6, 0.16); ZIndex = 5 }))
 
 	-- the string, from the top of the screen to the eyelet (outside the group, so it isn't clipped)
 	local String = new(`Frame`, { Name = `DocketString`; BackgroundColor3 = Color3.fromRGB(150, 30, 30); BorderSizePixel = 0; AnchorPoint = Vector2.new(0.5, 0);
@@ -1631,9 +1668,14 @@ function Bench.Docket(Screen, Message)
 	local Stand = new(`Frame`, { Name = `CountCandle`; BackgroundTransparency = 1; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.76, 0.52);
 		Size = UDim2.fromScale(0.3, 0.62); ZIndex = 4 }, Gui)
 	new(`UIAspectRatioConstraint`, { AspectRatio = 0.5; DominantAxis = Enum.DominantAxis.Height }, Stand)
-	local Glow = new(`Frame`, { Name = `Glow`; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.42, 0.2); Size = UDim2.fromScale(1.2, 0.6);
-		BackgroundColor3 = Color3.fromRGB(255, 170, 70); BackgroundTransparency = 0.82; ZIndex = 3 }, Stand)
-	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Glow)
+	-- the glow: nested faint discs, so the light falls off instead of reading as one flat circle
+	local Glow = new(`Frame`, { Name = `Glow`; BackgroundTransparency = 1; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.42, 0.2); Size = UDim2.fromScale(1.3, 0.65); ZIndex = 3 }, Stand)
+	for k = 1, 6 do
+		local f = 1 - (k - 1) * 0.15
+		local Ring = new(`Frame`, { AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromScale(f, f);
+			BackgroundColor3 = Color3.fromRGB(255, 170, 70); BackgroundTransparency = 0.955; ZIndex = 3 }, Glow)
+		new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Ring)
+	end
 	local Dish = new(`Frame`, { Name = `Dish`; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.42, 0.9); Size = UDim2.fromScale(0.8, 0.09);
 		BackgroundColor3 = Color3.fromRGB(150, 118, 62); ZIndex = 4 }, Stand)
 	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Dish)
@@ -1651,24 +1693,31 @@ function Bench.Docket(Screen, Message)
 	local Core = new(`Frame`, { Name = `Core`; AnchorPoint = Vector2.new(0.5, 1); Position = UDim2.fromScale(0.5, 0.95); Size = UDim2.fromScale(0.5, 0.55);
 		BackgroundColor3 = Color3.fromRGB(255, 244, 200); ZIndex = 8 }, Flame)
 	new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, Core)
-	local Marks = {}
+	local Marks, Numerals = {}, {}
 	for i = 1, 3 do
 		local Y = TOP + (BASE - TOP) * (i - 0.35) / 3.2
 		new(`Frame`, { Name = `Mark{i}`; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.42, Y); Size = UDim2.fromScale(0.3, 0.006);
 			BackgroundColor3 = Color3.fromRGB(150, 120, 90); BorderSizePixel = 0; ZIndex = 6 }, Stand)
 		Marks[4 - i] = { Y = Y; Label = text(Stand, tostring(4 - i), { Font = Fonts.Title or Enum.Font.Fantasy; TextColor3 = Color3.fromRGB(150, 132, 110);
 			TextXAlignment = Enum.TextXAlignment.Left; AnchorPoint = Vector2.new(0, 0.5); Position = UDim2.fromScale(0.63, Y); Size = UDim2.fromScale(0.3, 0.07); ZIndex = 6 }) }
+		Marks[4 - i].Label.TextScaled = false
+		table.insert(Numerals, Marks[4 - i].Label)
 	end
-	text(Stand, `THE COUNT BURNS DOWN`, { Font = Enum.Font.Merriweather; TextColor3 = Color3.fromRGB(190, 166, 130); TextXAlignment = Enum.TextXAlignment.Center;
-		AnchorPoint = Vector2.new(0.5, 0); Position = UDim2.fromScale(0.42, 0.965); Size = UDim2.fromScale(1.1, 0.035); ZIndex = 4 })
+	table.insert(Fit, { Labels = Numerals })
+	one(text(Stand, `THE COUNT BURNS DOWN`, { Font = Enum.Font.Merriweather; TextColor3 = Color3.fromRGB(190, 166, 130); TextXAlignment = Enum.TextXAlignment.Center;
+		AnchorPoint = Vector2.new(0.5, 0); Position = UDim2.fromScale(0.42, 0.965); Size = UDim2.fromScale(1.1, 0.035); ZIndex = 4 }))
 
 	-- the flame flickers while the docket is up
 	local Alive = true
+	fitDocket(Fit)
+	local NextFit = 0
 	task.spawn(function()
 		while Alive and Flame.Parent do
+			if os.clock() >= NextFit then NextFit = os.clock() + 0.25 fitDocket(Fit) end
 			local s = 1 + math.sin(os.clock() * 13) * 0.06 + math.sin(os.clock() * 7.3) * 0.05
 			Flame.Size = UDim2.fromScale(0.14 * (2 - s), 0.12 * s)
-			Glow.BackgroundTransparency = 0.82 + math.sin(os.clock() * 5.1) * 0.03
+			local g = 1 + math.sin(os.clock() * 5.1) * 0.03
+			Glow.Size = UDim2.fromScale(1.3 * g, 0.65 * g)
 			task.wait()
 		end
 	end)
@@ -1743,7 +1792,8 @@ function Bench.SkinQuit(Quit: TextButton)
 		-- the button's padding (6% / 12%) is undone so the art fills the whole button
 		Size = UDim2.fromScale(1 / 0.88, 1 / 0.76); Position = UDim2.fromScale(-0.06 / 0.88, -0.12 / 0.76) }, Quit)
 	local Pad = Quit:FindFirstChildOfClass(`UIPadding`)
-	if Pad then Pad.PaddingLeft = UDim.new(0.24, 0) Pad.PaddingRight = UDim.new(0.06, 0) end
+	if Pad then Pad.PaddingLeft = UDim.new(0.34, 0) Pad.PaddingRight = UDim.new(0.07, 0) end -- clear of the tag's hole
+	Quit.TextXAlignment = Enum.TextXAlignment.Left
 	Quit.TextColor3 = DOCKET_INK
 	Quit.Font = Enum.Font.Merriweather
 end
