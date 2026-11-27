@@ -278,6 +278,18 @@ the GUI, so the copy keeps this screen's fitted size; a real resize re-fits with
 on these tags: in Play something flips it straight back to false and leaves TextSize 8 (two flips per set, every
 set). The writer wasn't found; nothing in the scripts sets it, and R2 confirms none of its work does either.
 
+## Lesson intro: the specimen docket (2026-11-26)
+
+The chalkboard intro and gold 3-2-1 orb are replaced for bench lessons by a paper specimen docket on a red string and a
+candle that burns down past 3-2-1 (`Bench.Docket`, called from Activities). "Leave lesson" becomes a brass tag (`Bench.SkinQuit`).
+
+- Seen in Play (two rounds): every docket and candle text reads; UI.FitCheck is clean at 1920x1080 and 1280x720.
+  At 844x390 FitCheck reports CLIPPED because it copies sizes fitted for the current window; the live docket refits within 0.25 s.
+- All docket text uses explicit fitted sizes (`fitDocket`), never TextScaled, which drops to 8 in Play.
+- The room header carries `NHContrastOk`: FitCheck reads the white base under the dark gradient (real contrast about 13:1).
+- Leave tag: a TextButton's padding also shrinks its children, so the tag art is sized from the padding to fill the button.
+  The hole sits 16-19% across the art and the text starts at 26%. This last fix is installed in Edit, not yet seen in Play.
+
 ## Follow-ups for the owner
 
 - **Healer perk has no consumer.** `Config.Anatomy.HealMult(Level)` (+10% per level) and `ReviveMult(Level)` (-8% time

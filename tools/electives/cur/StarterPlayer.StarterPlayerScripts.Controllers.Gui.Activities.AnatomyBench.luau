@@ -1790,11 +1790,13 @@ function Bench.SkinQuit(Quit: TextButton)
 	if not (typeof(Ids.Tag) == `number` and Ids.Tag > 0) then return end
 	Quit.BackgroundTransparency = 1
 	for _, X in Quit:GetChildren() do if X:IsA(`ImageLabel`) or X:IsA(`UIGradient`) or X:IsA(`UIStroke`) then X:Destroy() end end
+	-- the tag art's hole sits 16-19% across: the text starts at 26%
+	local Pad = Quit:FindFirstChildOfClass(`UIPadding`) or new(`UIPadding`, {}, Quit)
+	Pad.PaddingLeft = UDim.new(0.26, 0) Pad.PaddingRight = UDim.new(0.06, 0)
+	-- children are laid out inside the padded box, so the art's size and offset undo the padding and it fills the button
+	local L, R, T, B = Pad.PaddingLeft.Scale, Pad.PaddingRight.Scale, Pad.PaddingTop.Scale, Pad.PaddingBottom.Scale
 	new(`ImageLabel`, { Name = `TagSkin`; BackgroundTransparency = 1; Image = `rbxassetid://{Ids.Tag}`; ZIndex = math.max(Quit.ZIndex - 1, 1);
-		-- the button's padding (6% / 12%) is undone so the art fills the whole button
-		Size = UDim2.fromScale(1 / 0.88, 1 / 0.76); Position = UDim2.fromScale(-0.06 / 0.88, -0.12 / 0.76) }, Quit)
-	local Pad = Quit:FindFirstChildOfClass(`UIPadding`)
-	if Pad then Pad.PaddingLeft = UDim.new(0.34, 0) Pad.PaddingRight = UDim.new(0.07, 0) end -- clear of the tag's hole
+		Size = UDim2.fromScale(1 / (1 - L - R), 1 / (1 - T - B)); Position = UDim2.fromScale(-L / (1 - L - R), -T / (1 - T - B)) }, Quit)
 	Quit.TextXAlignment = Enum.TextXAlignment.Left
 	Quit.TextColor3 = DOCKET_INK
 	Quit.Font = Enum.Font.Merriweather
