@@ -1599,7 +1599,9 @@ function Bench.Docket(Screen, Message)
 	local Fit = {}
 	local function one(L: TextLabel, Max: number?) L.TextScaled = false L.TextWrapped = L.TextWrapped and L.Name == `Task` table.insert(Fit, { Labels = { L }; Max = Max }) return L end
 	one(text(Room, `NIGHTMARE HIGHSCHOOL  \u{00B7}  ELECTIVE  \u{00B7}  {string.upper(E.Name or `Anatomy`)}`, { Font = Enum.Font.Merriweather; TextColor3 = Color3.fromRGB(222, 204, 170);
-		Position = UDim2.fromScale(0.025, 0.03); Size = UDim2.fromScale(0.5, 0.03); ZIndex = 2 }))
+		Position = UDim2.fromScale(0.025, 0.03); Size = UDim2.fromScale(0.5, 0.034); ZIndex = 2 }))
+	-- FitCheck reads the room's white base colour, not the near-black gradient over it; on the real ground this cream is ~13:1
+	Room:FindFirstChildOfClass(`TextLabel`):SetAttribute(`NHContrastOk`, true)
 
 	-- the docket: a CanvasGroup so it swings and fades as one piece
 	local Group = new(`CanvasGroup`, { Name = `Docket`; BackgroundTransparency = 1; AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.42, 0.53);
@@ -1621,7 +1623,7 @@ function Bench.Docket(Screen, Message)
 	-- the card art carries its own double red rule at ~18% down: header and subline sit above it, the name below
 	one(docketText(Card, `SPECIMEN  DOCKET`, { Font = Fonts.Title or Enum.Font.Fantasy; TextColor3 = DOCKET_RED; Position = UDim2.fromScale(0.15, 0.098); Size = UDim2.fromScale(0.7, 0.04) }))
 	one(docketText(Card, `{E.Name or `Anatomy`}  \u{00B7}  Room {E.Room or `R103`}  \u{00B7}  Level {P.Level or Message.Level or 1}`,
-		{ TextColor3 = DOCKET_DIM; Position = UDim2.fromScale(0.15, 0.139); Size = UDim2.fromScale(0.7, 0.026) }))
+		{ TextColor3 = DOCKET_DIM; Position = UDim2.fromScale(0.15, 0.137); Size = UDim2.fromScale(0.7, 0.032) }))
 	one(docketText(Card, string.upper(P.Name or `Specimen`), { Font = Fonts.Title or Enum.Font.Fantasy; Position = UDim2.fromScale(0.1, 0.235); Size = UDim2.fromScale(0.8, 0.07) }))
 	one(docketText(Card, `<i>{P.Latin or ``}</i>`, { TextColor3 = DOCKET_DIM; Position = UDim2.fromScale(0.15, 0.315); Size = UDim2.fromScale(0.7, 0.04) }))
 
@@ -1637,7 +1639,7 @@ function Bench.Docket(Screen, Message)
 	local KeyLabels, ValueLabels = {}, {}
 	for i, Fd in Fields do
 		local Y = 0.385 + (i - 1) * 0.072
-		table.insert(KeyLabels, docketText(Card, `<b>{Fd[1]}</b>`, { TextColor3 = DOCKET_DIM; TextXAlignment = Enum.TextXAlignment.Left; Position = UDim2.fromScale(0.14, Y + 0.012); Size = UDim2.fromScale(0.22, 0.026) }))
+		table.insert(KeyLabels, docketText(Card, `<b>{Fd[1]}</b>`, { TextColor3 = DOCKET_DIM; TextXAlignment = Enum.TextXAlignment.Left; Position = UDim2.fromScale(0.14, Y + 0.006); Size = UDim2.fromScale(0.23, 0.034) }))
 		table.insert(ValueLabels, docketText(Card, Fd[2], { TextXAlignment = Enum.TextXAlignment.Left; Position = UDim2.fromScale(0.38, Y); Size = UDim2.fromScale(0.48, 0.04) }))
 		rule(Card, Y + 0.047, 1, DOCKET_LINE, 0.38, 0.86)
 	end
@@ -1658,7 +1660,7 @@ function Bench.Docket(Screen, Message)
 		new(`UICorner`, { CornerRadius = UDim.new(1, 0) }, SealHolder)
 	end
 	one(docketText(SealHolder, string.upper(Mode), { TextColor3 = Color3.fromRGB(250, 226, 200); Font = Fonts.Title or Enum.Font.Fantasy;
-		AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromScale(0.6, 0.16); ZIndex = 5 }))
+		AnchorPoint = Vector2.new(0.5, 0.5); Position = UDim2.fromScale(0.5, 0.5); Size = UDim2.fromScale(0.68, 0.2); ZIndex = 5 }))
 
 	-- the string, from the top of the screen to the eyelet (outside the group, so it isn't clipped)
 	local String = new(`Frame`, { Name = `DocketString`; BackgroundColor3 = Color3.fromRGB(150, 30, 30); BorderSizePixel = 0; AnchorPoint = Vector2.new(0.5, 0);
@@ -1705,7 +1707,7 @@ function Bench.Docket(Screen, Message)
 	end
 	table.insert(Fit, { Labels = Numerals })
 	one(text(Stand, `THE COUNT BURNS DOWN`, { Font = Enum.Font.Merriweather; TextColor3 = Color3.fromRGB(190, 166, 130); TextXAlignment = Enum.TextXAlignment.Center;
-		AnchorPoint = Vector2.new(0.5, 0); Position = UDim2.fromScale(0.42, 0.965); Size = UDim2.fromScale(1.1, 0.035); ZIndex = 4 }))
+		AnchorPoint = Vector2.new(0.5, 0); Position = UDim2.fromScale(0.42, 0.955); Size = UDim2.fromScale(1.1, 0.045); ZIndex = 4 }))
 
 	-- the flame flickers while the docket is up
 	local Alive = true
@@ -1796,6 +1798,23 @@ function Bench.SkinQuit(Quit: TextButton)
 	Quit.TextXAlignment = Enum.TextXAlignment.Left
 	Quit.TextColor3 = DOCKET_INK
 	Quit.Font = Enum.Font.Merriweather
+	-- an explicit size inside the padded box (TextScaled does not hold in Play), refitted on resize
+	local function fit()
+		local k = scaleAbove(Quit.Parent :: Instance)
+		local Pd = Quit:FindFirstChildOfClass(`UIPadding`)
+		local AX, AY = Quit.AbsoluteSize.X / k, Quit.AbsoluteSize.Y / k
+		local W = AX * (1 - (if Pd then Pd.PaddingLeft.Scale + Pd.PaddingRight.Scale else 0)) - (if Pd then Pd.PaddingLeft.Offset + Pd.PaddingRight.Offset else 0)
+		local H = AY * (1 - (if Pd then Pd.PaddingTop.Scale + Pd.PaddingBottom.Scale else 0)) - (if Pd then Pd.PaddingTop.Offset + Pd.PaddingBottom.Offset else 0)
+		if W < 4 or H < 4 then return end
+		local Size = math.floor(H)
+		while Size > 8 and TextService:GetTextSize(Quit.ContentText, Size, Quit.Font, Vector2.new(10000, 10000)).X * 1.04 > W do Size -= 1 end
+		Quit.TextScaled = false
+		Quit.TextWrapped = false
+		Quit.TextSize = Size
+	end
+	fit()
+	Quit:GetPropertyChangedSignal(`AbsoluteSize`):Connect(fit)
+	Quit:GetPropertyChangedSignal(`Text`):Connect(fit)
 end
 
 return Bench
