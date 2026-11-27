@@ -19,6 +19,10 @@ local ITEMS = {
 	};
 }
 local IDS = {
+	NHAcc_LoupeMonocle_color = 134116310588674;
+	NHAcc_LoupeMonocle_normal = 98749265765633;
+	NHAcc_LoupeMonocle_roughness = 96555817900325;
+	NHAcc_LoupeMonocle_metalness = 75657078744166;
 }
 local function id(name)
 	local v = IDS[name]
