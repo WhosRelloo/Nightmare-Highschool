@@ -647,6 +647,9 @@ end
 -- One text size for a row of labels: the largest that fits every label, so the tags match and none clips. Set as an
 -- explicit TextSize (in the GUI's own units: AbsoluteSize is divided by any UIScale above) and re-checked every half
 -- second from Step, so a resize, an intro scale-in or anything else touching the labels is corrected at once.
+-- Not TextScaled: in Play something flips TextScaled straight back to false on these labels and leaves TextSize 8
+-- (seen 2026-11-26, two flips per set, every set); an explicit size is the only thing that holds. UI.FitCheck copies
+-- the GUI, so its 844x390 pass carries this screen's size and may flag Scalpel/Tweezers; a real resize re-fits within 0.5 s.
 local TextService = game:GetService(`TextService`)
 local function scaleAbove(G: Instance): number
 	local S, X = 1, G

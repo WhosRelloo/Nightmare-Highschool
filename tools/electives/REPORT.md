@@ -265,6 +265,19 @@ The sheet slides up and settles from a tilt. Reduced motion gets it at once. It 
 - Only the Frog was seen on the stage. The Raven and the Wyvern use the same code path.
 - graphify isn't installed, so `graphify update .` wasn't run.
 
+**Readability pass (2026-11-26, seen in Play).** The owner's rule: no text may overlap or be cut off, and everything,
+trace lines included, must be readable. Fixed and seen in Play:
+- the plate rows sit inside the frame and clear of the loupe roundel; the procedure heading sits above its red rule
+  and the steps below it; the specimen title and slots are clear of the frame; slice borders scale with each panel;
+- the tool tags' text is clear of the punch hole, at one fitted size for all five, re-checked every 0.5 s;
+- the trace is a continuous bright line on a dark outline that breaks on a pointer jump; the seam guide is a dashed
+  cream ring on a dark edge;
+- the arms aim partially (tool 0.4, pointer 0.2, brace 0.5), so the near arm stays at the frame's edge.
+UI.FitCheck is clean at 1920x1080 and 1280x720. At 844x390 it flags the Scalpel and Tweezers tags: FitCheck copies
+the GUI, so the copy keeps this screen's fitted size; a real resize re-fits within 0.5 s. TextScaled can't be used
+on these tags: in Play something flips it straight back to false and leaves TextSize 8 (two flips per set, every
+set). The writer wasn't found; nothing in the scripts sets it, and R2 confirms none of its work does either.
+
 ## Follow-ups for the owner
 
 - **Healer perk has no consumer.** `Config.Anatomy.HealMult(Level)` (+10% per level) and `ReviveMult(Level)` (-8% time

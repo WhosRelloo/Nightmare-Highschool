@@ -644,28 +644,39 @@ local function skinFrame(F: GuiObject, Id: number, Slice: Rect?, Scale: number?,
 	return I
 end
 
--- one text size for a row of labels: the largest that fits every label, so no tag reads larger than its neighbours
+-- One text size for a row of labels: the largest that fits every label, so the tags match and none clips. Set as an
+-- explicit TextSize (in the GUI's own units: AbsoluteSize is divided by any UIScale above) and re-checked every half
+-- second from Step, so a resize, an intro scale-in or anything else touching the labels is corrected at once.
+-- Not TextScaled: in Play something flips TextScaled straight back to false on these labels and leaves TextSize 8
+-- (seen 2026-11-26, two flips per set, every set); an explicit size is the only thing that holds. UI.FitCheck copies
+-- the GUI, so its 844x390 pass carries this screen's size and may flag Scalpel/Tweezers; a real resize re-fits within 0.5 s.
 local TextService = game:GetService(`TextService`)
-local function uniformText(Labels: { TextLabel })
-	local function fit()
-		local Best = math.huge
-		for _, L in Labels do
-			local W, H = L.AbsoluteSize.X, L.AbsoluteSize.Y
-			if W < 4 or H < 4 then return end
-			local Size = math.floor(H)
-			while Size > 6 and TextService:GetTextSize(L.ContentText, Size, L.Font, Vector2.new(10000, 10000)).X > W do Size -= 1 end
-			Best = math.min(Best, Size)
-		end
-		-- still TextScaled (so a label can always shrink to fit), capped at the shared size so the row matches
-		for _, L in Labels do
-			L.TextScaled = true L.TextWrapped = false
-			local C = L:FindFirstChildOfClass(`UITextSizeConstraint`) or new(`UITextSizeConstraint`, {}, L)
-			C.MaxTextSize = math.max(Best, 1)
-		end
+local function scaleAbove(G: Instance): number
+	local S, X = 1, G
+	while X do
+		local U = X:FindFirstChildOfClass(`UIScale`)
+		if U then S *= U.Scale end
+		X = X.Parent
+		if X and X:IsA(`LayerCollector`) then break end
 	end
-	for _, L in Labels do L:GetPropertyChangedSignal(`AbsoluteSize`):Connect(fit) end
-	fit()
-	task.defer(fit)
+	return S
+end
+local function uniformText(Labels: { TextLabel }): boolean
+	local Best = math.huge
+	for _, L in Labels do
+		local k = scaleAbove(L)
+		local W, H = L.AbsoluteSize.X / k, L.AbsoluteSize.Y / k
+		if W < 4 or H < 4 then return false end
+		local Size = math.floor(H)
+		while Size > 8 and TextService:GetTextSize(L.ContentText, Size, L.Font, Vector2.new(10000, 10000)).X > W do Size -= 1 end
+		Best = math.min(Best, Size)
+	end
+	for _, L in Labels do
+		if L.TextScaled then L.TextScaled = false end
+		if L.TextWrapped then L.TextWrapped = false end
+		if L.TextSize ~= Best then L.TextSize = Best end
+	end
+	return true
 end
 
 function Bench:ApplySkin()
@@ -738,6 +749,7 @@ function Bench:ApplySkin()
 		end
 		local Labels = {}
 		for _, T in self.Tags do for _, X in T.Button:GetChildren() do if X:IsA(`TextLabel`) then table.insert(Labels, X) end end end
+		self.TagLabels = Labels
 		uniformText(Labels)
 	end
 	if has(`Hold`) then
@@ -1112,6 +1124,10 @@ end
 function Bench:Step(Dt: number)
 	if self.Destroyed then return end
 	local Now = os.clock()
+	if self.TagLabels and Now >= (self.NextTagFit or 0) then
+		self.NextTagFit = Now + 0.5
+		uniformText(self.TagLabels)
+	end
 	-- the tool in hand follows the pointer
 	if self.Hand then
 		local T = self.Tools[self.Hand]
